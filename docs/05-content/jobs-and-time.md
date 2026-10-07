@@ -15,7 +15,7 @@ Most meaningful actions also consume real time.
 
 ## Job duration
 
-Jobs may last from roughly one minute to two hours.
+Most personal actions should resolve in seconds to tens of minutes. Typical examples: pistol repair ~10 seconds, research sample ~2 minutes, construction shift ~20 minutes.
 
 Time is part of the cost, but the player should not normally:
 1. click a job;
@@ -79,7 +79,7 @@ Example: unloading a damaged coal cart:
 
 ## Medium jobs
 
-Jobs around 5–30 minutes should include several phases with short interactive checkpoints.
+Jobs around 1–10 minutes should include several short phases or at least one meaningful interaction.
 
 Example: repairing a public steam pump:
 - diagnose fault;
@@ -88,15 +88,15 @@ Example: repairing a public steam pump:
 - encounter pressure instability;
 - choose shutdown, bypass or risky live repair.
 
-## Long jobs
+## Longer jobs
 
-Jobs around 30–120 minutes should be semi-active.
+Jobs around 10–30 minutes should be semi-active rather than passive waiting.
 
-The player starts the work, makes meaningful setup choices, and may receive one or more checkpoints.
+Example: a construction shift may last around 20 minutes, with setup choices and one or two incidents/checkpoints.
 
 Missing a checkpoint should not normally destroy the job. A safe/default outcome should resolve automatically, usually less efficiently than active intervention.
 
-This prevents the game from demanding alarms or constant checking.
+Travel should generally be short enough to preserve momentum. A typical route may take around 3–5 minutes and should usually guarantee at least one encounter or meaningful event, so travel itself becomes gameplay rather than dead time.
 
 ## Design goal
 
