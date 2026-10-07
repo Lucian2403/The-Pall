@@ -151,3 +151,41 @@ Jobs themselves do not need a separate universal Job XP system unless a later pr
 - Jobs are interactive, not simple timers.
 - Long jobs remain compatible with asynchronous browser play.
 - Reusable interaction modules keep the system feasible for a solo developer.
+
+
+## Continuous world time during interaction
+
+Timers do not pause when an encounter, incident, dialogue, puzzle or job interaction appears.
+
+The timer represents elapsed world time, not a UI countdown that freezes while the player thinks.
+
+### Travel example
+
+A route has a base travel time of 3 minutes.
+
+- The player departs.
+- An encounter appears after 20 seconds.
+- The travel timer continues running while the player reads and resolves the encounter.
+- If the player resolves it quickly, the remaining route continues normally.
+- If the encounter takes longer than the original 3-minute route time, arrival is blocked until the encounter is resolved.
+
+Therefore, 3 minutes is a base travel duration, not a guaranteed completion time.
+
+The actual journey may take 3 minutes, 5 minutes, or longer depending on encounters and player decisions.
+
+### Job example
+
+A construction shift has a base duration of 20 minutes.
+
+An incident appears during the shift. The job timer keeps running while the player handles it.
+
+If the nominal 20 minutes expires while an unresolved interaction is still open, the job does not magically complete through the incident. Completion waits for resolution, then applies the outcome.
+
+Waiting longer at a prompt does not improve rewards or progress. It only consumes real time.
+
+### Design rule
+
+Interactive events are part of elapsed time, not pauses between chunks of elapsed time.
+
+This keeps the game moving and avoids the artificial feeling of:
+timer → pause → interaction → resume timer.
