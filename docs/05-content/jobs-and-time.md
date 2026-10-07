@@ -189,3 +189,33 @@ Interactive events are part of elapsed time, not pauses between chunks of elapse
 
 This keeps the game moving and avoids the artificial feeling of:
 timer → pause → interaction → resume timer.
+
+
+## Early interaction window
+
+For player-controlled travel and jobs, mandatory encounters, incidents, puzzles, dialogues and other interactive prompts should normally appear within the first **2 minutes** after the activity starts.
+
+The player should never feel forced to watch a 20-minute timer because an important prompt might appear at minute 18.
+
+### Travel
+
+For a 3–5 minute route:
+- an encounter should appear early, usually within the first 20–120 seconds;
+- the route timer continues during the encounter;
+- once the required encounter is resolved, the remaining travel time may complete passively;
+- if resolving the encounter takes longer than the nominal route time, arrival waits for resolution.
+
+### Jobs
+
+For a 20-minute construction shift:
+- preparation and any required incident/interactivity happen within roughly the first 2 minutes;
+- after those interactions are resolved, the remaining work time can safely run in the background;
+- the player can leave the screen or close the browser without worrying that a mandatory prompt will appear later.
+
+Late random events may exist only if they resolve automatically and do not punish the player for being absent. They must not require babysitting.
+
+### Design intent
+
+The player engages first, then commits time.
+
+Longer durations represent the character continuing the work, not the player being required to stare at the countdown.
