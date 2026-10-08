@@ -501,3 +501,94 @@ Possible consequences:
 - faction reputation can unlock hidden stock or better prices.
 
 This system supports discovery, trade, logistics and player communication at the same time.
+
+
+## Economic harshness guardrails
+
+The Pall should be economically demanding without making routine play feel like constant financial attrition.
+
+Core rule:
+
+**Basic survival should be sustainable. Ambition should be expensive. Scale should be very expensive.**
+
+### Normal play should remain net-positive
+
+A reasonably competent player completing an ordinary activity successfully should usually earn enough to:
+- replace routine consumables;
+- absorb ordinary equipment wear;
+- cover expected travel/supply costs;
+- retain a meaningful surplus.
+
+Poor runs may break even or lose a little. Disastrous runs can be costly. Skilled, well-prepared or lucky runs should be strongly profitable.
+
+Routine successful play must not routinely consume nearly all earnings.
+
+### Avoid cost stacking
+
+Do not attach every possible expense to the same activity.
+
+Possible cost families:
+- core costs: materials, fuel where appropriate, durability, food/supplies;
+- convenience/service costs: NPC repair, transport, storage, specialist services;
+- scale costs: property upkeep, machinery, workers, guards, vehicles;
+- market friction: modest listing/sales fees;
+- high-risk costs: Pall filters, advanced medicine, specialist recovery/repair.
+
+Only a few should dominate any one activity.
+
+### Safety-net activities
+
+City work and other low-risk activities should provide a reliable recovery path for broke players.
+
+A player must never become economically trapped because they cannot afford the equipment required to earn the money needed to buy that equipment.
+
+Low-risk work should be less profitable than dangerous exploration, but dependable and low-overhead.
+
+### Growth expenses should create capability
+
+Major spending should usually purchase or unlock something tangible:
+- room;
+- workshop;
+- facility;
+- vehicle;
+- storage;
+- machine;
+- equipment;
+- access to a new production chain.
+
+Recurring upkeep should normally be much smaller than acquisition cost.
+
+Advanced infrastructure should unlock new earning potential rather than function only as a tax.
+
+### Upkeep should not punish absence excessively
+
+Returning after time away should not routinely mean catastrophic loss.
+
+Unpaid or overdue upkeep may:
+- reduce efficiency;
+- disable advanced production;
+- require servicing before use.
+
+It should not normally delete months of progress, destroy property or create impossible debt.
+
+### Costs should be understandable
+
+Players should be able to estimate the financial shape of an activity.
+
+Higher Commerce, relevant skill, familiarity or tools may reveal more precise forecasts such as:
+- expected supply cost;
+- likely repair/wear cost;
+- estimated break-even value;
+- likely market value range.
+
+Harshness should come from informed risk and overreach, not opaque surprise fees.
+
+### Balancing rule
+
+When tuning content, use these checks:
+1. Is successful normal play net-positive?
+2. Are basic activities low-overhead?
+3. Are large recurring costs tied to optional ambition/scale?
+4. Can a broke player recover without outside charity?
+5. Does major spending create new capability or earning potential?
+6. Are losses understandable and reasonably forecastable?
