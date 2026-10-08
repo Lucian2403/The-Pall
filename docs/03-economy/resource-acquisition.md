@@ -1175,3 +1175,226 @@ Sand leaves the economy through:
 - filtration recipes.
 
 Its value should stay low; logistics and bulk handling matter more than scarcity.
+
+
+---
+
+# RES_PLANT_FIBRE — Plant Fibre
+
+## Economic role
+
+Plant Fibre is the basic raw input for low-tech textiles, cordage and padding.
+
+Primary downstream uses:
+- Cloth;
+- rope/cordage where needed;
+- basic clothing;
+- bandages and medical textiles;
+- backpack components;
+- filters/padding;
+- sacks, wraps and simple workshop consumables.
+
+The Phase One economy should avoid separate flax/hemp/jute-style resources unless one later creates a distinct sourcing or crafting role.
+
+## Primary source region
+
+**Safe City / Protected Agricultural Outskirts**
+
+Sources may include:
+- managed fibre crops;
+- municipal gardens;
+- agricultural estates;
+- textile cooperatives;
+- reclaimed cloth-processing waste.
+
+Basic fibre should never require Grey Marches or Pall travel.
+
+## Phase One acquisition sources
+
+### 1. Agricultural / textile work
+
+Safe wage jobs may involve:
+- harvesting fibre plants;
+- stripping stalks;
+- sorting usable fibres;
+- drying bundles;
+- cleaning plant matter;
+- loading textile stock.
+
+Rewards:
+- coins;
+- Industry / Craftsmanship XP;
+- small fibre allowance where appropriate.
+
+### 2. Licensed small plot / cooperative allotment
+
+Players may grow or harvest limited fibre crops in safe surroundings.
+
+This should not become a farming simulator in Phase One.
+
+The gameplay focus is:
+- choosing the better stand;
+- timing harvest;
+- separating damaged from usable material;
+- handling wet/mould-prone bundles.
+
+### 3. Reclaimed textile source
+
+Old sacks, canvas, torn clothing and industrial cloth may be salvaged and processed into lower-grade fibre/cloth.
+
+This provides another city/salvage source and supports recycling.
+
+### 4. NPC baseline supply
+
+NPC textile suppliers sell basic fibre and basic Cloth at a modest markup.
+
+## Acquisition gameplay
+
+Plant Fibre should be low-risk and fairly routine.
+
+Example:
+> A harvested bundle contains a mix of long clean fibres and damp stalks beginning to spot with mould.
+
+Choices:
+- separate the clean fibres carefully;
+- process everything quickly;
+- discard the damp portion;
+- dry the bundle before continuing.
+
+Higher Craftsmanship / Fieldcraft may reveal:
+- likely fibre yield;
+- hidden mould;
+- suitability for fine cloth versus sacks/padding.
+
+Routine skilled work often proceeds without interruption.
+
+## Processing
+
+Keep the chain simple:
+
+**Plant Fibre -> Cloth**
+
+Optional rope/cordage should only become its own tradeable component if recipes and logistics justify it.
+
+Cloth then feeds:
+- clothing;
+- packs;
+- bandages;
+- wraps;
+- filters/padding;
+- facility consumables.
+
+## Key sinks
+
+Cloth leaves the economy through:
+- clothing production;
+- repairs;
+- medical consumables;
+- backpack production;
+- filtration;
+- workshop use;
+- civic demand.
+
+Textile goods should wear out enough to maintain ongoing demand.
+
+---
+
+# RES_RAW_HIDE — Raw Hide
+
+## Economic role
+
+Raw Hide is the animal-derived input for leather goods.
+
+Primary downstream uses:
+- Leather;
+- straps;
+- harnesses;
+- gloves;
+- boots;
+- packs;
+- protective clothing;
+- seals/gaskets where leather is suitable;
+- weapon/tool grips;
+- carriage harnessing and fittings later.
+
+## Primary source region
+
+**Safe agricultural outskirts and protected livestock supply**, with additional Grey Marches hunting sources.
+
+Players should not need dangerous hunting merely to access basic Leather.
+
+## Phase One acquisition sources
+
+### 1. Livestock / butcher supply
+
+The city economy produces Raw Hide as a byproduct of meat production.
+
+Players may acquire it through:
+- butcher contracts;
+- tannery supply jobs;
+- livestock-processing work;
+- direct purchase.
+
+This should be the main safe baseline source.
+
+### 2. Protected hunting / trapping
+
+Limited safe or low-risk outskirts hunting can provide small quantities.
+
+The activity may also yield meat or other animal byproducts.
+
+### 3. Grey Marches hunting
+
+More dangerous animals may provide:
+- larger hides;
+- tougher hides;
+- unusual hides with special properties later.
+
+Do not create multiple hide grades unless they justify distinct recipes or protection behavior.
+
+### 4. NPC baseline supply
+
+NPC butchers/tanners sell basic Raw Hide and Leather at a markup.
+
+## Acquisition gameplay
+
+Hide acquisition should mostly be a byproduct of another activity rather than a dedicated “harvest hide” button.
+
+Example after a successful hunt or butcher job:
+> The carcass has one clean side and one badly damaged by impact.
+
+Choices may involve:
+- take time to preserve the usable hide;
+- prioritize meat instead;
+- process quickly and accept lower hide yield;
+- abandon the damaged portion.
+
+Higher Fieldcraft / Craftsmanship may reveal:
+- likely usable leather area;
+- contamination;
+- whether the hide is worth carrying.
+
+Inside the city, tannery/butcher jobs are more routine and less event-heavy.
+
+## Processing
+
+Keep the chain simple:
+
+**Raw Hide -> Leather**
+
+Leather then feeds straps, boots, gloves, packs, harnesses and selected seals.
+
+Do not create separate intermediate items such as scraped hide, cured hide, tanned hide, finished hide in Phase One unless later gameplay clearly needs them.
+
+## Key sinks
+
+Leather leaves the economy through:
+- clothing;
+- boots/gloves;
+- backpack and harness production;
+- repairs;
+- weapon/tool grips;
+- carriage components;
+- workshop use.
+
+Leather equipment should degrade enough that replacement and repair remain meaningful.
