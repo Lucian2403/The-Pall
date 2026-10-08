@@ -323,3 +323,181 @@ The first playable economy should already support:
 - player market trading.
 
 It should feel like a small economy, not a tutorial placeholder.
+
+
+## Background civic demand
+
+The city should consume ordinary goods even when no visible player or NPC merchant is buying them.
+
+This is not simulated fake NPC characters placing market orders. It is a controlled systemic sink representing:
+- households;
+- workshops;
+- municipal works;
+- hospitals;
+- barracks;
+- factories;
+- taverns;
+- construction;
+- transport;
+- maintenance.
+
+Typical background-demand goods:
+- coal;
+- timber;
+- stone;
+- cloth;
+- leather;
+- basic food;
+- common medicine;
+- iron/steel products;
+- simple tools;
+- construction materials.
+
+### How it should work
+
+Each commodity can have:
+- a baseline demand per real-world day;
+- a preferred price band;
+- a maximum amount the city will absorb per period;
+- demand modifiers from world events;
+- optional reputation/faction modifiers.
+
+The system should buy only limited quantities and generally at unattractive-to-moderate prices.
+
+Purpose:
+- establish a soft floor value;
+- prevent basic commodities becoming worthless in low-population periods;
+- create permanent material sinks;
+- make production viable without replacing player demand.
+
+It must not:
+- guarantee profit at any production cost;
+- absorb infinite supply;
+- outbid real players;
+- behave as a hidden price-fixing mechanism.
+
+Example:
+The city may consume up to 2,000 units of Coal per day at a dynamic baseline around 6-8 coins each. If players flood the market, the civic buyer quota fills and extra coal must find player demand or wait. During a cold snap or rail-construction event, demand may temporarily rise.
+
+Background demand may be represented through market UI as named institutional demand such as:
+- Municipal Fuel Office;
+- Dock Quarter Kitchens;
+- Physicians' Stores;
+- Foundry Consortium;
+rather than pretending individual NPC shoppers exist.
+
+## Frontier traders and procedural caravans
+
+The Grey Marches and Pall zones may contain temporary traders, caravans, salvagers, expedition camps and wandering specialists.
+
+These are visible world content, not economic stabilization bots.
+
+Possible forms:
+- nomad caravan;
+- scavenger convoy;
+- lone explorer;
+- military supply camp;
+- travelling apothecary;
+- engineer expedition;
+- black-market peddler;
+- stranded trade wagon;
+- temporary frontier market.
+
+They may:
+- sell limited quantities of unusual resources;
+- sell rare components;
+- occasionally carry one high-quality finished item;
+- buy specific goods at unusually good prices;
+- offer barter instead of coins;
+- provide rumours, maps, contracts or discoveries;
+- disappear or relocate later.
+
+### Procedural generation
+
+A trader instance can be generated from authored building blocks:
+- trader/archetype;
+- faction/allegiance;
+- location or route;
+- inventory theme;
+- quality ceiling;
+- stock quantity;
+- price modifier;
+- wanted goods;
+- duration;
+- risk/event hook.
+
+The system should never free-generate arbitrary canonical items. It selects from valid item pools and rule tables.
+
+Example inventory:
+- Fine Field Respirator x1
+- Violet Stone x5
+- Precision Valve x2
+- High-Capacity Filter x3
+- Pall-Touched Alloy x7
+
+When sold out, stock does not immediately regenerate.
+
+### Availability
+
+Frontier traders should be:
+- temporary;
+- limited-stock;
+- geographically inconvenient;
+- sometimes dangerous to reach;
+- not guaranteed to appear on a fixed schedule.
+
+Their position may be discovered through:
+- exploration;
+- rumours;
+- faction contacts;
+- map intelligence;
+- player reports;
+- encounter outcomes.
+
+Some traders can persist for hours or days; others may exist only for one world-event window.
+
+### Pricing
+
+Frontier pricing can be significantly above city norms for scarce goods.
+
+Likewise, they may pay a premium for items difficult to obtain locally.
+
+Example:
+A caravan deep in the Grey Marches might sell Violet Stone at 180 coins when the city market averages 130, because the player is paying for immediate availability far from home.
+
+The same caravan might buy:
+- medicine;
+- food;
+- filters;
+- ammunition;
+at above-city prices because resupply is difficult.
+
+This creates two-way frontier trade rather than simple rare-item vending.
+
+### Important limits
+
+Frontier merchants should not become reliable vending machines for endgame equipment.
+
+Rare finished goods should be:
+- uncommon;
+- quantity-limited;
+- procedurally selected;
+- expensive;
+- sometimes damaged or lower durability;
+- constrained by trader archetype and region.
+
+A Fine respirator appearing in a caravan should feel like a lucky find, not a daily purchase route.
+
+### Player interaction
+
+Players may discover the same caravan and compete economically without requiring PvP.
+
+Possible consequences:
+- first buyers deplete limited stock;
+- rumours spread through chat or player-made maps;
+- merchants speculate by transporting goods back to the city;
+- explorers sell location intelligence;
+- players may escort or assist certain caravans;
+- faction reputation can unlock hidden stock or better prices.
+
+This system supports discovery, trade, logistics and player communication at the same time.
