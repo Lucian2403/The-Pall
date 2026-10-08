@@ -235,3 +235,74 @@ Avoid:
 
 The intended feeling is:
 **prepare carefully -> make one informed process decision -> let the work run -> receive an outcome shaped by skill, inputs and choices.**
+
+
+## Interaction frequency and mastery
+
+Mandatory interactions must **not** appear on every crafting job.
+
+Interaction is caused by:
+- difficulty;
+- novelty;
+- risk;
+- poor or unusual materials;
+- inadequate facilities;
+- high target quality;
+- substitutions;
+- proximity to the player's skill ceiling.
+
+Routine production should normally have no mandatory interaction once the player is sufficiently skilled, familiar with the recipe and using an appropriate facility.
+
+Three broad production states:
+
+### Routine production
+Examples:
+- common bandages;
+- basic bread;
+- fasteners;
+- familiar ammunition/components.
+
+The player chooses batch, inputs and production method, then the job runs without interruption unless an uncommon incident occurs.
+
+### Skilled production
+Interactions may appear when:
+- attempting a higher quality;
+- using substitutes;
+- producing near current skill limits;
+- using a marginal facility;
+- making expensive or complex equipment.
+
+Usually one meaningful early interaction is enough.
+
+### Exceptional / risky production
+Interactions should usually appear for:
+- Masterwork attempts;
+- unfamiliar or newly learned recipes;
+- experimental processes;
+- Pall materials;
+- damaged or unsuitable facilities;
+- dangerous chemistry;
+- prototype machinery.
+
+### Mastery effect
+
+A recipe that once required supervision can become Routine as the player's relevant skill, specialization and familiarity improve.
+
+Example:
+- low Cooking: a bread batch may need heat/dough decisions;
+- experienced Cooking: ordinary bread becomes routine;
+- advanced Pall-preserved ration: meaningful interaction returns because the work is difficult again.
+
+Planned crafting decisions and random incidents are separate systems.
+
+Incidents should be uncommon and influenced by:
+- facility condition;
+- maintenance;
+- equipment/tool quality;
+- material quality;
+- operator skill;
+- process risk.
+
+A well-maintained professional workshop operated by an expert should be calmer than an improvised shed.
+
+**Rule:** interaction exists because the work deserves attention, not merely because the player clicked Craft.
