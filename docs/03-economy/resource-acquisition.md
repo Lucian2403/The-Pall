@@ -702,3 +702,105 @@ Iron-derived materials leave the economy through:
 - partial unrecoverable crafting/repair waste.
 
 Metal recycling should recover some material, but never all.
+
+
+## Timber acquisition locations and interaction flow
+
+### Managed forestry locations
+
+Basic logging should take place in protected or semi-protected forestry sites near the city, such as:
+- Municipal Coppice;
+- Crown/City Timber Reserve;
+- estate-managed groves;
+- stormfall recovery zones;
+- protected roadside woodland;
+- reclamation/demolition yards inside the city.
+
+These are not deep wilderness zones. They are controlled work areas with wardens, permits and known routes.
+
+### Logging activity flow
+
+A logging session should not be a single "Chop Tree" button.
+
+Typical flow:
+1. Choose a permitted stand/plot.
+2. Inspect available trees or fallen timber.
+3. Select the target based on visible traits.
+4. Choose a method/tool.
+5. Resolve an interaction only when difficulty, novelty or risk justifies it.
+6. Process or haul the resulting timber.
+
+Possible tree traits:
+- straight / twisted;
+- young / mature;
+- storm-damaged;
+- hollow;
+- rot signs;
+- dense grain;
+- easy/hard access;
+- leaning toward obstacles;
+- suitable for beams, boards, handles, or only fuel.
+
+### Example interaction
+
+A mature tree leans toward an old stone wall.
+
+Low-skill options:
+- cut from the near side;
+- cut from the far side;
+- leave it and choose another tree.
+
+Higher Fieldcraft / Carpentry may reveal:
+- likely fall direction;
+- hidden split in the trunk;
+- expected usable board yield;
+- whether the wood is structurally sound.
+
+Possible consequences:
+- clean logs;
+- damaged/warped timber;
+- tool wear;
+- extra time;
+- minor injury;
+- damage to nearby property;
+- reduced yield.
+
+### Interaction frequency
+
+Not every tree should trigger an interaction.
+
+Routine harvesting from a familiar managed stand should often be quiet for experienced players.
+
+Interactions become more likely with:
+- difficult terrain;
+- poor tools;
+- damaged trees;
+- stormfall;
+- unusual wood quality;
+- aggressive harvesting;
+- low skill;
+- rare finds.
+
+### Post-cut processing
+
+Fresh logs are not automatically finished Timber.
+
+Depending on the use, logs may require:
+- trimming;
+- sawing;
+- seasoning/drying;
+- grading;
+- transport to a sawmill/timber yard.
+
+This creates separate work for haulers, sawmills and carpenters.
+
+### Reclaimed timber
+
+Inside the city, players may also obtain wood through:
+- demolition jobs;
+- broken carts;
+- abandoned buildings;
+- warehouse clearance;
+- salvage auctions.
+
+Reclaimed timber may be cheaper but more variable in quality and require cleaning, nail removal, trimming or re-grading before use.
