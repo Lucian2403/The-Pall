@@ -123,6 +123,16 @@ Only selected item families should normally support modification slots:
 
 Most clothing, tools and miscellaneous equipment should have no modification slots unless there is a clear gameplay reason.
 
+
+### Fitting quality compatibility
+
+- Fittings may have craftsmanship quality tiers, but not every fitting must support all five tiers.
+- A host item's quality sets the maximum quality of fitting it can accept.
+- A Crude item can accept only Crude fittings; Standard can accept Crude or Standard; Well-made can accept up to Well-made; Fine can accept up to Fine; Masterwork can accept any fitting quality supported by that fitting family.
+- Installing a lower-quality fitting into a higher-quality host is allowed.
+- Installing a higher-quality fitting into a lower-quality host is not allowed.
+- This rule prevents inexpensive low-quality gear from acting as a shell for endgame fittings and gives higher item quality structural value beyond raw stats.
+
 ### Item condition / damage flavour
 
 Do not add a second mechanical condition system on top of durability in the first version.
