@@ -804,3 +804,138 @@ Inside the city, players may also obtain wood through:
 - salvage auctions.
 
 Reclaimed timber may be cheaper but more variable in quality and require cleaning, nail removal, trimming or re-grading before use.
+
+
+## Resource/itemization granularity rule
+
+Do not create a new material or intermediate product merely for realism.
+
+A distinct economic item should exist only when it creates at least one meaningful difference in:
+- sourcing;
+- specialization;
+- trade;
+- risk;
+- processing;
+- logistics;
+- recipe choice;
+- facility requirements.
+
+If two materials behave almost identically, combine them.
+
+Most Phase One production chains should stay within roughly 2-4 economically meaningful stages from raw resource to finished good.
+
+Examples:
+- Timber -> Sawn Timber -> Furniture
+- Iron Ore -> Iron Ingot -> Component -> Equipment
+- Pall Material -> Stabilized Material -> Specialist Component -> Advanced Equipment
+
+Avoid needless chains such as:
+Clay -> Clean Clay -> Prepared Clay -> Ceramic Mix -> Unfired Vessel -> Fired Vessel -> Reagent Jar
+
+The game should imply physical detail through flavour text when that detail does not justify another tradeable item.
+
+
+---
+
+# RES_CLAY — Clay
+
+## Economic role
+
+Clay is a cheap, safe-city bulk resource used mainly to support construction and industrial facilities.
+
+The first playable version should keep its itemization deliberately simple.
+
+Primary uses:
+- construction and room upgrades;
+- forge/furnace infrastructure;
+- chemistry/medical facility requirements;
+- selected filter/industrial recipes.
+
+## Primary source region
+
+**Safe City / Protected Outskirts**
+
+Clay can be sourced from:
+- managed clay pits;
+- riverbank excavation;
+- construction cuts;
+- drainage works;
+- municipal earthworks.
+
+It should never require dangerous-zone travel.
+
+## Phase One acquisition sources
+
+### 1. Municipal Clay Works
+
+Safe wage work.
+
+The player may:
+- remove stones/grit;
+- dig usable clay;
+- grade wet/dry deposits;
+- load barrows;
+- manage drainage;
+- separate contaminated spoil.
+
+Rewards:
+- coins;
+- Industry XP;
+- possible small clay allowance.
+
+### 2. Public/leased clay pit
+
+The player may obtain a permit or lease and keep the extracted Clay.
+
+The interesting decision is deposit selection rather than spam-click digging.
+
+Example:
+- dark clean clay: slower extraction, high usable yield;
+- pale gritty clay: faster extraction, more waste;
+- drainage-edge clay: high yield, contamination risk.
+
+Higher Industry reveals likely usable yield and contamination.
+
+### 3. NPC baseline supply
+
+NPC suppliers sell basic Clay at a relatively poor price so the economy cannot deadlock.
+
+## Acquisition gameplay
+
+A Clay worksite should use the generic authored/procedural interaction system.
+
+Possible interactions:
+- waterlogged pit wall;
+- mixed gravel layer;
+- contaminated drainage seep;
+- collapsed barrow track;
+- unusually clean deposit;
+- tool damage.
+
+Routine work should become quiet for experienced players.
+
+## Processing
+
+Keep Phase One processing simple:
+
+**Clay -> Fired Ceramic**
+
+Fired Ceramic is a generic processed industrial material representing bricks, furnace lining pieces, vessels, pipe sections, crucibles and similar ceramic goods where separate itemization would add bookkeeping rather than gameplay.
+
+Processing requires:
+- kiln/furnace;
+- fuel;
+- time;
+- relevant Industry/Craftsmanship skill.
+
+Do not introduce separate bricks, reagent jars, pipe sections or crucibles as tradeable materials in Phase One unless a later system proves they need distinct economic behavior.
+
+## Key sinks
+
+Fired Ceramic is consumed by:
+- property/facility upgrades;
+- forge/furnace construction and maintenance;
+- chemistry/medical room upgrades;
+- selected industrial and filtration recipes.
+
+Clay should be cheap per unit but relevant in moderate bulk.
