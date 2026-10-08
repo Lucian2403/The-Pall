@@ -939,3 +939,239 @@ Fired Ceramic is consumed by:
 - selected industrial and filtration recipes.
 
 Clay should be cheap per unit but relevant in moderate bulk.
+
+
+---
+
+# RES_COPPER_ORE — Copper Ore
+
+## Economic role
+
+Copper is a mid-volume industrial resource used where iron is too crude or unsuitable.
+
+Primary downstream uses:
+- Copper Ingot;
+- wire;
+- tubing;
+- brass-related components;
+- pressure fittings;
+- valves;
+- respirator parts;
+- precision mechanisms;
+- workshop machinery;
+- later steam-carriage and rail systems.
+
+Copper should be less abundant than Iron Ore and therefore noticeably more valuable.
+
+## Primary source region
+
+**Protected Outskirts for low-grade deposits; Grey Marches for better deposits and salvage.**
+
+Players should be able to acquire basic copper without entering high danger, but the best yields should begin pulling them outward.
+
+## Phase One acquisition sources
+
+### 1. Protected low-grade copper workings
+
+Safe but inefficient extraction.
+
+Players may work:
+- old shallow diggings;
+- city-controlled spoil heaps;
+- low-grade veins near protected industrial areas.
+
+The player keeps output only when working an independent permit/lease; municipal work primarily pays wages.
+
+### 2. Grey Marches deposits
+
+Better copper-bearing seams appear in more exposed areas.
+
+Advantages:
+- higher usable yield;
+- less waste;
+- occasional richer deposits.
+
+Costs:
+- travel;
+- equipment wear;
+- encounter risk;
+- hauling burden.
+
+### 3. Salvage
+
+Old machinery, wire, pressure systems and abandoned industrial equipment can yield copper-bearing salvage.
+
+This should often compete with mining as a source.
+
+### 4. NPC baseline supply
+
+NPC industry sells limited Copper Ore or Copper Ingots at a high enough price that player supply remains attractive.
+
+## Acquisition gameplay
+
+Copper mining should emphasize deposit quality and access.
+
+Example:
+> A narrow green-stained seam disappears behind fractured stone.
+
+Possible choices:
+- follow the visible seam carefully;
+- break the surrounding rock aggressively;
+- take a sample first;
+- abandon it and continue searching.
+
+Higher Industry/Scholarship may reveal:
+- likely copper concentration;
+- whether the green staining is misleading;
+- contamination;
+- structural weakness;
+- probable refining yield.
+
+Safe low-grade workings should become routine quickly.
+
+Grey Marches deposits can introduce more varied hazards and richer interaction pools.
+
+## Tools
+
+Possible tools:
+- pick;
+- hammer;
+- wedges;
+- shovel;
+- sampling kit;
+- cart.
+
+## Processing
+
+Keep the chain simple:
+
+**Copper Ore -> Copper Ingot**
+
+Copper Ingots then feed components such as:
+- Copper Wire;
+- Brass Fittings or other alloys where justified.
+
+Do not create several grades of copper concentrate unless later economy data proves it useful.
+
+## Key sinks
+
+Copper-derived materials leave the economy through:
+- machinery;
+- fittings;
+- respirators;
+- pressure systems;
+- precision components;
+- repairs;
+- vehicles;
+- infrastructure.
+
+Copper should remain valuable enough that salvaging old machinery feels worthwhile.
+
+---
+
+# RES_SAND — Industrial Sand
+
+## Economic role
+
+Sand is a cheap, local bulk resource with a small number of important industrial uses.
+
+Primary uses:
+- Fired Ceramic recipes;
+- treated/industrial glass;
+- construction;
+- casting/foundry processes where needed;
+- selected filtration recipes.
+
+Do not itemize multiple sand varieties in Phase One unless they create clearly different economic behavior.
+
+## Primary source region
+
+**Safe City / Protected Outskirts**
+
+Sources may include:
+- riverbanks;
+- managed sand pits;
+- dredging sites;
+- construction excavations;
+- municipal aggregate yards.
+
+## Phase One acquisition sources
+
+### 1. Municipal aggregate works
+
+Safe wage work.
+
+Activities:
+- screen sand from gravel;
+- remove organic debris;
+- load carts;
+- inspect contamination;
+- manage wet stockpiles.
+
+Rewards:
+- coins;
+- Industry XP;
+- small allowance where appropriate.
+
+### 2. Public/leased sand pit
+
+Players can extract for personal use or sale.
+
+The main choice is not rarity but usable quality and effort.
+
+Example deposits:
+- clean coarse sand;
+- silty wet sand;
+- gravel-heavy sand;
+- contaminated construction spoil.
+
+Higher Industry reveals expected processing waste and suitability.
+
+### 3. NPC baseline supply
+
+Basic Sand is always purchasable at a modest but unattractive price.
+
+## Acquisition gameplay
+
+Sand gathering should be intentionally low-drama.
+
+It should still avoid a dead single button, but it does not need adventure-level interaction.
+
+Example:
+> The pit face contains a clean dry band above a wetter silty layer.
+
+Choices:
+- take the clean band slowly;
+- process the wet layer for higher volume;
+- screen mixed material;
+- move to another section.
+
+Routine experienced work may have no interaction at all.
+
+## Processing
+
+For Phase One, Sand usually remains Sand until consumed by a recipe.
+
+Where a distinct processed good is economically meaningful:
+
+**Sand + fuel + facility -> Treated Glass**
+
+Treated Glass is the tradeable processed product used in:
+- respirators;
+- lenses;
+- medical/chemical facilities;
+- gauges;
+- selected precision equipment.
+
+Avoid adding separate glass grades unless later recipes genuinely need them.
+
+## Key sinks
+
+Sand leaves the economy through:
+- Fired Ceramic;
+- Treated Glass;
+- construction;
+- selected industrial processes;
+- filtration recipes.
+
+Its value should stay low; logistics and bulk handling matter more than scarcity.
