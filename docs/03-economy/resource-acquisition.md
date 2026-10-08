@@ -334,3 +334,371 @@ Stone leaves the economy through:
 - repairs and civic projects.
 
 Unlike metal equipment, most consumed construction Stone should not be meaningfully recyclable.
+
+
+---
+
+# RES_TIMBER — Common Timber
+
+## Economic role
+
+Timber is a basic but strategically important material.
+
+Primary consumers:
+- carpentry;
+- crates and storage;
+- furniture;
+- weapon stocks/handles;
+- scaffolding;
+- building upgrades;
+- carts;
+- supports and bracing;
+- fuel in low-tech situations;
+- packaging and transport;
+- later vehicle interiors and rail infrastructure.
+
+Wood should remain more expensive than stone because healthy trees are comparatively scarce in the setting.
+
+## Primary source region
+
+**Safe City / Protected Greenbelt / Managed Outskirts**
+
+Basic timber should not require entry into dangerous zones.
+
+The city survives partly because protected groves, managed coppice, reclaimed timber yards and controlled estates exist close enough to defend.
+
+## Phase One acquisition sources
+
+### 1. Municipal Timber Yard
+
+Safe wage work.
+
+The player may:
+- sort reclaimed beams;
+- trim usable boards;
+- split firewood;
+- strip damaged timber;
+- grade warped or rotten stock;
+- load carts;
+- maintain cutting tools.
+
+Rewards:
+- coins;
+- Industry or Craftsmanship XP;
+- possible small material allowance.
+
+The timber belongs primarily to the employer.
+
+### 2. Managed Cutting Permit
+
+The player obtains a permit to harvest from a protected managed grove or coppice section.
+
+The player keeps permitted output.
+
+The activity is not “chop tree for 2 minutes.”
+
+The player chooses what to cut and how:
+- take mature straight growth;
+- harvest smaller coppice poles;
+- reclaim storm-damaged timber;
+- preserve a valuable tree and accept lower immediate yield;
+- cut aggressively for more short-term material.
+
+This creates a mild stewardship tradeoff without turning forestry into a simulation game.
+
+### 3. Reclaimed Timber
+
+Old buildings, warehouses, broken carts and demolition sites may produce usable timber.
+
+This is important because living trees are scarce.
+
+Reclaimed timber can enter through:
+- city demolition jobs;
+- salvaging;
+- civic auctions;
+- Grey Marches ruins.
+
+Reclaimed wood may require processing before high-quality use.
+
+### 4. NPC baseline supply
+
+NPC yards sell limited basic timber and cheap boards.
+
+NPC supply should be reliable enough to avoid lockout but priced above healthy player production.
+
+### 5. Player-owned Timber Yard / Managed Grove — late game
+
+A player or guild may own/lease:
+- timber yard;
+- managed grove;
+- sawmill;
+- reclamation yard.
+
+Owners can post jobs and sell processed boards/beams.
+
+## Acquisition gameplay
+
+Forestry should feel like selecting and preparing material, not repeatedly clicking trees.
+
+Possible interaction:
+> Two nearby trunks are viable. One is straight but young; the other is mature but visibly twisted.
+
+Choices:
+- take the young straight tree;
+- take the mature twisted tree;
+- inspect for internal rot;
+- cut only branches/poles and leave both trunks;
+- move on.
+
+Higher Fieldcraft / Carpentry may reveal:
+- grain quality;
+- likely usable-board yield;
+- hidden rot signs;
+- whether the timber is suitable for structural use or only fuel.
+
+Possible outputs:
+- common logs;
+- straight timber;
+- warped timber;
+- firewood;
+- bark/fibre byproducts.
+
+Routine experienced forestry should become quiet.
+
+## Tools
+
+Possible tools:
+- hand axe;
+- saw;
+- wedge;
+- rope;
+- cart;
+- protective gloves.
+
+Tool choice affects:
+- speed;
+- waste;
+- fatigue;
+- durability;
+- injury risk.
+
+## Resource behavior
+
+Timber is renewable but throughput-limited.
+
+Managed groves regenerate over time at the world-system level.
+
+Individual leased plots can:
+- become temporarily exhausted;
+- require regrowth;
+- lose efficiency if overharvested;
+- improve under good management later.
+
+Public supply must remain available.
+
+## Processing
+
+Common Timber may become:
+- Sawn Timber;
+- Timber Beam;
+- Plank;
+- Handle Blank;
+- Charcoal later if needed.
+
+Higher-grade wood such as Seasoned Hardwood should be a separate processed or source-specific material.
+
+## Key sinks
+
+Timber leaves the economy through:
+- construction;
+- furniture;
+- crates;
+- weapon/tool handles;
+- repairs;
+- scaffolding;
+- carts;
+- civic projects;
+- workshop upgrades.
+
+Most used structural timber should recover poorly when demolished or destroyed.
+
+---
+
+# RES_IRON_ORE — Iron Ore
+
+## Economic role
+
+Iron Ore is the main raw feedstock for basic ferrous metal production.
+
+Primary downstream products:
+- Iron Ingots;
+- steel-related materials;
+- plates;
+- fasteners;
+- tools;
+- weapons;
+- machinery;
+- workshop equipment;
+- construction fittings;
+- vehicle parts.
+
+Iron should be common enough to support civilization, but expensive enough in labor/fuel that processed metal retains value.
+
+## Primary source region
+
+**Protected Industrial Outskirts / Safe Mining District**
+
+Basic low-to-medium grade Iron Ore should be obtainable without entering the Grey Marches.
+
+Higher-grade deposits and unusual ore can exist farther out.
+
+## Phase One acquisition sources
+
+### 1. Municipal Iron Works / Mine
+
+Safe employment.
+
+Possible duties:
+- sort ore from waste rock;
+- crush large chunks;
+- grade ore quality;
+- load mine carts;
+- inspect supports;
+- clear drainage;
+- operate simple hoisting gear.
+
+Rewards:
+- coins;
+- Industry XP;
+- possible small ore allowance.
+
+### 2. Licensed Surface Extraction
+
+The player can work a protected shallow deposit, spoil heap or licensed claim and keep the ore.
+
+This is useful for:
+- supplying a personal forge;
+- selling to refiners;
+- learning Industry.
+
+### 3. Salvage-derived ferrous metal
+
+Old machinery and ruins can produce:
+- scrap iron;
+- rusted plate;
+- damaged tools;
+- contaminated alloy.
+
+These are not the same as fresh ore and may follow separate processing paths.
+
+### 4. NPC baseline supply
+
+NPC industrial suppliers sell limited low-grade ore or ingots.
+
+Player refining should usually beat NPC prices at scale.
+
+### 5. Player-owned mine/concession — late game
+
+A player or guild can lease/develop a mine or extraction concession.
+
+Needs:
+- workers;
+- hoists/carts;
+- timber supports;
+- lamps;
+- drainage;
+- maintenance;
+- transport;
+- storage.
+
+Mining ownership creates demand for Timber, tools, oil, labor and hauling.
+
+## Acquisition gameplay
+
+Iron extraction should focus on identifying ore quality and extraction efficiency.
+
+Possible interaction:
+> The face contains two visible bands: a dark dense seam and a broader reddish band mixed with waste rock.
+
+Choices:
+- work the dense seam carefully;
+- extract the broad band quickly;
+- take a sample before committing;
+- follow the seam deeper;
+- abandon the face.
+
+Higher Industry / Scholarship / Mechanics may reveal:
+- estimated iron content;
+- contamination;
+- structural risk;
+- likely refining waste;
+- whether the seam is worth preserving.
+
+Possible outputs:
+- Low-grade Iron Ore;
+- Standard Iron Ore;
+- mineral-rich waste;
+- occasional unusual inclusions.
+
+Do not make every ore piece have a rarity tier. Grade should matter mainly through refining efficiency and suitability.
+
+## Tools
+
+Possible tools:
+- pick;
+- hammer;
+- wedges;
+- shovel;
+- cart;
+- lamp;
+- simple sampling kit.
+
+## Resource behavior
+
+Iron Ore is abundant enough to be a strategic staple, not a rare loot material.
+
+The main constraints are:
+- labor;
+- hauling weight;
+- fuel required for processing;
+- ore grade;
+- refining capacity;
+- site throughput.
+
+Individual claims may degrade or deplete; safe regional supply does not disappear globally.
+
+## Processing
+
+Iron Ore should not be directly craftable into finished metal goods.
+
+Typical chain:
+Iron Ore -> Smelted Iron / Iron Ingot -> processed metal/components -> finished goods.
+
+Refining may require:
+- furnace;
+- Coal or Coke;
+- time;
+- Industry / Smithing;
+- waste handling.
+
+Higher-grade ore:
+- yields more usable metal;
+- consumes less fuel per usable ingot;
+- produces less slag.
+
+Low-grade ore remains viable when prices or local supply make it worthwhile.
+
+## Key sinks
+
+Iron-derived materials leave the economy through:
+- equipment production;
+- tools;
+- machinery;
+- repairs;
+- construction;
+- fittings;
+- vehicle parts;
+- infrastructure;
+- partial unrecoverable crafting/repair waste.
+
+Metal recycling should recover some material, but never all.
