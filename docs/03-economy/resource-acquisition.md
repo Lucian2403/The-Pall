@@ -1848,3 +1848,223 @@ Higher-tier farm infrastructure may reduce:
 It does not reduce the biological food requirement of the animals themselves.
 
 A larger farm will usually consume more total feed because it supports more livestock.
+
+
+---
+
+# Regional Signature Materials
+
+Status: PHASE ONE foundation.
+
+Design rule: these materials are not generic "higher tier" resources. Each exists because of a specific geological, biological or ecological condition, and each has a narrow economic role that ordinary city materials cannot fully replace.
+
+## Grey Marches signature materials
+
+### March Zeolite
+
+Nature:
+- porous aluminosilicate mineral occurring in a specific Grey Marches geological belt.
+
+Why it is there:
+- the Grey Marches expose old altered ash/sedimentary layers not present under the city;
+- deeper Pall deposits exist but are too contaminated for clean industrial use.
+
+Acquisition:
+- quarry/mineral extraction from hidden or semi-known deposits;
+- shared-world deposits;
+- logistics matter because it is bulky.
+
+Processing:
+**March Zeolite -> Prepared Zeolite**
+
+Primary uses:
+- respirator prefilters;
+- decontamination beds;
+- laboratory filtration;
+- water treatment;
+- sealed cargo systems;
+- advanced medical/chemical facilities.
+
+End-game reason:
+advanced Pall equipment can still require clean March Zeolite, keeping Grey Marches economically relevant.
+
+### Black Bog Nodules
+
+Nature:
+- manganese-rich iron concretions formed in Grey Marches wetlands.
+
+Why it is there:
+- repeated wet/dry and oxygen-rich/poor cycles plus microbial activity concentrate iron and manganese;
+- city wetlands were largely drained;
+- deep Pall wetlands produce unsuitable contaminated precipitates.
+
+Acquisition:
+- wetland sediment harvesting;
+- drainage channels;
+- bog excavation;
+- semi-renewable over long ecological/geological cycles.
+
+Processing:
+**Black Bog Nodules -> Manganese Concentrate**
+
+Primary uses:
+- high-grade steel processes;
+- durable springs;
+- pressure machinery;
+- vehicle parts;
+- advanced tools;
+- high-quality weapons.
+
+End-game reason:
+small but important process input for advanced metallurgy.
+
+### Sphagnum Moss
+
+Nature:
+- highly absorbent bog moss.
+
+Why it is there:
+- clean Grey Marches bogs remain intact;
+- city expansion/drainage removed much suitable habitat;
+- Pall-zone moss is generally contaminated and unsuitable for medicine.
+
+Acquisition:
+- shared-world hidden/known bog patches;
+- Herbalism/Fieldcraft harvesting;
+- regrowth-sensitive.
+
+Processing:
+**Sphagnum Moss -> Sterilized Sphagnum**
+
+Primary uses:
+- advanced trauma dressings;
+- severe-wound kits;
+- surgical supplies;
+- expedition medicine.
+
+End-game reason:
+remains a specialist absorbent medium in high-end medicine and does not replace Yarrow/Calendula.
+
+## Pall signature materials
+
+### Violet Fluorspar
+
+Nature:
+- violet fluorite/fluorspar-bearing mineral deposits.
+
+Why it is there:
+- the Pall did not create the mineral;
+- subsidence, erosion, collapsed mines and abandoned workings exposed deposits that are now dangerous to reach.
+
+Acquisition:
+- hidden geological discovery;
+- survey and extraction from exposed veins;
+- heavy and logistics-intensive.
+
+Processing:
+**Violet Fluorspar -> Refined Fluorspar**
+
+Primary uses:
+- advanced metallurgy as a processing additive;
+- glassmaking;
+- precision optics/gauges;
+- advanced respirator lenses;
+- selected high-end industrial recipes.
+
+End-game reason:
+small-quantity specialist material that enables better processes without becoming universal "magic ore."
+
+### Sootlace
+
+Nature:
+- fictional melanized Pall-adapted fungus with fibrous, pollutant-binding growth.
+
+Why it is there:
+- thrives in environments with severe Pall contamination where ordinary fungi compete poorly;
+- city cultivation cannot reproduce the same dense growth characteristics reliably.
+
+Acquisition:
+- harvested from contaminated ruins, pipes, damp masonry and industrial structures;
+- requires respiratory protection and Herbalism/Scholarship knowledge.
+
+Processing:
+**Sootlace -> Treated Sootlace**
+
+Primary uses:
+- advanced respirator filter medium;
+- decontamination cartridges;
+- laboratory scrubbers;
+- sealed-storage filtration;
+- steam-carriage cabin filtration later.
+
+End-game reason:
+high-value filtration resource unique to extreme contaminated environments.
+
+### Pall Membrane
+
+Nature:
+- flexible barrier tissue harvested from specific Pall-adapted fauna.
+
+Why it is there:
+- selected creatures evolved dense respiratory/joint/ocular membranes under contaminated environmental pressure.
+
+Acquisition:
+- species-specific hunting;
+- careful field dressing;
+- poor combat technique can destroy the valuable tissue.
+
+Processing:
+**Raw Pall Membrane -> Stabilized Pall Membrane**
+
+Primary uses:
+- respirator diaphragms;
+- sealed glove/boot joints;
+- expedition suit seals;
+- pack liners;
+- medical barriers.
+
+End-game reason:
+critical flexible sealing material for advanced protective equipment.
+
+### Scar Resin
+
+Nature:
+- resin produced by Pall-stressed, heavily scarred surviving trees.
+
+Why it is there:
+- chronic environmental injury and pathogen pressure drive extreme resin production in surviving trees.
+
+Acquisition:
+- discovered during logging/Fieldcraft inspection;
+- careful tapping preserves the tree;
+- aggressive cutting yields more immediately but damages or destroys future production.
+
+Processing:
+**Scar Resin -> Purified Resin**
+
+Primary uses:
+- sealants;
+- waterproofing;
+- respirator joints;
+- coat treatment;
+- container sealing;
+- high-end repair compounds;
+- pressure fittings;
+- vehicle maintenance later.
+
+End-game reason:
+specialist sealing/maintenance material with a renewable-but-overharvestable source.
+
+## Cross-region dependency
+
+High-end recipes should often combine materials from multiple regions.
+
+Example advanced respirator:
+- March Zeolite — Grey Marches
+- Treated Sootlace — Pall
+- Stabilized Pall Membrane — Pall fauna
+- Copper/Brass — city industry
+- Treated Glass — city industry
+- Cloth/Leather — safe agricultural economy
+
+This preserves demand across the entire world and prevents end-game players from abandoning lower-risk regions entirely.
