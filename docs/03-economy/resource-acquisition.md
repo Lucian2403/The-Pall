@@ -2068,3 +2068,48 @@ Example advanced respirator:
 - Cloth/Leather — safe agricultural economy
 
 This preserves demand across the entire world and prevents end-game players from abandoning lower-risk regions entirely.
+
+
+## Natural resource quality rule
+
+Natural resources do not use the five craftsmanship quality tiers.
+
+For Phase One, source differences such as:
+- rich ore seam;
+- mature herb;
+- straight tree;
+- clean clay;
+- high-yield sand layer
+
+normally affect **how many usable units are recovered**, extraction time, waste, contamination or tool wear.
+
+Once safely harvested, the commodity should usually become one fungible inventory item.
+
+Avoid inventory fragmentation such as:
+- Fine Iron Ore;
+- Masterwork Yarrow;
+- Straight Timber;
+- Gritty Clay.
+
+Contaminated variants are allowed only when contamination creates a genuine processing/safety decision.
+
+## RES_DRINKING_WATER — Drinking Water
+
+Status: PHASE ONE survival resource.
+
+Inside the safe city, ordinary drinking water is infrastructure and Thirst is automatically maintained.
+
+Outside safe-city infrastructure, Drinking Water becomes physical expedition cargo.
+
+Acquisition:
+- fill canteens/tanks cheaply or free in the city;
+- frontier resupply may cost money;
+- field water sourcing/treatment can remain limited until later content.
+
+Gameplay:
+- has weight and volume;
+- consumes liquid-container capacity;
+- used by Thirst;
+- competes with loot, Oil and other expedition cargo.
+
+Drinking Water is a survival resource, not intended as a major speculative market commodity in Phase One.
