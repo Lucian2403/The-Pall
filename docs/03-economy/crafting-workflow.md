@@ -142,23 +142,23 @@ Large batches may require larger facilities or machinery.
 
 Finished complex equipment such as rifles or advanced respirators should normally be crafted as individual jobs.
 
-## 6. Material quality and source
+## 6. Material identity, condition and source
 
 High-tier output requires suitable inputs.
 
 A player's skill alone cannot turn poor scrap into Masterwork equipment.
 
 Recipes may check:
-- material type;
-- minimum processed-material quality;
-- component quality;
+- material identity/type;
+- required regional/special material;
+- component quality where workmanship matters;
 - contamination state;
-- provenance/source tags where relevant;
+- provenance/source tags where genuinely relevant;
 - facility level;
 - tool quality;
 - blueprint understanding.
 
-Materials can be economically different without every resource having five universal quality tiers.
+Natural resources and bulk processed materials do not use universal five-tier quality. Differences in source richness usually affect harvest yield before inventory; craftsmanship quality is reserved mainly for crafted components, fittings and finished goods where workmanship matters.
 
 ## 7. Skill and specialization effects
 
