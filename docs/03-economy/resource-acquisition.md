@@ -1831,3 +1831,20 @@ This creates a choice between:
 - consuming/replacing livestock for Meat/Hide.
 
 Exact replacement costs and production-cycle economics remain balance data.
+
+
+## Livestock feed scaling rule
+
+Farm upgrades do not make animals consume less food.
+
+Feed demand scales with the number/type of livestock being supported.
+
+Higher-tier farm infrastructure may reduce:
+- feed spoilage;
+- storage losses;
+- handling waste;
+- accidental loss during distribution.
+
+It does not reduce the biological food requirement of the animals themselves.
+
+A larger farm will usually consume more total feed because it supports more livestock.
