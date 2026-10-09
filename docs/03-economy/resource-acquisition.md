@@ -1398,3 +1398,217 @@ Leather leaves the economy through:
 - workshop use.
 
 Leather equipment should degrade enough that replacement and repair remain meaningful.
+
+
+---
+
+# RES_CRUDE_OIL — Crude Oil
+
+## Economic role
+
+Crude Oil is a scarce, high-value Pall-zone resource.
+
+It should not replace Coal as the basic industrial fuel. Oil is more compact, expensive and useful where weight, lubrication, chemistry or advanced machinery matter.
+
+Primary downstream uses:
+- Refined Oil;
+- lubricants/maintenance supplies;
+- high-value fuel;
+- chemistry;
+- precision machinery;
+- steam-carriage systems;
+- advanced industrial processes.
+
+## Primary source region
+
+**The Pall only.**
+
+Oil deposits should be one of the resources that justify dangerous expeditions and specialized logistics.
+
+## Discovery model
+
+Oil sources use the same broad shared-world discovery philosophy as hidden herb patches, but they are geological rather than botanical.
+
+The world owns the deposit. Knowledge of it is initially private to the discoverer.
+
+Possible source types:
+- natural seep;
+- exposed tar/oil pocket;
+- ruined pre-Pall industrial well;
+- fractured underground reservoir;
+- abandoned pumping installation.
+
+Deposits should persist rather than reroll each visit.
+
+A source can track:
+- deposit_id;
+- location;
+- current accessible reserve;
+- extraction rate;
+- contamination level;
+- pressure/access difficulty;
+- depletion state;
+- equipment requirements;
+- known/surveyed state.
+
+Higher Industry, Fieldcraft, Scholarship or relevant investigation skills may reveal better information.
+
+A novice may notice:
+"Dark viscous liquid seeping through fractured ground."
+
+An expert may identify:
+- likely crude oil;
+- contamination level;
+- approximate reserve;
+- whether portable pumping is viable;
+- whether deeper extraction would require machinery.
+
+## Extraction equipment
+
+Oil requires appropriate extraction equipment.
+
+Phase One should add a **Portable Hand Pump / Field Pump** as a real tool item.
+
+Do not separately itemize every hose, funnel, coupling and valve unless later gameplay justifies it.
+
+The pump item conceptually includes the basic extraction assembly.
+
+Possible requirements:
+- pump durability;
+- setup time;
+- relevant Industry/Mechanics skill;
+- container capacity;
+- compatible extraction source.
+
+Higher-tier pumps may later provide:
+- faster extraction;
+- lower contamination risk;
+- better durability;
+- higher pressure capability.
+
+Large/end-game deposits may require fixed infrastructure rather than a portable pump.
+
+## Extraction gameplay
+
+Oil extraction is not a single "Pump Oil" button.
+
+Typical flow:
+1. discover/survey the seep or deposit;
+2. inspect contamination and access;
+3. set up the pump;
+4. choose extraction rate/method;
+5. resolve early problems when justified;
+6. fill available liquid containers;
+7. decide whether to stay for more or leave.
+
+Possible interactions:
+- clogged intake;
+- unstable seep;
+- contaminated upper layer;
+- pressure change;
+- leaking connection;
+- damaged pump seal;
+- nearby Pall activity drawn by noise/smell.
+
+Higher Mechanics/Industry can reveal safer or more efficient options.
+
+Routine extraction from a familiar site with good equipment can become mostly quiet.
+
+## Liquid transport
+
+Oil must occupy **liquid storage capacity**.
+
+This should be mechanically meaningful but simple.
+
+Use containers with a liquid-capacity property rather than tracking dozens of special container parts.
+
+Example container concepts:
+- Field Can: 10 L, carried by player;
+- Reinforced Canister: 20 L, heavy;
+- Sealed Drum: 50-100 L, practical mainly on cart/steam-carriage;
+- Vehicle Tank: large integrated capacity later.
+
+The oil itself has weight and volume.
+
+This creates a genuine expedition decision:
+- more water;
+- more oil containers;
+- more loot space;
+- more ammunition/medicine.
+
+A steam-carriage later becomes extremely valuable because it can carry sealed drums/tanks without consuming the character's personal carrying capacity.
+
+## Container safety
+
+Ordinary backpacks cannot directly hold loose Oil.
+
+Oil containers should have:
+- liquid capacity;
+- seal rating;
+- durability;
+- leak risk if badly damaged.
+
+Do not create a second complex fluid-simulation system.
+
+A damaged container may lose some Oil or contaminate nearby cargo through a simple event/result.
+
+## Deposit behavior
+
+Not all oil sources behave the same way.
+
+Natural seep:
+- low extraction rate;
+- may slowly replenish;
+- good for small expeditions.
+
+Finite pocket:
+- higher yield;
+- depletes permanently or for a very long period.
+
+Ruined industrial well:
+- potentially large reserve;
+- may require repair/reactivation;
+- can become a valuable shared discovery or later player-controlled industrial site.
+
+This gives Oil progression from hand-gathered expedition resource to end-game infrastructure.
+
+## Processing
+
+Keep the Phase One chain simple:
+
+**Crude Oil -> Refined Oil**
+
+Refined Oil can represent the usable industrial product for:
+- fuel;
+- lubrication;
+- machinery;
+- chemistry.
+
+Do not initially split it into kerosene, lamp oil, machine oil, diesel-like products, etc. unless later systems genuinely need that distinction.
+
+## Key sinks
+
+Refined Oil should be consumed by:
+- advanced machinery;
+- maintenance;
+- steam-carriages;
+- chemistry;
+- specialist workshops;
+- high-efficiency portable equipment;
+- some expedition gear.
+
+Coal remains the bulk cheap fuel. Oil is the expensive compact industrial resource.
+
+## Design guardrail
+
+Oil logistics should matter without becoming container-management busywork.
+
+The meaningful decisions are:
+- Can I find it?
+- Can I safely extract it?
+- How much liquid capacity did I bring?
+- Is the weight worth the risk?
+- Can I get it home?
+
+Not:
+- Did I remember three hose couplers and the correct funnel size?
