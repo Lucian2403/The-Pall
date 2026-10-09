@@ -1758,3 +1758,76 @@ A small player plot may force:
 Larger farm upgrades expand available crop slots and storage/throughput.
 
 This creates specialization without requiring multiple farm buildings.
+
+
+---
+
+# RES_EGGS — Eggs
+
+Status: PHASE ONE.
+
+## Economic role
+
+Eggs are a recurring safe-city food resource.
+
+Primary uses:
+- cooked meals;
+- baking;
+- richer recovery foods;
+- tavern recipes.
+
+## Acquisition
+
+Primary sources:
+- NPC poultry farms;
+- city/protected-outskirts farm jobs;
+- player Chicken Flock production.
+
+Player-owned chickens use Farm Holding capacity and consume Grain/upkeep.
+
+Eggs are recurring output and do not require slaughter.
+
+Routine collection should be mostly automatic after setup, with occasional farm interactions only when justified.
+
+---
+
+# RES_MILK — Milk
+
+Status: PHASE ONE.
+
+## Economic role
+
+Milk is a recurring safe-city food resource.
+
+Primary uses:
+- cooking;
+- richer meals;
+- recovery foods;
+- later cheese or preserved dairy only if those products justify separate economic roles.
+
+## Acquisition
+
+Primary sources:
+- NPC dairy farms;
+- protected-estate farm work;
+- player Cattle Herd Unit production.
+
+Cattle require substantially more Farm Holding capacity and upkeep than chickens.
+
+Milk is recurring output and does not require slaughter.
+
+Phase One does not need individual cow simulation, breeding, or detailed milking actions.
+
+Routine production runs as a farm process; meaningful incidents may affect yield, upkeep, or animal condition.
+
+## Meat/hide tradeoff
+
+A Chicken Flock or Cattle Herd Unit can eventually be slaughtered/converted for meat outputs.
+
+Cattle slaughter may also yield Raw Hide.
+
+This creates a choice between:
+- keeping livestock for recurring Eggs/Milk;
+- consuming/replacing livestock for Meat/Hide.
+
+Exact replacement costs and production-cycle economics remain balance data.
