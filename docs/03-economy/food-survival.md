@@ -10,12 +10,15 @@ NPCs may sell basic provisions and ingredients such as:
 
 - bread;
 - vegetables;
-- fruit;
-- raw meat;
-- raw fish;
+- chicken meat;
+- pork;
+- beef;
+- game meat;
 - eggs;
 - milk;
 - flour.
+
+Fishing and fish-based food are **LATER**. Fruit is also deferred unless later cooking design gives it a distinct economic role.
 
 The city tavern serves roughly 5–10 proper meals. Tavern food is deliberately more expensive than equivalent player-cooked food so kitchens and Cooking have economic value.
 
