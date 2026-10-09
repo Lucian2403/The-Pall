@@ -326,7 +326,7 @@ Phase One direction:
 
 Do not introduce separate Chicken Feed, Cattle Feed, Hay, Silage, Bran, etc. in Phase One unless later economy data proves they are needed.
 
-Pasture/farm upgrades may reduce purchased feed requirements.
+Pasture/farm upgrades must not reduce the animals' biological food requirement. Feed consumption scales with livestock population. Better infrastructure may reduce feed **waste, spoilage, or loss during storage/distribution**, but the animals themselves eat the same amount.
 
 ### Interaction philosophy
 
