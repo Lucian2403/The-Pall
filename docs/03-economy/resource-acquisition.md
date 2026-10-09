@@ -1612,3 +1612,149 @@ The meaningful decisions are:
 
 Not:
 - Did I remember three hose couplers and the correct funnel size?
+
+
+---
+
+# RES_GRAIN — Grain
+
+Status: PHASE ONE.
+
+## Economic role
+
+Grain is a safe-city agricultural staple.
+
+Primary uses:
+- Flour;
+- Bread;
+- expedition rations;
+- later cooking recipes.
+
+Grain should be sourced only from the city and protected agricultural outskirts in Phase One.
+
+## Acquisition
+
+Primary sources:
+- NPC/municipal farm jobs;
+- protected farm estates;
+- player-owned farm plots later as a housing/base upgrade.
+
+Farm work can include:
+- harvesting;
+- threshing/sorting;
+- moving sacks;
+- identifying spoiled or wet grain;
+- managing simple field problems.
+
+Routine experienced farm work should usually be low-interruption.
+
+## Processing
+
+Keep the chain:
+
+**Grain -> Flour -> Bread / other recipes**
+
+Do not add a dedicated Mill building in Phase One.
+
+A Tier 1 Kitchen may include or support a simple hand mill/quern as part of the workstation.
+
+Milling is a short batch-processing action:
+- small batches at Tier 1;
+- larger/faster batches at higher kitchen tiers;
+- minor tool/workstation wear;
+- no need for a separate room.
+
+Flour is justified as a distinct processed item because it can feed multiple recipes rather than Bread alone.
+
+Illustrative ratios only:
+- 1 unit Grain -> 1 unit Flour
+- 1 unit Flour + Water + fuel -> 2 Bread portions
+
+Exact balancing remains tunable.
+
+## Player farming
+
+Player farms should behave like base/facility modules rather than manual farming simulators.
+
+A player should not need separate entire farms for Grain and Vegetables.
+
+Use a **Farm Plot** with a small number of crop allocations/beds.
+
+Example:
+- small allotment: 2 crop beds;
+- improved plot: 4;
+- larger farm module later: more capacity.
+
+Each bed/slot can be assigned to a crop family such as:
+- Grain;
+- Vegetables;
+- medicinal plants later if allowed.
+
+This creates a choice:
+- specialize for maximum Grain output;
+- split production between Grain and Vegetables;
+- change allocation between growing cycles.
+
+Crop growth is a base process and can continue offline.
+
+The player performs setup/harvest and occasional meaningful incidents, but does not click-water plants repeatedly.
+
+---
+
+# RES_VEGETABLES — Vegetables
+
+Status: PHASE ONE.
+
+## Economic role
+
+Vegetables are a safe-city food resource representing common edible produce without creating many nearly identical crop items.
+
+Primary uses:
+- soups;
+- stews;
+- cooked meals;
+- ration recipes;
+- tavern dishes;
+- recovery-focused food.
+
+Do not split Phase One into carrot/cabbage/onion/turnip resources unless a specific crop later creates unique gameplay.
+
+## Acquisition
+
+Same safe agricultural ecosystem as Grain:
+- municipal farm jobs;
+- protected farms/estates;
+- player Farm Plot allocations.
+
+Possible farm interactions:
+- pest damage;
+- waterlogged beds;
+- early frost;
+- spoiled section;
+- unusually strong yield;
+- harvest timing choice.
+
+Higher Fieldcraft/Cooking/Craftsmanship may reveal better harvest timing or spoilage risk.
+
+## Processing
+
+Vegetables generally remain Vegetables until used in cooking.
+
+Avoid introducing unnecessary intermediates such as chopped vegetables or vegetable mash as market items.
+
+## Player farming
+
+Vegetables use the same Farm Plot system as Grain.
+
+One farm can produce multiple crop families by allocating beds/plots.
+
+The limitation is **capacity**, not separate ownership.
+
+A small player plot may force:
+- 2 Grain / 0 Vegetables;
+- 1 Grain / 1 Vegetables;
+- 0 Grain / 2 Vegetables.
+
+Larger farm upgrades expand available crop slots and storage/throughput.
+
+This creates specialization without requiring multiple farm buildings.
