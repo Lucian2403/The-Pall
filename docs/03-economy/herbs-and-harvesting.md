@@ -354,3 +354,142 @@ The harvesting system should create the feeling:
 not:
 
 "My Herbalism number gives me +27% herbs."
+
+
+## Discovery, visibility and shared herb patches
+
+Herb patches outside safe/public areas should exist in the **shared world**, while knowledge of their location initially belongs only to the discovering player.
+
+A patch is not generated separately for each player.
+
+Example runtime state:
+- patch_id;
+- species;
+- world location;
+- current population / harvestable amount;
+- maturity;
+- contamination;
+- regrowth rate;
+- depletion pressure;
+- environmental requirements;
+- lifespan / persistence rules.
+
+### Knowledge states
+
+A player may know a herb patch at different levels:
+
+- **Unknown** — no knowledge that the patch exists.
+- **Rumoured** — vague report that the species exists somewhere in an area.
+- **Approximate** — a search region is known.
+- **Located** — exact patch location is known.
+- **Surveyed** — player has detailed information such as maturity, population, contamination and likely regrowth.
+
+Higher Fieldcraft/Herbalism can improve how quickly a player moves from vague knowledge to surveyed knowledge.
+
+### Private discovery
+
+When a player discovers a hidden patch:
+- it appears in their personal map/journal/intelligence records;
+- other players do not automatically learn it;
+- the discoverer may keep it secret, share it, sell the location, give it to a guild, or publish it later.
+
+Once another player learns the location, both players are interacting with the same patch.
+
+If one player harvests it, the world state changes for everyone.
+
+### Persistence
+
+Patches should not reroll every time a player enters the area.
+
+Persistence should depend on species and ecology.
+
+Examples:
+- common Yarrow patch: long-lived and reliable;
+- Sphagnum patch: persistent while wetland conditions remain suitable;
+- Black Turmeric patch: long-lived but slow to recover from heavy harvest;
+- Pall plant: may emerge after a storm, survive for a limited period, then disappear.
+
+This preserves the value of exploration knowledge.
+
+### Regeneration and migration
+
+Heavy harvest may:
+- lower current population;
+- slow regrowth;
+- push a patch into Exhausted state;
+- temporarily remove harvestable yield.
+
+It should not permanently delete the species from the server.
+
+New patches may:
+- regrow at the same location;
+- emerge in other ecologically valid locations;
+- appear after weather/Pall/world events;
+- migrate through procedural ecology rules.
+
+### Public vs hidden herb sources
+
+Suggested split:
+
+**Common safe herbs**
+- known public harvesting locations;
+- stable supply;
+- little secrecy.
+
+**Uncommon Grey Marches herbs**
+- procedurally placed shared patches;
+- individually discovered;
+- meaningful but recoverable scarcity.
+
+**Rare herbs**
+- hidden shared patches;
+- strong information value;
+- slow regrowth;
+- valuable location intelligence.
+
+**Pall plants**
+- highly dynamic;
+- may depend on contamination, storms, terrain, season/world state or newly exposed zones.
+
+### Ecology rules
+
+The map system should not manually place every individual herb forever.
+
+Instead, species define ecological requirements.
+
+Examples:
+- Sphagnum Moss -> wet terrain, low contamination, marsh/bog ecology.
+- Black Turmeric -> sheltered warm microclimate, suitable soil, rare botanical remnants.
+- Devil's Claw -> dry Pall terrain, high contamination tolerance.
+
+When the world/map system is designed, valid patches can be generated from these ecological constraints.
+
+### Information economy
+
+Discovered resource locations are economically valuable information.
+
+Possible player actions:
+- share privately;
+- sell verified coordinates;
+- post guild intelligence;
+- publish publicly;
+- create map/intelligence records later.
+
+Information should decay.
+
+Example:
+A player buys a report that says:
+"Black Turmeric patch, surveyed 3 hours ago, 6 mature plants."
+
+The location remains valid, but by the time the buyer arrives:
+- another player may have harvested it;
+- contamination may have changed;
+- the patch may be partially depleted.
+
+This keeps discovery knowledge valuable without making purchased information a guaranteed loot claim.
+
+## Design rule
+
+The world owns the resource.
+
+The player owns the **knowledge** that they discovered it until they choose to share it.
