@@ -18,9 +18,13 @@ Equipment wear, consumables, repairs, vehicle operation, taxes and construction 
 
 The first playable version should contain enough economic breadth to create real trade and specialization from the start.
 
-Target approximately **50-70 economic items total**, not including every quest object or decorative item.
+The earlier 50-70-item estimate is now too tight for the agreed food, herb and regional-resource breadth.
 
-The exact catalogue remains tunable, but the first vertical slice should include more than a minimal proof-of-concept economy.
+Current scope target:
+- **first vertical slice:** roughly 45-55 economic items;
+- **Phase One content:** roughly 75-90 economic items.
+
+These are ceilings/working ranges, not quotas. Every item still has to justify itself through sourcing, trade, specialization, logistics, or recipes.
 
 ### Raw resources — canonical direction
 
@@ -55,9 +59,9 @@ Keep the Phase One processed layer lean:
 
 Processing steps do not automatically become separate tradeable items.
 
-### Components — provisional examples
+### Components — audited candidates
 
-Mechanical:
+Strong Phase One candidates:
 - Metal Plate
 - Fastener Set
 - Precision Spring
@@ -66,27 +70,17 @@ Mechanical:
 - Pressure Valve
 - Gear Assembly
 - Firing Mechanism
-- Reinforced Frame
-
-Textile / leather:
 - Leather Strap
-- Cloth Panel
 - Sealed Seam Kit
-- Harness Assembly
-
-Respiratory:
 - Filter Medium
 - Seal Gasket
 - Filter Canister
 - Lens Set
-
-Medical:
 - Sterile Dressing
-- Herbal Compound
-- Syringe / applicator component
-- Antiseptic Solution
 
-Components are important because they allow multiple specialists to participate in one finished item.
+Do not add an intermediate merely because the real object would contain one. Finished recipes may consume Sawn Timber, Cloth, Leather, Metal Plate, etc. directly.
+
+Crafted components may have workmanship quality where it materially affects a finished item. Raw and bulk processed materials normally do not use the five-tier craftsmanship ladder.
 
 ## Finished goods — provisional examples
 
@@ -131,34 +125,26 @@ Components are important because they allow multiple specialists to participate 
 - Sealed Backpack Compartment
 
 ### Base / infrastructure goods
-- Timber Beam
-- Masonry Block
-- Furnace Lining
-- Machine Part Crate
-- Pressure Pipe
-- Workshop Bench Components
 
-These goods can support housing upgrades and later vehicle construction without requiring a separate material universe.
+Phase One upgrades should primarily consume existing processed materials/components directly (for example Sawn Timber, Stone, Fired Ceramic, Metal Plate, Fasteners). Dedicated infrastructure intermediates are added only when a recipe later proves they create useful specialization.
 
 ## Example production chains
 
 ### Respirator chain
 
 Explorer / scavenger:
-- salvage glass
-- Pall membrane
-- metal scrap
+- Pall Membrane
+- Sootlace
+- March Zeolite
+- salvage/ordinary metal inputs
 
-Refiner / processor:
-- treated glass
-- stabilized Pall material
-- cleaned metal
-
-Component specialist:
-- lens set
-- seal gasket
-- filter canister
-- brass fittings
+Processor/component specialists:
+- Treated Glass
+- Filter Medium
+- Lens Set
+- Seal Gasket
+- Filter Canister
+- Brass Fittings
 
 Respiratory crafter:
 - Field Respirator
@@ -171,15 +157,15 @@ The respirator later degrades and requires parts or eventual replacement, keepin
 ### Rifle chain
 
 Resource suppliers:
-- iron / steel
-- hardwood
-- copper
+- Iron Ore / recycled Scrap Metal
+- Common Timber
+- Copper Ore
 - salvaged mechanism parts
 
 Processors:
-- steel billet
-- seasoned hardwood
-- copper ingot
+- Steel
+- Sawn Timber
+- Copper Ingot
 
 Component makers:
 - precision spring
@@ -195,16 +181,13 @@ The exact mechanical recipes must remain fictionalized and game-oriented rather 
 ### Medicine chain
 
 Forager:
-- herbs / rare medicinal growth
+- named herbs with distinct medical roles
 
-Processor:
-- herbal extract
-- antiseptic base
-
-Medical crafter:
-- sterile dressing
-- herbal compound
-- field medicine
+Processor/medical crafter:
+- Sterile Dressing
+- Antiseptic / Medical Alcohol where required
+- recipe-specific herb preparation
+- Field Medicine
 
 Doctor:
 - uses the finished medicine in treatment or buys it for clinical stock.
@@ -272,7 +255,7 @@ Higher crafting ability may improve:
 
 High-quality output should depend on more than raw skill:
 - appropriate breakthrough;
-- material quality/source;
+- required material identity/source/condition;
 - facility;
 - tools;
 - recipe/blueprint understanding;
