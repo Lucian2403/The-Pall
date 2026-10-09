@@ -22,65 +22,38 @@ Target approximately **50-70 economic items total**, not including every quest o
 
 The exact catalogue remains tunable, but the first vertical slice should include more than a minimal proof-of-concept economy.
 
-### Raw resources — provisional examples
+### Raw resources — canonical direction
 
-City / common:
-- Coal
-- Stone
-- Scrap Metal
-- Timber
-- Raw Hide
-- Plant Fibre
-- Clay
-- Sand
-- Raw Meat
-- Raw Fish
-- Milk
-- Eggs
-- Flour / Grain
+The detailed audited catalogue lives in `phase-one-resource-audit.md` and `resource-acquisition.md`.
 
-Grey Marches:
-- Iron Ore
-- Copper Ore
-- Hardwood
-- Yarrow
-- Calendula
-- Nettle
-- Comfrey
-- Industrial Oil
-- Salvaged Mechanisms
-- Intact Glass
-- Chemical Residue
+Broad Phase One groups:
+- safe industrial: Coal, Stone, Timber, Iron Ore, Copper Ore, Clay, Sand, Plant Fibre, Scrap Metal;
+- agriculture/livestock: Grain, Vegetables, Eggs, Milk, Chicken Meat, Pork, Beef, Raw Hide;
+- hunting: Game Meat;
+- common/rare medicinal resources: Yarrow, Calendula, Nettle, Comfrey, Agarwood, Black Turmeric;
+- Grey Marches: Sphagnum Moss, March Zeolite, Black Bog Nodules;
+- Pall: Crude Oil, Devil's Claw, Violet Fluorspar, Sootlace, Pall Membrane, Scar Resin;
+- survival: Drinking Water outside safe-city infrastructure.
 
-Pall zones:
-- Pall-Touched Ore
-- Violet Stone / Purple Stone (working name)
-- Contaminated Alloy Scrap
-- Altered Biological Tissue
-- Pall Membrane
-- Ancient Precision Components
-- Rare Medicinal Growths
+Vague older placeholders such as Pall-Touched Ore, Rare Medicinal Growths and Violet/Purple Stone are retired.
 
-Not every raw resource must exist in the first build, but multiple sourcing regions should already matter.
+### Processed materials — canonical direction
 
-### Processed materials — provisional examples
-
+Keep the Phase One processed layer lean:
 - Iron Ingot
 - Copper Ingot
-- Steel Billet
+- Steel
 - Sawn Timber
-- Seasoned Hardwood
-- Tanned Leather
-- Woven Cloth
-- Refined Oil
-- Herbal Extract
-- Medical Alcohol / antiseptic base
-- Ceramic
+- Leather
+- Cloth
+- Flour
+- Fired Ceramic
 - Treated Glass
-- Stabilized Pall Material
-- Cleaned Salvage Alloy
+- Refined Oil
+- Manganese Concentrate
+- Medical Alcohol only if Medicine/Chemistry recipes justify it
 
-Processed materials should usually require time, fuel, facilities and relevant skill.
+Processing steps do not automatically become separate tradeable items.
 
 ### Components — provisional examples
 
@@ -121,7 +94,6 @@ Components are important because they allow multiple specialists to participate 
 - Bread
 - Cheap Ration
 - Cooked Meat Meal
-- Fish Stew
 - Herbal Tea
 - Field Medicine
 - Antiseptic
