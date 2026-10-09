@@ -237,8 +237,11 @@ Domestic:
 Wild:
 - Deer
 - Wild Boar
+- Bear
+- European Bison
 - Hare/Rabbit
-- Fish
+
+Fishing is **LATER** and not part of the Phase One implementation.
 
 Pall-touched:
 - 3-5 authored species initially, each with distinct behavior and harvestable materials.
@@ -351,8 +354,9 @@ Phase One should keep serious breeding/veterinary incidents rare.
 
 ### Phase One species priority
 
-For the first playable implementation, the player-owned livestock system only needs:
+For the first playable implementation, the player-owned livestock system should support:
 - Chicken Flock
+- Pig Pen
 - Cattle Herd Unit
 
 Pig and Goat remain valid world/NPC livestock and can become player-manageable later.
@@ -360,8 +364,169 @@ Pig and Goat remain valid world/NPC livestock and can become player-manageable l
 This is enough to produce:
 - Eggs
 - Chicken Meat
+- Pork
 - Milk
 - Beef
 - Raw Hide
 
 without creating a full animal-management game.
+
+
+## Phase One pig farming
+
+Pig is a valid player-managed livestock option in Phase One.
+
+A Pig Pen:
+- consumes more farm capacity than a Chicken Coop;
+- consumes recurring feed;
+- produces no recurring food output;
+- is raised toward a slaughter cycle;
+- yields Pork and Raw Hide when slaughtered/processed.
+
+This creates a different farm model from chickens and cattle:
+- Chickens -> recurring Eggs or slaughter for meat;
+- Cattle -> recurring Milk or slaughter for Beef + Hide;
+- Pigs -> primarily meat/hide production after a growth cycle.
+
+Phase One still does not simulate individual animals, breeding genetics, age curves, or veterinary micromanagement.
+
+## Hunting progression
+
+Do not create a separate full "Hunting" major skill in Phase One.
+
+Hunting competence comes from the interaction of:
+- Fieldcraft -> Tracking: finding, following and reading animal signs;
+- Arms: bringing the animal down safely;
+- Fieldcraft/Craftsmanship: field dressing, preserving hide/meat, and reducing waste.
+
+Progression should unlock access to more difficult prey because the player can:
+- interpret harder tracks;
+- approach safely;
+- survive dangerous encounters;
+- recover the carcass efficiently;
+- carry or transport larger yields.
+
+### Hunting bands
+
+#### Early / ordinary hunting
+Primary prey:
+- Hare/Rabbit;
+- Deer;
+- Wild Boar.
+
+Deer:
+- moderate meat;
+- useful hide;
+- rewards clean shot and careful field dressing.
+
+Wild Boar:
+- more dangerous;
+- strong meat yield;
+- usable hide;
+- can seriously injure an unprepared hunter.
+
+#### Advanced hunting
+Primary prey:
+- Bear;
+- European Bison.
+
+These are not simply "higher level deer."
+
+They require:
+- stronger Arms capability;
+- better Tracking;
+- heavier equipment;
+- more ammunition/weapon reliability;
+- better transport capacity;
+- more time to field-dress;
+- greater injury risk.
+
+They provide large carcasses, making logistics a major part of the reward.
+
+A player on foot may kill a bison and still be unable to carry most of its value home.
+
+This is intentional.
+
+#### Pall hunting
+Selected Pall fauna can become high-end hunting targets.
+
+They may yield:
+- specialized hide;
+- Pall-resistant leather source material;
+- altered tissue;
+- glands;
+- membrane;
+- bone/keratin;
+- unique meat where biologically and thematically appropriate.
+
+Pall hunting should remain species-specific rather than every monster dropping the same generic resources.
+
+## Pall meat rule
+
+The earlier rule remains: **most Pall meat is unsafe as ordinary food**.
+
+However, a small number of specifically designed Pall species may yield edible or medicinally useful meat.
+
+Such meat may require:
+- decontamination;
+- specialist butchering;
+- Cooking/Medicine/Scholarship knowledge;
+- proper facility;
+- inspection for contamination.
+
+These special meats can provide strong or unusual food effects, but should not simply be "better steak."
+
+Possible effect directions:
+- unusually long Stamina recovery bonus;
+- temporary resistance to Fatigue;
+- Composure recovery;
+- improved cold/heat tolerance;
+- rare Pall-resistance preparation.
+
+Each Pall meat should carry tradeoffs or preparation difficulty.
+
+Example:
+A rare Pall herbivore may yield meat that can be rendered safe and gives a long-duration recovery effect, but preparation is difficult and failed processing creates Contaminated Meat.
+
+## Pall hide rule
+
+Selected Pall fauna may yield specialized hides.
+
+Possible chain:
+Contaminated Hide -> Stabilized Pall Leather
+
+Use cases:
+- sealed expedition clothing;
+- respirator harnesses;
+- gloves/boots;
+- packs;
+- protective fittings.
+
+Higher hunting/recovery skill improves:
+- amount of usable hide;
+- damage avoidance during field dressing;
+- contamination assessment;
+- preservation;
+- ability to identify which tissue is actually valuable.
+
+## Scope tags
+
+**PHASE ONE**
+- Chicken, Pig, Cattle player farming
+- Deer and Wild Boar hunting
+- basic hunting interactions
+- meat/hide recovery
+- shared farm-capacity system
+
+**PHASE ONE if content budget allows**
+- Bear
+- European Bison
+- one or two Pall huntable fauna with distinct harvests
+
+**LATER**
+- Fishing
+- detailed breeding
+- genetics
+- veterinary profession depth
+- individual animal simulation
+- extensive Pall cuisine
