@@ -32,6 +32,9 @@ Physical/logistics:
 - max_stack
 - weight_kg
 - volume_l
+- unit_label / quantity_unit where needed (piece, kg, L, bundle)
+- liquid_capacity_l for containers where applicable
+- compatible_liquid_group where applicable
 - base_durability
 - max_durability
 - durability_profile_id
@@ -252,6 +255,7 @@ Minimum runtime state:
 - maintenance state/expiry where relevant
 - installed fittings
 - loaded filter/ammunition where relevant
+- contained_liquid_id and contained_liquid_amount where relevant
 - crafted_by_player_id if applicable
 - created_at
 - optional provenance/history flags
