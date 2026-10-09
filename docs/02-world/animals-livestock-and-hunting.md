@@ -244,3 +244,124 @@ Pall-touched:
 - 3-5 authored species initially, each with distinct behavior and harvestable materials.
 
 This is enough to make the ecosystem feel alive without creating a zoo-sized content burden.
+
+
+## Phase One player livestock model
+
+Player livestock should reuse the base/facility farming framework rather than introduce a separate simulation system.
+
+The player owns a **Farm Holding** with limited productive capacity.
+
+That capacity can be allocated between:
+- crop plots;
+- poultry/coops;
+- small livestock pens later;
+- cattle pasture/stall capacity later.
+
+The limitation is capacity, not owning several disconnected farms.
+
+### Capacity points
+
+Use farm capacity points rather than every animal occupying one identical slot.
+
+Illustrative direction:
+- Grain plot: 1 capacity
+- Vegetable plot: 1 capacity
+- Chicken flock / coop: 1 capacity
+- Goat pen: 2 capacity
+- Pig pen: 2 capacity
+- Cattle unit: 3-4 capacity
+
+Exact values are balance data.
+
+A small early farm may therefore choose:
+- 2 Grain plots;
+- 1 Grain + 1 Vegetable;
+- 1 Grain + 1 Chicken coop;
+- 2 Chicken coops.
+
+A larger holding can diversify further.
+
+### Livestock as production groups
+
+Phase One should not track every chicken or cow as an individual character.
+
+Represent livestock as production groups such as:
+- Chicken Flock
+- Cattle Herd Unit
+
+Each group has:
+- required farm capacity;
+- feed/upkeep requirement;
+- production cycle;
+- output;
+- occasional incident state.
+
+This keeps the system deep enough economically without adding breeding/genetics/veterinary micromanagement.
+
+### Recurrent vs destructive outputs
+
+Some animal products are renewable:
+- Chickens -> Eggs
+- Cattle -> Milk
+
+Some require slaughter/removal of livestock:
+- Chickens -> Chicken Meat
+- Cattle -> Beef + Raw Hide
+
+This creates an economic choice between ongoing production and immediate meat/hide recovery.
+
+Replacement livestock can be bought from NPC farms/breeders in Phase One.
+
+Breeding mechanics are LATER.
+
+### Feed
+
+Livestock should create demand for existing agricultural goods rather than introduce a large feed-item catalogue.
+
+Phase One direction:
+- chickens consume Grain;
+- cattle consume a farm upkeep bundle represented mainly by Grain/Vegetables/pasture access;
+- city clean water is abstracted as farm utility under normal conditions.
+
+Do not introduce separate Chicken Feed, Cattle Feed, Hay, Silage, Bran, etc. in Phase One unless later economy data proves they are needed.
+
+Pasture/farm upgrades may reduce purchased feed requirements.
+
+### Interaction philosophy
+
+Livestock uses the same interaction architecture as crops.
+
+Routine production should often run quietly.
+
+Meaningful interactions may include:
+- poor laying;
+- damaged coop;
+- feed shortage;
+- injured animal;
+- escaped livestock;
+- spoiled milk;
+- predator threat;
+- difficult calving only if/when breeding is introduced later;
+- disease concern.
+
+Higher Fieldcraft / Medicine / Craftsmanship may reveal better responses.
+
+Phase One should keep serious breeding/veterinary incidents rare.
+
+### Phase One species priority
+
+For the first playable implementation, the player-owned livestock system only needs:
+- Chicken Flock
+- Cattle Herd Unit
+
+Pig and Goat remain valid world/NPC livestock and can become player-manageable later.
+
+This is enough to produce:
+- Eggs
+- Chicken Meat
+- Milk
+- Beef
+- Raw Hide
+
+without creating a full animal-management game.
