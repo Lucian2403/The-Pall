@@ -281,11 +281,12 @@ Higher Industry/Construction may reveal:
 - whether the face is worth preserving.
 
 Possible outcomes:
-- more raw Stone;
-- more high-value block-grade material;
+- more usable Common Stone;
+- lower/higher waste;
 - tool damage;
-- slower but safer output;
-- wasted rubble.
+- slower but safer output.
+
+Rock-face quality changes yield rather than creating separate Stone grades in Phase One.
 
 ## Tools
 
@@ -456,12 +457,7 @@ Higher Fieldcraft / Carpentry may reveal:
 - hidden rot signs;
 - whether the timber is suitable for structural use or only fuel.
 
-Possible outputs:
-- common logs;
-- straight timber;
-- warped timber;
-- firewood;
-- bark/fibre byproducts.
+Output is normally the single fungible **Common Timber** resource. Tree form, rot, grain and access affect usable yield, time and tool wear rather than creating separate timber grades. Rare discoveries such as Agarwood are explicit exceptions.
 
 Routine experienced forestry should become quiet.
 
@@ -498,14 +494,11 @@ Public supply must remain available.
 
 ## Processing
 
-Common Timber may become:
-- Sawn Timber;
-- Timber Beam;
-- Plank;
-- Handle Blank;
-- Charcoal later if needed.
+Phase One processing stays simple:
 
-Higher-grade wood such as Seasoned Hardwood should be a separate processed or source-specific material.
+**Common Timber -> Sawn Timber**
+
+Finished recipes and building upgrades consume Sawn Timber directly where possible. Beams, planks, handle blanks and charcoal are not separate Phase One commodities unless later recipes prove they need distinct market behavior.
 
 ## Key sinks
 
@@ -634,13 +627,7 @@ Higher Industry / Scholarship / Mechanics may reveal:
 - likely refining waste;
 - whether the seam is worth preserving.
 
-Possible outputs:
-- Low-grade Iron Ore;
-- Standard Iron Ore;
-- mineral-rich waste;
-- occasional unusual inclusions.
-
-Do not make every ore piece have a rarity tier. Grade should matter mainly through refining efficiency and suitability.
+Output is normally the single fungible **Iron Ore** resource. Geological grade affects how much usable ore is recovered for the same work, plus extraction time/waste. Unusual inclusions are explicit rare discoveries rather than routine ore grades.
 
 ## Tools
 
@@ -661,7 +648,7 @@ The main constraints are:
 - labor;
 - hauling weight;
 - fuel required for processing;
-- ore grade;
+- source richness;
 - refining capacity;
 - site throughput.
 
@@ -681,12 +668,7 @@ Refining may require:
 - Industry / Smithing;
 - waste handling.
 
-Higher-grade ore:
-- yields more usable metal;
-- consumes less fuel per usable ingot;
-- produces less slag.
-
-Low-grade ore remains viable when prices or local supply make it worthwhile.
+Richer deposits produce more fungible Iron Ore per unit of extraction effort. Once safely harvested into inventory, ordinary Iron Ore does not retain a separate quality grade.
 
 ## Key sinks
 
