@@ -35,7 +35,7 @@ Broad Phase One groups:
 - agriculture/livestock: Grain, Vegetables, Eggs, Milk, Chicken Meat, Pork, Beef, Raw Hide;
 - hunting: Game Meat;
 - common/rare medicinal resources: Yarrow, Calendula, Nettle, Comfrey, Agarwood, Black Turmeric;
-- Grey Marches: Sphagnum Moss, March Zeolite, Black Bog Nodules;
+- Grey Marches: Sphagnum Moss, March Zeolite, Black Bog Nodules, Grey Bogwood;
 - Pall: Crude Oil, Devil's Claw, Violet Fluorspar, Sootlace, Pall Membrane, Scar Resin;
 - survival: Drinking Water outside safe-city infrastructure.
 
@@ -48,7 +48,7 @@ Keep the Phase One processed layer lean:
 - Copper Ingot
 - Lead Ingot
 - Steel
-- Sawn Timber
+- Planks
 - Leather
 - Cloth
 - Flour
@@ -79,7 +79,7 @@ Strong Phase One candidates:
 - Lens Set
 - Sterile Dressing
 
-Do not add an intermediate merely because the real object would contain one. Finished recipes may consume Sawn Timber, Cloth, Leather, Metal Plate, etc. directly.
+Do not add an intermediate merely because the real object would contain one. Finished recipes may consume Planks, Cloth, Leather, Metal Plate, etc. directly.
 
 Crafted components may have workmanship quality where it materially affects a finished item. Raw and bulk processed materials normally do not use the five-tier craftsmanship ladder.
 
@@ -127,7 +127,7 @@ Crafted components may have workmanship quality where it materially affects a fi
 
 ### Base / infrastructure goods
 
-Phase One upgrades should primarily consume existing processed materials/components directly (for example Sawn Timber, Stone, Fired Ceramic, Metal Plate, Fasteners). Dedicated infrastructure intermediates are added only when a recipe later proves they create useful specialization.
+Phase One upgrades should primarily consume existing processed materials/components directly (for example Planks, Stone, Fired Ceramic, Metal Plate, Fasteners). Dedicated infrastructure intermediates are added only when a recipe later proves they create useful specialization.
 
 ## Example production chains
 
@@ -165,7 +165,7 @@ Resource suppliers:
 
 Processors:
 - Steel
-- Sawn Timber
+- Planks
 - Copper Ingot
 
 Component makers:
