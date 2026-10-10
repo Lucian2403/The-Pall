@@ -142,6 +142,25 @@ The intended acquisition loop is:
 This prevents circular progression where the player needs a Pall material before being capable of entering the Pall.
 
 
+
+## Filter Medium baseline performance
+
+These values describe the intrinsic Filter Medium before canister shell/fitting/gasket losses, respirator face-seal losses, damage, or other equipment effects.
+
+| Filter Medium | Ash Filtration | Pall Filtration | Service Life |
+| --- | ---: | ---: | ---: |
+| Crude Filter Medium | **60%** | **30%** | **20 min** |
+| Grey Filter Medium | **80%** | **60%** | **30 min** |
+| Pall Filter Medium | **90%** | **80%** | **45 min** |
+| Deep Pall Filter Medium | **90%** | **90%** | **75 min** |
+
+Design intent:
+- Crude is a weak emergency/frontier-entry medium.
+- Grey is the first dependable Ash/Grey solution and a meaningful Pall step.
+- Pall is the major serious-Pall upgrade.
+- Deep Pall does not improve Ash filtration beyond Pall Medium; its value is higher Pall filtration and substantially longer service life.
+- Breathing resistance remains unresolved and should be balanced separately.
+
 ## Filter Canister composition direction
 
 Filter Canisters should use a component-derived model rather than one hardcoded catalogue entry per possible component combination.
@@ -173,7 +192,7 @@ Mixed-tier components are allowed. Their result is calculated rather than manual
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
-- exact protection/service-life values;
+- exact canister protection formula and component baseline stats;
 - exact protection/service-life values.
 
 
