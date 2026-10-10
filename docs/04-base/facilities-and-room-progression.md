@@ -283,3 +283,22 @@ It represents a compact work area containing the appropriate hand tools and smal
 It is one gameplay workstation/facility family, not one literal machine.
 
 This keeps Phase One property pressure reasonable while preserving believable physical processes.
+
+
+## Phase One Oil Distillation Rig
+
+Status: PROVISIONAL.
+
+The **Oil Distillation Rig** is a specialist Industry -> Refining workstation for Crude Oil processing.
+
+It is not part of the Forge/Smelter line.
+
+Recommended placement:
+- requires a proper dedicated industrial room, approximately Workshop House progression or better;
+- unavailable in the starter hut;
+- supports sealed liquid input/output storage;
+- requires ventilation and fire-safety capability.
+
+The workstation represents a compact retort/still, condenser, valves, collection vessels and filtration/settling hardware.
+
+Its purpose is to let Refining progression branch beyond metalworking without making the Forge a universal processing station.
