@@ -233,7 +233,7 @@ Agreed raw Pressure Systems gates:
 The Tier 1 gate deliberately does not start at 0. A completely untrained character must first gain basic Pressure Systems competence through concrete related work before independently assembling even a crude canister.
 
 Workstation direction:
-- **Pressure Bench** is the preferred Phase One name for the Mechanics -> Pressure Systems workstation;
+- **Pressure Bench** is the canonical Phase One Mechanics -> Pressure Systems workstation;
 - T1 Pressure Bench can assemble Crude and Grey Filter Canisters;
 - T2 Pressure Bench does not unlock a new canister tier, but may unlock other Pressure Systems items/components;
 - T3 Pressure Bench can assemble Pall Filter Canisters;
