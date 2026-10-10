@@ -340,7 +340,7 @@ The progression gate for Copper Fitting and Seal Gasket comes from their raw ski
 
 Final Filter Canister assembly uses the Mechanics -> Pressure Systems workstation.
 
-Preferred workstation name: **Pressure Bench**.
+Canonical workstation name: **Pressure Bench**.
 
 Canister access by facility tier:
 - T1: Crude and Grey Filter Canisters;
