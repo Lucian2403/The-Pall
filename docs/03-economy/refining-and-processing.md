@@ -564,6 +564,12 @@ Requirements:
 - minimum raw Refining: **0**;
 - Coal fuel.
 
+Why Refining 20 for Glass:
+- basic clay firing is forgiving enough for a novice;
+- glassmaking requires tighter heat control and cleaner handling;
+- it creates a meaningful progression step between basic refining and specialist metallurgy;
+- it prevents Glass from being just another Refining-0 commodity.
+
 Rules:
 - same skill batch caps as Iron/Copper;
 - same avoidable-waste curve;
@@ -600,7 +606,7 @@ Nominal game conversion:
 Requirements:
 - suitable high-heat furnace capability;
 - Industry -> Refining;
-- minimum raw Refining: **0**;
+- minimum raw Refining: **20**;
 - Coal fuel.
 
 Rules:
