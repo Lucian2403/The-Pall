@@ -31,7 +31,7 @@ These are ceilings/working ranges, not quotas. Every item still has to justify i
 The detailed audited catalogue lives in `phase-one-resource-audit.md` and `resource-acquisition.md`.
 
 Broad Phase One groups:
-- safe industrial: Coal, Stone, Timber, Iron Ore, Copper Ore, Clay, Sand, Plant Fibre, Scrap Metal;
+- safe industrial: Coal, Stone, Timber, Iron Ore, Copper Ore, Lead Ore, Clay, Sand, Plant Fibre, Scrap Metal;
 - agriculture/livestock: Grain, Vegetables, Eggs, Milk, Chicken Meat, Pork, Beef, Raw Hide;
 - hunting: Game Meat;
 - common/rare medicinal resources: Yarrow, Calendula, Nettle, Comfrey, Agarwood, Black Turmeric;
@@ -46,13 +46,14 @@ Vague older placeholders such as Pall-Touched Ore, Rare Medicinal Growths and Vi
 Keep the Phase One processed layer lean:
 - Iron Ingot
 - Copper Ingot
+- Lead Ingot
 - Steel
 - Sawn Timber
 - Leather
 - Cloth
 - Flour
 - Fired Ceramic
-- Treated Glass
+- Glass
 - Refined Oil
 - Manganese Concentrate
 - Medical Alcohol only if Medicine/Chemistry recipes justify it
@@ -139,7 +140,7 @@ Explorer / scavenger:
 - salvage/ordinary metal inputs
 
 Processor/component specialists:
-- Treated Glass
+- Glass
 - Filter Medium
 - Lens Set
 - Seal Gasket
