@@ -262,6 +262,18 @@ Example:
 Deep inspection is limited to selected complex item families in Phase One rather than every inventory item.
 
 
+
+
+### Novice-entry progression
+
+Not every crafting branch should begin with an independently craftable item at raw skill 0.
+
+Where the fiction supports it, a complete novice should first gain a few levels through named beginner work using existing items, facilities or supervised/NPC-owned equipment.
+
+For Mechanics -> Pressure Systems, the first independently craftable Filter Canister begins at raw Pressure Systems **5**, not 0.
+
+The 0-5 path must be supplied by concrete named Phase One jobs/actions before implementation. It must not be justified by generic phrases such as "basic pressure work."
+
 ## Progression-source specificity rule
 
 When defining how a subskill levels, only **named, explicit Phase One content** counts as a progression source.
