@@ -338,4 +338,14 @@ Phase One component recipes use existing workstation families:
 
 The progression gate for Copper Fitting and Seal Gasket comes from their raw skill requirements, not from forcing an unnecessary higher workstation tier.
 
-Final Filter Canister assembly is expected to use a Mechanics/Pressure workstation and is defined separately.
+Final Filter Canister assembly uses the Mechanics -> Pressure Systems workstation.
+
+Preferred workstation name: **Pressure Bench**.
+
+Canister access by facility tier:
+- T1: Crude and Grey Filter Canisters;
+- T2: no additional canister tier required, but the tier may unlock other Pressure Systems recipes;
+- T3: Pall Filter Canister;
+- T4: Deep Pall Filter Canister.
+
+Facility tiers are not defined solely by Filter Canisters; other named Pressure Systems items can justify T2 and later progression.
