@@ -27,6 +27,29 @@ Bulk industrial resources use physical quantity units where practical:
 
 For bulk materials, a market stack quantity therefore represents physical quantity rather than an arbitrary MMO "ore item."
 
+## Contaminated common-metal feedstock
+
+Iron Ore, Copper Ore, and Lead Ore found in the Grey Marches or Pall zones may carry the **Contaminated** state.
+
+The underlying commodity remains the same ore type.
+
+Rules:
+- clean and contaminated stacks do not merge;
+- contamination is not a quality bonus;
+- the nominal recipe ratio does not improve;
+- contaminated refining should be more troublesome, not more profitable;
+- a contamination-capable facility/process may be required for safe large-scale refining.
+
+Exact extra fuel/time and facility requirements are deferred until the contamination-control system is tuned.
+
+The implementation should support recipe modifiers such as:
+- additional Coal;
+- additional processing time;
+- higher incident chance;
+- contamination-control facility requirement.
+
+Do not create separate item IDs such as "Pall Iron Ore" or "Grey Copper Ore."
+
 ## Batch-size rule
 
 Maximum requested batch is:
@@ -105,8 +128,11 @@ For Phase One, every **furnace-based mineral/metal refining recipe** consumes Co
 This includes:
 - Iron Ore -> Iron Ingot;
 - Copper Ore -> Copper Ingot;
+- Lead Ore -> Lead Ingot;
 - Iron Ingot -> Steel;
 - Black Bog Nodules -> Manganese Concentrate;
+- Clay -> Fired Ceramic;
+- Industrial Sand -> Glass;
 - later furnace-based mineral refining recipes.
 
 Non-furnace processing such as milling Grain, tanning Hide or weaving Fibre does not consume Coal merely for consistency.
@@ -492,3 +518,115 @@ Recommended gates:
 This gives the metal progression a readable staircase:
 
 **0 Iron/Copper -> 20 Steel -> 25 Manganese Concentrate -> 30 recycled Steel -> 40 advanced manganese-assisted metallurgy.**
+
+
+---
+
+# Lead refining
+
+Status: PHASE ONE.
+
+## Recipe: Lead Ore -> Lead Ingot
+
+Nominal game conversion:
+
+**2 kg Lead Ore + 1 kg Coal -> 1 kg Lead Ingot**
+
+Requirements:
+- T1 furnace capability or better;
+- Industry -> Refining;
+- minimum raw Refining: **0**;
+- Coal fuel.
+
+Lead uses:
+- the same skill batch-cap table as Iron/Copper;
+- the same avoidable-waste curve;
+- the same nominal baseline processing time;
+- the same facility-cap model.
+
+Lead Ingot is fungible and primarily feeds ammunition production.
+
+---
+
+# Ceramic processing
+
+Status: PHASE ONE.
+
+## Recipe: Clay -> Fired Ceramic
+
+Nominal game conversion:
+
+**5 kg Clay + 2 kg Coal -> 1 kg Fired Ceramic**
+
+Requirements:
+- furnace/kiln capability;
+- Industry -> Refining;
+- minimum raw Refining: **0**;
+- Coal fuel.
+
+Rules:
+- same skill batch caps as Iron/Copper;
+- same avoidable-waste curve;
+- same baseline time per kg of output as Iron/Copper;
+- same facility throughput logic.
+
+The high 5:1 input ratio represents water, unsuitable mineral fraction, shrinkage, breakage, and rejected material without creating additional clay-processing commodities.
+
+### Ceramic interaction themes
+
+Use the same interaction frequency philosophy, but ceramic-specific situations:
+- uneven heating;
+- charge still too wet;
+- cracking during firing;
+- poor furnace loading;
+- deciding whether to extend the firing cycle at extra Coal cost.
+
+Higher Refining reveals whether more heat will help or simply increase breakage/fuel waste.
+
+Fired Ceramic remains one fungible processed material.
+
+---
+
+# Glass processing
+
+Status: PHASE ONE.
+
+## Recipe: Industrial Sand -> Glass
+
+Nominal game conversion:
+
+**7 kg Industrial Sand + 2 kg Coal -> 1 kg Glass**
+
+Requirements:
+- suitable high-heat furnace capability;
+- Industry -> Refining;
+- minimum raw Refining: **0**;
+- Coal fuel.
+
+Rules:
+- same skill batch caps as Iron/Copper;
+- same avoidable-waste curve;
+- same baseline time per kg of output as Iron/Copper;
+- same facility throughput logic.
+
+The high 7:1 input ratio abstracts unsuitable grains, impurities, rejected melt, furnace loss, and the fact that "Industrial Sand" is a broad harvested feedstock rather than pure silica.
+
+### Glass interaction themes
+
+Possible situations:
+- melt remains cloudy;
+- furnace heat is uneven;
+- impurities are collecting at the surface;
+- the batch is beginning to overheat;
+- the furnace is consuming Coal without fully clearing the melt.
+
+Higher Refining reveals whether to:
+- continue heating;
+- skim impurities;
+- redistribute the batch;
+- reduce heat;
+- accept lower recovery.
+
+Glass remains fungible.
+
+Violet Fluorspar can later enter specific advanced glass/optics recipes without creating a separate universal "Fine Glass" commodity.
