@@ -141,6 +141,31 @@ The intended acquisition loop is:
 
 This prevents circular progression where the player needs a Pall material before being capable of entering the Pall.
 
+
+## Filter Canister composition direction
+
+Filter Canisters should use a component-derived model rather than one hardcoded catalogue entry per possible component combination.
+
+Current component direction:
+- Metal Plate / canister body;
+- Copper Fitting;
+- Seal Gasket;
+- Filter Medium.
+
+A crude canister may omit the Copper Fitting and Seal Gasket and rely on a poorer integral/crimped connection.
+
+The finished canister's headline Ash/Pall respiratory resistance is derived from:
+- the medium's filtration capability;
+- shell seal;
+- connection seal;
+- gasket seal where present.
+
+Players always see the final practical resistance values.
+
+Relevant subskills can reveal deeper component diagnostics through the generic Inspect system.
+
+Mixed-tier components are allowed. Their result is calculated rather than manually authored.
+
 ## Still open
 
 - governing existing skill and subskill;
