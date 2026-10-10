@@ -175,3 +175,55 @@ Mixed-tier components are allowed. Their result is calculated rather than manual
 - exact Tier 3 and Tier 4 penalties;
 - Filter Canister assembly recipes and Mechanics requirements;
 - exact protection/service-life values.
+
+
+## Canister component recipes
+
+Status: PROVISIONAL Phase One; recipes, skill gates and workstation families locked.
+
+### Metal Plate
+
+**1 Iron Ingot -> 2 Metal Plates**
+
+Requirements:
+- Craftsmanship -> Smithing;
+- minimum raw Smithing: **0**;
+- workstation: **Forge**;
+- T1 Forge is sufficient.
+
+### Copper Fitting
+
+**1 Copper Ingot -> 4 Copper Fittings**
+
+Requirements:
+- Craftsmanship -> Smithing;
+- minimum raw Smithing: **15**;
+- workstation: **Forge**;
+- T1 Forge is sufficient.
+
+The skill requirement provides the progression gate; a higher Forge tier is not required merely to make the fitting.
+
+### Seal Gasket
+
+**1 Leather + 1 Cloth -> 4 Seal Gaskets**
+
+Requirements:
+- Craftsmanship -> Tailoring;
+- minimum raw Tailoring: **15**;
+- workstation: **Textile & Leather Workshop**;
+- T1 Textile & Leather Workshop is sufficient.
+
+Leather provides the flexible sealing surface; Cloth provides reinforcement/packing.
+
+These components are leaf components for Phase One. Do not add further sub-components unless a later recipe creates a distinct economic reason.
+
+### Final Filter Canister assembly
+
+The final canister should **not** be assembled at the Forge or Textile & Leather Workshop.
+
+Current direction:
+- Mechanics-based assembly;
+- likely Pressure Systems;
+- likely Pressure/Mechanics workstation.
+
+Exact assembly skill gate, workstation name/tier and times remain open.
