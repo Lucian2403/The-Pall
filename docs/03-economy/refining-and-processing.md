@@ -1,0 +1,374 @@
+# Refining and Processing
+
+Status: PROVISIONAL Phase One design.
+
+## Core rules
+
+Refining converts raw resources into economically meaningful processed materials.
+
+A refining recipe defines:
+- input commodities and quantities;
+- output commodity and quantity;
+- workstation capability;
+- minimum raw skill;
+- batch cap;
+- base fuel requirement;
+- processing time;
+- avoidable material waste;
+- avoidable fuel waste;
+- interaction pool;
+- possible incidents.
+
+Bulk industrial resources use physical quantity units where practical:
+- solid bulk commodities: kilograms (kg);
+- liquids: liters (L);
+- discrete objects/components: pieces;
+- herbs and similar small biological materials: recipe-defined bundles/units where needed.
+
+For bulk materials, a market stack quantity therefore represents physical quantity rather than an arbitrary MMO "ore item."
+
+## Batch-size rule
+
+Maximum requested batch is:
+
+**min(skill batch cap, facility batch cap, available inputs/storage)**
+
+Skill creates the knowledge/handling ceiling. Facility creates the physical throughput ceiling.
+
+### Provisional Refining skill batch caps
+
+| Raw Refining skill | Max output batch |
+| --- | ---: |
+| 0-9 | 1 kg |
+| 10-19 | 3 kg |
+| 20-29 | 5 kg |
+| 30-39 | 10 kg |
+| 40-49 | 20 kg |
+| 50-59 | 40 kg |
+| 60-69 | 60 kg |
+| 70-79 | 80 kg |
+| 80-100 | 100 kg |
+
+This replaces irregular 35-skill thresholds and keeps the progression readable.
+
+### Provisional facility caps
+
+| Metalworking facility | Max refining batch |
+| --- | ---: |
+| T1 Basic Furnace / Forge | 5 kg |
+| T2 Proper Smelter / Forge | 20 kg |
+| T3 Industrial Metalworks | 50 kg |
+| T4 Advanced Foundry | 100 kg |
+
+Exact names and construction requirements remain to be finalized with facility content.
+
+## Waste model
+
+The recipe's nominal conversion ratio already represents unavoidable physical loss such as gangue, slag, scale and impurities.
+
+**Skill waste is additional avoidable process loss**, not the same thing as the recipe conversion ratio.
+
+Provisional avoidable material-waste curve:
+
+**waste_pct = max(1%, 20% × exp(-raw_refining_skill / 35))**
+
+Approximate values:
+
+| Refining skill | Avoidable waste |
+| --- | ---: |
+| 0 | 20.0% |
+| 10 | 15.0% |
+| 20 | 11.3% |
+| 30 | 8.5% |
+| 40 | 6.4% |
+| 50 | 4.8% |
+| 60 | 3.6% |
+| 70 | 2.7% |
+| 80 | 2.0% |
+| 90 | 1.5% |
+| 100 | 1.1% |
+
+Waste never reaches zero.
+
+For UI and server calculation:
+- the player chooses desired output;
+- the recipe shows nominal inputs;
+- expected extra material required from process waste is shown before confirmation;
+- batch calculations may use decimals internally even when the UI rounds sensibly.
+
+Good interaction choices may reduce the current batch's avoidable waste. Poor choices or incidents may increase it.
+
+## Fuel model
+
+Coal is a bulk commodity measured in kg.
+
+Each recipe has a **base Coal requirement per kg of target output**.
+
+Skill/facility should primarily reduce avoidable overburn and poor furnace management, not make the thermodynamic base fuel requirement disappear.
+
+Fuel use therefore has:
+- base recipe fuel;
+- optional avoidable fuel waste;
+- facility modifier;
+- incident/interaction modifier.
+
+Exact economy tuning can change base rates without changing the system.
+
+---
+
+# Iron refining
+
+Status: PHASE ONE.
+
+## Recipe: Iron Ore -> Iron Ingot
+
+Nominal conversion:
+
+**2 kg Iron Ore + 1 kg Coal -> 1 kg Iron Ingot**
+
+The 2:1 ore ratio already abstracts:
+- waste rock/gangue;
+- slag;
+- impurities;
+- unavoidable refining loss.
+
+Additional skill waste is applied on top of the nominal ore requirement.
+
+### Requirements
+
+- workstation: Smelting Furnace capability;
+- facility: T1 Basic Furnace / Forge or better;
+- skill: Industry -> Refining;
+- minimum raw Refining: 0;
+- novice-accessible;
+- fuel: Coal.
+
+A novice can perform the process, but pays through:
+- low batch cap;
+- higher avoidable material waste;
+- greater chance of needing an interaction;
+- potentially higher avoidable fuel consumption.
+
+### Outcomes
+
+Iron Ingot is a fungible processed bulk material and does not use Crude/Standard/Fine/etc.
+
+Process outcome affects:
+- ore wasted;
+- Coal overburn;
+- completion time;
+- chance of a minor furnace incident.
+
+It should not produce separate "Poor Iron Ingot" inventory stacks.
+
+---
+
+# Steel refining
+
+Status: PHASE ONE.
+
+## Design correction: Scrap Metal is not mandatory
+
+Steel should **not** require Scrap Metal in every recipe.
+
+Making scrap mandatory would be both economically awkward and metallurgically backwards: scrap is useful as recycled feedstock, but the ability to make steel should not depend on finding old broken objects.
+
+Phase One should support a primary steel process plus a later/unlocked recycled route.
+
+## Primary recipe: Iron Ingot -> Steel
+
+Provisional nominal conversion:
+
+**1 kg Iron Ingot + 0.5 kg Coal -> 1 kg Steel**
+
+Coal here abstracts the carbon-bearing fuel/process input and heat requirement; most Coal mass is burned rather than incorporated into the steel.
+
+Requirements:
+- workstation: Forge / steel-hearth capability within Metalworks;
+- minimum raw Refining: **20**;
+- T2 Proper Smelter / Forge recommended/required for normal production;
+- Coal fuel.
+
+Steel at Refining 20 should be possible but inefficient and attention-demanding.
+
+## Recycled-steel route
+
+A second route can make Scrap Metal economically important without making it compulsory.
+
+Provisional direction:
+
+**0.5 kg Iron Ingot + 1 kg Scrap Metal + 0.75 kg Coal -> 1 kg Steel**
+
+Requirements:
+- Refining 30+;
+- suitable Metalworks facility;
+- scrap inspection/sorting capability.
+
+The higher nominal input reflects dirt, corrosion, mixed metals and unrecoverable contamination in generic Scrap Metal.
+
+This route:
+- reduces demand for virgin Iron Ingot;
+- creates a permanent sink for salvage;
+- is more sensitive to poor process decisions;
+- can become attractive when scrap is cheap.
+
+Exact ratios remain balance values.
+
+## Advanced metallurgy
+
+Black Bog Nodules -> Manganese Concentrate should matter in selected advanced steel-based recipes/processes.
+
+Do **not** create a universal "Fine Steel" commodity simply to consume Manganese Concentrate.
+
+Instead, advanced components may require:
+- Steel;
+- Manganese Concentrate;
+- appropriate facility/skill.
+
+This preserves the Grey Marches resource sink without fragmenting Steel into quality grades.
+
+---
+
+# Iron/steel interaction design
+
+## Philosophy
+
+Ordinary refining should not become a repetitive minigame.
+
+Interactions occur when:
+- the recipe is new to the character;
+- skill is close to recipe difficulty;
+- the batch is large relative to experience;
+- the furnace/facility is worn;
+- mixed/recycled inputs are used;
+- an uncommon process incident occurs.
+
+A skilled refiner making ordinary Iron Ingots in a good facility should usually run the batch quietly.
+
+Steel should remain attention-demanding longer than basic Iron.
+
+## Interaction family A: Furnace heat
+
+Example prompt:
+
+> The furnace has come up hot, but the charge is not settling evenly. The upper layer remains dark while the lower bed is beginning to spark.
+
+Low-skill options:
+- Add more Coal.
+- Increase the draft.
+- Continue as-is.
+- Stop the batch.
+
+Higher Refining may reveal:
+- The draft is already sufficient; more air will waste fuel.
+- Redistribute the charge before adding fuel.
+- The lower bed is overheating; reduce draft briefly and preserve yield.
+
+Possible consequences:
+- extra Coal consumed;
+- lower/higher avoidable material waste;
+- extra processing time;
+- minor facility wear.
+
+## Interaction family B: Slag separation
+
+Example prompt:
+
+> A thick glassy layer is collecting around the working metal.
+
+Low-skill options:
+- Keep heating.
+- Skim it now.
+- Stir the charge.
+- Stop and inspect.
+
+Higher Refining may identify:
+- slag is ready to separate;
+- the metal is still carrying too much impurity;
+- further heating will begin costing usable iron.
+
+Possible consequences:
+- recovered yield;
+- lost metal;
+- extra fuel;
+- extra time.
+
+No separate Slag commodity is required in Phase One.
+
+## Interaction family C: Airflow / furnace condition
+
+Example prompt:
+
+> The flame has become dull and uneven. Heat is falling despite normal fuel consumption.
+
+Possible causes selected by context:
+- partially blocked air path;
+- wet/poorly stored Coal;
+- furnace lining damage;
+- overloaded batch.
+
+Higher Refining/Mechanics reveals cause-specific options.
+
+Possible consequences:
+- clear obstruction;
+- reduce batch load;
+- spend extra Coal;
+- accept longer process time;
+- facility durability damage if ignored.
+
+## Interaction family D: Steel process control
+
+Example prompt:
+
+> The metal has reached working heat, but the surface response is uneven across the batch.
+
+Low-skill options:
+- Keep heating.
+- Add Coal.
+- Work the batch now.
+- Slow the process.
+
+Higher Refining/Smithing information may reveal:
+- the batch is overheating;
+- carbon exposure has been uneven;
+- one section needs additional working;
+- continuing at the current heat risks extra scale loss.
+
+Consequences primarily affect:
+- material waste;
+- Coal use;
+- process time.
+
+Bulk Steel remains one fungible commodity.
+
+## Interaction family E: Recycled scrap
+
+Only relevant when Scrap Metal is used.
+
+Example prompt:
+
+> One part of the scrap charge is producing an unfamiliar coloured scale before the rest has reached working heat.
+
+Higher Refining/Scholarship/Mechanics may reveal:
+- a contaminating non-ferrous piece;
+- heavily corroded material;
+- usable iron worth separating;
+- a component better recovered intact than melted.
+
+Choices may:
+- remove contamination and lose time;
+- continue and accept higher waste;
+- abort part of the charge;
+- recover a valuable component.
+
+This makes recycled steel meaningfully different from virgin production.
+
+## Mastery
+
+Suggested routine thresholds:
+- Iron Ingot becomes normally interaction-free around Refining 20-25 with a sound facility.
+- Steel becomes normally interaction-free around Refining 40-45 for ordinary batches.
+- Recycled steel remains somewhat more incident-prone because input consistency is worse.
+- Oversized batches, damaged facilities and unusual inputs can reintroduce interactions for experts.
+
+Skill should reveal understanding first and efficiency second.
