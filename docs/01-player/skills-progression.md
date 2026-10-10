@@ -239,3 +239,24 @@ Example for a respirator canister:
 The server stores the full item truth. The UI reveals only the information permitted by the player's relevant raw/effective knowledge.
 
 Important progression gates should still use Raw Skill. Inspection assistance from equipment may improve detail or confidence but should not substitute for permanent expertise.
+
+
+### Data-driven implementation rule
+
+Inspection does not require handcrafted logic for every item/component combination.
+
+Inspectable properties should use reusable data rules that map:
+- property/component tag;
+- relevant subskill;
+- reveal threshold;
+- reveal depth;
+- text/numeric output.
+
+The same rule can therefore apply to any compatible item.
+
+Example:
+- a connection-seal rule can be reused by respirators, valves and pressure equipment;
+- a mechanism-alignment rule can be reused by firearms and precision machinery;
+- a Pall-material rule can be reused by respirators, sealed gear and contaminated components.
+
+Deep inspection is limited to selected complex item families in Phase One rather than every inventory item.
