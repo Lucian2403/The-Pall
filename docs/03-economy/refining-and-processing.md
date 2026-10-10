@@ -831,9 +831,11 @@ Ordinary Leather should become routine as Tailoring rises.
 
 Status: PHASE ONE.
 
-Minimum raw Tailoring: **0**.
+Nominal conversion:
 
-Exact nominal input/output ratio remains to be set separately.
+**2 Plant Fibre -> 1 Cloth**
+
+Minimum raw Tailoring: **0**.
 
 Cloth uses:
 - the same Tailoring waste curve;
