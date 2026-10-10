@@ -734,3 +734,116 @@ Bogwood Planks are heavier and harder to work but offer superior dimensional sta
 There is **no separate Pall wood commodity in Phase One**.
 
 Pall forestry already has Scar Resin as a specialist resource. Adding an altered Pall timber solely to create another Carpentry tier would duplicate purpose and expand contamination/processing scope without enough payoff.
+
+
+---
+
+# Textile and leather processing
+
+Status: PHASE ONE.
+
+These processes use **Craftsmanship -> Tailoring**, not Industry -> Refining.
+
+They share one broad Phase One workstation:
+
+**Textile & Leather Workshop**
+
+The workshop represents a compact group of tools rather than one literal machine:
+- cutting/work table;
+- spindle/hand loom;
+- hide scraping/stretching tools;
+- small tanning vat/rack;
+- drying/storage space.
+
+This avoids creating separate buildings for cloth and leather while keeping the physical fiction believable.
+
+## Tailoring processing waste
+
+Textile/leather processing should have lower avoidable waste than sawing Timber.
+
+Provisional Tailoring waste curve:
+
+| Raw Tailoring | Avoidable process loss |
+| --- | ---: |
+| 0 | 15% |
+| 10 | 12% |
+| 20 | 9% |
+| 30 | 7% |
+| 40 | 5.5% |
+| 50 | 4% |
+| 60 | 3% |
+| 70 | 2.2% |
+| 80 | 1.6% |
+| 90 | 1.2% |
+| 100 | 0.8% |
+
+Waste never reaches zero.
+
+As with other discrete-output processing, waste is calculated across the whole batch rather than rounding each individual input separately.
+
+## Leather processing
+
+### Recipe: Raw Hide -> Leather
+
+Nominal conversion:
+
+**2 Raw Hide -> 1 Leather**
+
+Recommended minimum raw Tailoring: **10**.
+
+The 2:1 ratio represents unavoidable tanning/preparation loss:
+- water loss;
+- fat/flesh removal;
+- hair removal where appropriate;
+- trimming damaged edges;
+- unusable scarred/torn sections.
+
+Avoidable Tailoring waste is additional to the nominal 2:1 conversion.
+
+Leather is a fungible processed material and does not use craftsmanship quality tiers.
+
+### Interaction themes
+
+Possible situations:
+- hide has an unnoticed thin/torn section;
+- scraping is removing too much usable material;
+- tanning bath is too weak/strong;
+- hide is drying unevenly;
+- tension on the rack is causing distortion.
+
+Higher Tailoring reveals:
+- where to trim versus preserve;
+- whether more soaking is useful;
+- when stretching will improve usable area;
+- whether a damaged section should be cut away immediately.
+
+Outcomes affect:
+- usable Leather yield;
+- processing time;
+- tool/workstation wear;
+- rare batch spoilage if badly mishandled.
+
+Ordinary Leather should become routine as Tailoring rises.
+
+## Cloth processing
+
+### Recipe: Plant Fibre -> Cloth
+
+Status: PHASE ONE.
+
+Minimum raw Tailoring: **0**.
+
+Exact nominal input/output ratio remains to be set separately.
+
+Cloth uses:
+- the same Tailoring waste curve;
+- the same Textile & Leather Workshop;
+- cloth-specific interactions rather than Leather interactions.
+
+Possible interaction themes:
+- uneven fibre tension;
+- tangled or poorly aligned fibre;
+- weak section in the weave;
+- spindle/loom tension issue;
+- deciding whether to rework a section or accept loss.
+
