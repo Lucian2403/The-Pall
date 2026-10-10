@@ -326,3 +326,16 @@ Facility upgrades do not remove the recipe's unavoidable 4:1 Crude Oil conversio
 A T4 refinery is deliberately deferred until player-owned industrial scale warrants it.
 
 Its purpose is to let Refining progression branch beyond metalworking without making the Forge a universal processing station.
+
+
+### Canister component workstation mapping
+
+Phase One component recipes use existing workstation families:
+
+- Metal Plate -> Forge, T1 sufficient;
+- Copper Fitting -> Forge, T1 sufficient;
+- Seal Gasket -> Textile & Leather Workshop, T1 sufficient.
+
+The progression gate for Copper Fitting and Seal Gasket comes from their raw skill requirements, not from forcing an unnecessary higher workstation tier.
+
+Final Filter Canister assembly is expected to use a Mechanics/Pressure workstation and is defined separately.
