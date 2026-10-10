@@ -185,6 +185,73 @@ Relevant subskills can reveal deeper component diagnostics through the generic I
 
 Mixed-tier components are allowed. Their result is calculated rather than manually authored.
 
+
+## Filter Canister structural baselines
+
+Status: PROVISIONAL balance values; current canonical baseline for Phase One.
+
+A Metal Plate does not itself carry a shell-seal stat. Shell Seal is created by the canister-body assembly process.
+
+### Standard-quality structural baselines
+
+| Part / assembly | Baseline stat | Durability | Weight |
+| --- | ---: | ---: | ---: |
+| Crude one-plate body | Shell Seal **88%** | **80** | **0.50 kg** |
+| Proper one-plate body | Shell Seal **97%** | **100** | **0.50 kg** |
+| Reinforced two-plate body | Shell Seal **98%** | **140** | **1.00 kg** |
+| Copper Fitting | Connection Seal **97%** | **90** | **0.08 kg** |
+| Seal Gasket | Gasket Seal **98%** | **65** | **0.02 kg** |
+
+The Seal Gasket is intentionally the least durable structural component. It should commonly become the first replaceable weak point rather than forcing replacement of the whole canister.
+
+### Crude canister connection
+
+The Crude Filter Canister has no Copper Fitting and no Seal Gasket.
+
+Its integral slip/crimp connection uses a baseline:
+- Connection Seal: **85%**.
+
+Therefore its total structural seal is:
+
+**0.88 × 0.85 = 0.748**, or **74.8%**.
+
+With Crude Filter Medium:
+- Ash: **60% × 74.8% ≈ 45%** effective canister resistance;
+- Pall: **30% × 74.8% ≈ 22%** effective canister resistance.
+
+### Proper one-plate canister
+
+Grey and Pall Filter Canisters use:
+- proper one-plate body;
+- Copper Fitting;
+- Seal Gasket.
+
+Total structural seal:
+
+**0.97 × 0.97 × 0.98 = 0.922**, or about **92.2%**.
+
+Using the current Filter Medium baselines:
+- Grey Filter Canister: about **74% Ash / 55% Pall**;
+- Pall Filter Canister: about **83% Ash / 74% Pall**.
+
+### Reinforced Deep Pall canister
+
+Deep Pall uses:
+- reinforced two-plate body;
+- Copper Fitting;
+- Seal Gasket.
+
+Total structural seal:
+
+**0.98 × 0.97 × 0.98 = 0.932**, or about **93.2%**.
+
+Using Deep Pall Filter Medium:
+- about **84% Ash / 84% Pall** effective canister resistance.
+
+These are canister-level respiratory resistance values only. Final character respiratory resistance can be reduced further by the respirator's face-seal performance.
+
+The top tier intentionally does not approach immunity.
+
 ## Still open
 
 - governing existing skill and subskill;
@@ -192,7 +259,7 @@ Mixed-tier components are allowed. Their result is calculated rather than manual
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
-- exact canister protection formula and component baseline stats;
+- breathing-resistance penalties and quality/durability interaction details;
 - exact protection/service-life values.
 
 
