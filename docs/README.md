@@ -19,3 +19,5 @@ This directory contains the human-readable design source of truth.
 **Chat proposes. Docs decide. Structured game data tunes. Code implements.**
 
 Game systems should be implemented generically enough that most future additions are new data/content rather than new special-case code.
+
+- `docs/03-economy/filter-progression.md`
