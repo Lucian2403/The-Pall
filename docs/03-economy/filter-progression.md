@@ -173,7 +173,7 @@ Mixed-tier components are allowed. Their result is calculated rather than manual
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
-- Filter Canister assembly recipes and Mechanics requirements;
+- Filter Canister assembly times and final workstation requirements;
 - exact protection/service-life values.
 
 
@@ -221,9 +221,17 @@ These components are leaf components for Phase One. Do not add further sub-compo
 
 The final canister should **not** be assembled at the Forge or Textile & Leather Workshop.
 
-Current direction:
-- Mechanics-based assembly;
-- likely Pressure Systems;
-- likely Pressure/Mechanics workstation.
+Governing subskill:
+- Mechanics -> **Pressure Systems**.
 
-Exact assembly skill gate, workstation name/tier and times remain open.
+Agreed raw Pressure Systems gates:
+- Tier 1 Crude Filter Canister: **5**;
+- Tier 2 Grey Filter Canister: **15**;
+- Tier 3 Pall Filter Canister: **25**;
+- Tier 4 Deep Pall Filter Canister: **40**.
+
+The Tier 1 gate deliberately does not start at 0. A completely untrained character must first gain basic Pressure Systems competence through concrete related work before independently assembling even a crude canister.
+
+The exact Pressure/Mechanics workstation name/tier and assembly times remain open.
+
+This does not change the separate Filter Medium skill gates. A player may assemble a canister using purchased or otherwise acquired Filter Medium without personally having the skill required to manufacture that medium.
