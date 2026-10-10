@@ -905,7 +905,20 @@ The rig represents:
 - valves and pipework;
 - collection tank.
 
-The exact Crude Oil -> Refined Oil recipe and fuel input remain open pending final fuel choice.
+Nominal recipe:
+
+**4 Crude Oil + 2 Coal -> 1 Refined Oil**
+
+The Oil Distillation Rig has its own facility progression rather than sharing Forge tiers.
+
+| Oil facility | Recommended Refining | Max output batch | Role |
+| --- | ---: | ---: | --- |
+| T1 Basic Distillation Rig | 30 | 5 | first viable oil refining; high loss and attention |
+| T2 Sealed Distillation Rig | 50 | 20 | safer pressure/condensation control; medium production |
+| T3 Industrial Distillation Plant | 70 | 50 | high-throughput specialist production |
+| T4 Large Refinery | LATER | TBD | player-industry scale, not required for Phase One |
+
+The player's Refining batch cap still applies, so actual maximum output is the lower of skill cap, facility cap, inputs and storage.
 
 Oil processing should have:
 - significantly higher process difficulty than Iron/Copper;
