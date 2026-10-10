@@ -27,9 +27,10 @@ This list contains resources that can enter the economy directly from extraction
 | Common Stone | quarries | construction | rooms, workshops, civic works |
 | Common Timber | managed forestry, reclamation | carpentry/construction | buildings, repairs, equipment |
 | Iron Ore | protected mines | ferrous metallurgy | tools, equipment, machinery |
-| Copper Ore | low-grade protected workings; richer seams farther out | precision industry | valves, wire, machinery, respirators |
+| Copper Ore | protected workings; rare contaminated frontier deposits | precision industry | valves, wire, machinery, respirators |
+| Lead Ore | protected workings; rare contaminated frontier deposits | projectile metal | ammunition |
 | Clay | clay pits/earthworks | ceramics/infrastructure | Fired Ceramic, facilities |
-| Industrial Sand | pits/river works | glass/ceramic processes | Treated Glass, facilities |
+| Industrial Sand | pits/river works | glass/ceramic processes | Glass, facilities |
 | Plant Fibre | farms/textile work | textiles | Cloth, bandages, clothing |
 | Scrap Metal | demolition/city salvage | recycling/repair | refining, repair, components |
 | Grain | protected farms | food/feed/processing | Flour, Bread, livestock feed |
@@ -96,13 +97,14 @@ Keep the processed layer lean.
 Phase One core:
 - Iron Ingot
 - Copper Ingot
+- Lead Ingot
 - Steel
 - Sawn Timber
 - Leather
 - Cloth
 - Flour
 - Fired Ceramic
-- Treated Glass
+- Glass
 - Refined Oil
 - Manganese Concentrate
 
@@ -274,6 +276,18 @@ Adds two generic capabilities worth implementing:
 
 Do not separately itemize hoses, funnels, couplers, etc.
 
+### Common-metal regional contamination
+
+Iron, Copper, and Lead have reliable clean sources in the protected outskirts.
+
+Rare deposits can also occur in the Grey Marches and Pall zones. These frontier ores are normally contaminated and do not provide better intrinsic metal quality.
+
+This means:
+- geology remains continuous across regions;
+- explorers can find ordinary useful ore anywhere;
+- safe-region mines remain the efficient backbone;
+- frontier mining carries contamination/logistics costs rather than becoming a superior tier.
+
 ## Regional relevance audit
 
 ### Safe city / outskirts
@@ -327,6 +341,7 @@ Every core resource currently has a credible sink:
 - Stone -> construction/civic works.
 - Timber -> construction/equipment/repairs.
 - Iron/Copper -> equipment, components, repairs, partial loss through recycling.
+- Lead -> ammunition and other consumable projectile/industrial uses.
 - Clay/Sand -> ceramics/glass/facilities.
 - Fibre/Hide -> degradable equipment/medical goods.
 - Grain/Vegetables/Eggs/Milk/Meat -> consumed as food/feed.
@@ -349,7 +364,7 @@ The following earlier names should **not** remain separate Phase One resources:
 - Pall-Touched Ore -> remove; vague and redundant
 - Rare Medicinal Growths -> replace with named plants
 - Ancient Precision Components -> treat as salvageable complex mechanisms/components
-- Intact Glass -> salvage may recover Treated Glass or Lens Set directly
+- Intact Glass -> salvage may recover Glass or Lens Set directly
 - Chemical Residue -> defer until Chemistry design proves it needs a distinct commodity
 - Contaminated Alloy Scrap -> use Scrap Metal with contamination where mechanically relevant, or a specific salvage result
 - Stabilized Pall Material -> remove vague generic material
