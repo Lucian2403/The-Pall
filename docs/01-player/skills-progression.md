@@ -16,6 +16,34 @@ Current proposed Major Skills:
 
 Major Skills use a long 0–100 progression. Specializations use a smaller tier structure rather than separate full XP grinds.
 
+## Canonical Major Skills and Subskills
+
+The following is the current agreed Phase One skill tree.
+
+These subskills are canonical unless a later explicit design decision changes them.
+
+| Major Skill | Agreed subskills |
+| --- | --- |
+| **Arms** | Melee, Pistols, Rifles, Scatterguns, Defense |
+| **Fieldcraft** | Scavenging, Navigation, Foraging, Tracking |
+| **Industry** | Hauling, Mining, Construction, Refining |
+| **Mechanics** | Pressure Systems, Precision Mechanisms, Weapon Maintenance, Industrial Machinery |
+| **Craftsmanship** | Smithing, Carpentry, Tailoring, Cooking |
+| **Medicine** | Trauma, Surgery, Disease, Herbalism |
+| **Scholarship** | Pall Research, Investigation, Engineering Theory |
+| **Commerce** | Trading, Negotiation, Logistics, Contracts |
+
+### Skill-tree guardrail
+
+Do not introduce a new subskill merely because a single recipe or item needs somewhere to live.
+
+A new subskill must justify a broader gameplay identity, progression path, multiple activities/recipes, and meaningful distinction from the existing branches.
+
+**Chemistry is not currently an agreed subskill.** It was discussed as a possible home for specialist filter/material processing, but remains uncommitted.
+
+Until an explicit decision is made, recipes such as Filter Medium should keep their governing skill/subskill as TBD rather than silently expanding the skill tree.
+
+
 ## Learning
 
 Most skill progression comes from:
