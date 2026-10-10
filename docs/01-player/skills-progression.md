@@ -260,3 +260,27 @@ Example:
 - a Pall-material rule can be reused by respirators, sealed gear and contaminated components.
 
 Deep inspection is limited to selected complex item families in Phase One rather than every inventory item.
+
+
+## Progression-source specificity rule
+
+When defining how a subskill levels, only **named, explicit Phase One content** counts as a progression source.
+
+Valid examples:
+- a named item/component with an agreed crafting or repair action;
+- a named facility with an agreed maintenance/operation action;
+- a named job/activity that is part of the Phase One content catalogue;
+- a named salvage object/interaction that has been deliberately retained as content.
+
+Do not justify a skill with vague placeholders such as:
+- "industrial machinery";
+- "pressure equipment";
+- "damaged mechanisms";
+- "advanced systems";
+- similar generic future content.
+
+Those phrases may describe a content family, but they do not prove that a playable progression path exists.
+
+A subskill's Phase One progression path should be auditable against the actual item/job/facility catalogue.
+
+Design examples in other documents do not automatically become canonical jobs or items merely because they were used to illustrate a system.
