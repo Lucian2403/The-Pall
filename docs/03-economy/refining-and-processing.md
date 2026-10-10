@@ -849,3 +849,69 @@ Possible interaction themes:
 - spindle/loom tension issue;
 - deciding whether to rework a section or accept loss.
 
+
+
+---
+
+# Grain processing
+
+Status: PHASE ONE.
+
+Grain processing uses **Craftsmanship -> Cooking** and the Kitchen.
+
+## Recipe: Grain -> Flour
+
+Nominal conversion:
+
+**2 Grain -> 1 Flour**
+
+Requirements:
+- T1 Kitchen or better;
+- hand mill/quern capability included in the Kitchen;
+- minimum raw Cooking: **0**;
+- no Coal requirement.
+
+Flour processing should be fast, low-risk and become routine quickly.
+
+It uses a low avoidable-waste curve relative to Timber processing. Interactions should be uncommon and mainly cover damp grain, grit/chaff, poor grinding and tool wear.
+
+No separate Mill building is required in Phase One.
+
+
+---
+
+# Oil refining
+
+Status: PROVISIONAL Phase One direction.
+
+Oil refining uses **Industry -> Refining** but does **not** use the Forge.
+
+## Workstation: Oil Distillation Rig
+
+A dedicated **Oil Distillation Rig** is the first specialist non-forge Refining machine.
+
+It should be installed in a proper industrial workshop rather than the starter dwelling.
+
+Recommended access:
+- Workshop House / equivalent dedicated industrial room;
+- minimum raw Refining around **30**;
+- appropriate liquid storage and sealed containers;
+- ventilation/fire-safety capability.
+
+The rig represents:
+- heated retort/still;
+- condenser;
+- settling/filter vessels;
+- valves and pipework;
+- collection tank.
+
+The exact Crude Oil -> Refined Oil recipe and fuel input remain open pending final fuel choice.
+
+Oil processing should have:
+- significantly higher process difficulty than Iron/Copper;
+- longer processing time;
+- higher avoidable loss;
+- fire/leak/pressure/contamination interaction themes;
+- meaningful facility wear.
+
+The large nominal Crude Oil conversion ratio should represent unavoidable unusable fractions; skill waste is additional avoidable loss and should not be confused with the recipe ratio.
