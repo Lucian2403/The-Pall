@@ -176,3 +176,66 @@ Example:
 - Arms may force a dangerous route, but should not be the universal solution.
 
 This keeps skill builds distinct and prevents every breakthrough from requiring the same checklist.
+
+
+## Item inspection and knowledge reveals
+
+Phase One uses a single universal **Inspect** action.
+
+Inspect itself is not a skill and does not require a new Inspection specialization.
+
+Every player can always see basic gameplay-critical information such as:
+- item name/type;
+- weight;
+- current durability/condition;
+- equipment requirements;
+- final headline protection values where applicable;
+- obvious penalties;
+- basic recipe/use information when already known.
+
+Relevant subskills reveal deeper diagnostic information.
+
+### Technical inspection
+
+Three agreed subskills provide broad technical analysis:
+
+- **Mechanics -> Precision Mechanisms** — assembly tolerances, moving parts, fittings, alignment, precision defects and component workmanship.
+- **Scholarship -> Engineering Theory** — design principles, load paths, material/system limitations, theoretical performance and likely failure modes.
+- **Scholarship -> Pall Research** — Pall contamination behavior, anomalous material response, hazard suitability and Pall-specific degradation.
+
+These are important cross-domain inspection skills, but they are not universal replacements for profession knowledge.
+
+### Domain inspection
+
+Items may additionally reference the subskill that normally makes, maintains or understands them.
+
+Examples:
+- weapons: Weapon Maintenance; Precision Mechanisms where relevant;
+- respirators/pressure equipment: Pressure Systems; Precision Mechanisms; Pall Research where relevant;
+- forged metal goods: Smithing;
+- wooden goods: Carpentry;
+- textile/leather goods: Tailoring;
+- industrial/refining machinery: Industrial Machinery and/or Engineering Theory;
+- medical items: Trauma, Surgery, Disease or Herbalism as appropriate;
+- food/cooking products: Cooking.
+
+### Reveal model
+
+Inspection data should be divided into layers rather than hidden wholesale.
+
+A novice sees the practical result.
+
+A competent specialist sees the likely cause.
+
+An expert sees quantified diagnosis and improvement potential.
+
+Example for a respirator canister:
+- everyone: Pall Resistance 63%;
+- Pressure Systems / Precision Mechanisms: poor connection seal is reducing performance;
+- higher relevant skill: Connection Seal 82%, estimated result after replacing the fitting;
+- Pall Research: whether the medium is appropriate for the current Pall hazard and how exposure may affect service life;
+- Engineering Theory: interaction between shell, fitting, gasket and medium and the limiting system behavior.
+
+The server stores the full item truth. The UI reveals only the information permitted by the player's relevant raw/effective knowledge.
+
+Important progression gates should still use Raw Skill. Inspection assistance from equipment may improve detail or confidence but should not substitute for permanent expertise.
