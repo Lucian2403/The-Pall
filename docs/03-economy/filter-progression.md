@@ -173,7 +173,7 @@ Mixed-tier components are allowed. Their result is calculated rather than manual
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
-- Filter Canister assembly times and final workstation requirements;
+- exact protection/service-life values;
 - exact protection/service-life values.
 
 
@@ -239,6 +239,12 @@ Workstation direction:
 - T3 Pressure Bench can assemble Pall Filter Canisters;
 - T4 Pressure Bench can assemble Deep Pall Filter Canisters.
 
-Exact assembly times remain open.
+Assembly times:
+- Crude Filter Canister: **15 seconds**;
+- Grey Filter Canister: **20 seconds**;
+- Pall Filter Canister: **30 seconds**;
+- Deep Pall Filter Canister: **60 seconds**.
+
+These are finished-item assembly times and are intentionally longer than the Filter Medium preparation times.
 
 This does not change the separate Filter Medium skill gates. A player may assemble a canister using purchased or otherwise acquired Filter Medium without personally having the skill required to manufacture that medium.
