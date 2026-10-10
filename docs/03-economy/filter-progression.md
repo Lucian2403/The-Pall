@@ -186,6 +186,27 @@ Relevant subskills can reveal deeper component diagnostics through the generic I
 Mixed-tier components are allowed. Their result is calculated rather than manually authored.
 
 
+
+## Filter Medium breathing resistance
+
+Breathing Resistance is primarily an intrinsic property of the Filter Medium because the wearer must draw air through that medium.
+
+Baseline values:
+- Crude Filter Medium: **8%**;
+- Grey Filter Medium: **6%**;
+- Pall Filter Medium: **10%**;
+- Deep Pall Filter Medium: **15%**.
+
+The progression is intentionally non-linear:
+- Crude is inefficiently packed and somewhat restrictive despite weak filtration;
+- Grey is the first properly engineered medium and improves both protection and airflow;
+- Pall increases restriction to achieve serious Pall filtration;
+- Deep Pall imposes the strongest breathing burden in exchange for high Pall filtration and long service life.
+
+Metal body, Copper Fitting and Seal Gasket do not normally add breathing resistance. Their roles are sealing, durability and structural integrity.
+
+Breathing Resistance remains a raw equipment stat. Its exact effects on Stamina, exertion and combat are defined by the later character/exertion model rather than being hardcoded into the filter recipe.
+
 ## Filter Canister structural baselines
 
 Status: PROVISIONAL balance values; current canonical baseline for Phase One.
@@ -259,7 +280,7 @@ The top tier intentionally does not approach immunity.
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
-- breathing-resistance penalties and quality/durability interaction details;
+- quality/durability interaction details and final exertion effects of Breathing Resistance;
 - exact protection/service-life values.
 
 
