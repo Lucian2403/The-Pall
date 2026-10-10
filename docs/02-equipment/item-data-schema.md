@@ -262,6 +262,72 @@ Minimum runtime state:
 
 This separation is essential. Two rifles of the same item_id may have different quality, durability, fittings, repair history and owners.
 
+
+## 10. Component-derived equipment and inspection
+
+Selected complex equipment families may derive their final stats from installed components rather than requiring a separate catalogue item for every possible component combination.
+
+Phase One candidates:
+- respiratory equipment;
+- weapons;
+- advanced machinery;
+- other families only when the component model creates meaningful gameplay.
+
+Simple items such as food, basic clothing, ordinary tools and containers should not receive deep component simulation by default.
+
+### Runtime composition
+
+A complex item instance may reference component instances or component definitions such as:
+- body/shell;
+- functional medium/core;
+- fitting/connection;
+- gasket/seal;
+- mechanism;
+- stock/frame;
+- other family-specific slots.
+
+The server calculates derived stats from generic formulas.
+
+Example for a Filter Canister:
+- Filter Medium provides Ash/Pall filtration, service life and breathing resistance;
+- canister body provides shell seal, durability and weight;
+- fitting provides connection seal;
+- gasket provides gasket seal;
+- the finished canister derives effective Ash/Pall respiratory resistance from those values.
+
+Do not create a separate item definition for every mixed component combination.
+
+### Generic inspection reveals
+
+Inspection must also be data-driven.
+
+Each inspectable stat or diagnosis can define:
+- relevant subskill(s);
+- reveal thresholds;
+- whether the player sees qualitative, numeric or predictive information;
+- reusable text templates;
+- optional component/source reference.
+
+Example reveal progression:
+- low/no relevant skill: show only practical final stats;
+- moderate relevant skill: reveal which subsystem or component is limiting performance;
+- higher skill: reveal exact component values;
+- expert skill: estimate likely result after repair/replacement.
+
+Different subskills may reveal different aspects of the same item.
+
+This must be implemented through generic rules and tags, not bespoke code for each item combination.
+
+### Scope guardrail
+
+Deep component simulation is reserved for equipment where:
+- component choice creates meaningful tradeoffs;
+- mixed components can plausibly coexist;
+- the player benefits from diagnosis, repair or tuning;
+- the extra data creates gameplay rather than bookkeeping.
+
+If an item does not pass that test, it remains a normal catalogue item with ordinary stats.
+
 ## 10. Implementation principle
 
 Server owns item truth.
