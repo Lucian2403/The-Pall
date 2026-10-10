@@ -63,6 +63,7 @@ Different animals can produce different quantities while recipes use food tags w
 | Sphagnum Moss | surviving clean bog ecology | advanced wound dressings |
 | March Zeolite | specific clean geological belt | filtration/decontamination |
 | Black Bog Nodules | functioning wetland iron/manganese chemistry | advanced steel/metallurgy |
+| Grey Bogwood | preserved ancient hardwood exposed in Grey wetlands | specialist Carpentry, durable/weather-stable woodwork |
 
 Copper, herbs, game and salvage may also have better Grey Marches sources, but they are not region-exclusive signature items.
 
@@ -99,7 +100,7 @@ Phase One core:
 - Copper Ingot
 - Lead Ingot
 - Steel
-- Sawn Timber
+- Planks
 - Leather
 - Cloth
 - Flour
@@ -153,7 +154,7 @@ Conditional / cut unless recipes prove the need:
 - Workshop Bench Components
 - separate Timber Beam component
 
-Finished recipes can consume Sawn Timber, Cloth, Leather, Metal Plate, etc. directly where an extra intermediate would add only bookkeeping.
+Finished recipes can consume Planks, Cloth, Leather, Metal Plate, etc. directly where an extra intermediate would add only bookkeeping.
 
 ## Raw vs processed vs component quality
 
@@ -368,7 +369,7 @@ The following earlier names should **not** remain separate Phase One resources:
 - Chemical Residue -> defer until Chemistry design proves it needs a distinct commodity
 - Contaminated Alloy Scrap -> use Scrap Metal with contamination where mechanically relevant, or a specific salvage result
 - Stabilized Pall Material -> remove vague generic material
-- Seasoned Hardwood -> not Phase One; use Common Timber -> Sawn Timber
+- Seasoned Hardwood -> not Phase One; use Common Timber -> Planks
 - Handle Blank / Plank / Cut Stone / Crushed Aggregate -> do not create separate Phase One items without a recipe-driven need
 - Generic Herbal Extract -> remove as a universal commodity; named herbs must retain their identity
 - Raw Fish / Fish Stew -> LATER with Fishing
@@ -426,7 +427,7 @@ This should be implemented once and configured by data.
 ## Scope count
 
 The agreed breadth now implies roughly:
-- ~34 source-level/survival resources;
+- ~35 source-level/survival resources;
 - ~11-12 core processed materials;
 - ~15 strong component candidates;
 - finished consumables/equipment/fittings on top.
