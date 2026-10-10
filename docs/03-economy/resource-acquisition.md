@@ -525,9 +525,13 @@ Public supply must remain available.
 
 Phase One processing stays simple:
 
-**Common Timber -> Sawn Timber**
+**1 Common Timber -> 4 Planks**
 
-Finished recipes and building upgrades consume Sawn Timber directly where possible. Beams, planks, handle blanks and charcoal are not separate Phase One commodities unless later recipes prove they need distinct market behavior.
+Common Timber is treated as a standardized workable log/timber unit rather than a kilogram commodity.
+
+Planks are the canonical sawn-wood commodity for construction and Carpentry recipes.
+
+Finished recipes and building upgrades consume Planks directly where possible. Beams, handle blanks and charcoal are not separate Phase One commodities unless later recipes prove they need distinct market behavior.
 
 ## Key sinks
 
@@ -2168,3 +2172,70 @@ Gameplay:
 - competes with loot, Oil and other expedition cargo.
 
 Drinking Water is a survival resource, not intended as a major speculative market commodity in Phase One.
+
+
+---
+
+# RES_BOGWOOD — Grey Bogwood
+
+Status: PHASE ONE specialist resource.
+
+## Nature and geography
+
+Grey Bogwood is not a magical tree species.
+
+It is ancient hardwood, primarily oak-like timber, that has lain waterlogged in the anaerobic peat and marsh soils of the Grey Marches for decades or centuries.
+
+Low-oxygen conditions slow ordinary decay. Tannins, dissolved iron and long mineral contact darken and alter the timber.
+
+The same wetland geography that supports Sphagnum and Black Bog Nodules therefore also explains occasional preserved buried trunks.
+
+## Acquisition
+
+Bogwood is found through:
+- exposed peat cuts;
+- eroded marsh banks;
+- drainage works;
+- collapsed old woodland;
+- rare discoveries while harvesting Grey Marches bog resources.
+
+It is uncommon, heavy and awkward to recover.
+
+It is not farmed and does not regenerate on ordinary gameplay timescales. World generation/events expose new deposits over time.
+
+## Economic identity
+
+Bogwood is not universally "better Timber."
+
+Compared with Common Timber it is:
+- denser/heavier;
+- harder on tools;
+- slower to work;
+- more dimensionally stable once properly prepared;
+- highly resistant to ordinary rot/weathering;
+- visually dark and desirable for prestige work.
+
+Tradeoff:
+better durability/environmental stability, but greater weight, processing time and tool wear.
+
+## Processing
+
+Bogwood should use Craftsmanship -> Carpentry and a proper sawing/drying workstation.
+
+The processed form can be:
+
+**Bogwood -> Bogwood Planks**
+
+Recommended minimum raw Carpentry: **30**.
+
+Uses:
+- high-end weapon stocks;
+- precision tool handles/frames;
+- weather-resistant expedition crates;
+- selected workshop/facility upgrades;
+- Fine/Masterwork furniture;
+- later vehicle/interior structural work.
+
+Bogwood should appear only in recipes where its stability or weather resistance matters.
+
+It must not replace ordinary Planks as the default construction material.
