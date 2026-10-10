@@ -301,4 +301,28 @@ Recommended placement:
 
 The workstation represents a compact retort/still, condenser, valves, collection vessels and filtration/settling hardware.
 
+### Facility progression
+
+Oil refining uses a shorter specialist facility ladder than metalworking:
+
+| Tier | Facility | Recommended Refining | Max output batch |
+| --- | --- | ---: | ---: |
+| T1 | Basic Distillation Rig | 30 | 5 |
+| T2 | Sealed Distillation Rig | 50 | 20 |
+| T3 | Industrial Distillation Plant | 70 | 50 |
+| T4 | Large Refinery | LATER | TBD |
+
+Tier improvements primarily provide:
+- larger batches;
+- safer pressure and vapor handling;
+- better condensation/recovery;
+- lower avoidable fuel loss;
+- lower incident chance;
+- stronger contamination control;
+- better liquid storage integration.
+
+Facility upgrades do not remove the recipe's unavoidable 4:1 Crude Oil conversion loss.
+
+A T4 refinery is deliberately deferred until player-owned industrial scale warrants it.
+
 Its purpose is to let Refining progression branch beyond metalworking without making the Forge a universal processing station.
