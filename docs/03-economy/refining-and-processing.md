@@ -98,6 +98,19 @@ For UI and server calculation:
 
 Good interaction choices may reduce the current batch's avoidable waste. Poor choices or incidents may increase it.
 
+## Furnace-fuel rule
+
+For Phase One, every **furnace-based mineral/metal refining recipe** consumes Coal.
+
+This includes:
+- Iron Ore -> Iron Ingot;
+- Copper Ore -> Copper Ingot;
+- Iron Ingot -> Steel;
+- Black Bog Nodules -> Manganese Concentrate;
+- later furnace-based mineral refining recipes.
+
+Non-furnace processing such as milling Grain, tanning Hide or weaving Fibre does not consume Coal merely for consistency.
+
 ## Fuel model
 
 Coal is a bulk commodity measured in kg.
@@ -372,3 +385,110 @@ Suggested routine thresholds:
 - Oversized batches, damaged facilities and unusual inputs can reintroduce interactions for experts.
 
 Skill should reveal understanding first and efficiency second.
+
+
+---
+
+# Copper refining
+
+Status: PHASE ONE.
+
+## Recipe: Copper Ore -> Copper Ingot
+
+Copper uses the same basic rules as Iron.
+
+Nominal game conversion:
+
+**2 kg Copper Ore + 1 kg Coal -> 1 kg Copper Ingot**
+
+Requirements:
+- T1 Basic Furnace / Forge or better;
+- Industry -> Refining;
+- minimum raw Refining: **0**;
+- Coal fuel.
+
+Copper uses:
+- the same skill batch-cap table as Iron;
+- the same avoidable-waste curve;
+- the same facility-cap rule;
+- the same broad interaction difficulty.
+
+Copper Ingot is fungible and does not carry craftsmanship quality.
+
+Its interaction text should have copper-specific flavour, but mechanically it remains the second novice-accessible refining process rather than a new subsystem.
+
+---
+
+# Black Bog Nodules processing
+
+Status: PHASE ONE.
+
+## Recipe: Black Bog Nodules -> Manganese Concentrate
+
+This is a harder regional refining process than Iron or Copper.
+
+Provisional game conversion:
+
+**3 kg Black Bog Nodules + 2 kg Coal -> 1 kg Manganese Concentrate**
+
+Requirements:
+- T2 Proper Smelter / Forge or better;
+- Industry -> Refining;
+- minimum raw Refining: **25**;
+- Coal fuel.
+
+Why Refining 25:
+- Iron/Copper remain the novice foundation at 0;
+- Steel opens around 20;
+- Grey Marches Manganese should require an established refiner;
+- it is still reachable well before high mastery;
+- the valuable Grey Marches material does not become unusable for most of the playerbase.
+
+### Batch
+
+Use the same skill batch-cap table as Iron/Copper.
+
+Actual batch remains limited by skill, facility, inputs and storage.
+
+### Time
+
+Manganese Concentrate should take roughly **1.75x the Iron/Copper refining time per kg of output** as a starting balance value.
+
+### Waste
+
+Use the same avoidable-waste curve.
+
+The 3:1 source conversion is the recipe's built-in unavoidable loss. Skill adds only avoidable process waste on top of that.
+
+### Interactions
+
+Use the same one-interaction philosophy, but with a higher difficulty pool.
+
+Possible game situations:
+- the batch is heating unevenly;
+- too much fuel is being consumed for the current progress;
+- useful material is mixed with obvious waste;
+- the furnace is struggling under the load;
+- a portion of the batch may be reworked at the cost of extra Coal and time.
+
+Higher Refining reveals which response is likely to preserve more material and fuel.
+
+Outcomes affect:
+- extra Coal use;
+- extra time;
+- avoidable material waste;
+- facility wear.
+
+Do not create multiple grades of Manganese Concentrate.
+
+## Manganese-use progression
+
+Recommended gates:
+
+- **Refining 25:** produce Manganese Concentrate.
+- **Refining 40:** use Manganese Concentrate in advanced metallurgy recipes.
+- **Refining 50+:** ordinary manganese-assisted work becomes largely routine in a suitable facility.
+
+This gives the metal progression a readable staircase:
+
+**0 Iron/Copper -> 20 Steel -> 25 Manganese Concentrate -> 30 recycled Steel -> 40 advanced manganese-assisted metallurgy.**
