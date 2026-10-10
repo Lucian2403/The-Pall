@@ -66,7 +66,7 @@ Strong Phase One candidates:
 - Fastener Set
 - Precision Spring
 - Copper Wire
-- Brass Fitting
+- Copper Fitting
 - Pressure Valve
 - Gear Assembly
 - Firing Mechanism
@@ -144,7 +144,7 @@ Processor/component specialists:
 - Lens Set
 - Seal Gasket
 - Filter Canister
-- Brass Fittings
+- Copper Fittings
 
 Respiratory crafter:
 - Field Respirator
