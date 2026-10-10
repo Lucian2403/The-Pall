@@ -636,3 +636,101 @@ Higher Refining reveals whether to:
 Glass remains fungible.
 
 Violet Fluorspar can later enter specific advanced glass/optics recipes without creating a separate universal "Fine Glass" commodity.
+
+
+---
+
+# Timber processing
+
+Status: PHASE ONE.
+
+Timber processing is **not Industry -> Refining** and does not use the Forge.
+
+It uses:
+- Craftsmanship -> Carpentry;
+- Carpenter's Bench / Sawing Station;
+- saw/tool durability;
+- no Coal requirement for ordinary sawing.
+
+## Recipe: Common Timber -> Planks
+
+Nominal conversion:
+
+**1 Common Timber -> 4 Planks**
+
+Minimum raw Carpentry: **0**.
+
+Common Timber is a standardized workable timber/log unit. Planks are discrete stackable pieces.
+
+## Carpentry waste
+
+Wood has higher avoidable processing loss than basic metal refining at low skill because of:
+- saw kerf;
+- knots;
+- hidden splits;
+- poor grain reading;
+- warped cuts;
+- damaged ends;
+- mistakes in laying out usable boards.
+
+Provisional avoidable-yield loss:
+
+| Carpentry | Avoidable wood loss |
+| --- | ---: |
+| 0 | 25% |
+| 10 | 19% |
+| 20 | 14% |
+| 30 | 10% |
+| 40 | 7% |
+| 50 | 5% |
+| 60 | 3.8% |
+| 70 | 2.8% |
+| 80 | 2.0% |
+| 90 | 1.5% |
+| 100 | 1.0% |
+
+Waste never reaches zero.
+
+Because Planks are discrete, implementation must calculate waste across the whole batch rather than rounding every single Timber unit independently. Small-batch rounding must not systematically punish players.
+
+## Interaction themes
+
+Possible situations:
+- hidden split opens during the first cut;
+- grain begins pulling the saw off line;
+- one side is warped;
+- a knot cluster makes the planned board layout inefficient;
+- damp timber starts binding the saw;
+- the log can be reoriented for fewer but cleaner boards.
+
+Higher Carpentry reveals:
+- likely grain direction;
+- whether a crack continues internally;
+- best cutting orientation;
+- when preserving one wide board is more valuable than maximizing count.
+
+Outcomes affect:
+- usable Plank yield;
+- time;
+- tool wear;
+- occasional injury risk.
+
+At higher skill, ordinary Common Timber sawing becomes routine.
+
+## Specialist Grey Bogwood
+
+Grey Bogwood processing uses the same Carpentry system but is deliberately harder.
+
+Recommended minimum raw Carpentry: **30**.
+
+It should:
+- take longer;
+- cause more tool wear;
+- have a higher interaction chance until mastered;
+- produce Bogwood Planks.
+
+Bogwood Planks are heavier and harder to work but offer superior dimensional stability and weather/rot resistance in recipes where those properties matter.
+
+There is **no separate Pall wood commodity in Phase One**.
+
+Pall forestry already has Scar Resin as a specialist resource. Adding an altered Pall timber solely to create another Carpentry tier would duplicate purpose and expand contamination/processing scope without enough payoff.
