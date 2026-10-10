@@ -6,6 +6,35 @@ Resources are being designed two at a time. Each entry defines not only where th
 
 ## Shared acquisition rules
 
+## Cross-region common-metal rule
+
+Iron, Copper, and Lead are ordinary geological metals rather than zone-exclusive progression ores.
+
+Their reliable economic sources are in the protected industrial outskirts.
+
+However, rare deposits may also be discovered in:
+- the Grey Marches;
+- Pall zones.
+
+Ore recovered outside the protected region is normally **contaminated**.
+
+Phase One uses a simple contamination state:
+- Clean
+- Contaminated
+
+Contamination is not a craftsmanship quality tier and does not make the ore stronger or more valuable by itself.
+
+Clean and contaminated stacks do not merge.
+
+Grey/Pall deposits are:
+- uncommon;
+- incidental discoveries rather than primary supply;
+- riskier to extract and transport;
+- useful when discovered, but not superior replacements for protected-outskirts mining.
+
+This preserves believable geology while keeping the safe industrial economy relevant.
+
+
 - Basic, cheap civilization-level resources must be obtainable in the city or its protected surroundings.
 - Resource acquisition should not normally be a one-click timer such as "Chop Wood -> wait -> receive Wood."
 - Worksites provide context, preparation choices, and interactions when difficulty, novelty, risk, poor tools, or unusual conditions justify them.
@@ -539,11 +568,9 @@ Iron should be common enough to support civilization, but expensive enough in la
 
 ## Primary source region
 
-**Protected Industrial Outskirts / Safe Mining District**
+**Protected Industrial Outskirts / Safe Mining District — primary reliable source**
 
-Basic low-to-medium grade Iron Ore should be obtainable without entering the Grey Marches.
-
-Higher-grade deposits and unusual ore can exist farther out.
+Rare Iron Ore deposits may also occur in the Grey Marches and Pall zones, but those finds are normally contaminated and are not inherently higher-grade.
 
 ## Phase One acquisition sources
 
@@ -816,6 +843,52 @@ Clay -> Clean Clay -> Prepared Clay -> Ceramic Mix -> Unfired Vessel -> Fired Ve
 
 The game should imply physical detail through flavour text when that detail does not justify another tradeable item.
 
+
+
+---
+
+# RES_LEAD_ORE — Lead Ore
+
+## Economic role
+
+Lead is the basic projectile metal for the firearm economy.
+
+Primary downstream uses:
+- Lead Ingot;
+- ammunition/projectiles;
+- selected weights, seals, and workshop uses where later recipes justify them.
+
+Ammunition alone is enough to justify Lead as a Phase One metal because firearms require a permanent consumable material sink.
+
+## Primary source region
+
+**Protected Industrial Outskirts / Safe Mining District — primary reliable source**
+
+Rare Lead Ore deposits may also occur in the Grey Marches and Pall zones, but those finds are normally contaminated.
+
+## Acquisition
+
+Lead uses the same generic mining framework as Iron and Copper:
+- municipal/protected mining jobs;
+- licensed extraction;
+- NPC baseline supply where needed;
+- rare contaminated frontier deposits.
+
+It does not need a bespoke gathering subsystem.
+
+## Processing
+
+**2 kg Lead Ore + 1 kg Coal -> 1 kg Lead Ingot**
+
+Lead refining is novice-accessible and uses the standard Refining batch/waste/facility rules.
+
+## Key sinks
+
+Lead leaves the economy primarily through:
+- ammunition;
+- unrecovered projectiles;
+- crafting waste;
+- selected industrial components where appropriate.
 
 ---
 
