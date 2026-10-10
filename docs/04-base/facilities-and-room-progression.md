@@ -268,3 +268,18 @@ Facility tiers should not make earlier facilities meaningless.
 A crude bench remains useful for cheap small jobs, emergency repairs and low-volume production.
 
 Large facilities are better when scale, complexity, quality or safety matter.
+
+
+## Phase One Textile & Leather Workshop
+
+A single **Textile & Leather Workshop** supports Craftsmanship -> Tailoring processes for both Cloth and Leather.
+
+It represents a compact work area containing the appropriate hand tools and small equipment for:
+- fibre preparation/spinning/weaving;
+- cutting and sewing;
+- hide scraping/stretching;
+- small-scale tanning/drying.
+
+It is one gameplay workstation/facility family, not one literal machine.
+
+This keeps Phase One property pressure reasonable while preserving believable physical processes.
