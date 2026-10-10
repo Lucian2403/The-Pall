@@ -81,7 +81,7 @@ Example: unloading a damaged coal cart:
 
 Jobs around 1–10 minutes should include several short phases or at least one meaningful interaction.
 
-Example: repairing a public steam pump:
+Illustrative workflow example, not yet a canonical named Phase One job: repairing a public steam pump:
 - diagnose fault;
 - select parts;
 - begin repair;
