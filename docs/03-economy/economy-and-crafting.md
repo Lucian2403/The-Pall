@@ -65,6 +65,7 @@ Processing steps do not automatically become separate tradeable items.
 Strong Phase One candidates:
 - Metal Plate
 - Fastener Set
+- Basic Spring ([locked recipe and provisional balance](basic-spring.md))
 - Precision Spring
 - Copper Wire
 - Copper Fitting
