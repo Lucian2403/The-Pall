@@ -194,7 +194,7 @@ Examples:
 - chemistry station;
 - medical preparation bench;
 - industrial furnace;
-- pressure-work station.
+- Pressure Bench.
 
 Facility requirements create economic specialization.
 
