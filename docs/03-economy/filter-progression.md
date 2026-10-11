@@ -437,3 +437,36 @@ Assembly times:
 These are finished-item assembly times and are intentionally longer than the Filter Medium preparation times.
 
 This does not change the separate Filter Medium skill gates. A player may assemble a canister using purchased or otherwise acquired Filter Medium without personally having the skill required to manufacture that medium.
+
+
+## Pressure Valve
+
+Status: PROVISIONAL Phase One component.
+
+Recipe:
+
+**1 Metal Plate + 2 Copper Fittings + 1 Precision Spring + 1 Seal Gasket -> 1 Pressure Valve**
+
+Requirements:
+- Mechanics -> Pressure Systems;
+- minimum raw Pressure Systems: **20**;
+- workstation: **T2 Pressure Bench**;
+- crafting time: **45 seconds**;
+- crafted individually rather than as a bulk commodity.
+
+Component roles:
+- Metal Plate forms the valve body;
+- two Copper Fittings provide inlet/outlet pressure connections;
+- Precision Spring controls opening/closing force;
+- Seal Gasket prevents leakage.
+
+Pressure Valve is a reusable industrial control component.
+
+Agreed Phase One/future uses:
+- Field Pump / Crude Oil extraction equipment;
+- Oil Distillation Rig construction, upgrades or repairs where appropriate;
+- a later pneumatic/pump rifle using compressed pressure rather than conventional powder combustion.
+
+The pneumatic rifle is only a planned consumer here; its recipe and weapon balance belong to the firearms milestone.
+
+Precision Spring remains an existing approved component whose own recipe is still to be defined.
