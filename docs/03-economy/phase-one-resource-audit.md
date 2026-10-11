@@ -452,3 +452,14 @@ New resource proposals must answer:
 5. Is that subsystem worth Phase One scope?
 
 The resource catalogue is now broad enough to proceed to refining/processing design.
+
+
+### Pressure Valve recipe direction
+
+Pressure Valve is a retained Phase One component with the agreed recipe:
+
+**1 Metal Plate + 2 Copper Fittings + 1 Precision Spring + 1 Seal Gasket -> 1 Pressure Valve**
+
+It uses Mechanics -> Pressure Systems at raw skill 20 on a T2 Pressure Bench and takes 45 seconds.
+
+Concrete consumers include the Field Pump and Oil Distillation equipment. A later pneumatic/pump rifle may also use Pressure Valve as part of its compressed-pressure mechanism.
