@@ -76,6 +76,14 @@ Comprehension may require Major Skill level, specialization tier, attributes, re
 
 Higher Craftsmanship/specialization unlocks more recipes and deeper understanding of existing recipes.
 
+### Component production versus ownership and servicing
+
+A component's **manufacturing skill gate applies to crafting it**, not automatically to buying, selling, carrying, owning, installing, operating or repairing it. Those activities have **separate host-specific or task-specific requirements**. When an item is purchasable, a non-specialist should be able to use it in compatible equipment if they meet the equipment's operation/installation requirements.
+
+This distinction matters especially to Industry players: entry-level professional equipment must not become unusable or routinely irreparable merely because its specialist replacement could require a high raw crafting skill. Provide a valid basic repair path; optional upgrades may require more advanced components. Material acquisition can use player crafting, appropriate salvage and limited costly NPC fallback to prevent hard market deadlocks without erasing specialization.
+
+Concrete locked example: [Gear Assembly](../03-economy/gear-assembly.md) is manufactured with raw Precision Mechanisms **30** at a **T2 Precision Bench**. It may be purchased without that skill, while installation and repair follow the host or task. A basic Field Pump does not require Gear Assembly for routine operation or repair.
+
 ## Material efficiency
 
 Higher specialization may reduce material consumption, but only by reducing **waste and inefficiency**.
