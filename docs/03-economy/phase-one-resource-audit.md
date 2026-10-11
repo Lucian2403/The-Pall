@@ -130,6 +130,7 @@ The component layer is useful because it creates player specialization, but it m
 Strong Phase One candidates:
 - Metal Plate
 - Fastener Set
+- Basic Spring ([locked recipe and provisional balance](basic-spring.md))
 - Precision Spring
 - Copper Wire
 - Copper Fitting
