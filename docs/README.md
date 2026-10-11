@@ -20,4 +20,7 @@ This directory contains the human-readable design source of truth.
 
 Game systems should be implemented generically enough that most future additions are new data/content rather than new special-case code.
 
-- `docs/03-economy/filter-progression.md`
+## Specific design records
+
+- [Filter Progression](03-economy/filter-progression.md)
+- [Gear Assembly — Phase One](03-economy/gear-assembly.md)
