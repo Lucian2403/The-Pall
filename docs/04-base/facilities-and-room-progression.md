@@ -349,3 +349,5 @@ Canister access by facility tier:
 - T4: Deep Pall Filter Canister.
 
 Facility tiers are not defined solely by Filter Canisters; other named Pressure Systems items can justify T2 and later progression.
+
+Filter Medium preparation also uses the Pressure Bench. Exact tier access for the four Filter Medium recipes remains open.
