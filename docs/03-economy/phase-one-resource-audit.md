@@ -481,7 +481,7 @@ Requirements:
 - crafting time: **30 seconds per batch**.
 
 Baseline characteristics:
-- weight: **0.08 kg each**;
+- weight: **0.20 kg each**;
 - baseline durability: **100**;
 - quality-supported: yes;
 - stackable when compatible in quality/condition class;
