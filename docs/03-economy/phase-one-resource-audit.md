@@ -463,3 +463,58 @@ Pressure Valve is a retained Phase One component with the agreed recipe:
 It uses Mechanics -> Pressure Systems at raw skill 20 on a T2 Pressure Bench and takes 45 seconds.
 
 Concrete consumers include the Field Pump and Oil Distillation equipment. A later pneumatic/pump rifle may also use Pressure Valve as part of its compressed-pressure mechanism.
+
+
+### Precision Spring
+
+Precision Spring is a retained Phase One component.
+
+Recipe:
+
+**1 Steel + 1 Manganese Concentrate -> 2 Precision Springs**
+
+Requirements:
+- Mechanics -> Precision Mechanisms;
+- minimum raw Precision Mechanisms: **20**;
+- workstation: **Precision Mechanics Bench**;
+- T1 bench sufficient for this recipe;
+- crafting time: **30 seconds per batch**.
+
+Baseline characteristics:
+- weight: **0.08 kg each**;
+- baseline durability: **100**;
+- quality-supported: yes;
+- stackable when compatible in quality/condition class;
+- normally replaced rather than repaired when badly damaged;
+- salvageable;
+- newly crafted springs are clean unless a recipe explicitly uses contaminated inputs.
+
+Primary functional stat:
+- **Spring Reliability**
+- Standard baseline: **95%**
+
+Current Reliability scales with durability condition:
+
+| Durability band | Reliability multiplier |
+| --- | ---: |
+| 81–100% — Sound | **100%** |
+| 61–80% — Worn | **98%** |
+| 41–60% — Damaged | **92%** |
+| 21–40% — Failing | **80%** |
+| 11–20% — Critical | **60%** |
+| <=10% — Ruined | unusable |
+
+Do not add separate spring tension/elasticity/fatigue meters in Phase One.
+
+Inspect roles:
+- Precision Mechanisms: current reliability, deformation/fatigue/poor winding;
+- Engineering Theory: suitability for intended load/system;
+- Pressure Systems: adequacy when installed in a Pressure Valve;
+- Weapon Maintenance: effect when installed in a firearm mechanism.
+
+Agreed/likely consumers:
+- Pressure Valve;
+- Firing Mechanism;
+- later pneumatic rifle mechanism;
+- Gear Assembly only if its later recipe genuinely needs it.
+
