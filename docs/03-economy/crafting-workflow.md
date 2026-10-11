@@ -190,7 +190,7 @@ Examples:
 - kitchen;
 - forge;
 - carpenter's bench;
-- precision mechanics bench;
+- Precision Bench;
 - chemistry station;
 - medical preparation bench;
 - industrial furnace;
