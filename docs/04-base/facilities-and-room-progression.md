@@ -350,4 +350,8 @@ Canister access by facility tier:
 
 Facility tiers are not defined solely by Filter Canisters; other named Pressure Systems items can justify T2 and later progression.
 
-Filter Medium preparation also uses the Pressure Bench. Exact tier access for the four Filter Medium recipes remains open.
+Filter Medium preparation also uses the Pressure Bench and follows the same tier ladder as Filter Canister assembly:
+- T1: Crude and Grey Filter Medium;
+- T2: no new Filter Medium tier required;
+- T3: Pall Filter Medium;
+- T4: Deep Pall Filter Medium.
