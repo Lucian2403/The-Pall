@@ -548,3 +548,14 @@ When tuning content, use these checks:
 4. Can a broke player recover without outside charity?
 5. Does major spending create new capability or earning potential?
 6. Are losses understandable and reasonably forecastable?
+
+
+### Pressure Valve recipe direction
+
+Pressure Valve is a retained Phase One component with the agreed recipe:
+
+**1 Metal Plate + 2 Copper Fittings + 1 Precision Spring + 1 Seal Gasket -> 1 Pressure Valve**
+
+It uses Mechanics -> Pressure Systems at raw skill 20 on a T2 Pressure Bench and takes 45 seconds.
+
+Concrete consumers include the Field Pump and Oil Distillation equipment. A later pneumatic/pump rifle may also use Pressure Valve as part of its compressed-pressure mechanism.
