@@ -16,19 +16,33 @@ Therefore the filter chain deliberately climbs by region:
 
 There is no Tier 0. The crude safe-economy filter is Tier 1.
 
-## Governing skill
+## Governing skills
 
-Do **not** invent a new skill/subskill for this chain yet.
+Primary crafting skill:
+- Mechanics -> **Pressure Systems**
 
-The governing skill/subskill remains **TBD**.
+Raw Pressure Systems requirements:
+- Tier 1 Crude Filter Medium: **10**
+- Tier 2 Grey Filter Medium: **15**
+- Tier 3 Pall Filter Medium: **25**
+- Tier 4 Deep Pall Filter Medium: **40**
 
-Whatever existing skill is eventually chosen, the raw-skill requirements are locked as:
-- Tier 1: 10
-- Tier 2: 15
-- Tier 3: 25
-- Tier 4: 40
+Secondary knowledge gate:
+- Scholarship -> **Pall Research**
 
-The chosen skill should support the entire Filter Medium chain consistently.
+Pall Research is required only once Pall-derived materials enter the recipe:
+- Crude Filter Medium: no Pall Research requirement
+- Grey Filter Medium: no Pall Research requirement
+- Pall Filter Medium: **Pall Research 15**
+- Deep Pall Filter Medium: **Pall Research 30**
+
+Pressure Systems governs practical filter construction: packing, airflow, compression, layering and preventing bypass channels.
+
+Pall Research governs understanding and safe use of Pall-derived filtration materials such as Sootlace and Pall Membrane.
+
+Engineering Theory may improve inspection, diagnosis and prediction but is not a hard recipe gate.
+
+Tailoring is not a crafting requirement merely because Cloth is an ingredient.
 
 ## Tier 1 — Crude Filter Medium
 
@@ -37,7 +51,7 @@ The chosen skill should support the entire Filter Medium chain consistently.
 2 Cloth + 1 Coal -> 1 Crude Filter Medium
 
 **Requirements**
-- governing skill: TBD
+- governing skill: Mechanics -> Pressure Systems
 - minimum raw skill: 10
 - crafting time: **7 seconds**
 
@@ -56,7 +70,7 @@ Coal represents crude adsorptive material rather than a sophisticated industrial
 2 Cloth + 1 Coal + 1 March Zeolite -> 1 Grey Filter Medium
 
 **Requirements**
-- governing skill: TBD
+- governing skill: Mechanics -> Pressure Systems
 - minimum raw skill: 15
 - crafting time: **10 seconds**
 
@@ -72,7 +86,7 @@ Coal represents crude adsorptive material rather than a sophisticated industrial
 2 Cloth + 2 March Zeolite + 1 Sootlace -> 1 Pall Filter Medium
 
 **Requirements**
-- governing skill: TBD
+- governing skill: Mechanics -> Pressure Systems
 - minimum raw skill: 25
 - crafting time: **13 seconds**
 
@@ -98,7 +112,7 @@ Exact penalty is not yet locked.
 4 Cloth + 2 March Zeolite + 2 Sootlace + 1 Pall Membrane -> 1 Deep Pall Filter Medium
 
 **Requirements**
-- governing skill: TBD
+- governing skill: Mechanics -> Pressure Systems
 - minimum raw skill: 40
 - crafting time: **20 seconds**
 
@@ -275,8 +289,7 @@ The top tier intentionally does not approach immunity.
 
 ## Still open
 
-- governing existing skill and subskill;
-- workstation/facility;
+- workstation/facility for Filter Medium preparation;
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
