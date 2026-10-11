@@ -304,12 +304,65 @@ These are canister-level respiratory resistance values only. Final character res
 
 The top tier intentionally does not approach immunity.
 
+
+## Filter Canister durability interaction
+
+Structural canister parts use the existing global equipment durability condition bands.
+
+Filter Medium does **not** use structural durability. It uses its own Service Life value.
+
+### Structural seal scaling by condition
+
+A structural component's current seal is:
+
+**Current Seal = Baseline Seal × Condition Multiplier**
+
+Use the existing durability bands:
+
+| Durability band | Condition multiplier |
+| --- | ---: |
+| 81–100% — Sound | **100%** |
+| 61–80% — Worn | **98%** |
+| 41–60% — Damaged | **94%** |
+| 21–40% — Failing | **85%** |
+| 11–20% — Critical | **70%** |
+| <=10% — Ruined | no reliable seal; component/canister is effectively unusable |
+
+This applies generically to:
+- canister body / Shell Seal;
+- Copper Fitting / Connection Seal;
+- Seal Gasket / Gasket Seal.
+
+Do not add separate crack, leak, gasket-wear or pressure-loss meters in Phase One.
+
+Because the Seal Gasket has the lowest baseline durability, it naturally tends to become the first maintenance weak point.
+
+### Filter Medium wear
+
+Filter Medium performance is governed by:
+- Ash Filtration;
+- Pall Filtration;
+- Service Life;
+- Breathing Resistance.
+
+It does not also receive a separate durability meter.
+
+A canister can therefore have a healthy Filter Medium but poor effective resistance because one or more structural components have degraded.
+
+Inspection may reveal the limiting component and expected resistance after replacement/repair according to the generic Inspect rules.
+
+### Quality rule
+
+Filter Canister/component craftsmanship quality should primarily affect longevity, repair tolerance and wear resistance rather than granting large fresh-item filtration/seal bonuses.
+
+Exact Crude / Standard / Well-made / Fine / Masterwork multipliers remain part of the global quality model and should not be invented separately for Filter Canisters.
+
 ## Still open
 
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
-- quality/durability interaction details and final exertion effects of Breathing Resistance;
+- final exertion effects of Breathing Resistance;
 - exact protection/service-life values.
 
 
