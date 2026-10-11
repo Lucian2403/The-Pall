@@ -55,7 +55,11 @@ Rationale:
 - Pall Research provides the secondary material-knowledge gate for Pall-derived media;
 - no separate filtration/chemistry workstation is required in Phase One.
 
-Exact Pressure Bench tier requirements for Crude, Grey, Pall and Deep Pall Filter Medium remain open.
+Filter Medium access by Pressure Bench tier is aligned with Filter Canister access:
+- T1: Crude and Grey Filter Medium;
+- T2: no new Filter Medium tier; reserved for other Pressure Systems recipes;
+- T3: Pall Filter Medium;
+- T4: Deep Pall Filter Medium.
 
 ## Tier 1 — Crude Filter Medium
 
@@ -302,7 +306,6 @@ The top tier intentionally does not approach immunity.
 
 ## Still open
 
-- exact Pressure Bench tier requirements for Filter Medium preparation;
 - batch-size rules;
 - waste model;
 - exact Tier 3 and Tier 4 penalties;
