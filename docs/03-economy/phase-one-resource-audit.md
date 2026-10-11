@@ -134,7 +134,7 @@ Strong Phase One candidates:
 - Copper Wire
 - Copper Fitting
 - Pressure Valve
-- Gear Assembly
+- Gear Assembly ([locked design](gear-assembly.md))
 - Firing Mechanism
 - Leather Strap
 - Sealed Seam Kit
@@ -476,7 +476,7 @@ Recipe:
 Requirements:
 - Mechanics -> Precision Mechanisms;
 - minimum raw Precision Mechanisms: **20**;
-- workstation: **Precision Mechanics Bench**;
+- workstation: **Precision Bench**;
 - T1 bench sufficient for this recipe;
 - crafting time: **30 seconds per batch**.
 
@@ -516,5 +516,5 @@ Agreed/likely consumers:
 - Pressure Valve;
 - Firing Mechanism;
 - later pneumatic rifle mechanism;
-- Gear Assembly only if its later recipe genuinely needs it.
+- Gear Assembly does not require Precision Spring in its locked recipe.
 
