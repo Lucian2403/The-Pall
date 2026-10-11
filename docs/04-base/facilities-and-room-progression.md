@@ -355,3 +355,64 @@ Filter Medium preparation also uses the Pressure Bench and follows the same tier
 - T2: no new Filter Medium tier required;
 - T3: Pall Filter Medium;
 - T4: Deep Pall Filter Medium.
+
+
+
+## Phase One Precision Bench
+
+Status: PROVISIONAL Phase One workstation.
+
+The **Precision Bench** is the canonical workstation for Mechanics -> Precision Mechanisms.
+
+It represents a compact fine-mechanics workspace containing:
+- vice and small clamps;
+- files and fine hand tools;
+- winding/holding fixtures;
+- small drill/press capability;
+- gauges, calipers and alignment tools;
+- protected trays/storage for small components.
+
+These are workstation capabilities, not separate inventory items.
+
+### Role
+
+The Precision Bench is used for components and fittings where:
+- tolerances matter;
+- alignment matters;
+- moving parts must work consistently;
+- small mechanical assemblies must be fitted or calibrated.
+
+It is not a Forge and does not replace Smithing.
+It is not a Pressure Bench and does not replace Pressure Systems assembly.
+
+### Facility tiers
+
+| Tier | Role |
+| --- | --- |
+| **T1 Precision Bench** | entry-level fine mechanical work; sufficient for Precision Spring |
+| **T2 Precision Bench** | more complex assemblies and tighter tolerances |
+| **T3 Precision Bench** | advanced precision components/fittings and higher-quality work |
+| **T4 Precision Bench** | top-end Phase One precision work where recipes explicitly require it |
+
+Tier increases should improve:
+- achievable recipe complexity;
+- alignment/tolerance control;
+- quality ceiling where applicable;
+- reliability of difficult work;
+- tool wear/material waste;
+- setup efficiency.
+
+Do not invent recipes merely to populate a tier. Recipe access is assigned only when a named Phase One item is actually defined.
+
+### Current named Precision Mechanisms candidates
+
+Already-existing items/components that may use the Precision Bench as their recipes are defined:
+- Precision Spring — confirmed, T1;
+- Gear Assembly;
+- Firing Mechanism;
+- Basic Rifle Sight;
+- Lens Set;
+- Precision Tool Roll.
+
+Their exact recipes, skill gates and bench tiers remain separate decisions.
+
