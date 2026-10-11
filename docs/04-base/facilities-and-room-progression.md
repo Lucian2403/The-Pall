@@ -390,7 +390,7 @@ It is not a Pressure Bench and does not replace Pressure Systems assembly.
 | Tier | Role |
 | --- | --- |
 | **T1 Precision Bench** | entry-level fine mechanical work; sufficient for Precision Spring |
-| **T2 Precision Bench** | more complex assemblies and tighter tolerances |
+| **T2 Precision Bench** | Gear Assembly; more complex assemblies and tighter tolerances |
 | **T3 Precision Bench** | advanced precision components/fittings and higher-quality work |
 | **T4 Precision Bench** | top-end Phase One precision work where recipes explicitly require it |
 
@@ -406,13 +406,13 @@ Do not invent recipes merely to populate a tier. Recipe access is assigned only 
 
 ### Current named Precision Mechanisms candidates
 
-Already-existing items/components that may use the Precision Bench as their recipes are defined:
+Current named items and candidate components for the Precision Bench:
 - Precision Spring — confirmed, T1;
-- Gear Assembly;
+- Gear Assembly — confirmed, T2 (raw Precision Mechanisms 30); see [Gear Assembly](../03-economy/gear-assembly.md);
 - Firing Mechanism;
 - Basic Rifle Sight;
 - Lens Set;
 - Precision Tool Roll.
 
-Their exact recipes, skill gates and bench tiers remain separate decisions.
+The remaining candidates (Firing Mechanism, Basic Rifle Sight, Lens Set and Precision Tool Roll) still need their exact recipes, raw-skill gates and bench tiers defined.
 
