@@ -254,7 +254,7 @@ A Metal Plate does not itself carry a shell-seal stat. Shell Seal is created by 
 | Copper Fitting | Connection Seal **97%** | **90** | **0.08 kg** |
 | Seal Gasket | Gasket Seal **98%** | **65** | **0.10 kg** |
 
-**Mass adjustment (LOCKED 2026-10-12):** the Seal Gasket now weighs **0.10 kg**, previously 0.02 kg. Canister structural masses *excluding the Filter Medium* are Crude **0.50 kg**, Grey **0.68 kg**, Pall **0.68 kg**, and Deep Pall **1.18 kg**. This changes carried mass only, not Ash/Pall filtration, service life, breathing resistance, seal percentages or durability. See [Leather and Cloth](textile-materials.md).
+**Mass adjustment (LOCKED 2026-10-12):** the Seal Gasket now weighs **0.10 kg**, previously 0.02 kg. Canister structural masses *excluding the Filter Medium* are Crude **0.50 kg**, Grey **0.68 kg**, Pall **0.68 kg**, and Deep Pall **1.18 kg**. This changes carried mass only, not Ash/Pall filtration, service life, breathing resistance, seal percentages or durability. See [Leather and Cloth](../../refined/textile-materials.md).
 
 The Seal Gasket is intentionally the least durable structural component. It should commonly become the first replaceable weak point rather than forcing replacement of the whole canister.
 

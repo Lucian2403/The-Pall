@@ -13,7 +13,7 @@ Precision Tool Roll is **reusable portable precision-mechanics equipment**, not 
 - Tradeable, marketable, lootable, salvageable where justified.
 - **Repairable** at a suitable workshop; service materials/time and repair gates TBD.
 - **Base durability:** **100** for Standard; quality-specific maxima below.
-- **Weight:** **1.20 kg LOCKED**. Input mass: 0.50 kg Steel + 0.10 kg Fastener Sets + 0.60 kg for 2 Leather + 0.15 kg Cloth = **1.35 kg**; 0.15 kg is nominal trimming/finishing loss (11.1%). See [Leather and Cloth](textile-materials.md).
+- **Weight:** **1.20 kg LOCKED**. Input mass: 0.50 kg Steel + 0.10 kg Fastener Sets + 0.60 kg for 2 Leather + 0.15 kg Cloth = **1.35 kg**; 0.15 kg is nominal trimming/finishing loss (11.1%). See [Leather and Cloth](../../refined/textile-materials.md).
 
 ## Locked recipe
 
@@ -69,4 +69,4 @@ No separate random `Reliability %`, calibration meter, tool-sharpness meter or s
 - Exact salvage yield, vendor stock, crafted appearance/art and trade prices.
 - Outcome quality-roll distribution and facility tuning.
 
-Related: [Precision Bench](../04-base/facilities-and-room-progression.md), [Equipment System](../02-equipment/equipment-system.md), [Crafting Workflow](crafting-workflow.md), and [Fastener Set](fastener-set.md).
+Related: [Precision Bench](../../../06-bases/workstations/facilities-and-room-progression.md), [Equipment System](../../../04-equipment/core/equipment-system.md), [Crafting Workflow](../../../05-gameplay/crafting/crafting-workflow.md), and [Fastener Set](../../components/metalwork/fastener-set.md).

@@ -49,8 +49,8 @@ Keep the Phase One processed layer lean:
 - Lead Ingot
 - Steel
 - Planks
-- Leather ([0.30 kg/piece](textile-materials.md))
-- Cloth ([0.15 kg/piece, 4 Plant Fibre per piece](textile-materials.md))
+- Leather ([0.30 kg/piece](../refined/textile-materials.md))
+- Cloth ([0.15 kg/piece, 4 Plant Fibre per piece](../refined/textile-materials.md))
 - Flour
 - Fired Ceramic
 - Glass
@@ -64,20 +64,20 @@ Processing steps do not automatically become separate tradeable items.
 
 Strong Phase One candidates:
 - Metal Plate
-- Fastener Set ([locked recipe](fastener-set.md))
-- Basic Spring ([locked recipe and reliability](basic-spring.md))
+- Fastener Set ([locked recipe](../components/metalwork/fastener-set.md))
+- Basic Spring ([locked recipe and reliability](../components/mechanical/basic-spring.md))
 - Precision Spring
-- Copper Wire ([locked batch and sight use](copper-wire.md))
+- Copper Wire ([locked batch and sight use](../components/metalwork/copper-wire.md))
 - Copper Fitting
 - Pressure Valve
-- Gear Assembly ([locked design](gear-assembly.md))
-- Firing Mechanisms T1–T3 ([locked recipes](firing-mechanisms.md))
+- Gear Assembly ([locked design](../components/mechanical/gear-assembly.md))
+- Firing Mechanisms T1–T3 ([locked recipes](../components/mechanical/firing-mechanisms.md))
 - Leather Strap
 - Sealed Seam Kit
 - Filter Medium
 - Seal Gasket
 - Filter Canister
-- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
+- Lens Set ([locked optical recipe and quality factors](../components/optics/lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
 - Sterile Dressing
 
 Do not add an intermediate merely because the real object would contain one. Finished recipes may consume Planks, Cloth, Leather, Metal Plate, etc. directly.
@@ -114,10 +114,10 @@ Crafted components may have workmanship quality where it materially affects a fi
 - Long Rifle
 - Industrial Cleaver
 - Blacksmith Hammer
-- Precision Tool Roll ([locked recipe, role, quality factors and 1.20 kg weight](precision-tool-roll.md))
+- Precision Tool Roll ([locked recipe, role, quality factors and 1.20 kg weight](../final-products/tools/precision-tool-roll.md))
 
 ### Fittings
-- Rifle Sight upgrades: T2 Calibrated and T3 Optical ([locked recipes](rifle-sights.md)); integrated T1 iron sights are not a separate craftable item
+- Rifle Sight upgrades: T2 Calibrated and T3 Optical ([locked recipes](../final-products/weapon-fittings/rifle-sights.md)); integrated T1 iron sights are not a separate craftable item
 - Reinforced Stock
 - Sling
 - Extended Filter Housing
@@ -143,7 +143,7 @@ Explorer / scavenger:
 Processor/component specialists:
 - Glass
 - Filter Medium
-- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
+- Lens Set ([locked optical recipe and quality factors](../components/optics/lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
 - Seal Gasket
 - Filter Canister
 - Copper Fittings

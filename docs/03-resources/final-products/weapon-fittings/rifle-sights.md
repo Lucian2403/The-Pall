@@ -30,11 +30,11 @@ Only one upgrade sight may be active at a time. Basic integrated sights remain a
 | Weight | **0.20 kg** | **0.50 kg LOCKED** |
 | Craftsmanship quality | Crude–Masterwork, independent of tier | Crude–Masterwork, independent of tier |
 
-Copper Wire: [**0.10 kg Copper Ingot → 8 Copper Wires**](copper-wire.md), at Smithing 10, Forge T1, 20 s; **each sight uses four**. Fastener Set is a distinct 0.025 kg component.
+Copper Wire: [**0.10 kg Copper Ingot → 8 Copper Wires**](../../components/metalwork/copper-wire.md), at Smithing 10, Forge T1, 20 s; **each sight uses four**. Fastener Set is a distinct 0.025 kg component.
 
 T2 ingredient mass: 0.20 kg Steel + 0.05 kg fasteners + 0.04 kg wire = **0.29 kg** input to **0.20 kg** finished sight, leaving **0.09 kg nominal process/waste difference**. This can represent offcuts and alignment finishing; do not generate recoverable scrap by default.
 
-T3 input mass is **0.44 kg plus 1 Lens Set (0.15 kg)**, i.e. **0.59 kg** total, yielding a **0.50 kg** sight with **0.09 kg** nominal assembly loss. The [Lens Set recipe and craftsmanship optical factors](lens-set.md) are locked, but its **Refined Fluorspar** processing dependency remains TBD.
+T3 input mass is **0.44 kg plus 1 Lens Set (0.15 kg)**, i.e. **0.59 kg** total, yielding a **0.50 kg** sight with **0.09 kg** nominal assembly loss. The [Lens Set recipe and craftsmanship optical factors](../../components/optics/lens-set.md) are locked, but its **Refined Fluorspar** processing dependency remains TBD.
 
 The wire represents fine alignment/reference elements for T2 and fine optical reticle/reference elements for T3, **not** a structural barrel/receiver or a battery. There is no separate power requirement or new invented intermediate.
 
@@ -51,6 +51,6 @@ The wire represents fine alignment/reference elements for T2 and fine optical re
 - Weapon-specific sight support and installation conditions.
 - Numerical condition penalties, environment damage rates, field repair accessibility and quality modifiers.
 - Optical magnification, reticle interaction and aiming time: do not introduce until combat requires them.
-- Upstream Refined Fluorspar processing recipe, and later whole-weapon optical effect formulas; [Lens Set](lens-set.md) manufacturing and quality tables are locked.
+- Upstream Refined Fluorspar processing recipe, and later whole-weapon optical effect formulas; [Lens Set](../../components/optics/lens-set.md) manufacturing and quality tables are locked.
 
-Related: [Copper Wire](copper-wire.md), [Precision Bench](../04-base/facilities-and-room-progression.md), [Item Data Schema](../02-equipment/item-data-schema.md).
+Related: [Copper Wire](../../components/metalwork/copper-wire.md), [Precision Bench](../../../06-bases/workstations/facilities-and-room-progression.md), [Item Data Schema](../../../04-equipment/data/item-data-schema.md).

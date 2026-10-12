@@ -129,20 +129,20 @@ The component layer is useful because it creates player specialization, but it m
 
 Strong Phase One candidates:
 - Metal Plate
-- Fastener Set ([locked recipe](fastener-set.md))
-- Basic Spring ([locked recipe and reliability](basic-spring.md))
+- Fastener Set ([locked recipe](../components/metalwork/fastener-set.md))
+- Basic Spring ([locked recipe and reliability](../components/mechanical/basic-spring.md))
 - Precision Spring
-- Copper Wire ([locked batch and sight use](copper-wire.md))
+- Copper Wire ([locked batch and sight use](../components/metalwork/copper-wire.md))
 - Copper Fitting
 - Pressure Valve
-- Gear Assembly ([locked design](gear-assembly.md))
-- Firing Mechanisms T1–T3 ([locked recipes](firing-mechanisms.md))
+- Gear Assembly ([locked design](../components/mechanical/gear-assembly.md))
+- Firing Mechanisms T1–T3 ([locked recipes](../components/mechanical/firing-mechanisms.md))
 - Leather Strap
 - Sealed Seam Kit
 - Filter Medium
 - Seal Gasket
 - Filter Canister
-- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
+- Lens Set ([locked optical recipe and quality factors](../components/optics/lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
 - Sterile Dressing
 
 Conditional / cut unless recipes prove the need:

@@ -83,4 +83,4 @@ The user-approved revised recipe is **0.50 kg Steel + 0.20 kg Manganese Concentr
 
 **Decision rule:** This audit records and fixes clear bookkeeping problems but **does not amend locked design values**. Outstanding choices remain explicit and should be reviewed separately.
 
-See [Precision Tool Roll](precision-tool-roll.md), [Firing Mechanisms](firing-mechanisms.md), [Rifle Sights](rifle-sights.md), [Lens Set](lens-set.md), and [Refined Fluorspar](refined-fluorspar.md).
+See [Precision Tool Roll](../final-products/tools/precision-tool-roll.md), [Firing Mechanisms](../components/mechanical/firing-mechanisms.md), [Rifle Sights](../final-products/weapon-fittings/rifle-sights.md), [Lens Set](../components/optics/lens-set.md), and [Refined Fluorspar](../refined/refined-fluorspar.md).
