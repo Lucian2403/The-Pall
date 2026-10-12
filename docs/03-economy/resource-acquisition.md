@@ -1331,7 +1331,7 @@ Routine skilled work often proceeds without interruption.
 
 Keep the chain simple:
 
-**Plant Fibre -> Cloth**
+**4 Plant Fibre -> 1 Cloth** (Tailoring processing; each Cloth piece **0.15 kg**; see [Leather and Cloth](textile-materials.md))
 
 Optional rope/cordage should only become its own tradeable component if recipes and logistics justify it.
 
