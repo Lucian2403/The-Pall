@@ -37,4 +37,4 @@ The Fastener Set is the universal mechanical fastening ingredient where needed; 
 
 NPC vendor prices/stock, salvage outputs, exact failure yield, crafting skill XP, and subsequent host-item-specific repair use.
 
-See [Firing Mechanisms](firing-mechanisms.md), [Gear Assembly](gear-assembly.md), and [Refining and Processing](refining-and-processing.md).
+See [Firing Mechanisms](../mechanical/firing-mechanisms.md), [Gear Assembly](../mechanical/gear-assembly.md), and [Refining and Processing](../../refined/refining-and-processing.md).

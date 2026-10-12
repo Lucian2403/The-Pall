@@ -30,7 +30,7 @@ Gear Assembly is a **reusable mechanical transmission component**, carrying rota
 | Quality roll | Enabled |
 
 - Do **not** consume a Precision Spring. Basic gear trains do not need a spring by default.
-- Fastener Set's [locked recipe and physical values](fastener-set.md) use 0.25 kg Steel to produce eight 0.025 kg sets at Smithing 5 on a T1 Forge. Revised ingredient mass: 1.00 kg Steel + 0.50 kg Metal Plate + 0.20 kg Fastener Sets = 1.70 kg total for a 1.50 kg assembly (nominal 0.20 kg fabrication loss).
+- Fastener Set's [locked recipe and physical values](../metalwork/fastener-set.md) use 0.25 kg Steel to produce eight 0.025 kg sets at Smithing 5 on a T1 Forge. Revised ingredient mass: 1.00 kg Steel + 0.50 kg Metal Plate + 0.20 kg Fastener Sets = 1.70 kg total for a 1.50 kg assembly (nominal 0.20 kg fabrication loss).
 - Secondary skill gates, failure handling, blueprint rules, material waste and batch extensions are TBD unless defined separately.
 - A **manufacturing prerequisite is not an ownership, trading, installation, operation or repair prerequisite**.
 
@@ -103,4 +103,4 @@ Use the generic layered Inspect rules, not item-specific server code.
 - NPC supply source, stock, prices and salvage tables.
 - Maximum stack size, repair cost, salvage return, upkeep consumables/time, fine quality progression thresholds, and detailed failure outcomes.
 
-See also: [Economy + Crafting](economy-and-crafting.md), [Skills and Progression](../01-player/skills-progression.md), and [Facilities and Room Progression](../04-base/facilities-and-room-progression.md).
+See also: [Economy + Crafting](../../catalogue/economy-and-crafting.md), [Skills and Progression](../../../01-player/skills-progression.md), and [Facilities and Room Progression](../../../06-bases/workstations/facilities-and-room-progression.md).

@@ -33,7 +33,7 @@ A Lens Set comprises matched, shaped and polished optical elements used by a **T
 
 Glass provides the optical forms; Industrial Sand is a consumed grinding/abrasive medium; Refined Fluorspar provides a specialist corrective optical element. These are gameplay abstractions for optics manufacturing, not detailed real-world optical engineering instructions. The output-to-input mass difference is **not** recoverable scrap by default.
 
-**Upstream dependency:** Raw [Violet Fluorspar](resource-acquisition.md) is a Pall-zone specialty material. The nominal [Refined Fluorspar](refined-fluorspar.md) route is now **0.50 kg Violet Fluorspar → 0.10 kg Refined Fluorspar at Refining 30**. One processing batch nominally supplies two Lens Sets. Its 120-second duration and proposed T2 industrial processing facility are provisional pending detailed facility design and waste tuning.
+**Upstream dependency:** Raw [Violet Fluorspar](../../raw/resource-acquisition.md) is a Pall-zone specialty material. The nominal [Refined Fluorspar](../../refined/refined-fluorspar.md) route is now **0.50 kg Violet Fluorspar → 0.10 kg Refined Fluorspar at Refining 30**. One processing batch nominally supplies two Lens Sets. Its 120-second duration and proposed T2 industrial processing facility are provisional pending detailed facility design and waste tuning.
 
 ## Workstation upgrade — Optical Lapping Attachment
 
@@ -80,4 +80,4 @@ The T3 Optical Rifle Sight consumes **0.30 kg Steel + 4 Fastener Sets (0.10 kg t
 2. Exact numerical firearm accuracy/range formulas, including how combined sight/lens benefits are capped and applied once.
 3. Repair/salvage yields, contamination constraints and finished quality-roll probabilities.
 
-See [Rifle Sights](rifle-sights.md), [Precision Bench](../04-base/facilities-and-room-progression.md), [Item Data Schema](../02-equipment/item-data-schema.md).
+See [Rifle Sights](../../final-products/weapon-fittings/rifle-sights.md), [Precision Bench](../../../06-bases/workstations/facilities-and-room-progression.md), [Item Data Schema](../../../04-equipment/data/item-data-schema.md).

@@ -60,6 +60,6 @@ Mechanism condition can contribute to increased malfunction risk as durability d
 
 ## Dependencies and open work
 
-Fastener Sets: [locked recipe](fastener-set.md). Basic Spring: [locked recipe and reliability](basic-spring.md). Precision Spring: [Economy and Crafting](economy-and-crafting.md).
+Fastener Sets: [locked recipe](../metalwork/fastener-set.md). Basic Spring: [locked recipe and reliability](basic-spring.md). Precision Spring: [Economy and Crafting](../../catalogue/economy-and-crafting.md).
 
 Still required before complete weapon integration: explicit pistol/rifle/scattergun/pneumatic compatibility data, host-dependent condition effects and wear tests, repair recipe/cost and durability loss, NPC/salvage market supply, and quality adjustment curves.

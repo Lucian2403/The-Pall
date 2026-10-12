@@ -42,4 +42,4 @@ Each consumes **0.04 kg** of finished Copper Wire. Eight wire units from one cra
 
 Additional consumers, vendor prices and salvage yields, crafting fail/quality rolls, exact Forge tool requirements, and appearance/icon art.
 
-Related: [Rifle Sights](rifle-sights.md), [Refining and Processing](refining-and-processing.md), [Fastener Set](fastener-set.md).
+Related: [Rifle Sights](../../final-products/weapon-fittings/rifle-sights.md), [Refining and Processing](../../refined/refining-and-processing.md), [Fastener Set](fastener-set.md).

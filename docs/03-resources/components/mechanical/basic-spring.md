@@ -77,4 +77,4 @@ The assembled host mechanism should derive one final activation-reliability valu
 - Future Basic Spring consumers require named recipes; no speculative sinks.
 - Still TBD: per-use durability loss; available item quality grades and modifiers; NPC supply and prices; specific salvage tables; stack cap; beginner Precision 0–5 jobs; mechanism reliability integration.
 
-Related: [Precision Bench](../04-base/facilities-and-room-progression.md), [Economy + Crafting](economy-and-crafting.md), and [Gear Assembly](gear-assembly.md).
+Related: [Precision Bench](../../../06-bases/workstations/facilities-and-room-progression.md), [Economy + Crafting](../../catalogue/economy-and-crafting.md), and [Gear Assembly](gear-assembly.md).

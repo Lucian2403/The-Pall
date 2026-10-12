@@ -48,8 +48,8 @@ The gasket increases the structural weight of every Grey/Pall/Deep Pall Filter C
 
 ## Respiratory system status: no redesign
 
-The [Filter Progression](filter-progression.md) already locks all four Filter Medium recipes, Ash/Pall filtration, service lives, breathing resistance, Pressure Bench/skill requirements, canister sealing, structural condition behavior and the Seal Gasket's non-weight stats. **No such values are being reopened**.
+The [Filter Progression](../final-products/respiratory/filter-progression.md) already locks all four Filter Medium recipes, Ash/Pall filtration, service lives, breathing resistance, Pressure Bench/skill requirements, canister sealing, structural condition behavior and the Seal Gasket's non-weight stats. **No such values are being reopened**.
 
 The workbook's **individual Filter Medium weight_kg values remain blank**; similarly the published canister structural weights deliberately say they exclude medium mass. This is a specific optional bookkeeping detail, **not** a claim that Filter Medium recipes, statistics or respiratory mechanics are undefined. Do not fill those blank fields with invented numbers.
 
-See [Refining and Processing](refining-and-processing.md), [Precision Tool Roll](precision-tool-roll.md), [Filter Progression](filter-progression.md).
+See [Refining and Processing](refining-and-processing.md), [Precision Tool Roll](../final-products/tools/precision-tool-roll.md), [Filter Progression](../final-products/respiratory/filter-progression.md).
