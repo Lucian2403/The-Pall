@@ -36,7 +36,7 @@ All masses in kg. These compare **one manufacturing batch's consumed ingredient 
 | Optical Rifle Sight ×1 | Precision 40 / T3 Precision Bench | 50 | 0.59 | 0.50 | 0.09 | Consistent |
 | Lens Set ×1 | Precision 40 / T3 Precision Bench + Lapping | 90 | 0.45 | 0.15 | 0.30 | Intended optical finishing loss |
 | Refined Fluorspar 0.10 kg | Refining 30 / **T2 provisionally** | **120 provisional** | 0.50 | 0.10 | 0.40 | Intended **20% recovery** |
-| Precision Tool Roll ×1 | Precision 25 / T2 Precision Bench | 30 | **Undetermined** | **1.20 provisional** | — | Leather ×2 + Cloth ×1 lack per-unit masses |
+| Precision Tool Roll ×1 | Precision 25 / T2 Precision Bench | 30 | **1.35** | **1.20** | **0.15** | **Resolved with Leather 0.30, Cloth 0.15 kg** |
 | Pressure Valve ×1 (adjacent chain) | Pressure Systems 20 / T2 Pressure Bench | 45 | 0.88 | **Not defined** | — | Finished valve mass unresolved |
 
 ### Precision Spring economy — REBALANCED, 2026-10-12
@@ -76,7 +76,7 @@ The user-approved revised recipe is **0.50 kg Steel + 0.20 kg Manganese Concentr
 | --- | --- | --- |
 | **Resolved 2026-10-12** | Precision Spring recipe rebalance | User approved 0.50 kg Steel + 0.20 kg Manganese Concentrate → 2 springs; nominal 42.9% mass difference. No other spring stats changed. |
 | **2** | Finish per-item quality tables only as those components are needed in equipment/repair implementation | Flags currently exist but most grade rows do not |
-| **3** | Define Leather and Cloth unit weights; finalize Tool Roll mass | Resolve the one open Precision family mass balance |
+| **Resolved 2026-10-12** | Leather/Cloth unit weights and Tool Roll mass | Leather 0.30 kg, Cloth 0.15 kg, Tool Roll finished weight 1.20 kg; 1.35 kg input, 0.15 kg nominal loss. |
 | **4** | Define mineral-processing facility details without premature workstation attachment inventory | T2/120-second fluorspar processing currently provisional |
 | **5** | Normalize installed-module construction recipes when the facility schema is designed | Optical Lapping ingredient list currently notes-only |
 | **Later** | Firearm interaction, repair, durability wear, sight bonuses and item compatibility | Depends on actual combat/equipment loop |
