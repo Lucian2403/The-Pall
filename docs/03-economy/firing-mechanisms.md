@@ -1,6 +1,6 @@
 # Firing Mechanisms — Phase One
 
-**Status: LOCKED (2026-10-12)** for recipe inputs, crafting gates and times, technological tiers, baseline weight/durability/reliability. Operational wear rates and detailed repair/compatibility systems still need validation.
+**Status: LOCKED (updated 2026-10-12)** for recipe inputs, crafting gates and times, technological tiers, durability and full-condition reliability. **T2/T3 finished weights are under review** because revised recipes contradict earlier weights. Operational wear and repair/compatibility systems still need validation.
 
 Every firearm has one **required internal Firing Mechanism** component, distinct from the optional modification slots. The name identifies a gameplay component family; individual firearm families may have different compatible actuation profiles, including for an eventual pneumatic weapon. Do not assume an identical physical part fits every firearm.
 
@@ -12,22 +12,23 @@ All recipes yield **1** compatible internal mechanism.
 
 | Input / property | T1 Basic | T2 Refined | T3 Precision |
 | --- | ---: | ---: | ---: |
-| Bulk Steel | **0.25 kg** | **0.15 kg** | **0.20 kg** |
+| Bulk Steel | **0.25 kg** | **0.30 kg** | **0.35 kg** |
 | Basic Spring | **1** | 0 | 0 |
-| Precision Spring | 0 | **1** | **1** |
-| Fastener Set | **2** | **2** | **2** |
-| Manganese Concentrate | 0 | 0 | **0.05 kg** |
+| Precision Spring | 0 | **1** | **2** |
+| Fastener Set | **2** | **2** | **4** |
 | Output | 1 | 1 | 1 |
 | Mechanics → Precision Mechanisms (raw) | **5** | **20** | **40** |
 | Precision Bench | **T1** | **T2** | **T3** |
 | Crafting time per item | **20 s** | **30 s** | **50 s** |
-| Finished weight | **0.35 kg** | **0.35 kg** | **0.40 kg** |
-| Nominal combined input mass | **0.40 kg** | **0.40 kg** | **0.50 kg** |
-| Nominal fabrication/process loss | **0.05 kg** | **0.05 kg** | **0.10 kg** |
+| Previously agreed finished weight | **0.35 kg** | **0.35 kg (REVIEW)** | **0.40 kg (REVIEW)** |
+| Combined input mass | **0.40 kg** | **0.55 kg** | **0.85 kg** |
+| Difference using old finished weight (NOT locked as waste) | **0.05 kg** | **0.20 kg** | **0.45 kg** |
 
 Fastener Set weighs **0.025 kg each**, Basic Spring **0.10 kg**, Precision Spring **0.20 kg**. Metal Plate and Copper Fitting are **not** ingredients. No Gear Assembly in the firearm mechanism.
 
-At T3, **0.05 kg Manganese Concentrate** is a minor *consumed metal-finishing/process input*, not 50 grams of retained bulk manganese in the mechanism. T3 Precision Bench needs the controlled small-part metal-finishing capability necessary for that operation. Full industrial metallurgy remains part of the upstream material economy; manufacture does not add a separate raw Refining prerequisite.
+T3 no longer consumes **Manganese Concentrate directly**. Its two Precision Springs already create upstream Manganese Concentrate demand. Assembling T3 requires more material and additional high-tier springs, without introducing a new input category or implying that the T3 Bench performs a separate manganese-finishing process.
+
+**Open mass-balance issue:** At 0.20 kg per Precision Spring, T3 contains 0.40 kg of springs alone, so a 0.40 kg completed mechanism is physically inconsistent if both springs remain installed. The earlier 0.35 kg T2 and 0.40 kg T3 weights are retained as *unresolved existing values*, not valid mass-balanced targets. Recommend **0.50 kg T2** (0.05 kg fabrication loss) and **0.75 kg T3** (0.10 kg loss), pending explicit approval. Do not silently interpret 0.20/0.45 kg discrepancies as manufacturing waste. T1 weight remains locked at 0.35 kg.
 
 Bulk materials are measured in kg and can be consumed fractionally. Manufactured springs and Fastener Sets use discrete counts.
 
