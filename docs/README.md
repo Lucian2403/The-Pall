@@ -1,36 +1,24 @@
 # The Pall — Design Documentation
 
-This directory contains the human-readable design source of truth.
+Canonical pre-production specifications for the game. **Chat proposes. Docs decide. Structured game data tunes. Code implements.**
 
-## Structure
+## Documentation areas
 
-- `00-vision/` — game pillars and non-negotiable design rules.
-- `01-player/` — character state, attributes, skills and progression.
-- `02-equipment/` — equipment and survival gear.
-- `03-economy/` — resources, crafting, food and the player economy.
-- `04-world/` — locations, routes, discoveries and world-state systems.
-- `05-content/` — quests, encounters, factions and procedural content.
-- `06-bases/` — housing, compounds, workshops and trains.
-- `07-technical/` — architecture, data contracts and implementation decisions.
-- `decisions/` — important locked design decisions and their reasoning.
+- [00 — Vision](00-vision/README.md): core fantasy, principles and project boundaries.
+- [01 — Player](01-player/README.md): character attributes, state, skills and progression.
+- [02 — World](02-world/README.md): world ecology, fauna and hunting.
+- [03 — Resources and Item Production](03-resources/README.md): **raw → refined → components → final products**, plus catalogue and audits.
+- [04 — Equipment](04-equipment/README.md): equipment rules and data contracts.
+- [05 — Gameplay Systems](05-gameplay/README.md): crafting workflow, economy, jobs, survival, salvage and interactive content.
+- [06 — Bases and Facilities](06-bases/README.md): workstations, room limits and facility progression.
 
-## Rule
+## Navigation and housekeeping
 
-**Chat proposes. Docs decide. Structured game data tunes. Code implements.**
+- [Resource production overview](03-resources/README.md) is the entry point for all production chains.
+- [Old → new document paths](MIGRATION.md) records the 2026-10-12 repository organization migration.
+- Existing multi-topic specifications remain together to preserve design decisions; sections may be split later only if warranted.
+- New documents should live under the system they define. Cross-domain concepts should link to their canonical specification rather than duplicate it.
 
-Game systems should be implemented generically enough that most future additions are new data/content rather than new special-case code.
+## Pre-implementation next work
 
-## Specific design records
-
-- [Filter Progression](03-economy/filter-progression.md)
-- [Gear Assembly — Phase One](03-economy/gear-assembly.md)
-- [Basic Spring — Phase One](03-economy/basic-spring.md)
-- [Fastener Set — Phase One](03-economy/fastener-set.md)
-- [Firing Mechanisms — T1 to T3](03-economy/firing-mechanisms.md)
-- [Copper Wire — Phase One](03-economy/copper-wire.md)
-- [Rifle Sights — T2 and T3](03-economy/rifle-sights.md)
-- [Lens Set — Advanced Optics](03-economy/lens-set.md)
-- [Refined Fluorspar — Specialist Mineral Processing](03-economy/refined-fluorspar.md)
-- [Precision Tool Roll — Portable Fine Mechanics](03-economy/precision-tool-roll.md)
-- [Leather and Cloth — Phase One Textile Materials](03-economy/textile-materials.md)
-- [Precision Mechanisms — Catalogue Audit](03-economy/precision-mechanisms-audit.md)
+Agree the Phase One vertical slice and the first player experience, then design the playable location, activity, encounter and equipment loops before extensive content production.
