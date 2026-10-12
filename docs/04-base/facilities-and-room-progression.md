@@ -389,9 +389,9 @@ It is not a Pressure Bench and does not replace Pressure Systems assembly.
 
 | Tier | Role |
 | --- | --- |
-| **T1 Precision Bench** | entry-level fine mechanical work; Basic Spring (Precision 5) and Precision Spring (Precision 20) |
-| **T2 Precision Bench** | Gear Assembly; more complex assemblies and tighter tolerances |
-| **T3 Precision Bench** | advanced precision components/fittings and higher-quality work |
+| **T1 Precision Bench** | Basic Spring (Precision 5), Precision Spring (Precision 20), and T1 Basic Firing Mechanism (Precision 5) |
+| **T2 Precision Bench** | Gear Assembly and T2 Refined Firing Mechanism; complex assemblies and tighter tolerances |
+| **T3 Precision Bench** | T3 Precision Firing Mechanism; advanced precision work and controlled small-part metal finishing (consumes a small Manganese Concentrate input) |
 | **T4 Precision Bench** | top-end Phase One precision work where recipes explicitly require it |
 
 Tier increases should improve:
@@ -410,10 +410,10 @@ Current named items and candidate components for the Precision Bench:
 - Basic Spring — confirmed, T1 (raw Precision Mechanisms 5); see [Basic Spring](../03-economy/basic-spring.md);
 - Precision Spring — confirmed, T1 (raw Precision Mechanisms 20);
 - Gear Assembly — confirmed, T2 (raw Precision Mechanisms 30); see [Gear Assembly](../03-economy/gear-assembly.md);
-- Firing Mechanism;
+- Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../03-economy/firing-mechanisms.md);
 - Basic Rifle Sight;
 - Lens Set;
 - Precision Tool Roll.
 
-The remaining candidates (Firing Mechanism, Basic Rifle Sight, Lens Set and Precision Tool Roll) still need their exact recipes, raw-skill gates and bench tiers defined.
+The remaining candidates (**Basic Rifle Sight, Lens Set and Precision Tool Roll**) still need their exact recipes, raw-skill gates and bench tiers defined.
 
