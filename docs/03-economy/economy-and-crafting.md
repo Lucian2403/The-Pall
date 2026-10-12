@@ -67,7 +67,7 @@ Strong Phase One candidates:
 - Fastener Set ([locked recipe](fastener-set.md))
 - Basic Spring ([locked recipe and reliability](basic-spring.md))
 - Precision Spring
-- Copper Wire
+- Copper Wire ([locked batch and sight use](copper-wire.md))
 - Copper Fitting
 - Pressure Valve
 - Gear Assembly ([locked design](gear-assembly.md))
@@ -117,7 +117,7 @@ Crafted components may have workmanship quality where it materially affects a fi
 - Precision Tool Roll
 
 ### Fittings
-- Basic Rifle Sight
+- Rifle Sight upgrades: T2 Calibrated and T3 Optical ([locked recipes](rifle-sights.md)); integrated T1 iron sights are not a separate craftable item
 - Reinforced Stock
 - Sling
 - Extended Filter Housing
