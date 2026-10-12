@@ -391,8 +391,8 @@ It is not a Pressure Bench and does not replace Pressure Systems assembly.
 | --- | --- |
 | **T1 Precision Bench** | Basic Spring (Precision 5), Precision Spring (Precision 20), and T1 Basic Firing Mechanism (Precision 5) |
 | **T2 Precision Bench** | Gear Assembly, T2 Refined Firing Mechanism, and T2 Calibrated Rifle Sight; complex assemblies and tighter tolerances |
-| **T3 Precision Bench** | T3 Precision Firing Mechanism, T3 Optical Rifle Sight and other advanced precision work; T3 Firing Mechanism consumes 2 Precision Springs, no direct Manganese Concentrate |
-| **T4 Precision Bench** | top-end Phase One precision work where recipes explicitly require it |
+| **T3 Precision Bench** | T3 Precision Firing Mechanism, T3 Optical Rifle Sight, and Lens Set (Precision 40, requiring an installed Optical Lapping Attachment); T3 Firing Mechanism uses 2 Precision Springs |
+| **T4 Precision Bench** | Masterwork Lens Set production (Precision 75) with Optical Lapping Attachment; other explicitly defined top-end precision work |
 
 Tier increases should improve:
 - achievable recipe complexity;
@@ -412,8 +412,8 @@ Current named items and candidate components for the Precision Bench:
 - Gear Assembly — confirmed, T2 (raw Precision Mechanisms 30); see [Gear Assembly](../03-economy/gear-assembly.md);
 - Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../03-economy/firing-mechanisms.md);
 - Rifle Sight upgrades — T2 Calibrated (raw Precision 20) and T3 Optical (raw Precision 40) confirmed; see [Rifle Sights](../03-economy/rifle-sights.md); T1 iron sight is integrated, not separately crafted;
-- Lens Set;
+- Lens Set — confirmed raw Precision 40 at T3 Precision Bench with Optical Lapping Attachment (120 s setup, Gear Assembly + Metal Plate + 4 Fastener Sets); see [Lens Set](../03-economy/lens-set.md);
 - Precision Tool Roll.
 
-The remaining candidates (**Lens Set and Precision Tool Roll**) still need their exact recipes, raw-skill gates and bench tiers defined. Lens Set is a confirmed T3 Optical Rifle Sight input, but its own crafting specification remains TBD.
+The remaining Precision Mechanisms catalogue candidate needing a recipe and bench tier is **Precision Tool Roll**. Lens Set's manufacturing recipe is locked, but the upstream **Refined Fluorspar** refining recipe is not yet defined.
 
