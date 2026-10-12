@@ -114,7 +114,7 @@ Crafted components may have workmanship quality where it materially affects a fi
 - Long Rifle
 - Industrial Cleaver
 - Blacksmith Hammer
-- Precision Tool Roll
+- Precision Tool Roll ([locked recipe, role and quality factors](precision-tool-roll.md); weight provisional)
 
 ### Fittings
 - Rifle Sight upgrades: T2 Calibrated and T3 Optical ([locked recipes](rifle-sights.md)); integrated T1 iron sights are not a separate craftable item
