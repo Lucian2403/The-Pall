@@ -1,6 +1,6 @@
 # Lens Set — Phase One Optical Component
 
-**Status: LOCKED (2026-10-12)** for recipe input identities/quantities, subskill gate, station/tool gate, crafting time, weight, craftsmanship-quality factors and manufacturing-quality access. **Not yet end-to-end producible:** upstream Refined Fluorspar processing recipe is **TBD**. Exact firearm combat calculations are also TBD.
+**Status: LOCKED (2026-10-12)** for recipe input identities/quantities, subskill gate, station/tool gate, crafting time, weight, craftsmanship-quality factors and manufacturing-quality access. **Upstream Refined Fluorspar conversion/yield/skill now LOCKED**, with its processing time and facility mapping still **PROVISIONAL**. Exact firearm combat calculations are also TBD.
 
 ## Function
 
@@ -33,7 +33,7 @@ A Lens Set comprises matched, shaped and polished optical elements used by a **T
 
 Glass provides the optical forms; Industrial Sand is a consumed grinding/abrasive medium; Refined Fluorspar provides a specialist corrective optical element. These are gameplay abstractions for optics manufacturing, not detailed real-world optical engineering instructions. The output-to-input mass difference is **not** recoverable scrap by default.
 
-**Upstream dependency:** Raw [Violet Fluorspar](resource-acquisition.md) is a Pall-zone specialty material and `Violet Fluorspar → Refined Fluorspar` is previously named in resource-acquisition lore, but **there is no locked refining recipe, skill, furnace, yield or duration yet**. Treat `Refined Fluorspar` as a planned processed commodity until its production chain is defined. Do not conflate Violet Fluorspar with ready-to-use Refined Fluorspar, and do not invent a mass conversion ratio.
+**Upstream dependency:** Raw [Violet Fluorspar](resource-acquisition.md) is a Pall-zone specialty material. The nominal [Refined Fluorspar](refined-fluorspar.md) route is now **0.50 kg Violet Fluorspar → 0.10 kg Refined Fluorspar at Refining 30**. One processing batch nominally supplies two Lens Sets. Its 120-second duration and proposed T2 industrial processing facility are provisional pending detailed facility design and waste tuning.
 
 ## Workstation upgrade — Optical Lapping Attachment
 
