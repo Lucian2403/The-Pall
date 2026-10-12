@@ -32,3 +32,4 @@ Game systems should be implemented generically enough that most future additions
 - [Lens Set — Advanced Optics](03-economy/lens-set.md)
 - [Refined Fluorspar — Specialist Mineral Processing](03-economy/refined-fluorspar.md)
 - [Precision Tool Roll — Portable Fine Mechanics](03-economy/precision-tool-roll.md)
+- [Precision Mechanisms — Catalogue Audit](03-economy/precision-mechanisms-audit.md)
