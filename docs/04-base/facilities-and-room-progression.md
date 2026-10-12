@@ -390,8 +390,8 @@ It is not a Pressure Bench and does not replace Pressure Systems assembly.
 | Tier | Role |
 | --- | --- |
 | **T1 Precision Bench** | Basic Spring (Precision 5), Precision Spring (Precision 20), and T1 Basic Firing Mechanism (Precision 5) |
-| **T2 Precision Bench** | Gear Assembly and T2 Refined Firing Mechanism; complex assemblies and tighter tolerances |
-| **T3 Precision Bench** | T3 Precision Firing Mechanism and other advanced precision work; its revised recipe consumes 2 Precision Springs, with no direct Manganese Concentrate input |
+| **T2 Precision Bench** | Gear Assembly, T2 Refined Firing Mechanism, and T2 Calibrated Rifle Sight; complex assemblies and tighter tolerances |
+| **T3 Precision Bench** | T3 Precision Firing Mechanism, T3 Optical Rifle Sight and other advanced precision work; T3 Firing Mechanism consumes 2 Precision Springs, no direct Manganese Concentrate |
 | **T4 Precision Bench** | top-end Phase One precision work where recipes explicitly require it |
 
 Tier increases should improve:
@@ -411,9 +411,9 @@ Current named items and candidate components for the Precision Bench:
 - Precision Spring — confirmed, T1 (raw Precision Mechanisms 20);
 - Gear Assembly — confirmed, T2 (raw Precision Mechanisms 30); see [Gear Assembly](../03-economy/gear-assembly.md);
 - Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../03-economy/firing-mechanisms.md);
-- Basic Rifle Sight;
+- Rifle Sight upgrades — T2 Calibrated (raw Precision 20) and T3 Optical (raw Precision 40) confirmed; see [Rifle Sights](../03-economy/rifle-sights.md); T1 iron sight is integrated, not separately crafted;
 - Lens Set;
 - Precision Tool Roll.
 
-The remaining candidates (**Basic Rifle Sight, Lens Set and Precision Tool Roll**) still need their exact recipes, raw-skill gates and bench tiers defined.
+The remaining candidates (**Lens Set and Precision Tool Roll**) still need their exact recipes, raw-skill gates and bench tiers defined. Lens Set is a confirmed T3 Optical Rifle Sight input, but its own crafting specification remains TBD.
 
