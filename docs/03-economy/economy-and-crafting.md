@@ -64,14 +64,14 @@ Processing steps do not automatically become separate tradeable items.
 
 Strong Phase One candidates:
 - Metal Plate
-- Fastener Set
-- Basic Spring ([locked recipe and provisional balance](basic-spring.md))
+- Fastener Set ([locked recipe](fastener-set.md))
+- Basic Spring ([locked recipe and reliability](basic-spring.md))
 - Precision Spring
 - Copper Wire
 - Copper Fitting
 - Pressure Valve
 - Gear Assembly ([locked design](gear-assembly.md))
-- Firing Mechanism
+- Firing Mechanisms T1–T3 ([locked recipes](firing-mechanisms.md))
 - Leather Strap
 - Sealed Seam Kit
 - Filter Medium
