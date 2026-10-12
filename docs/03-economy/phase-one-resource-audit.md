@@ -142,7 +142,7 @@ Strong Phase One candidates:
 - Filter Medium
 - Seal Gasket
 - Filter Canister
-- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar processing remains TBD)
+- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar nominal 20% yield / Refining 30 now locked, final facility setup TBD)
 - Sterile Dressing
 
 Conditional / cut unless recipes prove the need:
