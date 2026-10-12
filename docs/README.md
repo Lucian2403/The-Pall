@@ -31,3 +31,4 @@ Game systems should be implemented generically enough that most future additions
 - [Rifle Sights — T2 and T3](03-economy/rifle-sights.md)
 - [Lens Set — Advanced Optics](03-economy/lens-set.md)
 - [Refined Fluorspar — Specialist Mineral Processing](03-economy/refined-fluorspar.md)
+- [Precision Tool Roll — Portable Fine Mechanics](03-economy/precision-tool-roll.md)
