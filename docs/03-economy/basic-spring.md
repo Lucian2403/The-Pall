@@ -1,6 +1,6 @@
 # Basic Spring — Phase One
 
-Status: **LOCKED** for component identity, recipe, skill/workstation gate and physical characteristics. Spring consistency and degradation multipliers are **PROVISIONAL** balance values.
+Status: **LOCKED** for component identity, recipe, skill/workstation gate and physical characteristics. Spring consistency (90%) and condition multipliers are **LOCKED**.
 
 Decision date: **2026-10-11**.
 
@@ -11,7 +11,7 @@ Basic Spring is an entry-level return-action mechanical component under **Mechan
 - Item ID: `itm_basic_spring`
 - Recipe ID: `rec_basic_spring`
 - Category: Component / Precision mechanism
-- First intended consumer: **T1 Basic Firing Mechanism**; that mechanism's full recipe is **not yet locked**
+- Confirmed consumer: **T1 Basic Firing Mechanism**, see [Firing Mechanisms](firing-mechanisms.md)
 - Salvageable, tradable and marketable; quality/condition-compatible copies may stack (maximum stack size TBD)
 
 ## Locked recipe
@@ -46,11 +46,11 @@ Material failure behavior, quality-roll specifics, blueprint/discovery rules and
 
 Basic Springs wear through meaningful mechanical use. Exact operation wear rate and environmental effects are **not defined**. Do not introduce extra fatigue, elasticity, tension, or stored-energy meters in Phase One.
 
-## Provisional spring consistency
+## Locked spring consistency
 
-A **90% Standard-quality spring consistency/reliability rating** is a **proposal**, not an approved numerical decision. The existing Precision Spring retains its **95%** rating unchanged. This metric is a component quality input, **not a separate per-shot malfunction roll** after the spring is incorporated into a Firing Mechanism.
+**90% Standard-quality spring consistency/reliability index is LOCKED.** It expresses mechanical consistency, not a literal 10% per-use failure probability. The existing Precision Spring retains its **95%** rating unchanged. This metric is a component quality input, **not a separate per-shot malfunction roll** after the spring is incorporated into a Firing Mechanism.
 
-For now, the Basic Spring condition curve **provisionally reuses** the already-defined Precision Spring multipliers:
+The Basic Spring condition curve **is locked to** the previously defined Precision Spring multipliers:
 
 | Remaining durability | Condition | Proposed consistency multiplier |
 | --- | --- | ---: |
@@ -73,8 +73,8 @@ The assembled host mechanism should derive one final activation-reliability valu
 ## Scope boundaries and unresolved work
 
 - This does **not** change the existing Precision Spring (Precision 20), Pressure Valve, or Gear Assembly recipes.
-- The T1 Firing Mechanism may consume Basic Spring. Its exact materials and full crafting specification await a separate approval.
+- The T1 Basic Firing Mechanism consumes **1 Basic Spring** per completed mechanism; [its recipe is locked](firing-mechanisms.md).
 - Future Basic Spring consumers require named recipes; no speculative sinks.
-- Still TBD: confirm/adjust the 90% rating and condition curve; per-use durability loss; available item quality grades and modifiers; NPC supply and prices; specific salvage tables; stack cap; beginner Precision 0–5 jobs; mechanism reliability integration.
+- Still TBD: per-use durability loss; available item quality grades and modifiers; NPC supply and prices; specific salvage tables; stack cap; beginner Precision 0–5 jobs; mechanism reliability integration.
 
 Related: [Precision Bench](../04-base/facilities-and-room-progression.md), [Economy + Crafting](economy-and-crafting.md), and [Gear Assembly](gear-assembly.md).
