@@ -18,7 +18,7 @@ Gear Assembly is a **reusable mechanical transmission component**, carrying rota
 
 ## Manufacturing recipe
 
-**2 Steel + 1 Metal Plate + 1 Fastener Set → 1 Gear Assembly**
+**1 kg Steel + 1 Metal Plate + 8 Fastener Sets → 1 Gear Assembly**
 
 | Requirement | Agreed value |
 | --- | --- |
@@ -30,7 +30,7 @@ Gear Assembly is a **reusable mechanical transmission component**, carrying rota
 | Quality roll | Enabled |
 
 - Do **not** consume a Precision Spring. Basic gear trains do not need a spring by default.
-- Fastener Set is an acknowledged component input, but its own recipe, skill gates, acquisition and physical values are **not yet defined**.
+- Fastener Set's [locked recipe and physical values](fastener-set.md) use 0.25 kg Steel to produce eight 0.025 kg sets at Smithing 5 on a T1 Forge. Revised ingredient mass: 1.00 kg Steel + 0.50 kg Metal Plate + 0.20 kg Fastener Sets = 1.70 kg total for a 1.50 kg assembly (nominal 0.20 kg fabrication loss).
 - Secondary skill gates, failure handling, blueprint rules, material waste and batch extensions are TBD unless defined separately.
 - A **manufacturing prerequisite is not an ownership, trading, installation, operation or repair prerequisite**.
 
@@ -97,7 +97,7 @@ Use the generic layered Inspect rules, not item-specific server code.
 
 ## Unresolved / future work
 
-- Fastener Set production and acquisition chain.
+- Fastener Set NPC availability, regional sourcing, and salvage distribution (recipe now locked).
 - Specific installation, operation, maintenance and repair gates for named host items.
 - Actual consuming recipes, upgrade variants and repair activities.
 - NPC supply source, stock, prices and salvage tables.
