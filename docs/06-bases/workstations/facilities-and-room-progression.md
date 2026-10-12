@@ -407,13 +407,13 @@ Do not invent recipes merely to populate a tier. Recipe access is assigned only 
 ### Current named Precision Mechanisms candidates
 
 Current named items and candidate components for the Precision Bench:
-- Basic Spring — confirmed, T1 (raw Precision Mechanisms 5); see [Basic Spring](../03-economy/basic-spring.md);
+- Basic Spring — confirmed, T1 (raw Precision Mechanisms 5); see [Basic Spring](../../03-resources/components/mechanical/basic-spring.md);
 - Precision Spring — confirmed, T1 (raw Precision Mechanisms 20);
-- Gear Assembly — confirmed, T2 (raw Precision Mechanisms 30); see [Gear Assembly](../03-economy/gear-assembly.md);
-- Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../03-economy/firing-mechanisms.md);
-- Rifle Sight upgrades — T2 Calibrated (raw Precision 20) and T3 Optical (raw Precision 40) confirmed; see [Rifle Sights](../03-economy/rifle-sights.md); T1 iron sight is integrated, not separately crafted;
-- Lens Set — confirmed raw Precision 40 at T3 Precision Bench with Optical Lapping Attachment (120 s setup, Gear Assembly + Metal Plate + 4 Fastener Sets); see [Lens Set](../03-economy/lens-set.md);
-- Precision Tool Roll — confirmed, raw Precision Mechanisms 25, T2 Precision Bench, 30 s; see [Precision Tool Roll](../03-economy/precision-tool-roll.md); finished weight LOCKED at 1.20 kg.
+- Gear Assembly — confirmed, T2 (raw Precision Mechanisms 30); see [Gear Assembly](../../03-resources/components/mechanical/gear-assembly.md);
+- Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../../03-resources/components/mechanical/firing-mechanisms.md);
+- Rifle Sight upgrades — T2 Calibrated (raw Precision 20) and T3 Optical (raw Precision 40) confirmed; see [Rifle Sights](../../03-resources/final-products/weapon-fittings/rifle-sights.md); T1 iron sight is integrated, not separately crafted;
+- Lens Set — confirmed raw Precision 40 at T3 Precision Bench with Optical Lapping Attachment (120 s setup, Gear Assembly + Metal Plate + 4 Fastener Sets); see [Lens Set](../../03-resources/components/optics/lens-set.md);
+- Precision Tool Roll — confirmed, raw Precision Mechanisms 25, T2 Precision Bench, 30 s; see [Precision Tool Roll](../../03-resources/final-products/tools/precision-tool-roll.md); finished weight LOCKED at 1.20 kg.
 
-All current named Precision Mechanisms candidate components now have locked primary recipes and bench tiers. Remaining balancing includes Refined Fluorspar's facility/tool implementation and various equipment-specific wear/repair gates. Precision Tool Roll mass accounting has been resolved with [Leather and Cloth](../03-economy/textile-materials.md).
+All current named Precision Mechanisms candidate components now have locked primary recipes and bench tiers. Remaining balancing includes Refined Fluorspar's facility/tool implementation and various equipment-specific wear/repair gates. Precision Tool Roll mass accounting has been resolved with [Leather and Cloth](../../03-resources/refined/textile-materials.md).
 
