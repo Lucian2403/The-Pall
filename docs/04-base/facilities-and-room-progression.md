@@ -413,7 +413,7 @@ Current named items and candidate components for the Precision Bench:
 - Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../03-economy/firing-mechanisms.md);
 - Rifle Sight upgrades — T2 Calibrated (raw Precision 20) and T3 Optical (raw Precision 40) confirmed; see [Rifle Sights](../03-economy/rifle-sights.md); T1 iron sight is integrated, not separately crafted;
 - Lens Set — confirmed raw Precision 40 at T3 Precision Bench with Optical Lapping Attachment (120 s setup, Gear Assembly + Metal Plate + 4 Fastener Sets); see [Lens Set](../03-economy/lens-set.md);
-- Precision Tool Roll — confirmed, raw Precision Mechanisms 25, T2 Precision Bench, 30 s; see [Precision Tool Roll](../03-economy/precision-tool-roll.md); finished weight provisional.
+- Precision Tool Roll — confirmed, raw Precision Mechanisms 25, T2 Precision Bench, 30 s; see [Precision Tool Roll](../03-economy/precision-tool-roll.md); finished weight LOCKED at 1.20 kg.
 
-All current named Precision Mechanisms candidate components now have locked primary recipes and bench tiers. Remaining balancing includes the Precision Tool Roll's Leather/Cloth mass accounting, Refined Fluorspar's facility/tool implementation and various equipment-specific wear/repair gates.
+All current named Precision Mechanisms candidate components now have locked primary recipes and bench tiers. Remaining balancing includes Refined Fluorspar's facility/tool implementation and various equipment-specific wear/repair gates. Precision Tool Roll mass accounting has been resolved with [Leather and Cloth](../03-economy/textile-materials.md).
 
