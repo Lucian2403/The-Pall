@@ -522,6 +522,12 @@ This gives the metal progression a readable staircase:
 
 ---
 
+## Specialist mineral processing — Refined Fluorspar
+
+The nominal conversion is **0.50 kg Violet Fluorspar → 0.10 kg Refined Fluorspar** at **Industry → raw Refining 30**, see [Refined Fluorspar](refined-fluorspar.md). The low **20% recovery** reflects removal of unsuitable mineral and fragile fragments, not fuel-burning smelting. **120 seconds** is a provisional nominal processing time; a **T2 industrial processing facility with mineral separation/grading capability** is the working candidate, but the hardware/upgrade details are deliberately not defined yet. No direct Coal recipe input. The standard avoidable waste mechanism is separate from the built-in 80% reject ratio. Refined Fluorspar is fungible and not a workmanship-graded material.
+
+---
+
 # Lead refining
 
 Status: PHASE ONE.
