@@ -49,8 +49,8 @@ Keep the Phase One processed layer lean:
 - Lead Ingot
 - Steel
 - Planks
-- Leather
-- Cloth
+- Leather ([0.30 kg/piece](textile-materials.md))
+- Cloth ([0.15 kg/piece, 4 Plant Fibre per piece](textile-materials.md))
 - Flour
 - Fired Ceramic
 - Glass
@@ -114,7 +114,7 @@ Crafted components may have workmanship quality where it materially affects a fi
 - Long Rifle
 - Industrial Cleaver
 - Blacksmith Hammer
-- Precision Tool Roll ([locked recipe, role and quality factors](precision-tool-roll.md); weight provisional)
+- Precision Tool Roll ([locked recipe, role, quality factors and 1.20 kg weight](precision-tool-roll.md))
 
 ### Fittings
 - Rifle Sight upgrades: T2 Calibrated and T3 Optical ([locked recipes](rifle-sights.md)); integrated T1 iron sights are not a separate craftable item
