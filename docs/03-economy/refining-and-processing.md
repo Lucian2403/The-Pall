@@ -839,9 +839,11 @@ Status: PHASE ONE.
 
 Nominal conversion:
 
-**2 Plant Fibre -> 1 Cloth**
+**4 Plant Fibre -> 1 Cloth**
 
 Minimum raw Tailoring: **0**.
+
+**LOCKED 2026-10-12:** the recipe consumes four Plant Fibre per one Cloth (previously two). Each finished Cloth piece weighs **0.15 kg**. One Leather piece weighs **0.30 kg**; Leather still uses 2 Raw Hide per output. See [Leather and Cloth](textile-materials.md).
 
 Cloth uses:
 - the same Tailoring waste curve;
