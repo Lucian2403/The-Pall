@@ -27,3 +27,5 @@ Game systems should be implemented generically enough that most future additions
 - [Basic Spring — Phase One](03-economy/basic-spring.md)
 - [Fastener Set — Phase One](03-economy/fastener-set.md)
 - [Firing Mechanisms — T1 to T3](03-economy/firing-mechanisms.md)
+- [Copper Wire — Phase One](03-economy/copper-wire.md)
+- [Rifle Sights — T2 and T3](03-economy/rifle-sights.md)
