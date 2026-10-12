@@ -132,7 +132,7 @@ Strong Phase One candidates:
 - Fastener Set ([locked recipe](fastener-set.md))
 - Basic Spring ([locked recipe and reliability](basic-spring.md))
 - Precision Spring
-- Copper Wire
+- Copper Wire ([locked batch and sight use](copper-wire.md))
 - Copper Fitting
 - Pressure Valve
 - Gear Assembly ([locked design](gear-assembly.md))
