@@ -25,3 +25,5 @@ Game systems should be implemented generically enough that most future additions
 - [Filter Progression](03-economy/filter-progression.md)
 - [Gear Assembly — Phase One](03-economy/gear-assembly.md)
 - [Basic Spring — Phase One](03-economy/basic-spring.md)
+- [Fastener Set — Phase One](03-economy/fastener-set.md)
+- [Firing Mechanisms — T1 to T3](03-economy/firing-mechanisms.md)
