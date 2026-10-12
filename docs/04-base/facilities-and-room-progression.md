@@ -390,7 +390,7 @@ It is not a Pressure Bench and does not replace Pressure Systems assembly.
 | Tier | Role |
 | --- | --- |
 | **T1 Precision Bench** | Basic Spring (Precision 5), Precision Spring (Precision 20), and T1 Basic Firing Mechanism (Precision 5) |
-| **T2 Precision Bench** | Gear Assembly, T2 Refined Firing Mechanism, and T2 Calibrated Rifle Sight; complex assemblies and tighter tolerances |
+| **T2 Precision Bench** | Gear Assembly, T2 Refined Firing Mechanism, T2 Calibrated Rifle Sight, and Precision Tool Roll (Precision 25); complex assemblies and tighter tolerances |
 | **T3 Precision Bench** | T3 Precision Firing Mechanism, T3 Optical Rifle Sight, and Lens Set (Precision 40, requiring an installed Optical Lapping Attachment); T3 Firing Mechanism uses 2 Precision Springs |
 | **T4 Precision Bench** | Masterwork Lens Set production (Precision 75) with Optical Lapping Attachment; other explicitly defined top-end precision work |
 
@@ -413,7 +413,7 @@ Current named items and candidate components for the Precision Bench:
 - Firing Mechanisms — confirmed T1/T2/T3; raw Precision 5/20/40; see [Firing Mechanisms](../03-economy/firing-mechanisms.md);
 - Rifle Sight upgrades — T2 Calibrated (raw Precision 20) and T3 Optical (raw Precision 40) confirmed; see [Rifle Sights](../03-economy/rifle-sights.md); T1 iron sight is integrated, not separately crafted;
 - Lens Set — confirmed raw Precision 40 at T3 Precision Bench with Optical Lapping Attachment (120 s setup, Gear Assembly + Metal Plate + 4 Fastener Sets); see [Lens Set](../03-economy/lens-set.md);
-- Precision Tool Roll.
+- Precision Tool Roll — confirmed, raw Precision Mechanisms 25, T2 Precision Bench, 30 s; see [Precision Tool Roll](../03-economy/precision-tool-roll.md); finished weight provisional.
 
-The remaining Precision Mechanisms catalogue candidate needing a recipe and bench tier is **Precision Tool Roll**. Lens Set's manufacturing recipe is locked, but the upstream **Refined Fluorspar** refining recipe is not yet defined.
+All current named Precision Mechanisms candidate components now have locked primary recipes and bench tiers. Remaining balancing includes the Precision Tool Roll's Leather/Cloth mass accounting, Refined Fluorspar's facility/tool implementation and various equipment-specific wear/repair gates.
 
