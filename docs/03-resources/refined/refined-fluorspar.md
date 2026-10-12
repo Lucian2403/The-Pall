@@ -18,7 +18,7 @@ Violet Fluorspar is a specialized geological resource found in dangerous exposed
 
 ## Consumers and balance
 
-The [Lens Set](lens-set.md) consumes **0.05 kg Refined Fluorspar** per unit. Thus one **0.10 kg nominal processing batch supports two Lens Sets**, and each finished Lens Set implies **0.25 kg raw Violet Fluorspar** at the nominal recipe ratio. This excludes additional, avoidable loss.
+The [Lens Set](../components/optics/lens-set.md) consumes **0.05 kg Refined Fluorspar** per unit. Thus one **0.10 kg nominal processing batch supports two Lens Sets**, and each finished Lens Set implies **0.25 kg raw Violet Fluorspar** at the nominal recipe ratio. This excludes additional, avoidable loss.
 
 **Waste accounting:** The 80% loss is built into the nominal recipe. It must not be charged a second time as generic refining waste. The game's existing **avoidable waste model** may cause additional material loss or reduced net output; precise rounding, batch handling and contaminated-feed adjustments remain to be resolved. Treat 0.10 kg as the nominal batch output, not guaranteed actual yield at all skill/conditions.
 
@@ -28,7 +28,7 @@ Potential future consumers in advanced metallurgy, glass, gauges and respirator 
 
 ## Progression note
 
-The **Pall Filter Medium** does *not* unlock with Refining 30. Current locked filter manufacture uses **Mechanics → Pressure Systems 25 + Scholarship → Pall Research 15**. Players may attempt short/cautious incursions with Grey filters earlier, consistent with [Filter Progression](filter-progression.md). Refining 30 is a distinct industrial specialization that roughly aligns with the period when players begin to bring Pall-region resources into the economy; it is not an exploration gate.
+The **Pall Filter Medium** does *not* unlock with Refining 30. Current locked filter manufacture uses **Mechanics → Pressure Systems 25 + Scholarship → Pall Research 15**. Players may attempt short/cautious incursions with Grey filters earlier, consistent with [Filter Progression](../final-products/respiratory/filter-progression.md). Refining 30 is a distinct industrial specialization that roughly aligns with the period when players begin to bring Pall-region resources into the economy; it is not an exploration gate.
 
 ## Deferred
 
@@ -37,4 +37,4 @@ The **Pall Filter Medium** does *not* unlock with Refining 30. Current locked fi
 - Separate Pall-zone mining drop rates and market acquisition price.
 - Extraction-site safety, material sorting events and industrial incident tuning.
 
-See also [Resource Acquisition](resource-acquisition.md), [Refining and Processing](refining-and-processing.md), [Lens Set](lens-set.md).
+See also [Resource Acquisition](../raw/resource-acquisition.md), [Refining and Processing](refining-and-processing.md), [Lens Set](../components/optics/lens-set.md).

@@ -1331,7 +1331,7 @@ Routine skilled work often proceeds without interruption.
 
 Keep the chain simple:
 
-**4 Plant Fibre -> 1 Cloth** (Tailoring processing; each Cloth piece **0.15 kg**; see [Leather and Cloth](textile-materials.md))
+**4 Plant Fibre -> 1 Cloth** (Tailoring processing; each Cloth piece **0.15 kg**; see [Leather and Cloth](../refined/textile-materials.md))
 
 Optional rope/cordage should only become its own tradeable component if recipes and logistics justify it.
 
@@ -2021,7 +2021,7 @@ Acquisition:
 - heavy and logistics-intensive.
 
 Processing:
-**0.50 kg Violet Fluorspar -> 0.10 kg Refined Fluorspar** at Industry → Refining 30 (recipe locked; T2 industrial processing candidate / 120-second time provisional). See [Refined Fluorspar](refined-fluorspar.md).
+**0.50 kg Violet Fluorspar -> 0.10 kg Refined Fluorspar** at Industry → Refining 30 (recipe locked; T2 industrial processing candidate / 120-second time provisional). See [Refined Fluorspar](../refined/refined-fluorspar.md).
 
 Primary uses:
 - advanced metallurgy as a processing additive;

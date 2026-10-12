@@ -82,7 +82,7 @@ A component's **manufacturing skill gate applies to crafting it**, not automatic
 
 This distinction matters especially to Industry players: entry-level professional equipment must not become unusable or routinely irreparable merely because its specialist replacement could require a high raw crafting skill. Provide a valid basic repair path; optional upgrades may require more advanced components. Material acquisition can use player crafting, appropriate salvage and limited costly NPC fallback to prevent hard market deadlocks without erasing specialization.
 
-Concrete locked example: [Gear Assembly](../03-economy/gear-assembly.md) is manufactured with raw Precision Mechanisms **30** at a **T2 Precision Bench**. It may be purchased without that skill, while installation and repair follow the host or task. A basic Field Pump does not require Gear Assembly for routine operation or repair.
+Concrete locked example: [Gear Assembly](../03-resources/components/mechanical/gear-assembly.md) is manufactured with raw Precision Mechanisms **30** at a **T2 Precision Bench**. It may be purchased without that skill, while installation and repair follow the host or task. A basic Field Pump does not require Gear Assembly for routine operation or repair.
 
 ## Material efficiency
 
