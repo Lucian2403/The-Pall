@@ -252,7 +252,9 @@ A Metal Plate does not itself carry a shell-seal stat. Shell Seal is created by 
 | Proper one-plate body | Shell Seal **97%** | **100** | **0.50 kg** |
 | Reinforced two-plate body | Shell Seal **98%** | **140** | **1.00 kg** |
 | Copper Fitting | Connection Seal **97%** | **90** | **0.08 kg** |
-| Seal Gasket | Gasket Seal **98%** | **65** | **0.02 kg** |
+| Seal Gasket | Gasket Seal **98%** | **65** | **0.10 kg** |
+
+**Mass adjustment (LOCKED 2026-10-12):** the Seal Gasket now weighs **0.10 kg**, previously 0.02 kg. Canister structural masses *excluding the Filter Medium* are Crude **0.50 kg**, Grey **0.68 kg**, Pall **0.68 kg**, and Deep Pall **1.18 kg**. This changes carried mass only, not Ash/Pall filtration, service life, breathing resistance, seal percentages or durability. See [Leather and Cloth](textile-materials.md).
 
 The Seal Gasket is intentionally the least durable structural component. It should commonly become the first replaceable weak point rather than forcing replacement of the whole canister.
 
@@ -402,7 +404,7 @@ Requirements:
 - workstation: **Textile & Leather Workshop**;
 - T1 Textile & Leather Workshop is sufficient.
 
-Leather provides the flexible sealing surface; Cloth provides reinforcement/packing.
+Leather provides the flexible sealing surface; Cloth provides reinforcement/packing. With Leather **0.30 kg** per unit and Cloth **0.15 kg** per unit, this batch produces four **0.10 kg** gaskets (0.40 kg finished) from 0.45 kg of processed textile, with 0.05 kg nominal offcuts.
 
 These components are leaf components for Phase One. Do not add further sub-components unless a later recipe creates a distinct economic reason.
 
