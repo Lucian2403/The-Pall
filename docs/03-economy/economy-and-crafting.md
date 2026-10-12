@@ -568,7 +568,9 @@ Precision Spring is a retained Phase One component.
 
 Recipe:
 
-**1 Steel + 1 Manganese Concentrate -> 2 Precision Springs**
+**0.50 kg Steel + 0.20 kg Manganese Concentrate -> 2 Precision Springs**
+
+Rebalanced and LOCKED 2026-10-12: 0.70 kg nominal input produces 0.40 kg of springs (0.20 kg each), leaving 0.30 kg / 42.9% nominal fabrication loss. All skill, workstation, timing, durability and consistency figures below remain unchanged.
 
 Requirements:
 - Mechanics -> Precision Mechanisms;
