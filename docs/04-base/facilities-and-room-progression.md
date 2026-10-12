@@ -391,7 +391,7 @@ It is not a Pressure Bench and does not replace Pressure Systems assembly.
 | --- | --- |
 | **T1 Precision Bench** | Basic Spring (Precision 5), Precision Spring (Precision 20), and T1 Basic Firing Mechanism (Precision 5) |
 | **T2 Precision Bench** | Gear Assembly and T2 Refined Firing Mechanism; complex assemblies and tighter tolerances |
-| **T3 Precision Bench** | T3 Precision Firing Mechanism; advanced precision work and controlled small-part metal finishing (consumes a small Manganese Concentrate input) |
+| **T3 Precision Bench** | T3 Precision Firing Mechanism and other advanced precision work; its revised recipe consumes 2 Precision Springs, with no direct Manganese Concentrate input |
 | **T4 Precision Bench** | top-end Phase One precision work where recipes explicitly require it |
 
 Tier increases should improve:
