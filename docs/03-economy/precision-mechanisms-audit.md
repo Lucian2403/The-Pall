@@ -37,7 +37,7 @@ All masses in kg. These compare **one manufacturing batch's consumed ingredient 
 | Lens Set ×1 | Precision 40 / T3 Precision Bench + Lapping | 90 | 0.45 | 0.15 | 0.30 | Intended optical finishing loss |
 | Refined Fluorspar 0.10 kg | Refining 30 / **T2 provisionally** | **120 provisional** | 0.50 | 0.10 | 0.40 | Intended **20% recovery** |
 | Precision Tool Roll ×1 | Precision 25 / T2 Precision Bench | 30 | **1.35** | **1.20** | **0.15** | **Resolved with Leather 0.30, Cloth 0.15 kg** |
-| Pressure Valve ×1 (adjacent chain) | Pressure Systems 20 / T2 Pressure Bench | 45 | 0.88 | **Not defined** | — | Finished valve mass unresolved |
+| Pressure Valve ×1 (adjacent chain) | Pressure Systems 20 / T2 Pressure Bench | 45 | **0.96** | **Not defined** | — | Gasket now 0.10 kg; finished valve mass unresolved |
 
 ### Precision Spring economy — REBALANCED, 2026-10-12
 
@@ -59,7 +59,7 @@ The user-approved revised recipe is **0.50 kg Steel + 0.20 kg Manganese Concentr
 2. **Optical Rifle Sight** consumes Lens Set; Lens Set consumes **0.05 kg Refined Fluorspar**. Nominally **0.50 kg Violet Fluorspar → 0.10 kg Refined Fluorspar** supplies two lenses/sights. Refining **30** and 20% recovery are LOCKED; the **T2 processing assignment and 120 seconds are PROVISIONAL**, as instructed.
 3. **Optical Lapping Attachment** is represented in `22_Base_Modules` with its LOCKED materials (1 Gear Assembly + 1 Metal Plate + 4 Fastener Sets), Precision Mechanisms 40 and 120-second install time. These construction ingredients exist only as a **description/note**, not normalized input rows. Decide how base-module build recipes are represented when facility implementation is designed.
 4. **Precision Tool Roll** correctly allows portable inspection/alignment/eligible maintenance but cannot replace a Precision Bench, consumable Repair Kit or Weapon Cleaning Kit. Required task tags and actual repair/material costs remain TBD.
-5. **Pressure Valve** remains an adjacent consumer of Precision Spring; weight and downstream machine-specific uses should be reviewed with the pressure-component family, not invented here.
+5. **Pressure Valve** remains an adjacent consumer of Precision Spring; its **input mass is 0.96 kg** after the Seal Gasket increases from 0.02 to 0.10 kg. Its own finished mass and downstream machine-specific uses should be reviewed with the pressure-component family, not invented here.
 6. **Host compatibility and installation:** Firing mechanisms require one compatible internal slot, while sight upgrade fitment and firearm-specific maintenance skill gates remain to be designed with combat and repair systems.
 7. The generic facility **quality ceiling** (T1/T2/T3/T4) is separate from a recipe's minimum workstation tier. Masterwork Lens Set requires a T4 Precision Bench and raw Precision Mechanisms 75 even though ordinary Lens Set production starts at T3/40.
 
@@ -76,7 +76,7 @@ The user-approved revised recipe is **0.50 kg Steel + 0.20 kg Manganese Concentr
 | --- | --- | --- |
 | **Resolved 2026-10-12** | Precision Spring recipe rebalance | User approved 0.50 kg Steel + 0.20 kg Manganese Concentrate → 2 springs; nominal 42.9% mass difference. No other spring stats changed. |
 | **2** | Finish per-item quality tables only as those components are needed in equipment/repair implementation | Flags currently exist but most grade rows do not |
-| **Resolved 2026-10-12** | Leather/Cloth unit weights and Tool Roll mass | Leather 0.30 kg, Cloth 0.15 kg, Tool Roll finished weight 1.20 kg; 1.35 kg input, 0.15 kg nominal loss. |
+| **Resolved 2026-10-12** | Leather/Cloth weights; Tool Roll and Seal Gasket mass | Leather 0.30 kg, Cloth 0.15 kg, Tool Roll finished weight 1.20 kg from 1.35 kg input; Seal Gasket 0.10 kg; Cloth output now uses 4 Plant Fibre. |
 | **4** | Define mineral-processing facility details without premature workstation attachment inventory | T2/120-second fluorspar processing currently provisional |
 | **5** | Normalize installed-module construction recipes when the facility schema is designed | Optical Lapping ingredient list currently notes-only |
 | **Later** | Firearm interaction, repair, durability wear, sight bonuses and item compatibility | Depends on actual combat/equipment loop |
