@@ -2021,7 +2021,7 @@ Acquisition:
 - heavy and logistics-intensive.
 
 Processing:
-**Violet Fluorspar -> Refined Fluorspar**
+**0.50 kg Violet Fluorspar -> 0.10 kg Refined Fluorspar** at Industry → Refining 30 (recipe locked; T2 industrial processing candidate / 120-second time provisional). See [Refined Fluorspar](refined-fluorspar.md).
 
 Primary uses:
 - advanced metallurgy as a processing additive;
