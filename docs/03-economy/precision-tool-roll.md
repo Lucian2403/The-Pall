@@ -1,6 +1,6 @@
 # Precision Tool Roll — Phase One
 
-**Status: LOCKED (2026-10-12)** for identity, recipe, raw skill gate, bench tier, crafting time, intended portable tool role, base durability and quality statistics. **PROVISIONAL:** 1.20 kg finished weight (Leather and Cloth lack settled individual mass). Detailed maintenance/repair recipes and tool-use durability loss are TBD.
+**Status: LOCKED (2026-10-12)** for identity, recipe, raw skill gate, bench tier, crafting time, intended portable tool role, base durability and quality statistics. **LOCKED:** 1.20 kg finished weight after Leather and Cloth mass reconciliation. Detailed maintenance/repair recipes and tool-use durability loss are TBD.
 
 ## Purpose
 
@@ -13,7 +13,7 @@ Precision Tool Roll is **reusable portable precision-mechanics equipment**, not 
 - Tradeable, marketable, lootable, salvageable where justified.
 - **Repairable** at a suitable workshop; service materials/time and repair gates TBD.
 - **Base durability:** **100** for Standard; quality-specific maxima below.
-- **Weight:** **1.20 kg PROVISIONAL**, because unit weights for **2 Leather** and **1 Cloth** are still undefined. Known fixed input mass before these is **0.60 kg** (=0.50 kg Steel + four 0.025 kg Fastener Sets).
+- **Weight:** **1.20 kg LOCKED**. Input mass: 0.50 kg Steel + 0.10 kg Fastener Sets + 0.60 kg for 2 Leather + 0.15 kg Cloth = **1.35 kg**; 0.15 kg is nominal trimming/finishing loss (11.1%). See [Leather and Cloth](textile-materials.md).
 
 ## Locked recipe
 
@@ -63,7 +63,7 @@ No separate random `Reliability %`, calibration meter, tool-sharpness meter or s
 
 ## Remaining balancing and implementation work
 
-- Exact Leather/Cloth unit weights and resulting finished roll weight/mass balance.
+- Leather/Cloth weights and Tool Roll input-to-finished mass balance **RESOLVED 2026-10-12**.
 - Eligible task tags and skill requirements for weapon maintenance, precision inspection, alignment and field service.
 - Per-task tool wear rate; environmental wear, repair materials/time, major repair penalties and NPC repair services.
 - Exact salvage yield, vendor stock, crafted appearance/art and trade prices.
