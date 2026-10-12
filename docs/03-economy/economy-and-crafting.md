@@ -77,7 +77,7 @@ Strong Phase One candidates:
 - Filter Medium
 - Seal Gasket
 - Filter Canister
-- Lens Set
+- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar processing remains TBD)
 - Sterile Dressing
 
 Do not add an intermediate merely because the real object would contain one. Finished recipes may consume Planks, Cloth, Leather, Metal Plate, etc. directly.
@@ -143,7 +143,7 @@ Explorer / scavenger:
 Processor/component specialists:
 - Glass
 - Filter Medium
-- Lens Set
+- Lens Set ([locked optical recipe and quality factors](lens-set.md); Refined Fluorspar processing remains TBD)
 - Seal Gasket
 - Filter Canister
 - Copper Fittings
