@@ -28,7 +28,7 @@ Bulk Steel is measured by mass and supports fractional-kg inventory and recipe o
 
 - **Basic Firing Mechanism:** 2 Fastener Sets.
 - **Refined Firing Mechanism:** 2 Fastener Sets.
-- **Precision Firing Mechanism:** 2 Fastener Sets.
+- **Precision Firing Mechanism:** **4** Fastener Sets.
 - **Gear Assembly:** 8 Fastener Sets under the **revised** recipe.
 
 The Fastener Set is the universal mechanical fastening ingredient where needed; **Copper Fitting** retains its specialized pressure-connection purpose. Do not multiply fastener recipes into different technological tiers without a concrete gameplay justification.
