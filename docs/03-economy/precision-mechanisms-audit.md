@@ -25,7 +25,7 @@ All masses in kg. These compare **one manufacturing batch's consumed ingredient 
 | Output | Raw crafting skill / bench | Seconds | Nominal ingredient kg | Output kg | Difference kg | Assessment |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | Basic Spring ×4 | Precision 5 / T1 Precision Bench | 20 | 0.50 | 0.40 | 0.10 | Consistent |
-| Precision Spring ×2 | Precision 20 / T1 Precision Bench | 30 | 2.00 | 0.40 | **1.60** | **Review: 80% loss** |
+| Precision Spring ×2 | Precision 20 / T1 Precision Bench | 30 | **0.70** | 0.40 | **0.30** | **Revised: 42.9% loss** |
 | Fastener Set ×8 | Smithing 5 / T1 Forge | 20 | 0.25 | 0.20 | 0.05 | Consistent |
 | Copper Wire ×8 | Smithing 10 / T1 Forge | 20 | 0.10 | 0.08 | 0.02 | Consistent |
 | Gear Assembly ×1 | Precision 30 / T2 Precision Bench | 60 | 1.70 | 1.50 | 0.20 | Consistent |
@@ -39,11 +39,9 @@ All masses in kg. These compare **one manufacturing batch's consumed ingredient 
 | Precision Tool Roll ×1 | Precision 25 / T2 Precision Bench | 30 | **Undetermined** | **1.20 provisional** | — | Leather ×2 + Cloth ×1 lack per-unit masses |
 | Pressure Valve ×1 (adjacent chain) | Pressure Systems 20 / T2 Pressure Bench | 45 | 0.88 | **Not defined** | — | Finished valve mass unresolved |
 
-### Precision Spring high-cost alert — decision required
+### Precision Spring economy — REBALANCED, 2026-10-12
 
-Existing locked recipe **1 kg Steel + 1 kg Manganese Concentrate → 2 Precision Springs**, weighing **0.20 kg each**, consumes **2.00 kg** to retain **0.40 kg** (80% nominal difference). This is notably more wasteful than the **Basic Spring** (20%), **Fastener Set** (20%) and Firing Mechanism assemblies (9–13%). It also draws on relatively expensive Manganese Concentrate, whose own recipe consumes Black Bog Nodules and Coal.
-
-**Do not change this recipe without approval.** It may be an intentional specialist-material sink, but a transparent economic explanation, actual sale/production price check or revised batch quantities should be agreed before considering its balancing complete.
+The user-approved revised recipe is **0.50 kg Steel + 0.20 kg Manganese Concentrate → 2 Precision Springs** (0.20 kg each). **0.70 kg input → 0.40 kg output** is **0.30 kg nominal fabrication loss (42.9%)**. This replaces the previous **1 kg Steel + 1 kg Manganese Concentrate**, which had an 80% material difference. Mechanic skill **20**, T1 Precision Bench, **30 seconds**, durability **100**, mechanical consistency **95%**, quality availability and condition curve remain unchanged. There are no revised upstream recipes for Manganese Concentrate or downstream consumers, merely lower aggregate material cost per spring batch.
 
 ## Quality and condition audit
 
@@ -76,7 +74,7 @@ Existing locked recipe **1 kg Steel + 1 kg Manganese Concentrate → 2 Precision
 
 | Priority | Decision | Why |
 | --- | --- | --- |
-| **1** | Review Precision Spring economics / 80% nominal mass difference | Recurs inside Pressure Valve and T2/T3 Firing Mechanisms |
+| **Resolved 2026-10-12** | Precision Spring recipe rebalance | User approved 0.50 kg Steel + 0.20 kg Manganese Concentrate → 2 springs; nominal 42.9% mass difference. No other spring stats changed. |
 | **2** | Finish per-item quality tables only as those components are needed in equipment/repair implementation | Flags currently exist but most grade rows do not |
 | **3** | Define Leather and Cloth unit weights; finalize Tool Roll mass | Resolve the one open Precision family mass balance |
 | **4** | Define mineral-processing facility details without premature workstation attachment inventory | T2/120-second fluorspar processing currently provisional |
