@@ -31,11 +31,11 @@ Art direction: distinct, simplified 2D industrial illustration; graphic shapes; 
 
 | Background | Where they come from | Practical edge (proposed subskill) | Starter item idea | First quest / lore window |
 | --- | --- | --- | --- | --- |
-| **Cinderhand** | Foundry and workshop labor | Craftsmanship → Smithing | Worn work gloves | Help restore a shuttered workshop; see industrial labor and ownership |
+| **Millhand** | Foundry and workshop labor | Craftsmanship → Smithing | Worn work gloves | Help restore a shuttered workshop; see industrial labor and ownership |
 | **Bellrunner** | City messengers and shift couriers | Industry → Hauling | Small delivery satchel | Trace a missing wage packet; see city districts and worker contracts |
-| **Fenborn** | Families living along the protected wet outskirts | Fieldcraft → Foraging | Herb wrap and simple provisions | Locate a delayed gatherer; see the city's uneasy relationship with the fringes |
+| **Squatter** | Families living along the protected wet outskirts | Fieldcraft → Foraging | Herb wrap and simple provisions | Locate a delayed gatherer; see the city's uneasy relationship with the fringes |
 | **Stitcher** | Clinic attendants and informal caregivers | Medicine → Trauma | Basic dressing supplies | Triage an overworked infirmary; see medicine access and public hardship |
-| **Reclaimer** | Scrap-yard pickers and demolition crews | Fieldcraft → Scavenging | Low-grade salvage hand tool | Recover a marked mechanical part; see recycling and salvage rights |
+| **Scrapper** | Scrap-yard pickers and demolition crews | Fieldcraft → Scavenging | Low-grade salvage hand tool | Recover a marked mechanical part; see recycling and salvage rights |
 | **Inkbound** | Records keepers and ledger copyists | Scholarship → Investigation | Used notebook | Resolve a contradictory ration record; see bureaucracy and missing histories |
 
 These are **social backgrounds, not character classes or locked professions**. All six may train any skill and pursue the same City → Outskirts → Grey Marches journey. Special starter items are illustrative; don't create item definitions, precise skill bonuses, quest rewards or NPC affiliations from these names yet. Each opening should converge on the general tutorial and remain approximately equal in item/currency value and difficulty.
