@@ -22,4 +22,4 @@ Player activities, time, world economy and authored interactive events.
 
 - [Shared tutorial structure: first job, branching second job, combat, healing, rent](onboarding/shared-structure.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
-- [Bellrunner: Dispatch House (locked) and branching tutorial (proposed)](onboarding/bellrunner.md)
+- [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
