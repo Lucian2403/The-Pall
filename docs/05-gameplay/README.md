@@ -24,4 +24,4 @@ Player activities, time, world economy and authored interactive events.
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
-- [Stitcher: working-class infirmary / Matron (agreed), The Teaching Bed (proposal)](onboarding/stitcher.md)
+- [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher.md)
