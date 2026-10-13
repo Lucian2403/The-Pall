@@ -43,7 +43,7 @@ A player can create a character, obtain a starting opportunity, undertake a city
 
 ## Next design task — not yet locked
 
-Specify the **first 30 minutes** of play, including starting currency, equipment, access to the market, beginner job, reward/skill feedback, tutorial pacing and the first outskirts objective. No starter cash amount, starter equipment loadout, XP quantity or NPC identity is established by this scope document.
+Specify the **first 30 minutes** of play, including access to the market, background-specific beginner jobs, reward/skill feedback, tutorial pacing and the first outskirts objective. **Now agreed across all six origins:** starting kit is **Basic Clothes + one Crude Small Bag + 20 coins**, and each origin completes first-skill job → twist/choice → different-skill second job → two interactions → turn-based PvE encounter → healing → home and rent notice (see [Shared Tutorial Structure](../05-gameplay/onboarding/shared-structure.md)). Precise item attributes, wages/XP, medical charges, timings and specific NPC names remain to be authored.
 
 References:
 - [Core Design Pillars](design-pillars.md)
