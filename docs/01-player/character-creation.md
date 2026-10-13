@@ -6,7 +6,7 @@ Status: Partially agreed, 2026-10-13. Open design choices are distinguished from
 
 - Character name.
 - Modular stylized 2D portrait; not a fixed portrait roster or full-body character editor.
-- Six background/origin choices, each with meaningful gameplay consequences and a distinct introduction to city lore. Names, starting packages and quest details below are proposed until individually confirmed.
+- Six **locked** background/origin names and social roles, each intended to have meaningful gameplay consequences and a distinct introduction to city lore. Starter skill values, items, quests and rewards remain provisional.
 - **All attributes fixed at STR 5, DEX 5, INT 5, RES 5 for every background.** No point distribution or background-based attribute changes (LOCKED).
 - No age selection.
 - Player identity and narrative framing are not yet established. A rent payment is a possible narrative hook, not a finalized obligation.
@@ -25,9 +25,9 @@ Status: Partially agreed, 2026-10-13. Open design choices are distinguished from
 
 Art direction: distinct, simplified 2D industrial illustration; graphic shapes; muted colors; consistent linework and anchor points. Art assets may be created with AI assistance but need manual consistency checks. 512 by 512 transparent layers are a proposed technical standard.
 
-## Six backgrounds — proposed names and gameplay packages
+## Six backgrounds — confirmed names, proposed gameplay packages
 
-**LOCKED:** six options, no core-attribute modifiers. **PROPOSED:** the following names and exact starter content, awaiting review.
+**LOCKED (2026-10-13):** Millhand, Bellrunner, Squatter, Stitcher, Scrapper and Inkbound; their broad social origins; six total options; no core-attribute modifiers. **PROPOSED / NOT LOCKED:** specific starting subskills, equipment, quest hooks, NPCs and reward values in the table below.
 
 | Background | Where they come from | Practical edge (proposed subskill) | Starter item idea | First quest / lore window |
 | --- | --- | --- | --- | --- |
@@ -44,9 +44,8 @@ Each option should ultimately specify its distinct short story opening, NPC, beg
 
 ## Next decisions
 
-1. Review and approve the six proposed names and their different social/lore roles.
-2. Define starter skill values, possessions and origin-specific opening quest mechanics, with parity checks.
-3. Decide whether imminent rent frames the common introduction and what it actually does.
-4. Set starting money, basic worn clothing/bag, naming validation and first common job.
+1. Define starter skill values, possessions and origin-specific opening quest mechanics, with parity checks.
+2. Decide whether imminent rent frames the common introduction and what it actually does.
+3. Set starting money, basic worn clothing/bag, naming validation and first common job.
 
 Related: [First Playable Scope](../00-vision/first-playable-scope.md), [Character System](character-system.md), [Jobs and Time](../05-gameplay/jobs/jobs-and-time.md).
