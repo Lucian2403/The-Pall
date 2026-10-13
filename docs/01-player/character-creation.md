@@ -28,14 +28,14 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 
 | Background | Where they come from | Starting Major Skill bonus | Brief tutorial idea (proposed, not yet detailed) |
 | --- | --- | --- | --- |
-| **Millhand** | Foundry and workshop labor | **Craftsmanship +3** | [Noisy workshop, Smithing foreman and tutorial](../05-gameplay/onboarding/millhand.md); narrative under review |
-| **Bellrunner** | City messengers and shift couriers | **Industry +3** | [The Wrong Bell](../05-gameplay/onboarding/bellrunner.md): Dispatch House, Shift Dispatch, three follow-on jobs and Shift Marshal's dogman opponent locked |
-| **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | [Hedge Shelter / Herb Dealer / Yarrow Cut / The Warm Patch](../05-gameplay/onboarding/squatter.md) and three second-job branches, injured boar combat and rent-at-home sequence locked |
-| **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | [Cinder Row Infirmary / Matron / Morning Dressings / The Teaching Bed](../05-gameplay/onboarding/stitcher.md) with three second jobs, Night Porter encounter and home/rent ending locked |
+| **Millhand** | Foundry and workshop labor | **Craftsmanship +3** | [Guther Anvil, Smithing Foreman, and The Missing Stamp](../05-gameplay/onboarding/millhand.md); tutorial direction locked |
+| **Bellrunner** | City messengers and shift couriers | **Industry +3** | [Hector D. Smoke, Dispatch Master, and The Wrong Bell](../05-gameplay/onboarding/bellrunner.md); branching tutorial locked |
+| **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | [Benny Ben, Herb Dealer, and The Warm Patch](../05-gameplay/onboarding/squatter.md); branching tutorial locked |
+| **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | [Claudia Cyka, Matron, and The Teaching Bed](../05-gameplay/onboarding/stitcher.md); branching tutorial locked |
 | **Scrapper** | Scrap-yard pickers and demolition crews | **Mechanics +3** | [Rust Yard / Ignatius Smog / The Last Dry Floor](../05-gameplay/onboarding/scrapper.md), three second jobs and Barnaby Rusk confrontation locked |
 | **Inkbound** | Records keepers and ledger copyists | **Scholarship +3** | [Civic Copying Office / Erwin Buro / The Acceptable Losses](../05-gameplay/onboarding/inkbound.md), three second jobs and Silas Pumpard encounter locked |
 
-**NPC naming rule (LOCKED 2026-10-13):** every NPC in the game's authored cast must have a personal in-world name, not merely a job title; individual names are to be defined/approved while designing each character. **Ignatius Smog**, the Yard Foreman of **Rust Yard**, is the first Scrapper job-giver explicitly named. Existing Matron, Dispatch Master, Herb Dealer and other role labels remain placeholders for personal names; do not invent canon names without approval.
+**NPC naming rule (LOCKED):** every NPC in the authored cast must have a personal in-world name, not merely a job title; further NPC names are defined/approved individually. The six background recurring NPCs are now named: **Guther Anvil** (Smithing Foreman/Millhand), **Hector D. Smoke** (Dispatch Master/Bellrunner), **Benny Ben** (Herb Dealer/Squatter), **Claudia Cyka** (female Matron/Stitcher), **Ignatius Smog** (Yard Foreman/Scrapper), and **Erwin Buro** (Senior Copy Clerk/Inkbound). Other characters, including some opponents and supporting job-givers, may still need names; do not silently canonize them.
 
 **Implementation rule:** The +3 is applied at character creation to the **Major Skill level**, not to a subskill or attribute, and is not contingent on completing the tutorial quest. Other Major Skills begin at the same common baseline for every character. **Squatter grants Fieldcraft +3; Scrapper grants Mechanics +3.** No background changes any core attribute.
 
