@@ -17,3 +17,7 @@ Player activities, time, world economy and authored interactive events.
 
 - [Jobs and time](jobs/jobs-and-time.md)
 - [Interaction generation](interactions/interaction-generation.md)
+
+## First-session onboarding
+
+- [Millhand: Smithing workshop, reusable job giver and introductory tutorial](onboarding/millhand.md)
