@@ -1,16 +1,16 @@
 # Stitcher — Infirmary Opening: The Teaching Bed
 
-**Status (2026-10-13):** **Overcrowded working-class infirmary** as recurring medical job hub and a **Matron** as recurring medical job-giver are AGREED in direction. The proper location name **Cinder Row Infirmary**, first job **Morning Dressings**, unique **The Teaching Bed** story, second jobs and Night Porter enemy are **PROPOSALS**, not approved yet. The background's **Medicine +3**, universal starter equipment and [common E2E tutorial structure](shared-structure.md) are LOCKED.
+**Status: STORY STRUCTURE AND CONTENT LOCKED (2026-10-13).** **Cinder Row Infirmary**, its recurring **Matron** job-giver, **Morning Dressings**, **The Teaching Bed**, three choice-dependent second jobs, two follow-up interactions, the **Night Porter** opponent and the patient's local rescue were explicitly approved. The shared [E2E tutorial structure](shared-structure.md), Medicine +3 and universal starter kit remain canonical. Dialogue, combat systems, wages, medical fees and geographical details are still to be defined.
 
 ## Locked state and hub direction
 
 - **Origin:** Stitcher — clinic attendant and informal caregiver, already knows the hardships of their neighborhood.
 - **Background bonus:** **Medicine +3 Major Skill levels** at character creation. Core attributes STR/DEX/INT/RES all 5; 50 starting maximum Health; Male and Female portraits use the same stats and gameplay.
 - **Global starter kit:** **Basic Clothes + one Crude Small Bag + 20 coins**. No special medical starter equipment or extra medicines by background.
-- **Hub:** a crowded **working-class city infirmary**, a permanent hub for routine **Medicine / Trauma** and other appropriate medical jobs (not a special tutorial-only facility). Working name: **Cinder Row Infirmary**. Sterilizing water is scarce, the coal stove smokes, spare beds overflow into the hall; exact district/name TBD pending approval.
+- **Hub:** a crowded **working-class city infirmary**, a permanent hub for routine **Medicine / Trauma** and other appropriate medical jobs (not a special tutorial-only facility). **Cinder Row Infirmary** (LOCKED name). Sterilizing water is scarce, the coal stove smokes, spare beds overflow into the hall; exact district/location within Grand Cylinder City TBD.
 - **Recurring job-giver:** the **Matron** (role approved, individual name TBD), responsible for allocating nursing work and issuing its ordinary **coins and relevant Medicine XP**. She is competent, exhausted and morally complicated; she need not be a secret supervillain. Medical care services for the wounded player later should also follow reusable NPC treatment rules.
 
-## Proposed first paid job: Morning Dressings — Medicine / Trauma
+## First paid job (LOCKED): Morning Dressings — Medicine / Trauma
 
 Under the Matron, do a short paid shift in an overcrowded ward. This is an **ordinary, repeatable Medicine / Trauma job** usable after the tutorial.
 
@@ -20,7 +20,7 @@ Under the Matron, do a short paid shift in an overcrowded ward. This is an **ord
 3. Resolve a normal complication such as a dirty dressing or loosening bandage using generic treatment/inspection choices.
 4. Complete the routine work and receive normal **Medicine XP and coins**. The distinctive tutorial-only revelation follows the ordinary interaction sequence; do not replace normal Medicine gameplay with dialogue-only scenes.
 
-## Proposed unique twist: The Teaching Bed
+## Unique twist (LOCKED): The Teaching Bed
 
 As the Matron prepares to close a side ward, the player notices an **adult patient who is awake, restrained to a narrow bed, and marked in blue ink with precise surgical cutting lines**. His chart does not list the procedure needed to treat his wound. Instead it reads:
 
@@ -32,7 +32,7 @@ A surgeon's teaching contract treats the patient's body as payment for care that
 
 The Matron knows enough to be uneasy. Her justification is not simple evil: *"Keep him, and tonight the fever ward has no heat."* This leaves the player an ugly decision rather than a pure cartoon villain. Do **not** depict explicit surgery or create a systemic organ-trafficking economy; this is a **one-off authored local case**, not the game's main plot or a newly established universal practice throughout Grand Cylinder City.
 
-### Three proposed choices → three paid jobs in another Major Skill
+### Three approved choices → three paid jobs in another Major Skill
 
 | Player response to the patient | Second paid job (reusable job interaction family) | Immediate discovery / consequence |
 | --- | --- | --- |
@@ -44,13 +44,13 @@ The Matron knows enough to be uneasy. Her justification is not simple evil: *"Ke
 
 ### Two more interactions, then a common encounter
 
-**Interaction 1 — The Empty Sheet (PROPOSED):** Back near the service corridor, a patient bed is empty but its sheets are warm. The player can inspect the trolley's seal, call for the Matron, or use their route's evidence to challenge the transfer. Their branch alters dialogue and what they can demonstrate. All paths learn the patient is still alive, and all can secure his release from the demonstration by the local ending. Don't make the fate of the patient depend on an untrained beginner passing a hidden high-skill check.
+**Interaction 1 — The Empty Sheet (LOCKED story event; exact options TBD):** Back near the service corridor, a patient bed is empty but its sheets are warm. The player can inspect the trolley's seal, call for the Matron, or use their route's evidence to challenge the transfer. Their branch alters dialogue and what they can demonstrate. All paths learn the patient is still alive, and all can secure his release from the demonstration by the local ending. Don't make the fate of the patient depend on an untrained beginner passing a hidden high-skill check.
 
-**Interaction 2 — The Night Door (PROPOSED):** The hospital **Night Porter**, paid by the receiving anatomy school to deliver the patient, bars the service exit and demands the papers or trolley back. The player can attempt to reason with him, distract him with a nearby cart, or brace against the narrow doorway. His choice to use force triggers the same **short, turn-based PvE encounter** on each route. He is **not the Matron and not a senior surgeon**.
+**Interaction 2 — The Night Door (LOCKED story event; exact options TBD):** The hospital **Night Porter**, paid by the receiving anatomy school to deliver the patient, bars the service exit and demands the papers or trolley back. The player can attempt to reason with him, distract him with a nearby cart, or brace against the narrow doorway. His choice to use force triggers the same **short, turn-based PvE encounter** on each route. He is **not the Matron and not a senior surgeon**.
 
 ### PvE, treatment and home — common structure
 
-- **Proposed opponent: Night Porter**, a physically tired hospital employee with keys and a thick leather strap or short truncheon (weapon TBD). His pay and post depend on completing this transfer. A grounded human adversary, not a shadowy boss or supernatural monster. The player fights to block the attempted abduction; they needn't kill him, and a successful win can force him away from the patient.
+- **LOCKED opponent: Night Porter**,  a physically tired hospital employee with keys and a thick leather strap or short truncheon (weapon TBD). His pay and post depend on completing this transfer. A grounded human adversary, not a shadowy boss or supernatural monster. The player fights to block the attempted abduction; they needn't kill him, and a successful win can force him away from the patient.
 - **Narrative closure:** The patient is secured in ordinary care and the dawn demonstration prevented **for this one case**. What the hospital does about its funding is unpleasantly unresolved; no huge conspiracy campaign or off-screen permanent faction consequences are promised. All three second jobs resolve, the player has gained their wages and XP, and the local case is over.
 - **Treatment:** The player emerges wounded and receives a **paid patch-up** using ordinary clinic treatment services (at Cinder Row or a nearby working-class surgery). It is particularly bitter that a Stitcher must pay the institution for their own dressing. Health/injury math and fees TBD, and loss must not block tutorial completion.
 - **Ending:** Returning to a rented room with little money, the player finds **rent due**. The tutorial ends, without triggering the overarching main storyline.
@@ -58,8 +58,6 @@ The Matron knows enough to be uneasy. Her justification is not simple evil: *"Ke
 
 ## Approval and production boundaries
 
-**Already locked:** Medicine +3, 50 maximum Health, universal starting kit, working-class infirmary / Matron start, and same first skill job → twist → choice-dependent second job in another Major Skill → two interactions → beginner PvE → clinic care → home/rent structure used for every origin.
+**LOCKED:** Medicine +3 and common starter kit; Cinder Row Infirmary / Matron; *Morning Dressings*; *The Teaching Bed* involving coerced consent to an unnecessary demonstration on an adult patient; three paid second jobs (**Industry/Hauling — The Night Trolley**, **Commerce/Contracts — The Signed Consent**, **Scholarship/Investigation — Notes for the Living**); **The Empty Sheet**, **The Night Door**, **Night Porter** as the PvE opponent, preventing this patient's transfer, paid medical treatment, and home/rent tutorial ending. This is a **self-contained local case**, not the main storyline or a declaration that all hospitals practice this abuse.
 
-**For user approval:** Cinder Row Infirmary name; *Morning Dressings* first job; *The Teaching Bed* and its coercive surgical-demonstration premise; **Industry/Hauling**, **Commerce/Contracts**, **Scholarship/Investigation** second jobs; two interactive scenes; **Night Porter** as opponent; one patient's local rescue as an ending.
-
-**Deliberately TBD:** formal names and relationships of Matron/patient/surgeon/porter, precise dialogue, reusable job templates, coin/XP amounts, timing and map distances, specific medical props and supply effects, treatment price, rent amount/deadline and all combat rules/stats. The surgical-teaching abuse is not yet established as general world lore.
+**Still TBD:** personal names and relationships of Matron/patient/surgeon/porter, specific dialogue and checks, reusable job templates, coin/XP amounts, timing and map distances, care supplies and their effects, treatment price, rent amount/deadline, plus turn-based combat details/stats. Avoid presenting the deferred implementation mechanics as approved.
