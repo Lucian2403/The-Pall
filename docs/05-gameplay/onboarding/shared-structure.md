@@ -29,4 +29,4 @@
 
 Start location (persistent) · NPC (recurring) · first job and generic interactions · unique twist · choice-driven second Major Skill jobs · two bridging interactions · motivated enemy · clinic/service · home/rent scene · rewards/XP parity · defeat/retry behavior · asset/UI and persistent state references.
 
-See [Millhand](millhand.md) and [Bellrunner](bellrunner.md). Bellrunner's agreed second jobs lead to Commerce/Contracts, Medicine/Trauma or Mechanics/Industrial Machinery; the fight opponent is the **Shift Marshal's unofficial dogman**, not the Shift Marshal himself.
+See [Millhand](millhand.md), [Bellrunner](bellrunner.md) and [Squatter (proposed)](squatter.md). Bellrunner's agreed second jobs lead to Commerce/Contracts, Medicine/Trauma or Mechanics/Industrial Machinery; the fight opponent is the **Shift Marshal's unofficial dogman**, not the Shift Marshal himself. Squatter's proposed herb-gathering and animal-encounter story is not yet locked.
