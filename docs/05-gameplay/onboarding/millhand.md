@@ -56,9 +56,9 @@ Job timers continue during interactions under the general [Jobs and Time](../job
 - **Immediate consequence:** The number is saved as a completed-quest journal entry, **not an inventory item or promise of a future investigation**. The discrepancy is established, paid records work finishes, and the character leaves with unsettling knowledge.
 - **Scope:** No further archive quest is required for the tutorial to feel finished.
 
-## Shared climax after the second job — PROPOSED SCRIPT, NOT YET APPROVED
+## Shared climax after the second job — opponent LOCKED, encounter specifics under design
 
-All three second-job routes return toward the same residential workshop district, with their regular wages already received. The brief encounter ties together the episode: a subcontractor who handles municipal labour papers also uses private muscle to collect unofficial "processing charges" from workers. A lone **contractor's wage enforcer / collector** intercepts the player. This is an ordinary, local shakedown, not the start of a sprawling investigation or main plot.
+All three second-job routes return toward the same residential workshop district, with their regular wages already received. The brief encounter ties together the episode: a subcontractor who handles municipal labour papers also uses private muscle to collect unofficial "processing charges" from workers. A lone **contractor's wage enforcer / collector** intercepts the player. **The same wage enforcer as the opponent across all three routes is LOCKED (approved 2026-10-13)**; his exact methods and dialogue still require design. This is an ordinary, local shakedown, not the start of a sprawling investigation or main plot.
 
 **Why the collector singles out each branch:**
 - **Restamp:** The player stamped and signed for the numbered lot; the collector recognizes the worker's mark and demands a supposed release fee.
@@ -71,13 +71,40 @@ All three second-job routes return toward the same residential workshop district
 
 **Interaction 2 — Cornered:** The collector blocks the way home, grips a short club and makes clear he is not allowing the player past. The player chooses a **tactical stance**—brace and defend, keep moving and exploit an opening, or take an improvised nearby obstacle as cover. These are genuine combat setup differences (defence, initiative or environment), not fake peaceful exits: **all three lead into a fight**, as required by the tutorial. Exact combat rules and outcomes still TBD.
 
-### Mandatory fight — introductory Arms / Melee (PROPOSAL)
+### Mandatory fight — contractor's wage enforcer (opponent LOCKED; mechanics PROPOSED)
 
 - **Enemy:** one human **contractor's wage enforcer** with a short club; ordinary street thug, not a monster, supernatural foe or major villain.
 - **Where:** a service passage on the route back through Grand Cylinder City, without implying PvP rules have changed. A scripted **PvE** incident inside the industrial city is distinct from voluntary player-vs-player combat.
 - **Player:** starts without a purchased weapon or firearm. The encounter should support **unarmed defence and/or using a nearby worksite object as a temporary environmental advantage**; no free permanent weapon or new inventory item is presumed.
 - **Difficulty:** novice wins through understandable attack/guard/read-the-opponent choices; **easy but not trivial**, with visible cost in Health and/or a minor wound. Do not assume starting Arms level above the common baseline. Include sensible fail-safe for defeat (e.g. knocked down and helped to care rather than dead/locked out); precise system design and damage bands TBD.
 - **Rewards:** if fighting grants Arms experience, it uses ordinary combat XP rules (not an extra automatic +3 starting level). Do not promise confiscated thug coins or powerful dropped loot.
+
+### First combat interaction draft — PROPOSED
+
+**Interaction format:** short, turn-by-turn decision combat with the *ordinary reusable PvE combat actions* (no reflex timing/QTE minigame). The first two story interactions already set up the confrontation: **Wage Claim**, then **Cornered**. After the player picks a stance/position, the same combat rules used outside tutorials take over.
+
+- **Start:** the enforcer raises a short club and crowds the player in a passage. The character has no permanent weapon from creation. They can defend unarmed; an environmental option such as backing around a cart should act as positioning, not as a free loot item. Don't secretly hand out a firearm.
+- **Enemy intent preview:** show an intelligible tell such as **"preparing a heavy swing"** or **"recovering from a missed strike"** before the player's choice. Teach recognition of attack patterns without a long text tutorial.
+- **Player actions (illustrative categories):** **Strike** (deal damage when there is an opening); **Guard** (reduce incoming damage / endure the swing); **Reposition** (trade immediate offence for an opening or safer next exchange). Exact Stamina costs, hit probabilities and numbers depend on the general combat design.
+- **Suggested sequence:** defend or reposition against an obvious swing; exploit a short recovery window; finish the staggered enforcer with a couple of sensible exchanges. Wrong decisions cause noticeable extra harm, not an automatic defeat. **Avoid a fixed "press three buttons to win" script**; enemy choices, guard and position should matter.
+- **Outcome:** the enforcer backs away, drops the demand or is subdued. The character remains alive but has a **visible minor injury or Health deficit** needing patching. The antagonist's retreat should resolve the street conflict locally—no forced killing, execution animation or crime/reputation system. Award ordinary Arms practice/XP if the chosen combat rules reward it.
+- **Defeat safety:** if the player loses, the encounter still advances to the medical scene via an appropriate narrative rescue or aid, with a worse injury and possibly a larger treatment expense. Do not make the opening loop unwinnable, force a character reset, or confiscate indispensable starting items.
+
+**Difficulty target:** an attentive new player should win and need care; reckless attacks should leave the player substantially worse off. The exact injury bands, Health values and enemy tuning remain **unapproved** and must be tested using starting 50 maximum Health and baseline Arms skill.
+
+### First healing interaction draft — PROPOSED
+
+- Following victory or defeat, the player is directed toward a **small, working-class city infirmary** (name/NPC TBD); it is an ordinary future Medicine/Trauma or NPC treatment service, not a one-time story-only healing button.
+- **Inspect condition** to see remaining Health, injured area and the price of treatment. Then choose/confirm a **basic patch-up** from the clinician. Use the normal NPC treatment/service flow; avoid requiring the untrained player to have crafting recipes or a special healing item.
+- Healing restores enough Health and addresses the minor wound to let the player walk home and continue ordinary play. No permanent disability, lengthy recovery timer or debut medical bill that can bankrupt the new character.
+- **Economic rhythm:** the two standard jobs pay coins, and the clinic costs a noticeable part of those earnings; the character returns home with **little available money**, just as rent is revealed. Exact wage, initial 20-coin reserve, clinic fee and rent need balancing *together* rather than inventing independent prices.
+- If the character lost the fight, care remains accessible. Avoid a punitive medical fee that blocks the tutorial or strands an incapacitated player.
+
+### Design choices not locked here
+
+- Whether combat is specifically turn-based / action-by-action, as proposed above.
+- Exact mechanics of **Strike / Guard / Reposition**, NPC AI, how positioning changes outcomes, enemy HP, combat damage, death/defeat handling and total encounter length.
+- Injury severity and costs, whether basic patch-up can be done personally or only through an NPC, and whether a guaranteed wound is appropriate without making damage feel arbitrary.
 
 ### Healing / first medical interaction (PROPOSAL)
 
@@ -112,11 +139,11 @@ All three second-job routes return toward the same residential workshop district
 
 **LOCKED by user:** generic Smithing interactions before the unique stamp scene; three approved second-job paths using **Industry, Commerce and Scholarship**; **two additional interactions after the second job; short mandatory, moderately challenging PvE fight; medical treatment; return home with little money; only then reveal rent due and end the Millhand E2E tutorial**. Not the main story.
 
-**STILL PROPOSED / TBD:** the contractor's wage collector as the shared antagonist, the two encounter interactions' exact options, combat stats/weapon/defeat handling, medical service and charges, location of the rented home, timing and all reward values. Specific dialogue and final script still require approval.
+**STILL PROPOSED / TBD:** two pre-fight interactions' precise options, combat interface, enemy stats/weapon tuning/defeat handling, medical service and fees, rented home details, durations, dialogue and all job reward values. The **wage enforcer identity is no longer provisional**.
 
 ## Implementation boundaries / remaining work
 
-1. Confirm the **collector as the shared opponent** and the two proposed pre-combat interactions; tune how each approved job feeds naturally into the confrontation. No longer-lived fraud/complicity system without separate approval.
+1. Confirm how the **locked wage enforcer** is introduced by the two proposed pre-combat interactions; tune how each approved second job feeds naturally into the confrontation. No longer-lived fraud/complicity system without separate approval.
 2. Define the generic Smithing workshop, recurring NPC and repeatable low-tier Smithing jobs, including which normal interaction templates are used in this opening.
 3. Define exact Worker Clothes and cheapest Bag item records and their equipped/inventory presentation; **20 coins** is the only exact starter-currency figure confirmed so far, for Millhand.
 4. Specify both jobs' pay, XP and duration, Hauling / Contracts / Investigation job NPCs, basic combat mechanics, medical provider and expense, the return-home location, and **after-healing-at-home** rent notice. Do not invent unattended payment penalties or offline rent deadlines.
