@@ -13,7 +13,7 @@
 
 - **Starter location: The Dispatch House (LOCKED).** Noisy city parcel-and-shift-notice sorting hall: duty bells, ink-stained route board, wooden freight counter, coal-smudged couriers and carts.
 - **Persistent gameplay role:** generic hub for **Industry / Hauling courier and light-delivery jobs** throughout the game, not a one-use tutorial set.
-- **Recurring NPC: Dispatch Master (LOCKED TITLE)** (personal name TBD), assigns routine deliveries and pays **ordinary Industry job coins and experience** via reusable job resolutions.
+- **Recurring NPC: Hector D. Smoke, the Dispatch Master (personal name and role LOCKED)**, assigns routine deliveries and pays **ordinary Industry job coins and experience** via reusable job resolutions.
 - **First action:** speak to Dispatch Master, receive a modest route bundle and inspect the job briefing. Character starts in a familiar workplace; player learns the UI and world through work rather than exposition.
 
 ## Locked ordinary job — Shift Dispatch
@@ -60,6 +60,6 @@ After the short, moderately challenging fight against the **Shift Marshal's dogm
 
 ## Locked versus remaining to author
 
-**LOCKED:** Dispatch House as persistent generic courier hub; Dispatch Master as recurring job-giver; Shift Dispatch as first Industry/Hauling job; The Wrong Bell twist; three alternative second jobs **Commerce / Contracts — Attendance Certificate**, **Medicine / Trauma — First Aid Line**, **Mechanics / Industrial Machinery — The Bell Linkage**; an unofficial **dogman working for the higher-ranking Shift Marshal** as the common fight opponent; two intervening story interactions; fight → heal → home → rent; universal starting kit.
+**LOCKED:** Dispatch House as persistent generic courier hub; **Hector D. Smoke, the Dispatch Master** as recurring job-giver; Shift Dispatch as first Industry/Hauling job; The Wrong Bell twist; three alternative second jobs **Commerce / Contracts — Attendance Certificate**, **Medicine / Trauma — First Aid Line**, **Mechanics / Industrial Machinery — The Bell Linkage**; an unofficial **dogman working for the higher-ranking Shift Marshal** as the common fight opponent; two intervening story interactions; fight → heal → home → rent; universal starting kit.
 
 **TBD:** The dogman's personal name and exact look, the Shift Marshal's formal position, interaction dialogue and skill checks, NPC identities for second jobs, rewards/XP, timings, enemy stats and combat system, healing cost, precise home/rent mechanics. Do not claim the Shift Marshal is personally present or personally defeated. The mission ends locally and does not open the game's overarching main story.
