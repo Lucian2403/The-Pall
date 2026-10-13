@@ -1,6 +1,6 @@
 # Squatter — Protected Outskirts Opening
 
-**Status: Opening E2E quest APPROVED (2026-10-13).** **Hedge Shelter**, recurring **Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, pay and treatment pricing are deferred. The [shared tutorial structure](shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
+**Status: Opening E2E quest APPROVED (2026-10-13).** **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, pay and treatment pricing are deferred. The [shared tutorial structure](shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
 
 ## Character starting state (LOCKED)
 
@@ -14,12 +14,12 @@
 
 **Hedge Shelter (LOCKED).** A shabby timber-and-canvas lean-to at the **protected outskirts near the Grand Cylinder City gate**. It has marked harvesting routes, hanging herb bundles, a communal scale and a contract board, plus sheltered baskets. Nearby common fields are a low-risk, established Fieldcraft work area. Exact neighbourhood, map tile and asset layout TBD.
 
-**Recurring job NPC: Herb Dealer (LOCKED occupational title)** (individual name TBD): a practical broker who weighs and pays for ordinary collected plants and assigns nearby Foraging/gathering jobs. This is the permanent **Fieldcraft / Foraging paid-job hub**, not a tutorial-only place or a general city Smithing station. The Factor is morally ambiguous as an employer but not declared a villain.
+**Recurring job NPC: Benny Ben, Herb Dealer (personal name and occupational title LOCKED)**: a practical broker who weighs and pays for ordinary collected plants and assigns nearby Foraging/gathering jobs. This is the permanent **Fieldcraft / Foraging paid-job hub**, not a tutorial-only place or a general city Smithing station. Benny Ben may be morally ambiguous as an employer but is not declared a villain.
 
 **First paid job (LOCKED): Yarrow Cut**. Gather a modest assigned quantity of common **Yarrow** from a reliable known public patch near the shelter. Yarrow's normal safe field/outskirts sourcing and bleeding-control medicinal role are already documented in [Herbs and Harvesting](../../03-resources/raw/herbs-and-harvesting.md).
 
 Normal, reusable Foraging interactions:
-1. Speak to the Factor: see the quantity, payment, estimated time and a simple gathering destination.
+1. Speak to Benny Ben: see the quantity, payment, estimated time and a simple gathering destination.
 2. Identify **Yarrow** and confirm the patch, paying attention to safe plant identification.
 3. Choose a harvest method / how much to take without ruining regrowth; normal yield, patch health, equipment/time implications apply.
 4. Sort dirty/damaged plant matter from usable cuttings and return/deliver through a generic quantity/condition check. This is ordinary Fieldcraft/Foraging XP and job payment, not a one-off minigame.
@@ -28,7 +28,7 @@ Normal, reusable Foraging interactions:
 
 ## The Warm Patch — LOCKED tutorial-only twist
 
-**Only after the normal Foraging interactions** are finished, the Squatter discovers that this Yarrow bed is thriving over a half-collapsed outfall beside the old poorhouse disposal ground. Wet ribbons from medical dressings are tangled around the roots; a human finger bone has surfaced after a rain. A faint warmth comes through the drainage bricks. The Factor expected ordinary plants and gives no explanation for the newly exposed remains.
+**Only after the normal Foraging interactions** are finished, the Squatter discovers that this Yarrow bed is thriving over a half-collapsed outfall beside the old poorhouse disposal ground. Wet ribbons from medical dressings are tangled around the roots; a human finger bone has surfaced after a rain. A faint warmth comes through the drainage bricks. Benny Ben expected ordinary plants and gives no explanation for the newly exposed remains.
 
 This is a **local scandal concerning neglected remains and the supply of medical herbs**, not a Pall expedition or the opening of the main plot. The buried dead are implied; avoid gratuitous gore or requiring full simulated burial systems. Exact identity/cause and why the drain is warm remain **TBD**, not a new canon Pall phenomenon.
 
@@ -56,6 +56,6 @@ Three agreed first-event choices send the player to distinct **paid, reusable se
 
 ## Locked versus to be designed
 
-**LOCKED:** Squatter Fieldcraft +3; universal Basic Clothes + Crude Small Bag + 20 coins; **Hedge Shelter** as reusable Protected Outskirts Foraging hub; **Herb Dealer** as recurring job-giver; **Yarrow Cut** as the first Fieldcraft job with general plant identification/harvest interactions; **The Warm Patch** twisted discovery; three choices leading to **Commerce / Trading (The Apothecary's Weighing)**, **Medicine / Herbalism (Suspect Cuttings)** and **Industry / Construction (Clear the Outfall)**; two story interactions **The Rustling Bank** and **Nowhere to Step**; **young injured wild boar** as shared PvE opponent; paid medical care; home/rent scene ends the tutorial. This E2E episode is separate from the overarching main storyline.
+**LOCKED:** Squatter Fieldcraft +3; universal Basic Clothes + Crude Small Bag + 20 coins; **Hedge Shelter** as reusable Protected Outskirts Foraging hub; **Benny Ben, the Herb Dealer** as recurring job-giver; **Yarrow Cut** as the first Fieldcraft job with general plant identification/harvest interactions; **The Warm Patch** twisted discovery; three choices leading to **Commerce / Trading (The Apothecary's Weighing)**, **Medicine / Herbalism (Suspect Cuttings)** and **Industry / Construction (Clear the Outfall)**; two story interactions **The Rustling Bank** and **Nowhere to Step**; **young injured wild boar** as shared PvE opponent; paid medical care; home/rent scene ends the tutorial. This E2E episode is separate from the overarching main storyline.
 
-**TBD, not locked:** Herb Dealer personal name; exact map location and visuals; job quantities, wages, XP and timings; second-job NPCs; precise fate of disposed remains and warm drain; dialogue; player choice suboptions; turn-based combat balancing and novice-boar defensibility; doctor/service fees and Health state; whether Squatter home is a rented outskirts shelter and who collects rent. The unique scripted event is not a regular repeatable Fieldcraft encounter.
+**TBD, not locked:** Benny Ben's appearance and dialogue; exact map location and visuals; job quantities, wages, XP and timings; second-job NPCs; precise fate of disposed remains and warm drain; dialogue; player choice suboptions; turn-based combat balancing and novice-boar defensibility; doctor/service fees and Health state; whether Squatter home is a rented outskirts shelter and who collects rent. The unique scripted event is not a regular repeatable Fieldcraft encounter.
