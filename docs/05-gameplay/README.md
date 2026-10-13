@@ -26,4 +26,4 @@ Player activities, time, world economy and authored interactive events.
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher.md)
 - [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper.md)
-- [Inkbound: Civic Copying Office / The Acceptable Losses and three branches (proposal)](onboarding/inkbound.md)
+- [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound.md)
