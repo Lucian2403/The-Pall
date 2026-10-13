@@ -27,7 +27,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 
 | Background | Where they come from | Starting Major Skill bonus | Brief tutorial idea (proposed, not yet detailed) |
 | --- | --- | --- | --- |
-| **Millhand** | Foundry and workshop labor | **Craftsmanship +3** | Help a worker assess and mend a simple production fault |
+| **Millhand** | Foundry and workshop labor | **Craftsmanship +3** | [Noisy workshop, Smithing foreman and tutorial](../05-gameplay/onboarding/millhand.md); narrative under review |
 | **Bellrunner** | City messengers and shift couriers | **Industry +3** | Deliver a shift notice and learn the city's labour routes |
 | **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | Find a safe patch of useful plants just outside the gates |
 | **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | Assist with a routine minor injury and learn who receives care |
@@ -38,7 +38,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 
 **Tutorial rule:** Each origin-specific segment is brief (target about 2–5 minutes), grounded in local lore and a meaningful interaction. The character is familiar with their own circumstances; conversations and activity teach the **player** about the setting without an artificial history lecture. **Finishing the origin tutorial reveals rent coming due**, converging all six origins into one shared early-game predicament and storyline. This does **not** yet establish a rent payment mechanic, number of coins, timer, sanctions or debt system. Origins do not create six separate main questlines or mandatory ongoing origin arcs. NPCs, objectives, exact rent-notice delivery and incidental rewards remain to be authored.
 
-**Inventory rule:** Do **not** assign unique background items merely to fill a character-creation column. The already-agreed common starter direction is worn basic clothing, a small carrying bag and modest starting money (exact item definitions and amounts TBD). If suitable, properly specified inventory items become available later, optional origin-specific starter variations may be introduced with comparable value; no such variations are locked now.
+**Inventory rule:** Do **not** assign unique background items merely to fill a character-creation column. **Millhand is now specifically locked to Worker Clothes, the cheapest Bag and 20 starting coins** (precise item definitions and their statistics TBD; see the [Millhand opening](../05-gameplay/onboarding/millhand.md)). Do not apply Millhand's exact 20-coin figure or item selection to other backgrounds without a separate decision. If suitable, properly specified inventory items become available later, optional origin-specific starter variations may be introduced with comparable value; no such variations are locked now.
 
 A background has real value through early Major Skill progress, a distinctive social perspective and a short tailored introduction, while all players retain unrestricted long-term progression.
 
