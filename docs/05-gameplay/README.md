@@ -20,5 +20,6 @@ Player activities, time, world economy and authored interactive events.
 
 ## First-session onboarding
 
+- [Shared tutorial structure: first job, branching second job, combat, healing, rent](onboarding/shared-structure.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
-- [Bellrunner: proposed Dispatch House and courier tutorial](onboarding/bellrunner.md)
+- [Bellrunner: Dispatch House (locked) and branching tutorial (proposed)](onboarding/bellrunner.md)
