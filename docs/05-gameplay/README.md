@@ -23,4 +23,4 @@ Player activities, time, world economy and authored interactive events.
 - [Shared tutorial structure: first job, branching second job, combat, healing, rent](onboarding/shared-structure.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
-- [Squatter: Protected Outskirts foraging hub and The Warm Patch (in review)](onboarding/squatter.md)
+- [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
