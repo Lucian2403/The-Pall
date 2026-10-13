@@ -20,4 +20,5 @@ Player activities, time, world economy and authored interactive events.
 
 ## First-session onboarding
 
-- [Millhand: Smithing workshop, reusable job giver and introductory tutorial](onboarding/millhand.md)
+- [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
+- [Bellrunner: proposed Dispatch House and courier tutorial](onboarding/bellrunner.md)
