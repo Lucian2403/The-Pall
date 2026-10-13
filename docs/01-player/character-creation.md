@@ -32,8 +32,10 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 | **Bellrunner** | City messengers and shift couriers | **Industry +3** | [The Wrong Bell](../05-gameplay/onboarding/bellrunner.md): Dispatch House, Shift Dispatch, three follow-on jobs and Shift Marshal's dogman opponent locked |
 | **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | [Hedge Shelter / Herb Dealer / Yarrow Cut / The Warm Patch](../05-gameplay/onboarding/squatter.md) and three second-job branches, injured boar combat and rent-at-home sequence locked |
 | **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | [Cinder Row Infirmary / Matron / Morning Dressings / The Teaching Bed](../05-gameplay/onboarding/stitcher.md) with three second jobs, Night Porter encounter and home/rent ending locked |
-| **Scrapper** | Scrap-yard pickers and demolition crews | **Mechanics +3** | Diagnose and dismantle a damaged mechanical assembly in the salvage yard |
+| **Scrapper** | Scrap-yard pickers and demolition crews | **Mechanics +3** | [Rust Yard and Ignatius Smog, the Yard Foreman](../05-gameplay/onboarding/scrapper.md) locked; first pump-stripping task proposed, plot TBD |
 | **Inkbound** | Records keepers and ledger copyists | **Scholarship +3** | Investigate a discrepancy in a city work or ration ledger |
+
+**NPC naming rule (LOCKED 2026-10-13):** every NPC in the game's authored cast must have a personal in-world name, not merely a job title; individual names are to be defined/approved while designing each character. **Ignatius Smog**, the Yard Foreman of **Rust Yard**, is the first Scrapper job-giver explicitly named. Existing Matron, Dispatch Master, Herb Dealer and other role labels remain placeholders for personal names; do not invent canon names without approval.
 
 **Implementation rule:** The +3 is applied at character creation to the **Major Skill level**, not to a subskill or attribute, and is not contingent on completing the tutorial quest. Other Major Skills begin at the same common baseline for every character. **Squatter grants Fieldcraft +3; Scrapper grants Mechanics +3.** No background changes any core attribute.
 
