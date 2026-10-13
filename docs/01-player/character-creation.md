@@ -6,8 +6,8 @@ Status: Partially agreed, 2026-10-13. Open design choices are distinguished from
 
 - Character name.
 - Modular stylized 2D portrait; not a fixed portrait roster or full-body character editor.
-- Background/origin only if it changes gameplay and teaches the world lore. Specific origins and their outcomes are still proposals.
-- No manual attribute distribution. Existing baseline: STR 5, DEX 5, INT 5, RES 5; whether an origin changes these remains undecided.
+- Six background/origin choices, each with meaningful gameplay consequences and a distinct introduction to city lore. Names, starting packages and quest details below are proposed until individually confirmed.
+- **All attributes fixed at STR 5, DEX 5, INT 5, RES 5 for every background.** No point distribution or background-based attribute changes (LOCKED).
 - No age selection.
 - Player identity and narrative framing are not yet established. A rent payment is a possible narrative hook, not a finalized obligation.
 
@@ -25,23 +25,28 @@ Status: Partially agreed, 2026-10-13. Open design choices are distinguished from
 
 Art direction: distinct, simplified 2D industrial illustration; graphic shapes; muted colors; consistent linework and anchor points. Art assets may be created with AI assistance but need manual consistency checks. 512 by 512 transparent layers are a proposed technical standard.
 
-## Background design principles (proposed, not locked)
+## Six backgrounds — proposed names and gameplay packages
 
-Each option should offer a different opening quest and city-lore perspective, a modest useful starting competence, practical starting supplies, and an NPC relationship. Comparable total starting value, no permanent profession restriction.
+**LOCKED:** six options, no core-attribute modifiers. **PROPOSED:** the following names and exact starter content, awaiting review.
 
-Possible options for discussion:
-- Workshop Hand: entry-level industrial knowledge and a workshop introduction.
-- City Runner: logistics familiarity and a delivery introduction.
-- Outskirts Forager: gathering familiarity and a resource introduction.
-- Clinic Helper: basic care familiarity and a clinic introduction.
+| Background | Where they come from | Practical edge (proposed subskill) | Starter item idea | First quest / lore window |
+| --- | --- | --- | --- | --- |
+| **Cinderhand** | Foundry and workshop labor | Craftsmanship → Smithing | Worn work gloves | Help restore a shuttered workshop; see industrial labor and ownership |
+| **Bellrunner** | City messengers and shift couriers | Industry → Hauling | Small delivery satchel | Trace a missing wage packet; see city districts and worker contracts |
+| **Fenborn** | Families living along the protected wet outskirts | Fieldcraft → Foraging | Herb wrap and simple provisions | Locate a delayed gatherer; see the city's uneasy relationship with the fringes |
+| **Stitcher** | Clinic attendants and informal caregivers | Medicine → Trauma | Basic dressing supplies | Triage an overworked infirmary; see medicine access and public hardship |
+| **Reclaimer** | Scrap-yard pickers and demolition crews | Fieldcraft → Scavenging | Low-grade salvage hand tool | Recover a marked mechanical part; see recycling and salvage rights |
+| **Inkbound** | Records keepers and ledger copyists | Scholarship → Investigation | Used notebook | Resolve a contradictory ration record; see bureaucracy and missing histories |
 
-Recommendation: keep the four core attributes at 5 for all origins; give differences through starting practical skills, inventory and quests. Not yet agreed.
+These are **social backgrounds, not character classes or locked professions**. All six may train any skill and pursue the same City → Outskirts → Grey Marches journey. Special starter items are illustrative; don't create item definitions, precise skill bonuses, quest rewards or NPC affiliations from these names yet. Each opening should converge on the general tutorial and remain approximately equal in item/currency value and difficulty.
+
+Each option should ultimately specify its distinct short story opening, NPC, beginning supplies, initial skill advantage, and at least one meaningful contextual dialogue/quest outcome. A background should affect what the player knows and can attempt, but never deny permanent access to general gameplay.
 
 ## Next decisions
 
-1. Whether backgrounds alter attributes or only practical skills, possessions and quests.
-2. Final origin options and introductory lore.
-3. Whether an imminent rent payment frames the opening and how it works.
-4. Starting money, items and first job.
+1. Review and approve the six proposed names and their different social/lore roles.
+2. Define starter skill values, possessions and origin-specific opening quest mechanics, with parity checks.
+3. Decide whether imminent rent frames the common introduction and what it actually does.
+4. Set starting money, basic worn clothing/bag, naming validation and first common job.
 
 Related: [First Playable Scope](../00-vision/first-playable-scope.md), [Character System](character-system.md), [Jobs and Time](../05-gameplay/jobs/jobs-and-time.md).
