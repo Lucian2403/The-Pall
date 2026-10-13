@@ -1,6 +1,6 @@
-# Bellrunner — Dispatch House and Tutorial Development
+# Bellrunner — Dispatch House and The Wrong Bell
 
-**Status: Starter hub and first job LOCKED (2026-10-13); storyline/branches under review.** Background name, role and **Industry +3 Major Skill** are agreed in [Character Creation](../../01-player/character-creation.md). All six tutorials follow the [locked shared structure](shared-structure.md).
+**Status: Core tutorial premise, three second-job branches and common antagonist LOCKED (2026-10-13).** Specific dialogue, normal job interaction templates, timing, fight mechanics and numerical balance remain to be designed. Background name, role and **Industry +3 Major Skill** are agreed in [Character Creation](../../01-player/character-creation.md). All six tutorials follow the [locked shared structure](shared-structure.md).
 
 ## Locked common character-creation context
 
@@ -26,13 +26,13 @@ Generic job interactions to reuse in future courier/Hauling assignments:
 3. **Delivery discrepancy:** use a reusable address verification, damaged docket, queue management or receiver-confirmation interaction.
 4. **Regular resolution:** apply ordinary currency / Industry XP and any generic time/condition effects.
 
-### Dark opening incident — The Wrong Bell (PROPOSED, not approved)
+### Dark opening incident — The Wrong Bell (LOCKED)
 
-**Working title: The Wrong Bell.** Among routine messages is a sealed order to start a night shift at a block officially closed for unsafe fumes. The shift bell still rings, and a watchman expects workers to enter. The dispatch docket gives a perfectly ordinary signature requirement. A choice here **must** lead to a second job using a different Major Skill, followed by two additional interactions, a fitting turn-based fight, healing, home and rent. The exact story options are **proposals**, not yet approved.
+**The Wrong Bell.** Among routine messages is a sealed order to start a night shift at a block officially closed for unsafe fumes. The shift bell still rings, and a watchman expects workers to enter. The dispatch docket gives a perfectly ordinary signature requirement. The player's choice leads to one of the **three locked second-Major-Skill jobs** below, then two interactions, a logically motivated fight against **a Shift Marshal's unofficial security man ('dogman')**, healing, home and rent. The detailed scene/dialogue design remains TBD.
 
 This should feel like grim labor governance and human risk, **not a repeat of Millhand's false death-register stamp plot**.
 
-## Bellrunner branch pitches — NOT YET LOCKED
+## Bellrunner second-job branches — LOCKED
 
 **The Wrong Bell**: a sealed notice orders a night shift back into a building officially closed after a dangerous fume incident. The building's warning bell rings regardless. The player must decide what to do with the notice.
 
@@ -42,24 +42,24 @@ This should feel like grim labor governance and human risk, **not a repeat of Mi
 | **Warn the waiting crew** | **Medicine → Trauma:** *First Aid Line*. A working infirmary attendant recruits the player to triage workers already coughing from the fumes, using ordinary diagnosis/priority interactions. | The medical register marks the coughs as **non-work illness**, shifting treatment costs onto the workers. |
 | **Investigate why the bell is ringing** | **Mechanics → Industrial Machinery:** *The Bell Linkage*. The city works mechanic hires the player to check the shift-bell linkage and ventilation controls, using normal machinery inspection/work interactions. | The bell is deliberately kept operational after the safety shutoff, so the crew can be summoned without reopening the building legally. |
 
-**Shared proposed street confrontation (after the second paid job):** A **shift marshal** (the contractor's rough private site guard, **not** Millhand's enforcer) corners the player near the service gate. His motive varies by branch: demanded certification, interfering with the medical line, or inspecting the bell controls. He wants the notice and is prepared to hurt the courier.
+**Shared confrontation (LOCKED opponent):** The **Shift Marshal is a senior figure who remains off-screen** during the opening. One of his **unofficially employed security men—called a 'dogman'—corners the Bellrunner** near the sealed site's service gate. The dogman is hired muscle, **not the Shift Marshal himself, not an official city guard, and not Millhand's wage collector**. Why he targets the courier varies by the chosen second job: delivering or disputing shift paperwork, warning/assisting workers, or investigating the illicit bell controls. He tries to intimidate the player into silence or surrendering the notice; his methods provoke the required fight. His personal name and precise appearance remain TBD.
 
-**Interaction 1, proposed:** *Show Your Papers* — the marshal demands the notice; player can inspect his authority, argue the order, or challenge his attempt to seize the docket. Dialogue and information vary with route.
+**Interaction 1 — Show Your Papers (LOCKED scene direction; exact options TBD):** The **dogman** demands the notice or proof of the player's dealings. The player can scrutinize his dubious authority, challenge his right to confiscate papers or point out the contradiction revealed by their branch. His bluster gives away that he acts for the **Shift Marshal**, not as a lawful officer.
 
-**Interaction 2, proposed:** *Gate Barred* — he blocks the exit and draws a baton; player chooses a tactical approach/position before normal **turn-based PvE** combat. This is a different face of ordinary municipal coercion than Millhand's wage collection.
+**Interaction 2 — Gate Barred (LOCKED scene direction; exact options TBD):** The **dogman** blocks the route home and threatens violence, potentially drawing a short baton/club. The player can take a defensive position, try to put a cart between them, or hold their ground; these choices feed the normal **turn-based PvE** encounter. The weapon and precise combat consequences are not locked, pending the common combat system.
 
-Following the short, appropriately tuned fight, the player seeks city medical treatment, pays a modest fee, walks home with little money and discovers rent due. The opponent's exact appearance/weapon, location, job wages, XP, medical charges, narrative dialogue and combat result are still TBD.
+After the short, moderately challenging fight against the **Shift Marshal's dogman**, the player seeks ordinary city medical treatment, pays a meaningful but affordable fee, walks home with little money and discovers rent due. The dogman's precise appearance and weapon, job wages, XP, medical charges, narrative dialogue and combat numbers remain TBD. The Shift Marshal should **not** be fought or confronted as a boss in this first encounter.
 
 **Scope/fairness:** No forced high-tier gear, guaranteed political conspiracy continuation, permanent profession lock or special starter item. All three second jobs pay their normal coins and XP, and all routes converge without invalidating the choice. Tasks and incident interactions must reuse the ordinary job templates where applicable.
 
-## Inventories and economy — undecided
+## Shared starter inventory — LOCKED
 
-- Specific outfit, carry bag, number of coins, consumables and job reward amounts: **TBD**. Aim for similar startup value and useful function to Millhand's Worker Clothes / cheapest Bag / 20 coins, without automatically copying those values into canon.
+- **Every background, including Bellrunner, starts with Basic Clothes, one Crude Small Bag and 20 coins**. This is a global locked starting kit. Exact item IDs, weights, capacity, quality/durability data and clothing coverage are TBD; don't invent starter combat weapons or additional items. Job reward amounts and medical costs remain TBD.
 - The route docket and parcels may be task props rather than inventory equipment; do not create new permanent items purely for tutorial narrative.
 - First background-specific episode should later converge on a rent-due discovery after its full resolution; no rent amounts or offline penalties yet.
 
-## Pending review
+## Locked versus remaining to author
 
-1. Review **The Wrong Bell** and the three second-job routes: Commerce/Contracts, Medicine/Trauma, Mechanics/Industrial Machinery.
-2. Review the shift marshal and two proposed pre-combat interactions; approve or amend their logic.
-3. Define Bellrunner's starting inventory and currency, NPC identities, job rewards and duration, care cost and actual home/rent scene.
+**LOCKED:** Dispatch House as persistent generic courier hub; Dispatch Master as recurring job-giver; Shift Dispatch as first Industry/Hauling job; The Wrong Bell twist; three alternative second jobs **Commerce / Contracts — Attendance Certificate**, **Medicine / Trauma — First Aid Line**, **Mechanics / Industrial Machinery — The Bell Linkage**; an unofficial **dogman working for the higher-ranking Shift Marshal** as the common fight opponent; two intervening story interactions; fight → heal → home → rent; universal starting kit.
+
+**TBD:** The dog's-man name and exact look, Shift Marshal's formal position, interaction dialogue and skill checks, NPC identities for second jobs, rewards/XP, timings, enemy stats and combat system, healing cost, precise home/rent mechanics. Do not claim the Shift Marshal is personally present or personally defeated. The mission ends locally and does not open the game's overarching main story.
