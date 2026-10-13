@@ -1,6 +1,6 @@
 # Scrapper — Rust Yard Opening
 
-**Status (2026-10-13):** Rust Yard, named Yard Foreman **Ignatius Smog** and his specified characterization, plus first regular paid Mechanics job **Strip a Condemned Pump**, are **LOCKED by user**. The unique twist **The Last Dry Floor**, second Major Skill job branches, and the rival breaker confrontation are **new story proposals** for review, **not yet locked**. Mechanics +3, universal starter kit and [shared tutorial sequence](shared-structure.md) are locked.
+**Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent paid second jobs, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
 ## Locked start and regular NPC
 
@@ -16,9 +16,9 @@ Ignatius Smog assigns the player to inspect and dismantle a condemned industrial
 
 **Reusable job phases:** accept the scrap docket and see the normal wage/risk; isolate a work section and identify reusable parts; choose removal order/tool to protect valuable fasteners or linkage; sort recovered pieces by condition and submit ordinary work. Crucially, **the initial safe strip only removes external guards and nonessential hardware**—it does not disconnect the pump's working drainage connection before the tutorial discovery. This keeps the machine and its dependent households physically viable. Beginner work must be possible with workshop-supplied tools, not a forbidden free starter item.
 
-The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to a paid second job in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](shared-structure.md). **The Last Dry Floor, its branches and Barnaby Rusk are newly proposed below and are NOT yet approved.**
+The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to a paid second job in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](shared-structure.md). **The Last Dry Floor, all three branches and Barnaby Rusk are approved narrative elements; exact implementation is still to be designed.**
 
-## Proposed unique twist — The Last Dry Floor
+## Locked unique twist — The Last Dry Floor
 
 **Trigger:** only after the normal Mechanics interactions are done, on the first Scrapper tutorial; it is not a random event in all pump jobs.
 
@@ -30,7 +30,7 @@ There is another sign: three deliberate knocks from beneath the iron floor. The 
 
 The presence of tenants is a local social and industrial fact, **not** a promised main-story mystery, hidden new faction, or proof of Pall mutation. Smog need not have planned this. His scrap order may be authentic but dangerously uninformed, and his response should be developed without turning him into a one-dimensional villain.
 
-### Three proposed first-event responses and paid second jobs
+### Three locked first-event responses and paid second jobs
 
 | Player response | Second job, using a different Major Skill | Immediate discovery / meaningful outcome |
 | --- | --- | --- |
@@ -40,11 +40,11 @@ The presence of tenants is a local social and industrial fact, **not** a promise
 
 **Contract credibility:** the second jobs are short paid **normal job templates** sourced from city drainage, canal survey and logistics work, with a story-specific incident. Do not award coins merely for clicking a humanitarian choice. All three paths pay ordinary wages and appropriate second-Major-Skill XP, comparable net income, no starter-only gear. The first Mechanics job pays normally too. Its stage does **not** immediately end the E2E tutorial.
 
-### Two further interactions → one shared opponent (PROPOSED)
+### Two further interactions → one shared opponent (LOCKED narrative)
 
 The story converges beside a pipe-cutting gantry at Rust Yard, after the second paid job has delivered its distinct physical or administrative leverage.
 
-**Interaction 1 — The Copper Claim:** **Barnaby Rusk** (proposed name), a competing **piece-rate breaker**, arrives to sever the abandoned pump's copper branch. He has already been promised a bonus for the weight. He sees the Scrapper as someone obstructing his paid salvage. Depending on the chosen branch, the player can show the shoring gang's work order, point out an evacuation path, or produce a redirected logistics docket. Barnaby dismisses the warning because acknowledging residents would cost him his shift earnings. This is a brutal economic choice, not a secret top-level official ordering a murder.
+**Interaction 1 — The Copper Claim:** **Barnaby Rusk** (LOCKED personal name), a competing **piece-rate breaker**, arrives to sever the abandoned pump's copper branch. He has already been promised a bonus for the weight. He sees the Scrapper as someone obstructing his paid salvage. Depending on the chosen branch, the player can show the shoring gang's work order, point out an evacuation path, or produce a redirected logistics docket. Barnaby dismisses the warning because acknowledging residents would cost him his shift earnings. This is a brutal economic choice, not a secret top-level official ordering a murder.
 
 **Interaction 2 — The Red Lever:** Barnaby reaches for the isolation lever / cutting gear that would stop the auxiliary pump. The player can block the walkway, take cover behind an iron scrap bin, or try one last verbal warning. A fight follows regardless; positioning and intent may influence the eventual common turn-based combat system, which is **not yet being defined**.
 
@@ -52,27 +52,24 @@ The story converges beside a pipe-cutting gantry at Rust Yard, after the second 
 
 **Local closure:** Barnaby retreats / is forced away, and the pump is not cut *during this episode*. The player's second-job choice changes what is temporarily secured: shoring, exit route, or replacement drainage. The displaced residents and the city's neglect remain a grim practical dilemma, but **this is a complete local E2E episode, not chapter one of the main campaign**. Do not promise that every trapped household is housed or that a permanent new public works system has been built.
 
-### Treatment, home and rent (structurally locked, specifics proposed)
+### Treatment, home and rent (narrative sequence LOCKED; numbers TBD)
 
 The brawl leaves the Scrapper with a credible minor injury—battered ribs, split knuckles or a forearm abrasion are possible flavors; exact conditions and Health effects TBD. The player pays an affordable working-class city clinician to patch them up, learns the reusable healing interface, and goes home with little money left. The **rent-due notice appears at home, after care**. This completes Scrapper onboarding.
 
 **Pacing and parity:** all three second jobs must be within a comparable beginner time/pay envelope. Encounter remains a single grounded short turn-based PvE conflict, not a machine boss or a second forced fight. No early Pall-zone expedition, long rescue quest, specialized parts gate or hidden fraud/crime/reputation flag.
 
-## What is locked versus awaiting approval
+## Locked versus to be detailed
 
-**LOCKED:** Rust Yard permanent Mechanics hub; Ignatius Smog as named recurring Yard Foreman and his cough / exact quote; **Strip a Condemned Pump** as the regular first Mechanics job; Mechanics +3; the global common starter kit; shared two paid jobs → two interactions → turn-based combat → paid healing → home rent reveal structure.
+**LOCKED:** Rust Yard permanent Mechanics hub; Ignatius Smog as named recurring Yard Foreman, cough and exact quotation; **Strip a Condemned Pump** repeatable first Mechanics job; **The Last Dry Floor** twist; three paid follow-up choices/jobs (**Industry/Construction — The Brace Shift**, **Fieldcraft/Navigation — The Low Passage**, **Commerce/Logistics — The Spare Line**); **The Copper Claim** and **The Red Lever** pre-combat story interactions; **Barnaby Rusk**, named fellow salvage breaker, as common PvE foe; keeping the pump running long enough for a short-lived reprieve, medical treatment, return home and rent notice. Mechanics +3 and universal starting kit apply. This is self-contained, not the main campaign.
 
-**PROPOSED, pending user approval:** **The Last Dry Floor** as unique industrial twist; three player choices and paid jobs (**Industry / Construction**, **Fieldcraft / Navigation**, **Commerce / Logistics**); **The Copper Claim**, **The Red Lever**, **Barnaby Rusk** as the common antagonist; local rescue/temporary reprieve and aftercare narrative. Barnaby's proposed personal name follows the rule that all NPCs eventually have a name but is **not canon until approved**. Other second-job NPC names remain TBD, to be defined with the user.
-
-**TBD even after story approval:** exact locations, costs, wage/XP values, parts and salvage yields, medical outcomes, NPC character sheets, dialogue, time targets, and all turn-based combat mechanics/balancing.
+**Still TBD:** precise locations, costs, wages/XP, salvage yields, effects and medical outcomes, named NPCs for secondary jobs, dialogue, timing, plus all deferred turn-based combat systems/values. No further permanent story systems are implicit.
 
 ## NPC naming rule (LOCKED for all six origins)
 
 Every NPC must ultimately have a **personal in-world name**, not merely an occupational label such as Yard Foreman, Matron or Herb Dealer. Roles/titles remain useful UI descriptors, but canonical personal names are approved separately. Do **not** automatically invent canon names for other NPCs while authoring Scrapper.
 
-## Open design steps
+## Remaining production tasks
 
-1. Review **The Last Dry Floor**, its three proposed second-skill jobs and whether the old drainage pump/occupied cellars feel like the right kind of Scrapper horror.
-2. Confirm or alter **Barnaby Rusk** as the personal name/role of the shared beginner opponent and the two pre-combat interactions.
-3. Name the drain gang lead, canal surveyor and dispatch clerk **with the user** as their jobs are finalized; Ignatius Smog is already locked.
-4. Define numerical rewards, item props, care costs and durations later; the global **turn-based combat system remains deferred**.
+1. Name the secondary drain gang, canal surveyor and dispatch clerk NPCs with the user; Ignatius Smog and Barnaby Rusk are locked.
+2. Author reusable interactions, dialogue and scene geometry while preserving three comparable paid second jobs.
+3. Define item props, numerical rewards, clinic expenses and durations later; global turn-based combat system remains deferred.
