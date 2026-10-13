@@ -16,7 +16,7 @@ Ignatius Smog assigns the player to inspect and dismantle a condemned industrial
 
 **Reusable job phases:** accept the scrap docket and see the normal wage/risk; isolate a work section and identify reusable parts; choose removal order/tool to protect valuable fasteners or linkage; sort recovered pieces by condition and submit ordinary work. Crucially, **the initial safe strip only removes external guards and nonessential hardware**—it does not disconnect the pump's working drainage connection before the tutorial discovery. This keeps the machine and its dependent households physically viable. Beginner work must be possible with workshop-supplied tools, not a forbidden free starter item.
 
-The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to a paid second job in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](shared-structure.md). The specific twist, three branches, encounter opponent and definitive resolution are still **TBD**, not implicitly approved by naming Rust Yard and Ignatius.
+The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to a paid second job in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](shared-structure.md). **The Last Dry Floor, its branches and Barnaby Rusk are newly proposed below and are NOT yet approved.**
 
 ## Proposed unique twist — The Last Dry Floor
 
