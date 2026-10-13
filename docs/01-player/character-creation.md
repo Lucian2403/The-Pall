@@ -31,7 +31,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 | **Millhand** | Foundry and workshop labor | **Craftsmanship +3** | [Noisy workshop, Smithing foreman and tutorial](../05-gameplay/onboarding/millhand.md); narrative under review |
 | **Bellrunner** | City messengers and shift couriers | **Industry +3** | [The Wrong Bell](../05-gameplay/onboarding/bellrunner.md): Dispatch House, Shift Dispatch, three follow-on jobs and Shift Marshal's dogman opponent locked |
 | **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | [Hedge Shelter / Herb Dealer / Yarrow Cut / The Warm Patch](../05-gameplay/onboarding/squatter.md) and three second-job branches, injured boar combat and rent-at-home sequence locked |
-| **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | [Working-class infirmary and Matron](../05-gameplay/onboarding/stitcher.md) agreed as starting hub and recurring job NPC; **The Teaching Bed** story and second jobs proposed |
+| **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | [Cinder Row Infirmary / Matron / Morning Dressings / The Teaching Bed](../05-gameplay/onboarding/stitcher.md) with three second jobs, Night Porter encounter and home/rent ending locked |
 | **Scrapper** | Scrap-yard pickers and demolition crews | **Mechanics +3** | Diagnose and dismantle a damaged mechanical assembly in the salvage yard |
 | **Inkbound** | Records keepers and ledger copyists | **Scholarship +3** | Investigate a discrepancy in a city work or ration ledger |
 
