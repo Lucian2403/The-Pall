@@ -25,4 +25,4 @@ Player activities, time, world economy and authored interactive events.
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher.md)
-- [Scrapper: Rust Yard and Ignatius Smog (locked), first Mechanics task proposed](onboarding/scrapper.md)
+- [Scrapper: Rust Yard / Ignatius Smog / pump-stripping first job (locked); The Last Dry Floor branches (proposal)](onboarding/scrapper.md)
