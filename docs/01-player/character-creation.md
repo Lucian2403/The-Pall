@@ -9,6 +9,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 - Six **locked** background/origin names and social roles. Every chosen background grants **+3 levels in its associated Major Skill at character creation**, and provides **one small background-related tutorial quest**. Unique starter items are not required or defined yet.
 - **All attributes fixed at STR 5, DEX 5, INT 5, RES 5 for every background.** No point distribution or background-based attribute changes (LOCKED).
 - No age selection.
+- **Global starter kit (LOCKED for all six backgrounds): Basic Clothes + 1 Crude Small Bag + 20 coins.** These are the same for male and female characters and for every background. Exact item IDs, mass/capacity and condition values remain TBD.
 - **Every short background tutorial ends by revealing rent coming due, introducing shared immediate economic pressure, NOT initiating the game's overarching main storyline.** The tutorial introduces the **player** to the lore through the character's existing life; the character is not an amnesiac receiving an introductory history lesson. Rent amounts, payment deadline, penalties and housing rules remain TBD.
 
 ## Portrait system — locked starter implementation
@@ -28,7 +29,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 | Background | Where they come from | Starting Major Skill bonus | Brief tutorial idea (proposed, not yet detailed) |
 | --- | --- | --- | --- |
 | **Millhand** | Foundry and workshop labor | **Craftsmanship +3** | [Noisy workshop, Smithing foreman and tutorial](../05-gameplay/onboarding/millhand.md); narrative under review |
-| **Bellrunner** | City messengers and shift couriers | **Industry +3** | [Dispatch House, Dispatch Master and Shift Dispatch](../05-gameplay/onboarding/bellrunner.md) locked; tutorial incident and branches proposed |
+| **Bellrunner** | City messengers and shift couriers | **Industry +3** | [The Wrong Bell](../05-gameplay/onboarding/bellrunner.md): Dispatch House, Shift Dispatch, three follow-on jobs and Shift Marshal's dogman opponent locked |
 | **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | Find a safe patch of useful plants just outside the gates |
 | **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | Assist with a routine minor injury and learn who receives care |
 | **Scrapper** | Scrap-yard pickers and demolition crews | **Mechanics +3** | Diagnose and dismantle a damaged mechanical assembly in the salvage yard |
@@ -38,7 +39,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 
 **Tutorial rule — LOCKED for ALL SIX backgrounds (2026-10-13):** each receives an E2E tutorial with the same sequence: **first paid job using its starting Major Skill, ordinary job interactions, one unique dark/twisted incident and meaningful choice, a choice-dependent second paid job using a different Major Skill, two further interactions, a manageable scripted turn-based PvE fight with a believable adversary, paid injury treatment, and return home with little money to discover rent due**. Only then does the background tutorial complete. [Shared Background Tutorial Structure](../05-gameplay/onboarding/shared-structure.md) is the canonical full specification. Story, jobs and antagonists differ for each origin; see [Millhand](../05-gameplay/onboarding/millhand.md) and [Bellrunner](../05-gameplay/onboarding/bellrunner.md). The player learns the lore naturally; the character is not an amnesiac. The older 2–5-minute tutorial target is superseded, and pacing needs testing. These E2E tutorial episodes are **not the overarching main storyline**. Rent amount, timer, sanctions and housing rules remain TBD.
 
-**Inventory rule:** Do **not** assign unique background items merely to fill a character-creation column. **Millhand is now specifically locked to Worker Clothes, the cheapest Bag and 20 starting coins** (precise item definitions and their statistics TBD; see the [Millhand opening](../05-gameplay/onboarding/millhand.md)). Do not apply Millhand's exact 20-coin figure or item selection to other backgrounds without a separate decision. If suitable, properly specified inventory items become available later, optional origin-specific starter variations may be introduced with comparable value; no such variations are locked now.
+**Starter inventory rule (LOCKED for all six origins):** **Basic Clothes, one Crude Small Bag, and 20 coins.** This supersedes Millhand's old *Worker Clothes / cheapest Bag* working names and the old rule reserving 20 coins to Millhand. Every player receives the **same** starting equipment and coins regardless of background or sex. The item's exact records (ID, slot coverage, weight, capacity, quality/durability values) remain to be authored. Tutorial work documents and objects may be quest props, not permanent extra starter gear. Do **not** invent background-specific inventory perks.
 
 A background has real value through early Major Skill progress, a distinctive social perspective and a short tailored introduction, while all players retain unrestricted long-term progression.
 
@@ -46,7 +47,7 @@ A background has real value through early Major Skill progress, a distinctive so
 
 1. Detail the six short tutorial quests and their transition into a shared opening.
 2. Define the **rent-due reveal** after each origin tutorial, then decide the amount, deadline and whether/when it becomes a playable obligation.
-3. Define shared starting inventory and money once basic item records support them; finalize naming rules and first common job.
+3. Define **item data and equip slots** for the now-locked universal Basic Clothes and Crude Small Bag; 20 starting coins is already locked for everyone. Then finish name rules and rewards for regular first jobs.
 4. Decide how late the barber unlocks and specify its cosmetic variant assets and exact fee.
 
 Related: [First Playable Scope](../00-vision/first-playable-scope.md), [Character System](character-system.md), [Jobs and Time](../05-gameplay/jobs/jobs-and-time.md).
