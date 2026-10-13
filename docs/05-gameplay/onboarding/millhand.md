@@ -81,7 +81,7 @@ All three second-job routes return toward the same residential workshop district
 
 ### First combat interaction draft — PROPOSED
 
-**Interaction format:** short, turn-by-turn decision combat with the *ordinary reusable PvE combat actions* (no reflex timing/QTE minigame). The first two story interactions already set up the confrontation: **Wage Claim**, then **Cornered**. After the player picks a stance/position, the same combat rules used outside tutorials take over.
+**LOCKED combat format (2026-10-13):** **turn-based**. The actual combat system, turns, attack/defence rules, resources, enemy AI and damage balance will be designed separately later. This section is an illustrative encounter, **not** a combat system specification. The first two story interactions already set up the confrontation: **Wage Claim**, then **Cornered**. After the player picks a stance/position, the same combat rules used outside tutorials take over.
 
 - **Start:** the enforcer raises a short club and crowds the player in a passage. The character has no permanent weapon from creation. They can defend unarmed; an environmental option such as backing around a cart should act as positioning, not as a free loot item. Don't secretly hand out a firearm.
 - **Enemy intent preview:** show an intelligible tell such as **"preparing a heavy swing"** or **"recovering from a missed strike"** before the player's choice. Teach recognition of attack patterns without a long text tutorial.
@@ -102,7 +102,7 @@ All three second-job routes return toward the same residential workshop district
 
 ### Design choices not locked here
 
-- Whether combat is specifically turn-based / action-by-action, as proposed above.
+- **Turn-based combat is locked.** Exact turn sequencing, action choices and mechanics remain undefined and are not locked by this onboarding design.
 - Exact mechanics of **Strike / Guard / Reposition**, NPC AI, how positioning changes outcomes, enemy HP, combat damage, death/defeat handling and total encounter length.
 - Injury severity and costs, whether basic patch-up can be done personally or only through an NPC, and whether a guaranteed wound is appropriate without making damage feel arbitrary.
 
@@ -139,7 +139,7 @@ All three second-job routes return toward the same residential workshop district
 
 **LOCKED by user:** generic Smithing interactions before the unique stamp scene; three approved second-job paths using **Industry, Commerce and Scholarship**; **two additional interactions after the second job; short mandatory, moderately challenging PvE fight; medical treatment; return home with little money; only then reveal rent due and end the Millhand E2E tutorial**. Not the main story.
 
-**STILL PROPOSED / TBD:** two pre-fight interactions' precise options, combat interface, enemy stats/weapon tuning/defeat handling, medical service and fees, rented home details, durations, dialogue and all job reward values. The **wage enforcer identity is no longer provisional**.
+**STILL PROPOSED / TBD:** two pre-fight interactions' precise options, **all combat mechanics and balancing (to be designed separately)**, medical service and fees, rented home details, durations, dialogue and all job reward values. **Turn-based format and wage enforcer identity are locked**.
 
 ## Implementation boundaries / remaining work
 
