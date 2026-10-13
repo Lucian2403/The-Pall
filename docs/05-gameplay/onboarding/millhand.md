@@ -16,7 +16,7 @@
 
 The Smithing foreman gives the player ordinary piecework on identification plates for a municipal labour contract. During normal workshop work, the player inspects a plate, chooses a reasonable technique/tool, and resolves a normal Smithing complication. These should be **reusable interaction templates** also available in regular Smithing jobs, not bespoke tutorial-only minigames.
 
-**After** the generic interaction sequence resolves, the tutorial-only event fires: the plate's identifying mark belongs to a worker officially recorded as deceased in a locked-door workshop fire, but the inspection mark is fresh. The contradiction introduces a second job **within the same introductory quest**, whose task and skill depend on the first choice. The small local episode must resolve after that second job; it is not chapter one of the main campaign. The deeper explanation of the discrepancy is not yet canon.
+**After** the generic interaction sequence resolves, the tutorial-only event fires: the plate's identifying mark belongs to a worker officially recorded as deceased in a locked-door workshop fire, but the inspection mark is fresh. The contradiction introduces a second job **within the same introductory quest**, whose task and skill depend on the first choice. The second job settles its own contract, but the tutorial episode continues through the two encounters, street fight, medical care and rent notice at home; it is not chapter one of the main campaign. The deeper explanation of the discrepancy is not yet canon.
 
 ### Locked quest architecture, proposed scene specifics
 
