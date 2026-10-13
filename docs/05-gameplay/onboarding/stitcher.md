@@ -1,6 +1,6 @@
 # Stitcher — Infirmary Opening: The Teaching Bed
 
-**Status: STORY STRUCTURE AND CONTENT LOCKED (2026-10-13).** **Cinder Row Infirmary**, its recurring **Matron** job-giver, **Morning Dressings**, **The Teaching Bed**, three choice-dependent second jobs, two follow-up interactions, the **Night Porter** opponent and the patient's local rescue were explicitly approved. The shared [E2E tutorial structure](shared-structure.md), Medicine +3 and universal starter kit remain canonical. Dialogue, combat systems, wages, medical fees and geographical details are still to be defined.
+**Status: STORY STRUCTURE AND CONTENT LOCKED (2026-10-13).** **Cinder Row Infirmary**, its recurring **Matron Claudia Cyka** as job-giver, **Morning Dressings**, **The Teaching Bed**, three choice-dependent second jobs, two follow-up interactions, the **Night Porter** opponent and the patient's local rescue were explicitly approved. The shared [E2E tutorial structure](shared-structure.md), Medicine +3 and universal starter kit remain canonical. Dialogue, combat systems, wages, medical fees and geographical details are still to be defined.
 
 ## Locked state and hub direction
 
@@ -8,7 +8,7 @@
 - **Background bonus:** **Medicine +3 Major Skill levels** at character creation. Core attributes STR/DEX/INT/RES all 5; 50 starting maximum Health; Male and Female portraits use the same stats and gameplay.
 - **Global starter kit:** **Basic Clothes + one Crude Small Bag + 20 coins**. No special medical starter equipment or extra medicines by background.
 - **Hub:** a crowded **working-class city infirmary**, a permanent hub for routine **Medicine / Trauma** and other appropriate medical jobs (not a special tutorial-only facility). **Cinder Row Infirmary** (LOCKED name). Sterilizing water is scarce, the coal stove smokes, spare beds overflow into the hall; exact district/location within Grand Cylinder City TBD.
-- **Recurring job-giver:** the **Matron** (role approved, individual name TBD), responsible for allocating nursing work and issuing its ordinary **coins and relevant Medicine XP**. She is competent, exhausted and morally complicated; she need not be a secret supervillain. Medical care services for the wounded player later should also follow reusable NPC treatment rules.
+- **Recurring job-giver:** **Claudia Cyka, the Matron (name, role and female identity LOCKED)**, responsible for allocating nursing work and issuing its ordinary **coins and relevant Medicine XP**. She is competent, exhausted and morally complicated; she need not be a secret supervillain. Medical care services for the wounded player later should also follow reusable NPC treatment rules.
 
 ## First paid job (LOCKED): Morning Dressings — Medicine / Trauma
 
@@ -58,6 +58,6 @@ The Matron knows enough to be uneasy. Her justification is not simple evil: *"Ke
 
 ## Approval and production boundaries
 
-**LOCKED:** Medicine +3 and common starter kit; Cinder Row Infirmary / Matron; *Morning Dressings*; *The Teaching Bed* involving coerced consent to an unnecessary demonstration on an adult patient; three paid second jobs (**Industry/Hauling — The Night Trolley**, **Commerce/Contracts — The Signed Consent**, **Scholarship/Investigation — Notes for the Living**); **The Empty Sheet**, **The Night Door**, **Night Porter** as the PvE opponent, preventing this patient's transfer, paid medical treatment, and home/rent tutorial ending. This is a **self-contained local case**, not the main storyline or a declaration that all hospitals practice this abuse.
+**LOCKED:** Medicine +3 and common starter kit; Cinder Row Infirmary / Claudia Cyka, the Matron; *Morning Dressings*; *The Teaching Bed* involving coerced consent to an unnecessary demonstration on an adult patient; three paid second jobs (**Industry/Hauling — The Night Trolley**, **Commerce/Contracts — The Signed Consent**, **Scholarship/Investigation — Notes for the Living**); **The Empty Sheet**, **The Night Door**, **Night Porter** as the PvE opponent, preventing this patient's transfer, paid medical treatment, and home/rent tutorial ending. This is a **self-contained local case**, not the main storyline or a declaration that all hospitals practice this abuse.
 
-**Still TBD:** personal names and relationships of Matron/patient/surgeon/porter, specific dialogue and checks, reusable job templates, coin/XP amounts, timing and map distances, care supplies and their effects, treatment price, rent amount/deadline, plus turn-based combat details/stats. Avoid presenting the deferred implementation mechanics as approved.
+**Still TBD:** Claudia Cyka's appearance and precise relationships; names and relationships of the patient/surgeon/porter, specific dialogue and checks, reusable job templates, coin/XP amounts, timing and map distances, care supplies and their effects, treatment price, rent amount/deadline, plus turn-based combat details/stats. Avoid presenting the deferred implementation mechanics as approved.
