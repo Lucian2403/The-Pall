@@ -4,7 +4,7 @@ Canonical pre-production specifications for the game. **Chat proposes. Docs deci
 
 ## Documentation areas
 
-- [00 — Vision](00-vision/README.md): core fantasy, principles and project boundaries.
+- [00 — Vision](00-vision/README.md): core fantasy, principles and project boundaries, including [first playable scope](00-vision/first-playable-scope.md).
 - [01 — Player](01-player/README.md): character attributes, state, skills and progression.
 - [02 — World](02-world/README.md): world ecology, fauna and hunting.
 - [03 — Resources and Item Production](03-resources/README.md): **raw → refined → components → final products**, plus catalogue and audits.
