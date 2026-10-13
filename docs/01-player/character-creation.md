@@ -5,7 +5,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 ## Agreed fields
 
 - Character name.
-- **Six fixed, stylized 2D starting portraits, one per background.** There is **no modular portrait editor at character creation**. The earlier planned face/body/hair/clothing selection at creation is superseded.
+- **Twelve fixed, stylized 2D starting portraits:** one **male** and one **female** portrait for each of the six backgrounds. Character creation selects name, sex (Male / Female) and background; it does **not** provide a modular portrait editor. Background bonuses and tutorial gameplay are identical for male and female characters.
 - Six **locked** background/origin names and social roles. Every chosen background grants **+3 levels in its associated Major Skill at character creation**, and provides **one small background-related tutorial quest**. Unique starter items are not required or defined yet.
 - **All attributes fixed at STR 5, DEX 5, INT 5, RES 5 for every background.** No point distribution or background-based attribute changes (LOCKED).
 - No age selection.
@@ -13,11 +13,11 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 
 ## Portrait system — locked starter implementation
 
-- Exactly **six predefined stylized 2D portraits** at character creation, each assigned to its matching background: Millhand, Bellrunner, Squatter, Stitcher, Scrapper, Inkbound.
-- No initial choice of face, body silhouette, eyes, hairstyle, facial hair, skin tone, clothing top or outerwear. The previously discussed large modular creator asset counts are **superseded as launch requirements**, not still agreed deliverables.
+- Exactly **twelve predefined stylized 2D portraits** at character creation: **male and female** versions of Millhand, Bellrunner, Squatter, Stitcher, Scrapper and Inkbound. The corresponding portrait is determined by background plus sex.
+- No initial choice of face, body silhouette, eyes, hairstyle, facial hair, skin tone, clothing top or outerwear beyond choosing Male or Female and a background. Previously discussed modular creator asset counts are **superseded as first playable requirements**.
 - **Equipped gameplay items visibly alter the portrait.** Only items/garments that the equipment system genuinely equips should produce such overlays; cosmetic-only accessories are not added to creation.
-- **A barber in Grand Cylinder City** becomes available around mid-game, perhaps slightly earlier (precise progression/access gate TBD). For a small fee of a couple of coins (exact amount TBD), the barber can change **hairstyle, beard and hair/facial-hair colour**. No face/body or skin-tone editing is approved. The barber is a later progression feature, not part of the opening character creator.
-- Keep portrait assets compatible with future barber variations and equipment overlays, even though the first six portraits are hardcoded. The portrait may therefore have internal rendering layers without exposing a modular creation UI.
+- **A barber in Grand Cylinder City** becomes available around mid-game, perhaps slightly earlier (precise access gate TBD). For a small fee of a couple of coins (exact amount TBD), the barber changes **hairstyle, beard/facial hair where applicable, and hair/facial-hair colour** on both male and female portraits. No face, sex, background, body or skin-tone editing is approved. The barber is not part of the opening character creator.
+- Keep portrait assets compatible with future barber variations and equipment overlays, even though the first twelve portraits are hardcoded. The portrait may therefore have internal rendering layers without exposing a modular creation UI.
 
 **Visual direction:** distinctive, nonrealistic, simplified 2D industrial illustration; muted palette, graphic shadows, consistent alignment and recognizable backgrounds. AI may assist in making assets, but normalization and equipment-layer compatibility are needed. Exact art canvas dimensions and layer architecture remain technical proposals, not newly locked design constraints.
 
