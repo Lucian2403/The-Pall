@@ -33,7 +33,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 | **Squatter** | Families at the protected outskirts | **Fieldcraft +3** | [Hedge Shelter / Herb Dealer / Yarrow Cut / The Warm Patch](../05-gameplay/onboarding/squatter.md) and three second-job branches, injured boar combat and rent-at-home sequence locked |
 | **Stitcher** | Clinic attendants and informal caregivers | **Medicine +3** | [Cinder Row Infirmary / Matron / Morning Dressings / The Teaching Bed](../05-gameplay/onboarding/stitcher.md) with three second jobs, Night Porter encounter and home/rent ending locked |
 | **Scrapper** | Scrap-yard pickers and demolition crews | **Mechanics +3** | [Rust Yard / Ignatius Smog / The Last Dry Floor](../05-gameplay/onboarding/scrapper.md), three second jobs and Barnaby Rusk confrontation locked |
-| **Inkbound** | Records keepers and ledger copyists | **Scholarship +3** | [Civic Copying Office, The Winter Register and The Acceptable Losses](../05-gameplay/onboarding/inkbound.md): all new story details proposed, not locked |
+| **Inkbound** | Records keepers and ledger copyists | **Scholarship +3** | [Civic Copying Office / Erwin Buro / The Acceptable Losses](../05-gameplay/onboarding/inkbound.md), three second jobs and Silas Pumpard encounter locked |
 
 **NPC naming rule (LOCKED 2026-10-13):** every NPC in the game's authored cast must have a personal in-world name, not merely a job title; individual names are to be defined/approved while designing each character. **Ignatius Smog**, the Yard Foreman of **Rust Yard**, is the first Scrapper job-giver explicitly named. Existing Matron, Dispatch Master, Herb Dealer and other role labels remain placeholders for personal names; do not invent canon names without approval.
 
