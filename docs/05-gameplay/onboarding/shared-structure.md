@@ -17,6 +17,7 @@
 ## Consistency rules
 
 - Background-specific content varies by start location, recurring NPC, first job, eerie/dark incident, three-way choice, second-job specializations, antagonist and narrative detail.
+- **Every NPC must eventually receive a personal in-world name (LOCKED).** A title such as Matron, Dispatch Master, Herb Dealer or Yard Foreman may describe their role, but is not a final personal name. Names are defined and approved individually with the user; do not silently canonize invented names.
 - **All backgrounds use the exact structural rhythm above**, with comparable beginner difficulty, job earnings, healing cost burden and approximate duration; costs, difficulty and route rewards must be tested for parity.
 - Real-time job and travel clocks continue during interactions according to [Jobs and Time](../jobs/jobs-and-time.md); do not force players to wait for late prompts.
 - Combat is scripted **PvE** for onboarding, not an expansion of nonconsensual PvP rules; no special combat system is created only for tutorials.
@@ -29,4 +30,4 @@
 
 Start location (persistent) · NPC (recurring) · first job and generic interactions · unique twist · choice-driven second Major Skill jobs · two bridging interactions · motivated enemy · clinic/service · home/rent scene · rewards/XP parity · defeat/retry behavior · asset/UI and persistent state references.
 
-See [Millhand](millhand.md), [Bellrunner](bellrunner.md), [Squatter](squatter.md) and [Stitcher (approved)](stitcher.md). Bellrunner's agreed second jobs lead to Commerce/Contracts, Medicine/Trauma or Mechanics/Industrial Machinery; the fight opponent is the **Shift Marshal's unofficial dogman**, not the Shift Marshal himself. Squatter's **Hedge Shelter**, **Herb Dealer** job-giver, **Yarrow Cut**, **The Warm Patch**, three second jobs (Commerce/Trading, Medicine/Herbalism, Industry/Construction) and injured wild boar opponent are **locked in story direction**, with numerical mechanics and precise rent/home details TBD.
+See [Millhand](millhand.md), [Bellrunner](bellrunner.md), [Squatter](squatter.md), [Stitcher (approved)](stitcher.md) and [Scrapper](scrapper.md). Bellrunner's agreed second jobs lead to Commerce/Contracts, Medicine/Trauma or Mechanics/Industrial Machinery; the fight opponent is the **Shift Marshal's unofficial dogman**, not the Shift Marshal himself. Squatter's **Hedge Shelter**, **Herb Dealer** job-giver, **Yarrow Cut**, **The Warm Patch**, three second jobs (Commerce/Trading, Medicine/Herbalism, Industry/Construction) and injured wild boar opponent are **locked in story direction**, with numerical mechanics and precise rent/home details TBD.
