@@ -5,7 +5,7 @@
 ## Required E2E sequence
 
 1. **Choose name, Male/Female portrait and background.** STR/DEX/INT/RES all start at 5; chosen background grants **+3 levels in one Major Skill**, before any tutorial quest.
-2. **Begin in background-specific persistent job hub.** Speak with its regular NPC job-giver.
+2. **Start with identical kit for every background: Basic Clothes + one Crude Small Bag + 20 coins (LOCKED).** The actual item records/stats remain TBD. Begin in a background-specific persistent job hub and speak with its regular NPC job-giver.
 3. **First paid job — chosen background's Major Skill.** Run normal, reusable job preparation and meaningful gameplay interactions; learn the generic mechanics and receive its normal coins and skill experience.
 4. **Unique twist after regular job interactions.** A background-specific incident prompts a meaningful choice. This event is not randomly repeated by the ordinary job system.
 5. **Second paid job — a different Major Skill.** The player's incident choice **branches to one of several logical second jobs**, each using normal reusable interactions associated with its different Major Skill. Millhand uses three options leading to Industry / Commerce / Scholarship. All other backgrounds should likewise offer consequential alternatives, with the exact choices/skill destinations authored per origin.
@@ -22,11 +22,11 @@
 - Combat is scripted **PvE** for onboarding, not an expansion of nonconsensual PvP rules; no special combat system is created only for tutorials.
 - Tasks may introduce lore to the player without treating their character as someone who needs the basics of their life explained.
 - The opening chapters are **self-contained jobs and incidents**, not the start of the game's central story. Do not promise systemic future ramifications unless authored.
-- Don't invent extra starting items per origin; starter currency and inventory are defined individually (Millhand currently locked to Worker Clothes + cheapest Bag + 20 coins, with item data still TBD).
+- **Universal starting items are LOCKED:** every origin and portrait starts with **Basic Clothes, one Crude Small Bag and 20 coins**; item data/stats are still TBD. Do not introduce extra origin-specific starter items. Wage/XP and paid medical costs vary by story but need balanced player outcomes.
 - Existing skill and job rules remain canonical; tutorial XP comes from actual skill-relevant activity, not bonus +3 levels for the second skill.
 
 ## Content authoring checklist per background
 
 Start location (persistent) · NPC (recurring) · first job and generic interactions · unique twist · choice-driven second Major Skill jobs · two bridging interactions · motivated enemy · clinic/service · home/rent scene · rewards/XP parity · defeat/retry behavior · asset/UI and persistent state references.
 
-See [Millhand](millhand.md) and [Bellrunner](bellrunner.md).
+See [Millhand](millhand.md) and [Bellrunner](bellrunner.md). Bellrunner's agreed second jobs lead to Commerce/Contracts, Medicine/Trauma or Mechanics/Industrial Machinery; the fight opponent is the **Shift Marshal's unofficial dogman**, not the Shift Marshal himself.
