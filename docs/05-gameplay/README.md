@@ -17,12 +17,13 @@ Player activities, time, world economy and authored interactive events.
 
 - [Jobs and time](jobs/jobs-and-time.md)
 - [Interaction generation](interactions/interaction-generation.md)
+- [Spoken dialogue style guide — game-wide locked writing requirements](interactions/dialogue-style-guide.md)
 
 ## First-session onboarding
 
 - [Shared tutorial structure: unpaid work, +3/+1 skills, 10-coin care and common home/rent](onboarding/shared-structure.md)
 - [Remaining dialogue checklist and approved NPC names](onboarding/npc-dialogue-backlog.md)
-- [Millhand / Guther Anvil: first conversation (proposed dialogue)](onboarding/millhand-opening-dialogue.md)
+- [Millhand / Guther Anvil: rewritten first conversation (awaiting approval)](onboarding/millhand-opening-dialogue.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
