@@ -1,6 +1,6 @@
 # Millhand — Starting Location and Opening Tutorial
 
-**Status (updated 2026-10-15): MILLHAND STAGES 1–7 APPROVED and LOCKED.** Stage 8 home/rent presentation remains proposed; universal home/rent sequence is locked, combat and medical numeric mechanics TBD. Other backgrounds are documented separately in their own origin folders.
+**Status (updated 2026-10-15): MILLHAND STAGES 1–8 APPROVED in structure and narrative.** Stage 8 includes the user-requested self-talk after setting down the rent notice; its exact draft wording awaits verbal approval. Combat and medical numbers remain TBD. Other backgrounds are documented separately in their own origin folders.
 
 ## Locked setup
 
@@ -29,7 +29,7 @@
 
 **Stage 7 — Medical treatment (LOCKED, approved 2026-10-15):** [Working-class Clinic Visit](clinic-treatment.md). The reusable examine/price/treat/leave service and exact short unnamed clinician dialogue are approved; fixed 10-coin fee. Precise injury/recovery mechanics and the no-damage fight edge case remain TBD.
 
-**Stage 8 — Return home and rent (PROPOSED for approval):** [Shared starter home, notice and tutorial completion](home-rent-ending.md). The universal arrival-after-clinic sequence and 10 coins remaining / 150 coins provisional rent are locked; precise notice copy, interaction and end-screen text remain proposed.
+**Stage 8 — Return home and rent (LOCKED structure, new spoken line draft):** [Shared starter home, notice and tutorial completion](home-rent-ending.md). Read the notice, set it down, and let the Millhand briefly speak of paying rent through jobs or goods made for sale; all are approved in meaning. Exact self-talk wording is pending review. Balance after clinic: 10 coins; rent: 150 coins PROVISIONAL.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
@@ -158,12 +158,12 @@ All three second-job routes return toward the same shared starter-home route as 
 
 **LOCKED by user:** generic Smithing interactions before the unique stamp scene; three approved second-job paths using **Industry, Commerce and Scholarship**; **two additional interactions after the second job; short mandatory, moderately challenging PvE fight; medical treatment; return home with little money; only then reveal rent due and end the Millhand E2E tutorial**. Not the main story.
 
-**STILL PROPOSED / TBD:** **all numerical combat mechanics and balancing**, treatment's injury-specific effects and the perfect-no-damage clinic edge case, details of the shared rented home, exact job/treatment/travel durations, the Stage 8 notice wording and completion screen, and non-tutorial reward amounts. **Flint's revised dialogue, both pre-fight interactions, encounter story, clinic service dialogue and fixed 10-coin tutorial care fee are LOCKED.** Turn-based combat format, Flint's role/identity and preserved win/loss outcome are locked.
+**STILL PROPOSED / TBD:** **all numerical combat mechanics and balancing**, treatment's injury-specific effects and the perfect-no-damage clinic edge case, details of the shared rented home, exact job/treatment/travel durations, the final spoken wording for Stage 8's added self-directed line, and non-tutorial reward amounts. **Flint's revised dialogue, both pre-fight interactions, encounter story, clinic service dialogue and fixed 10-coin tutorial care fee are LOCKED.** Turn-based combat format, Flint's role/identity and preserved win/loss outcome are locked.
 
 ## Implementation boundaries / remaining work
 
 1. Preserve the **approved Flint Wage Claim and Cornered scenes**, with branch-specific evidence from the Stage 4 job. No longer-lived fraud/complicity system without separate approval.
 2. Define the generic Smithing workshop layout, Guther Anvil's appearance and repeatable low-tier Smithing jobs, including which normal interaction templates are used in this opening.
 3. Define the **global** Basic Clothes and Crude Small Bag records, equipment slots and inventory presentation; **20 coins for every background** is already locked.
-4. Resolve future numerical job/combat/medical balance; use the approved Hauling / Contracts / Investigation NPC lines and 10-coin clinic dialogue. Approve Stage 8 notice and final UI. Rent must appear only **after healing, at home**; no invented late-payment rules or offline deadlines.
+4. Resolve future numerical job/combat/medical balance; preserve the approved Hauling / Contracts / Investigation and clinic dialogue. Stage 8's rent notice sequence and self-talk meaning are approved; confirm exact words of the new brief spoken line before final script implementation. Rent appears only **after healing, at home**; no invented late-payment rules or offline deadlines.
 
