@@ -1,64 +1,55 @@
-# Background tutorials — secondary NPC and dialogue backlog
+# Background tutorials — NPC and dialogue backlog
 
-**Status: AUDIT / OPEN DESIGN, 2026-10-14.** This is a tracking inventory of **characters and writing not yet user-approved**. It does **not** canonize any new personal names, add new scenes or introduce new quest systems.
+**Status: LOCKED NPC naming policy / OPEN dialogue writing (2026-10-14).** This page tracks remaining narrative production, without assuming every minor NPC needs a name. No new personal names or scene details are canonized here.
 
-## Canonical foundations
+## Canonical major NPC identifiers
 
-All six backgrounds have approved story direction, first Major Skill work, twist, three second-task destinations, follow-up interactions, an opponent and heal→home→rent E2E ending. Their six **named recurring work NPCs are LOCKED**:
-
-| Origin | Recurring, user-named NPC | Main encounter opponent |
+| Origin | Recurring job-giver (LOCKED) | Main tutorial opponent (LOCKED) |
 | --- | --- | --- |
-| Millhand | **Guther Anvil** — Smithing Foreman | **Unidentified contractor's wage collector/enforcer** (name TBD) |
-| Bellrunner | **Hector D. Smoke** — Dispatch Master | **Unnamed Shift Marshal dogman**; the Shift Marshal is senior and not the fight opponent |
-| Squatter | **Benny Ben** — Herb Dealer | **Young injured wild boar** (animal, not a human NPC needing an ordinary personal name) |
-| Stitcher | **Claudia Cyka** — female Matron | **Unnamed Night Porter** |
-| Scrapper | **Ignatius Smog** — Yard Foreman | **Barnaby Rusk** — competing piece-rate breaker (LOCKED name) |
-| Inkbound | **Erwin Buro** — Senior Copy Clerk | **Silas Pumpard** — Fuel Watchman (LOCKED name) |
+| Millhand | **Guther Anvil** — Smithing Foreman | **Flint** — contractor's Wage Enforcer |
+| Bellrunner | **Hector D. Smoke** — Dispatch Master | **Dogman** — unofficial security subordinate of the Shift Marshal, called *Dogman* in-world |
+| Squatter | **Benny Ben** — Herb Dealer | **Young injured wild boar**; animal needs no personal name |
+| Stitcher | **Claudia Cyka** — the female Matron | **Owler** — the Night Porter |
+| Scrapper | **Ignatius Smog** — Yard Foreman | **Barnaby Rusk** — competing salvage breaker |
+| Inkbound | **Erwin Buro** — Senior Copy Clerk | **Silas Pumpard** — Fuel Watchman |
 
-### Missing person/role names by origin
+Flint, Dogman, and Owler are **complete approved single-name identifiers**. No extra forenames/surnames should be invented for them. Dogman is a nickname/moniker for a man, not an animal and not the Shift Marshal.
 
-All listed below are **existing roles in the approved story or implied job interactions**. A personal name must be chosen if the person appears as an individual NPC who speaks/acts; background crowds and ambient passersby do not need an individually canonized NPC record unless interacted with.
+## Naming policy — LOCKED
 
-| Origin | Priority people needing names (not yet named / not yet approved) |
-| --- | --- |
-| **Millhand** | **Wage collector/enforcer** (common foe, highest priority); municipal depot intake supervisor for **Depot Intake Run** (Industry), contract-counter clerk for **Disputed Docket** (Commerce), archive/records assistant for **Ledger Reconciliation** (Scholarship). |
-| **Bellrunner** | **Dogman** (common foe, highest priority), shift-office certification clerk (**Attendance Certificate**), infirmary attendant (**First Aid Line**), city-works mechanic (**The Bell Linkage**); site watchman if a speaking NPC. The **Shift Marshal** is an off-screen authority; name if/when personally represented in authored dialogue/interface. |
-| **Squatter** | Apothecary/buyer (**The Apothecary's Weighing**), clinic herbalist (**Suspect Cuttings**), drainage/ditch gang leader (**Clear the Outfall**); the shared medical practitioner may suffice for clinic aftercare. **No human name needed for the boar.** |
-| **Stitcher** | **Adult charity patient** (highest narrative priority), **Night Porter** (common foe); the surgeon/anatomy instructor who authorizes the demonstration **if encountered or individually referenced as a named actor**; records copyist (**Notes for the Living**); trolley/receiving officer (**The Night Trolley**) and charity-bond clerk (**The Signed Consent**) if distinct playable NPCs. Claudia is already named. |
-| **Scrapper** | Culvert/drain-gang lead (**The Brace Shift**), canal-route survey lead (**The Low Passage**), dispatch clerk (**The Spare Line**); an adult cellar resident speaking through the pipe **if turned into an individually voiced NPC**. Ignatius and Barnaby already have names. |
-| **Inkbound** | Fuel-allocation clerk (**The Coal Waiver**), ward survey/route leader (**The Door Count**), coal cart driver or loading foreman (**The Short Cart**), resident speaking by the sealed communal coal box. Erwin and Silas are already named. |
+**Do not individually name every NPC.** Recurring, important and narratively significant characters receive names or in-world monikers when the user approves. **Minor occupational/service characters can remain role-labelled and unnamed**, even if they speak a few lines or execute a job interaction. The previous instruction to create a personal name for every single NPC has been explicitly superseded by the user's 2026-10-14 decision.
 
-### Shared NPCs — minimize unnecessary authoring
+### Existing minor characters — no individual names required
 
-- **Medical service:** one ordinary working-class clinician/attendant with a personal name can provide the **10-coin tutorial treatment for every origin**. This would avoid six separately authored healers, but **the reuse of a specific clinician and clinic location is a PROPOSAL**, not yet a locked fact. Distinguish this provider from Stitcher's narratively compromised Matron if necessary.
-- **Rent:** the **same starter home/location/rent** is locked for everyone. A **landlord/collector NPC is NOT required** just to show a rent notice; if later made interactive, give that person a name. The notice can work without any new NPC scene.
-- Other unnamed characters may be represented as anonymous crowds, worksite groups or non-speaking props until they become actual individual NPCs.
+- **Millhand:** municipal depot clerk/supervisor, Contracts counter clerk, archive/ledger assistant.
+- **Bellrunner:** shift-office clerk, working infirmary attendant, city-works mechanic, site watchman. **Shift Marshal** remains a senior off-screen figure, not fought in this origin; his name is not needed here.
+- **Squatter:** apothecary/buyer, herbalist, drainage/ditch crew worker or lead. The wild boar stays unnamed.
+- **Stitcher:** adult patient, surgeon/anatomy teacher, records copyist, trolley receiver/ward staff, charity contracts clerk. **The patient is narratively central but is not assigned a personal name under the current user's instruction**, unless that changes.
+- **Scrapper:** drain gang lead, canal route surveyor, dispatch clerk, a cellar resident as needed.
+- **Inkbound:** fuel-allocation clerk, ward survey lead, coal cart driver/foreman, cold tenement resident.
+- **Shared:** ordinary medical clinician can appear with a **role label** (e.g., Clinic Attendant), without a special name. The home rent notice does not require a landlord NPC.
 
-## Scripted dialogue still to define (all six origins)
+Use NPCs only when needed for a playable interaction; avoid bloating the cast with one-use talking heads.
 
-1. **Opening greetings and first-task tutorial:** six recurring NPCs introduce their work, basic mechanical interaction and realistic **nonpayment** after a normally paid job turns into an exceptional incident. **No false promises of wages or XP** from the scripted instance. Ordinary repeatable jobs elsewhere continue to pay and grant XP.
-2. **Unique twist reveal and three-way decision:** player-facing observations, concise responsive dialogue, optional inspection/skill hints and three clear choices per origin. Existing headline narrative beats are locked; the wording, exact buttons and reaction lines are TBD.
-3. **Second-task work and consequences:** **18 different routes** (six backgrounds × three) each require a named route NPC where an individual appears, normal reusable work interactions, and branch-specific dialogue/explanation. On committing to the route, award **one +1 level in the corresponding different Major Skill**, once only; **0 coins and 0 ordinary XP** for the scripted task.
-4. **Two pre-combat interactions per background:** **12 core interactive scenes total** with route-dependent responses. Their story beats/enemy identities are approved, but actual lines, fallback responses and skill-sensitive options are not. The player should understand who is confronting them and why.
-5. **Combat result and defeat language:** six victory and six defeat-safe continuations (can reuse frameworks), with no tutorial XP/coin/loot payout. Exact battle mechanics are deferred; do not lock combat buttons/stats through narrative copy.
-6. **Single service-provider interaction + shared rent notice:** explain the **10-coin treatment**, show the **10-coin remaining balance**, return everyone to the **same rented home**, and reveal **150 coins due (PROVISIONAL)**. The rent deadline, recurrence, eviction rules and collector are TBD.
+## Dialogue production, still PROPOSED / TO AUTHOR
 
-## Special dialogue hazards to resolve
+1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards.
+2. **Six unique twist reveals** after the ordinary first-task interactions; three consequential response choices each.
+3. **Eighteen second-task follow-ups** (six origins × three routes) using the different Major Skill, their ordinary job interaction families, and role-labelled minor NPCs where needed.
+4. **Twelve pre-combat interactions** (two per origin), with choice-aware dialogue from the locked opponent where the opponent speaks; Squatter uses observation/animal behaviour instead of human speech.
+5. **Six fight outcomes** (victory, defeat-safe transition), with no scripted combat rewards. Global turn-based mechanics remain deferred.
+6. **Shared medical scene:** pay 10 coins to a clinician, recover enough to return home; **shared rent scene:** same starter home, 10 coins left, provisional 150-coin rent notice. Deadline and eviction consequences remain TBD.
 
-- **Millhand:** Guther has withheld wages because the fresh stamp compromises the lot; the enforcer's **'Wage Claim'** must now demand a spurious processing **debt/fee despite the character being unpaid**, not an actual share of earned wages.
-- **Bellrunner:** Hector's normal courier circuit pays outside tutorial. The *Wrong Bell* incident has invalidated or frozen the tutorial docket and second incident work, so 'expected wages' should not appear as awarded currency.
-- **Squatter:** Explain why contaminated or suspicious cuttings are rejected/quarantined and why the three follow-up emergency tasks are unpaid; Benny's ordinary herb buying still functions after onboarding.
-- **Stitcher:** Claudia's moral compromise remains the core of *Teaching Bed*. Specify why a ward duty shift and the three extraordinary intervention tasks give no normal payment, without making the Matron into a simplistic villain.
-- **Scrapper:** Condemned-pump contract cannot settle as ordinary payable scrap while the occupied cellars depend on the pump; the subsequent urgent works are uncompensated. Ignatius's exact locked fresh-air phrase remains unchanged.
-- **Inkbound:** Normal copying jobs pay after onboarding; this disputed winter report and follow-up intervention do not. Erwin's complicit/pragmatic lines and Silas's confrontational lines must reflect the lack of wages.
+### Dialogue constraints — LOCKED
 
-## Canonical shared rules
+- **Economy/progression:** starter +3 creation Major Skill, one +1 level in second chosen Major Skill on branch commitment; scripted tasks/fight pay **0 coins, 0 ordinary XP and no loot**. Normal repeatable jobs outside onboarding still pay.
+- **Realistic explanation for unpaid tasks** must be specific to the incident. With Millhand the council-lot inspection dispute freezes wages, and **Flint** wants an unofficial debt despite no payout.
+- Keep first work interaction **before** tutorial-only reveal. Don't frontload lore or suggest the character doesn't know their workplace.
+- Player responses may shape tone/information without fabricating unapproved skill bonuses or permanent crime flags.
+- Tutorial home is **the exact same home for all six backgrounds**; clinic fee 10 coins; rent 150 coins is **PROVISIONAL**.
 
-- One identical rented **starter home and location**, with no origin-specific hut or room variants.
-- **Basic Clothes + Crude Small Bag + 20 coins** for everyone.
-- Creation background **+3 Major Skill levels**, branch selection **+1 level** in a *different* Major Skill once.
-- No ordinary XP, money or loot from first/second scripted tutorial tasks or their combat.
-- **10-coin clinic fee** → **10 coins left**, then a **150-coin rent notice (PROVISIONAL; 140-coin shortfall)**; exact rent deadline and consequences TBD.
-- External/non-tutorial jobs and combat keep the normal reward/progression system.
+### Current first dialogue draft
 
-Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), the six sibling onboarding documents.
+- [Millhand — Guther Anvil, opening conversation (PROPOSAL)](millhand-opening-dialogue.md)
+
+Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
