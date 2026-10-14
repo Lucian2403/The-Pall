@@ -1,6 +1,6 @@
-# Millhand — Worker Plate Smithing Task (Stage 2)
+# Millhand — Worker Plate Smithing Task (Stage 2 — APPROVED)
 
-**Status: PROPOSED FOR USER REVIEW (2026-10-14).** This is a detailed candidate **interaction design**, not approved/locked mechanics or final UI text. The previously [approved Guther Anvil opening](millhand-opening-dialogue.md), [Millhand story](millhand.md), [global spoken dialogue standard](../interactions/dialogue-style-guide.md), [normal job structure](../jobs/jobs-and-time.md), and [crafting workflow](../crafting/crafting-workflow.md) remain canonical. Do not accidentally elevate this proposal to canon.
+**Status: INTERACTION STRUCTURE APPROVED AND LOCKED (2026-10-14).** User approved docket inspection, mark/die matching, the bent-blank work complication, three alternatives (straighten / replace / stamp anyway), stamp/inspect/rework as needed, and the boundary before the later unique Missing Stamp reveal. Normal Smithing interactions stay reusable. **Exact serial numbers, durations, formulas, appearance, item records and other numerical implementation remain TBD; illustrative UI copy is not separately final.** See [approved Guther opening](millhand-opening-dialogue.md), [Millhand story](millhand.md), [dialogue style standard](../interactions/dialogue-style-guide.md), [jobs](../jobs/jobs-and-time.md) and [crafting](../crafting/crafting-workflow.md).
 
 ## Design intent and guardrails
 
@@ -8,7 +8,7 @@ The first Millhand task is **ordinary worker-plate stamping piecework**, a low-l
 
 The first task is scripted to yield **0 coins, 0 ordinary XP and no item output to inventory**. Guther's already-approved opening explicitly warns that the inspector must accept the lot before anyone can be paid. Only **after** the normal task resolves do the disputed records freeze that payment. Ordinary repeatable Smithing work outside onboarding remains compensated and has ordinary XP progression. Do not show a guaranteed monetary reward then secretly remove it. Character already has +3 Craftsmanship at creation; the +1 level in a *different* Major Skill belongs to the eventual three-way story branch, NOT this task.
 
-## Entry — LOCKED handoff, new screen PROPOSED
+## Entry — LOCKED handoff and approved screen flow (exact UI copy TBD)
 
 Guther's approved last line:
 
@@ -16,7 +16,7 @@ Guther's approved last line:
 
 Player presses **[Take the docket]**.
 
-**Proposed job panel** (UI copy, not NPC speech):
+**Approved panel information** (exact UI copy and implementation TBD; not NPC speech):
 
 - **Work:** Mark the council's worker identification plates.
 - **Docket:** Gives the identifying numbers required for the batch.
@@ -27,7 +27,7 @@ Player presses **[Take the docket]**.
 
 The player works one representative plate/placement as a short, **batch-level** interaction. Don't make them align and stamp every individual plate by repeatedly clicking a button.
 
-## Proposed four-stage interaction
+## Approved four-stage interaction
 
 ### P01. Inspect and match — ordinary work
 
@@ -40,11 +40,11 @@ Outcomes:
 - If the player adjusts it before striking, there is no irreversible loss.
 - No allusion yet to a dead worker, the workshop fire or a fresh inspection stamp. Knowing a serial number is **not** knowing its owner's fate.
 
-**Reusable module:** `smithing_match_marks` (proposed identifier). Can parameterize all ordinary stamped work with a source docket and mark pattern.
+**Reusable module:** `smithing_match_marks` (working identifier; exact ID TBD). Can parameterize all ordinary stamped work with a source docket and mark pattern.
 
 ### P02. Prepare plate — the one meaningful ordinary complication
 
-**UI text (not character dialogue):**
+**Illustrative UI text (not character dialogue; wording TBD):**
 
 > One blank has a bent corner. It won't lie flat beneath the stamp.
 
@@ -62,7 +62,7 @@ Three legitimate responses:
 
 This is an ordinary **material-condition and work-method interaction**, not the mystery.
 
-**Reusable template (proposed ID):** `smithing_blank_seating` with condition = bent; parameterizable for other suitable blank/marked-metal work.
+**Reusable template (working ID):** `smithing_blank_seating` with condition = bent; parameterizable for other suitable blank/marked-metal work.
 
 ### P03. Stamp / inspect the result — ordinary work resolution
 
@@ -78,7 +78,7 @@ Then inspect:
 
 All versions conclude the normal interaction without determining the fate of the novel stamped identifier or concealing key story choices behind quality rolls.
 
-**Reusable module:** `smithing_mark_and_verify` (proposed).
+**Reusable module:** `smithing_mark_and_verify` (working identifier).
 
 ### P04. Ordinary task complete → story boundary
 
@@ -93,7 +93,7 @@ After ordinary inspection and verification, a **job-resolution view** shows:
 
 **Important boundary:** do **not** define the exact method by which the player verifies the worker is dead or why the inspection mark is fresh here. That belongs to **Stage 3: revelation and Guther's response**, which is **not yet authored/approved**. Do not put worker-death hints into the ordinary P01–P03 screens.
 
-## Sample player-facing flow (UI copy, all proposed)
+## Sample player-facing flow (approved actions; exact UI wording TBD)
 
 1. **[Take the docket]** — approved conversation ends.
 2. **[Inspect the docket and blanks]** — required mark and provided equipment visible.
@@ -108,7 +108,7 @@ After ordinary inspection and verification, a **job-resolution view** shows:
 
 No new NPC dialogue is required during this routine activity. The task UI does its own teaching, and Guther's approved line is not repeated as exposition.
 
-## Implementation notes (PROPOSED)
+## Implementation notes (approved design intent; details TBD)
 
 | Aspect | Direction |
 | --- | --- |
@@ -125,11 +125,10 @@ No new NPC dialogue is required during this routine activity. The task UI does i
 | One-off story reveal | Separate event keyed only after `smithing_task_completed`; always fires once in Millhand tutorial regardless of ordinary quality choice |
 | Server data | Author choices/outcomes/condition parameters and persistence flags; no runtime generative AI |
 
-## Open decisions for user approval
+## Approved versus remaining design
 
-1. **Approve or replace** the **bent blank** as the one normal work complication. It should be common, visually graspable, low-stakes and clearly distinct from the later stamp mystery.
-2. Approve **Straighten / Replace / Stamp anyway** as ordinary trade-off decisions and inspect/rework as a consequence. Precise numerical balancing deferred.
-3. Confirm this first-task shape: simple docket matching, one meaningful choice, verification, and only **then** the unique revelation; no additional Guther dialogue until the job-resolution/reveal scene.
-4. Number of plates, exact data/UI component implementations, forge/tool specification, difficulty formula, actual timing and final story reveal still TBD. **Do not infer or lock these from the draft.**
+**LOCKED:** one representative plate per batch interaction, docket/die matching, bent-blank work complication on the tutorial instance, **Straighten / Set aside & replace / Stamp as-is** options with trade-offs in time/waste/quality/rework, stamp/verify, normal task completion before the unique reveal, no tutorial wages/XP/loot, employer-owned tools and stock, nonblocking work recovery, reuse outside onboarding (where routine work does pay/advance normally).
+
+**TBD:** precise number of plates, serial numbers, data IDs, final job and UI wording, grade modifiers/chances, extra time or material quantities, exact workstation tooling, condition calculations, base duration and the separate Stage 3 reveal/dialogue. Do not treat these undecided implementation details as approved facts.
 
 Related: [Millhand storyline](millhand.md), [Approved Guther opening](millhand-opening-dialogue.md), [Jobs and Time](../jobs/jobs-and-time.md), [Crafting Workflow](../crafting/crafting-workflow.md), [Spoken Dialogue Standard](../interactions/dialogue-style-guide.md).
