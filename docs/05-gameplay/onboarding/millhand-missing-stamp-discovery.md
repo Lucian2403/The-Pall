@@ -31,25 +31,27 @@ After both views, display **“Same worker number. Inspection recorded after dea
 
 ## Guther confrontation — proposed first spoken draft
 
-*The Millhand puts the returned plate beside the cancellation slip. Guther reads them.*
+*The Millhand sets the returned plate beside the cancellation slip.*
 
-**PLAYER:** “The man's listed dead.”
+**PLAYER:** “This number was cancelled. Dead in the fire.”
 
-**GUTHER:** “So it says.”
+**GUTHER:** “Let me see.”
 
-**PLAYER:** “But his plate was inspected afterward.”
+*Guther compares the two.*
 
-**GUTHER:** “I can see that.”
+**PLAYER:** “The inspector marked his plate afterward.”
 
-**PLAYER:** “And?”
+**GUTHER:** “I see the date.”
 
-**GUTHER:** “And I can't sign this lot.”
+**PLAYER:** “What do we do?”
 
-**PLAYER:** “That's it?”
+**GUTHER:** “Can't sign it. No pay till the council clears the lot.”
 
-**GUTHER:** “That's what I've got.”
+**PLAYER:** “That wasn't my question.”
 
-**Editorial intent:** Guther makes the situation uncomfortable by retreating to the one practical authority he has: signing or refusing the council lot. He does not deliver a moral speech, pretend the worker is alive, tell a punchline or explain the city's system. **This dialogue remains subject to user approval**; if it sounds stilted aloud, revise it before locking. The tiny dry edge is an evasion, not a comedic performance.
+**GUTHER:** “I know.”
+
+**Editorial intent:** Guther does read the evidence, but answers the worker's question as a problem of signature and wages. The player calls out the evasion; he doesn't deny it. This is the almost imperceptible uncomfortable edge—**not a punchline**. All lines remain subject to user approval.
 
 ## Three locked responses → draft lines and route handoffs
 
@@ -77,11 +79,12 @@ The **three player choices and associated Major Skills are LOCKED**, but the **s
 
 ## Tone quality check for new draft
 
-- **“The man's listed dead.”** Gives the immediate observed fact, not a speculative memory or history lesson.
-- **“So it says.” / “I can see that.”** Deliberately avoids arguing with obvious evidence. Risk: two brief evasions can sound repetitive. Adjust if performance makes them overly similar.
-- **“And I can't sign this lot.”** He speaks about his real action and the worker's wages, not a general philosophical theme.
-- **“That's what I've got.”** Small, unheroic refusal to resolve a problem outside his authority. Risk: it may sound too prepared; should be reconsidered aloud during review.
-- **No comedy quota:** discomfort should come from the inadequate bureaucratic answer to an obvious death-record discrepancy. Do not tack on “funny” sayings.
+- **“This number was cancelled. Dead in the fire.”** Identifies the contradiction from paperwork, not from an invented memory.
+- **“Let me see.”** Guther requests the actual evidence instead of instantly knowing the answer.
+- **“I see the date.”** Confirms the newer inspection without a speech explaining the whole mystery.
+- **“Can't sign it. No pay till the council clears the lot.”** Moves straight to the practical authority Guther actually possesses; avoids a general moral lecture.
+- **“That wasn't my question.” / “I know.”** The single small beat of friction: he knows he evaded the real question. No extra joke or rhetorical proverb.
+- **No comedy quota:** unease comes from his inadequate answer, not a wink at the audience.
 
 ## Approval scope requested
 
