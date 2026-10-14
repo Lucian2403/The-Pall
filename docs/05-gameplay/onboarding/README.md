@@ -37,6 +37,6 @@
 | 5 | [Flint confrontation](millhand/flint-confrontation.md) | LOCKED |
 | 6 | [Flint fight](millhand/flint-fight.md) | Encounter narrative LOCKED; combat mechanics TBD |
 | 7 | [Clinic treatment](millhand/clinic-treatment.md) | LOCKED; detailed Health mechanics TBD |
-| 8 | [Return home and rent notice](millhand/home-rent-ending.md) | APPROVED structure; user-requested spoken ending (exact draft words pending review) |
+| 8 | [Return home and rent notice](millhand/home-rent-ending.md) | LOCKED, including the exact self-directed closing line |
 
 **Continuity:** the permanent Flint fight outcome (player victory / player defeat) must be retained for dialogue variation if a **future separately approved** quest features him.
