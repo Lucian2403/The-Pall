@@ -1,6 +1,6 @@
 # Millhand — Stage 8: Return Home and the Rent Notice (APPROVED)
 
-**STATUS: STAGE 8 STRUCTURE APPROVED AND LOCKED (2026-10-15), WITH ONE USER-REQUESTED ADDITION.** After the fight and **10-coin treatment**, the player returns to the **same universal starter rented home** with **10 coins** left and discovers the **150-coin PROVISIONAL** rent notice there, then sets it down. **The user additionally requires a brief self-directed line about earning money through more jobs or making items to sell, alongside the desire for a place of one's own.** The exact phrasing of the new line below is a **reviewable draft**, not a separate confirmed verbatim quote. No landlord, deadline, penalties, special quest or ownership mechanic is canonized.
+**STATUS: STAGE 8 STRUCTURE APPROVED AND LOCKED (2026-10-15), WITH ONE USER-REQUESTED ADDITION.** After the fight and **10-coin treatment**, the player returns to the **same universal starter rented home** with **10 coins** left and discovers the **150-coin PROVISIONAL** rent notice there, then sets it down. **The user approved the brief self-directed line about earning money through more jobs or making items to sell, alongside the desire for a place of one's own. Its exact wording below is now LOCKED.** No landlord, deadline, penalties, special quest or ownership mechanic is canonized.
 
 See [Millhand main design](README.md), [approved clinic scene](clinic-treatment.md), [approved Flint fight](flint-fight.md), [shared tutorial architecture](../shared-structure.md) and [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md).
 
@@ -57,7 +57,7 @@ The “140” is the arithmetic gap, **not an extra fine**. Don't imply the play
 ## Scene H03 — Millhand speaks to himself, then tutorial ends (APPROVED flow)
 
 1. **[Put the notice down]** closes the notice. This is a simple continuation/acknowledgement, not a roleplay choice that secretly changes housing rules.
-2. **The Millhand speaks aloud to himself once, immediately after setting the notice down (USER-REQUESTED ADDITION).** Draft exact line for spoken-tone approval:
+2. **The Millhand speaks aloud to himself once, immediately after setting the notice down (USER-REQUESTED ADDITION).** Exact spoken line — APPROVED AND LOCKED:
 
    *The Millhand puts the notice down.*
 
@@ -112,6 +112,6 @@ If a player wins against Flint without taking actual damage/condition, Stage 6/7
 
 **LOCKED:** the Stage 8 return-home/rent reveal and journal wrap-up, read/put-down interaction, factual completion copy, and **the new requirement that the Millhand briefly speaks to himself/herself about needing a home and raising money from ordinary work or things they can make and sell immediately after putting down the notice**. The amount remains **150 coins PROVISIONAL**, with 10 held after treatment. Preserve Flint's win/lose flag and the chosen second-skill route.
 
-**Exact new self-talk wording:** drafted above, **pending approval of the precise words** (the user supplied an approximate example). 
+**Exact new self-talk wording:** **APPROVED VERBATIM on 2026-10-15.** Preserve the line as written; only revise through explicit user review. 
 
 **TBD:** numerical combat/health rules, no-damage clinic edge case, room layout, rent deadline/frequency/payment/penalties, future property ownership systems, and ordinary economy reward values.
