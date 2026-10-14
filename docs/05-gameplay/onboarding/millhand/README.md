@@ -1,6 +1,6 @@
 # Millhand — Starting Location and Opening Tutorial
 
-**Status: Partially locked (2026-10-13).** Only Millhand has been specified in this detail. Other backgrounds will be addressed individually, not assumed from these choices.
+**Status (updated 2026-10-15): MILLHAND STAGES 1–7 APPROVED and LOCKED.** Stage 8 home/rent presentation remains proposed; universal home/rent sequence is locked, combat and medical numeric mechanics TBD. Other backgrounds are documented separately in their own origin folders.
 
 ## Locked setup
 
@@ -27,7 +27,9 @@
 
 **Stage 6 — Flint's fight (LOCKED narrative, approved 2026-10-15):** [Flint's Turn-Based Fight — encounter beats, victory and defeat](flint-fight.md). The turn-based encounter, anonymous-worker interruption on player defeat, nonlethal win and meaningful opening stance are approved; numerical combat/injury rules remain TBD. **Persist player victory vs defeat as a durable outcome, so Flint has a different short response if a future quest reintroduces him; no future quest or exact callback line is approved yet.**
 
-**Stage 7 — Medical treatment (PROPOSED for approval):** [Working-class Clinic Visit](clinic-treatment.md). Reusable examine/price/treat/leave service and short unnamed clinician dialogue, fixed 10-coin fee. Precise injury/recovery mechanics and the no-damage fight edge case remain TBD.
+**Stage 7 — Medical treatment (LOCKED, approved 2026-10-15):** [Working-class Clinic Visit](clinic-treatment.md). The reusable examine/price/treat/leave service and exact short unnamed clinician dialogue are approved; fixed 10-coin fee. Precise injury/recovery mechanics and the no-damage fight edge case remain TBD.
+
+**Stage 8 — Return home and rent (PROPOSED for approval):** [Shared starter home, notice and tutorial completion](home-rent-ending.md). The universal arrival-after-clinic sequence and 10 coins remaining / 150 coins provisional rent are locked; precise notice copy, interaction and end-screen text remain proposed.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
@@ -109,7 +111,7 @@ All three second-job routes return toward the same shared starter-home route as 
 
 **Difficulty target:** an attentive new player should win and need care; reckless attacks should leave the player substantially worse off. The exact injury bands, Health values and enemy tuning remain **unapproved** and must be tested using starting 50 maximum Health and baseline Arms skill.
 
-### First healing interaction draft — PROPOSED
+### Early healing design notes (superseded by the approved Stage 7 scene above)
 
 - Following victory or defeat, the player is directed toward a **small, working-class city infirmary** (name/NPC TBD); it is an ordinary future Medicine/Trauma or NPC treatment service, not a one-time story-only healing button.
 - **Inspect condition** to see remaining Health, injured area and the price of treatment. Then choose/confirm a **basic patch-up** from the clinician. Use the normal NPC treatment/service flow; avoid requiring the untrained player to have crafting recipes or a special healing item.
@@ -123,13 +125,13 @@ All three second-job routes return toward the same shared starter-home route as 
 - Exact mechanics of **Strike / Guard / Reposition**, NPC AI, how positioning changes outcomes, enemy HP, combat damage, death/defeat handling and total encounter length.
 - Injury severity and costs, whether basic patch-up can be done personally or only through an NPC, and whether a guaranteed wound is appropriate without making damage feel arbitrary.
 
-### Healing / first medical interaction (PROPOSAL)
+### Additional legacy care considerations (refer to approved Stage 7 clinic file)
 
 - After the fight, the player is **hurt enough to need a patch-up**, even though the encounter is survivable; introduce Health, a minor treatable injury, and the city healing service. This must teach a reusable **Medicine / Trauma or NPC care** pathway, not a tutorial-exclusive miracle.
 - A cheap **city infirmary, surgeon or clinic attendant** treats the character for a **small but meaningful fee** so 10 of the starting 20 coins are spent. The clinician's identity, injury type, healing amount and defeat-to-care transition are TBD.
 - Avoid permanent loss, long convalescence or a service price that makes onboarding impossible. A self-patch alternative is not required unless explicitly approved.
 
-### Home and rent reveal (LOCKED SEQUENCE; CONTENT TBD)
+### Home and rent reveal (LOCKED SEQUENCE; Stage 8 wording PROPOSED)
 
 - The character **returns home after getting patched up**, carrying **little money** relative to coming expenses. This is the first tutorial's natural final location and the point at which the player learns about rent due.
 - The rent notice must appear **at home, after treatment**, not at the foreman's workplace or immediately after the second job. The home is identical for all backgrounds; rent is provisionally 150 coins. Address, deadline, rental authority and penalties remain to be designed.
@@ -156,12 +158,12 @@ All three second-job routes return toward the same shared starter-home route as 
 
 **LOCKED by user:** generic Smithing interactions before the unique stamp scene; three approved second-job paths using **Industry, Commerce and Scholarship**; **two additional interactions after the second job; short mandatory, moderately challenging PvE fight; medical treatment; return home with little money; only then reveal rent due and end the Millhand E2E tutorial**. Not the main story.
 
-**STILL PROPOSED / TBD:** two pre-fight interactions' precise options, **all combat mechanics and balancing (to be designed separately)**, medical service and fees, rented home details, durations, dialogue and non-tutorial job reward values. **Turn-based format and Flint's role/identity are locked**.
+**STILL PROPOSED / TBD:** **all numerical combat mechanics and balancing**, treatment's injury-specific effects and the perfect-no-damage clinic edge case, details of the shared rented home, exact job/treatment/travel durations, the Stage 8 notice wording and completion screen, and non-tutorial reward amounts. **Flint's revised dialogue, both pre-fight interactions, encounter story, clinic service dialogue and fixed 10-coin tutorial care fee are LOCKED.** Turn-based combat format, Flint's role/identity and preserved win/loss outcome are locked.
 
 ## Implementation boundaries / remaining work
 
-1. Confirm how the **locked wage enforcer** is introduced by the two proposed pre-combat interactions; tune how each approved second job feeds naturally into the confrontation. No longer-lived fraud/complicity system without separate approval.
+1. Preserve the **approved Flint Wage Claim and Cornered scenes**, with branch-specific evidence from the Stage 4 job. No longer-lived fraud/complicity system without separate approval.
 2. Define the generic Smithing workshop layout, Guther Anvil's appearance and repeatable low-tier Smithing jobs, including which normal interaction templates are used in this opening.
 3. Define the **global** Basic Clothes and Crude Small Bag records, equipment slots and inventory presentation; **20 coins for every background** is already locked.
-4. Specify tutorial task durations, explanations for non-payment, Hauling / Contracts / Investigation NPCs, medical provider (the tutorial service costs 10 coins), the return-home location, and **after-healing-at-home** rent notice. Do not invent unattended payment penalties or offline rent deadlines.
+4. Resolve future numerical job/combat/medical balance; use the approved Hauling / Contracts / Investigation NPC lines and 10-coin clinic dialogue. Approve Stage 8 notice and final UI. Rent must appear only **after healing, at home**; no invented late-payment rules or offline deadlines.
 
