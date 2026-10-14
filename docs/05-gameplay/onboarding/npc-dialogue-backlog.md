@@ -46,7 +46,7 @@ All listed below are **existing roles in the approved story or implied job inter
 ## Special dialogue hazards to resolve
 
 - **Millhand:** Guther has withheld wages because the fresh stamp compromises the lot; the enforcer's **'Wage Claim'** must now demand a spurious processing **debt/fee despite the character being unpaid**, not an actual share of earned wages.
-- **Bellrunner:** Hector's normal courier circuit pays outside tutorial. The *Wrong Bell* incident has invalidated/freezed the tutorial docket and second incident work, so 'expected wages' should not appear as awarded currency.
+- **Bellrunner:** Hector's normal courier circuit pays outside tutorial. The *Wrong Bell* incident has invalidated or frozen the tutorial docket and second incident work, so 'expected wages' should not appear as awarded currency.
 - **Squatter:** Explain why contaminated or suspicious cuttings are rejected/quarantined and why the three follow-up emergency tasks are unpaid; Benny's ordinary herb buying still functions after onboarding.
 - **Stitcher:** Claudia's moral compromise remains the core of *Teaching Bed*. Specify why a ward duty shift and the three extraordinary intervention tasks give no normal payment, without making the Matron into a simplistic villain.
 - **Scrapper:** Condemned-pump contract cannot settle as ordinary payable scrap while the occupied cellars depend on the pump; the subsequent urgent works are uncompensated. Ignatius's exact locked fresh-air phrase remains unchanged.
