@@ -19,7 +19,9 @@
 
 **First-task Smithing interaction (LOCKED, approved 2026-10-14):** [Worker Plate Stampwork — Reusable Job Modules](millhand-platework-interaction.md). Docket inspection, die matching, one bent-blank incident, its three alternatives, mark verification and the boundary before the Missing Stamp twist are approved. Exact numerical values/UI wording remain TBD.
 
-**Stage 3 revelation and Guther dialogue (PROPOSED, pending review):** [The Missing Stamp — Evidence, Dialogue and Branch Choice](millhand-missing-stamp-discovery.md). New evidence props and lines are not canon until individually approved.
+**Stage 3 revelation and Guther dialogue (LOCKED, approved 2026-10-14):** [The Missing Stamp — Evidence, Dialogue and Branch Choice](millhand-missing-stamp-discovery.md). The reference plate/cancellation slip, the date contradiction, Guther's common exchange and his three exact replies are approved, including the one corrective worker-number marking action for Restamp. Exact worker number and dates remain TBD.
+
+**Stage 4, all three follow-up tasks (PROPOSED for review):** [Depot Intake Run / Disputed Docket / Ledger Reconciliation](millhand-second-task-branches.md). Job interactions and supporting role-labelled NPC dialogue require approval; the routes, Major Skills and outcomes were already locked.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
