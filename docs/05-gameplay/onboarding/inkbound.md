@@ -1,20 +1,22 @@
 # Inkbound — The Acceptable Losses
 
-**Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing and home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
+**Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
+
+**Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing (10-coin tutorial treatment) and common home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
 
 ## Locked hub and recurring NPC
 
 **Civic Copying Office** — a publicly contracted counting-room near Grand Cylinder City's poorer wards: ink-dark windows, sand used to dry fresh writing, scorched tally slips, wooden record bins and clerks transcribing household rolls and industry reports. This is a **permanent Scholarship / Investigation job hub**, not a tutorial-only institution.
 
-**LOCKED regular job NPC:** **Erwin Buro, Senior Copy Clerk** (exact personal name approved by user). He hires ordinary copyists, checks their accuracy and pays normal Scholarship coins/XP. His attitude is pragmatic, not obviously villainous; he worries about losing the municipal account that keeps his clerks employed. Every NPC ultimately needs a personal name, including the street surveyor, coal carrier and opponent, but names aren't fixed merely by introducing this pitch.
+**LOCKED regular job NPC:** **Erwin Buro, Senior Copy Clerk** (exact personal name approved by user). He hires ordinary copyists, checks their accuracy and pays normal Scholarship coins/XP outside the tutorial; this opening assignment gives neither. His attitude is pragmatic, not obviously villainous; he worries about losing the municipal account that keeps his clerks employed. Every NPC ultimately needs a personal name, including the street surveyor, coal carrier and opponent, but names aren't fixed merely by introducing this pitch.
 
 The Inkbound character already works in the copying trade. Character creation grants **Scholarship +3** to its Major Skill and normal STR/DEX/INT/RES 5, 50 max Health, **Basic Clothes + Crude Small Bag + 20 coins**.
 
-## First paid job: The Winter Register — Scholarship / Investigation (LOCKED)
+## First unpaid tutorial job: The Winter Register — Scholarship / Investigation (LOCKED)
 
 A routine copy-and-verification assignment. The player checks ward rosters, reconciles household counts, distinguishes original from amended totals and flags mismatched column entries. This is normal, reusable **Investigation** work, not a tutorial-exclusive puzzle.
 
-Generic phases: accept terms/pay/time; compare two rolls, select the correct source, decide which discrepancy to investigate; resolve a normal missing-seal or transcription complication; submit accepted work for regular Scholarship XP and coins. The narrative twist triggers **only after those generic interactions**. The original personal record numbers and coal allocation remain task/quest props, not free permanent inventory items.
+Generic phases: accept regular work terms/time, with tutorial pay unavailable; compare two rolls, select the correct source, decide which discrepancy to investigate; resolve a normal missing-seal or transcription complication; submit accepted tutorial work for 0 coins/ordinary XP. The narrative twist triggers **only after those generic interactions**. The original personal record numbers and coal allocation remain task/quest props, not free permanent inventory items.
 
 ## The twist — The Acceptable Losses (LOCKED)
 
@@ -28,15 +30,15 @@ This isn't a supernatural prophecy or a main-story mystery. The underlying horro
 
 Erwin Buro urges the player to finish the copy. He knows too much about what the column means, but not necessarily who approved it.
 
-### Three first-event responses → different ordinary paid jobs (LOCKED)
+### Three first-event responses → unpaid tutorial tasks based on ordinary jobs (LOCKED)
 
-| Inkbound's choice | Second paid job and different Major Skill | Local discovery/consequence |
+| Inkbound's choice | Second unpaid tutorial task and different Major Skill | Local discovery/consequence |
 | --- | --- | --- |
-| **Challenge the calculation** — prove a budget line is being treated as legal authority | **Commerce → Contracts: The Coal Waiver.** Take ordinary paid document-reconciliation work at a fuel-allocation counter; examine signatures, approval clauses and competing claims. | The ward's heating appeal is marked *received* but intentionally not processed until spring; the player secures a copy/temporary dispute note but no automatic citywide reversal. |
-| **Count the people, not the ledger** — verify that the affected households are still occupied | **Fieldcraft → Navigation: The Door Count.** Join a paid low-tier ward/route survey for safe delivery access, mapping doorways and checking blocked courtyards with ordinary route and observation interactions. | The supposed empty tenements are full. A tenant is burning floorboards for heat. Their addresses can now be reached by a coal cart; this is concrete location knowledge, not magic revelation. |
-| **Follow the missing coal** — discover where the reduced ration is being held | **Industry → Hauling: The Short Cart.** Earn ordinary payment for moving/inspecting a small municipal fuel consignment, choosing load and delivery route and resolving a manifest discrepancy. | The contracted cart has far less coal than the route requires. The player can ensure this shipment actually reaches Ward Six, but it won't keep all households warm all winter. |
+| **Challenge the calculation** — prove a budget line is being treated as legal authority | **Commerce → Contracts: The Coal Waiver.** Undertake unpaid tutorial document-reconciliation work at a fuel-allocation counter; examine signatures, approval clauses and competing claims. | The ward's heating appeal is marked *received* but intentionally not processed until spring; the player secures a copy/temporary dispute note but no automatic citywide reversal. |
+| **Count the people, not the ledger** — verify that the affected households are still occupied | **Fieldcraft → Navigation: The Door Count.** Join a low-tier ward/route survey (unpaid in the tutorial) for safe delivery access, mapping doorways and checking blocked courtyards with ordinary route and observation interactions. | The supposed empty tenements are full. A tenant is burning floorboards for heat. Their addresses can now be reached by a coal cart; this is concrete location knowledge, not magic revelation. |
+| **Follow the missing coal** — discover where the reduced ration is being held | **Industry → Hauling: The Short Cart.** Use normally paid Hauling mechanics for moving/inspecting, but earn no tutorial coins for a small municipal fuel consignment, choosing load and delivery route and resolving a manifest discrepancy. | The contracted cart has far less coal than the route requires. The player can ensure this shipment actually reaches Ward Six, but it won't keep all households warm all winter. |
 
-All three second jobs have genuine normal gameplay and pay normal wages/XP for **Commerce, Fieldcraft or Industry**, respectively. They don't make the player powerful enough to solve an entire city's heating problem, and no special starting items or second Major Skill bonuses are implied.
+All three second tutorial tasks reuse genuine normal gameplay but give 0 coins/ordinary XP. At branch selection the character gains **+1 level in Commerce, Fieldcraft or Industry**, respectively, one time. Ordinary repeatable jobs outside the tutorial pay/level normally. They don't make the player powerful enough to solve an entire city's heating problem, and no special starting items or additional bonuses beyond that single +1 Major Skill level are implied.
 
 ## Two follow-up interactions and common enemy (LOCKED narrative)
 
@@ -48,7 +50,7 @@ All three second jobs have genuine normal gameplay and pay normal wages/XP for *
 
 ## Healing and the last page
 
-After the fight the Inkbound is visibly injured and must use the regular paid clinical treatment process, spending a meaningful but affordable amount. They return to their own cramped lodging with little money. The same bureaucracy that calculated *acceptable losses* has left a **rent-due notice** on their door.
+After the fight the Inkbound is visibly injured and must use the regular paid clinical treatment process, spending the fixed **10-coin** tutorial fee. They return to the **same shared starter home used by every background**, with **10 coins left**. The same bureaucracy that calculated *acceptable losses* has left a **rent-due notice** on their door.
 
 The episode ends. The ward has obtained a small practical reprieve according to the chosen route; the mortality allowance isn't overturned by one junior scribe, and nothing about this quest starts the overarching main storyline.
 
@@ -56,4 +58,4 @@ The episode ends. The ward has obtained a small practical reprieve according to 
 
 **LOCKED:** Scholarship +3 and standard Basic Clothes / Crude Small Bag / 20 coins kit; **Civic Copying Office** as permanent Scholarship job hub; **Erwin Buro, Senior Copy Clerk** as its recurring job-giver; **The Winter Register** as the normal first job; **The Acceptable Losses** and its Ward Six loss-allocation scene; three branches **Commerce/Contracts — The Coal Waiver**, **Fieldcraft/Navigation — The Door Count**, **Industry/Hauling — The Short Cart**; **The Sealed Stove**, **The Coal Hook**, **Silas Pumpard, Fuel Watchman** as the common turn-based PvE opponent; affordable paid medical treatment; return home with little money and discover rent due. This is a self-contained E2E episode, not the main storyline.
 
-**Still TBD:** other NPC personal names; specific ward and housing geography beyond the incident; any citywide public welfare policy (not implied by this single case); full dialogue and work interactions; wages, skill XP, timings, injury/healing costs, rent values and all general turn-based combat mechanics.
+**Still TBD:** other NPC personal names; specific ward and housing geography beyond the incident; any citywide public welfare policy (not implied by this single case); full dialogue and work interactions; normal-job wages/XP, timings, injury/healing mechanics, shared home details and the provisional 150-coin rent and all general turn-based combat mechanics.
