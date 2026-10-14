@@ -1,6 +1,6 @@
-# Millhand — Stage 8: Return Home and the Rent Notice
+# Millhand — Stage 8: Return Home and the Rent Notice (APPROVED)
 
-**STATUS: NEW STAGE 8 PROPOSAL, NOT YET APPROVED (2026-10-15).** This document supplies the proposed final scene and interface transitions of Millhand's complete opening episode. The **sequence** is already LOCKED for all six origins: after the fight and **paid 10-coin medical care**, the character reaches the **same universal starter rented home**, has **10 coins** left from the initial 20, and only **there** learns that rent is due. The rent amount is **150 coins PROVISIONAL**. All exact dialogue/notice words below are **proposed**; no landlord, deadline, penalties or additional story beat are canonized.
+**STATUS: STAGE 8 STRUCTURE APPROVED AND LOCKED (2026-10-15), WITH ONE USER-REQUESTED ADDITION.** After the fight and **10-coin treatment**, the player returns to the **same universal starter rented home** with **10 coins** left and discovers the **150-coin PROVISIONAL** rent notice there, then sets it down. **The user additionally requires a brief self-directed line about earning money through more jobs or making items to sell, alongside the desire for a place of one's own.** The exact phrasing of the new line below is a **reviewable draft**, not a separate confirmed verbatim quote. No landlord, deadline, penalties, special quest or ownership mechanic is canonized.
 
 See [Millhand main design](README.md), [approved clinic scene](clinic-treatment.md), [approved Flint fight](flint-fight.md), [shared tutorial architecture](../shared-structure.md) and [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md).
 
@@ -12,7 +12,7 @@ The Millhand has done the work and remains unpaid; followed one of three genuine
 
 This is the **identical home, location, floor plan, storage capability and rent framework** used by Bellrunner, Squatter, Stitcher, Scrapper and Inkbound. Do not add a Millhand-specific flat, forge corner, hereditary keepsake, landlord or bonus storage.
 
-## Scene H01 — Arrive after care (PROPOSED presentation)
+## Scene H01 — Arrive after care (APPROVED scene structure)
 
 **Prerequisites (LOCKED):**
 - Player has recorded Stage 6 fight result as **victory or defeat**;
@@ -26,13 +26,13 @@ This is the **identical home, location, floor plan, storage capability and rent 
 3. The player finds a **rent notice** in the home. **Its exact placement (door/desk/table) is TBD**; avoid adding layout details before the common home asset is designed.
 4. **[Read the rent notice]** — opens a short written artifact in the ordinary message/interaction panel.
 
-**Observable scene line (PROPOSED; restrained):**
+**Observable scene line (APPROVED in meaning; concise UI wording):**
 
 > There is a rent notice waiting at home.
 
 No narrator assessment of the player's disappointment, suffering, anger, luck or exhaustion. No invented memory or named householder.
 
-## Scene H02 — The notice (PROPOSED exact copy)
+## Scene H02 — The notice (APPROVED; rent amount remains provisional)
 
 In-world paper, with a simple accounting style appropriate to the nineteenth-century setting:
 
@@ -54,13 +54,20 @@ This is **not** a bill with an invented date, an official municipal seal, a land
 
 The “140” is the arithmetic gap, **not an extra fine**. Don't imply the player owes 150 immediately under a countdown system that does not exist. Rent frequency, landlord, due date, payment rules and missed-payment consequences remain future design work.
 
-## Scene H03 — End the Millhand opening (PROPOSED flow)
+## Scene H03 — Millhand speaks to himself, then tutorial ends (APPROVED flow)
 
 1. **[Put the notice down]** closes the notice. This is a simple continuation/acknowledgement, not a roleplay choice that secretly changes housing rules.
-2. The server marks the **Millhand tutorial complete exactly once** only after the home notice has been read and dismissed. A reload must not charge rent, repeat the 10-coin treatment, award a second Major Skill level again or replay Flint's forced encounter.
-3. The character remains **at the same rented home**, now free to perform normal paid jobs, travel or use ordinary services according to the wider game. **No automatic next quest or main-story promise.**
-4. The regular **Guther Anvil Smithing workshop** stays available as a recurring job hub, with **normal wages and skill XP outside onboarding** (exact amounts still TBD). The unpaid tutorial was the exception due to the disputed council lot.
-5. The dead worker's identity, inspector's later mark and one chosen second-job fact are recorded as a **finished local quest summary**, not as an incomplete “Find the mastermind” objective.
+2. **The Millhand speaks aloud to himself once, immediately after setting the notice down (USER-REQUESTED ADDITION).** Draft exact line for spoken-tone approval:
+
+   *The Millhand puts the notice down.*
+
+   **MILLHAND (to himself/herself, as appropriate):** “Ah, hell. Need a place of my own. First I've got this rent to pay. More jobs... or I could make something to sell.”
+
+   This is a brief, ordinary reaction and a **diegetic guide** to normal paid jobs and crafting/trading. It is the Millhand's personal hope to have a place of their own, **not a promise of a new home-ownership system**, extra reward, or quest objective. Keep this one thought—no additional motivational speech or NPC lecture. Do not display a gendered speaker caption in actual UI.
+3. **After that line**, the server marks the **Millhand tutorial complete exactly once**, provided the home notice was read and dismissed. A reload must not repeat the self-directed line, charge rent, repeat the 10-coin treatment, award a second Major Skill level or replay Flint's encounter.
+4. The character remains **at the same rented home**, free to take normal paid jobs, practice crafting for sale, travel or use ordinary services. **No automatic next quest or main-story promise.**
+5. The regular **Guther Anvil Smithing workshop** stays available as a recurring job hub, with **normal wages and skill XP outside onboarding** (exact amounts still TBD). The unpaid tutorial was the exception due to the disputed council lot.
+6. The dead worker's identity, inspector's later mark and one chosen second-job fact are recorded as a **finished local quest summary**, not an incomplete “Find the mastermind” objective.
 
 **UI completion text (PROPOSED):**
 
@@ -70,9 +77,9 @@ The “140” is the arithmetic gap, **not an extra fine**. Don't imply the play
 >
 > **10 coins in hand. Rent owing: 150 coins.**
 
-Keep this factual and quiet, not triumphal or defeatist. No extra quote from Flint, Guther or a landlord. The player should understand their next practical need—earning ordinary money—without being handed an unrelated mandatory quest.
+Keep the completion notice factual and quiet, not triumphal or defeatist. The **only added spoken response** is the Millhand's self-directed line after putting the paper down. No quote from Flint, Guther or a landlord; no unrelated mandatory quest.
 
-## Journal recap — branch-aware, no new rewards (PROPOSED)
+## Journal recap — branch-aware, no new rewards (APPROVED intent)
 
 This is *existing quest-journal state*, not a new evidence inventory system, XP source or promised storyline:
 
@@ -97,12 +104,14 @@ If a player wins against Flint without taking actual damage/condition, Stage 6/7
 - **No due date, penalty, eviction countdown, debt collection, automatic rental payment or named landlord** in this draft.
 - On notice read, show exact arithmetic 150 − 10 = 140, clearly distinguishing rent owed from new fines.
 - The notice is a readable quest/UI prop; no permanent loot item, reward, home furnishing or exclusive storage.
-- End once, after reading, with persisted status. No repeat +1 skill, 10-coin clinic charge or Flint fight from reload.
+- End once, after reading and setting down the notice and the brief self-directed line. No repeat +1 skill, 10-coin clinic charge, Flint fight, or self-talk from reload.
 - Preserve **Stage 4 route**, **Flint victory/defeat**, **spend 10 coins on care**, and shared home/rent flags across session.
 - No background-specific special home or exceptional income. The next job under normal Smithing/other job systems is paid according to normal rates.
 
-## Approval scope
+## Approval boundary
 
-**Already LOCKED:** the exact end sequence, common home, 20 starting coins, 10 clinic coins, 10 home balance, provisional rent amount 150, no coin/XP/loot from tutorial, no new main-story quest, Flint outcome persistence for possible future dialogue.
+**LOCKED:** the Stage 8 return-home/rent reveal and journal wrap-up, read/put-down interaction, factual completion copy, and **the new requirement that the Millhand briefly speaks to himself/herself about needing a home and raising money from ordinary work or things they can make and sell immediately after putting down the notice**. The amount remains **150 coins PROVISIONAL**, with 10 held after treatment. Preserve Flint's win/lose flag and the chosen second-skill route.
 
-**PROPOSED for approval now:** a single calm entry scene, rent notice copy, wallet/rent comparison view, read/put-down interaction, completion text and branch-aware final journal summary. Numeric combat/health rules, specific rent due date/rate finalization, future rent payments, room layout and automatic availability of follow-up work in UI are all TBD.
+**Exact new self-talk wording:** drafted above, **pending approval of the precise words** (the user supplied an approximate example). 
+
+**TBD:** numerical combat/health rules, no-damage clinic edge case, room layout, rent deadline/frequency/payment/penalties, future property ownership systems, and ordinary economy reward values.
