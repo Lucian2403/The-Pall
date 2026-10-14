@@ -15,7 +15,7 @@
 
 **2026-10-14 economy/housing override (LOCKED):** The opening +3 Craftsmanship comes from character creation; choosing a second task grants exactly +1 level in the other Major Skill once. Neither tutorial task nor the fight grants coins, XP or loot. The contested lot freezes all tutorial wages, and the forced follow-up tasks are not separately compensated. Shared home, starting 20 coins, 10-coin medical care, 10 ending coins and 150 provisional rent follow [Shared Tutorial Structure](shared-structure.md). Normal repeatable jobs outside the tutorial still pay and grant XP.
 
-**Opening conversation draft (PROPOSED, not yet approved):** [Guther Anvil — First Workshop Conversation](millhand-opening-dialogue.md). This covers greeting, optional roleplay questions and entry into the normal Smithing interaction; the Missing Stamp remains later.
+**Opening conversation (LOCKED, approved 2026-10-14):** [Guther Anvil — First Workshop Conversation](millhand-opening-dialogue.md). The third revision is approved with understated friction and dry humour. It covers greeting, the optional brief pay exchange and entry into normal Smithing interactions; the Missing Stamp remains later.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
