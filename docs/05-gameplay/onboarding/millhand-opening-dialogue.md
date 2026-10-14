@@ -16,17 +16,17 @@
 
 *Guther lays the council docket beside the blank plates.*
 
-**GUTHER:** "Council lot. Worker plates. Docket's on the bench."
+**GUTHER:** "Council wants another lot of worker plates. Docket's on the bench."
 
 **PLAYER (optional):** "And the pay?"
 
-**GUTHER:** "When their inspector accepts them."
+**GUTHER:** "When their inspector accepts the lot."
 
-**PLAYER:** "That's a poor arrangement."
+**PLAYER:** "You trust that?"
 
-**GUTHER:** "It's their arrangement."
+**GUTHER:** "No. But that's what it says."
 
-**GUTHER (convergence, also used if player skips the pay exchange):** "Check the number before you strike. If one's wrong, put it aside."
+**GUTHER (convergence, also used if player skips the pay exchange):** "Check the number before you strike. If one doesn't match, leave it for me."
 
 **Interface action:** **[Take the docket]** → standard Smithing interaction: inspect plate and recorded number; prepare/align die; perform work and resolve a routine complication.
 
