@@ -2,7 +2,7 @@
 
 **Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
 
-**Status: Core tutorial premise, three second-job branches and common antagonist LOCKED (2026-10-13).** [Stage 1 Hector opening dialogue](opening-dialogue.md) was **APPROVED AND LOCKED on 2026-10-15**. Stage 2 ordinary courier interactions and later dialogue, timing, fight mechanics and numerical balance remain to be designed. Background name, role and **Industry +3 Major Skill** are agreed in [Character Creation](../../../01-player/character-creation.md). All six tutorials follow the [locked shared structure](../shared-structure.md).
+**Status: Core tutorial premise, three second-job branches and common antagonist LOCKED (2026-10-13).** [Stage 1 Hector opening dialogue](opening-dialogue.md) was **APPROVED AND LOCKED on 2026-10-15**. [Stage 2 ordinary courier interactions](shift-dispatch-interaction.md) have been drafted for review (NOT APPROVED). Later dialogue, timing, fight mechanics and numerical balance remain to be designed. Background name, role and **Industry +3 Major Skill** are agreed in [Character Creation](../../../01-player/character-creation.md). All six tutorials follow the [locked shared structure](../shared-structure.md).
 
 ## Locked common character-creation context
 
@@ -20,6 +20,8 @@
 - **First action:** speak to Dispatch Master, receive a modest route bundle and inspect the job briefing. Character starts in a familiar workplace; player learns the UI and world through work rather than exposition.
 
 ## Locked ordinary job — Shift Dispatch
+
+[Stage 2 reusable courier gameplay draft — PROPOSED](shift-dispatch-interaction.md) defines preparation, route selection, routine receiving-mark discrepancy and the boundary before The Wrong Bell. It is **not locked** until separately approved.
 
 The player is assigned a short courier circuit (unpaid in its tutorial occurrence; normally paid) carrying municipal shift notices. This belongs to **Industry / Hauling**, not a unique Bellrunner-only job system.
 
