@@ -23,6 +23,8 @@
 
 **Stage 4, all three follow-up tasks (PROPOSED for review):** [Depot Intake Run / Disputed Docket / Ledger Reconciliation](millhand-second-task-branches.md). Job interactions and supporting role-labelled NPC dialogue require approval; the routes, Major Skills and outcomes were already locked.
 
+**Stage 5 — Flint (PROPOSED for review):** [The Wage Claim / Cornered — Branch Evidence and Local Resolution](millhand-flint-confrontation.md). Shows how all three records matter in the encounter, why Flint seeks out the Millhand, and the limited outcome after combat. **Neither Stage 4 nor Stage 5 is locked.** The dead worker's full mystery is not definitively solved by beating a collector; review completeness before signing off.
+
 ## The Missing Stamp — opening job and agreed second-job branches
 
 The Smithing foreman gives the player ordinary piecework on identification plates for a municipal labour contract. During normal workshop work, the player inspects a plate, chooses a reasonable technique/tool, and resolves a normal Smithing complication. These should be **reusable interaction templates** also available in regular Smithing jobs, not bespoke tutorial-only minigames.
