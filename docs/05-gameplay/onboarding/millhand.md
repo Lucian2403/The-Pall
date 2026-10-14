@@ -9,6 +9,7 @@
 - **Starting location:** a **noisy Smithing workshop in Grand Cylinder City**. This same workshop is the **generic hub for all Smithing jobs**, not a one-use tutorial backdrop. Its exact in-world name, layout and neighborhood are TBD.
 - **First interaction:** **talk to Guther Anvil, the Smithing Foreman (personal name LOCKED)** at the workshop. Guther is the recurring Smithing-work giver, paying coins and skill XP for ordinary non-tutorial jobs; the onboarding story's work is an unpaid exception. His appearance, pay formula and precise XP figures are TBD.
 - **Starting inventory (LOCKED universally):** **Basic Clothes**, **one Crude Small Bag**, **20 coins**. These replace earlier Millhand-specific working labels *Worker Clothes* and *cheapest Bag*. Every background begins with exactly this same kit. The clothing and bag still need exact item IDs, equip slots, weights, capacity, protection and condition data; no unique origin loot is included.
+- **LOCKED fight opponent:** **Flint**, a contractor's wage enforcer/collector. **Flint** is his approved single-name identifier; do not invent a surname. He demands a spurious processing debt despite the character receiving no wages.
 - **Introductory tutorial:** one **self-contained end-to-end (E2E) Millhand episode**: a generic Smithing job with a special discovery; a choice-dependent second job in a different Major Skill; **two further story interactions**; a compulsory, manageable **PvE street fight**; **healing/patching at a city care provider**; **return home with little money**, where the character sees **rent due**. Only then does the Millhand tutorial end. This is **not** the start of the overarching main story.
 - **LOCKED tutorial interaction order:** perform reusable Smithing interactions → Missing Stamp decision → first task's 0 coin / 0 ordinary XP outcome → one of three **different-Major-Skill** second tasks with normal work interactions but no coins/ordinary XP and +1 chosen Major Skill level at branch selection → **two additional interactive beats** → **mandatory introductory PvE fight** → **10-coin medical treatment/patching** → **shared starter home (10 coins remaining)** → **150-coin provisional rent notice / tutorial complete**. Earlier 2–5 and 6–9 minute targets are superseded: timing must be re-estimated once combat, care and travel are specified. Standard job/travel timers apply; avoid passive waiting.
 
@@ -60,7 +61,7 @@ Job timers continue during interactions under the general [Jobs and Time](../job
 
 ## Shared climax after the second job — opponent LOCKED, encounter specifics under design
 
-All three second-job routes return toward the same shared starter-home route as every origin, without having received wages. The brief encounter ties together the episode: a subcontractor who handles municipal labour papers also uses private muscle to collect unofficial "processing charges" from workers. A lone **contractor's wage enforcer / collector** intercepts the player. **The same wage enforcer as the opponent across all three routes is LOCKED (approved 2026-10-13)**; his exact methods and dialogue still require design. This is an ordinary, local shakedown, not the start of a sprawling investigation or main plot.
+All three second-job routes return toward the same shared starter-home route as every origin, without having received wages. The brief encounter ties together the episode: a subcontractor who handles municipal labour papers also uses private muscle to collect unofficial "processing charges" from workers. A lone **contractor's wage enforcer / collector named Flint** intercepts the player. **Flint as the same wage enforcer across all three routes is LOCKED (approved 2026-10-13)**; his exact methods and dialogue still require design. This is an ordinary, local shakedown, not the start of a sprawling investigation or main plot.
 
 **Why the collector singles out each branch:**
 - **Restamp:** The player stamped and signed for the numbered lot; the collector recognizes the worker's mark and demands a supposed release fee.
@@ -69,13 +70,13 @@ All three second-job routes return toward the same shared starter-home route as 
 
 ### Two new interactions (both playable, before combat)
 
-**Interaction 1 — The Wage Claim:** The collector presents a contractor-issued demand for a bogus 'processing debt' **despite the player receiving no wages**, hinting that the city quietly permits the charges. The player can **inspect the demand or challenge its authority**, revealing a branch-specific inconsistency. This teaches reading a hostile NPC's intent and using a noncombat interactive choice, not yet another Smithing minigame.
+**Interaction 1 — The Wage Claim:** Flint presents a contractor-issued demand for a bogus 'processing debt' **despite the player receiving no wages**, hinting that the city quietly permits the charges. The player can **inspect the demand or challenge its authority**, revealing a branch-specific inconsistency. This teaches reading a hostile NPC's intent and using a noncombat interactive choice, not yet another Smithing minigame.
 
-**Interaction 2 — Cornered:** The collector blocks the way home, grips a short club and makes clear he is not allowing the player past. The player chooses a **tactical stance**—brace and defend, keep moving and exploit an opening, or take an improvised nearby obstacle as cover. These are genuine combat setup differences (defence, initiative or environment), not fake peaceful exits: **all three lead into a fight**, as required by the tutorial. Exact combat rules and outcomes still TBD.
+**Interaction 2 — Cornered:** Flint blocks the way home, grips a short club and makes clear he is not allowing the player past. The player chooses a **tactical stance**—brace and defend, keep moving and exploit an opening, or take an improvised nearby obstacle as cover. These are genuine combat setup differences (defence, initiative or environment), not fake peaceful exits: **all three lead into a fight**, as required by the tutorial. Exact combat rules and outcomes still TBD.
 
 ### Mandatory fight — contractor's wage enforcer (opponent LOCKED; mechanics PROPOSED)
 
-- **Enemy:** one human **contractor's wage enforcer** with a short club; ordinary street thug, not a monster, supernatural foe or major villain.
+- **Enemy: Flint** — one human **contractor's wage enforcer** with a short club; ordinary street thug, not a monster, supernatural foe or major villain.
 - **Where:** a service passage on the route back through Grand Cylinder City, without implying PvP rules have changed. A scripted **PvE** incident inside the industrial city is distinct from voluntary player-vs-player combat.
 - **Player:** starts without a purchased weapon or firearm (the universal kit is Basic Clothes, Crude Small Bag and 20 coins). The encounter should support **unarmed defence and/or using a nearby worksite object as a temporary environmental advantage**; no free permanent weapon or new inventory item is presumed.
 - **Difficulty:** novice wins through understandable attack/guard/read-the-opponent choices; **easy but not trivial**, with visible cost in Health and/or a minor wound. Do not assume starting Arms level above the common baseline. Include sensible fail-safe for defeat (e.g. knocked down and helped to care rather than dead/locked out); precise system design and damage bands TBD.
@@ -141,7 +142,7 @@ All three second-job routes return toward the same shared starter-home route as 
 
 **LOCKED by user:** generic Smithing interactions before the unique stamp scene; three approved second-job paths using **Industry, Commerce and Scholarship**; **two additional interactions after the second job; short mandatory, moderately challenging PvE fight; medical treatment; return home with little money; only then reveal rent due and end the Millhand E2E tutorial**. Not the main story.
 
-**STILL PROPOSED / TBD:** two pre-fight interactions' precise options, **all combat mechanics and balancing (to be designed separately)**, medical service and fees, rented home details, durations, dialogue and non-tutorial job reward values. **Turn-based format and wage enforcer identity are locked**.
+**STILL PROPOSED / TBD:** two pre-fight interactions' precise options, **all combat mechanics and balancing (to be designed separately)**, medical service and fees, rented home details, durations, dialogue and non-tutorial job reward values. **Turn-based format and Flint's role/identity are locked**.
 
 ## Implementation boundaries / remaining work
 
