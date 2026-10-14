@@ -25,7 +25,9 @@
 
 **Stage 5 — Flint's confrontation (LOCKED, approved 2026-10-15):** [The Wage Claim / Cornered — Branch Evidence and Local Resolution](millhand-flint-confrontation.md). Flint's revised simple words, specific response to each Stage 4 route, contractor demand, two interactions and the limited local shakedown outcome are approved. The wider dead-worker records mystery is **intentionally unresolved**; Flint has no special knowledge of who manipulated the documents.
 
-**Stage 6 — Actual fight (PROPOSED, not approved):** [Flint's Turn-Based Fight — encounter beats, victory and defeat](millhand-flint-fight.md). Story/pacing and recoverable defeat are drafted; global combat mechanics and injury calculations remain deferred.
+**Stage 6 — Flint's fight (LOCKED narrative, approved 2026-10-15):** [Flint's Turn-Based Fight — encounter beats, victory and defeat](millhand-flint-fight.md). The turn-based encounter, anonymous-worker interruption on player defeat, nonlethal win and meaningful opening stance are approved; numerical combat/injury rules remain TBD. **Persist player victory vs defeat as a durable outcome, so Flint has a different short response if a future quest reintroduces him; no future quest or exact callback line is approved yet.**
+
+**Stage 7 — Medical treatment (PROPOSED for approval):** [Working-class Clinic Visit](millhand-clinic-treatment.md). Reusable examine/price/treat/leave service and short unnamed clinician dialogue, fixed 10-coin fee. Precise injury/recovery mechanics and the no-damage fight edge case remain TBD.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
