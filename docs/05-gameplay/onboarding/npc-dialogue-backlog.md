@@ -51,13 +51,13 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 ### Current first dialogue draft
 
-- [Millhand — Guther Anvil, opening conversation (LOCKED; canonical tonal reference)](millhand-opening-dialogue.md)
-- [Millhand — Worker Plates: reusable Smithing task interaction (LOCKED)](millhand-platework-interaction.md)
-- [Millhand — Missing Stamp discovery and Guther Anvil (LOCKED)](millhand-missing-stamp-discovery.md)
-- [Millhand — Three second-task jobs and supporting dialogue (LOCKED)](millhand-second-task-branches.md)
-- [Millhand — Flint / Wage Claim and Cornered (LOCKED)](millhand-flint-confrontation.md)
-- [Millhand — Turn-based fight, outcomes and defeat transition (LOCKED narrative, mechanics TBD)](millhand-flint-fight.md)
-- [Millhand — Clinic treatment and dialogue (PROPOSED)](millhand-clinic-treatment.md)
+- [Millhand — Guther Anvil, opening conversation (LOCKED; canonical tonal reference)](millhand/opening-dialogue.md)
+- [Millhand — Worker Plates: reusable Smithing task interaction (LOCKED)](millhand/platework-interaction.md)
+- [Millhand — Missing Stamp discovery and Guther Anvil (LOCKED)](millhand/missing-stamp-discovery.md)
+- [Millhand — Three second-task jobs and supporting dialogue (LOCKED)](millhand/second-task-branches.md)
+- [Millhand — Flint / Wage Claim and Cornered (LOCKED)](millhand/flint-confrontation.md)
+- [Millhand — Turn-based fight, outcomes and defeat transition (LOCKED narrative, mechanics TBD)](millhand/flint-fight.md)
+- [Millhand — Clinic treatment and dialogue (PROPOSED)](millhand/clinic-treatment.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
