@@ -1,6 +1,8 @@
 # Squatter — Protected Outskirts Opening
 
-**Status: Opening E2E quest APPROVED (2026-10-13).** **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, pay and treatment pricing are deferred. The [shared tutorial structure](shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
+**Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
+
+**Status: Opening E2E quest APPROVED (2026-10-13).** **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, non-tutorial pay and medical mechanics are deferred; scripted tutorial care is 10 coins. The [shared tutorial structure](shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
 
 ## Character starting state (LOCKED)
 
@@ -8,7 +10,7 @@
 - **Background Major Skill:** **Fieldcraft +3** at character creation. Fieldcraft includes Foraging, Scavenging, Navigation, Tracking; the initial job uses **Foraging**.
 - **Attributes:** STR 5 / DEX 5 / INT 5 / RES 5; base max Health 50.
 - **Starter gear for all origins:** **Basic Clothes, one Crude Small Bag, 20 coins.** No background-special starter knives, medicines or weapons. Exact item records/stats remain TBD.
-- **Tutorial:** first Fieldcraft job → unique choice → paid second job in a **different Major Skill** → two interactions → short **turn-based PvE fight** → treatment at ordinary city care service → home with little money → rent notice, E2E tutorial ends. The overarching main storyline does not start here.
+- **Tutorial:** first Fieldcraft job → unique choice → unpaid tutorial second task in a **different Major Skill** → two interactions → short **turn-based PvE fight** → treatment at ordinary city care service → home with little money → rent notice, E2E tutorial ends. The overarching main storyline does not start here.
 
 ## Hedge Shelter — LOCKED first location and permanent job hub
 
@@ -16,13 +18,13 @@
 
 **Recurring job NPC: Benny Ben, Herb Dealer (personal name and occupational title LOCKED)**: a practical broker who weighs and pays for ordinary collected plants and assigns nearby Foraging/gathering jobs. This is the permanent **Fieldcraft / Foraging paid-job hub**, not a tutorial-only place or a general city Smithing station. Benny Ben may be morally ambiguous as an employer but is not declared a villain.
 
-**First paid job (LOCKED): Yarrow Cut**. Gather a modest assigned quantity of common **Yarrow** from a reliable known public patch near the shelter. Yarrow's normal safe field/outskirts sourcing and bleeding-control medicinal role are already documented in [Herbs and Harvesting](../../03-resources/raw/herbs-and-harvesting.md).
+**First tutorial task (LOCKED): Yarrow Cut**. Gather a modest assigned quantity of common **Yarrow** from a reliable known public patch near the shelter. Yarrow's normal safe field/outskirts sourcing and bleeding-control medicinal role are already documented in [Herbs and Harvesting](../../03-resources/raw/herbs-and-harvesting.md).
 
 Normal, reusable Foraging interactions:
 1. Speak to Benny Ben: see the quantity, payment, estimated time and a simple gathering destination.
 2. Identify **Yarrow** and confirm the patch, paying attention to safe plant identification.
 3. Choose a harvest method / how much to take without ruining regrowth; normal yield, patch health, equipment/time implications apply.
-4. Sort dirty/damaged plant matter from usable cuttings and return/deliver through a generic quantity/condition check. This is ordinary Fieldcraft/Foraging XP and job payment, not a one-off minigame.
+4. Sort dirty/damaged plant matter from usable cuttings and return/deliver through a generic quantity/condition check. This reuses normal Fieldcraft/Foraging gameplay, but the tutorial instance yields 0 coins and 0 ordinary XP; ordinary repeatable harvest jobs pay normally.
 
 **Source-of-truth economy guardrail:** Herb material has **no Crude–Masterwork tier**; patch population and harvest pressure are shared-world rules. Introductory required common Yarrow must remain obtainable even when the world patch is depleted or other players have harvested it.
 
@@ -32,15 +34,15 @@ Normal, reusable Foraging interactions:
 
 This is a **local scandal concerning neglected remains and the supply of medical herbs**, not a Pall expedition or the opening of the main plot. The buried dead are implied; avoid gratuitous gore or requiring full simulated burial systems. Exact identity/cause and why the drain is warm remain **TBD**, not a new canon Pall phenomenon.
 
-Three agreed first-event choices send the player to distinct **paid, reusable second-job activities**:
+Three agreed first-event choices send the player to distinct **unpaid tutorial activities reusing ordinary job templates**:
 
-| Player decision | Second paid job and Major Skill | Locally resolved revelation (agreed narrative direction; dialogue TBD) |
+| Player decision | Second tutorial task and Major Skill | Locally resolved revelation (agreed narrative direction; dialogue TBD) |
 | --- | --- | --- |
 | **Deliver the harvest without mentioning the find** | **Commerce → Trading: The Apothecary's Weighing.** A working apothecary needs a hand sorting, weighing and recording everyday herb deliveries (generic trade/inspection templates). | The apothecary recognizes the disposal-ground stains on some bundles but buys the verified clean portion: medicine for the poor cannot simply stop. Is commercial pragmatism complicity? |
-| **Warn the infirmary about the patch** | **Medicine → Herbalism: Suspect Cuttings.** A clinic herbalist pays for assisting with identifying usable versus contaminated Yarrow and preparing clean stock (ordinary Herbalism/quality-check activity). | The infirmary's refuse may be draining into the same ground where its medicinal plants are gathered, and the staff know more than they admit. |
-| **Trace the warm drainage channel** | **Industry → Construction: Clear the Outfall.** A ditch crew pays for checking supports and clearing a blocked public drainage channel (ordinary basic construction/handling interactions; no elite mechanics gate). | The disturbed ground contains discarded pauper-welfare tags and medical linens. The village's water and herbs rely on a neglected city outfall. |
+| **Warn the infirmary about the patch** | **Medicine → Herbalism: Suspect Cuttings.** A clinic herbalist normally pays for assisting (this tutorial instance is unpaid) with identifying usable versus contaminated Yarrow and preparing clean stock (ordinary Herbalism/quality-check activity). | The infirmary's refuse may be draining into the same ground where its medicinal plants are gathered, and the staff know more than they admit. |
+| **Trace the warm drainage channel** | **Industry → Construction: Clear the Outfall.** A ditch crew normally pays for checking (this tutorial instance is unpaid) supports and clearing a blocked public drainage channel (ordinary basic construction/handling interactions; no elite mechanics gate). | The disturbed ground contains discarded pauper-welfare tags and medical linens. The village's water and herbs rely on a neglected city outfall. |
 
-**Job/skill guardrail:** The first job gives real Fieldcraft XP. Each second job gives ordinary appropriate Commerce, Medicine or Industry XP, respectively, and pays its normal coins. No route requires unearned mastery, specialist tools, new unique crafted items, or a new Major Skill.
+**Job/skill guardrail:** The first and second scripted tutorial tasks give 0 coins and 0 ordinary XP. The chosen second-task Major Skill (Commerce, Medicine or Industry) gains exactly +1 level when the route is selected, once. Their normal repeatable job versions still pay coins/XP. No route requires unearned mastery, specialist tools, new unique crafted items, or a new Major Skill.
 
 ## Two follow-up interactions after second job — LOCKED story beats, mechanics TBD
 
@@ -50,12 +52,12 @@ Three agreed first-event choices send the player to distinct **paid, reusable se
 
 ### Short fight, care and home — agreed story direction; mechanics TBD
 
-- **LOCKED opponent:** a desperate young, injured **wild boar**, not another hired thug. The encounter should allow a frightened, unarmed novice to **drive it off** using sensible defensive positioning or environmental shelter rather than requiring them to kill an adult boar bare-handed. Ordinary combat XP, difficulty, animal AI, Health loss and defeat fallback must be defined later in the global turn-based combat system. If testing reveals unfair difficulty, the encounter mechanics/setting can be tuned without silently replacing the locked opponent.
+- **LOCKED opponent:** a desperate young, injured **wild boar**, not another hired thug. The encounter should allow a frightened, unarmed novice to **drive it off** using sensible defensive positioning or environmental shelter rather than requiring them to kill an adult boar bare-handed. Tutorial combat grants no XP or loot; difficulty, animal AI, Health loss and defeat fallback must be defined later in the global turn-based combat system. If testing reveals unfair difficulty, the encounter mechanics/setting can be tuned without silently replacing the locked opponent.
 - **Injury and care:** the player suffers a plausible minor wound (e.g., torn forearm from a glancing tusk/abrasion; wounds/bleeding rules TBD), seeks **paid city medical treatment**, learns inspection and patching, then returns home. Do not lock disease or permanent injury mechanics based on this pitch.
-- **Ending:** a humble rented room or shelter connected to their outskirts household is reached after treatment; after two small jobs and a clinic bill, only a little money remains. **Rent is due**, and the tutorial ends. Whether a protected-outskirts dwelling can be subject to rent and who collects it need specific lore confirmation. The episode does not initiate the overarching main story.
+- **Ending:** the same common starter rented home and location used by every background is reached after treatment; after two unpaid tutorial tasks and a 10-coin clinic bill, exactly 10 of the initial 20 coins remain. **Rent is due**, and the tutorial ends. The starter home has no Squatter-specific variation; its location and rent collector are TBD. Rent notice: provisional 150 coins. The episode does not initiate the overarching main story.
 
 ## Locked versus to be designed
 
 **LOCKED:** Squatter Fieldcraft +3; universal Basic Clothes + Crude Small Bag + 20 coins; **Hedge Shelter** as reusable Protected Outskirts Foraging hub; **Benny Ben, the Herb Dealer** as recurring job-giver; **Yarrow Cut** as the first Fieldcraft job with general plant identification/harvest interactions; **The Warm Patch** twisted discovery; three choices leading to **Commerce / Trading (The Apothecary's Weighing)**, **Medicine / Herbalism (Suspect Cuttings)** and **Industry / Construction (Clear the Outfall)**; two story interactions **The Rustling Bank** and **Nowhere to Step**; **young injured wild boar** as shared PvE opponent; paid medical care; home/rent scene ends the tutorial. This E2E episode is separate from the overarching main storyline.
 
-**TBD, not locked:** Benny Ben's appearance and dialogue; exact map location and visuals; job quantities, wages, XP and timings; second-job NPCs; precise fate of disposed remains and warm drain; dialogue; player choice suboptions; turn-based combat balancing and novice-boar defensibility; doctor/service fees and Health state; whether Squatter home is a rented outskirts shelter and who collects rent. The unique scripted event is not a regular repeatable Fieldcraft encounter.
+**TBD, not locked:** Benny Ben's appearance and dialogue; exact map location and visuals; job quantities, normal-job wages/XP and timings; second-job NPCs; precise fate of disposed remains and warm drain; dialogue; player choice suboptions; turn-based combat balancing and novice-boar defensibility; non-tutorial doctor/service fees and Health state; shared home location, rent deadline and collector. The unique scripted event is not a regular repeatable Fieldcraft encounter.
