@@ -20,7 +20,8 @@ Player activities, time, world economy and authored interactive events.
 
 ## First-session onboarding
 
-- [Shared tutorial structure: first job, branching second job, combat, healing, rent](onboarding/shared-structure.md)
+- [Shared tutorial structure: unpaid work, +3/+1 skills, 10-coin care and common home/rent](onboarding/shared-structure.md)
+- [Outstanding secondary NPC names and dialogue checklist](onboarding/npc-dialogue-backlog.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
