@@ -1,8 +1,8 @@
-# Bellrunner — Hector D. Smoke, Stage 1 Opening Conversation
+# Bellrunner — Hector D. Smoke, Stage 1 Opening Conversation (APPROVED)
 
-**STATUS: PROPOSED FOR USER APPROVAL (2026-10-15).** This is a first spoken dialogue draft, not locked text. The Dispatch House, **Hector D. Smoke (Dispatch Master)**, first **Industry / Hauling** job *Shift Dispatch*, council shift notices, generic courier hub, *The Wrong Bell* incident after ordinary work, all three second Major Skills and **Dogman** are already locked in [Bellrunner](README.md). Apply the [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md) and the approved [Millhand Guther opening](../millhand/opening-dialogue.md) as a calibration point **without copying Guther's character or structure**.
+**STATUS: APPROVED AND LOCKED (2026-10-15).** The user approved the exact Stage 1 opening exchange, optional objection and reply, spoken direction, route-sheet handoff, and Stage 1 payment-state presentation. Later-stage mechanics, timings and wages remain separately undecided. The Dispatch House, **Hector D. Smoke (Dispatch Master)**, first **Industry / Hauling** job *Shift Dispatch*, council shift notices, generic courier hub, *The Wrong Bell* incident after ordinary work, all three second Major Skills and **Dogman** are already locked in [Bellrunner](README.md). Apply the [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md) and the approved [Millhand Guther opening](../millhand/opening-dialogue.md) as a calibration point **without copying Guther's character or structure**.
 
-## Scene B01 — Dispatch House, First Assignment (PROPOSED)
+## Scene B01 — Dispatch House, First Assignment (APPROVED)
 
 *Hector takes a bundle of council shift notices from the sorting shelf. A duty bell sounds across the hall.*
 
@@ -16,18 +16,18 @@
 
 **Interface action:** **[Take the round]** → open the standard **Industry / Hauling — Shift Dispatch** preparation screen. The player inspects the assigned route, notices/delivery count, carried load and expected job time, then proceeds to normal courier mechanics. This is one ordinary paid-job family, with a scripted onboarding exception.
 
-## Why these lines (reviewable, not extra dialogue)
+## Why these lines (design notes, not extra dialogue)
 
-- **Hector has a different authority style from Guther.** He runs the sorting floor, acknowledges his late dispatch and has already noted when the runner received the bundle. He's brisk and willing to answer complaints from those higher up rather than making a junior messenger defend the office's delay. **This is a proposed characterization only**, not a new invented biography or guarantee of later protection.
+- **Hector has a different authority style from Guther.** He runs the sorting floor, acknowledges his late dispatch and has already noted when the runner received the bundle. He's brisk and willing to answer complaints from those higher up rather than making a junior messenger defend the office's delay. **This is the approved Stage 1 characterization**, not an invented biography or guarantee of later protection.
 - The optional player objection is **about being blamed for late delivery**, not a decorative “What is my job?” questionnaire. Hector answers the real concern. The optional lines don't alter rewards, work terms or story route.
 - The bell is an **ordinary duty bell within the working Dispatch House**. This is NOT the later condemned worksite's bell and does not reveal or prefigure the unsafe site in dialogue.
 - Hector's words use ordinary work vocabulary: council notices, route sheet, receiving marks. No modern bureaucratic formula or theatrical period accent; no forced bell-related joke or clever proverb.
 - “Take the round” is the action to receive task-related papers; **no special inventory loot** is granted.
 - The scene is short deliberately. The player learns the actual route selection and delivery verification through the **job UI**, not through instructional monologue.
 
-## Proposed user interface and ordinary first-job handoff
+## Stage 1 interface and ordinary first-job handoff (APPROVED; numerical details TBD)
 
-**Job panel — Shift Dispatch** (exact copy and numerical parameters TBD):
+**Job panel — Shift Dispatch** (Stage 1 handoff approved; remaining exact copy and numerical parameters TBD):
 
 | Field | Display direction |
 | --- | --- |
@@ -63,7 +63,7 @@ Scene B01 avoids claiming normal nonpayment and avoids promising money. **A conc
 
 **LOCKED earlier:** location, Hector's role/name, shift-notice job family, later *Wrong Bell* premise, +3 Industry, shared kit/reward sequence and future Dogman encounter.
 
-**PROPOSED now:** exact Hector dialogue, the optional blame exchange, opening stage direction, route-sheet handoff and payment-state UI language. Do not mark this scene approved until user explicitly agrees to this particular text.
+**APPROVED on 2026-10-15:** exact Hector dialogue, optional blame exchange, opening stage direction, route-sheet handoff and payment-state UI language. Stage 2 and later stages require separate approval.
 
 **Not authored:** Stage 2 normal courier interactions; Stage 3 discovery, branch decision and Hector's return exchange; all subsequent route dialogue, Dogman confrontation, fight and clinician/home adaptation.
 
