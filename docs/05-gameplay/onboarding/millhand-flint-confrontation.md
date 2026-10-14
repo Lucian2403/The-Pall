@@ -1,18 +1,18 @@
-# Millhand — Stage 5: The Wage Claim, Cornered, and Local Plot Payoff
+# Millhand — Stage 5: The Wage Claim, Cornered, and Local Plot Payoff (APPROVED)
 
-**Status: PROPOSED, NOT LOCKED (2026-10-14).** The named antagonist **Flint**, the two pre-combat scenes **The Wage Claim** and **Cornered**, and a short unavoidable but nonlethal/defeat-safe **turn-based PvE** fight are existing LOCKED directions. This document proposes their **specific dramatic connection to the three Stage 4 routes**, exact Flint dialogue (revised 2026-10-14 to be simpler and more direct), role of a contractor's demand, interaction choices, and the limited resolution. Neither the fraud mechanism nor any new dialogue is user-approved merely because it is written here. Combat mathematics remains separately deferred.
+**Status: FLINT SCENE AND REVISED DIALOGUE APPROVED/LOCKED (2026-10-15).** The user approved Flint's blunt speech and limited access to information, the contractor bill/lot reference, the distinct Stage 4 evidence responses, both interactions (*The Wage Claim* and *Cornered*), physical stance choices and the limited local outcome. Flint is not the author of the records. **Full mystery culprit, specific payment chain, numerical combat rules, character injuries and implementation details are not canonized by this approval.** The fight is turn-based and defeat-safe; combat mathematics stays deferred.
 
 ## First, what is missing from Stage 4
 
-The three Stage 4 routes and supporting NPC exchanges are **still only proposals**. They reveal useful facts but, on their own, feel incomplete:
+The three Stage 4 routes and supporting NPC exchanges are **approved and locked**. They reveal useful facts but, on their own, feel incomplete:
 
 - **Depot Intake:** “Then put down plates. I receive what's here.” The clerk's answer is overly tidied up. A physically meaningful load/receipt task is promising, but ending at an unexplained manifest is not yet a payoff.
 - **Contracts:** “You can put that in writing.” A credible bit of bureaucratic evasion, but it becomes a dead end unless the formal objection later matters.
 - **Archive:** “I don't know.” Realistic but inert if the discovered altered wage entry has no practical consequence afterward.
 
-**Do not lock Stage 4 as finished until we review the entire episode's causal arc.** Each route must give the player a fact they can use when Flint arrives. These should be distinct observations that change a response, not just three ways to fill a notebook and see identical dialogue.
+**The reviewed Stage 4–5 episode is approved as a self-contained local shakedown, without claiming to solve the larger record fraud.** Each route gives the player a fact they can use when Flint arrives. These should be distinct observations that change a response, not just three ways to fill a notebook and see identical dialogue.
 
-## Why Flint confronts the player (PROPOSED CAUSAL LINK)
+## Why Flint confronts the player (LOCKED CAUSAL LINK)
 
 A **contractor responsible for the disputed municipal worker-plate lot** treats the council's refusal to clear the lot as a **chargeable inspection delay**. The contractor has the player's workshop mark/work assignment on the lot's existing paperwork and sends its collector, **Flint**, after the worker rather than settling the dispute. This does **not** require Flint to track the player's actions across three routes, be secretly present at each site, or know what the player privately discovered. He knows which worker was assigned to the disputed batch; this is enough to seek them out along the established common homeward passage.
 
@@ -24,7 +24,7 @@ This makes the dead-worker record material to Flint's business: the number remai
 
 **Extent of the explanation:** the episode can establish a concrete abuse—**a contractor can keep using a cancelled worker number in paperwork and demand money from the living worker who questions the lot**. The episode does **not** yet prove who changed the records, who authorized two incompatible seals, where every coin is going, or that the entire city's labour system follows the same fraud.
 
-## Interaction 1 — The Wage Claim (PROPOSED)
+## Interaction 1 — The Wage Claim (LOCKED DIALOGUE AND INTERACTION INTENT)
 
 **Location:** existing industrial service passage on the route home after any of the three second tasks. Flint intercepts the Millhand on the disputed lot; do not imply new citywide PvP permission or a new cutscene-only location.
 
@@ -64,7 +64,7 @@ The player may choose either:
 
 Both provide the core information without a specialist skill gate. They change the immediate wording/tone of one reply, **not money, loot, combat XP or an invented legal status**.
 
-### Branch-specific evidence that actually matters (PROPOSED)
+### Branch-specific evidence that matters (LOCKED SPOKEN RESPONSES)
 
 After seeing the notice, the player can bring up the fact obtained in Stage 4. Only the **chosen** branch appears; Flint has no unexplained foreknowledge of it.
 
@@ -94,7 +94,7 @@ After seeing the notice, the player can bring up the fact obtained in Stage 4. O
 
 **Shared last instruction:** Flint demands settlement and reaches for the worker's papers/way past, not because all three investigations lead to a new hidden villain but because the player will not satisfy his demand. If the player asks to leave, proceed to *Cornered*.
 
-## Interaction 2 — Cornered (PROPOSED)
+## Interaction 2 — Cornered (LOCKED DIALOGUE AND STANCES)
 
 Flint steps into the narrow way back home and produces his existing small club (weapon type as currently assumed in Millhand master; exact combat item and statistics TBD).
 
@@ -118,7 +118,7 @@ Flint steps into the narrow way back home and produces his existing small club (
 
 Choose a physical response to the blocked passage. All three lead into **the same necessary short PvE fight**, and their exact mechanical effect requires the global turn-based combat design.
 
-| Choice (PROPOSED) | What the player does | What is **NOT** yet defined |
+| Choice (approved intention, effects TBD) | What the player does | What is **NOT** yet defined |
 | --- | --- | --- |
 | **[Brace and defend]** | Stand clear of Flint's first approach and prepare to protect yourself | Guard effectiveness, initiative, damage |
 | **[Keep moving]** | Try to go around him before he closes the space | Positioning/initiative outcome |
@@ -128,7 +128,7 @@ These are physical stances, **not peaceful exits** and not new items awarded to 
 
 ## What exactly is resolved, and what is not (critical)
 
-**Proposed local resolution following the fight:**
+**Approved local resolution direction following the fight (mechanics TBD):**
 
 - On player victory, **Flint withdraws** and cannot collect the bogus processing charge from the character **in this incident**. This is a meaningful small action: **one shakedown was resisted**, without permanently defeating the contractor, voiding the disputed records in every office, or automatically recovering wages.
 - On defeat, **Flint leaves or the confrontation is interrupted** and the tutorial moves through a credible rescue/aid-to-care transition. **He must not confiscate the character's starting coins or render the fixed 10-coin clinic fee impossible.** A loss has Health/injury effects to be determined separately; an unwinnable money penalty is prohibited.
@@ -139,7 +139,7 @@ These are physical stances, **not peaceful exits** and not new items awarded to 
 
 ### Does this fully satisfy the player's concern?
 
-**Not automatically.** The current Stage 4 proposals are still quite thin. If the desired result is a self-contained mystery where the player discovers the culprit, recovers diverted wages or corrects the official death records, this Stage 5 is **insufficient**. We should explicitly revisit Stage 4 and/or add a concrete locally-resolved victim/outcome before calling Millhand's story done, rather than pretend a single alley fight answers the mystery. That would require a **new user-approved expansion** beyond the current locked tutorial rhythm.
+**Scope acknowledged upon approval:** This plot resolves the worker's immediate encounter with Flint, not the larger falsification of records. The player's limited knowledge is deliberate; he cannot identify a culprit from three incompatible documents and a collector who does not know who wrote them. Any future expansion into a solved fraud mystery requires separate approval.
 
 ### Integration and persistence (PROPOSED)
 
@@ -165,8 +165,8 @@ These are physical stances, **not peaceful exits** and not new items awarded to 
 - **“They don't tell men like us.”** is the only explicit statement about the information gap. He hasn't been told who altered the numbers. Nor can he promise that anyone would answer a low-paid worker's questions. **Don't add a second line about the same theme.**
 - **“And you still want my money?” / “Yes.”** is the sole dry uncomfortable beat. A bad system is funny only in its implacable seriousness.
 - Flint's assignment comes from the contractor, not an invented official law. His knowing the lot reference does not imply knowing who manipulated it.
-- Stage 4's **“Then put down plates. I receive what's here.”** still deserves spoken review and is **not locked** by these Stage 5 revisions.
+- Stage 4's **“Then put down plates. I receive what's here.”** is now part of the approved Stage 4 dialogue; retain its exact wording unless the user requests a future revision.
 
-## Approval pending
+## Approval boundary
 
-User has **not** approved this confrontation, its exact lines, charge form or asserted local closure. Stage 4's detailed job modules/dialogue also remain proposed. Review the full causal arc and ask whether stopping one collection (while leaving the worker-number manipulation unresolved) is a satisfying ending for an authored tutorial episode, before marking either Stage 4 or Stage 5 locked.
+**LOCKED:** Flint's revised plain-spoken lines, class/information context (he is told only enough to collect), the contractor's demand, the three branch-specific dialogues, the two pre-combat encounters, the three pre-fight physical stances as choices, and limited local confrontation resolution without a wider revealed culprit. **UNDECIDED:** specific combat rules and effect of stances, opponent tuning, injury/defeat mechanics, further story content, exact contractor identity/legal authority beyond existing role.
