@@ -8,7 +8,7 @@ See [Millhand main design](README.md), [approved clinic scene](clinic-treatment.
 
 The Millhand has done the work and remains unpaid; followed one of three genuine alternate tasks; discovered one kind of contradictory official evidence; resisted, or lost to, Flint's attempted contractor collection; and spent 10 coins on necessary care. The player can now return to the life they already have, with a very simple economic problem.
 
-**The tutorial does not end with Flint's fight.** It ends only after the player returns home and reads the notice. Do not tack on a new incident, suggest that the worker-number mystery has been solved, reveal an overarching campaign, or promise a story follow-up that is not authored.
+**The tutorial does not end with Flint's fight.** It ends after the player returns home, reads and puts down the notice, and makes the brief user-requested remark to themselves. Do not tack on a new incident, suggest that the worker-number mystery has been solved, reveal an overarching campaign, or promise a story follow-up that is not authored.
 
 This is the **identical home, location, floor plan, storage capability and rent framework** used by Bellrunner, Squatter, Stitcher, Scrapper and Inkbound. Do not add a Millhand-specific flat, forge corner, hereditary keepsake, landlord or bonus storage.
 
@@ -61,7 +61,7 @@ The “140” is the arithmetic gap, **not an extra fine**. Don't imply the play
 
    *The Millhand puts the notice down.*
 
-   **MILLHAND (to himself/herself, as appropriate):** “Ah, hell. Need a place of my own. First I've got this rent to pay. More jobs... or I could make something to sell.”
+   **MILLHAND (quietly):** “Ah, hell. Need a place of my own. First I've got this rent to pay. More jobs... or I could make something to sell.”
 
    This is a brief, ordinary reaction and a **diegetic guide** to normal paid jobs and crafting/trading. It is the Millhand's personal hope to have a place of their own, **not a promise of a new home-ownership system**, extra reward, or quest objective. Keep this one thought—no additional motivational speech or NPC lecture. Do not display a gendered speaker caption in actual UI.
 3. **After that line**, the server marks the **Millhand tutorial complete exactly once**, provided the home notice was read and dismissed. A reload must not repeat the self-directed line, charge rent, repeat the 10-coin treatment, award a second Major Skill level or replay Flint's encounter.
