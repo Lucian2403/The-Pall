@@ -1,6 +1,6 @@
 # Millhand — Guther Anvil, Approved Opening Conversation
 
-**Status: APPROVED AND LOCKED (2026-10-14).** The exact Scene M01 dialogue was approved by the user as the tonal reference for The Pall.  Follows the user-locked [The Pall Spoken Dialogue Standard](../interactions/dialogue-style-guide.md). The previous scene is rejected as too scripted, instructional and stuffed with aphorisms. The **approved story, Guther's name, first task, money rules and later Missing Stamp reveal are unchanged**.
+**Status: APPROVED AND LOCKED (2026-10-14).** The exact Scene M01 dialogue was approved by the user as the tonal reference for The Pall. Follows the user-locked [The Pall Spoken Dialogue Standard](../interactions/dialogue-style-guide.md). The previous scene is rejected as too scripted, instructional and stuffed with aphorisms. The **approved story, Guther's name, first task, money rules and later Missing Stamp reveal are unchanged**.
 
 ## Specific problems in rejected first version
 
