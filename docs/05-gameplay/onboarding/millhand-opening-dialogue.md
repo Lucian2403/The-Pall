@@ -1,6 +1,6 @@
-# Millhand — Guther Anvil, Opening Conversation (Third Draft)
+# Millhand — Guther Anvil, Approved Opening Conversation
 
-**Status: THIRD DRAFT, NOT YET APPROVED (2026-10-14).** Follows the user-locked [The Pall Spoken Dialogue Standard](../interactions/dialogue-style-guide.md). The previous scene is rejected as too scripted, instructional and stuffed with aphorisms. The **approved story, Guther's name, first task, money rules and later Missing Stamp reveal are unchanged**.
+**Status: APPROVED AND LOCKED (2026-10-14).** The exact Scene M01 dialogue was approved by the user as the tonal reference for The Pall.  Follows the user-locked [The Pall Spoken Dialogue Standard](../interactions/dialogue-style-guide.md). The previous scene is rejected as too scripted, instructional and stuffed with aphorisms. The **approved story, Guther's name, first task, money rules and later Missing Stamp reveal are unchanged**.
 
 ## Specific problems in rejected first version
 
@@ -18,7 +18,7 @@
 - **"Council wants another lot of worker plates. Docket's on the bench."** This already works as plain work talk; do **not** manufacture a quip here.
 - **"Check the number before you strike. If one doesn't match, leave it for me."** This is a functional closing instruction and should remain intact.
 
-## Scene M01 — PROPOSED third draft
+## Scene M01 — LOCKED dialogue
 
 *Guther lays the council docket beside the blank plates.*
 
@@ -46,6 +46,6 @@ The player can **skip the optional payment exchange** and simply take the docket
 - In UI, the tutorial job's payment state may be labelled **“Pending council acceptance”**, but this is **proposed UI copy**. The scripted tutorial ends with **0 coins, 0 ordinary XP** because the plate's inspection dispute freezes payment. Avoid suggesting a payout will come later in this episode.
 - Neither the exchange nor the optional response grants skill or currency; Craftsmanship +3 was assigned at character creation. The second-task branch later gives one +1 level to that other Major Skill.
 - Keep action descriptions physically observable. No florid summary of what the worker feels; no modern slang, faux-19th-century parody or scripted puns.
-- **Do not pad this with further banter.** The user wants slightly more uncomfortable humour and friction than the second draft, almost imperceptibly. Judge the scene by how it sounds aloud, not by how many punchlines it contains. The exact dialogue has **NOT** been declared canon.
+- **Do not pad this with further banter.** The user wants slightly more uncomfortable humour and friction than the second draft, almost imperceptibly. Judge the scene by how it sounds aloud, not by how many punchlines it contains. The exact Scene M01 dialogue is **LOCKED** and should not be revised without user approval.
 
 Related: [Millhand master storyline](millhand.md), [NPC/dialogue backlog](npc-dialogue-backlog.md), [Game-wide spoken dialogue guide](../interactions/dialogue-style-guide.md).
