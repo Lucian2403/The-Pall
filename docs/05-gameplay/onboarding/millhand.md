@@ -21,9 +21,11 @@
 
 **Stage 3 revelation and Guther dialogue (LOCKED, approved 2026-10-14):** [The Missing Stamp — Evidence, Dialogue and Branch Choice](millhand-missing-stamp-discovery.md). The reference plate/cancellation slip, the date contradiction, Guther's common exchange and his three exact replies are approved, including the one corrective worker-number marking action for Restamp. Exact worker number and dates remain TBD.
 
-**Stage 4, all three follow-up tasks (PROPOSED for review):** [Depot Intake Run / Disputed Docket / Ledger Reconciliation](millhand-second-task-branches.md). Job interactions and supporting role-labelled NPC dialogue require approval; the routes, Major Skills and outcomes were already locked.
+**Stage 4, all three follow-up tasks (LOCKED, approved 2026-10-15):** [Depot Intake Run / Disputed Docket / Ledger Reconciliation](millhand-second-task-branches.md). The player actions and supporting role-labelled NPC dialogue are approved; numerical timing, balance and final UI implementation are TBD.
 
-**Stage 5 — Flint (PROPOSED for review):** [The Wage Claim / Cornered — Branch Evidence and Local Resolution](millhand-flint-confrontation.md). Shows how all three records matter in the encounter, why Flint seeks out the Millhand, and the limited outcome after combat. **Neither Stage 4 nor Stage 5 is locked.** The dead worker's full mystery is not definitively solved by beating a collector; review completeness before signing off.
+**Stage 5 — Flint's confrontation (LOCKED, approved 2026-10-15):** [The Wage Claim / Cornered — Branch Evidence and Local Resolution](millhand-flint-confrontation.md). Flint's revised simple words, specific response to each Stage 4 route, contractor demand, two interactions and the limited local shakedown outcome are approved. The wider dead-worker records mystery is **intentionally unresolved**; Flint has no special knowledge of who manipulated the documents.
+
+**Stage 6 — Actual fight (PROPOSED, not approved):** [Flint's Turn-Based Fight — encounter beats, victory and defeat](millhand-flint-fight.md). Story/pacing and recoverable defeat are drafted; global combat mechanics and injury calculations remain deferred.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
