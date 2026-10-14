@@ -1,6 +1,6 @@
-# Millhand — Stage 6: Flint's Turn-Based Fight
+# Millhand — Stage 6: Flint's Turn-Based Fight (APPROVED ENCOUNTER)
 
-**STATUS: NEW ENCOUNTER DRAFT, NOT APPROVED (2026-10-15).** This is a **story-level combat encounter specification only**. It is **not** the full combat ruleset. The opponent, encounter justification and spoken lead-in are already [LOCKED in Stage 5](millhand-flint-confrontation.md); do not revise that approved conversation. **Turn-based PvE** format, a manageable beginner fight and a nonblocking loss are locked from [shared onboarding](shared-structure.md). Actual damage, initiative, accuracy, stamina, enemy HP, skill gates, action terminology, health depletion and injury calculations remain TBD.
+**STATUS: STORY-LEVEL ENCOUNTER APPROVED AND LOCKED (2026-10-15).** The user approved the battle's tactical-entry choices, telegraphed attack, real defensive/offensive exchanges, nonlethal local victory and defeat-safe exit by intervening workers. This is **not** the full combat ruleset. Flint's lead-in and identity remain locked in [Stage 5](millhand-flint-confrontation.md); the turn-based PvE format and clinic/home sequence remain locked in [shared onboarding](shared-structure.md). **Actual damage, initiative, accuracy, stamina, enemy HP, thresholds, action terminology and Health/injury numbers remain TBD.** Additionally, user approved retaining the **victory/defeat outcome for possible future Flint encounters**, with outcome-dependent speech to be authored only when such an encounter exists.
 
 ## Locked entry
 
@@ -15,7 +15,7 @@ The player experiences a short real turn-based fight, learns to read a visible h
 
 The encounter must have **actual consequences** from actions and positions. Do not script a guaranteed automatic win after three UI clicks or make a Stance button cosmetic. Do not hand out a club, a firearm, temporary inventory weapon, money, gear or Arms XP.
 
-## Proposed battle presentation
+## Approved encounter presentation (UI/assets TBD)
 
 **Non-spoken scene line:** *Flint grips his club and comes forward.* (visual scene cue; final animation/copy TBD)
 
@@ -31,7 +31,7 @@ The encounter must have **actual consequences** from actions and positions. Do n
 
 The options should not offer three identical results; **if global combat design cannot honour one, revisit the Stage 5 stance implementation instead of promising a fake bonus**. No numeric modifiers are invented here.
 
-## Proposed reusable fight teaching beats
+## Approved reusable fight teaching beats (mechanics TBD)
 
 ### Beat C01 — An attack is coming
 
@@ -52,7 +52,7 @@ After an unsuccessful heavy blow, a guarded strike, or Flint overreaching into a
 Fight ends once Flint can no longer enforce the demand: driven off, forced to back away or knocked down long enough to escape. **Do not require a killing blow**. Avoid granting a new post-fight dialogue menu unless a real decision requires it; the Stage 5 spoken exchange has already done the story work.
 
 - **Player victory:** Flint backs away or falls and the Millhand passes; **no collection occurs in this incident**. His contractor's bill remains legally unresolved, and the council records remain wrong. The result is a narrow, credible personal victory.
-- **Player defeat (story proposal requiring approval):** The fight is audible beyond the service passage. Other workers approach; Flint refuses to make a spectacle, breaks off and leaves the money uncollected. An unnamed passerby helps the injured Millhand get to ordinary medical care. **No new named rescuer, faction, police rescue or quest chain.** A defeat is clearly recorded, **not narrated as a win**, and must not force a restart or take away the 20 coins needed for treatment.
+- **Player defeat (approved narrative approach):** The fight is audible beyond the service passage. Other workers approach; Flint refuses to make a spectacle, breaks off and leaves the money uncollected. An unnamed passerby helps the injured Millhand get to ordinary medical care. **No new named rescuer, faction, police rescue or quest chain.** A defeat is clearly recorded, **not narrated as a win**, and must not force a restart or take away the 20 coins needed for treatment.
 - **Player disconnect/timeout:** preserve the combat state according to future global rules; don't let a browser reload duplicate rewards, run Flint's dialogue again to farm any effect, or bypass the medical transition. The exact timeout/disconnect rule remains deferred.
 
 ## Injury and clinic handoff — proposed implementation constraint
@@ -67,13 +67,13 @@ The fight itself awards **0 coins, 0 ordinary XP, 0 Arms XP, 0 items, 0 addition
 
 - Entry: `millhand_second_task_done=true` and both Stage 5 interactions recorded, Stage 5 tactical stance stored.
 - Combat is a normal **one-human PvE instance** created once; no replay for levels, drops or special cash.
-- Completion: `millhand_flint_resolved=won|lost` and exactly one post-fight clinic transition.
+- Completion: **PERSISTENT CANON FACT** `millhand_flint_outcome=player_victory|player_defeat` (field/identifier illustrative) and exactly one post-fight clinic transition. Store the outcome durably, not merely as a temporary tutorial step: if Flint appears in a later quest, his dialogue must acknowledge whether the player defeated him or he defeated the player. **No later Flint quest is currently promised or authored.** Do not fabricate future history, name a recurrence, or lock precise lines without reviewing the context.
 - All three Stage 4 routes reach the same fight, but earlier evidence is preserved in quest recap; Flint does not magically learn other routes' discoveries.
 - The shared tutorial continues **fight → medical point/10 coins → same starter home/10 coins → provisional 150-coin rent notice**, then ends. Flint's loss is NOT itself the end of onboarding.
 
-## Stage 6 approval scope
+## Approval boundary
 
-Approve encounter-level narrative, the three teaching beats and the **anonymous-worker-interrupted defeat** approach if credible. Keep the global turn-based rules, all numerical stats, injuries and the exact story/medical transition details **deferred**.
+**LOCKED:** encounter-level narrative, three teaching beats, pre-fight choice must affect real combat state, Flint can be driven off without dying, and anonymous workers interrupt the scene after defeat so the injured player can reach care without losing starter coins. **UNDECIDED:** all global combat numerical systems, exact injury behavior, and handling a no-injury perfect defence without an arbitrary hidden wound. The specific line Flint might speak in a future quest has not yet been written or approved.
 
 ### Writing / tone check
 
