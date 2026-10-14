@@ -26,6 +26,10 @@
 - Do not leave new background-specific scenario files at the onboarding root.
 - Reuse shared systems; do not clone the global rules into each folder. All six origins share the **same starter home**, not six separate home definitions.
 
+## Bellrunner opening (current)
+
+- [Stage 1 — Hector D. Smoke opening conversation](bellrunner/opening-dialogue.md) — **PROPOSED; awaiting approval**. The Dispatch House, ordinary Shift Dispatch job and later *Wrong Bell* premise are already locked.
+
 ## Millhand progression (current)
 
 | Stage | Document | Status |
