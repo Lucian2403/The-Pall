@@ -35,6 +35,7 @@ Player activities, time, world economy and authored interactive events.
 - [Millhand: approved Stage 8 return home, rent notice and short self-directed ending](onboarding/millhand/home-rent-ending.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand/README.md)
 - [Bellrunner: Hector D. Smoke Stage 1 opening conversation (approved)](onboarding/bellrunner/opening-dialogue.md)
+- [Bellrunner: Shift Dispatch Stage 2 courier work (proposed)](onboarding/bellrunner/shift-dispatch-interaction.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner/README.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter/README.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
