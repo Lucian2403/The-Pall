@@ -1,6 +1,6 @@
 # Millhand — Stage 5: The Wage Claim, Cornered, and Local Plot Payoff
 
-**Status: PROPOSED, NOT LOCKED (2026-10-14).** The named antagonist **Flint**, the two pre-combat scenes **The Wage Claim** and **Cornered**, and a short unavoidable but nonlethal/defeat-safe **turn-based PvE** fight are existing LOCKED directions. This document proposes their **specific dramatic connection to the three Stage 4 routes**, exact Flint dialogue, role of a contractor's demand, interaction choices, and the limited resolution. Neither the fraud mechanism nor any new dialogue is user-approved merely because it is written here. Combat mathematics remains separately deferred.
+**Status: PROPOSED, NOT LOCKED (2026-10-14).** The named antagonist **Flint**, the two pre-combat scenes **The Wage Claim** and **Cornered**, and a short unavoidable but nonlethal/defeat-safe **turn-based PvE** fight are existing LOCKED directions. This document proposes their **specific dramatic connection to the three Stage 4 routes**, exact Flint dialogue (revised 2026-10-14 to be simpler and more direct), role of a contractor's demand, interaction choices, and the limited resolution. Neither the fraud mechanism nor any new dialogue is user-approved merely because it is written here. Combat mathematics remains separately deferred.
 
 ## First, what is missing from Stage 4
 
@@ -28,29 +28,33 @@ This makes the dead-worker record material to Flint's business: the number remai
 
 **Location:** existing industrial service passage on the route home after any of the three second tasks. Flint intercepts the Millhand on the disputed lot; do not imply new citywide PvP permission or a new cutscene-only location.
 
-*Flint holds out a folded contractor's demand.*
+*Flint holds out a folded contractor's bill.*
 
-**FLINT:** "You worked Anvil's council lot?"
+**FLINT:** "You worked on Anvil's plates?"
 
 **PLAYER:** "I did."
 
-**FLINT:** "Inspection's held. There's a charge."
+**FLINT:** "They've stopped the lot. You owe money for it."
 
 **PLAYER:** "They haven't paid me."
 
-**FLINT:** "I wasn't sent to pay you."
+**FLINT:** "I don't pay wages."
 
-*A short UI inspection of the notice is available before escalation. The cancelled worker number appears on the lot reference; the player's own role is listed as the person Flint has come to charge. The notice bears contractor authority, not a proven lawful city enforcement order.*
+*A short UI inspection of the bill is available before the argument continues. It refers to the cancelled worker number and identifies the player as the person being charged. The bill comes from the contractor, not a lawful city officer.*
 
-**PLAYER:** "That's the cancelled number."
+**PLAYER:** "This number's a dead man's."
 
-**FLINT:** "It's what's on the paper."
+**FLINT:** "I didn't write it."
 
-**PLAYER:** "And I'm paying for it?"
+**PLAYER:** "Who did?"
 
-**FLINT:** "That's the instruction."
+**FLINT:** "Don't know. They don't tell men like us."
 
-**Editorial guardrail:** The only half-smile in the scene is that wages and a charge are treated as completely separate matters. Flint doesn't try to be funny; he insists on his order. His pressure is more personal than Guther's weary evasion. No over-explained fraud confession.
+**PLAYER:** "And you still want my money?"
+
+**FLINT:** "Yes."
+
+**Editorial guardrail:** Flint can read his assignment and knows who to demand money from; he has no access to the people who altered the books. His ignorance is part of the **chain of orders**, not proof of stupidity or a claim that *all* workers are incapable of understanding events. One flat "Yes" is the entire uncomfortable beat. Don't add a punchline or a speech about class.
 
 ### Playable interaction, not just dialogue
 
@@ -68,23 +72,23 @@ After seeing the notice, the player can bring up the fact obtained in Stage 4. O
 
 **PLAYER:** "The depot took plates. My receipt says plates."
 
-**FLINT:** "It says workers on this."
+**FLINT:** "That's not what mine says."
 
 *Difference:* the player's receipt proves that the contractor's classification is not a straightforward delivery record. Flint has no answer beyond the paper he was given.
 
 **If Disputed Docket (Commerce / Contracts):**
 
-**PLAYER:** "Contracts took my objection. You haven't got a clearance."
+**PLAYER:** "I showed the clerk both seals. He wrote down what was wrong."
 
-**FLINT:** "I've got a demand."
+**FLINT:** "He didn't tell me."
 
 *Difference:* the player can dispute the contractor's claimed authority using the recorded, unresolved contractual conflict. Flint's demand is **not** a council decision or correction of the conflicting seals.
 
 **If Ledger Reconciliation (Scholarship / Investigation):**
 
-**PLAYER:** "The wage book carries that number after the man died."
+**PLAYER:** "That number's in the wage book. The man's dead."
 
-**FLINT:** "I haven't seen the wage book."
+**FLINT:** "Tell whoever keeps it."
 
 *Difference:* the player now understands that the cancelled identity is still used for accounting. Flint need not know who scraped out the correction or why.
 
@@ -96,19 +100,19 @@ Flint steps into the narrow way back home and produces his existing small club (
 
 **PLAYER:** "I'm going home."
 
-**FLINT:** "Not until this is settled."
+**FLINT:** "Not till I've got the money."
 
-**PLAYER:** "I've had no wages."
+**PLAYER:** "They kept my wages."
 
-**FLINT:** "You keep saying wages."
+**FLINT:** "I heard."
 
-*Pause: Flint blocks the passage.*
+*Flint blocks the passage.*
 
 **PLAYER:** "Move."
 
 **FLINT:** "No."
 
-**Tone:** The point is not a stylized thug's monologue. Flint refuses the premise that unpaid work means an employee owes nothing. **“You keep saying wages”** is a small, unpleasant verbal turn; if it lands as a polished punchline aloud, cut it rather than adding explanation.
+**Tone:** Flint doesn't grasp, or care about, the difference between a disputed lot and the worker's debt. He repeats the demand rather than debating it. No speech about power; no clever double meaning. His short refusal is the threat.
 
 ### The actual second player interaction
 
@@ -147,12 +151,21 @@ These are physical stances, **not peaceful exits** and not new items awarded to 
 
 ## Strict dialogue self-review (before approval)
 
-- The current Stage 4 line “Then put down plates. I receive what's here” sounds writerly; do not cite it as a final tonal achievement or lock Stage 4 merely because Stage 5 is drafted.
-- **“I wasn't sent to pay you.”** It works if Flint is a practical enforcer, not an ironic narrator. The player had no wages; this answers the question without a witty speech.
-- **“It's what's on the paper.”** A more ordinary line than a themed proverb, but Guther also hid behind papers. Flint should sound more coercive, less resigned, in spoken delivery.
-- **“You keep saying wages.”** The one slight point of uncomfortable humour, but risks sounding engineered. Consider removing if the exchange feels self-conscious.
-- Short commands in *Cornered* carry the threat; don't add a long speech about the city's indifference.
-- The source of the contractor demand and how Flint knows the work assignment should appear in the notice, **not in an exposition monologue**.
+**Specific lines that were wrong in the previous draft (diagnosed before rewriting):**
+
+- **“Inspection's held. There's a charge.”** Sounds like an official clerk reporting a case. Flint is a practical collector, so he says the lot has stopped and demands money.
+- **“That's the instruction.”** Mechanical and formal. **“I didn't write it.”** expresses the limited fact that Flint didn't make the paperwork, while **“They don't tell men like us.”** explains why he cannot name its author.
+- **“Contracts took my objection. You haven't got a clearance.”** *Objection* and *clearance* both existed in 19th-century English, but this combined bureaucratic phrasing feels like a modern dispute department. Here the player names a concrete clerk and what the clerk wrote, while Flint responds only with what he knows.
+- **“I've got a demand.”** More formal than needed; **“He didn't tell me.”** is blunt, literal and stubborn.
+- **“You keep saying wages.”** Sounds like a line constructed for a clever uncomfortable laugh. **“I heard.”** is shorter, less performative and just as cold.
+
+**What to preserve in the new version:**
+
+- Flint is **a little slower to reason through documents, with plain words and direct physical pressure**; not an exaggerated fool, ungrammatical caricature, regional parody, or exposition machine.
+- **“They don't tell men like us.”** is the only explicit statement about the information gap. He hasn't been told who altered the numbers. Nor can he promise that anyone would answer a low-paid worker's questions. **Don't add a second line about the same theme.**
+- **“And you still want my money?” / “Yes.”** is the sole dry uncomfortable beat. A bad system is funny only in its implacable seriousness.
+- Flint's assignment comes from the contractor, not an invented official law. His knowing the lot reference does not imply knowing who manipulated it.
+- Stage 4's **“Then put down plates. I receive what's here.”** still deserves spoken review and is **not locked** by these Stage 5 revisions.
 
 ## Approval pending
 
