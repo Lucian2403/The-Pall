@@ -33,7 +33,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 ## Dialogue production, still PROPOSED / TO AUTHOR
 
-1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand / Guther Anvil is already approved and locked; five remain to write.**
+1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand / Guther Anvil and Bellrunner / Hector D. Smoke Stage 1 openings are approved and locked; four remain to write.**
 2. **Six unique twist reveals** after the ordinary first-task interactions; three consequential response choices each.
 3. **Eighteen second-task follow-ups** (six origins × three routes) using the different Major Skill, their ordinary job interaction families, and role-labelled minor NPCs where needed.
 4. **Twelve pre-combat interactions** (two per origin), with choice-aware dialogue from the locked opponent where the opponent speaks; Squatter uses observation/animal behaviour instead of human speech.
@@ -49,7 +49,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - **Strict voice policy:** follow the [approved game-wide spoken dialogue guide](../interactions/dialogue-style-guide.md). Each new scene must be checked for lines that sound generic, polished, expository, repetitive or staged; the approved Guther opening establishes the upper limit of *subtle* friction and uncomfortable humour, not a required joke for every conversation.
 - Tutorial home is **the exact same home for all six backgrounds**; clinic fee 10 coins; rent 150 coins is **PROVISIONAL**.
 
-### Current first dialogue draft
+### Current dialogue approval references
 
 - [Millhand — Guther Anvil, opening conversation (LOCKED; canonical tonal reference)](millhand/opening-dialogue.md)
 - [Millhand — Worker Plates: reusable Smithing task interaction (LOCKED)](millhand/platework-interaction.md)
@@ -59,7 +59,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Millhand — Turn-based fight, outcomes and defeat transition (LOCKED narrative, mechanics TBD)](millhand/flint-fight.md)
 - [Millhand — Clinic treatment and dialogue (LOCKED; Health mechanics TBD)](millhand/clinic-treatment.md)
 - [Millhand — Return home, provisional rent and exact self-directed work/crafting dialogue (LOCKED)](millhand/home-rent-ending.md)
-- [Bellrunner — Hector D. Smoke at the Dispatch House (Stage 1, PROPOSED)](bellrunner/opening-dialogue.md)
+- [Bellrunner — Hector D. Smoke at the Dispatch House (Stage 1, APPROVED 2026-10-15)](bellrunner/opening-dialogue.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
