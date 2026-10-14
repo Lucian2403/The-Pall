@@ -33,7 +33,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 ## Dialogue production, still PROPOSED / TO AUTHOR
 
-1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards.
+1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand / Guther Anvil is already approved and locked; five remain to write.**
 2. **Six unique twist reveals** after the ordinary first-task interactions; three consequential response choices each.
 3. **Eighteen second-task follow-ups** (six origins × three routes) using the different Major Skill, their ordinary job interaction families, and role-labelled minor NPCs where needed.
 4. **Twelve pre-combat interactions** (two per origin), with choice-aware dialogue from the locked opponent where the opponent speaks; Squatter uses observation/animal behaviour instead of human speech.
@@ -46,10 +46,11 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - **Realistic explanation for unpaid tasks** must be specific to the incident. With Millhand the council-lot inspection dispute freezes wages, and **Flint** wants an unofficial debt despite no payout.
 - Keep first work interaction **before** tutorial-only reveal. Don't frontload lore or suggest the character doesn't know their workplace.
 - Player responses may shape tone/information without fabricating unapproved skill bonuses or permanent crime flags.
+- **Strict voice policy:** follow the [approved game-wide spoken dialogue guide](../interactions/dialogue-style-guide.md). Each new scene must be checked for lines that sound generic, polished, expository, repetitive or staged; the approved Guther opening establishes the upper limit of *subtle* friction and uncomfortable humour, not a required joke for every conversation.
 - Tutorial home is **the exact same home for all six backgrounds**; clinic fee 10 coins; rent 150 coins is **PROVISIONAL**.
 
 ### Current first dialogue draft
 
-- [Millhand — Guther Anvil, opening conversation (PROPOSAL)](millhand-opening-dialogue.md)
+- [Millhand — Guther Anvil, opening conversation (LOCKED; canonical tonal reference)](millhand-opening-dialogue.md)
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
