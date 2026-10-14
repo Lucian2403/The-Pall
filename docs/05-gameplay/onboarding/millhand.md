@@ -17,6 +17,8 @@
 
 **Opening conversation (LOCKED, approved 2026-10-14):** [Guther Anvil — First Workshop Conversation](millhand-opening-dialogue.md). The third revision is approved with understated friction and dry humour. It covers greeting, the optional brief pay exchange and entry into normal Smithing interactions; the Missing Stamp remains later.
 
+**First-task Smithing interaction (PROPOSED, pending user review):** [Worker Plate Stampwork — Reusable Job Modules](millhand-platework-interaction.md). It lays out docket inspection, die matching, one ordinary bent-blank incident, mark verification and the precise boundary before the already-approved Missing Stamp twist. The incident/options are not yet locked.
+
 ## The Missing Stamp — opening job and agreed second-job branches
 
 The Smithing foreman gives the player ordinary piecework on identification plates for a municipal labour contract. During normal workshop work, the player inspects a plate, chooses a reasonable technique/tool, and resolves a normal Smithing complication. These should be **reusable interaction templates** also available in regular Smithing jobs, not bespoke tutorial-only minigames.
