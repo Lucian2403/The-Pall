@@ -59,6 +59,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Millhand — Turn-based fight, outcomes and defeat transition (LOCKED narrative, mechanics TBD)](millhand/flint-fight.md)
 - [Millhand — Clinic treatment and dialogue (LOCKED; Health mechanics TBD)](millhand/clinic-treatment.md)
 - [Millhand — Return home, provisional rent and exact self-directed work/crafting dialogue (LOCKED)](millhand/home-rent-ending.md)
+- [Bellrunner — Hector D. Smoke at the Dispatch House (Stage 1, PROPOSED)](bellrunner/opening-dialogue.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
