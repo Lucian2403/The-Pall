@@ -1,6 +1,6 @@
-# Millhand — Stage 7: The Clinic Visit
+# Millhand — Stage 7: The Clinic Visit (APPROVED)
 
-**STATUS: PROPOSED INTERACTION AND DIALOGUE FOR USER REVIEW (2026-10-15).** The **10-coin treatment**, access after **victory or defeat**, use of a **normal reusable city health service**, no tutorial combat rewards, and subsequent return to the **same** shared starter home with **10 coins** are already LOCKED. The clinic's specific flow, role-labelled clinician's dialogue and visible status panels are proposed. Neither a new named clinic nor a new permanent NPC is established. Medical Health/injury details remain TBD; do not simulate a fictional health system merely to complete this scene.
+**STATUS: CLINIC INTERACTION AND DIALOGUE APPROVED / LOCKED (2026-10-15).** The user approved the reusable **examine → speak → see price → pay 10 coins once → treat → leave** flow and the exact short clinician conversation, with injury-appropriate wording when the actual wound type is known. Both fight outcomes access the care service; the character returns to the **same** shared starter home with **10 coins**. No new named clinic or permanent NPC has been established. **Health/injury numbers, exact medical effects and the perfect-no-damage case remain TBD**; do not invent damage or a healing system to force a scene.
 
 ## What currently needs editing from the earlier sketch
 
@@ -14,7 +14,7 @@ The Millhand master currently says **“Inspect condition”** and **“Choose/c
 - The fight outcome **stays recorded** for future Flint-specific dialogue should a later quest include him; the clinician does not need to mention Flint or know that history.
 - This **is not** the rent-reveal scene. No rental demand is posted or explained before the later home scene.
 
-## Proposed service flow — reusable for future city clinic visits
+## Approved service flow — reusable for future city clinic visits (details TBD)
 
 ### M01 — Condition view
 
@@ -28,7 +28,7 @@ The player opens the regular **Care / Treatment** interface and sees:
 
 **UI actions:** **[Examine condition]** and **[Speak to clinician]**. Do not require special Medicine/Trauma skill or equipment to buy NPC treatment.
 
-### M02 — Clinician dialogue (NEW, PROPOSED)
+### M02 — Clinician dialogue (LOCKED; wording conditional on wound type)
 
 *The clinician looks over the injury.*
 
@@ -85,8 +85,8 @@ The exact zero-damage exception remains **OPEN** until a shared combat/injury de
 - Advance Millhand onboarding to **Stage 8 — Return Home / provisional 150-coin rent notice**, which is not drafted here.
 - Maintain Flint combat outcome as an independent persistent story fact; do not erase it when care is completed.
 
-## Approval requested
+## Approval boundary
 
-Approve the **examine → speak → quoted cost → pay once → medical result → leave** flow and the **short clinician conversation**. Exact appearance/name of clinic, medical effects, treatment duration, and the perfect-no-damage encounter edge case remain unresolved pending later global system design.
+**LOCKED:** examine → speak → priced 10-coin treatment → pay once → treatment result → leave; exact dialogue shown for an injury that needs cleaning/dressing; no added clinician name or persistent loot; preserve the win/lose Flint outcome. **TBD:** injury-specific alternative lines, clinic appearance/name, precise medical effects/duration, and an honest handling of a perfect uninjured combat result under the future common combat/injury system.
 
 Related: [approved Flint fight](millhand-flint-fight.md), [Millhand tutorial](millhand.md), [common tutorials](shared-structure.md), [character Health](../../01-player/character-system.md), [game-wide dialogue standard](../interactions/dialogue-style-guide.md).
