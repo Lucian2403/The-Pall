@@ -32,7 +32,7 @@ Player activities, time, world economy and authored interactive events.
 - [Millhand: approved Flint Wage Claim, Cornered and local narrative resolution](onboarding/millhand/flint-confrontation.md)
 - [Millhand: approved Flint fight encounter, persistent win/loss callback](onboarding/millhand/flint-fight.md)
 - [Millhand: approved 10-coin medical treatment and clinician dialogue](onboarding/millhand/clinic-treatment.md)
-- [Millhand: final return home, rent notice, quest completion (Stage 8 proposal)](onboarding/millhand/home-rent-ending.md)
+- [Millhand: approved Stage 8 return home, rent notice and short self-directed ending](onboarding/millhand/home-rent-ending.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand/README.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner/README.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter/README.md)
