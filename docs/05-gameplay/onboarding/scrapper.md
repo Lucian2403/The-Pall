@@ -1,6 +1,8 @@
 # Scrapper — Rust Yard Opening
 
-**Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent paid second jobs, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
+**Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
+
+**Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent unpaid tutorial second tasks, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
 ## Locked start and regular NPC
 
@@ -10,13 +12,13 @@
 - **Locked voice and characterization:** **You can hear him coughing from three blocks away.** He refers to fresh air as **"that elitist bourgeois luxury."** These are intentional details of his characterization, not hints at a currently designed medical condition/quest or hidden health stats. Preserve the line exactly when scripting his voice.
 - **Universal starter loadout:** **Basic Clothes, one Crude Small Bag, 20 coins**, exactly like every other background; no free starter tools, weapons or special Scrapper loot.
 
-## First regular paid job — Strip a Condemned Pump (LOCKED)
+## First regular job — Strip a Condemned Pump (LOCKED; unpaid tutorial occurrence)
 
-Ignatius Smog assigns the player to inspect and dismantle a condemned industrial pump and sort salvageable pieces from scrap, using ordinary reusable **Mechanics** interactions, yard-owned tools as needed, and regular wage/XP settlement. This job is available outside the tutorial, with ordinary different machinery/condition content; it is not just an introductory quest in disguise. The **first tutorial occurrence** concerns a condemned auxiliary drainage pump on Rust Yard's old culvert wall, so it can conceal the unique incident. Exact duration, wear, yields, coins and skill XP are TBD.
+Ignatius Smog assigns the player to inspect and dismantle a condemned industrial pump and sort salvageable pieces from scrap, using ordinary reusable **Mechanics** interactions, yard-owned tools as needed, and normal wage/XP settlement **outside onboarding**, but 0 coins/ordinary XP in this exceptional tutorial. This job is available outside the tutorial, with ordinary different machinery/condition content; it is not just an introductory quest in disguise. The **first tutorial occurrence** concerns a condemned auxiliary drainage pump on Rust Yard's old culvert wall, so it can conceal the unique incident. Exact duration, wear and yield mechanics and non-tutorial coins/XP are TBD; tutorial returns 0.
 
 **Reusable job phases:** accept the scrap docket and see the normal wage/risk; isolate a work section and identify reusable parts; choose removal order/tool to protect valuable fasteners or linkage; sort recovered pieces by condition and submit ordinary work. Crucially, **the initial safe strip only removes external guards and nonessential hardware**—it does not disconnect the pump's working drainage connection before the tutorial discovery. This keeps the machine and its dependent households physically viable. Beginner work must be possible with workshop-supplied tools, not a forbidden free starter item.
 
-The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to a paid second job in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](shared-structure.md). **The Last Dry Floor, all three branches and Barnaby Rusk are approved narrative elements; exact implementation is still to be designed.**
+The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to an unpaid tutorial second task in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](shared-structure.md). **The Last Dry Floor, all three branches and Barnaby Rusk are approved narrative elements; exact implementation is still to be designed.**
 
 ## Locked unique twist — The Last Dry Floor
 
@@ -30,19 +32,19 @@ There is another sign: three deliberate knocks from beneath the iron floor. The 
 
 The presence of tenants is a local social and industrial fact, **not** a promised main-story mystery, hidden new faction, or proof of Pall mutation. Smog need not have planned this. His scrap order may be authentic but dangerously uninformed, and his response should be developed without turning him into a one-dimensional villain.
 
-### Three locked first-event responses and paid second jobs
+### Three locked first-event responses and unpaid tutorial second tasks
 
 | Player response | Second job, using a different Major Skill | Immediate discovery / meaningful outcome |
 | --- | --- | --- |
-| **Keep the water back** — refuse to sever the pump until a physical stopgap exists | **Industry → Construction — The Brace Shift.** A municipal drain gang pays the player for a basic culvert shoring / outlet clearing shift. Reusable worksite safety, material choice and sequence/checkpoint modules; no Mechanics work disguised as a second skill. | The cracked culvert wall is beginning to leak around the foundation. Shoring buys a safe window for the people below, but cannot permanently rescue their homes. |
+| **Keep the water back** — refuse to sever the pump until a physical stopgap exists | **Industry → Construction — The Brace Shift.** The municipal drain gang normally pays for (this tutorial response is unpaid) a basic culvert shoring / outlet clearing shift. Reusable worksite safety, material choice and sequence/checkpoint modules; no Mechanics work disguised as a second skill. | The cracked culvert wall is beginning to leak around the foundation. Shoring buys a safe window for the people below, but cannot permanently rescue their homes. |
 | **Find a way out for the occupants** — answer the three knocks and trace the service passage | **Fieldcraft → Navigation — The Low Passage.** A regular low-tier canal-way survey route pays for checking accessible maintenance paths, marking a safe return route and assessing obstacles; reusable navigation/route and environment-reading modules. | The occupied flood cellars are reachable through a dry side passage, allowing the people to leave if the pump must be removed. A few refuse to abandon their possessions—no magical mass rescue, only a practical exit. |
-| **Challenge the salvage order** — try to redirect replacement stock before copper is cut | **Commerce → Logistics — The Spare Line.** A yard dispatch clerk pays for arranging a routine pump-parts delivery or substitute drainage hose; the player reconciles destination, allocation and delivery routing using ordinary Logistics/dispatch interactions. | The old pump cannot just be reclassified as expendable without imposing emergency drainage costs on a district the city says is empty. A temporary substitute can be directed there, but nobody has agreed to pay for a lasting solution. |
+| **Challenge the salvage order** — try to redirect replacement stock before copper is cut | **Commerce → Logistics — The Spare Line.** A yard dispatch clerk normally pays for (unpaid in the tutorial) arranging a routine pump-parts delivery or substitute drainage hose; the player reconciles destination, allocation and delivery routing using ordinary Logistics/dispatch interactions. | The old pump cannot just be reclassified as expendable without imposing emergency drainage costs on a district the city says is empty. A temporary substitute can be directed there, but nobody has agreed to pay for a lasting solution. |
 
-**Contract credibility:** the second jobs are short paid **normal job templates** sourced from city drainage, canal survey and logistics work, with a story-specific incident. Do not award coins merely for clicking a humanitarian choice. All three paths pay ordinary wages and appropriate second-Major-Skill XP, comparable net income, no starter-only gear. The first Mechanics job pays normally too. Its stage does **not** immediately end the E2E tutorial.
+**Contract credibility:** the second tutorial tasks reuse **normally paid job templates** sourced from city drainage, canal survey and logistics work, with a story-specific incident. Do not award coins merely for clicking a humanitarian choice. All three scripted routes award 0 coins/ordinary XP; choosing one grants exactly +1 level in its different Major Skill once. The first Mechanics task is also unpaid. Equivalent jobs outside tutorial pay normally. No starter-only gear. Its stage does **not** immediately end the E2E tutorial.
 
 ### Two further interactions → one shared opponent (LOCKED narrative)
 
-The story converges beside a pipe-cutting gantry at Rust Yard, after the second paid job has delivered its distinct physical or administrative leverage.
+The story converges beside a pipe-cutting gantry at Rust Yard, after the second unpaid tutorial task has delivered its distinct physical or administrative leverage.
 
 **Interaction 1 — The Copper Claim:** **Barnaby Rusk** (LOCKED personal name), a competing **piece-rate breaker**, arrives to sever the abandoned pump's copper branch. He has already been promised a bonus for the weight. He sees the Scrapper as someone obstructing his paid salvage. Depending on the chosen branch, the player can show the shoring gang's work order, point out an evacuation path, or produce a redirected logistics docket. Barnaby dismisses the warning because acknowledging residents would cost him his shift earnings. This is a brutal economic choice, not a secret top-level official ordering a murder.
 
@@ -54,15 +56,15 @@ The story converges beside a pipe-cutting gantry at Rust Yard, after the second 
 
 ### Treatment, home and rent (narrative sequence LOCKED; numbers TBD)
 
-The brawl leaves the Scrapper with a credible minor injury—battered ribs, split knuckles or a forearm abrasion are possible flavors; exact conditions and Health effects TBD. The player pays an affordable working-class city clinician to patch them up, learns the reusable healing interface, and goes home with little money left. The **rent-due notice appears at home, after care**. This completes Scrapper onboarding.
+The brawl leaves the Scrapper with a credible minor injury—battered ribs, split knuckles or a forearm abrasion are possible flavors; exact conditions and Health effects TBD. The player pays **10 coins** to a working-class city clinician to patch them up, learns the reusable healing interface, and returns to the same shared starter home with 10 coins remaining. The **rent-due notice appears at home, after care**. This completes Scrapper onboarding.
 
-**Pacing and parity:** all three second jobs must be within a comparable beginner time/pay envelope. Encounter remains a single grounded short turn-based PvE conflict, not a machine boss or a second forced fight. No early Pall-zone expedition, long rescue quest, specialized parts gate or hidden fraud/crime/reputation flag.
+**Pacing and parity:** all three second jobs must be within a comparable beginner time envelope (tutorial payouts are all zero). Encounter remains a single grounded short turn-based PvE conflict, not a machine boss or a second forced fight. No early Pall-zone expedition, long rescue quest, specialized parts gate or hidden fraud/crime/reputation flag.
 
 ## Locked versus to be detailed
 
-**LOCKED:** Rust Yard permanent Mechanics hub; Ignatius Smog as named recurring Yard Foreman, cough and exact quotation; **Strip a Condemned Pump** repeatable first Mechanics job; **The Last Dry Floor** twist; three paid follow-up choices/jobs (**Industry/Construction — The Brace Shift**, **Fieldcraft/Navigation — The Low Passage**, **Commerce/Logistics — The Spare Line**); **The Copper Claim** and **The Red Lever** pre-combat story interactions; **Barnaby Rusk**, named fellow salvage breaker, as common PvE foe; keeping the pump running long enough for a short-lived reprieve, medical treatment, return home and rent notice. Mechanics +3 and universal starting kit apply. This is self-contained, not the main campaign.
+**LOCKED:** Rust Yard permanent Mechanics hub; Ignatius Smog as named recurring Yard Foreman, cough and exact quotation; **Strip a Condemned Pump** repeatable first Mechanics job; **The Last Dry Floor** twist; three unpaid follow-up tutorial tasks (**Industry/Construction — The Brace Shift**, **Fieldcraft/Navigation — The Low Passage**, **Commerce/Logistics — The Spare Line**); **The Copper Claim** and **The Red Lever** pre-combat story interactions; **Barnaby Rusk**, named fellow salvage breaker, as common PvE foe; keeping the pump running long enough for a short-lived reprieve, medical treatment, return home and rent notice. Mechanics +3 and universal starting kit apply. This is self-contained, not the main campaign.
 
-**Still TBD:** precise locations, costs, wages/XP, salvage yields, effects and medical outcomes, named NPCs for secondary jobs, dialogue, timing, plus all deferred turn-based combat systems/values. No further permanent story systems are implicit.
+**Still TBD:** precise locations, non-tutorial wages/XP, salvage yields, effects and medical outcomes, named NPCs for secondary jobs, dialogue, timing, plus all deferred turn-based combat systems/values. No further permanent story systems are implicit.
 
 ## NPC naming rule (LOCKED for all six origins)
 
@@ -71,5 +73,5 @@ Every NPC must ultimately have a **personal in-world name**, not merely an occup
 ## Remaining production tasks
 
 1. Name the secondary drain gang, canal surveyor and dispatch clerk NPCs with the user; Ignatius Smog and Barnaby Rusk are locked.
-2. Author reusable interactions, dialogue and scene geometry while preserving three comparable paid second jobs.
-3. Define item props, numerical rewards, clinic expenses and durations later; global turn-based combat system remains deferred.
+2. Author reusable interactions, dialogue and scene geometry while preserving three second tasks with identical 0-coin/0-XP rewards and a one-time +1 level in the chosen other Major Skill.
+3. Define item props, numerical rewards, non-tutorial clinic costs (tutorial care is fixed at 10 coins) and durations later; global turn-based combat system remains deferred.
