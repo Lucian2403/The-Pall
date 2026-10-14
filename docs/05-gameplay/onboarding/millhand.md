@@ -17,7 +17,9 @@
 
 **Opening conversation (LOCKED, approved 2026-10-14):** [Guther Anvil — First Workshop Conversation](millhand-opening-dialogue.md). The third revision is approved with understated friction and dry humour. It covers greeting, the optional brief pay exchange and entry into normal Smithing interactions; the Missing Stamp remains later.
 
-**First-task Smithing interaction (PROPOSED, pending user review):** [Worker Plate Stampwork — Reusable Job Modules](millhand-platework-interaction.md). It lays out docket inspection, die matching, one ordinary bent-blank incident, mark verification and the precise boundary before the already-approved Missing Stamp twist. The incident/options are not yet locked.
+**First-task Smithing interaction (LOCKED, approved 2026-10-14):** [Worker Plate Stampwork — Reusable Job Modules](millhand-platework-interaction.md). Docket inspection, die matching, one bent-blank incident, its three alternatives, mark verification and the boundary before the Missing Stamp twist are approved. Exact numerical values/UI wording remain TBD.
+
+**Stage 3 revelation and Guther dialogue (PROPOSED, pending review):** [The Missing Stamp — Evidence, Dialogue and Branch Choice](millhand-missing-stamp-discovery.md). New evidence props and lines are not canon until individually approved.
 
 ## The Missing Stamp — opening job and agreed second-job branches
 
