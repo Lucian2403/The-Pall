@@ -32,23 +32,27 @@ The player opens the regular **Care / Treatment** interface and sees:
 
 *The clinician looks over the injury.*
 
-**CLINICIAN:** “Sit down. Let me see.”
+**CLINICIAN:** “Sit. Let me see.”
 
 *After the examination:*
 
-**CLINICIAN:** “I can dress that. Ten coins.”
+**CLINICIAN:** “Needs cleaning. I'll dress it.”
 
-**PLAYER:** “I've only got twenty.”
+**PLAYER:** “How much?”
 
-**CLINICIAN:** “Then you've enough.”
+**CLINICIAN:** “Ten coins.”
+
+**PLAYER:** “Ten?”
+
+**CLINICIAN:** “That includes the dressing.”
 
 *The player is offered the priced service.*
 
 **[Pay 10 coins for treatment]**
 
-The exchange is plain and slightly uncomfortable because the price consumes **half the player's money**, not because the clinician makes an industrial joke. The clinician is neither theatrical nor unreasonably cruel. There is **no additional quirky line after payment**.
+The exchange is practical: the bill includes the dressing, but **10 coins is half the player's remaining money**. The clinician answers the small objection without apology or a punchline. Don't add a wry afterthought once payment is complete.
 
-**Conditional spoken-detail guardrail:** “I can dress that” is appropriate for a visible scrape/cut. If the future combat outcome is bruising, strain or another condition not treated with a dressing, the clinician must use an accurate symptom-specific line instead—**do not pretend every possible wound needs a bandage**. A concrete conditional line is not approved until an actual injury family exists.
+**Conditional spoken-detail guardrail:** “Needs cleaning. I'll dress it” is appropriate for a visible scrape/cut. If the future combat outcome is bruising, strain or another condition not treated with a dressing, the clinician must use an accurate symptom-specific line instead—**do not pretend every possible wound needs a bandage**. A concrete conditional line is not approved until an actual injury family exists.
 
 ### M03 — Confirm ordinary paid treatment
 
