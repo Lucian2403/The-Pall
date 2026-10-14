@@ -68,10 +68,10 @@ The brawl leaves the Scrapper with a credible minor injury—battered ribs, spli
 
 ## NPC naming rule (LOCKED for all six origins)
 
-Every NPC must ultimately have a **personal in-world name**, not merely an occupational label such as Yard Foreman, Matron or Herb Dealer. Roles/titles remain useful UI descriptors, but canonical personal names are approved separately. Do **not** automatically invent canon names for other NPCs while authoring Scrapper.
+**Revised NPC rule (2026-10-14):** only important recurring/major story characters require approved personal names or recognizable monikers. **Ignatius Smog** and **Barnaby Rusk** are locked. Minor supporting NPCs such as drain-gang leads, surveyors or dispatch clerks may remain **unnamed occupational roles**, including when they give routine instructions. Do not invent additional names just to fill a list.
 
 ## Remaining production tasks
 
-1. Name the secondary drain gang, canal surveyor and dispatch clerk NPCs with the user; Ignatius Smog and Barnaby Rusk are locked.
+1. Keep drain-gang, canal-surveyor and dispatch-clerk NPCs as role-labelled minor characters; no names required unless they become important later.
 2. Author reusable interactions, dialogue and scene geometry while preserving three second tasks with identical 0-coin/0-XP rewards and a one-time +1 level in the chosen other Major Skill.
 3. Define item props, numerical rewards, non-tutorial clinic costs (tutorial care is fixed at 10 coins) and durations later; global turn-based combat system remains deferred.
