@@ -27,6 +27,7 @@ Player activities, time, world economy and authored interactive events.
 - [Millhand: worker-plate Smithing gameplay (approved interaction)](onboarding/millhand-platework-interaction.md)
 - [Millhand: approved Missing Stamp discovery and Guther dialogue](onboarding/millhand-missing-stamp-discovery.md)
 - [Millhand: second-task Hauling / Contracts / Investigation routes (proposed)](onboarding/millhand-second-task-branches.md)
+- [Millhand: Flint's Wage Claim, Cornered and local narrative resolution (proposed)](onboarding/millhand-flint-confrontation.md)
 - [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter.md)
