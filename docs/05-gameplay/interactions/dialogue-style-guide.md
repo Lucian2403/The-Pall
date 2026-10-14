@@ -45,7 +45,7 @@
 
 ## Character voice ledger (only established facts)
 
-- **Guther Anvil — Millhand:** recurring Smithing Foreman; assigns municipal worker-plate lot, later withholds wages due to disputed inspector stamp. His [approved opening scene](../onboarding/millhand-opening-dialogue.md) establishes restrained, practical workplace exchange with understated conflict; this is a **game-wide tonal example, not a template for every character's voice**. No catchphrase or invented history.
+- **Guther Anvil — Millhand:** recurring Smithing Foreman; assigns municipal worker-plate lot, later withholds wages due to disputed inspector stamp. His [approved opening scene](../onboarding/millhand/opening-dialogue.md) establishes restrained, practical workplace exchange with understated conflict; this is a **game-wide tonal example, not a template for every character's voice**. No catchphrase or invented history.
 - **Hector D. Smoke — Bellrunner:** Dispatch Master; shift notices and a closed fume-exposed worksite. No unapproved private history/tics.
 - **Benny Ben — Squatter:** Herb Dealer; Yarrow cuttings from a questionable patch. Do not turn the name into nonstop clowning.
 - **Claudia Cyka — Stitcher:** Matron (she); competent and exhausted, juggling care and institutional compromise. Moral argument should emerge from a decision, not an ethics lecture.
