@@ -38,9 +38,9 @@ This should feel like grim labor governance and human risk, **not a repeat of Mi
 
 **The Wrong Bell**: a sealed notice orders a night shift back into a building officially closed after a dangerous fume incident. The building's warning bell rings regardless. The player must decide what to do with the notice.
 
-| Incident choice | Second paid job in another Major Skill | Grimmer local revelation |
+| Incident choice | Second unpaid tutorial task in another Major Skill | Grimmer local revelation |
 | --- | --- | --- |
-| **Deliver the notice as ordered** | **Commerce → Contracts:** *Attendance Certificate*. The shift office ordinarily pays for reconciling (not during this scripted inquiry) sign-in sheets and obtaining acknowledgment of delivery, using normal contract/verification interactions. | The forms classify any worker who refuses entry as **voluntarily absent**, forfeiting wages even when the site is officially unsafe. |
+| **Deliver the notice as ordered** | **Commerce → Contracts:** *Attendance Certificate*. The shift-office work uses normal contract/verification interactions to reconcile sign-in sheets and obtain acknowledgment of delivery, but **this tutorial inquiry is unpaid**. | The forms classify any worker who refuses entry as **voluntarily absent**, forfeiting wages even when the site is officially unsafe. |
 | **Warn the waiting crew** | **Medicine → Trauma:** *First Aid Line*. A working infirmary attendant recruits the player to triage workers already coughing from the fumes, using ordinary diagnosis/priority interactions. | The medical register marks the coughs as **non-work illness**, shifting treatment costs onto the workers. |
 | **Investigate why the bell is ringing** | **Mechanics → Industrial Machinery:** *The Bell Linkage*. The city works mechanic hires the player to check the shift-bell linkage and ventilation controls, using normal machinery inspection/work interactions. | The bell is deliberately kept operational after the safety shutoff, so the crew can be summoned without reopening the building legally. |
 
