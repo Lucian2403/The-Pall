@@ -46,6 +46,8 @@ Until an explicit decision is made, recipes such as Filter Medium should keep th
 
 ## Learning
 
+**Locked onboarding exception (2026-10-14):** character creation grants **+3 levels** to the chosen background Major Skill. Once the player commits to one of the three second-task routes in the origin tutorial, award **+1 level** in the different Major Skill corresponding to that chosen task; it is an explicit level grant, not regular XP, and cannot be repeated by retries or resuming. Both scripted origin tasks and their scripted fight yield **zero ordinary XP**. Outside onboarding, normal jobs/combat still progress via the ordinary XP system. See [Shared Tutorial Structure](../05-gameplay/onboarding/shared-structure.md).
+
 Most skill progression comes from:
 - jobs;
 - crafting and cooking;
