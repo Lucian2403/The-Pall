@@ -10,7 +10,7 @@
 
 **PLAYER (optional):** “So they'll say I'm late.”
 
-**HECTOR (optional reply):** “I've put down when I gave them to you. They can come here if they don't like it.”
+**HECTOR (optional reply):** “I wrote down when you got them. They can come here if they want to argue.”
 
 **HECTOR (convergence; also when player skips optional response):** “Take the route sheet. Bring back the marks from whoever takes them.”
 
