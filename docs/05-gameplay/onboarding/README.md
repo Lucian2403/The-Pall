@@ -28,7 +28,7 @@
 
 ## Bellrunner opening (current)
 
-- [Stage 1 — Hector D. Smoke opening conversation](bellrunner/opening-dialogue.md) — **PROPOSED; awaiting approval**. The Dispatch House, ordinary Shift Dispatch job and later *Wrong Bell* premise are already locked.
+- [Stage 1 — Hector D. Smoke opening conversation](bellrunner/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-15**. The Dispatch House, ordinary Shift Dispatch job and later *Wrong Bell* premise are also locked; Stage 2 ordinary courier task design remains pending.
 
 ## Millhand progression (current)
 
