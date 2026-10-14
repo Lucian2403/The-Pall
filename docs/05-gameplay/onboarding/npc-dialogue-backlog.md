@@ -53,6 +53,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 - [Millhand — Guther Anvil, opening conversation (LOCKED; canonical tonal reference)](millhand-opening-dialogue.md)
 - [Millhand — Worker Plates: reusable Smithing task interaction (LOCKED)](millhand-platework-interaction.md)
-- [Millhand — Missing Stamp discovery and Guther Anvil (PROPOSED)](millhand-missing-stamp-discovery.md)
+- [Millhand — Missing Stamp discovery and Guther Anvil (LOCKED)](millhand-missing-stamp-discovery.md)
+- [Millhand — Three second-task jobs and supporting dialogue (PROPOSED)](millhand-second-task-branches.md)
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
