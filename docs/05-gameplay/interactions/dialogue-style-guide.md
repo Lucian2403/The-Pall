@@ -1,6 +1,6 @@
 # The Pall — Spoken Dialogue Standard
 
-**Status (2026-10-14): USER-LOCKED WRITING REQUIREMENTS.** The exact demonstrative dialogue examples and any interpretation not explicitly stated by the user are **PROPOSED for refinement**, not yet canonical character lines. Applies to every NPC conversation, quest scene, event dialogue, combat encounter, and any short in-world spoken exchange across the whole game—not only origin tutorials.
+**Status (2026-10-14): LOCKED GAME-WIDE DIALOGUE WRITING STANDARD AND TONE CALIBRATION.** This standard applies to every NPC conversation, quest scene, event dialogue, combat encounter and in-world spoken exchange across the whole game, not only origin tutorials. The **Guther Anvil opening, third revision, is explicitly approved as a concrete tonal benchmark**, while new character dialogue remains subject to individual approval. Do not copy Guther's precise personality into other characters.
 
 ## User's locked writing requirements
 
@@ -19,7 +19,7 @@
 - **Speech and gameplay have different jobs.** NPCs provide motive and stakes; the interface provides precise mechanical labels (Inspect docket / Match number / Stamp plate). Don't make an NPC explain buttons.
 - **Subtext over theme declarations.** A foreman need not pronounce that the city oppresses the poor: a withheld wage, a refused signature or an evasive answer shows it.
 - **Dry humour is often someone refusing the terms of a question.** Choose humour from status, money, risk, a work dispute or a mismatch between claim and reality. Let a funny line sit; do not attach more jokes to prove it was funny. Dark events still need tonal restraint.
-- **Tone calibration (user direction, 2026-10-14):** allow **a very small increase in uncomfortable humour and interpersonal friction** over the spare baseline. It should be almost imperceptible: one deflection, a pointed nonanswer or a little refusal to take responsibility—not an added routine of barbs, punchlines or theatrical cruelty. Never lengthen a scene just to hit a humour quota. The exact tone is tested on each scene before approval.
+- **Tone calibration (user-approved 2026-10-14, STRICT):** use **a very small, almost imperceptible amount of uncomfortable humour and interpersonal friction** where the situation earns it. One deflection, a pointed nonanswer or a little refusal to take responsibility is enough. No added routine of barbs, punchlines or theatrical cruelty; never lengthen dialogue for a humour quota. **Treat this as an editorial acceptance criterion, not an optional stylistic suggestion.** Each new scene must pass a spoken-aloud and character-motive check before it can be approved.
 - **Disagreement should change the exchange.** Let one speaker withhold, push back or change subject. Replies need not be complete sentences. Avoid three polite interview questions followed by instructional answers.
 - **Silence and action are valid.** A cough, a glance at a docket, or a pause may replace an explanation if the action is already grounded in the scene. Do not use mood-laden narration to prescribe emotion.
 - **Class and profession affect speech, not intelligence.** A Smithing foreman is practical; a clerk precise; a matron decisive under pressure. No one has to be a theatrical cockney stereotype, a philosophical fortune-cookie machine or an endlessly witty performer.
@@ -43,7 +43,7 @@
 
 ## Character voice ledger (only established facts)
 
-- **Guther Anvil — Millhand:** recurring Smithing Foreman; assigns municipal worker-plate lot, later withholds wages due to disputed inspector stamp. Keep work talk practical and social dynamics credible. Specific sense of humour/catchphrases TBD.
+- **Guther Anvil — Millhand:** recurring Smithing Foreman; assigns municipal worker-plate lot, later withholds wages due to disputed inspector stamp. His [approved opening scene](../onboarding/millhand-opening-dialogue.md) establishes restrained, practical workplace exchange with understated conflict; this is a **game-wide tonal example, not a template for every character's voice**. No catchphrase or invented history.
 - **Hector D. Smoke — Bellrunner:** Dispatch Master; shift notices and a closed fume-exposed worksite. No unapproved private history/tics.
 - **Benny Ben — Squatter:** Herb Dealer; Yarrow cuttings from a questionable patch. Do not turn the name into nonstop clowning.
 - **Claudia Cyka — Stitcher:** Matron (she); competent and exhausted, juggling care and institutional compromise. Moral argument should emerge from a decision, not an ethics lecture.
@@ -58,4 +58,4 @@ Before accepting any dialogue, ask: **What does this speaker want now? Why use t
 
 ## Approval workflow
 
-The **user's rules above are LOCKED**. Specific drafts, example lines and finer interpretations remain proposals for case-by-case review. Do not call revised Guther text canon until user approves it.
+The **user's rules and restrained-friction calibration above are LOCKED**. **Guther's third-draft opening dialogue was explicitly approved and is canonical**. All future scenes must receive careful line-by-line review for spoken cadence, character motive, specificity, period appropriateness, gratuitous jokes and artificial polish. Specific new dialogue stays PROPOSED until explicitly approved.
