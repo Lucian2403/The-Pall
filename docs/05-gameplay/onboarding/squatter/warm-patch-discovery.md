@@ -1,6 +1,6 @@
 # Squatter — Stage 3: The Warm Patch (APPROVED)
 
-**Status: APPROVED AND LOCKED (2026-10-15).** The premise, discoveries, three choices and second Major Skill routes were already agreed in the [Squatter master](README.md). This draft proposes their playable presentation, plain spoken player reactions, credible harvest-payment problem and the immediate route handoffs. Stage 1 is [approved](opening-dialogue.md); Stage 2 is [approved](yarrow-cut-interaction.md). Stage 4 will script the different follow-up jobs separately.
+**Status: APPROVED AND LOCKED (2026-10-15).** The premise, discoveries, three choices and second Major Skill routes were already agreed in the [Squatter master](README.md). The user approved the playable discovery, spoken player reactions, first-order acceptance dispute and immediate route handoffs. Stage 1 is [approved](opening-dialogue.md); Stage 2 is [approved](yarrow-cut-interaction.md). Stage 4 will script the different follow-up jobs separately.
 
 ## What the player discovers
 
@@ -24,7 +24,7 @@ The player can inspect the three visible clues in any order. The game does not r
 2. **[Look at the exposed bone]** — a small human finger bone lies in the disturbed edge of the soil. The old poorhouse disposal ground is nearby; **who this person was and how their remains came to be here are not known**.
 3. **[Check the drainage bricks]** — the outfall is partly collapsed, runs beside/under the bed and gives off a faint warmth. There is no reason yet to claim a supernatural cause, active Pall contamination or a fixed disease hazard.
 
-**Player reactions (proposed; spoken as the evidence is observed, not a monologue):**
+**Approved player reactions (spoken as the evidence is observed, not a monologue):**
 
 **PLAYER (on the cloth):** “Those look like old bandages. Right where I was picking the yarrow.”
 
@@ -38,13 +38,13 @@ After enough is seen to recognize that the **medicinal harvest may have come fro
 
 The ordinary first-job report remains marked **buyer acceptance pending**. Benny's scale confirmed the quantity, not the medicinal safety of its source, and no customer has accepted the entire order as clean medicinal stock. This explains why a foraging worker could do their part and still be left without a cleared payment. It does **not** make Benny a fraudster who intentionally withheld money.
 
-The initial order cannot be signed off as a full accepted medicinal batch while the source is in doubt. The exact acceptance shortfall/quality record will be evidenced in Stage 4: in the trading route the apothecary checks and buys only a verified clean portion; in the other routes the unresolved contamination concern prevents the order from clearing as delivered. This is a **proposed causal resolution for this exceptional tutorial job**, not a rule that normal Foraging jobs are unpaid or that a small amount of dirt invalidates every harvest.
+The initial order cannot be signed off as a full accepted medicinal batch while the source is in doubt. The exact acceptance shortfall/quality record will be evidenced in Stage 4: in the trading route the apothecary checks and buys only a verified clean portion; in the other routes the unresolved contamination concern prevents the order from clearing as delivered. This is the **approved causal resolution for this exceptional tutorial job**, not a rule that normal Foraging jobs are unpaid or that a small amount of dirt invalidates every harvest.
 
 **Do not script Benny claiming to know about the contaminated soil when the player chose not to tell him.** The buyer's acceptance is pending for ordinary business reasons before the discovery; the suspicious source gives the player an ethical reason to investigate or warn others. No false advance payment is made in Stage 2.
 
 ## S03-C — Choose what matters now
 
-The following three **route meanings and job families are already locked**. The suggested visible choices and short optional lines here remain proposed. All options appear without skill, item or moral-point prerequisites.
+The following three **route meanings and job families are already locked**. The visible choices and short optional lines are approved. All options appear without skill, item or moral-point prerequisites.
 
 ### A — [Take the order to the apothecary without mentioning the patch]
 
