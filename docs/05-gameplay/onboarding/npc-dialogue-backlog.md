@@ -61,7 +61,9 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Millhand — Return home, provisional rent and exact self-directed work/crafting dialogue (LOCKED)](millhand/home-rent-ending.md)
 - [Bellrunner — Hector D. Smoke at the Dispatch House (Stage 1, APPROVED 2026-10-15)](bellrunner/opening-dialogue.md)
 - [Bellrunner — Shift Dispatch ordinary courier interaction (Stage 2, APPROVED 2026-10-15)](bellrunner/shift-dispatch-interaction.md)
-- [Bellrunner — The Wrong Bell incident, watchman, deferred Hector exchange and three branches (Stage 3, PROPOSED 2026-10-15)](bellrunner/wrong-bell-discovery.md)
+- [Bellrunner — The Wrong Bell incident, watchman and deferred Hector exchange (Stage 3, APPROVED 2026-10-15)](bellrunner/wrong-bell-discovery.md)
+- [Bellrunner — Three second-task jobs and natural spoken dialogue (Stage 4, APPROVED 2026-10-15)](bellrunner/second-task-branches.md)
+- [Bellrunner — Dogman: Show Your Papers and Gate Barred (Stage 5, PROPOSED 2026-10-15)](bellrunner/dogman-confrontation.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
