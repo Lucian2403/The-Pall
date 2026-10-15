@@ -42,7 +42,7 @@ If a sufficient usable quantity is not obtained, **[Gather the shortfall]** retu
 
 **[Return to Hedge Shelter]** brings the cuttings to the familiar communal scale. **[Weigh the usable stems]** compares the work order to the accepted sorted quantity; if it is short, show the difference and allow an ordinary small correction. Benny may check the roots/stems visually, but this is not another multi-paragraph speech.
 
-**Proposed brief receipt exchange (spoken only after the job quality check):**
+**Approved brief receipt exchange (spoken only after the job quality check):**
 
 *Benny looks through the yarrow, then sets the bundle on the scale.*
 
