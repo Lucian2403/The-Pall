@@ -1,8 +1,8 @@
-# Squatter — Stage 1: Benny Ben at Hedge Shelter (PROPOSED)
+# Squatter — Stage 1: Benny Ben at Hedge Shelter (APPROVED)
 
-**Status: REVISED PROPOSAL FOR USER APPROVAL (2026-10-15); NOT LOCKED.** Benny Ben's conservation-minded personality was established by the user: he loves plants, believes preserving the little nature left underpins long-term prosperity, and pities the uncared-for flora and fauna in the dangerous zones. The **exact scene dialogue remains proposed**. The [Squatter master](README.md) already locks **Hedge Shelter**, **Benny Ben — Herb Dealer**, the ordinary **Fieldcraft / Foraging** job *Yarrow Cut*, and the later *Warm Patch* incident. Stage 1 does not reveal that discovery.
+**Status: APPROVED AND LOCKED (2026-10-15).** Benny Ben's conservation-minded personality was established by the user: he loves plants, believes preserving the little nature left underpins long-term prosperity, and pities the uncared-for flora and fauna in the dangerous zones. The user approved the exact Stage 1 scene dialogue and optional exchanges. The [Squatter master](README.md) already locks **Hedge Shelter**, **Benny Ben — Herb Dealer**, the ordinary **Fieldcraft / Foraging** job *Yarrow Cut*, and the later *Warm Patch* incident. Stage 1 does not reveal that discovery.
 
-## Scene S01 — A routine herb order (REVISED PROPOSAL)
+## Scene S01 — A routine herb order (APPROVED)
 
 *At the Hedge Shelter, Benny Ben sorts a bundle of yarrow. He straightens a bent stem before setting it on the scale.*
 
