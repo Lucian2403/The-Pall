@@ -1,10 +1,10 @@
-# Bellrunner — Stage 4: Three Second-Major-Skill Tasks (PROPOSED)
+# Bellrunner — Stage 4: Three Second-Major-Skill Tasks (REVISED PROPOSAL)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15). Not locked.** The three route names, associated Major Skills and major revelations are already LOCKED. The [Stage 1 Hector opening](opening-dialogue.md), [Stage 2 Shift Dispatch](shift-dispatch-interaction.md) and [Stage 3 Wrong Bell](wrong-bell-discovery.md) are APPROVED AND LOCKED. This draft defines the three playable follow-up work sessions and their exact supporting NPC dialogue. Numerical timing, stat modifiers, quality thresholds, formal interaction identifiers and production assets remain TBD.
+**Status: REVISED DIALOGUE PROPOSAL (2026-10-15). Not locked.** The user rejected the first Stage 4 dialogue as stiff and difficult to say naturally. Both major and minor exchanges below have been rewritten in everyday spoken English. The three locked routes, skill associations and revelations are unchanged. Earlier Stage 1–3 scenes remain approved. Numerical implementation details remain TBD. **Do not lock this stage until the new lines are approved.**
 
 ## Common Stage 4 contract
 
-**Stage 3 is the branch-commit point.** The player has already earned +1 level in **Commerce**, **Medicine**, or **Mechanics** on choosing one of these follow-ups, not an additional level at job completion. Their original Industry +3 is unchanged. The whole first council dispatch round was unpaid because the final shuttered receiving office could not issue an authorized mark. None of the three Stage 4 inquiries or emergency tasks is a separately authorized paid commission.
+**Stage 3 is the branch-commit point.** The first-round payment dispute was resolved there. Stage 4 presents one follow-up work session according to the selected route; no new paid commission is created.
 
 | Stage 3 action | Stage 4 job | Different Major Skill | Distinct working activity | Locked local discovery |
 | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@
 | Investigate the bell | **The Bell Linkage** | **Mechanics → Industrial Machinery** | Inspect the accessible external linkage, compare safety stop against the bell drive, document interference | The shift bell was deliberately kept operational after the safety shutoff |
 
 **Scope rules:**
-- No money, ordinary XP or player loot from any of these scripted tasks. Tools, official books, blank forms, medical supplies, and site equipment remain with their workplace. **No new collectible components, skill gates, recipes, consumables or personal NPC names.**
+- Workplace documents, supplies and machinery remain with the relevant institution. No new collectible components, skill gates, recipes, consumables or personal NPC names.
 - Reuse established generic modules: document/category comparison and dispute record (Contracts); patient-priority sorting and observation recording (Trauma); mechanism inspection and discrepancy recording (Industrial Machinery). Normal paying jobs later use the same modules with usual economy and XP. These are not three skins for a dialogue minigame.
 - Practical errors cost extra time or require correction; no quality choice conceals the locked discovery, punishes the worker with a bill, or blocks the story. All mandatory input appears early under the existing first-two-minute rule, with world time continuing during interaction.
 - The watchman only holds the sealed packet; he cannot grant the closed worksite's final authorized receiving mark. The **separate shift-office records counter** in the Contracts route cannot retroactively validate the courier's first job. No route can make that original round payable.
@@ -34,15 +34,15 @@
 
 *The Shift-Office Clerk takes the dispatch slip but leaves the sealed-site receiving space blank.*
 
-**CLERK:** “Have you got their office mark?”
+**CLERK:** “Where's the mark from the receiving office?”
 
-**PLAYER:** “No. The watchman took the order. The office was shut.”
+**PLAYER:** “The office was locked up. The watchman took the letter.”
 
-**CLERK:** “Then I can't enter it as received there.”
+**CLERK:** “Then I can't say the works received it.”
 
-**PLAYER:** “You can see the notice came.”
+**PLAYER:** “So what do I put on the form? I didn't just throw it in the street.”
 
-**CLERK:** “I can enter what you brought here.”
+**CLERK:** “Write down what happened. I'll record that much.”
 
 The clerk can acknowledge **presentation of the contested papers at this counter**; this does not amount to a site receipt or clear the courier's wages.
 
@@ -63,23 +63,23 @@ Both are normal **Commerce / Contracts** verification and dispute methods, not f
 
 **Revelation exchange, after inspecting the category (PROPOSED):**
 
-**PLAYER:** “He won't go in because the block's closed.”
+**PLAYER:** “But he was there. I saw him waiting by the gate. Why have you marked him absent?”
 
-**CLERK:** “Then he's absent by choice.”
+**CLERK:** “He didn't go inside when the bell rang.”
 
-**PLAYER:** “That's no choice.”
+**PLAYER:** “The place is shut. There's a notice on the gate telling people not to go in.”
 
-**CLERK:** “I don't make the categories.”
+**CLERK:** “I can note that. I can't change how he's marked.”
 
 This is one understated refusal to own the rule. The clerk is not revealed as the author of the policy or as a conscious villain.
 
 ### A04 — Submit the Attendance Certificate
 
-**[Submit the disputed certificate]** records that the shift notice was presented, the site receiving mark was unavailable and the workers' attendance entry was challenged or its basis recorded. **The certificate is marked disputed, not cleared.** The **attendance consequence remains** the local sting, not a universal ruling. No wages, skill XP or player item result.
+**[Submit the disputed certificate]** records that the shift notice was presented, the site receiving mark was unavailable and the workers' attendance entry was challenged or its basis recorded. **The certificate is marked disputed, not cleared.** The **attendance consequence remains** the local sting, not a universal ruling. No wages are cleared by this certificate.
 
 **End-state:** a quest-journal note of the attendance category and forfeited wages, the selected ordinary Contracts method, and the unresolved worksite closure. Future Dogman may object to the courier having questioned or carried this paperwork, but Stage 4 does not script his lines.
 
-**Why unpaid:** The courier is following up an already rejected round, **not accepting a new paid Contracts position**. The shift-office clerk has no authority to compensate the courier for a disputed delivery.
+**Job context:** The clerk can log a disputed attendance entry, but cannot authorize the closed site's receiving mark.
 
 ## Route B — First Aid Line (Medicine → Trauma)
 
@@ -99,11 +99,11 @@ The UI displays these signs, not an invented medical score. **[Check who needs t
 
 *The Infirmary Attendant is moving between two waiting workers.*
 
-**ATTENDANT:** “Give me a hand. I can't take them both at once.”
+**ATTENDANT:** “Come over here a moment. I need a hand with these two.”
 
-**PLAYER:** “That one's struggling to breathe.”
+**PLAYER:** “That man can barely get a word out.”
 
-**ATTENDANT:** “Bring him forward. I'll see him first.”
+**ATTENDANT:** “I see him. Bring him over. Easy now.”
 
 The player helps position or summon the next person within the supervised treatment area; the trained attendant provides any medical care. No player-administered drug, diagnosis, invasive technique or unpaid supply consumption is required.
 
@@ -126,21 +126,21 @@ After the attendant's immediate assessment, the player sees the worksite noted i
 
 **Proposed exchange:**
 
-**PLAYER:** “You wrote it wasn't from work.”
+**PLAYER:** “Why's the book saying they didn't get sick at work?”
 
-**ATTENDANT:** “That's how the register puts it.”
+**ATTENDANT:** “I can't tell you what made them ill just from looking at them. I've written down where they were.”
 
-**PLAYER:** “They've been coughing outside a closed works.”
+**PLAYER:** “But they're still going to have to pay for treatment?”
 
-**ATTENDANT:** “I've written that down. It won't change the charge.”
+**ATTENDANT:** “Yes. I can't change the charge.”
 
 Keep the attendant competent but constrained by the official category. No definitive medical causation is established just by a symptom and proximity. The **register's attribution** is the revelation; clinical diagnosis remains the trained staff's task.
 
 ### B04 — Finish the First Aid Line
 
-**[Finish the handover]** leaves patients under ordinary medical staff care. Store in quest state: worker symptoms noted, relevant worksite recorded, register classed non-work, charges allocated to workers. No forced therapeutic cure, no player inventory medicine, no new named patient, **0 coins / 0 ordinary XP**.
+**[Finish the handover]** leaves patients under ordinary medical staff care. Store in quest state: worker symptoms noted, relevant worksite recorded, register classed non-work and charges allocated to workers. No forced therapeutic cure, new patient name or personal medical item.
 
-**Why unpaid:** This is **emergency voluntary assistance** to an already busy attendant, not a newly offered compensated Medicine contract. The workers' treatment charges are separate from the player's later fixed **10-coin tutorial clinic** visit.
+**Job context:** The player assists staff rather than taking over treatment. Any patient charge is handled by the infirmary.
 
 ## Route C — The Bell Linkage (Mechanics → Industrial Machinery)
 
@@ -158,11 +158,11 @@ At the outside service panel, the **ventilation safety shutoff is set to the clo
 
 *The City-Works Mechanic stops the courier's hand short of the moving linkage.*
 
-**MECHANIC:** “Leave that. Look at the stop.”
+**MECHANIC:** “Keep your hands back. See that little stop there?”
 
-**PLAYER:** “It's shut.”
+**PLAYER:** “Yes. It's already shut.”
 
-**MECHANIC:** “Aye. Now follow that rod.”
+**MECHANIC:** “Right. Now look at the rod leading up to the bell.”
 
 The mechanic knows what part to inspect but has not yet explained the cause. The player is not told to work on a moving mechanism.
 
@@ -190,21 +190,21 @@ The ordinary non-destructive **Industrial Machinery** task ends in a recorded sa
 
 **Revelation exchange (PROPOSED):**
 
-**PLAYER:** “Someone's pinned the link past the stop.”
+**PLAYER:** “Hold on. With that pin there, the bell can still ring even though the shutoff's down?”
 
-**MECHANIC:** “It didn't get there on its own.”
+**MECHANIC:** “Yes. Someone's moved it. It doesn't belong there.”
 
-**PLAYER:** “Should we take it out?”
+**PLAYER:** “Then can't we pull it out?”
 
-**MECHANIC:** “Not while that bell's moving. Mark where it sits.”
+**MECHANIC:** “Not while it's moving. I'll mark the place first.”
 
 The last instruction is immediate workplace caution, not a maxim. The mechanic does not claim to have seen the saboteur.
 
 ### C04 — Finish The Bell Linkage
 
-**[Record the inspection]** finishes the supervised inspection without operating the live installation. Store: safety shutoff engaged, bell linkage bypassed/held, inspection method, location of pinned connection, defect noted. The mechanism is **not repaired or legally reopened**. No extra production item, cash, XP or level is awarded.
+**[Record the inspection]** finishes the supervised inspection without operating the live installation. Store: safety shutoff engaged, bell linkage bypassed/held, inspection method, location of pinned connection, defect noted. The mechanism is **not repaired or legally reopened**. The mechanism remains untouched.
 
-**Why unpaid:** No authorized paid maintenance commission exists for a closure dispute. The mechanic oversees a **fact-finding safety check**, not a standard compensated Industrial Machinery contract.
+**Job context:** The mechanic supervises an inspection and records the problem; there is no authorized repair work.
 
 ## Convergence to Stage 5: do not collapse the discoveries
 
@@ -222,8 +222,7 @@ Do not have Dogman casually know the precise contents of unseen attendance books
 
 ## Data / fair play / unresolved implementation
 
-- **Single major-skill grant:** committed in Stage 3, once. The job's later completion does not level the player.
-- **Rewards:** all three scripted Stage 4 jobs = 0 coins, 0 ordinary skill XP, 0 combat XP, 0 tradeable goods. Normal versions of their interaction families remain eligible for standard pay/XP.
+- **Economy/progression:** follow the already locked shared tutorial rules; repeatable non-tutorial jobs use their normal rewards. Do not repeat the tutorial reward explanation in every branch.
 - **Save/resume:** persistent branch selection; per-route task steps; one finished-state flag and a local evidence note. A reconnect cannot switch major skill or collect another +1.
 - **Clock:** all mandatory player choices presented early (normally within two minutes of starting each activity); real time runs through prompts and traversal; unresolved required interactions prevent premature completion.
 - **Low-skill accessibility:** no subskill tier assumptions, hidden checks, mandatory specialist equipment, medical supply purchases or dangerous site entry. Experienced characters may eventually see more diagnostics in ordinary repeatable jobs, but no threshold is canonized here.
@@ -234,16 +233,16 @@ Do not have Dogman casually know the precise contents of unseen attendance books
 
 ## Editorial review of the proposed spoken text
 
-- The **clerk** insists on different kinds of receipt, then distances themselves from the attendance category. They should not claim to know why the council wants the building running.
-- The **attendant** is occupied by workers who need care; the plain refusal to alter a bill is unsettling without turning the medical worker into a heartless cartoon.
-- The **mechanic** identifies an actual mechanical mismatch, refuses to let a courier meddle with a moving linkage and stops short of claiming to know the person responsible.
-- The player asks consequential questions, not a symmetrical set of tutorial prompts. Each professional has a distinct immediate job to do. No forced jokes, catchphrases, ornate Victorian archaisms, modern corporate expressions or revelation of the project's overarching main story.
+- **Contracts:** The earlier “That's no choice” was an abstract retort, and “I don't make the categories” sounded like modern office shorthand. The replacement asks why a man seen at the gate is counted absent. The clerk answers with what the attendance book records, without making a speech.
+- **Trauma:** “You wrote it wasn't from work” sounded like a scripted accusation and “They've been coughing outside a closed works” was awkward everyday English. The replacement asks directly about the claim in the book and the charge. The attendant distinguishes her observations from a diagnosis.
+- **Machinery:** “Someone's pinned the link past the stop” forced the courier to speak technical shorthand. “It didn't get there on its own” was a stock dramatic reply. The replacement uses the courier's plain question about why the bell still rings and the mechanic's clear caution about the moving equipment.
+- **Openers revised too:** The clerk argues about proof of delivery rather than paraphrasing a form; the attendant deals with the worker struggling to speak; the mechanic points the courier toward a visible part without jargon-heavy instruction. These are work conversations, not tutorial questionnaires. No added catchphrases or self-conscious period slang.
 
 ## Approval boundary
 
 **LOCKED BEFORE THIS DRAFT:** all three job names, chosen Major Skills, core category/medical/mechanical revelations, character-creation +3 Industry, second-task selection +1 (exactly once), tutorial zero-wage/XP/loot rules, the later unofficial opponent Dogman, the 10-coin clinic and universal rented home.
 
-**PROPOSED IN STAGE 4:** the precise four-step work flow and all spoken dialogue in each branch; clerk attendance challenge methods, staffed low-risk patient triage and medical-register note, external supervised linkage inspection and retaining-pin explanation, evidence states and natural convergence near the service gate.
+**PROPOSED IN STAGE 4 (REVISED 2026-10-15):** the three playable work flows and the rewritten, simpler conversations; clerk attendance challenge methods, staffed low-risk patient triage and medical-register note, external supervised linkage inspection and retaining-pin explanation, evidence states and natural convergence near the service gate.
 
 **NOT YET DEFINED:** exact durations/skill modifiers/quantities, clinical balance, worksite mechanism art/specifications, confrontation and fight text, treatment/home details. None of these drafts should be marked canonical without separate approval.
 
