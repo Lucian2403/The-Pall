@@ -126,7 +126,7 @@ After the attendant's immediate assessment, the player sees the worksite noted i
 
 **Proposed exchange:**
 
-**PLAYER:** “Why's the book saying they didn't get sick at work?”
+**PLAYER:** “Why does the book say they didn't get sick at work?”
 
 **ATTENDANT:** “I can't tell you what made them ill just from looking at them. I've written down where they were.”
 
@@ -190,11 +190,11 @@ The ordinary non-destructive **Industrial Machinery** task ends in a recorded sa
 
 **Revelation exchange (PROPOSED):**
 
-**PLAYER:** “Hold on. With that pin there, the bell can still ring even though the shutoff's down?”
+**PLAYER:** “Wait. Is that pin what's keeping the bell ringing?”
 
-**MECHANIC:** “Yes. Someone's moved it. It doesn't belong there.”
+**MECHANIC:** “Yes. Someone moved it so the bell would work even with the shutoff down.”
 
-**PLAYER:** “Then can't we pull it out?”
+**PLAYER:** “Can't we just pull it out?”
 
 **MECHANIC:** “Not while it's moving. Leave it alone till we've checked everything.”
 
