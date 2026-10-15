@@ -4,6 +4,8 @@
 
 **Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing (10-coin tutorial treatment) and common home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](../shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
 
+**Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
+
 ## Locked hub and recurring NPC
 
 **Civic Copying Office** — a publicly contracted counting-room near Grand Cylinder City's poorer wards: ink-dark windows, sand used to dry fresh writing, scorched tally slips, wooden record bins and clerks transcribing household rolls and industry reports. This is a **permanent Scholarship / Investigation job hub**, not a tutorial-only institution.
