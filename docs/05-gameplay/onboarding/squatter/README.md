@@ -2,7 +2,7 @@
 
 **Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
 
-**Status: Opening E2E quest APPROVED (2026-10-13).** [Stage 1 Benny Ben opening dialogue](opening-dialogue.md) is **APPROVED AND LOCKED (2026-10-15)**. [Stage 2 Yarrow Cut ordinary Foraging interaction](yarrow-cut-interaction.md) and [Stage 3 Warm Patch discovery](warm-patch-discovery.md) are **APPROVED AND LOCKED (2026-10-15)**. [Stage 4 three second-skill jobs](second-task-branches.md) and [Stage 5 two boar pre-fight encounters](boar-confrontation.md) are **PROPOSED (2026-10-15)**, pending user approval. **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, non-tutorial pay and medical mechanics are deferred; scripted tutorial care is 10 coins. The [shared tutorial structure](../shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
+**Status: Opening E2E quest APPROVED (2026-10-13).** [Stage 1 Benny Ben opening dialogue](opening-dialogue.md) is **APPROVED AND LOCKED (2026-10-15)**. [Stage 2 Yarrow Cut ordinary Foraging interaction](yarrow-cut-interaction.md) and [Stage 3 Warm Patch discovery](warm-patch-discovery.md) are **APPROVED AND LOCKED (2026-10-15)**. [Stage 4 three second-skill jobs](second-task-branches.md) and [Stage 5 two boar pre-fight encounters](boar-confrontation.md) are **APPROVED AND LOCKED (2026-10-15)**. [Stage 6 injured boar fight](boar-fight.md) and [Stage 7 clinic](clinic-treatment.md) are **PROPOSED (2026-10-15)**, pending user approval. **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, non-tutorial pay and medical mechanics are deferred; scripted tutorial care is 10 coins. The [shared tutorial structure](../shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
 
 ## Character starting state (LOCKED)
 
@@ -30,7 +30,7 @@ Normal, reusable Foraging interactions:
 
 ## The Warm Patch — LOCKED tutorial-only twist
 
-[Stage 3 scene, clues and branch handoffs](warm-patch-discovery.md) are approved and locked. [Stage 4 route work/dialogue](second-task-branches.md) is proposed.
+[Stage 3 scene, clues and branch handoffs](warm-patch-discovery.md) are approved and locked. [Stage 4 route work/dialogue](second-task-branches.md) is approved.
 
 
 **Only after the normal Foraging interactions** are finished, the Squatter discovers that this Yarrow bed is thriving over a half-collapsed outfall beside the old poorhouse disposal ground. Wet ribbons from medical dressings are tangled around the roots; a human finger bone has surfaced after a rain. A faint warmth comes through the drainage bricks. Benny Ben expected ordinary plants and gives no explanation for the newly exposed remains.
@@ -49,7 +49,7 @@ Three agreed first-event choices send the player to distinct **unpaid tutorial a
 
 ## Two follow-up interactions after second job — LOCKED story beats, proposed scripts
 
-[Stage 5 bank/boar interaction and dialogue proposal](boar-confrontation.md) is under review; the two named beats and opponent are already locked.
+[Stage 5 bank/boar interaction and dialogue](boar-confrontation.md) is approved. [Stage 6 fight and outcome design](boar-fight.md) and [Stage 7 clinic visit](clinic-treatment.md) are proposed.
 
 **Interaction 1, "The Rustling Bank" (LOCKED):** Returning toward the city gate along the edge of the disturbed drainage ground, the player sees rooted soil shifting and hears scraping among the reeds. Choose whether to inspect tracks, take the raised path or investigate a fresh tear in the ground. The choices determine information/position, not whether the mandatory combat exists. A Fieldcraft-aware player may identify animal signs sooner.
 
