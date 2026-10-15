@@ -4,6 +4,8 @@
 
 **Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent unpaid tutorial second tasks, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](../shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
+**Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
+
 ## Locked start and regular NPC
 
 - **Background:** Scrapper, a demolition/salvage-yard worker. At character creation gains **+3 levels in Mechanics** (Major Skill, not a subskill), starting STR / DEX / INT / RES at 5 and maximum Health 50.
