@@ -1,6 +1,6 @@
-# Squatter — Stage 5: The Rustling Bank / Nowhere to Step (PROPOSED)
+# Squatter — Stage 5: The Rustling Bank / Nowhere to Step (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The names and sequence of these **two** pre-fight interactions, and the **young injured wild boar** as the opponent, are already established in the [Squatter master](README.md). The observation choices, environmental staging and tactical starting positions below are proposed. Stage 6 will design the real turn-based animal fight and its consequences.
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the two interactions, observations, player speech, distressed-boar staging, and three physical approaches. The **young injured wild boar** remains the canonical opponent. Stage 6 must define encounter-level combat and outcome handling; exact global combat mechanics stay TBD.
 
 The player has finished exactly one of the [three Stage 4 second-skill activities](second-task-branches.md). The public approach road to Grand Cylinder City's gate runs near the disturbed drainage bank. No one has summoned a boar, and the animal has no knowledge of the player's paperwork or earlier branch. It is a wild creature reacting to noise, pain and restricted space—not a malicious or supernatural enemy.
 
@@ -18,7 +18,7 @@ The animal itself is still obscured. The player is in the **protected outskirts*
 
 All three choices advance. None guarantees the boar will disappear, forces the protagonist to step into danger, awards equipment, or creates new Tracking skill ranks. Record the choice as one sensible **approach-state** for the upcoming encounter; its eventual combat translation remains TBD.
 
-**Proposed short player aside, only after seeing the hoof marks:**
+**Approved short player aside, only after seeing the hoof marks:**
 
 **PLAYER:** “Something's been limping through here.”
 
@@ -32,7 +32,7 @@ A Squatter can recognize signs of an animal's awkward gait without diagnosing a 
 
 This explains the confrontation without inventing a trained attack animal, magical rage or a boar that pursues people for revenge: **the animal is injured, startled and trying to reach solid ground**. It may still charge when it cannot get past safely. The Squatter cannot be ordered to help it, touch it or kill it.
 
-**PLAYER (proposed):** “Easy. I'm not coming after you.”
+**PLAYER:** “Easy. I'm not coming after you.”
 
 *The boar stamps once and swings its head toward the path. It is too close to slip past without risking a charge.*
 
@@ -63,7 +63,7 @@ Benny loves plants and pities vulnerable animals, including those in danger zone
 
 **Already locked:** *The Rustling Bank* and *Nowhere to Step* as exactly two story encounters; a young injured wild boar as the common enemy; three environmental approaches; short beginner-safe turn-based combat; no mandatory killing blow.
 
-**Proposed in Stage 5:** precise physical staging, three observation choices, brief player words, the explanation for the animal's defensive aggression, three terrain-aware pre-fight positions and state handoff.
+**Approved in Stage 5:** precise physical staging, three observation choices, brief player words, the explanation for the animal's defensive aggression, three terrain-aware pre-fight positions and state handoff. Actual tactical modifiers remain unapproved.
 
 **TBD:** precise bank/fence art and layout, cause of the boar's injury, combat action names, enemy tuning, actual positional effects and Stage 6 victory/defeat transitions.
 
