@@ -47,7 +47,7 @@
 
 - **Guther Anvil — Millhand:** recurring Smithing Foreman; assigns municipal worker-plate lot, later withholds wages due to disputed inspector stamp. His [approved opening scene](../onboarding/millhand/opening-dialogue.md) establishes restrained, practical workplace exchange with understated conflict; this is a **game-wide tonal example, not a template for every character's voice**. No catchphrase or invented history.
 - **Hector D. Smoke — Bellrunner:** Dispatch Master; shift notices and a closed fume-exposed worksite. No unapproved private history/tics.
-- **Benny Ben — Squatter:** Herb Dealer; Yarrow cuttings from a questionable patch. Do not turn the name into nonstop clowning.
+- **Benny Ben — Squatter:** Herb Dealer; loves herbs and the remaining natural world. Believes protecting healthy plant patches is essential to future medicine, work and prosperity. Pities uncared-for plants and animals in the dangerous zones. His voice is caring and practical, not a conservation sermon or a joke about his name. The specific Stage 1 lines in [Benny's opening](../onboarding/squatter/opening-dialogue.md) remain proposed pending approval.
 - **Claudia Cyka — Stitcher:** Matron (she); competent and exhausted, juggling care and institutional compromise. Moral argument should emerge from a decision, not an ethics lecture.
 - **Ignatius Smog — Scrapper:** Yard Foreman with a cough audible three blocks away; specifically calls fresh air **"that elitist bourgeois luxury"**. This exact phrase is already canon; additional jokes/tics not canon.
 - **Erwin Buro — Inkbound:** Senior Copy Clerk, risk-averse around the municipal contract and accepted winter mortality table. Precise and self-protective is an available direction, not a speech caricature.
