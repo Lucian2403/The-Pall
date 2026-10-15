@@ -1,6 +1,6 @@
-# Bellrunner — Stage 6: Dogman's Turn-Based Fight (PROPOSED)
+# Bellrunner — Stage 6: Dogman's Turn-Based Fight (APPROVED ENCOUNTER)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The opponent, the physical threat, the service-gate setting and three pre-fight approaches are [APPROVED Stage 5](dogman-confrontation.md). This document proposes the encounter's narrative beats, tactical teaching goals, victory and defeat transitions, and preservation of the character's papers. The global combat rules and numerical balance are not designed here.
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-15).** The user approved the readable club attack, tactical entry differences, movement obstacle, nonlethal narrow victory, witnessed interruption on defeat, and onward medical handoff. Exact combat mechanics, numerical balance and Health effects remain TBD. The opponent, physical threat, gate setting and three pre-fight approaches were already approved in [Stage 5](dogman-confrontation.md).
 
 Related canonical context: [Bellrunner overview](README.md), [approved Stage 4](second-task-branches.md), [approved Stage 3](wrong-bell-discovery.md), [shared onboarding](../shared-structure.md), [Millhand Stage 6 fight as encounter design reference](../millhand/flint-fight.md), [game-wide dialogue guide](../../interactions/dialogue-style-guide.md).
 
@@ -103,6 +103,6 @@ The already-established tutorial reward/progression and starter-item rules apply
 
 **LOCKED BEFORE THIS STAGE:** Dogman's identity and employer relationship; Stage 5 exact words, bag-grab/club escalation and the three pre-fight physical stances; a short normal turn-based encounter; fair entry with the universal kit; defeat-safe onward route to the common care and housing ending.
 
-**PROPOSED NOW:** readable heavy-club warning, practical differences between the three stances, use of the work cart as a real obstacle, the close-range fight's general pace, nonlethal narrow victory, a loss interrupted by nearby witnesses before papers are taken, and storing the encounter result.
+**APPROVED IN STAGE 6:** readable heavy-club warning, meaningful opening stances, work-cart obstacle, broad close-range encounter structure, narrow nonlethal victory, witnesses interrupting a defeat before papers are taken, and storing the outcome. Exact combat effects remain deferred.
 
-**LATER / TBD:** all exact combat rules and values, Dogman's numerical kit, whether grappling exists globally, Health/injury integration and Stages 7–8. **Nothing in this proposed Stage 6 is approved until the user confirms it.**
+**LATER / TBD:** exact combat rules and values, Dogman's numerical kit, whether grappling exists globally, Health/injury integration and Stages 7–8.
