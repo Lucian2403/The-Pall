@@ -1,6 +1,6 @@
-# Bellrunner — Stage 8: Home and Rent Notice (PROPOSED)
+# Bellrunner — Stage 8: Home and Rent Notice (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15). NOT LOCKED.** This is the final Bellrunner onboarding scene. Use the *exact same rented starter home*, rent framework and ordinary travel as all other backgrounds. The home and rent amount are already shared canon; the Bellrunner's brief spoken reaction and exact scene flow below are proposed.
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the final Bellrunner onboarding scene: ordinary return to the same rented starter home, provisional rent notice, read/put-down interaction, exact self-directed spoken line, and branch-aware local journal closure. The shared housing, rent and clinic rules remain unchanged.
 
 Related approved scenes: [Stage 6 fight](dogman-fight.md), [Stage 7 clinic](clinic-treatment.md), [Bellrunner overview](README.md). Shared reference: [Millhand home ending](../millhand/home-rent-ending.md), [universal onboarding](../shared-structure.md), [dialogue standard](../../interactions/dialogue-style-guide.md).
 
@@ -60,6 +60,6 @@ The Dispatch House remains available for normal courier jobs. Hector's approved 
 
 **ALREADY LOCKED:** shared rented home, provisional rent notice, return after medical care, no surprise payment or invented landlord. The chosen branch and Dogman result persist.
 
-**PROPOSED NOW:** exact home narration and player line, read/put-down interaction, quiet tutorial-complete boundary, short route-aware journal recap and optional Hector conversation staying outside the mandatory tutorial ending.
+**APPROVED AND LOCKED THIS STAGE (2026-10-15):** exact home narration and player line, read/put-down interaction, tutorial-complete boundary, short route-aware journal recap and Hector's optional exchange staying outside the mandatory ending. Preserve the approved spoken line verbatim unless the user requests a revision.
 
 **TBD:** exact common room asset, rent frequency/due date/penalties, formal UI identifiers and global combat/Health numerical details.
