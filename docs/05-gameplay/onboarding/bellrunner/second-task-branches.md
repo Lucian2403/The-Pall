@@ -1,6 +1,6 @@
-# Bellrunner — Stage 4: Three Second-Major-Skill Tasks (REVISED PROPOSAL)
+# Bellrunner — Stage 4: Three Second-Major-Skill Tasks (APPROVED)
 
-**Status: REVISED DIALOGUE PROPOSAL (2026-10-15). Not locked.** The user rejected the first Stage 4 dialogue as stiff and difficult to say naturally. Both major and minor exchanges below have been rewritten in everyday spoken English. The three locked routes, skill associations and revelations are unchanged. Earlier Stage 1–3 scenes remain approved. Numerical implementation details remain TBD. **Do not lock this stage until the new lines are approved.**
+**Status: APPROVED AND LOCKED (2026-10-15).** User approved the revised, natural spoken dialogue in all three branches, including supporting exchanges, plus the proposed gameplay sequences and their already agreed route revelations. Preserve approved player/NPC wording unless further changes are specifically agreed. Numerical implementation details remain TBD.
 
 ## Common Stage 4 contract
 
@@ -30,7 +30,7 @@
 
 **[Compare the notice and attendance sheet]** brings up an ordinary shift roster (worker entries, scheduled shift, attendance category) and the notice's dispatch details. The entries show the closed site's night shift. The player can identify the same work block without finding a concealed mark or guessing at missing data.
 
-**Short exchange (PROPOSED):**
+**Short exchange (APPROVED):**
 
 *The Shift-Office Clerk takes the dispatch slip but leaves the sealed-site receiving space blank.*
 
@@ -61,7 +61,7 @@ The sheet lists a worker who will not enter the fume-closed block. The standard 
 
 Both are normal **Commerce / Contracts** verification and dispute methods, not forgeries. Both allow an accurate disputed certificate. Neither forces the player to endorse an unsafe shift or falsify attendance to continue.
 
-**Revelation exchange, after inspecting the category (PROPOSED):**
+**Revelation exchange, after inspecting the category (APPROVED):**
 
 **PLAYER:** “But he was there. I saw him waiting by the gate. Why have you marked him absent?”
 
@@ -95,7 +95,7 @@ The attendant has two visible cases in a short queue; these are **narrative pres
 
 The UI displays these signs, not an invented medical score. **[Check who needs the attendant first]** allows the player to select whom the attendant should see immediately. Choosing Worker B gives the obvious safer priority. Choosing Worker A triggers a short correction: the attendant redirects the urgent worker first while the player spends extra time reorganizing the queue. **No permanent medical injury or deaths are caused by a first-time player's incorrect click.** An emergency is not a test of invented clinical thresholds.
 
-**Proposed opening:**
+**Approved opening:**
 
 *The Infirmary Attendant is moving between two waiting workers.*
 
@@ -124,7 +124,7 @@ After the attendant's immediate assessment, the player sees the worksite noted i
 
 **[Compare the observation and register entry]** reveals the mismatch. The player may choose **[Ask for the worksite to be written in the notes]** or **[Ask why the charge is on the worker]**. Both paths establish what staff observed without granting them legal authority to reverse billing.
 
-**Proposed exchange:**
+**Approved exchange:**
 
 **PLAYER:** “Why does the book say they didn't get sick at work?”
 
@@ -188,7 +188,7 @@ The player chooses one of two standard Industrial Machinery checks. Both are **p
 
 The ordinary non-destructive **Industrial Machinery** task ends in a recorded safety defect. Neither branch magically repairs the closed ventilation machinery, removes evidence, stops the bell as an unapproved world effect or consumes a personal tool.
 
-**Revelation exchange (PROPOSED):**
+**Revelation exchange (APPROVED):**
 
 **PLAYER:** “Wait. Is that pin what's keeping the bell ringing?”
 
@@ -202,7 +202,7 @@ The last instruction is immediate workplace caution, not a maxim. The mechanic d
 
 ### C04 — Finish The Bell Linkage
 
-**[Record the inspection]** finishes the supervised inspection without operating the live installation. Store: safety shutoff engaged, bell linkage bypassed/held, inspection method, location of pinned connection, defect noted. The mechanism is **not repaired or legally reopened**. The mechanism remains untouched.
+**[Record the inspection]** finishes the supervised inspection without operating the live installation. Store: safety shutoff engaged, bell linkage bypassed/held, inspection method, location of pinned connection, defect noted. The mechanism remains **untouched**, and the building is not legally reopened.
 
 **Job context:** The mechanic supervises an inspection and records the problem; there is no authorized repair work.
 
@@ -231,7 +231,7 @@ Do not have Dogman casually know the precise contents of unseen attendance books
 - **Technical TBD:** formal interaction IDs, patient clinical attributes/conditions, mechanical design diagram, attendance form asset, route geometry, base work/travel duration, inspection success probabilities, equipment detail, UI copy and all skill-efficiency multipliers.
 - **Next:** Stage 5 — two Dogman interactions, *Show Your Papers* then *Gate Barred*; numerical combat design and later healing/housing still separate.
 
-## Editorial review of the proposed spoken text
+## Editorial review of the approved spoken text
 
 - **Contracts:** The earlier “That's no choice” was an abstract retort, and “I don't make the categories” sounded like modern office shorthand. The replacement asks why a man seen at the gate is counted absent. The clerk answers with what the attendance book records, without making a speech.
 - **Trauma:** “You wrote it wasn't from work” sounded like a scripted accusation and “They've been coughing outside a closed works” was awkward everyday English. The replacement asks directly about the claim in the book and the charge. The attendant distinguishes her observations from a diagnosis.
@@ -242,8 +242,8 @@ Do not have Dogman casually know the precise contents of unseen attendance books
 
 **LOCKED BEFORE THIS DRAFT:** all three job names, chosen Major Skills, core category/medical/mechanical revelations, character-creation +3 Industry, second-task selection +1 (exactly once), tutorial zero-wage/XP/loot rules, the later unofficial opponent Dogman, the 10-coin clinic and universal rented home.
 
-**PROPOSED IN STAGE 4 (REVISED 2026-10-15):** the three playable work flows and the rewritten, simpler conversations; clerk attendance challenge methods, staffed low-risk patient triage and medical-register note, external supervised linkage inspection and retaining-pin explanation, evidence states and natural convergence near the service gate.
+**APPROVED IN STAGE 4 (2026-10-15):** the three playable work flows and the rewritten, simpler conversations; clerk attendance challenge methods, staffed low-risk patient triage and medical-register note, external supervised linkage inspection and retaining-pin explanation, evidence states and natural convergence near the service gate.
 
-**NOT YET DEFINED:** exact durations/skill modifiers/quantities, clinical balance, worksite mechanism art/specifications, confrontation and fight text, treatment/home details. None of these drafts should be marked canonical without separate approval.
+**NOT YET DEFINED:** exact durations/skill modifiers/quantities, clinical balance, worksite mechanism art/specifications, confrontation and fight text, treatment/home details. Exact numerical mechanics and implementation details are still deferred.
 
 Related: [Bellrunner story](README.md), [Stage 3 discovery](wrong-bell-discovery.md), [Stage 2 courier work](shift-dispatch-interaction.md), [Shared structure](../shared-structure.md), [Jobs and Time](../../jobs/jobs-and-time.md), [Game-wide dialogue style](../../interactions/dialogue-style-guide.md).
