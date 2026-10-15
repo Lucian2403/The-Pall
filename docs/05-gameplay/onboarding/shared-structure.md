@@ -28,7 +28,7 @@
 
 ## Shared Stage 8 — one reusable rent scene
 
-The [single canonical home/rent interaction](shared-home-rent-ending.md) applies unchanged to **Millhand, Bellrunner, Squatter, Stitcher, Scrapper and Inkbound**. Do not author separate notices, alternative rent amounts, homes, housing mechanics or forced origin-specific endings. Millhand and Bellrunner retain only their **already approved character remarks after putting down this same notice**. Squatter and the remaining three require no separate Stage 8 script unless the user specifically requests an additional line. The 150-coin amount remains provisional.
+The [single canonical home/rent interaction](shared-home-rent-ending.md) applies unchanged to **Millhand, Bellrunner, Squatter, Stitcher, Scrapper and Inkbound**. Do not author separate notices, alternative rent amounts, homes, housing mechanics or forced origin-specific endings. **All six characters speak the EXACT same Millhand-origin line after putting down the notice**, with no altered wording or extra closing speech; this supersedes Bellrunner's earlier alternative and the previous omission for Squatter. The 150-coin amount remains provisional. Only earlier quest-journal facts remain background-specific.
 
 ## Shared housing and economic guardrails (LOCKED unless marked provisional)
 
