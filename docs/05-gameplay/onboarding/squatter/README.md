@@ -2,7 +2,7 @@
 
 **Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
 
-**Status: Opening E2E quest APPROVED (2026-10-13).** [Stage 1 Benny Ben opening dialogue](opening-dialogue.md) is **PROPOSED (2026-10-15)**, pending separate approval. **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, non-tutorial pay and medical mechanics are deferred; scripted tutorial care is 10 coins. The [shared tutorial structure](../shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
+**Status: Opening E2E quest APPROVED (2026-10-13).** [Stage 1 Benny Ben opening dialogue](opening-dialogue.md) is **APPROVED AND LOCKED (2026-10-15)**. [Stage 2 Yarrow Cut ordinary Foraging interaction](yarrow-cut-interaction.md) and [Stage 3 Warm Patch discovery](warm-patch-discovery.md) are **PROPOSED (2026-10-15)**, pending user approval. **Hedge Shelter**, recurring **Benny Ben, the Herb Dealer** as the foraging-job NPC, **Yarrow Cut**, **The Warm Patch**, three second-Major-Skill branches, the young injured wild boar, medical visit and rent-at-home ending are locked in narrative direction. Combat rules, numerical values, NPC personal names, location geometry, non-tutorial pay and medical mechanics are deferred; scripted tutorial care is 10 coins. The [shared tutorial structure](../shared-structure.md), **Fieldcraft +3**, and standard starter kit are locked.
 
 ## Character starting state (LOCKED)
 
@@ -18,7 +18,7 @@
 
 **Recurring job NPC: Benny Ben, Herb Dealer (personal name and occupational title LOCKED)**: a practical broker who weighs and pays for ordinary collected plants and assigns nearby Foraging/gathering jobs. **His personality is LOCKED by user direction (2026-10-15): Benny deeply loves herbs and living nature, believes protecting the few healthy patches left is essential to long-term prosperity, and feels compassion for plants and animals in dangerous/Pall-affected zones that receive no care.** He sees sustainable harvesting as a way to sustain medicines, work and future growth, not as a contradiction of his trade. His affection should appear in grounded behaviour and occasional heartfelt lines, not constant sermons, caricature, or invented personal experiences inside the zones. This is the permanent **Fieldcraft / Foraging paid-job hub**, not a tutorial-only place or a general city Smithing station. Benny is not established as a villain.
 
-**First tutorial task (LOCKED): Yarrow Cut**. Gather a modest assigned quantity of common **Yarrow** from a reliable known public patch near the shelter. Yarrow's normal safe field/outskirts sourcing and bleeding-control medicinal role are already documented in [Herbs and Harvesting](../../../03-resources/raw/herbs-and-harvesting.md).
+**First tutorial task (LOCKED): Yarrow Cut**. [Detailed Stage 2 work proposal](yarrow-cut-interaction.md) is not yet approved. Gather a modest assigned quantity of common **Yarrow** from a reliable known public patch near the shelter. Yarrow's normal safe field/outskirts sourcing and bleeding-control medicinal role are already documented in [Herbs and Harvesting](../../../03-resources/raw/herbs-and-harvesting.md).
 
 Normal, reusable Foraging interactions:
 1. Speak to Benny Ben: see the quantity, payment, estimated time and a simple gathering destination.
@@ -29,6 +29,9 @@ Normal, reusable Foraging interactions:
 **Source-of-truth economy guardrail:** Herb material has **no Crude–Masterwork tier**; patch population and harvest pressure are shared-world rules. Introductory required common Yarrow must remain obtainable even when the world patch is depleted or other players have harvested it.
 
 ## The Warm Patch — LOCKED tutorial-only twist
+
+[Stage 3 scene, clues and branch-handoff proposal](warm-patch-discovery.md) is under review; its underlying discovery and three routes are already locked.
+
 
 **Only after the normal Foraging interactions** are finished, the Squatter discovers that this Yarrow bed is thriving over a half-collapsed outfall beside the old poorhouse disposal ground. Wet ribbons from medical dressings are tangled around the roots; a human finger bone has surfaced after a rain. A faint warmth comes through the drainage bricks. Benny Ben expected ordinary plants and gives no explanation for the newly exposed remains.
 
