@@ -1,67 +1,38 @@
-# Bellrunner — Stage 8: Home and Rent Notice (APPROVED)
+# Bellrunner — Stage 8: Home and Rent Notice (APPROVED; SHARED SCENE)
 
-**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the final Bellrunner onboarding scene: ordinary return to the same rented starter home, provisional rent notice, read/put-down interaction, exact self-directed spoken line, and branch-aware local journal closure. The shared housing, rent and clinic rules remain unchanged.
+**Status: APPROVED AND LOCKED, updated by user's 2026-10-15 universal-closing-line instruction.** Bellrunner uses the exact [common Stage 8 home, rent notice and final spoken line](../shared-home-rent-ending.md) used by Millhand, Squatter, Stitcher, Scrapper and Inkbound. The earlier, independently approved Hector-specific **home-closing speech was explicitly superseded** when the user required every background to speak the Millhand line. Do not show or restore the superseded line.
 
-Related approved scenes: [Stage 6 fight](dogman-fight.md), [Stage 7 clinic](clinic-treatment.md), [Bellrunner overview](README.md). Shared reference: [Millhand home ending](../millhand/home-rent-ending.md), [universal onboarding](../shared-structure.md), [dialogue standard](../../interactions/dialogue-style-guide.md).
+## Bellrunner handoff and shared scene
 
-**Shared notice authority:** The [common Stage 8 home-and-rent scene](../shared-home-rent-ending.md) is the single source for this notice, its housing interactions and the rent figure (still provisional). This document's separately approved character line remains an exception **after the identical notice is put down**; it creates no origin-specific rent variation.
+The courier leaves [Stage 7](clinic-treatment.md) by ordinary city travel. Dogman's [Stage 6 outcome](dogman-fight.md) remains victory or defeat. Do not stage another ambush or force a visit to Hector.
 
-## B08-A — Back home
+Run the **shared Stage 8** without a Bellrunner-specific fork:
 
-The courier leaves the clinic and travels home through the usual city interface. The Dogman fight has ended, whether the player won or lost. Do not stage another ambush, bring in Hector without a natural player visit, or force the courier to settle the site's paperwork first.
+1. **[Enter home]** — same universal rented home and property/storage rules.
+2. **[Read the rent notice]** — identical in-world `RENT — 150 coins owing.` text; the amount remains provisional.
+3. **[Put the notice down]** — the player then says **the exact universal Millhand-origin closing speech** stored in [shared-home-rent-ending.md](../shared-home-rent-ending.md). No reference to Hector or courier work is added to that line.
+4. Complete the Bellrunner introduction once, preserving the shared post-clinic balance of 10 coins, no further charge and no new compulsory job.
 
-**[Enter home]**
+The central shared file is the **single source of truth** for full narration, precise quotation, payment/notice rules and completion order; do not duplicate the line as a background script.
 
-*There is a rent notice waiting at home.*
+## Bellrunner-specific journal closure — not part of the rent notice
 
-**[Read the rent notice]**
+Keep **only the one finding belonging to the Stage 4 route actually played**:
 
-> **RENT**
->
-> **150 coins owing.**
-
-The 150-coin rent remains **PROVISIONAL** in game design, as in every other background. It is not a new Bellrunner-specific charge. No due date, landlord signature, eviction threat or automatic rent collection is invented here.
-
-The ordinary UI, *separate from the in-world paper*, can show the existing 10 coins in hand and the amount still needed. The notice itself should remain a simple in-world document.
-
-## B08-B — Put down the notice
-
-**[Put the notice down]**
-
-*The courier sets the notice down.*
-
-**PLAYER (quietly, to themselves):** “Oh, come on. I didn't even get paid for that last round, and now this. Better see if Hector's got another job.”
-
-This is a short, everyday reaction to the courier's actual experience, not a new quest. It gives a natural reason to return to the existing Dispatch House and try ordinary paid work. The dialogue must not become a lesson about job rewards, contracts or skill levels.
-
-After this, **Bellrunner opening complete**. Normal work and travel are available.
-
-## B08-C — Keep what the character learned
-
-The completed introduction records the selected **one** Stage 4 finding:
-
-| Branch played | Journal takeaway |
+| Route | One local finding |
 | --- | --- |
 | **Attendance Certificate** | Workers who stayed out of the unsafe building are recorded as voluntarily absent and lose wages. |
 | **First Aid Line** | The medical register classes the affected workers' complaints as non-work illness, leaving them with the charges. |
-| **The Bell Linkage** | Someone left the night bell connected after the ventilation safety shutoff; the responsible person remains unknown. |
+| **The Bell Linkage** | Someone left the night bell connected despite the ventilation safety shutoff; the culprit remains unknown. |
 
-It also retains the Dogman **victory or defeat** outcome. No future Dogman mission is promised. The wider cause behind the shift notices remains unresolved; the courier has finished one personal incident, not the main story.
+Retain the **Dogman victory/defeat** result independently. The danger at the closed worksite and its paperwork remain locally unresolved. No new overarching quest is promised.
 
-The Dispatch House remains available for normal courier jobs. Hector's approved **optional** follow-up dialogue about the rejected council round belongs to the player's next natural visit, *if* they make one; it does not interrupt the final home scene or require replaying the tutorial.
+The Dispatch House remains available for *ordinary paid jobs*. Hector's previously approved optional conversation about the council's rejection of the courier round belongs only to an **ordinary later visit to Hector**, not the home ending, and remains unchanged.
 
-## Implementation boundaries
+## Implementation
 
-- Ordinary clinic exit → ordinary travel → same shared home → read rent notice → put it down → one brief self-directed line → complete tutorial once.
-- Stage 7 care must have finished. The ending does not create or resolve the still-open shared medical question of an unharmed fighter's examination.
-- Do not change the player's housing, starter gear, the clinic charge, or the provisional rent framework. Do not introduce a second rental home, new permanent NPC, deadline, eviction countdown, immediate payment demand or mandatory job.
-- A reload must not replay the line, reopen Dogman's encounter, charge clinic care twice, or restart the chosen branch.
-- This is a local closure: Dogman no longer blocks the way, but the unsafe-site records have not magically been corrected.
+Use identical housing scene/notice/dialogue IDs and controls across six backgrounds. This document contains Bellrunner's journal and transition metadata only. A reload cannot repeat the home speech, the clinic charge, Dogman's encounter or the one-time second-skill grant.
 
-## Approval boundary
+**TBD:** final shared home asset, rent schedule/penalties, global combat/Health effects and exact production identifiers. No Bellrunner-specific rent semantics or closing speech remain in force.
 
-**ALREADY LOCKED:** shared rented home, provisional rent notice, return after medical care, no surprise payment or invented landlord. The chosen branch and Dogman result persist.
-
-**APPROVED AND LOCKED THIS STAGE (2026-10-15):** exact home narration and player line, read/put-down interaction, tutorial-complete boundary, short route-aware journal recap and Hector's optional exchange staying outside the mandatory ending. Preserve the approved spoken line verbatim unless the user requests a revision.
-
-**TBD:** exact common room asset, rent frequency/due date/penalties, formal UI identifiers and global combat/Health numerical details.
+Related: [Bellrunner overview](README.md), [approved clinic](clinic-treatment.md), [common onboarding](../shared-structure.md), [universal Stage 8](../shared-home-rent-ending.md).
