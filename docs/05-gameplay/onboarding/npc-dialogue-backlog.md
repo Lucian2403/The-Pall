@@ -60,7 +60,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Millhand — Clinic treatment and dialogue (LOCKED; Health mechanics TBD)](millhand/clinic-treatment.md)
 - [Millhand — Return home, provisional rent and exact self-directed work/crafting dialogue (LOCKED)](millhand/home-rent-ending.md)
 - [Bellrunner — Hector D. Smoke at the Dispatch House (Stage 1, APPROVED 2026-10-15)](bellrunner/opening-dialogue.md)
-- [Bellrunner — Shift Dispatch ordinary courier interaction (Stage 2, PROPOSED 2026-10-15)](bellrunner/shift-dispatch-interaction.md)
+- [Bellrunner — Shift Dispatch ordinary courier interaction (Stage 2, APPROVED 2026-10-15)](bellrunner/shift-dispatch-interaction.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
