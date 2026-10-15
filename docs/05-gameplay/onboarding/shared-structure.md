@@ -26,6 +26,10 @@
 - **Universal starting items and accommodation are LOCKED:** every origin and portrait starts with **Basic Clothes, one Crude Small Bag and 20 coins** and returns to the **same starter rented home/location**. Exact gear and home properties remain TBD. No origin-specific starter items, rooms, huts, rental prices or cosmetic variants are required.
 - **Tutorial reward override (LOCKED 2026-10-14):** these SIX origin sequences grant **no wage, normal XP, combat XP or loot** for their tutorial work/fight. The only level changes are the **+3 Major Skill** at creation and **one +1 Major Skill** upon the second-task choice; never award the +1 multiple times on retries. Ordinary repeatable jobs and later combat keep their normal economy/XP systems. Do not mislead players by displaying a tutorial payout that will be withheld without explanation. The exceptional circumstances causing non-payment should be credibly written per background and need not be identical across origins.
 
+## Shared Stage 8 — one reusable rent scene
+
+The [single canonical home/rent interaction](shared-home-rent-ending.md) applies unchanged to **Millhand, Bellrunner, Squatter, Stitcher, Scrapper and Inkbound**. Do not author separate notices, alternative rent amounts, homes, housing mechanics or forced origin-specific endings. Millhand and Bellrunner retain only their **already approved character remarks after putting down this same notice**. Squatter and the remaining three require no separate Stage 8 script unless the user specifically requests an additional line. The 150-coin amount remains provisional.
+
 ## Shared housing and economic guardrails (LOCKED unless marked provisional)
 
 - **One home, one room/hut implementation** for all six starting backgrounds: the same location, floor plan, functions, storage rules and rent. Exact address, home asset and storage amount are future implementation details; the backgrounds' different initial *job hubs* still stay unique.
