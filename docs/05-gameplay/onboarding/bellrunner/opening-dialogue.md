@@ -44,7 +44,7 @@
 1. **[Inspect route and notices]** — check bundle count and marked destinations.
 2. **[Choose the route]** — ordinary comparison of shorter/busier path versus longer/easier path (premise direction already in master outline; exact options/consequences must be separately approved).
 3. **[Make deliveries / record receipts]** — a reusable receiver/delivery verification work interaction.
-4. Only **after normal courier task mechanics resolve**, trigger the one-time **The Wrong Bell** discovery ([Stage 3 draft — PROPOSED](wrong-bell-discovery.md)): a worksite closed after harmful fumes is still calling workers in. Do NOT mention that closure or the supposed warning bell in Scene B01.
+4. Only **after normal courier task mechanics resolve**, trigger the one-time **The Wrong Bell** discovery ([Stage 3 APPROVED](wrong-bell-discovery.md)): a worksite closed after harmful fumes is still calling workers in. Do NOT mention that closure or the supposed warning bell in Scene B01.
 
 **Economy and system guardrails (LOCKED globally):**
 - The **two scripted work tasks** in Bellrunner's onboarding, and the fight, award **0 coins, 0 ordinary XP and no loot**. Ordinary repeatable dispatch rounds outside the onboarding pay coins/XP. Do not present a definite wage then silently confiscate it.
@@ -65,6 +65,6 @@ Scene B01 avoids claiming normal nonpayment and avoids promising money. **A conc
 
 **APPROVED on 2026-10-15:** exact Hector dialogue, optional blame exchange, opening stage direction, route-sheet handoff and payment-state UI language. Stage 2 and later stages require separate approval.
 
-**Approved next step:** [Stage 2 ordinary courier interaction](shift-dispatch-interaction.md) (approved 2026-10-15). **Stage 3 drafted but NOT APPROVED:** [The Wrong Bell discovery, decision and Hector's deferred return exchange](wrong-bell-discovery.md). **Remaining:** Stage 4 route dialogue, Dogman confrontation, fight and clinician/home adaptation.
+**Approved next step:** [Stage 2 ordinary courier interaction](shift-dispatch-interaction.md) (approved 2026-10-15). **Stage 3 APPROVED:** [The Wrong Bell discovery](wrong-bell-discovery.md). **Stage 4 APPROVED:** [Three second-skill tasks](second-task-branches.md). **Stage 5 PROPOSED:** [Dogman: Show Your Papers and Gate Barred](dogman-confrontation.md). **Remaining:** Dogman Stage 5 approval, fight, clinician/home adaptation.
 
 Related: [Bellrunner overview](README.md), [game-wide dialogue guide](../../interactions/dialogue-style-guide.md), [shared onboarding](../shared-structure.md), [Jobs and Time](../../jobs/jobs-and-time.md).
