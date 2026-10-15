@@ -14,6 +14,7 @@
 ## Shared, not background-specific
 
 - [Common Background Tutorial Structure](shared-structure.md): universal kit, job progression, +3/+1 Major Skill rules, clinic, one starter home, rent sequence and tutorial reward override.
+- [Shared Stage 8 home and rent notice](shared-home-rent-ending.md): **single canonical rent scene for all six origins**; no separate origin-specific notices.
 - [NPC and Dialogue Backlog](npc-dialogue-backlog.md): remaining character dialogue and interaction work across all six.
 - [Game-wide Spoken Dialogue Standard](../interactions/dialogue-style-guide.md): locked writing rules and tonal reference for NPC speech.
 - [Jobs and Time](../jobs/jobs-and-time.md): reusable job phases, first-two-minute interaction rule and continuous world time.
@@ -45,8 +46,9 @@
 - [Stage 3 — The Warm Patch](squatter/warm-patch-discovery.md) — **APPROVED AND LOCKED 2026-10-15**.
 - [Stage 4 — Three second-skill jobs](squatter/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-15**.
 - [Stage 5 — Rustling Bank / Nowhere to Step](squatter/boar-confrontation.md) — **APPROVED AND LOCKED 2026-10-15**.
-- [Stage 6 — Injured boar fight](squatter/boar-fight.md) — **PROPOSED 2026-10-15**, combat numbers TBD.
-- [Stage 7 — Clinic after the boar](squatter/clinic-treatment.md) — **PROPOSED 2026-10-15**, shared medical details TBD.
+- [Stage 6 — Injured boar fight](squatter/boar-fight.md) — **APPROVED ENCOUNTER 2026-10-15**, combat numbers TBD.
+- [Stage 7 — Clinic after the boar](squatter/clinic-treatment.md) — **APPROVED AND LOCKED 2026-10-15**, shared medical details TBD.
+- [Stage 8 — Identical home and rent notice for all six](shared-home-rent-ending.md) — **COMMON APPROVED AND LOCKED 2026-10-15**, no Squatter-specific variant.
 
 ## Millhand progression (current)
 
