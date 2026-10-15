@@ -41,7 +41,7 @@ Player activities, time, world economy and authored interactive events.
 - [Bellrunner: Stage 5 Dogman confrontation (approved)](onboarding/bellrunner/dogman-confrontation.md)
 - [Bellrunner: Stage 6 Dogman fight (approved encounter)](onboarding/bellrunner/dogman-fight.md)
 - [Bellrunner: Stage 7 clinic dialogue and medical visit (approved)](onboarding/bellrunner/clinic-treatment.md)
-- [Bellrunner: Stage 8 shared home and rent notice (proposed)](onboarding/bellrunner/home-rent-ending.md)
+- [Bellrunner: Stage 8 shared home and rent notice (approved)](onboarding/bellrunner/home-rent-ending.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner/README.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter/README.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
