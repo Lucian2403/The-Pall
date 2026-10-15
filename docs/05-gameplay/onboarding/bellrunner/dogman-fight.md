@@ -57,9 +57,9 @@ The local victory happens when the common combat system resolves Dogman as **una
 
 **Proposed non-spoken victory sequence:**
 
-*Dogman takes a step back from the open side of the passage, keeping one hand on the cart for support. He looks at the street, then lets the courier pass.*
+*Dogman stumbles back and lowers the club. After a look toward the public street, he gets out of the way.*
 
-*The courier retrieves the route sheet from the bag and continues out of the lane.*
+*The courier keeps hold of the bag and walks past him.*
 
 He does **not** hand over a named Shift Marshal, reveal who ordered the condemned shift or submit to lawful arrest. His attempt to seize the courier's papers **fails this time**. The site remains closed on paper, its wider disputes unresolved. The win feels concrete because the player stood up to a man physically blocking their path, not because combat caused a citywide reform.
 
