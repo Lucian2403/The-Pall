@@ -1,6 +1,6 @@
-# Bellrunner — Stage 5: Dogman, Show Your Papers / Gate Barred (PROPOSED)
+# Bellrunner — Stage 5: Dogman, Show Your Papers / Gate Barred (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The two consecutive pre-combat interactions and the opponent **Dogman**, the Shift Marshal's unofficial hired security man, are already locked in the [Bellrunner story](README.md). The exact dialogue, branch callbacks, inspectable authority, on-screen choices, staging and transition to the common turn-based encounter are proposed here.
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved both pre-combat interactions, exact Dogman/player dialogue, the branch-specific replies, document/authority choices and the three physical approaches. Dogman is the Shift Marshal's unofficial hired man, not a city guard. Combat mechanics, opening-stance effects, enemy statistics and fight outcomes are deferred to Stage 6. Preserve approved scene dialogue.
 
 **Previous scenes:** [Stage 1 Hector](opening-dialogue.md), [Stage 2 Shift Dispatch](shift-dispatch-interaction.md), [Stage 3 The Wrong Bell](wrong-bell-discovery.md) and [Stage 4 three second-task jobs](second-task-branches.md) are APPROVED AND LOCKED. Follow the [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md).
 
@@ -168,8 +168,8 @@ The fight leads to the previously locked shared clinic → home → rent progres
 
 **ALREADY LOCKED:** Dogman is the Shift Marshal's unofficial hired man, not a city guard; the Shift Marshal remains off-screen. Exactly two pre-fight encounters, *Show Your Papers* and *Gate Barred*, occur after any of the three Stage 4 second-skill tasks and before the common Dogman turn-based fight. Shared clinic/home continuation remains intact.
 
-**PROPOSED IN STAGE 5:** every exact spoken line, who makes the first approach, the absent written-order test, three document-handling/dialogue responses including branch-specific facts, the exterior lane/cart setup, the bag grab and short club, three physical approach choices and immediate fight transition.
+**APPROVED IN STAGE 5 (2026-10-15):** every exact spoken line, Dogman's first approach, absence of written authority, three document-handling/dialogue responses including branch-specific facts, the exterior lane/cart setup, bag grab and short club, three physical approach choices and immediate fight transition. Exact combat effects and numerical equipment data remain unresolved.
 
-**LATER / TBD:** enemy stats, numeric position effects, weapon data, stamina/Health calculations, fight pacing and two outcome scenes, medical treatment details, and any additional visuals. None is approved merely by the existence of this draft.
+**LATER / TBD:** enemy stats, numeric position effects, weapon data, stamina/Health calculations, fight pacing, fight outcome scenes, medical treatment details and any additional visuals. Approval of this Stage 5 scene does not lock Stage 6 outcomes.
 
 Related: [Bellrunner overview](README.md), [approved Stage 4 branches](second-task-branches.md), [approved Stage 3 discovery](wrong-bell-discovery.md), [shared onboarding](../shared-structure.md), [game-wide dialogue style](../../interactions/dialogue-style-guide.md), [Millhand's analogous but distinct Stage 5](../millhand/flint-confrontation.md).
