@@ -1,6 +1,6 @@
-# Squatter — Stage 3: The Warm Patch (PROPOSED)
+# Squatter — Stage 3: The Warm Patch (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The premise, discoveries, three choices and second Major Skill routes were already agreed in the [Squatter master](README.md). This draft proposes their playable presentation, plain spoken player reactions, credible harvest-payment problem and the immediate route handoffs. Stage 1 is [approved](opening-dialogue.md); Stage 2 is [proposed](yarrow-cut-interaction.md). Stage 4 will script the different follow-up jobs separately.
+**Status: APPROVED AND LOCKED (2026-10-15).** The premise, discoveries, three choices and second Major Skill routes were already agreed in the [Squatter master](README.md). This draft proposes their playable presentation, plain spoken player reactions, credible harvest-payment problem and the immediate route handoffs. Stage 1 is [approved](opening-dialogue.md); Stage 2 is [approved](yarrow-cut-interaction.md). Stage 4 will script the different follow-up jobs separately.
 
 ## What the player discovers
 
@@ -108,8 +108,8 @@ Benny reacts first to the **specific plants and unsafe edge**, not with a sermon
 
 **ALREADY LOCKED:** The Warm Patch premise and three consequential routes, their Major Skills and distinct later revelations, protected-outskirts location, Benny's care for nature, and the young injured boar appearing later.
 
-**PROPOSED HERE:** stage directions and two player reactions, the three inspectable clues, buyer-acceptance explanation for this particular disputed first job, visible choice labels and optional self-directed lines, the optional disclosure to Benny, and route-specific handoffs.
+**APPROVED IN STAGE 3:** stage directions and two player reactions, the three inspectable clues, buyer-acceptance explanation for this particular disputed first job, visible choice labels and optional self-directed lines, the optional disclosure to Benny, and route-specific handoffs.
 
-**TBD:** exact clue artwork, rain/fume/soil presentation, physical source of the warmth, identity of the remains, precise buyer contract conditions, timing, and all Stage 4 supporting job dialogue. Do not mark Stage 3 dialogue locked without user review.
+**TBD:** exact clue artwork, rain/fume/soil presentation, physical source of the warmth, identity of the remains, precise buyer contract conditions, timing, and all Stage 4 supporting job dialogue. The user approved the Stage 3 scene, reactions and three route handoffs; preserve exact dialogue unless revisions are requested.
 
 Related: [Squatter overview](README.md), [approved opening](opening-dialogue.md), [Stage 2 Yarrow Cut](yarrow-cut-interaction.md), [herbs and harvesting](../../../03-resources/raw/herbs-and-harvesting.md), [spoken dialogue guide](../../interactions/dialogue-style-guide.md).
