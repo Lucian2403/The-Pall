@@ -104,11 +104,11 @@ At this point the player has learned who Dogman says he works for and that the d
 
 *Dogman steps into the way. The courier turns toward the open street, but Dogman moves to block it. A work cart stands nearby.*
 
-**PLAYER:** “I've told you what happened. Let me go home.”
+**PLAYER:** “I'm done talking. Let me go home.”
 
 **DOGMAN:** “Put the papers down.”
 
-**PLAYER:** “They're not yours. Move out of the way.”
+**PLAYER:** “No. They're not yours.”
 
 **DOGMAN:** “Then I'll take them off you.”
 
@@ -158,7 +158,7 @@ The fight leads to the previously locked shared clinic → home → rent progres
 
 ## Dialogue quality check
 
-- **Player speaks plainly:** “Yes. What do you want?”, “Are you one of his guards?”, “I've told you what happened. Let me go home.” The courier doesn't recite the legal doctrine behind an unofficial guard's demand.
+- **Player speaks plainly:** “Yes. What do you want?”, “Are you one of his guards?”, “I'm done talking. Let me go home.” The courier doesn't recite the legal doctrine behind an unofficial guard's demand.
 - **Dogman speaks as hired muscle:** he wants the route sheet and to stop the courier, and he says so. He does not quote council regulations or offer a polished speech about corruption.
 - **Route callbacks use witnessed facts:** a clerk's attendance entry, sick workers and a first-aid visit, or the mechanic's inspection. No actor becomes all-knowing between scenes.
 - **Conflict grows physically:** demand → refusal → blocked exit → grab for bag → exposed club → player chooses a stance. The violence follows from Dogman's escalation, not a manufactured Player “attack” button.
