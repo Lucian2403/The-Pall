@@ -1,46 +1,54 @@
-# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (PROPOSED)
+# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (REVISED PROPOSAL)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The [approved Stitcher overview](README.md) establishes **Cinder Row Infirmary**, **Claudia Cyka (the Matron, she)**, and the ordinary first **Medicine / Trauma** work assignment *Morning Dressings*. This page drafts only the opening conversation and its handoff into normal clinic work. The later *Teaching Bed* incident and coerced adult patient must **not** be exposed early.
+**Status: REVISED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality direction is LOCKED; the exact exchange below is still proposed. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
+
+## Editorial diagnosis — why Stage 1 was revised
+
+- “Two dressings still to change. Beds by the door.” communicated a simple assignment, but nothing of Claudia's harshness.
+- “Till the next wash comes through. Use what's needed, no more.” could belong to any responsible matron and read as quietly protective rather than cold.
+- “If you find one going bad, come and get me.” was sound medical advice, but combined with the gentle exchange made her seem supportive. Her new version maintains clinical oversight **without becoming kind or attentive to feelings**.
+- The earlier stage contained **no evidence** that Claudia is attractive, knows the effect she has on others, or uses charm to avoid scrutiny. The revision adds a small, observable exchange with an unnamed linen clerk instead of Claudia boasting about her appearance.
 
 ## Scene ST01 — Morning Dressings
 
-*In Cinder Row Infirmary, Claudia sets a small stack of clean dressings beside the basin. The coal stove smokes. Another patient calls from the crowded hall.*
+*At Cinder Row Infirmary, Claudia's hair and dress are immaculate despite the cramped ward and smoky coal stove. The linen clerk objects to how many clean dressings she has taken. Claudia turns a beautiful smile on him and asks him to check the count again. He goes back to his books. The smile vanishes when he leaves.*
 
-**CLAUDIA:** “Two dressings still to change. Beds by the door.”
+**CLAUDIA:** “Two dressings by the door. Get them changed.”
 
-**PLAYER (optional):** “Is that all the clean linen?”
+**PLAYER (optional):** “We're nearly out of clean linen.”
 
-**CLAUDIA (optional reply):** “Till the next wash comes through. Use what's needed, no more.”
+**CLAUDIA (optional reply):** “I can count. If they complain, let them. Use what the wounds need, no more.”
 
-**CLAUDIA (convergence; also if optional line skipped):** “Have a look at the wounds first. If you find one going bad, come and get me.”
+**CLAUDIA (convergence, also if the optional line is skipped):** “Look at the wounds first. If one's worse than it should be, fetch me. I'm not fixing your mistakes as well.”
 
-**[Check the ward round]** — opens the ordinary Morning Dressings job card: assigned patients, visible wound conditions, currently available clean dressings/water and routine treatment actions. Counts, service length and Health effects remain common-system TBD, not dialogue.
+**[Check the ward round]** — open the ordinary Morning Dressings job information: which two minor-injury charity beds need attention, a safe supply listing, current job/account status and basic condition information. **[Begin the dressings round]** — enter the normal Medicine / Trauma interactions.
 
-**[Begin the dressings round]** — start the reusable supervised Medicine / Trauma interaction. The player already works in the ward; Claudia does not need to explain how a hospital functions or deliver a training speech.
+The clerk's compliance is not guaranteed by her appearance: he has merely agreed to re-check a linen entry rather than continue an argument in the doorway. Whether more supplies exist is unknown. He stays unnamed and does not become a new plot character.
 
-## Why this works for Claudia
+## Claudia's voice and presentation — LOCKED characterization / PROPOSED staging
 
-- **Competence:** She knows which beds need attention and notices a possible shortage before the work begins. Her closing instruction routes a worrying wound to someone who can supervise it; it doesn't make an untrained player diagnose serious complications alone.
-- **Exhaustion without a speech:** A smoking stove, a call from the hall and a short answer about the linen are enough. She is busy; she cannot stand there philosophizing about the poor.
-- **Care and resource pressure at once:** She does not tell the player to withhold needed care. “Use what's needed, no more” reflects that she has to make scarce materials reach the ward.
-- **Light interpersonal pressure:** The optional question is a real concern about supplies; Claudia's answer neither scolds the worker nor pretends the shortage has been fixed.
-- **Later moral compromise is not pre-announced:** Her first instructions are ordinary and sensible. The *Teaching Bed* revelation comes only **after Stage 2 regular ward work**, when her choices become harder to defend.
+- **Cruel efficiency:** Claudia knows what the ward needs but treats questions, complaints and visible distress as annoyances. Her clinical instructions are usually correct; her lack of compassion is the problem.
+- **Beauty as social leverage:** She is exceptionally attractive and aware of it. She can switch on warmth when dealing with a clerk, an inspector or someone whose favour is useful, then drop it the instant it stops serving her. Her looks **help her avoid consequences often, not magically every time**. She is neither powerless without them nor written as a flirt in every scene.
+- **Contradiction:** Being professionally competent is compatible with coldness. She can keep a ward running while treating patients as numbers, and later rationalize something morally awful in the name of keeping the infirmary solvent.
+- **Period and voice:** No winking commentary about how beautiful she is, no modern workplace language, no theatrical villain declarations, and no sarcastic one-liner in every exchange. She uses plain, brusque 19th-century-friendly English.
+- **Boundaries:** The external linen clerk has no connection to the later patient transfer. Do not expose restrained patients, inked surgery lines, the teaching agreement or Owler in Stage 1.
 
-## Gameplay and chronology
+## First-work handoff and economy
 
-1. The Stitcher begins at the permanent Cinder Row Infirmary hub with the identical starter kit: Basic Clothes, Crude Small Bag and 20 coins. Creation already granted Medicine +3.
-2. Claudia assigns *Morning Dressings* as a routine Trauma ward round. No special medical equipment is given to the player; supplies are ward-owned and appear in the job interface.
-3. Stage 2 will show real reusable medical work: inspect an injury, choose a suitable basic care action under supervision, manage limited supplies between two patients, correct a bad dressing, and finish the ward round.
-4. **No explicit guaranteed pay is promised here.** This tutorial shift gives 0 coins and ordinary XP under the already locked tutorial economy; the precise credible in-world reason for this particular unpaid shift must be established in Stage 2/3 without false financial promises. Later normal shifts pay ordinary wages/XP.
-5. Do not disclose that a restrained patient, surgical demonstration or coerced consent exists. The incident is **Stage 3**, not Claudia's opening.
-6. The shared home notice and shared identical closing speech for all six backgrounds are handled exclusively by [common Stage 8](../shared-home-rent-ending.md), not by Stitcher dialogue.
+The Stitcher is already a worker at Cinder Row Infirmary, with **Medicine +3** at character creation and the common kit (Basic Clothes, Crude Small Bag, 20 coins). Ward supplies belong to the infirmary; the player receives no special kit or medicines.
+
+This is an **unpaid cover round on charity beds**, not a newly invented universal rule that medical work is unpaid. The ward's charity account does not fund a worker wage for this particular round; **show this fact on the assignment card from the start**, not as a surprise payout that is removed later. It fits the locked 0 coins and 0 ordinary XP for tutorial shifts, without implying that Claudia has stolen wages or that her beauty itself changes pay. Normal repeatable ward shifts remain paid and award ordinary Medicine XP.
+
+The normal work (Stage 2) consists of inspecting conditions, allocating genuinely limited clean linen/water between two mild injuries, handling a dressing complication, and closing the charity ward account. Only after finishing that ordinary task will Stage 3 reveal the separate Teaching Bed patient.
+
+**No additional moral choice, combat, permanent consequence or +1 skill gain here.** The second Major Skill is chosen much later at Stage 3.
 
 ## Approval boundary
 
-**Already locked:** location, Matron Claudia Cyka, her gender, exhausted but capable manner, *Morning Dressings* as ordinary Medicine / Trauma work, later *Teaching Bed* revelation and shared economy.
+**Already locked:** all core Stitcher story beats, Claudia's name/role/gender and new severe, low-empathy, beautiful, self-aware character direction; all six origins use the exact same [Stage 8 rent notice and Millhand speech](../shared-home-rent-ending.md).
 
-**Proposed in Stage 1:** precise environmental cues, dialogue and optional supply question, short convergence, and the normal shift handoff.
+**Proposed for Stage 1:** exact spoken lines and scene, the short linen-clerk demonstration of Claudia's social leverage, and charity-bed cover-round presentation.
 
-**TBD:** Claudia's appearance, treatment labels, patient-specific wounds, exact linen/water counts, job duration and the exact eventual explanation for this unpaid tutorial shift.
+**TBD:** artwork and physical appearance beyond her beauty/immaculate bearing, NPC reaction implementation, specific ward supplies, patient condition data, treatment numbers and duration.
 
-Related: [Stitcher overview](README.md), [shared onboarding](../shared-structure.md), [dialogue standard](../../interactions/dialogue-style-guide.md), [jobs and time](../../jobs/jobs-and-time.md).
+Related: [Stitcher overview](README.md), [shared tutorial](../shared-structure.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md), [jobs and time](../../jobs/jobs-and-time.md).
