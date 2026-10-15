@@ -37,6 +37,10 @@
 - [Stage 7 — Clinic visit](bellrunner/clinic-treatment.md) — **APPROVED AND LOCKED 2026-10-15**; shared medical values TBD.
 - [Stage 8 — Return home and rent notice](bellrunner/home-rent-ending.md) — **APPROVED AND LOCKED 2026-10-15**. Bellrunner's eight-stage onboarding is complete at narrative level.
 
+## Squatter opening (current)
+
+- [Stage 1 — Benny Ben and the Yarrow Cut order](squatter/opening-dialogue.md) — **PROPOSED 2026-10-15; awaiting approval**. The Squatter opening premise and background are already locked.
+
 ## Millhand progression (current)
 
 | Stage | Document | Status |
