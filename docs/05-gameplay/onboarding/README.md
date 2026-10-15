@@ -41,8 +41,10 @@
 
 - [Stage 1 — Benny Ben and the Yarrow Cut order](squatter/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-15**. The Squatter opening premise and background are already locked.
 
-- [Stage 2 — Yarrow Cut](squatter/yarrow-cut-interaction.md) — **PROPOSED 2026-10-15**.
-- [Stage 3 — The Warm Patch](squatter/warm-patch-discovery.md) — **PROPOSED 2026-10-15**.
+- [Stage 2 — Yarrow Cut](squatter/yarrow-cut-interaction.md) — **APPROVED AND LOCKED 2026-10-15**.
+- [Stage 3 — The Warm Patch](squatter/warm-patch-discovery.md) — **APPROVED AND LOCKED 2026-10-15**.
+- [Stage 4 — Three second-skill jobs](squatter/second-task-branches.md) — **PROPOSED 2026-10-15**.
+- [Stage 5 — Rustling Bank / Nowhere to Step](squatter/boar-confrontation.md) — **PROPOSED 2026-10-15**.
 
 ## Millhand progression (current)
 
