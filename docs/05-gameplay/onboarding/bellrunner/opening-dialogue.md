@@ -40,7 +40,7 @@
 | Trigger | **[Take the round]** → ordinary work preparation. No mystery event in this screen. |
 | Work skill | The character already received **Industry +3 Major Skill** from background choice; no bonus or job XP is earned from the scripted opening task. |
 
-**Next UI actions after acceptance ([Stage 2 draft, NOT YET APPROVED](shift-dispatch-interaction.md)):**
+**Next UI actions after acceptance ([Stage 2 APPROVED AND LOCKED](shift-dispatch-interaction.md)):**
 1. **[Inspect route and notices]** — check bundle count and marked destinations.
 2. **[Choose the route]** — ordinary comparison of shorter/busier path versus longer/easier path (premise direction already in master outline; exact options/consequences must be separately approved).
 3. **[Make deliveries / record receipts]** — a reusable receiver/delivery verification work interaction.
@@ -65,6 +65,6 @@ Scene B01 avoids claiming normal nonpayment and avoids promising money. **A conc
 
 **APPROVED on 2026-10-15:** exact Hector dialogue, optional blame exchange, opening stage direction, route-sheet handoff and payment-state UI language. Stage 2 and later stages require separate approval.
 
-**Still unapproved:** [Stage 2 ordinary courier interaction draft](shift-dispatch-interaction.md). **Not authored:** Stage 3 discovery, branch decision and Hector's return exchange; all subsequent route dialogue, Dogman confrontation, fight and clinician/home adaptation.
+**Approved next step:** [Stage 2 ordinary courier interaction](shift-dispatch-interaction.md) (approved 2026-10-15). **Remaining:** Stage 3 discovery, branch decision and Hector's return exchange; all subsequent route dialogue, Dogman confrontation, fight and clinician/home adaptation.
 
 Related: [Bellrunner overview](README.md), [game-wide dialogue guide](../../interactions/dialogue-style-guide.md), [shared onboarding](../shared-structure.md), [Jobs and Time](../../jobs/jobs-and-time.md).
