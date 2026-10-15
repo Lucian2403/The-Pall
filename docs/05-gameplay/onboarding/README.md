@@ -34,6 +34,8 @@
 - [Stage 4 — Three follow-up work tasks](bellrunner/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-15**, including revised natural dialogue.
 - [Stage 5 — Dogman: Show Your Papers / Gate Barred](bellrunner/dogman-confrontation.md) — **APPROVED AND LOCKED 2026-10-15**.
 - [Stage 6 — Dogman's turn-based fight](bellrunner/dogman-fight.md) — **APPROVED ENCOUNTER 2026-10-15**; combat numbers TBD.
+- [Stage 7 — Clinic visit](bellrunner/clinic-treatment.md) — **APPROVED AND LOCKED 2026-10-15**; shared medical values TBD.
+- [Stage 8 — Return home and rent notice](bellrunner/home-rent-ending.md) — **PROPOSED 2026-10-15; awaiting approval**.
 
 ## Millhand progression (current)
 
