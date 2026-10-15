@@ -24,7 +24,7 @@ Player activities, time, world economy and authored interactive events.
 - [Six background folders and shared onboarding index](onboarding/README.md)
 
 - [Shared tutorial structure: unpaid work, +3/+1 skills, 10-coin care and common home/rent](onboarding/shared-structure.md)
-- [Shared Stage 8: identical home and rent notice for all six backgrounds](onboarding/shared-home-rent-ending.md)
+- [Shared Stage 8: identical home, rent notice and Millhand closing speech for all six backgrounds](onboarding/shared-home-rent-ending.md)
 - [Remaining dialogue checklist and approved NPC names](onboarding/npc-dialogue-backlog.md)
 - [Millhand / Guther Anvil: approved opening conversation](onboarding/millhand/opening-dialogue.md)
 - [Millhand: worker-plate Smithing gameplay (approved interaction)](onboarding/millhand/platework-interaction.md)
@@ -53,5 +53,6 @@ Player activities, time, world economy and authored interactive events.
 - [Squatter: Stage 6 injured boar fight and outcomes (approved encounter)](onboarding/squatter/boar-fight.md)
 - [Squatter: Stage 7 clinic dialogue and care (approved)](onboarding/squatter/clinic-treatment.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
+- [Stitcher: Claudia Cyka Stage 1 Morning Dressings opening (proposed)](onboarding/stitcher/opening-dialogue.md)
 - [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper/README.md)
 - [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
