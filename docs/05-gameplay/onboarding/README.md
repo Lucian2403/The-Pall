@@ -32,7 +32,8 @@
 - [Stage 2 — Shift Dispatch courier-work interaction](bellrunner/shift-dispatch-interaction.md) — **APPROVED AND LOCKED 2026-10-15**. Reusable route, bundle and receipt-verification work; no early Wrong Bell reveal.
 - [Stage 3 — The Wrong Bell discovery and branch decision](bellrunner/wrong-bell-discovery.md) — **APPROVED AND LOCKED 2026-10-15**.
 - [Stage 4 — Three follow-up work tasks](bellrunner/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-15**, including revised natural dialogue.
-- [Stage 5 — Dogman: Show Your Papers / Gate Barred](bellrunner/dogman-confrontation.md) — **PROPOSED 2026-10-15; awaiting approval**.
+- [Stage 5 — Dogman: Show Your Papers / Gate Barred](bellrunner/dogman-confrontation.md) — **APPROVED AND LOCKED 2026-10-15**.
+- [Stage 6 — Dogman's turn-based fight](bellrunner/dogman-fight.md) — **PROPOSED 2026-10-15; awaiting approval**.
 
 ## Millhand progression (current)
 
