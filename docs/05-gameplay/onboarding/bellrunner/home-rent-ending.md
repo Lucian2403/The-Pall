@@ -4,6 +4,8 @@
 
 Related approved scenes: [Stage 6 fight](dogman-fight.md), [Stage 7 clinic](clinic-treatment.md), [Bellrunner overview](README.md). Shared reference: [Millhand home ending](../millhand/home-rent-ending.md), [universal onboarding](../shared-structure.md), [dialogue standard](../../interactions/dialogue-style-guide.md).
 
+**Shared notice authority:** The [common Stage 8 home-and-rent scene](../shared-home-rent-ending.md) is the single source for this notice, its housing interactions and the rent figure (still provisional). This document's separately approved character line remains an exception **after the identical notice is put down**; it creates no origin-specific rent variation.
+
 ## B08-A — Back home
 
 The courier leaves the clinic and travels home through the usual city interface. The Dogman fight has ended, whether the player won or lost. Do not stage another ambush, bring in Hector without a natural player visit, or force the courier to settle the site's paperwork first.
