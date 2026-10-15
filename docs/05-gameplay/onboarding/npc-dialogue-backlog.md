@@ -75,7 +75,8 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Squatter — Young injured boar fight and outcome handling, Stage 6 (APPROVED ENCOUNTER 2026-10-15)](squatter/boar-fight.md)
 - [Squatter — Post-boar clinic and dialogue, Stage 7 (APPROVED 2026-10-15)](squatter/clinic-treatment.md)
 - [Shared Stage 8 — identical home, provisional rent notice, and exact Millhand closing dialogue for all six origins (LOCKED 2026-10-15)](shared-home-rent-ending.md)
-- [Stitcher — Matron Claudia Cyka opening Morning Dressings, Stage 1 (PROPOSED 2026-10-15)](stitcher/opening-dialogue.md)
+- [Stitcher — Matron Claudia Cyka harsher opening Morning Dressings, Stage 1 (REVISED PROPOSAL 2026-10-15)](stitcher/opening-dialogue.md)
+- [Stitcher — Morning Dressings medical interaction and Claudia sign-off, Stage 2 (PROPOSED 2026-10-15)](stitcher/morning-dressings-interaction.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
