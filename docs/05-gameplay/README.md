@@ -44,6 +44,7 @@ Player activities, time, world economy and authored interactive events.
 - [Bellrunner: Stage 8 shared home and rent notice (approved)](onboarding/bellrunner/home-rent-ending.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner/README.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter/README.md)
+- [Squatter: Benny Ben Stage 1 opening dialogue (proposed)](onboarding/squatter/opening-dialogue.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
 - [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper/README.md)
 - [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
