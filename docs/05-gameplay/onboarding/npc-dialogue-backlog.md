@@ -67,7 +67,9 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Bellrunner — Dogman's fight and local victory/defeat (Stage 6, APPROVED ENCOUNTER 2026-10-15)](bellrunner/dogman-fight.md)
 - [Bellrunner — clinic visit and everyday treatment dialogue (Stage 7, APPROVED 2026-10-15)](bellrunner/clinic-treatment.md)
 - [Bellrunner — shared home and rent ending (Stage 8, APPROVED 2026-10-15)](bellrunner/home-rent-ending.md)
-- [Squatter — Benny Ben at Hedge Shelter, Stage 1 (PROPOSED 2026-10-15)](squatter/opening-dialogue.md)
+- [Squatter — Benny Ben at Hedge Shelter, Stage 1 (APPROVED 2026-10-15)](squatter/opening-dialogue.md)
+- [Squatter — Yarrow Cut gathering work, Stage 2 (PROPOSED 2026-10-15)](squatter/yarrow-cut-interaction.md)
+- [Squatter — The Warm Patch and three branch choices, Stage 3 (PROPOSED 2026-10-15)](squatter/warm-patch-discovery.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
