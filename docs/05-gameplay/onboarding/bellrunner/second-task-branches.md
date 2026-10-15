@@ -196,7 +196,7 @@ The ordinary non-destructive **Industrial Machinery** task ends in a recorded sa
 
 **PLAYER:** “Then can't we pull it out?”
 
-**MECHANIC:** “Not while it's moving. I'll mark the place first.”
+**MECHANIC:** “Not while it's moving. Leave it alone till we've checked everything.”
 
 The last instruction is immediate workplace caution, not a maxim. The mechanic does not claim to have seen the saboteur.
 
