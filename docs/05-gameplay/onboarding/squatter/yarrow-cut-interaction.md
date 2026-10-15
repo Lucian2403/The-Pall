@@ -1,6 +1,6 @@
-# Squatter — Stage 2: Yarrow Cut, Ordinary Foraging Work (PROPOSED)
+# Squatter — Stage 2: Yarrow Cut, Ordinary Foraging Work (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The job **Yarrow Cut**, Fieldcraft → Foraging, Benny Ben's Hedge Shelter and his [approved Stage 1 opening](opening-dialogue.md) are already canonical. This document defines a reusable ordinary plant-harvesting interaction before the story's *Warm Patch* reveal. Do not make this a bespoke timed clicking game or reveal the poorhouse outfall while the player is still learning to gather.
+**Status: APPROVED AND LOCKED (2026-10-15).** The job **Yarrow Cut**, Fieldcraft → Foraging, Benny Ben's Hedge Shelter and his [approved Stage 1 opening](opening-dialogue.md) are already canonical. This document defines a reusable ordinary plant-harvesting interaction before the story's *Warm Patch* reveal. Do not make this a bespoke timed clicking game or reveal the poorhouse outfall while the player is still learning to gather.
 
 ## S02-A — Check the order, go to the public patch
 
@@ -73,7 +73,7 @@ Stage 3 must not be framed as Benny sending the Squatter into a suspected hazard
 
 **ALREADY LOCKED:** Benny Ben's speech and ethos in Stage 1; Yarrow Cut as a Fieldcraft/Foraging job; existing generic resource/patch harvesting principles; *Warm Patch* only later.
 
-**PROPOSED IN STAGE 2:** the five work phases, two cutting choices, one sorting correction, buyer-pending receipt logic, the brief Benny exchange and the return-to-path transition.
+**APPROVED IN STAGE 2:** the five work phases, two cutting choices, one sorting correction, buyer-pending receipt logic, the brief Benny exchange and the return-to-path transition.
 
 **TBD:** exact quantities, source patch geometry, identification UI art, handling times, work-quality/patch math, and how pending consignment payment resolves after Stage 3/Stage 4. All ordinary paid Foraging sessions continue to use their proper pay/XP rules.
 
