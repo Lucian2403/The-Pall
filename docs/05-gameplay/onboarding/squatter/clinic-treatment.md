@@ -1,6 +1,6 @@
-# Squatter — Stage 7: Clinic After the Boar (PROPOSED)
+# Squatter — Stage 7: Clinic After the Boar (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The Squatter has survived the [proposed Stage 6 injured-boar encounter](boar-fight.md), whether by safely driving it away or by losing and receiving help from an unnamed traveller. This draft proposes a very short clinic conversation and a standard service flow. The existing [shared clinic](../shared-structure.md), previously approved [Millhand](../millhand/clinic-treatment.md) and [Bellrunner](../bellrunner/clinic-treatment.md) visits establish the universal 10-coin fee, ordinary treatment panel and same later home. Do not invent an exclusive Squatter clinic.
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the exact clinician dialogue, examination and ordinary single-payment service flow following either outcome of the [approved Stage 6 injured-boar encounter](boar-fight.md). The existing [shared clinic](../shared-structure.md), previously approved [Millhand](../millhand/clinic-treatment.md) and [Bellrunner](../bellrunner/clinic-treatment.md) visits establish the universal 10-coin fee, ordinary treatment panel and same later home. Do not invent an exclusive Squatter clinic.
 
 ## S07-A — Enter for an examination
 
@@ -10,7 +10,7 @@
 
 The provider is a **role-labelled clinician** using the same medical service system as other origins; do not invent a new name, building or special treatment skill because the Squatter once collected herbs.
 
-## S07-B — Proposed spoken dialogue
+## S07-B — Approved spoken dialogue
 
 *The clinician glances up as the Squatter comes inside.*
 
@@ -56,7 +56,7 @@ Save the clinic-complete flag and debit atomically; a reload cannot charge anoth
 
 **Already locked:** common medical service, price, no extra coins/XP/loot, same home and rent progression, no hidden injury, ordinary clinic role label and real treatment when needed.
 
-**Proposed in Stage 7:** exact dialogue, examination wording, the single pay-and-care interaction in this Squatter scene and the outcome-aware but non-branching arrival.
+**Approved in Stage 7:** exact dialogue, examination wording, the single pay-and-care interaction in this Squatter scene and the outcome-aware but non-branching arrival. Preserve the spoken lines verbatim unless revised by the user.
 
 **TBD:** actual wound categories, severity, examination-only handling when unhurt, treatment outcomes and service timing. No additional wildlife-disease or infection system is established here.
 
