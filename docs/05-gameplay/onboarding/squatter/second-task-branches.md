@@ -1,6 +1,6 @@
-# Squatter — Stage 4: Three Second-Skill Tasks (PROPOSED)
+# Squatter — Stage 4: Three Second-Skill Tasks (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** Stage 1 [Benny](opening-dialogue.md), Stage 2 [Yarrow Cut](yarrow-cut-interaction.md), and Stage 3 [The Warm Patch](warm-patch-discovery.md) are APPROVED. This draft covers **one** route selected at Stage 3; exact dialogue, work choices and site-specific handling need approval. The three job families and the core discovery in each are already locked in the [Squatter overview](README.md).
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the three distinct work loops, occupational dialogue, branch evidence handling and convergence. Stage 1 [Benny](opening-dialogue.md), Stage 2 [Yarrow Cut](yarrow-cut-interaction.md), and Stage 3 [The Warm Patch](warm-patch-discovery.md) are also APPROVED. Exact numerical rules remain TBD. The three job families and their core discoveries were already locked in the [Squatter overview](README.md).
 
 The player has seen dressings caught in the yarrow, a human finger bone and warm drainage bricks by the old poorhouse ground. Those observations **raise a question**, not a medical diagnosis or an established supernatural explanation. Benny's order is weighed but its **full buyer acceptance remains disputed**. Staff in each branch know only what the player tells them or what they inspect themselves.
 
@@ -121,7 +121,7 @@ Stage 5's animal has not seen the player's clinic conversation, trade receipt or
 
 **Already locked:** three route names/skills and their separate revelations, Benny's conservation ethic, the Stage 3 observations, unarmed low-skill accessibility and the later young injured boar.
 
-**Proposed here:** each route's concrete work loop and method choice, occupational NPC exchanges, specific evidence handling, credible partial stock acceptance/holds, limited local conclusion and common bank convergence.
+**Approved in Stage 4:** each route's concrete work loop and method choice, occupational NPC exchanges, specific evidence handling, credible partial stock acceptance/holds, limited local conclusion and common bank convergence. Preserve the spoken dialogue verbatim unless the user asks for revision.
 
 **TBD:** exact health/safety criteria for edible/medicinal herbs, job math, receipt/weight values, map geometry, outfall/works implementation and reuse identifiers. Don't declare the entire disputed outfall permanently cleared.
 
