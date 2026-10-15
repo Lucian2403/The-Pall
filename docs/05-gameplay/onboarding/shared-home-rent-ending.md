@@ -1,6 +1,6 @@
 # Shared Stage 8 — Return Home and Rent Notice (LOCKED FOR ALL SIX)
 
-**Status: COMMON ONBOARDING SCENE APPROVED / LOCKED (2026-10-15).** The universal home and rent structure were already locked in [shared-structure.md](shared-structure.md) and the user explicitly confirmed that **the rent notice must be the same for every background, without separate invented variations**. This is the single canonical source for Stage 8's reusable housing scene. Do **not** create six independent rent notices, different amounts, housing locations or equivalent reskins.
+**Status: COMMON ONBOARDING SCENE AND EXACT SHARED CLOSING SPEECH APPROVED / LOCKED (2026-10-15).** The universal home and rent structure were already locked in [shared-structure.md](shared-structure.md); the user explicitly confirmed that **both the rent notice and the Millhand closing line are identical for all six backgrounds, without origin-specific variations**. This is the single canonical source for Stage 8's reusable housing scene. Do **not** create six independent rent notices, different amounts, housing locations or equivalent reskins.
 
 ## One scene, every origin
 
@@ -27,18 +27,21 @@ This is the **identical in-world notice** regardless of background. The amount i
 
 **[Put the notice down]**
 
-The rent panel closes and onboarding is marked complete **once**. The player remains in the ordinary shared rented home with free access to recurring paid work, crafting/trading and normal city travel. There is **no** forced follow-up job, extra landlord conversation or new main-story quest. The notice is not collectible loot.
+*The character puts the notice down.*
 
-## Dialogues are not separate rent notices
+**PLAYER (quietly, to themselves):** “Ah, hell. Need a place of my own. First I've got this rent to pay. More jobs... or I could make something to sell.”
 
-The **rent notice, housing, location, read/put-down actions and completion rules never vary**. Only the following *already individually approved* origin-specific **post-notice character remarks** exist and remain untouched:
+**This exact spoken line is now LOCKED for ALL SIX backgrounds by the user's explicit 2026-10-15 direction.** It is the previously approved Millhand line, reused verbatim for Bellrunner, Squatter, Stitcher, Scrapper and Inkbound; no origin-specific substitutions, inserted names or rephrasings. A female or male portrait uses the same gender-neutral player voice label. This suggests ordinary paid work or making goods to sell; **it does not establish a home-ownership feature or a new mandatory quest.**
 
-- [Millhand Stage 8](millhand/home-rent-ending.md) — the previously approved self-directed line about earning money from jobs or selling crafted goods after putting down the same notice.
-- [Bellrunner Stage 8](bellrunner/home-rent-ending.md) — the previously approved self-directed line about unpaid courier work and checking Hector's board, after putting down the same notice.
+Immediately after the line, the rent panel closes and onboarding is marked complete **once**. The player remains in the ordinary shared rented home with free access to recurring paid work, crafting/trading and normal city travel. There is **no** forced follow-up job, extra landlord conversation or new main-story quest. The notice is not collectible loot.
 
-These lines are background-character dialogue **outside the rent notice** and do not change any shared rent fact or control. They are existing user approvals, not a license to devise a special closing monologue for every future origin.
+## Exactly one closing speech for every origin
 
-**Squatter:** **no new Squatter-specific rent dialogue or origin-only housing event.** Enter home, read this same notice, put it down, finish the Squatter tutorial. Apply the same reuse policy to Stitcher, Scrapper and Inkbound unless the user later explicitly approves a distinct character line. Avoid redundant `home-rent-ending.md` copies within their folders.
+The rent notice, housing, location, read/put-down actions, completion rules **and player's spoken closing line are identical** for all six backgrounds. The identical line from the [previously approved Millhand home ending](millhand/home-rent-ending.md) is canonical in this one common scene.
+
+The user explicitly **superseded Bellrunner's earlier Hector-specific self-talk** and the prior decision to omit Squatter-specific self-talk. No alternative Stage 8 speech should be created for Stitcher, Scrapper or Inkbound. Each origin may still have its own **quest-journal summary and branch/fight history**, but these must not enter or change the rent scene.
+
+Use this shared scene rather than producing six copied home/rent scripts.
 
 ## Completion and persistence
 
@@ -50,6 +53,6 @@ These lines are background-character dialogue **outside the rent notice** and do
 
 ## QA: compare across six origins
 
-All six should reference the **same home identifier, room/storage implementation, rent amount source, notice content, generic player prompts, absence of deadline/payment and completion logic**. Only the background's already approved dialogue and prior journal findings can differ. The notice itself never does.
+All six should reference the **same home identifier, room/storage implementation, rent amount source, notice content, generic player prompts, absence of deadline/payment and completion logic**. Only the background's earlier quest-journal findings may differ; **the closing speech does not**. Neither the notice nor its narration changes by origin.
 
 Related: [shared onboarding rules](shared-structure.md), [Squatter approved clinic](squatter/clinic-treatment.md), [Millhand Stage 8](millhand/home-rent-ending.md), [Bellrunner Stage 8](bellrunner/home-rent-ending.md), [onboarding index](README.md).
