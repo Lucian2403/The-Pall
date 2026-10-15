@@ -31,15 +31,17 @@ Generic job interactions to reuse in future courier/Hauling assignments:
 3. **Delivery discrepancy:** use a reusable address verification, damaged docket, queue management or receiver-confirmation interaction.
 4. **Regular resolution template:** outside onboarding, pay ordinary coins/Industry XP; in this opening tutorial, the exceptional route is unpaid and grants 0 ordinary XP.
 
-### Dark opening incident — The Wrong Bell (LOCKED premise; Stage 3 draft PROPOSED)
+### Dark opening incident — The Wrong Bell (APPROVED AND LOCKED)
 
-[Stage 3 discovery, watchman exchange and three-choice handoff (PROPOSED; not approved)](wrong-bell-discovery.md) covers the first physical contradiction, reason this delivery round earns nothing and a deferred optional Hector return exchange. The core premise below remains locked.
+[Stage 3 discovery, watchman exchange and three-choice handoff (APPROVED AND LOCKED)](wrong-bell-discovery.md) covers the closure contradiction, unpaid-round explanation and later optional Hector exchange.
 
-**The Wrong Bell.** Among routine messages is a sealed order to start a night shift at a block officially closed for unsafe fumes. The shift bell still rings, and a watchman expects workers to enter. The dispatch docket gives a perfectly ordinary signature requirement. The player's choice leads to one of the **three locked second-Major-Skill jobs** below, then two interactions, a logically motivated fight against **Dogman, a Shift Marshal's unofficial security man**, healing, home and rent. The detailed scene/dialogue design remains TBD.
+**The Wrong Bell.** Among routine messages is a sealed order to start a night shift at a block officially closed for unsafe fumes. The shift bell still rings, and a watchman expects workers to enter. The dispatch docket gives a perfectly ordinary signature requirement. The player's choice leads to one of the **three locked second-Major-Skill jobs** below, then two interactions, a logically motivated fight against **Dogman, a Shift Marshal's unofficial security man**, healing, home and rent. The Stage 3 dialogue and discovery are approved; numerical details and later fight remain TBD.
 
 This should feel like grim labor governance and human risk, **not a repeat of Millhand's false death-register stamp plot**.
 
-## Bellrunner second-job branches — LOCKED
+## Bellrunner second-job branches — APPROVED
+
+[Stage 4: all three playable follow-up work sessions and rewritten everyday dialogue (APPROVED AND LOCKED)](second-task-branches.md).
 
 **The Wrong Bell**: a sealed notice orders a night shift back into a building officially closed after a dangerous fume incident. The building's warning bell rings regardless. The player must decide what to do with the notice.
 
@@ -51,9 +53,11 @@ This should feel like grim labor governance and human risk, **not a repeat of Mi
 
 **Shared confrontation (LOCKED opponent):** The **Shift Marshal is a senior figure who remains off-screen** during the opening. One of his **unofficially employed security men—known simply as Dogman—corners the Bellrunner** near the sealed site's service gate. The dogman is hired muscle, **not the Shift Marshal himself, not an official city guard, and not Millhand's wage collector**. Why he targets the courier varies by the chosen second job: delivering or disputing shift paperwork, warning/assisting workers, or investigating the illicit bell controls. He tries to intimidate the player into silence or surrendering the notice; his methods provoke the required fight. **Dogman** is his locked in-world identifier; his precise appearance remains TBD.
 
-**Interaction 1 — Show Your Papers (LOCKED scene direction; exact options TBD):** **Dogman** demands the notice or proof of the player's dealings. The player can scrutinize his dubious authority, challenge his right to confiscate papers or point out the contradiction revealed by their branch. His bluster gives away that he acts for the **Shift Marshal**, not as a lawful officer.
+[Stage 5 Dogman confrontation (PROPOSED, not yet approved)](dogman-confrontation.md) details the two proposed interaction scripts, branch callbacks and pre-fight stances.
 
-**Interaction 2 — Gate Barred (LOCKED scene direction; exact options TBD):** **Dogman** blocks the route home and threatens violence, potentially drawing a short baton/club. The player can take a defensive position, try to put a cart between them, or hold their ground; these choices feed the normal **turn-based PvE** encounter. The weapon and precise combat consequences are not locked, pending the common combat system.
+**Interaction 1 — Show Your Papers (LOCKED scene direction; exact options PROPOSED):** **Dogman** demands the notice or proof of the player's dealings. The player can scrutinize his dubious authority, challenge his right to confiscate papers or point out the contradiction revealed by their branch. His bluster gives away that he acts for the **Shift Marshal**, not as a lawful officer.
+
+**Interaction 2 — Gate Barred (LOCKED scene direction; exact options PROPOSED):** **Dogman** blocks the route home and threatens violence, potentially drawing a short baton/club. The player can take a defensive position, try to put a cart between them, or hold their ground; these choices feed the normal **turn-based PvE** encounter. The weapon and precise combat consequences are not locked, pending the common combat system.
 
 After the short, moderately challenging fight against **Dogman, the Shift Marshal's hired security man**, the player seeks ordinary city medical treatment, pays the fixed 10-coin tutorial clinic fee, walks home with little money and discovers rent due. Dogman's precise appearance and weapon, normal-job wages, XP, narrative dialogue and combat numbers remain TBD. The Shift Marshal should **not** be fought or confronted as a boss in this first encounter.
 
