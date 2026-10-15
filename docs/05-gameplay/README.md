@@ -39,7 +39,7 @@ Player activities, time, world economy and authored interactive events.
 - [Bellrunner: The Wrong Bell Stage 3 discovery and branch choices (approved)](onboarding/bellrunner/wrong-bell-discovery.md)
 - [Bellrunner: Stage 4 three second-skill work tasks and dialogue (approved)](onboarding/bellrunner/second-task-branches.md)
 - [Bellrunner: Stage 5 Dogman confrontation (approved)](onboarding/bellrunner/dogman-confrontation.md)
-- [Bellrunner: Stage 6 Dogman fight (proposed)](onboarding/bellrunner/dogman-fight.md)
+- [Bellrunner: Stage 6 Dogman fight (approved encounter)](onboarding/bellrunner/dogman-fight.md)
 - [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner/README.md)
 - [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter/README.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
