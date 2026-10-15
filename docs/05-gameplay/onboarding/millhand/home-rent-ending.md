@@ -4,6 +4,8 @@
 
 See [Millhand main design](README.md), [approved clinic scene](clinic-treatment.md), [approved Flint fight](flint-fight.md), [shared tutorial architecture](../shared-structure.md) and [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md).
 
+**Shared notice authority:** The [common Stage 8 home-and-rent scene](../shared-home-rent-ending.md) is the single source for this notice, its housing interactions and the rent figure (still provisional). This document's separately approved character line remains an exception **after the identical notice is put down**; it creates no origin-specific rent variation.
+
 ## What this ending must accomplish
 
 The Millhand has done the work and remains unpaid; followed one of three genuine alternate tasks; discovered one kind of contradictory official evidence; resisted, or lost to, Flint's attempted contractor collection; and spent 10 coins on necessary care. The player can now return to the life they already have, with a very simple economic problem.
