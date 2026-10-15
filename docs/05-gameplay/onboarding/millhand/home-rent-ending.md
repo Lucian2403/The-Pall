@@ -4,7 +4,7 @@
 
 See [Millhand main design](README.md), [approved clinic scene](clinic-treatment.md), [approved Flint fight](flint-fight.md), [shared tutorial architecture](../shared-structure.md) and [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md).
 
-**Shared notice authority:** The [common Stage 8 home-and-rent scene](../shared-home-rent-ending.md) is the single source for this notice, its housing interactions and the rent figure (still provisional). This document's separately approved character line remains an exception **after the identical notice is put down**; it creates no origin-specific rent variation.
+**Shared Stage 8 authority (UPDATED 2026-10-15):** The [common Stage 8 scene](../shared-home-rent-ending.md) now owns **both the identical rent notice and the exact Millhand-origin closing speech for all six backgrounds**, following the user's explicit direction. The quotation below remains the original approved text and is copied verbatim by the shared service; it is **no longer a Millhand-exclusive line**.
 
 ## What this ending must accomplish
 
@@ -59,7 +59,7 @@ The “140” is the arithmetic gap, **not an extra fine**. Don't imply the play
 ## Scene H03 — Millhand speaks to himself, then tutorial ends (APPROVED flow)
 
 1. **[Put the notice down]** closes the notice. This is a simple continuation/acknowledgement, not a roleplay choice that secretly changes housing rules.
-2. **The Millhand speaks aloud to himself once, immediately after setting the notice down (USER-REQUESTED ADDITION).** Exact spoken line — APPROVED AND LOCKED:
+2. **All six background characters speak this same line once after setting down the identical notice (UPDATED USER DIRECTION).** The Millhand wording is canonical, APPROVED AND LOCKED:
 
    *The Millhand puts the notice down.*
 
@@ -112,7 +112,7 @@ If a player wins against Flint without taking actual damage/condition, Stage 6/7
 
 ## Approval boundary
 
-**LOCKED:** the Stage 8 return-home/rent reveal and journal wrap-up, read/put-down interaction, factual completion copy, and **the new requirement that the Millhand briefly speaks to himself/herself about needing a home and raising money from ordinary work or things they can make and sell immediately after putting down the notice**. The amount remains **150 coins PROVISIONAL**, with 10 held after treatment. Preserve Flint's win/lose flag and the chosen second-skill route.
+**LOCKED:** the Stage 8 return-home/rent reveal and journal wrap-up, read/put-down interaction, factual completion copy, and **the requirement that every background speaks the exact same Millhand-origin line immediately after putting down the identical notice**. The amount remains **150 coins PROVISIONAL**, with 10 held after treatment. Preserve Flint's win/lose flag and the chosen second-skill route.
 
 **Exact new self-talk wording:** **APPROVED VERBATIM on 2026-10-15.** Preserve the line as written; only revise through explicit user review. 
 
