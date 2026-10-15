@@ -72,8 +72,9 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Squatter — The Warm Patch and three branch choices, Stage 3 (APPROVED 2026-10-15)](squatter/warm-patch-discovery.md)
 - [Squatter — Trading, Herbalism and Construction jobs, Stage 4 (APPROVED 2026-10-15)](squatter/second-task-branches.md)
 - [Squatter — The Rustling Bank and Nowhere to Step, Stage 5 (APPROVED 2026-10-15)](squatter/boar-confrontation.md)
-- [Squatter — Young injured boar fight and outcome handling, Stage 6 (PROPOSED 2026-10-15)](squatter/boar-fight.md)
-- [Squatter — Post-boar clinic and dialogue, Stage 7 (PROPOSED 2026-10-15)](squatter/clinic-treatment.md)
+- [Squatter — Young injured boar fight and outcome handling, Stage 6 (APPROVED ENCOUNTER 2026-10-15)](squatter/boar-fight.md)
+- [Squatter — Post-boar clinic and dialogue, Stage 7 (APPROVED 2026-10-15)](squatter/clinic-treatment.md)
+- [Shared Stage 8 — identical starter home and provisional rent notice for all six origins (LOCKED 2026-10-15)](shared-home-rent-ending.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
