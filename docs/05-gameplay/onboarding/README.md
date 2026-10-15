@@ -43,8 +43,10 @@
 
 - [Stage 2 — Yarrow Cut](squatter/yarrow-cut-interaction.md) — **APPROVED AND LOCKED 2026-10-15**.
 - [Stage 3 — The Warm Patch](squatter/warm-patch-discovery.md) — **APPROVED AND LOCKED 2026-10-15**.
-- [Stage 4 — Three second-skill jobs](squatter/second-task-branches.md) — **PROPOSED 2026-10-15**.
-- [Stage 5 — Rustling Bank / Nowhere to Step](squatter/boar-confrontation.md) — **PROPOSED 2026-10-15**.
+- [Stage 4 — Three second-skill jobs](squatter/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-15**.
+- [Stage 5 — Rustling Bank / Nowhere to Step](squatter/boar-confrontation.md) — **APPROVED AND LOCKED 2026-10-15**.
+- [Stage 6 — Injured boar fight](squatter/boar-fight.md) — **PROPOSED 2026-10-15**, combat numbers TBD.
+- [Stage 7 — Clinic after the boar](squatter/clinic-treatment.md) — **PROPOSED 2026-10-15**, shared medical details TBD.
 
 ## Millhand progression (current)
 
