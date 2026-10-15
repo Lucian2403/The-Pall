@@ -2,7 +2,7 @@
 
 **Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
 
-**Status: Core tutorial premise, three second-job branches and common antagonist LOCKED (2026-10-13).** [Stage 1 Hector opening dialogue](opening-dialogue.md) was **APPROVED AND LOCKED on 2026-10-15**. [Stage 2 ordinary courier interactions](shift-dispatch-interaction.md) were **APPROVED AND LOCKED on 2026-10-15**. Later dialogue, timing, fight mechanics and numerical balance remain to be designed. Background name, role and **Industry +3 Major Skill** are agreed in [Character Creation](../../../01-player/character-creation.md). All six tutorials follow the [locked shared structure](../shared-structure.md).
+**Status: Core tutorial premise, three second-job branches and common antagonist LOCKED (2026-10-13).** [Stage 1 Hector opening dialogue](opening-dialogue.md) was **APPROVED AND LOCKED on 2026-10-15**. [Stage 2 ordinary courier interactions](shift-dispatch-interaction.md) were **APPROVED AND LOCKED on 2026-10-15**. [Stage 3 Wrong Bell discovery and first-job wage dispute](wrong-bell-discovery.md) is **PROPOSED (2026-10-15), not yet approved**. Stage 4 tasks, fight mechanics, timing and balance remain to be designed. Background name, role and **Industry +3 Major Skill** are agreed in [Character Creation](../../../01-player/character-creation.md). All six tutorials follow the [locked shared structure](../shared-structure.md).
 
 ## Locked common character-creation context
 
@@ -31,7 +31,9 @@ Generic job interactions to reuse in future courier/Hauling assignments:
 3. **Delivery discrepancy:** use a reusable address verification, damaged docket, queue management or receiver-confirmation interaction.
 4. **Regular resolution template:** outside onboarding, pay ordinary coins/Industry XP; in this opening tutorial, the exceptional route is unpaid and grants 0 ordinary XP.
 
-### Dark opening incident — The Wrong Bell (LOCKED)
+### Dark opening incident — The Wrong Bell (LOCKED premise; Stage 3 draft PROPOSED)
+
+[Stage 3 discovery, watchman exchange and three-choice handoff (PROPOSED; not approved)](wrong-bell-discovery.md) covers the first physical contradiction, reason this delivery round earns nothing and a deferred optional Hector return exchange. The core premise below remains locked.
 
 **The Wrong Bell.** Among routine messages is a sealed order to start a night shift at a block officially closed for unsafe fumes. The shift bell still rings, and a watchman expects workers to enter. The dispatch docket gives a perfectly ordinary signature requirement. The player's choice leads to one of the **three locked second-Major-Skill jobs** below, then two interactions, a logically motivated fight against **Dogman, a Shift Marshal's unofficial security man**, healing, home and rent. The detailed scene/dialogue design remains TBD.
 
