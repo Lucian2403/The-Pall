@@ -1,6 +1,6 @@
-# Bellrunner — Stage 3: The Wrong Bell (PROPOSED)
+# Bellrunner — Stage 3: The Wrong Bell (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The incident premise, three second Major Skills and their jobs, Dogman, and the shared tutorial rules are already canonical in the [Bellrunner overview](README.md). This file proposes the exact discovery, watchman speech, cause of nonpayment, immediate branch handoffs and optional later Hector exchange. It follows [approved Stage 1](opening-dialogue.md), [approved Stage 2](shift-dispatch-interaction.md) and the [game-wide dialogue standard](../../interactions/dialogue-style-guide.md).
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the exact discovery, watchman speech, cause of nonpayment, immediate branch handoffs and deferred optional Hector exchange. The incident premise, three second Major Skills and their jobs, Dogman, and the shared tutorial rules were already canonical in the [Bellrunner overview](README.md). Numerical tuning, exact world labels and production identifiers remain TBD. It follows [approved Stage 1](opening-dialogue.md), [approved Stage 2](shift-dispatch-interaction.md) and the [game-wide dialogue standard](../../interactions/dialogue-style-guide.md).
 
 ## Scope and dramatic purpose
 
@@ -10,7 +10,7 @@ The incident should be proved by things in the world, not an ungrounded characte
 
 Stage 3 concludes once the player commits to one of the three already-locked second-job routes. Stage 4 performs the selected job. Dogman's two later interactions, fight, clinic and home are untouched.
 
-## B03-A — The last address (PROPOSED)
+## B03-A — The last address (APPROVED)
 
 **Trigger:** Stage 2 reaches its ordinary courier work summary, then the player presses **[Take the final notice]**. At the marked work block:
 
@@ -25,7 +25,7 @@ The ringing bell is already audible; it does not require a separate puzzle actio
 
 These are three distinct objects. The closure notice is not the sealed order; its external dispatch slip is not the interior text; the active worksite bell is not the ordinary duty bell at Hector's Dispatch House. Nothing here yet establishes who reconnected the bell or why. That belongs to the later **Mechanics / Industrial Machinery** branch.
 
-## B03-B — The watchman (PROPOSED exact dialogue)
+## B03-B — The watchman (APPROVED exact dialogue)
 
 *The watchman looks at the packet in the courier's hand.*
 
@@ -49,13 +49,13 @@ These are three distinct objects. The closure notice is not the sealed order; it
 
 The player can optionally select **[Compare the orders]** to read the closure and shift summons together again. It is a clarity action, not a hidden test, and cannot gate the choice. Stage 2's mundane smeared receiving mark cannot hide this contradiction.
 
-## B03-C — An exceptional round without wages (PROPOSED concrete causal explanation)
+## B03-C — An exceptional round without wages (APPROVED causal explanation)
 
-**Proposed contract practice:** Council courier rounds are approved for payment **as a complete signed route**. This particular route contains a final delivery to a **legally closed worksite** whose receiving office is shut. The watchman may accept the packet, but **cannot issue the required office receiving mark**. An informal acknowledgment is not valid certification.
+**Approved tutorial-specific contract practice:** Council courier rounds are approved for payment **as a complete signed route**. This particular route contains a final delivery to a **legally closed worksite** whose receiving office is shut. The watchman may accept the packet, but **cannot issue the required office receiving mark**. An informal acknowledgment is not valid certification.
 
 Consequently, the council refuses to clear **the whole exceptional round**, not merely this stop, even if every ordinary Stage 2 receipt was properly obtained. The player is not being punished for choosing the crowded street or leaving a spoiled mark unresolved. The unfairness is that one city authority sends workers to a closed site while the approving office refuses to recognize the work of delivering that order.
 
-**Proposed first-job resolution display (after route commitment):**
+**Approved first-job resolution fields (exact UI wording TBD; after route commitment):**
 - Shift Dispatch: round not accepted.
 - Reason: receiving office closed; authorized final mark unavailable.
 - Payment: **0 coins**. Ordinary XP: **0**. Inventory/loot: **none**.
@@ -66,7 +66,7 @@ If the player later visits Hector, his optional exchange below gives the same re
 
 ## B03-D — Three choices at the gate
 
-After the inspections and watchman exchange, offer **all three**, with no skill or gear prerequisites. The meanings and jobs are **already locked**; the exact player lines and immediate actions below are **proposed**. This is a consequential branch choice, unlike Stage 2's two route options.
+After the inspections and watchman exchange, offer **all three**, with no skill or gear prerequisites. The meanings and jobs are **already locked**; the exact player lines and immediate actions below were **approved on 2026-10-15**. This is a consequential branch choice, unlike Stage 2's two route options.
 
 ### A. Deliver the notice as ordered → Commerce / Contracts
 
@@ -129,7 +129,7 @@ Do not reveal the deliberate bypass in Stage 3, automatically stop the bell or n
 - The player may inspect the evidence before confirming. A retry or reconnect must never award +1 again, substitute a branch or roll back the first-job closure.
 - The selected Stage 4 job and its supporting NPC may start locally; do not force a trip back to Hector before treating sick workers, meeting the attendance clerk or checking bell controls.
 
-## B03-E — Hector's later return exchange (PROPOSED, nonblocking)
+## B03-E — Hector's later return exchange (APPROVED, nonblocking)
 
 **Placement:** when the character **next naturally visits the Dispatch House after dealing with the immediate condemned-site tasks**. It is drafted now because Hector is the established recurring job-giver, but it is **not** a required interlude before Stage 4 or the gate confrontation.
 
@@ -176,7 +176,7 @@ There is no forced joke, false-worker-death callback, invented named NPC, fabric
 
 **ALREADY LOCKED:** Stage 1 exact opening; Stage 2 regular Shift Dispatch interaction; worksite closure after unsafe fumes; sealed night-shift order, ringing bell and watchman; three response meanings and their second Major Skill jobs; Dogman and the shared no-reward, +3/+1, 10-coin clinic and home/rent framework.
 
-**PROPOSED THIS STAGE:** physical evidence/inspection sequence, watchman and player spoken lines, exceptional unpaid-round causal rule, branch handoff actions, why each selected unpaid task is not an ordinary paid job, and Hector's deferred return exchange.
+**APPROVED AND LOCKED THIS STAGE (2026-10-15):** physical evidence/inspection sequence, watchman and player spoken lines, exceptional unpaid-round causal rule, branch handoff actions, why each selected unpaid task is not an ordinary paid job, and Hector's deferred return exchange. Exact UI copy, timers and quantitative values remain TBD.
 
 **LATER / TBD:** actual Stage 4 job interactions and accompanying supporting NPC exchanges; two Dogman interactions; turn-based PvE outcome; clinic/home scenes; all formulas, timing and implementation values.
 
