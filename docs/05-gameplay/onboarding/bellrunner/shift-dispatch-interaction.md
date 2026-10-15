@@ -1,6 +1,6 @@
-# Bellrunner — Shift Dispatch Courier Work (Stage 2 — PROPOSED)
+# Bellrunner — Shift Dispatch Courier Work (Stage 2 — APPROVED)
 
-**Status: PROPOSED FOR USER REVIEW (2026-10-15). NOT LOCKED.** This draft covers only the ordinary Industry / Hauling work between the [approved Hector opening](opening-dialogue.md) and the separately authored future *Wrong Bell* discovery. The Dispatch House, Hector D. Smoke, the council-notice round, the later sealed unsafe-site order, the three second-skill branches and Dogman are already locked in the [Bellrunner master](README.md). The exact work interactions and UI wording here are proposals.
+**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the Stage 2 ordinary Industry / Hauling work between the [approved Hector opening](opening-dialogue.md) and the future *Wrong Bell* discovery: bundle check, two route choices, spoiled receiving mark and three responses, routine round closure and the final sealed-notice handoff. Exact quantitative values, technical IDs, probabilities and balance remain TBD. The Dispatch House, Hector D. Smoke, the council-notice round, the later sealed unsafe-site order, the three second-skill branches and Dogman were already locked in the [Bellrunner master](README.md).
 
 ## Design boundary
 
@@ -87,12 +87,12 @@ A **sealed council order still requires final presentation at its marked address
 - **No new permanence:** no special reputation, guilt, crime, story faction, money or permanent gear consequences have been approved for these ordinary choices. Later branch and Dogman motivations depend on the Stage 3 choice, not on how the player handled a smudged mark.
 - **Shared game architecture:** implement with authored data and known outcomes; do not use runtime freeform AI to adjudicate the job.
 
-## Approval boundary
+## Approval boundary (approved narrative and interaction structure; numeric implementation TBD)
 
 **Already LOCKED elsewhere:** Bellrunner Industry +3; Hector, Dispatch House and the approved spoken opening; Industry/Hauling Shift Dispatch as first job; hidden *Wrong Bell* discovery only after ordinary work; the three later Commerce/Medicine/Mechanics tasks; Dogman; no tutorial wages/XP/loot; common clinic/home/rent path.
 
-**PROPOSED IN STAGE 2:** bundle-check screen and optional reordering; direct-versus-quieter road trade-off; spoiled receiving mark and its three handling choices; the round-summary presentation and explicit final-notice handoff; working data identifiers.
+**APPROVED IN STAGE 2 (2026-10-15):** bundle-check screen and optional reordering; direct-versus-quieter road trade-off; spoiled receiving mark and its three handling choices; the round-summary presentation and explicit final-notice handoff. **Working data identifiers are illustrative; not frozen as production IDs.**
 
-**TBD / later stage:** number of notices, destination labels, site location, duration, weights, threshold/percentage formulas, final UI prose, the closed-site reveal, Hector's post-round response and the exact nonpayment cause. Do not canonize these unapproved details by writing them into a LOCKED summary.
+**TBD / later stage:** number of notices, destination labels, site location, duration, weights, threshold/percentage formulas, final UI prose, the closed-site reveal, Hector's post-round response and the exact nonpayment cause. Do not canonize these still-undecided details by writing them into a LOCKED summary.
 
 Related: [Bellrunner background](README.md), [Approved Hector Stage 1](opening-dialogue.md), [Shared onboarding structure](../shared-structure.md), [Jobs and Time](../../jobs/jobs-and-time.md), [Interaction architecture](../../interactions/interaction-generation.md), [Spoken dialogue standard](../../interactions/dialogue-style-guide.md).
