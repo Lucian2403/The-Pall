@@ -1,6 +1,6 @@
-# Squatter — Stage 6: The Injured Boar Fight (PROPOSED)
+# Squatter — Stage 6: The Injured Boar Fight (APPROVED ENCOUNTER)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The player has completed one [approved Stage 4 route](second-task-branches.md) and both [approved Stage 5 encounters](boar-confrontation.md). The foe is an ordinary **young, injured wild boar**, not a monster or a hunting reward. This draft proposes the encounter's tactical teaching beats and two endings. Combat formulas, injury types and AI values belong to the unfinished shared turn-based system.
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-15).** The user approved the readable boar charge, terrain-based defensive options, nonlethal disengagement victory, safe defeat handoff and preservation of both results. The foe is an ordinary **young, injured wild boar**, not a monster or a hunting reward. Exact combat formulas, injury types and AI values remain TBD under the shared turn-based system.
 
 ## What actually needs to happen
 
@@ -95,7 +95,7 @@ A no-damage player still cannot be assigned an invisible scratch just to justify
 
 **Already locked:** young injured boar opponent; two preceding Stage 5 interactions with three approach choices apiece; unarmed starter kit; no kill requirement; ordinary shared turn-based PvE; clinic/home continuation.
 
-**Proposed for Stage 6:** clear charge telegraph, defensive movement-focused encounter, ordinary disengagement as a nonlethal victory, boar leaving once it can get through, defeat through a charge followed by aid from a passerby, and persistence of win/loss.
+**Approved in Stage 6:** clear charge telegraph, defensive movement-focused encounter, ordinary disengagement as a nonlethal victory, boar leaving once it can get through, defeat through a charge followed by aid from a passerby, and persistence of win/loss. Numerical combat implementation remains TBD.
 
 **Later / TBD:** all shared combat formulae, animal attack data, precise Health/injury effects, final UI terminology, and any future wildlife behaviour outside this one tutorial encounter.
 
