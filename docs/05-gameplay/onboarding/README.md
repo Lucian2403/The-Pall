@@ -30,7 +30,9 @@
 
 - [Stage 1 — Hector D. Smoke opening conversation](bellrunner/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-15**. The Dispatch House, ordinary Shift Dispatch job and later *Wrong Bell* premise are also locked.
 - [Stage 2 — Shift Dispatch courier-work interaction](bellrunner/shift-dispatch-interaction.md) — **APPROVED AND LOCKED 2026-10-15**. Reusable route, bundle and receipt-verification work; no early Wrong Bell reveal.
-- [Stage 3 — The Wrong Bell discovery and branch decision](bellrunner/wrong-bell-discovery.md) — **PROPOSED 2026-10-15; awaiting approval**. Locked incident premise, proposed scene/dialogue, wage-dispute cause and three branch handoffs.
+- [Stage 3 — The Wrong Bell discovery and branch decision](bellrunner/wrong-bell-discovery.md) — **APPROVED AND LOCKED 2026-10-15**.
+- [Stage 4 — Three follow-up work tasks](bellrunner/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-15**, including revised natural dialogue.
+- [Stage 5 — Dogman: Show Your Papers / Gate Barred](bellrunner/dogman-confrontation.md) — **PROPOSED 2026-10-15; awaiting approval**.
 
 ## Millhand progression (current)
 
