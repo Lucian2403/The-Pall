@@ -39,7 +39,7 @@
 
 ## Squatter opening (current)
 
-- [Stage 1 — Benny Ben and the Yarrow Cut order](squatter/opening-dialogue.md) — **PROPOSED 2026-10-15; awaiting approval**. The Squatter opening premise and background are already locked.
+- [Stage 1 — Benny Ben and the Yarrow Cut order](squatter/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-15**. The Squatter opening premise and background are already locked.
 
 ## Millhand progression (current)
 
