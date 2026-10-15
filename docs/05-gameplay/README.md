@@ -53,6 +53,7 @@ Player activities, time, world economy and authored interactive events.
 - [Squatter: Stage 6 injured boar fight and outcomes (approved encounter)](onboarding/squatter/boar-fight.md)
 - [Squatter: Stage 7 clinic dialogue and care (approved)](onboarding/squatter/clinic-treatment.md)
 - [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
-- [Stitcher: Claudia Cyka Stage 1 Morning Dressings opening (proposed)](onboarding/stitcher/opening-dialogue.md)
+- [Stitcher: Claudia Cyka revised Stage 1 harsher opening (proposed)](onboarding/stitcher/opening-dialogue.md)
+- [Stitcher: Stage 2 Morning Dressings reusable Trauma job (proposed)](onboarding/stitcher/morning-dressings-interaction.md)
 - [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper/README.md)
 - [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
