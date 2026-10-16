@@ -1,6 +1,6 @@
-# Scrapper — Stage 2: Strip a Condemned Pump (SIMPLIFIED PROPOSAL)
+# Scrapper — Stage 2: Strip a Condemned Pump (APPROVED)
 
-**Status: REVISED PROPOSAL (2026-10-16); NOT LOCKED.** The previous Stage 2 buried an easy hands-on job under technical vocabulary. This rewrite shows the player exactly **what they see, what they remove, why each choice matters, and what finishing the job looks like**. It does not change the [locked Scrapper story](README.md), Mechanics +3 or the later [Stage 3 — The Last Dry Floor](README.md).
+**Status: APPROVED AND LOCKED (2026-10-16) — user approved the simplified Mechanics work.** The previous Stage 2 buried an easy hands-on job under technical vocabulary. This rewrite shows the player exactly **what they see, what they remove, why each choice matters, and what finishing the job looks like**. It does not change the [locked Scrapper story](README.md), Mechanics +3 or the later [Stage 3 — The Last Dry Floor](README.md).
 
 ## The job in one sentence
 
@@ -125,8 +125,8 @@ After the player has done the ordinary job and put the yard tools away, **Stage 
 
 **Already LOCKED:** Rust Yard and Ignatius, official job name *Strip a Condemned Pump*, first task uses Mechanics +3, no tutorial wages/XP/loot, the connection to the still-running drainage pump, and Stage 3's later reveal.
 
-**REVISED PROPOSAL:** two clearly identified plates on the stand, simple remove/hold choices, three ways to handle a rusty bolt, keep/scrap sorting, count, Ignatius's plain sign-off and a clearly separate later story twist.
+**APPROVED IN STAGE 2:** two clearly identified plates on the stand, simple remove/hold choices, three ways to handle a rusty bolt, keep/scrap sorting, count, Ignatius's plain sign-off and a clearly separate later story twist.
 
 **TBD:** how the physical pump stand looks, exact bolt/part counts and conditions, time and material-quality formulas, normal paid job rewards, item/animation definitions and shared job interface.
 
-Related: [Stage 1 simplified dialogue](opening-dialogue.md), [Scrapper master](README.md), [Jobs and Time](../../jobs/jobs-and-time.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md).
+Related: [Stage 1 approved dialogue](opening-dialogue.md), [Scrapper master](README.md), [Jobs and Time](../../jobs/jobs-and-time.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md).
