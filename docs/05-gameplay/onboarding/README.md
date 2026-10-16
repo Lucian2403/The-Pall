@@ -55,6 +55,9 @@
 - [Stage 1 — Claudia Cyka's harsher opening](stitcher/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-16**. Her harsh, beautiful and calculating character direction is locked.
 - [Stage 2 — Morning Dressings basic Trauma work](stitcher/morning-dressings-interaction.md) — **APPROVED AND LOCKED 2026-10-16**. The later Teaching Bed premise remains locked.
 
+- [Stage 3 — The Teaching Bed](stitcher/teaching-bed-discovery.md) — **PROPOSED 2026-10-16**.
+- [Stage 4 — Three follow-up jobs](stitcher/second-task-branches.md) — **PROPOSED 2026-10-16**.
+
 ## Millhand progression (current)
 
 | Stage | Document | Status |
