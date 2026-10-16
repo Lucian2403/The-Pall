@@ -56,7 +56,7 @@ If the player first checks the old order or first knocks back, the same grounded
 
 ## Three player choices
 
-Each option opens a *different, ordinary job activity* in [Stage 4](second-task-branches.md). All three temporarily help the people below in a distinct way. None fixes their housing problem forever.
+Each option opens a *different, ordinary job activity* in [approved Stage 4](second-task-branches.md). All three temporarily help the people below in a distinct way. None fixes their housing problem forever.
 
 | Player choice (button text) | What the character will do | Second Major Skill |
 | --- | --- | --- |
