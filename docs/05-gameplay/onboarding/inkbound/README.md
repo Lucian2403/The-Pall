@@ -4,17 +4,22 @@
 
 **Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing (10-coin tutorial treatment) and common home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](../shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
 
+**Detailed opening drafts (PROPOSED 2026-10-16):** [Stage 1 — Erwin Buro and the office lists](opening-dialogue.md) and [Stage 2 — The Winter Register](winter-register-interaction.md) are written in plain language for user approval. The first scene assigns an unpaid office record check; the second has the player compare two lists, correct a blurred number and hand in a clean copy. The **Acceptable Losses** sheet is only revealed in Stage 3, after both regular work stages. These new exact lines and work choices are not yet locked.
+
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
 ## Locked hub and recurring NPC
 
 **Civic Copying Office** — a publicly contracted counting-room near Grand Cylinder City's poorer wards: ink-dark windows, sand used to dry fresh writing, scorched tally slips, wooden record bins and clerks transcribing household rolls and industry reports. This is a **permanent Scholarship / Investigation job hub**, not a tutorial-only institution.
 
-**LOCKED regular job NPC:** **Erwin Buro, Senior Copy Clerk** (exact personal name approved by user). He hires ordinary copyists, checks their accuracy and pays normal Scholarship coins/XP outside the tutorial; this opening assignment gives neither. His attitude is pragmatic, not obviously villainous; he worries about losing the municipal account that keeps his clerks employed. Every NPC ultimately needs a personal name, including the street surveyor, coal carrier and opponent, but names aren't fixed merely by introducing this pitch.
+**LOCKED regular job NPC:** **Erwin Buro, Senior Copy Clerk** (exact personal name approved by user). He hires ordinary copyists, checks their accuracy and pays normal Scholarship coins/XP outside the tutorial; this opening assignment gives neither. His attitude is pragmatic, not obviously villainous; he worries about losing the municipal account that keeps his clerks employed. **Current game-wide naming rule (LOCKED 2026-10-14):** major recurring NPCs such as Erwin and Silas have approved names; minor roles including the surveyor, coal carrier and counter clerk may remain unnamed. This supersedes the older name-every-NPC plan.
 
 The Inkbound character already works in the copying trade. Character creation grants **Scholarship +3** to its Major Skill and normal STR/DEX/INT/RES 5, 50 max Health, **Basic Clothes + Crude Small Bag + 20 coins**.
 
 ## First unpaid tutorial job: The Winter Register — Scholarship / Investigation (LOCKED)
+
+The [proposed Stage 1 dialogue](opening-dialogue.md) and [proposed Stage 2 ordinary job](winter-register-interaction.md) give an accessible, reusable work experience before the unique Stage 3 discovery. The player compares household counts, checks corrections and fixes one blurred entry without needing specialist accounting terms.
+
 
 A routine copy-and-verification assignment. The player checks ward rosters, reconciles household counts, distinguishes original from amended totals and flags mismatched column entries. This is normal, reusable **Investigation** work, not a tutorial-exclusive puzzle.
 
