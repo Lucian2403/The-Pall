@@ -1,6 +1,6 @@
-# Stitcher — Stage 5: The Empty Sheet / The Night Door (PROPOSED)
+# Stitcher — Stage 5: The Empty Sheet / The Night Door (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** These are the two already-approved-in-outline pre-combat interactions after the chosen [Stage 4 job](second-task-branches.md). The roles, names and rescue premise are canonical; the scene dialogue and staging here are proposed. Stage 6 is the short turn-based fight with **Owler, the Night Porter**.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved both pre-combat interactions, their dialogue, player approaches and patient-witness hold. This follows approved [Stage 4](second-task-branches.md) and leads to approved-at-encounter-level [Stage 6](owler-fight.md), the fight with **Owler, the Night Porter**. Exact combat values remain TBD.
 
 ## Interaction I — The Empty Sheet
 
@@ -91,7 +91,7 @@ His weapon remains **TBD** between the already outlined leather strap and short 
 
 **Already locked:** two named beats, Owler as the one common opponent, three preparatory approaches in principle, patient's eventual rescue, one route finding and the shared nonlethal PvE rule.
 
-**Proposed:** exact dialogue, warm-sheet investigation choices, patient/attendant witness exchange, Claudia's self-protective hold, physical doorway blocking and fight handoff.
+**Approved in Stage 5:** exact dialogue, warm-sheet investigation choices, patient/attendant witness exchange, Claudia's self-protective hold, physical doorway blocking and fight handoff. Preserve spoken dialogue unless explicitly revised.
 
 **TBD:** service-passage geometry, true official transfer authority, any exact obstruction/defense modifiers, world clock and combat action data.
 
