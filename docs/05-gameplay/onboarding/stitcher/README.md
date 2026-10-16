@@ -2,7 +2,7 @@
 
 **Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
 
-**Stage 1 dialogue:** [Claudia Cyka's harsher opening](opening-dialogue.md) is **APPROVED AND LOCKED (2026-10-16)** including her natural linen instruction. **Stage 2:** [Morning Dressings medical job flow](morning-dressings-interaction.md) is **APPROVED AND LOCKED (2026-10-16)**. **Stage 3:** [The Teaching Bed scene and choices](teaching-bed-discovery.md) is **PROPOSED (2026-10-16)**. **Stage 4:** [The Night Trolley / The Signed Consent / Notes for the Living job scenes](second-task-branches.md) are **PROPOSED (2026-10-16)**. Claudia's user-defined harsh, beautiful and calculating personality is locked; exact new Stage 3-4 dialogue is not. **Shared Stage 8:** all six backgrounds use the same [home, provisional rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md); no Stitcher-specific home script.
+**Stage 1 dialogue:** [Claudia Cyka's harsher opening](opening-dialogue.md) is **APPROVED AND LOCKED (2026-10-16)** including her natural linen instruction. **Stage 2:** [Morning Dressings medical job flow](morning-dressings-interaction.md) is **APPROVED AND LOCKED (2026-10-16)**. **Stage 3:** [The Teaching Bed scene and choices](teaching-bed-discovery.md) is **APPROVED AND LOCKED (2026-10-16)** with Claudia's updated fever-ward coal line. **Stage 4:** [The Night Trolley / The Signed Consent / Notes for the Living job scenes](second-task-branches.md) are **APPROVED AND LOCKED (2026-10-16)**. [Stage 5 — The Empty Sheet / The Night Door](owler-confrontation.md) and [Stage 6 — Owler's fight](owler-fight.md) are **PROPOSED (2026-10-16)** pending approval. Claudia's harsh, beautiful and calculating character is already locked. **Shared Stage 8:** all six backgrounds use the same [home, provisional rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md); no Stitcher-specific home script.
 
 **Status: STORY STRUCTURE AND CONTENT LOCKED (2026-10-13).** **Cinder Row Infirmary**, its recurring **Matron Claudia Cyka** as job-giver, **Morning Dressings**, **The Teaching Bed**, three choice-dependent second jobs, two follow-up interactions, **Owler, the Night Porter** as the opponent and the patient's local rescue were explicitly approved. The shared [E2E tutorial structure](../shared-structure.md), Medicine +3 and universal starter kit remain canonical. Dialogue, combat systems, normal job wages and geographical details remain TBD; tutorial jobs give no coins/XP and tutorial care costs 10 coins.
 
@@ -29,7 +29,7 @@ Under the Matron, do a short unpaid tutorial shift (normally paid in repeatable 
 
 ## Unique twist (LOCKED): The Teaching Bed
 
-[Stage 3 gameplay and dialogue proposal](teaching-bed-discovery.md) remains **unapproved**; the premises and three route meanings below are already locked.
+[Stage 3 gameplay and dialogue](teaching-bed-discovery.md) is **approved**; its exact spoken lines, including Claudia's newly revised coal argument, are locked.
 
 
 As the Matron prepares to close a side ward, the player notices an **adult patient who is awake, restrained to a narrow bed, and marked in blue ink with precise surgical cutting lines**. His chart does not list the procedure needed to treat his wound. Instead it reads:
@@ -40,11 +40,11 @@ The patient manages to say: *"They let me sleep. That's when they took my thumbp
 
 A surgeon's teaching contract treats the patient's body as payment for care that he has already received. The demonstration is **not medically necessary**. He did not knowingly agree. The grim logic is economic: the institution sells access to vulnerable adults to finance food, coal and medication for everyone else.
 
-The Matron knows enough to be uneasy. Her hard-edged funding argument (wording updated at the user's request, 2026-10-16): *"Who's paying for the fever ward's coal if I turn them away? You?"* This leaves the player an ugly decision rather than a pure cartoon villain. Do **not** depict explicit surgery or create a systemic organ-trafficking economy; this is a **one-off authored local case**, not the game's main plot or a newly established universal practice throughout Grand Cylinder City.
+The Matron knows about the deal and coldly defends the money rather than pretending it is needed care. Her hard-edged funding argument (wording updated at the user's request, 2026-10-16): *"Who's paying for the fever ward's coal if I turn them away? You?"* This leaves the player an ugly decision rather than a pure cartoon villain. Do **not** depict explicit surgery or create a systemic organ-trafficking economy; this is a **one-off authored local case**, not the game's main plot or a newly established universal practice throughout Grand Cylinder City.
 
 ### Three approved choices → three unpaid tutorial tasks in another Major Skill
 
-[Stage 4 three follow-up task/dialogue proposals](second-task-branches.md) are pending approval. The skill branches and their central findings in this table remain canonical.
+[Stage 4 follow-up tasks and dialogue](second-task-branches.md) are **approved**; the skill branches and their distinct findings in the table are canonical.
 
 
 | Player response to the patient | Second tutorial task (reusable job interaction family) | Immediate discovery / consequence |
@@ -60,6 +60,10 @@ The Matron knows enough to be uneasy. Her hard-edged funding argument (wording u
 **Interaction 1 — The Empty Sheet (LOCKED story event; exact options TBD):** Back near the service corridor, a patient bed is empty but its sheets are warm. The player can inspect the trolley's seal, call for the Matron, or use their route's evidence to challenge the transfer. Their branch alters dialogue and what they can demonstrate. All paths learn the patient is still alive, and all can secure his release from the demonstration by the local ending. Don't make the fate of the patient depend on an untrained beginner passing a hidden high-skill check.
 
 **Interaction 2 — The Night Door (LOCKED story event; exact options TBD):** The hospital **Night Porter, Owler**, paid by the receiving anatomy school to deliver the patient, bars the service exit and demands the papers or trolley back. The player can attempt to reason with him, distract him with a nearby cart, or brace against the narrow doorway. His choice to use force triggers the same **short, turn-based PvE encounter** on each route. He is **not the Matron and not a senior surgeon**.
+
+### Stage 5 and Stage 6 scene drafts
+
+[Stage 5 pre-fight interactions](owler-confrontation.md) and [Stage 6 Owler encounter and outcomes](owler-fight.md) are **proposed**, pending the user's review. The two named interaction beats, Owler, patient rescue, and combat/clinic/home order were previously locked in the story outline; **numerical combat mechanics remain TBD**.
 
 ### PvE, treatment and home — common structure
 
