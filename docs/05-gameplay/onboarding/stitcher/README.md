@@ -2,7 +2,7 @@
 
 **Tutorial economy / housing rule (LOCKED 2026-10-14):** The first and second opening work tasks are **unpaid (0 coins) and award no ordinary XP**; the scripted introductory fight also awards 0 XP, coins and loot. On committing to a second-task choice, gain **+1 level once** in that branch's *different* Major Skill, alongside the initial +3 Major Skill granted at character creation. All origin characters begin with 20 coins, spend 10 on the standard tutorial clinic service, and return to the same shared rented home with 10 coins. Its rent notice is **150 coins PROVISIONAL**, due date/penalties TBD. Ordinary repeatable jobs outside these six exceptional tutorials still pay coins and XP. Precise in-world reasons each tutorial task is unpaid should be written into the eventual dialogue.
 
-**Stage 1 dialogue:** [Claudia Cyka's revised harsher opening](opening-dialogue.md) is **PROPOSED (2026-10-15)** pending dialogue approval. **Stage 2:** [Morning Dressings medical job flow](morning-dressings-interaction.md) is **PROPOSED (2026-10-15)** pending gameplay/dialogue approval. **Claudia's newly user-defined hard, beautiful and calculating personality is LOCKED**; do not mistake that for approval of the exact proposed speeches. **Shared Stage 8:** all six backgrounds use the same [home, provisional rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md); no Stitcher-specific home script.
+**Stage 1 dialogue:** [Claudia Cyka's harsher opening](opening-dialogue.md) is **APPROVED AND LOCKED (2026-10-16)** including her natural linen instruction. **Stage 2:** [Morning Dressings medical job flow](morning-dressings-interaction.md) is **APPROVED AND LOCKED (2026-10-16)**. **Stage 3:** [The Teaching Bed scene and choices](teaching-bed-discovery.md) is **PROPOSED (2026-10-16)**. **Stage 4:** [The Night Trolley / The Signed Consent / Notes for the Living job scenes](second-task-branches.md) are **PROPOSED (2026-10-16)**. Claudia's user-defined harsh, beautiful and calculating personality is locked; exact new Stage 3-4 dialogue is not. **Shared Stage 8:** all six backgrounds use the same [home, provisional rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md); no Stitcher-specific home script.
 
 **Status: STORY STRUCTURE AND CONTENT LOCKED (2026-10-13).** **Cinder Row Infirmary**, its recurring **Matron Claudia Cyka** as job-giver, **Morning Dressings**, **The Teaching Bed**, three choice-dependent second jobs, two follow-up interactions, **Owler, the Night Porter** as the opponent and the patient's local rescue were explicitly approved. The shared [E2E tutorial structure](../shared-structure.md), Medicine +3 and universal starter kit remain canonical. Dialogue, combat systems, normal job wages and geographical details remain TBD; tutorial jobs give no coins/XP and tutorial care costs 10 coins.
 
@@ -29,6 +29,9 @@ Under the Matron, do a short unpaid tutorial shift (normally paid in repeatable 
 
 ## Unique twist (LOCKED): The Teaching Bed
 
+[Stage 3 gameplay and dialogue proposal](teaching-bed-discovery.md) remains **unapproved**; the premises and three route meanings below are already locked.
+
+
 As the Matron prepares to close a side ward, the player notices an **adult patient who is awake, restrained to a narrow bed, and marked in blue ink with precise surgical cutting lines**. His chart does not list the procedure needed to treat his wound. Instead it reads:
 
 > **CHARITY ACCOUNT SETTLED — TEACHING DEMONSTRATION, DAWN.**
@@ -40,6 +43,9 @@ A surgeon's teaching contract treats the patient's body as payment for care that
 The Matron knows enough to be uneasy. Her justification is not simple evil: *"Keep him, and tonight the fever ward has no heat."* This leaves the player an ugly decision rather than a pure cartoon villain. Do **not** depict explicit surgery or create a systemic organ-trafficking economy; this is a **one-off authored local case**, not the game's main plot or a newly established universal practice throughout Grand Cylinder City.
 
 ### Three approved choices → three unpaid tutorial tasks in another Major Skill
+
+[Stage 4 three follow-up task/dialogue proposals](second-task-branches.md) are pending approval. The skill branches and their central findings in this table remain canonical.
+
 
 | Player response to the patient | Second tutorial task (reusable job interaction family) | Immediate discovery / consequence |
 | --- | --- | --- |
