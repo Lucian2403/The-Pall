@@ -4,7 +4,7 @@
 
 **Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent unpaid tutorial second tasks, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](../shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
-**Detailed work drafts (PROPOSED, 2026-10-16):** [Stage 1 — Ignatius Smog opening and docket handoff](opening-dialogue.md) and [Stage 2 — Strip a Condemned Pump / Mechanics interaction](condemned-pump-interaction.md) are written **for user approval**, not locked. The hub, Smog's exact established fresh-air phrase, routine Mechanics job and later *Last Dry Floor* premise remain locked independently of these proposed dialogue and work decisions.
+**Stage 1 and Stage 2 drafts REVISED FOR PLAIN LANGUAGE (PROPOSED, 2026-10-16):** [Stage 1 — Ignatius Smog's simple pump assignment](opening-dialogue.md) and [Stage 2 — take off old metal plates and sort the good pieces](condemned-pump-interaction.md) have been rewritten after the user's feedback that the original draft was too technical. Both still await approval. The hub, Smog's exact established fresh-air phrase, routine Mechanics job and later *Last Dry Floor* premise remain locked independently of these proposed dialogue and work decisions.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -18,7 +18,7 @@
 
 ## First regular job — Strip a Condemned Pump (LOCKED; unpaid tutorial occurrence)
 
-The [proposed Stage 2 detailed job](condemned-pump-interaction.md) shows ordinary inspection, exterior dismantling, a stubborn fastener, grading and tally. The [proposed Stage 1 opening](opening-dialogue.md) hands the worker the salvage docket. These drafts do not reveal the occupied cellars or permit disconnecting the main pipe.
+The [revised Stage 2 draft](condemned-pump-interaction.md) is simple to picture: take two old metal plates off the pump's outer stand, free a rusty bolt, sort good pieces from broken ones and count what was done. The [revised Stage 1 opening](opening-dialogue.md) tells the worker exactly that. All **player-facing choices and dialogue use familiar words**, though the fixed job title remains *Strip a Condemned Pump*. The player leaves the main pipe untouched; **the later cellar reveal is not shown early**.
 
 
 Ignatius Smog assigns the player to inspect and dismantle a condemned industrial pump and sort salvageable pieces from scrap, using ordinary reusable **Mechanics** interactions, yard-owned tools as needed, and normal wage/XP settlement **outside onboarding**, but 0 coins/ordinary XP in this exceptional tutorial. This job is available outside the tutorial, with ordinary different machinery/condition content; it is not just an introductory quest in disguise. The **first tutorial occurrence** concerns a condemned auxiliary drainage pump on Rust Yard's old culvert wall, so it can conceal the unique incident. Exact duration, wear and yield mechanics and non-tutorial coins/XP are TBD; tutorial returns 0.
