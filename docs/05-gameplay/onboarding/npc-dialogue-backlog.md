@@ -33,7 +33,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 ## Dialogue production, still PROPOSED / TO AUTHOR
 
-1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand, Bellrunner and Squatter Stage 1 openings are approved and locked; Stitcher Stage 1 has been drafted and awaits approval, with Scrapper and Inkbound not yet drafted.**
+1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand, Bellrunner and Squatter Stage 1 openings are approved and locked; Stitcher Stages 1-2 are approved, while Stages 3-4 are proposed; Scrapper and Inkbound Stage 1 remain to be drafted.**
 2. **Six unique twist reveals** after the ordinary first-task interactions; three consequential response choices each.
 3. **Eighteen second-task follow-ups** (six origins × three routes) using the different Major Skill, their ordinary job interaction families, and role-labelled minor NPCs where needed.
 4. **Twelve pre-combat interactions** (two per origin), with choice-aware dialogue from the locked opponent where the opponent speaks; Squatter uses observation/animal behaviour instead of human speech.
@@ -75,8 +75,10 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Squatter — Young injured boar fight and outcome handling, Stage 6 (APPROVED ENCOUNTER 2026-10-15)](squatter/boar-fight.md)
 - [Squatter — Post-boar clinic and dialogue, Stage 7 (APPROVED 2026-10-15)](squatter/clinic-treatment.md)
 - [Shared Stage 8 — identical home, provisional rent notice, and exact Millhand closing dialogue for all six origins (LOCKED 2026-10-15)](shared-home-rent-ending.md)
-- [Stitcher — Matron Claudia Cyka harsher opening Morning Dressings, Stage 1 (REVISED PROPOSAL 2026-10-15)](stitcher/opening-dialogue.md)
-- [Stitcher — Morning Dressings medical interaction and Claudia sign-off, Stage 2 (PROPOSED 2026-10-15)](stitcher/morning-dressings-interaction.md)
+- [Stitcher — Matron Claudia Cyka harsher opening Morning Dressings, Stage 1 (APPROVED 2026-10-16)](stitcher/opening-dialogue.md)
+- [Stitcher — Morning Dressings and Claudia sign-off, Stage 2 (APPROVED 2026-10-16)](stitcher/morning-dressings-interaction.md)
+- [Stitcher — The Teaching Bed and Claudia, Stage 3 (PROPOSED 2026-10-16)](stitcher/teaching-bed-discovery.md)
+- [Stitcher — Three job route scenes, Stage 4 (PROPOSED 2026-10-16)](stitcher/second-task-branches.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
