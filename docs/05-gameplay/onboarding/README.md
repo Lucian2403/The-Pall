@@ -55,8 +55,10 @@
 - [Stage 1 — Claudia Cyka's harsher opening](stitcher/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-16**. Her harsh, beautiful and calculating character direction is locked.
 - [Stage 2 — Morning Dressings basic Trauma work](stitcher/morning-dressings-interaction.md) — **APPROVED AND LOCKED 2026-10-16**. The later Teaching Bed premise remains locked.
 
-- [Stage 3 — The Teaching Bed](stitcher/teaching-bed-discovery.md) — **PROPOSED 2026-10-16**.
-- [Stage 4 — Three follow-up jobs](stitcher/second-task-branches.md) — **PROPOSED 2026-10-16**.
+- [Stage 3 — The Teaching Bed](stitcher/teaching-bed-discovery.md) — **APPROVED AND LOCKED 2026-10-16**, with revised Claudia speech.
+- [Stage 4 — Three follow-up jobs](stitcher/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-16**.
+- [Stage 5 — The Empty Sheet / The Night Door](stitcher/owler-confrontation.md) — **PROPOSED 2026-10-16**.
+- [Stage 6 — Owler's fight and two outcomes](stitcher/owler-fight.md) — **PROPOSED 2026-10-16**, combat numbers TBD.
 
 ## Millhand progression (current)
 
