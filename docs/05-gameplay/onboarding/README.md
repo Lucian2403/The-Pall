@@ -52,8 +52,8 @@
 
 ## Stitcher opening (current)
 
-- [Stage 1 — Claudia Cyka's harsher opening](stitcher/opening-dialogue.md) — **REVISED PROPOSAL 2026-10-15; awaits dialogue approval**. Her harsh, beautiful and calculating character direction is locked.
-- [Stage 2 — Morning Dressings basic Trauma work](stitcher/morning-dressings-interaction.md) — **PROPOSED 2026-10-15; awaits approval**. The first job and later Teaching Bed premise are already locked.
+- [Stage 1 — Claudia Cyka's harsher opening](stitcher/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-16**. Her harsh, beautiful and calculating character direction is locked.
+- [Stage 2 — Morning Dressings basic Trauma work](stitcher/morning-dressings-interaction.md) — **APPROVED AND LOCKED 2026-10-16**. The later Teaching Bed premise remains locked.
 
 ## Millhand progression (current)
 
