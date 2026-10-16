@@ -1,6 +1,6 @@
-# Scrapper — Stage 4: Three Ways to Help the People Below (PROPOSED)
+# Scrapper — Stage 4: Three Ways to Help the People Below (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** Follows the [proposed Stage 3 — The Last Dry Floor](last-dry-floor-discovery.md), after approved [Stages 1](opening-dialogue.md) and [2](condemned-pump-interaction.md). The three task identities, different Major Skills and their specific findings were previously **LOCKED at story-outline level** in the [Scrapper master](README.md). The work actions, choices and dialogue here remain proposed.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved the accessible dialogue, three distinct normal work loops, route findings and Stage 5 convergence. Follows the [proposed Stage 3 — The Last Dry Floor](last-dry-floor-discovery.md), after approved [Stages 1](opening-dialogue.md) and [2](condemned-pump-interaction.md). The three task identities, different Major Skills and their specific findings were previously **LOCKED at story-outline level** in the [Scrapper master](README.md). The work actions, choices and dialogue here are approved; system numbers remain TBD.
 
 **One job per playthrough.** The choice in Stage 3 has **already awarded +1 once** in Industry, Fieldcraft or Commerce; no second award here. These emergency follow-ups use normally paid Construction, Navigation and Logistics job patterns but are **unpaid in this one scripted incident** (0 coins and ordinary XP). The player volunteered to help before another worker cuts the pump, rather than accepting a paid shift. No one has promised wages. Yard and city tools/materials belong to their employers, not to the player's bag.
 
@@ -107,7 +107,7 @@ The Stage 4 ending does not claim that **temporary boards**, **a marked way out*
 
 **ALREADY LOCKED:** the three task/skill pairs and their high-level discoveries, one route choice, no tutorial payments, eventual Barnaby confrontation.
 
-**PROPOSED:** specific friendly-to-non-mechanics work actions and spoken lines, named simple choices, local branch closure details and Stage 5's corresponding route facts.
+**APPROVED IN STAGE 4:** specific friendly-to-non-mechanics work actions and spoken lines, named simple choices, local branch closure details and Stage 5's corresponding route facts.
 
 **TBD:** exact wall construction/props, route length, work-duration and weather/water values, physical spare-hose compatibility/placement, any future payment authority and final job UI labels.
 
