@@ -33,7 +33,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 ## Dialogue production, still PROPOSED / TO AUTHOR
 
-1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand, Bellrunner and Squatter Stage 1 openings are approved and locked; Stitcher Stages 1-6 are approved, with shared medical and rent ending still to document for this origin; Scrapper and Inkbound Stage 1 remain to be drafted.**
+1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand, Bellrunner and Squatter Stage 1 openings are approved and locked; Stitcher Stages 1-6 are approved, Stage 7 clinical dialogue is proposed, and Stage 8 uses the already-approved universal home and rent ending; Scrapper and Inkbound Stage 1 remain to be drafted.**
 2. **Six unique twist reveals** after the ordinary first-task interactions; three consequential response choices each.
 3. **Eighteen second-task follow-ups** (six origins × three routes) using the different Major Skill, their ordinary job interaction families, and role-labelled minor NPCs where needed.
 4. **Twelve pre-combat interactions** (two per origin), with choice-aware dialogue from the locked opponent where the opponent speaks; Squatter uses observation/animal behaviour instead of human speech.
@@ -81,6 +81,8 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Stitcher — Three job route scenes, Stage 4 (APPROVED 2026-10-16)](stitcher/second-task-branches.md)
 - [Stitcher — The Empty Sheet / The Night Door, Stage 5 (APPROVED 2026-10-16)](stitcher/owler-confrontation.md)
 - [Stitcher — Owler fight and two outcomes, Stage 6 (APPROVED ENCOUNTER 2026-10-16, three changed lines)](stitcher/owler-fight.md)
+- [Stitcher — Post-Owler clinic dialogue, Stage 7 (PROPOSED 2026-10-16)](stitcher/clinic-treatment.md)
+- [Stitcher — Stage 8 identical common home, rent and closing speech (SHARED APPROVED)](shared-home-rent-ending.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
 Related: [Shared Structure](shared-structure.md), [Character Creation](../../01-player/character-creation.md), six origin documents.
