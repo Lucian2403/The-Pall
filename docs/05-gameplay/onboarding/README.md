@@ -50,6 +50,11 @@
 - [Stage 7 — Clinic after the boar](squatter/clinic-treatment.md) — **APPROVED AND LOCKED 2026-10-15**, shared medical details TBD.
 - [Stage 8 — Identical home and rent notice for all six](shared-home-rent-ending.md) — **COMMON APPROVED AND LOCKED 2026-10-15**, no Squatter-specific variant.
 
+## Inkbound opening (current)
+
+- [Stage 1 — Erwin Buro at the Civic Copying Office](inkbound/opening-dialogue.md) — **PROPOSED 2026-10-16**, natural work talk, transparent unpaid office-checking assignment.
+- [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **PROPOSED 2026-10-16**, compare two household lists, correct a smudged number, hand in a clean copy; later reveal reserved for Stage 3.
+
 ## Scrapper opening (current)
 
 - [Stage 1 — Ignatius Smog at Rust Yard](scrapper/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-16**, simple old-pump instructions and his established fresh-air quip.
@@ -58,7 +63,7 @@
 - [Stage 4 — Three follow-up jobs](scrapper/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-16**, Construction / Navigation / Logistics.
 - [Stage 5 — The Copper Claim / The Red Lever](scrapper/barnaby-confrontation.md) — **APPROVED AND LOCKED 2026-10-16**, Barnaby dispute and three tactical approaches.
 - [Stage 6 — Barnaby's fight and two outcomes](scrapper/barnaby-fight.md) — **APPROVED ENCOUNTER 2026-10-16**, genuine win/defeat and safe continuation; global combat numbers TBD.
-- [Stage 7 — Clinic after Barnaby's fight](scrapper/clinic-treatment.md) — **PROPOSED 2026-10-16**, standard ten-coin treatment and plain dialogue.
+- [Stage 7 — Clinic after Barnaby's fight](scrapper/clinic-treatment.md) — **APPROVED AND LOCKED 2026-10-16**, standard ten-coin care. Scrapper's eight-stage narrative onboarding is complete.
 - [Stage 8 — Common home and identical rent notice](shared-home-rent-ending.md) — **ALREADY APPROVED FOR ALL SIX BACKGROUNDS**; no Scrapper-specific variation.
 
 ## Stitcher opening (current)
