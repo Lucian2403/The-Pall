@@ -59,6 +59,6 @@ Player activities, time, world economy and authored interactive events.
 - [Stitcher: Stage 4 three second-skill job routes (approved)](onboarding/stitcher/second-task-branches.md)
 - [Stitcher: Stage 5 The Empty Sheet / The Night Door (approved)](onboarding/stitcher/owler-confrontation.md)
 - [Stitcher: Stage 6 Owler fight with win/loss outcomes (approved, revised dialogue)](onboarding/stitcher/owler-fight.md)
-- [Stitcher: Stage 7 standard 10-coin care visit (proposed)](onboarding/stitcher/clinic-treatment.md)
+- [Stitcher: Stage 7 standard 10-coin care visit (approved)](onboarding/stitcher/clinic-treatment.md)
 - [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper/README.md)
 - [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
