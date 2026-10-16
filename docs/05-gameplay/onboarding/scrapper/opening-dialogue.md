@@ -8,7 +8,7 @@
 
 **SMOG:** “That pump by the culvert wall. Take the outside fittings off. Leave the main pipe alone.”
 
-**PLAYER (optional):** “You ought to get some fresh air. That cough's getting worse.”
+**PLAYER (optional):** “You ought to get away from this smoke awhile.”
 
 **SMOG (optional reply):** “Fresh air? I've no time for that elitist bourgeois luxury.”
 
@@ -16,7 +16,7 @@
 
 **[Take the salvage docket]** — open the normal Mechanics job card for the condemned auxiliary pump's **exterior-only** salvage lot, with the approved first-work actions in [Stage 2](condemned-pump-interaction.md).
 
-This is a familiar foreman speaking to an already-employed yard worker. He has no reason to explain what a pump is or where they both work. His cough is audible enough to make the optional exchange sensible, but it is **not a newly diagnosed condition, quest, debuff or sign of Pall contamination**. The politically pompous turn of phrase is his **already approved personal joke**, delivered once without an invented second catchphrase.
+This is a familiar foreman speaking to an already-employed yard worker. He has no reason to explain what a pump is or where they both work. His cough and the smoky yard are enough to make the optional exchange sensible, but it is **not a newly diagnosed condition, quest, debuff or sign of Pall contamination**. The politically pompous turn of phrase is his **already approved personal joke**, delivered once without an invented second catchphrase.
 
 ## How wages are communicated without a false promise
 
