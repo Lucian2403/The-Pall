@@ -4,7 +4,7 @@
 
 **Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent unpaid tutorial second tasks, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](../shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
-**Stages 1–2 APPROVED AND LOCKED (2026-10-16):** [Ignatius Smog's plain-language opening](opening-dialogue.md) and [the simple pump-strip Mechanics work](condemned-pump-interaction.md) were explicitly approved after rewriting complicated jargon into clear actions. **Stage 3 — [The Last Dry Floor scene and three choices](last-dry-floor-discovery.md) and Stage 4 — [The Brace Shift / The Low Passage / The Spare Line](second-task-branches.md) are PROPOSED (2026-10-16)**; dialogue and work details await approval. The overall story structure remains locked.
+**Stages 1–2 APPROVED AND LOCKED (2026-10-16):** [Ignatius Smog's plain-language opening](opening-dialogue.md) and [the simple pump-strip Mechanics work](condemned-pump-interaction.md) were explicitly approved after rewriting complicated jargon into clear actions. **Stage 3 — [The Last Dry Floor scene and three choices](last-dry-floor-discovery.md) and Stage 4 — [The Brace Shift / The Low Passage / The Spare Line](second-task-branches.md) are APPROVED AND LOCKED (2026-10-16)**. **Stage 5 — [The Copper Claim / The Red Lever](barnaby-confrontation.md) and Stage 6 — [Barnaby Rusk's fight](barnaby-fight.md) are PROPOSED (2026-10-16)**; exact dialogue and encounters await approval. Global combat numbers remain TBD. The overall story structure remains locked.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -29,7 +29,7 @@ The **story twist must follow the regular job interactions**, not substitute for
 
 ## Locked unique twist — The Last Dry Floor
 
-The [Stage 3 discovery dialogue, simple inspection and three player choices](last-dry-floor-discovery.md) are **PROPOSED (2026-10-16)**. The discovery's underlying facts, exact warning text and three Major Skill destinations are already locked independently of these proposed spoken lines.
+The [Stage 3 discovery dialogue, simple inspection and three player choices](last-dry-floor-discovery.md) are **APPROVED AND LOCKED (2026-10-16)**. The discovery's underlying facts, exact warning text and three Major Skill destinations are already locked independently of these proposed spoken lines.
 
 
 **Trigger:** only after the normal Mechanics interactions are done, on the first Scrapper tutorial; it is not a random event in all pump jobs.
@@ -44,7 +44,7 @@ The presence of tenants is a local social and industrial fact, **not** a promise
 
 ### Three locked first-event responses and unpaid tutorial second tasks
 
-The [Stage 4 playable task and dialogue drafts](second-task-branches.md) are **PROPOSED (2026-10-16)**, and intentionally use accessible, non-technical speech. The table's three existing job identities, skills and outcomes remain locked at outline level.
+The [Stage 4 playable tasks and dialogue](second-task-branches.md) are **APPROVED AND LOCKED (2026-10-16)** and use accessible, non-technical speech. The table's three existing job identities, skills and outcomes remain locked at outline level.
 
 
 | Player response | Second job, using a different Major Skill | Immediate discovery / meaningful outcome |
@@ -56,6 +56,9 @@ The [Stage 4 playable task and dialogue drafts](second-task-branches.md) are **P
 **Contract credibility:** the second tutorial tasks reuse **normally paid job templates** sourced from city drainage, canal survey and logistics work, with a story-specific incident. Do not award coins merely for clicking a humanitarian choice. All three scripted routes award 0 coins/ordinary XP; choosing one grants exactly +1 level in its different Major Skill once. The first Mechanics task is also unpaid. Equivalent jobs outside tutorial pay normally. No starter-only gear. Its stage does **not** immediately end the E2E tutorial.
 
 ### Two further interactions → one shared opponent (LOCKED narrative)
+
+The detailed [Stage 5 Barnaby / red lever confrontation](barnaby-confrontation.md) and [Stage 6 fight with win/defeat outcomes](barnaby-fight.md) are **PROPOSED (2026-10-16)** for the user's review. They preserve the locked story but add actual spoken lines, a believable work-stop order and a defeat-safe intervention by workers who were already present. **Do not mark these new dialogues locked until approved.**
+
 
 The story converges beside a pipe-cutting gantry at Rust Yard, after the second unpaid tutorial task has delivered its distinct physical or administrative leverage.
 
