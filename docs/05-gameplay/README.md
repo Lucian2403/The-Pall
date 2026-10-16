@@ -61,6 +61,6 @@ Player activities, time, world economy and authored interactive events.
 - [Stitcher: Stage 6 Owler fight with win/loss outcomes (approved, revised dialogue)](onboarding/stitcher/owler-fight.md)
 - [Stitcher: Stage 7 standard 10-coin care visit (approved)](onboarding/stitcher/clinic-treatment.md)
 - [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper/README.md)
-- [Scrapper: Stage 1 Ignatius Smog's Rust Yard dialogue (proposed)](onboarding/scrapper/opening-dialogue.md)
-- [Scrapper: Stage 2 condemned-pump Mechanics job (proposed)](onboarding/scrapper/condemned-pump-interaction.md)
+- [Scrapper: Stage 1 Ignatius Smog's plain-language Rust Yard opening (revised proposal)](onboarding/scrapper/opening-dialogue.md)
+- [Scrapper: Stage 2 simplified condemned-pump Mechanics job (revised proposal)](onboarding/scrapper/condemned-pump-interaction.md)
 - [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
