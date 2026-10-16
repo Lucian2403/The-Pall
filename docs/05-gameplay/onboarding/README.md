@@ -59,6 +59,8 @@
 - [Stage 4 — Three follow-up jobs](stitcher/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-16**.
 - [Stage 5 — The Empty Sheet / The Night Door](stitcher/owler-confrontation.md) — **APPROVED AND LOCKED 2026-10-16**.
 - [Stage 6 — Owler's fight and two outcomes](stitcher/owler-fight.md) — **APPROVED ENCOUNTER 2026-10-16**, three revised lines; combat numbers TBD.
+- [Stage 7 — Treatment after Owler](stitcher/clinic-treatment.md) — **PROPOSED 2026-10-16**, common 10-coin service, dialogue pending approval.
+- [Stage 8 — Common home, rent notice and same closing line](shared-home-rent-ending.md) — **ALREADY APPROVED FOR ALL SIX ORIGINS**; no Stitcher-specific script.
 
 ## Millhand progression (current)
 
