@@ -1,6 +1,6 @@
-# Scrapper — Stage 7: After the Rust Yard Fight (PROPOSED)
+# Scrapper — Stage 7: After the Rust Yard Fight (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The ordinary **10-coin** clinic service and its place between the introductory fight and the single universal rent scene are already [locked for every background](../shared-structure.md). [Stage 5 — The Copper Claim / The Red Lever](barnaby-confrontation.md) and [Stage 6 — Barnaby Rusk's fight](barnaby-fight.md) are **APPROVED AND LOCKED** at story/encounter level. This page proposes the Scrapper's short spoken clinic exchange and scene transitions. All specific medical numbers and the no-injury case remain shared Health-system TBD.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved the clinician's exact dialogue, examination, price, one-time care/payment and shared home handoff. The ordinary **10-coin** clinic service and its place between the introductory fight and the single universal rent scene are already [locked for every background](../shared-structure.md). [Stage 5 — The Copper Claim / The Red Lever](barnaby-confrontation.md) and [Stage 6 — Barnaby Rusk's fight](barnaby-fight.md) are **APPROVED AND LOCKED** at story/encounter level. This page records the approved Scrapper clinic exchange and scene transitions. All specific medical numbers and the no-injury case remain shared Health-system TBD.
 
 ## Getting to the clinic
 
@@ -69,6 +69,6 @@ After the clinic, the player goes home with **10 coins** and plays the one [alre
 
 **Already LOCKED:** regular 10-coin care service, common 10-coin remaining balance after payment, one identical home/rent ending, non-blocking defeat after Barnaby and no forced reward.
 
-**PROPOSED IN STAGE 7:** plain spoken dialogue and the ordinary clinic arrival, exam, price, payment and leave interactions. Approval of this scene will complete the Scrapper's **eight narrative onboarding stages** because Stage 8 was approved globally already.
+**APPROVED IN STAGE 7:** plain spoken dialogue and the ordinary clinic arrival, exam, price, payment and leave interactions. With this scene approved, the Scrapper's **eight narrative onboarding stages are complete** because Stage 8 was approved globally already.
 
 Related: [Scrapper story](README.md), [approved Stage 6](barnaby-fight.md), [universal Stage 8](../shared-home-rent-ending.md), [Millhand clinic reference](../millhand/clinic-treatment.md), [common onboarding](../shared-structure.md).
