@@ -1,6 +1,6 @@
-# Scrapper — Stage 1: Ignatius Smog at Rust Yard (SIMPLIFIED PROPOSAL)
+# Scrapper — Stage 1: Ignatius Smog at Rust Yard (APPROVED)
 
-**Status: REVISED PROPOSAL (2026-10-16); NOT LOCKED.** The user found the earlier Scrapper work too technical to understand. This version puts **plain physical actions in speech and UI**. The [locked Scrapper storyline](README.md), character name, persistent Rust Yard setting, first job **Strip a Condemned Pump**, Smog's unmistakable cough and his exact phrase **“that elitist bourgeois luxury”** have NOT changed.
+**Status: APPROVED AND LOCKED (2026-10-16) — user approved the plain-language revision.** The user found the earlier Scrapper work too technical to understand. This version puts **plain physical actions in speech and UI**. The [locked Scrapper storyline](README.md), character name, persistent Rust Yard setting, first job **Strip a Condemned Pump**, Smog's unmistakable cough and his exact phrase **“that elitist bourgeois luxury”** have NOT changed.
 
 ## What the player sees
 
@@ -51,6 +51,6 @@ The player must **not** remove the big drainage pipe, open the pump's working bo
 
 **Cut from the first draft:** “culvert wall,” “outside fittings,” “salvage docket,” “condemned-stock clearance” and “tally” as spoken or player-facing commands. All were accurate-ish workshop shorthand but asked a non-mechanical player to translate the task before they could picture it. The official job title is kept because it is locked; the subtitle and work directions explain what to do.
 
-The spoken wording here remains **PROPOSED**, pending the user's approval. Don't mark Stage 1 locked until approved.
+The revised spoken words are **APPROVED AND LOCKED**. Preserve the simple directions and Ignatius's exact fresh-air line unless the user requests changes.
 
 Related: [Scrapper story](README.md), [Stage 2 simplified work](condemned-pump-interaction.md), [spoken dialogue rules](../../interactions/dialogue-style-guide.md), [common onboarding](../shared-structure.md).
