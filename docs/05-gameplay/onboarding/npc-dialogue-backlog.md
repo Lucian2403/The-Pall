@@ -82,8 +82,8 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Stitcher — The Empty Sheet / The Night Door, Stage 5 (APPROVED 2026-10-16)](stitcher/owler-confrontation.md)
 - [Stitcher — Owler fight and two outcomes, Stage 6 (APPROVED ENCOUNTER 2026-10-16, three changed lines)](stitcher/owler-fight.md)
 - [Stitcher — Post-Owler clinic dialogue, Stage 7 (APPROVED AND LOCKED 2026-10-16)](stitcher/clinic-treatment.md)
-- [Scrapper — Ignatius Smog Rust Yard opening, Stage 1 (PROPOSED 2026-10-16)](scrapper/opening-dialogue.md)
-- [Scrapper — Strip a Condemned Pump ordinary Mechanics work, Stage 2 (PROPOSED 2026-10-16)](scrapper/condemned-pump-interaction.md)
+- [Scrapper — Ignatius Smog Rust Yard opening, Stage 1 (REVISED PLAIN-LANGUAGE PROPOSAL 2026-10-16)](scrapper/opening-dialogue.md)
+- [Scrapper — Strip a Condemned Pump ordinary Mechanics work, Stage 2 (REVISED PLAIN-LANGUAGE PROPOSAL 2026-10-16)](scrapper/condemned-pump-interaction.md)
 - [Stitcher — Stage 8 identical common home, rent and closing speech (SHARED APPROVED)](shared-home-rent-ending.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
