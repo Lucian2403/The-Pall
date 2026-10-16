@@ -1,6 +1,6 @@
-# Stitcher — Stage 2: Morning Dressings, Ordinary Trauma Work (PROPOSED)
+# Stitcher — Stage 2: Morning Dressings, Ordinary Trauma Work (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** Continues the [revised proposed Stage 1 with Claudia Cyka](opening-dialogue.md) at Cinder Row Infirmary. The *Morning Dressings* job, **Medicine → Trauma**, working-class charity ward, shortage of clean water/linen and need for a generic reusable medical work loop are already established in [Stitcher's locked story](README.md). Stage 2 must be normal medical labour **before** the one-time *Teaching Bed* revelation.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved Stage 2's clinical work loop, practical choices and Claudia's reporting dialogue, after a wording correction confined to [approved Stage 1 with Claudia Cyka](opening-dialogue.md) at Cinder Row Infirmary. The *Morning Dressings* job, **Medicine → Trauma**, working-class charity ward, shortage of clean water/linen and need for a generic reusable medical work loop are already established in [Stitcher's locked story](README.md). Stage 2 must be normal medical labour **before** the one-time *Teaching Bed* revelation.
 
 ## S02-A — Read the two charity-bed work entries
 
@@ -100,15 +100,15 @@ Claudia's low empathy and polished looks may affect how she manages authority la
 - Honest quality/record outcomes should be retained, but both legitimate supply methods finish safely with the existing ward supplies or a valid ward request.
 - Wounds in this scripted shift are **minor, nonsexual and nongraphic**. The true violence/ethical crisis is the separate Stage 3 patient exploitation, not a punishment of first-job clinical mistakes.
 - Never invent a combat injury for the player, an infection mechanic, a permanent ward funding system, an automatic patient death, an unapproved patient name, or a new Stitched-quality bandage product.
-- The charity-account no-wage explanation is a proposed **local contract/accounting circumstance** for this one unpaid cover; exact future ward billing and any relation to the Teaching Bed's coal/medicine funding remain Stage 3/4 authored content, not silently set here.
+- The charity-account no-wage explanation is an **approved local contract/accounting circumstance** for this one unpaid cover; exact future ward billing and any relation to the Teaching Bed's coal/medicine funding remain Stage 3/4 authored content, not silently set here.
 - Ordinary repeatable *Morning Dressings* shifts outside onboarding pay normal coins and award Medicine XP. The player's next +1 **different Major Skill** comes only when they choose a Stage 3 branch.
 
 ## Approval boundary
 
 **Already locked:** Cinder Row Infirmary, Claudia and her newly specified hard character, *Morning Dressings* as normal Medicine/Trauma labour, scarce water/linen and tutorial zero-reward rule, and the later *Teaching Bed* reveal.
 
-**Proposed for Stage 2:** two specific minor injuries, work order and supply choices, visibly safe linen correction, sharp sign-off exchange with a path-consistent alternate, and the charity-bed cover-round explanation for nonpayment.
+**Approved in Stage 2:** two specific minor injuries, work order and supply choices, visibly safe linen correction, sharp sign-off exchange with a path-consistent alternate, and the charity-bed cover-round explanation for nonpayment.
 
 **TBD:** care/Health formulas, treatment items and stock counts, healing/debuff effects, exact work duration, UI identifiers and visual wound assets.
 
-Related: [Stitcher master](README.md), [revised Stage 1](opening-dialogue.md), [shared medical systems](../shared-structure.md), [job time rules](../../jobs/jobs-and-time.md), [dialogue style guide](../../interactions/dialogue-style-guide.md).
+Related: [Stitcher master](README.md), [approved Stage 1](opening-dialogue.md), [shared medical systems](../shared-structure.md), [job time rules](../../jobs/jobs-and-time.md), [dialogue style guide](../../interactions/dialogue-style-guide.md).
