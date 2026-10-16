@@ -1,6 +1,6 @@
-# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (REVISED PROPOSAL)
+# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (APPROVED)
 
-**Status: REVISED FOR USER APPROVAL (2026-10-15); NOT LOCKED.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality direction is LOCKED; the exact exchange below is still proposed. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
+**Status: APPROVED AND LOCKED (2026-10-16) following the requested dialogue correction.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality direction and exact Stage 1 scene are now LOCKED. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
 
 ## Editorial diagnosis — why Stage 1 was revised
 
@@ -17,7 +17,7 @@
 
 **PLAYER (optional):** “We're nearly out of clean linen.”
 
-**CLAUDIA (optional reply):** “I can count. If they complain, let them. Use what the wounds need, no more.”
+**CLAUDIA (optional reply):** “I can count. Let them complain. Just don't waste the clean linen.”
 
 **CLAUDIA (convergence, also if the optional line is skipped):** “Look at the wounds first. If one's worse than it should be, fetch me. I'm not fixing your mistakes as well.”
 
@@ -25,7 +25,7 @@
 
 The clerk's compliance is not guaranteed by her appearance: he has merely agreed to re-check a linen entry rather than continue an argument in the doorway. Whether more supplies exist is unknown. He stays unnamed and does not become a new plot character.
 
-## Claudia's voice and presentation — LOCKED characterization / PROPOSED staging
+## Claudia's voice and presentation — APPROVED staging and LOCKED characterization
 
 - **Cruel efficiency:** Claudia knows what the ward needs but treats questions, complaints and visible distress as annoyances. Her clinical instructions are usually correct; her lack of compassion is the problem.
 - **Beauty as social leverage:** She is exceptionally attractive and aware of it. She can switch on warmth when dealing with a clerk, an inspector or someone whose favour is useful, then drop it the instant it stops serving her. Her looks **help her avoid consequences often, not magically every time**. She is neither powerless without them nor written as a flirt in every scene.
@@ -47,7 +47,7 @@ The normal work (Stage 2) consists of inspecting conditions, allocating genuinel
 
 **Already locked:** all core Stitcher story beats, Claudia's name/role/gender and new severe, low-empathy, beautiful, self-aware character direction; all six origins use the exact same [Stage 8 rent notice and Millhand speech](../shared-home-rent-ending.md).
 
-**Proposed for Stage 1:** exact spoken lines and scene, the short linen-clerk demonstration of Claudia's social leverage, and charity-bed cover-round presentation.
+**Approved in Stage 1:** exact spoken lines and scene, the short linen-clerk demonstration of Claudia's social leverage, and charity-bed cover-round presentation.
 
 **TBD:** artwork and physical appearance beyond her beauty/immaculate bearing, NPC reaction implementation, specific ward supplies, patient condition data, treatment numbers and duration.
 
