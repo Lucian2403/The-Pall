@@ -57,8 +57,8 @@
 
 - [Stage 3 — The Teaching Bed](stitcher/teaching-bed-discovery.md) — **APPROVED AND LOCKED 2026-10-16**, with revised Claudia speech.
 - [Stage 4 — Three follow-up jobs](stitcher/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-16**.
-- [Stage 5 — The Empty Sheet / The Night Door](stitcher/owler-confrontation.md) — **PROPOSED 2026-10-16**.
-- [Stage 6 — Owler's fight and two outcomes](stitcher/owler-fight.md) — **PROPOSED 2026-10-16**, combat numbers TBD.
+- [Stage 5 — The Empty Sheet / The Night Door](stitcher/owler-confrontation.md) — **APPROVED AND LOCKED 2026-10-16**.
+- [Stage 6 — Owler's fight and two outcomes](stitcher/owler-fight.md) — **APPROVED ENCOUNTER 2026-10-16**, three revised lines; combat numbers TBD.
 
 ## Millhand progression (current)
 
