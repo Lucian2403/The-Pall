@@ -40,7 +40,7 @@ The patient manages to say: *"They let me sleep. That's when they took my thumbp
 
 A surgeon's teaching contract treats the patient's body as payment for care that he has already received. The demonstration is **not medically necessary**. He did not knowingly agree. The grim logic is economic: the institution sells access to vulnerable adults to finance food, coal and medication for everyone else.
 
-The Matron knows enough to be uneasy. Her justification is not simple evil: *"Keep him, and tonight the fever ward has no heat."* This leaves the player an ugly decision rather than a pure cartoon villain. Do **not** depict explicit surgery or create a systemic organ-trafficking economy; this is a **one-off authored local case**, not the game's main plot or a newly established universal practice throughout Grand Cylinder City.
+The Matron knows enough to be uneasy. Her hard-edged funding argument (wording updated at the user's request, 2026-10-16): *"Who's paying for the fever ward's coal if I turn them away? You?"* This leaves the player an ugly decision rather than a pure cartoon villain. Do **not** depict explicit surgery or create a systemic organ-trafficking economy; this is a **one-off authored local case**, not the game's main plot or a newly established universal practice throughout Grand Cylinder City.
 
 ### Three approved choices → three unpaid tutorial tasks in another Major Skill
 
