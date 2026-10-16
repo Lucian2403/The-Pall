@@ -1,6 +1,6 @@
-# Scrapper — Stage 3: The Last Dry Floor (PROPOSED)
+# Scrapper — Stage 3: The Last Dry Floor (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The discovery, warning words, people living under Rust Yard and three different second-skill jobs are already locked in [the Scrapper story](README.md). This draft proposes the playable scene and dialogue. [Stage 1](opening-dialogue.md) and [Stage 2](condemned-pump-interaction.md) are APPROVED AND LOCKED in plain language.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved the exact discovery scene, plain-language spoken dialogue, three response choices and their immediate consequences. The discovery, warning words, people living under Rust Yard and three different second-skill jobs are already locked in [the Scrapper story](README.md). This document records the approved playable scene and dialogue. [Stage 1](opening-dialogue.md) and [Stage 2](condemned-pump-interaction.md) are APPROVED AND LOCKED in plain language.
 
 ## What the player discovers
 
@@ -93,7 +93,7 @@ No hidden moral rating, theft flag, permanent property title, new supernatural c
 
 **ALREADY LOCKED:** pump still moving water, exact warning on cloth, three knocks, unofficial families in old flood cellars, three response/second-skill pairs, initial no-wages/no-XP rule.
 
-**PROPOSED HERE:** the voice from beneath the floor, exact Smog and player dialogue, inspection steps, simple choice labels and convergence.
+**APPROVED IN STAGE 3:** the voice from beneath the floor, exact Smog and player dialogue, inspection steps, simple choice labels and convergence.
 
 **TBD:** where the service pipe is visible, exact sound and art assets, distances, timing, item stats and system UI identifiers.
 
