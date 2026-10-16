@@ -4,7 +4,7 @@
 
 **Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent unpaid tutorial second tasks, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](../shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
-**Stages 1–2 APPROVED AND LOCKED (2026-10-16):** [Ignatius Smog's plain-language opening](opening-dialogue.md) and [the simple pump-strip Mechanics work](condemned-pump-interaction.md) were explicitly approved after rewriting complicated jargon into clear actions. **Stage 3 — [The Last Dry Floor scene and three choices](last-dry-floor-discovery.md) and Stage 4 — [The Brace Shift / The Low Passage / The Spare Line](second-task-branches.md) are APPROVED AND LOCKED (2026-10-16)**. **Stage 5 — [The Copper Claim / The Red Lever](barnaby-confrontation.md) and Stage 6 — [Barnaby Rusk's fight](barnaby-fight.md) are PROPOSED (2026-10-16)**; exact dialogue and encounters await approval. Global combat numbers remain TBD. The overall story structure remains locked.
+**Stages 1–2 APPROVED AND LOCKED (2026-10-16):** [Ignatius Smog's plain-language opening](opening-dialogue.md) and [the simple pump-strip Mechanics work](condemned-pump-interaction.md) were explicitly approved after rewriting complicated jargon into clear actions. **Stage 3 — [The Last Dry Floor scene and three choices](last-dry-floor-discovery.md) and Stage 4 — [The Brace Shift / The Low Passage / The Spare Line](second-task-branches.md) are APPROVED AND LOCKED (2026-10-16)**. **Stage 5 — [The Copper Claim / The Red Lever](barnaby-confrontation.md) is APPROVED AND LOCKED (2026-10-16) and Stage 6 — [Barnaby Rusk's fight](barnaby-fight.md) is APPROVED AT ENCOUNTER LEVEL (2026-10-16)**. [Stage 7 — The Clinic Visit](clinic-treatment.md) is **PROPOSED (2026-10-16)** pending dialogue review. Stage 8 uses the already approved common home scene. Global combat, medical and housing numbers remain TBD. The overall story structure remains locked.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -57,7 +57,7 @@ The [Stage 4 playable tasks and dialogue](second-task-branches.md) are **APPROVE
 
 ### Two further interactions → one shared opponent (LOCKED narrative)
 
-The detailed [Stage 5 Barnaby / red lever confrontation](barnaby-confrontation.md) and [Stage 6 fight with win/defeat outcomes](barnaby-fight.md) are **PROPOSED (2026-10-16)** for the user's review. They preserve the locked story but add actual spoken lines, a believable work-stop order and a defeat-safe intervention by workers who were already present. **Do not mark these new dialogues locked until approved.**
+The detailed [Stage 5 Barnaby / red lever confrontation](barnaby-confrontation.md) and [Stage 6 fight with win/defeat outcomes](barnaby-fight.md) are **APPROVED (2026-10-16)**. Their spoken lines, witnessed work-stop order and defeat-safe intervention by workers already present are now locked. Exact combat stats remain open.
 
 
 The story converges beside a pipe-cutting gantry at Rust Yard, after the second unpaid tutorial task has delivered its distinct physical or administrative leverage.
@@ -72,7 +72,7 @@ The story converges beside a pipe-cutting gantry at Rust Yard, after the second 
 
 ### Treatment, home and rent (narrative sequence LOCKED; numbers TBD)
 
-The brawl leaves the Scrapper with a credible minor injury—battered ribs, split knuckles or a forearm abrasion are possible flavors; exact conditions and Health effects TBD. The player pays **10 coins** to a working-class city clinician to patch them up, learns the reusable healing interface, and returns to the same shared starter home with 10 coins remaining. The **rent-due notice appears at home, after care**. This completes Scrapper onboarding.
+The fight may cause actual injuries under the common combat rules, but **do not force a hidden wound after a flawless victory**. [Stage 7's proposed ordinary clinic visit](clinic-treatment.md) costs **10 coins** and uses the existing Care / Treatment system. Then the player returns to the **single shared starter home** with 10 coins remaining. The [common Stage 8 rent notice and exact closing speech](../shared-home-rent-ending.md) trigger only after care, at home; no unique Scrapper ending is authored. The common medical rules for an uninjured player remain TBD.
 
 **Pacing and parity:** all three second jobs must be within a comparable beginner time envelope (tutorial payouts are all zero). Encounter remains a single grounded short turn-based PvE conflict, not a machine boss or a second forced fight. No early Pall-zone expedition, long rescue quest, specialized parts gate or hidden fraud/crime/reputation flag.
 
