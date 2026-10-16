@@ -1,6 +1,6 @@
-# Stitcher — Stage 4: Three Second-Skill Jobs (PROPOSED)
+# Stitcher — Stage 4: Three Second-Skill Jobs (APPROVED)
 
-**Status: PROPOSED FOR APPROVAL (2026-10-16); NOT LOCKED.** This follows [Stage 3, The Teaching Bed](teaching-bed-discovery.md), and the approved [Stage 1](opening-dialogue.md) and [Stage 2](morning-dressings-interaction.md). All three job identities and skill branches were already approved in the [Stitcher overview](README.md). The dialogue and exact interactions below are new proposals.
+**Status: APPROVED AND LOCKED (2026-10-16).** This follows [approved Stage 3, The Teaching Bed](teaching-bed-discovery.md), and approved [Stage 1](opening-dialogue.md) and [Stage 2](morning-dressings-interaction.md). The user approved each of the three job interaction branches, their spoken lines, evidence findings and convergence; exact numerical job systems remain TBD.
 
 The adult patient is alive. The dawn teaching demonstration has not happened. The Stitcher selected one way to investigate or block his transfer. Only **one** second job is played. The **+1 level in Industry, Commerce or Scholarship** was granted when the route was selected in Stage 3, not at task completion. Every scripted Stage 4 task gives **0 coins, 0 ordinary XP and no loot**, because this is a response to the dispute during an unpaid charity round, not a paid commission. Ordinary repeatable jobs of the same kinds still pay normally.
 
@@ -94,6 +94,6 @@ No surgery is performed here, no combat occurs, and the institution's larger fun
 
 **Already locked:** the three named tasks, their respective Major Skills, the distinctive branch findings, later service-corridor encounters and eventual rescue of the adult patient.
 
-**Proposed:** the ordinary work interactions, choice trade-offs, supporting characters' spoken lines, Claudia's Contracts reaction, route-specific evidence and convergence.
+**Approved in Stage 4:** the ordinary work interactions, choice trade-offs, supporting characters' spoken lines, Claudia's Contracts reaction, route-specific evidence and convergence. Preserve dialogue wording unless requested otherwise.
 
 **TBD:** exact route length, numbers, timing, clerk forms and ward procedure details; no additional personalized NPC names.
