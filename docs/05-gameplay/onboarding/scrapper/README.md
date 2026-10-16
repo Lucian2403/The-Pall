@@ -4,7 +4,7 @@
 
 **Status: Scrapper E2E storyline LOCKED (2026-10-13).** Rust Yard, named Yard Foreman **Ignatius Smog** (cough and exact fresh-air quotation), regular Mechanics job **Strip a Condemned Pump**, **The Last Dry Floor**, three choice-dependent unpaid tutorial second tasks, **The Copper Claim**, **The Red Lever**, and **Barnaby Rusk** as the common street-fight opponent were approved by the user. Shared starter kit, Mechanics +3 and [shared tutorial structure](../shared-structure.md) apply. Combat implementation, dialogue, numbers and remaining NPC personal names are TBD.
 
-**Stage 1 and Stage 2 drafts REVISED FOR PLAIN LANGUAGE (PROPOSED, 2026-10-16):** [Stage 1 — Ignatius Smog's simple pump assignment](opening-dialogue.md) and [Stage 2 — take off old metal plates and sort the good pieces](condemned-pump-interaction.md) have been rewritten after the user's feedback that the original draft was too technical. Both still await approval. The hub, Smog's exact established fresh-air phrase, routine Mechanics job and later *Last Dry Floor* premise remain locked independently of these proposed dialogue and work decisions.
+**Stages 1–2 APPROVED AND LOCKED (2026-10-16):** [Ignatius Smog's plain-language opening](opening-dialogue.md) and [the simple pump-strip Mechanics work](condemned-pump-interaction.md) were explicitly approved after rewriting complicated jargon into clear actions. **Stage 3 — [The Last Dry Floor scene and three choices](last-dry-floor-discovery.md) and Stage 4 — [The Brace Shift / The Low Passage / The Spare Line](second-task-branches.md) are PROPOSED (2026-10-16)**; dialogue and work details await approval. The overall story structure remains locked.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -18,7 +18,7 @@
 
 ## First regular job — Strip a Condemned Pump (LOCKED; unpaid tutorial occurrence)
 
-The [revised Stage 2 draft](condemned-pump-interaction.md) is simple to picture: take two old metal plates off the pump's outer stand, free a rusty bolt, sort good pieces from broken ones and count what was done. The [revised Stage 1 opening](opening-dialogue.md) tells the worker exactly that. All **player-facing choices and dialogue use familiar words**, though the fixed job title remains *Strip a Condemned Pump*. The player leaves the main pipe untouched; **the later cellar reveal is not shown early**.
+The [approved Stage 2 scene](condemned-pump-interaction.md) is simple to picture: take two old metal plates off the pump's outer stand, free a rusty bolt, sort good pieces from broken ones and count what was done. The [approved Stage 1 opening](opening-dialogue.md) tells the worker exactly that. All **player-facing choices and dialogue use familiar words**, though the fixed job title remains *Strip a Condemned Pump*. The player leaves the main pipe untouched; **the later cellar reveal is not shown early**.
 
 
 Ignatius Smog assigns the player to inspect and dismantle a condemned industrial pump and sort salvageable pieces from scrap, using ordinary reusable **Mechanics** interactions, yard-owned tools as needed, and normal wage/XP settlement **outside onboarding**, but 0 coins/ordinary XP in this exceptional tutorial. This job is available outside the tutorial, with ordinary different machinery/condition content; it is not just an introductory quest in disguise. The **first tutorial occurrence** concerns a condemned auxiliary drainage pump on Rust Yard's old culvert wall, so it can conceal the unique incident. Exact duration, wear and yield mechanics and non-tutorial coins/XP are TBD; tutorial returns 0.
@@ -28,6 +28,9 @@ Ignatius Smog assigns the player to inspect and dismantle a condemned industrial
 The **story twist must follow the regular job interactions**, not substitute for them. One consequential choice will then lead to an unpaid tutorial second task in a **different Major Skill**; subsequent story interactions lead to an appropriate beginner **turn-based PvE** fight, medical treatment and a return home where rent is revealed. See [Shared Tutorial Structure](../shared-structure.md). **The Last Dry Floor, all three branches and Barnaby Rusk are approved narrative elements; exact implementation is still to be designed.**
 
 ## Locked unique twist — The Last Dry Floor
+
+The [Stage 3 discovery dialogue, simple inspection and three player choices](last-dry-floor-discovery.md) are **PROPOSED (2026-10-16)**. The discovery's underlying facts, exact warning text and three Major Skill destinations are already locked independently of these proposed spoken lines.
+
 
 **Trigger:** only after the normal Mechanics interactions are done, on the first Scrapper tutorial; it is not a random event in all pump jobs.
 
@@ -40,6 +43,9 @@ There is another sign: three deliberate knocks from beneath the iron floor. The 
 The presence of tenants is a local social and industrial fact, **not** a promised main-story mystery, hidden new faction, or proof of Pall mutation. Smog need not have planned this. His scrap order may be authentic but dangerously uninformed, and his response should be developed without turning him into a one-dimensional villain.
 
 ### Three locked first-event responses and unpaid tutorial second tasks
+
+The [Stage 4 playable task and dialogue drafts](second-task-branches.md) are **PROPOSED (2026-10-16)**, and intentionally use accessible, non-technical speech. The table's three existing job identities, skills and outcomes remain locked at outline level.
+
 
 | Player response | Second job, using a different Major Skill | Immediate discovery / meaningful outcome |
 | --- | --- | --- |
