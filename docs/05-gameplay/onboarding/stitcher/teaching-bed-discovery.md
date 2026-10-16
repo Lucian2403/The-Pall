@@ -1,6 +1,6 @@
-# Stitcher — Stage 3: The Teaching Bed (PROPOSED)
+# Stitcher — Stage 3: The Teaching Bed (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). This document proposes the actual playable discovery, Claudia/player exchange, and the three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
+**Status: APPROVED AND LOCKED (2026-10-16), with Claudia's revised spoken line.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). This document proposes the actual playable discovery, Claudia/player exchange, and the three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
 
 ## S03-A — A bed that isn't on the round
 
@@ -40,13 +40,13 @@ He has received some care; the chart's claimed teaching operation is unnecessary
 
 **PLAYER:** “That doesn't mean they can do what they like with him.”
 
-**CLAUDIA:** “Keep him, and tonight the fever ward has no heat.”
+**CLAUDIA:** “Who's paying for the fever ward's coal if I turn them away? You?”
 
 **PLAYER:** “He can't even get out of the bed.”
 
 **CLAUDIA:** “Then don't stand there arguing. I've got a ward to keep open.”
 
-This uses the previously locked Claudia quotation, but gives it a personal cost: the Matron is defending a financial arrangement that keeps vulnerable patients supplied at the expense of **this one patient's consent**. Her manner is cold, practical and contemptuous of interference. She need not smile at anybody in this scene—her beauty and ability to charm do not make her less culpable.
+Claudia's previous stiff phrasing has been replaced at the user's request; the revised line gives the argument a personal cost: the Matron is defending a financial arrangement that keeps vulnerable patients supplied at the expense of **this one patient's consent**. Her manner is cold, practical and contemptuous of interference. She need not smile at anybody in this scene—her beauty and ability to charm do not make her less culpable.
 
 The Matron **does not** admit to forging the thumbprint or personally signing for a sedated patient; that specific proof belongs to Stage 4's Contracts route. She knows there is a teaching arrangement, knows it is not needed treatment, and refuses to set aside the ward funding simply because the patient objects. She is not physically attacking the player, and Owler is not introduced until the later service-door encounter.
 
@@ -62,7 +62,7 @@ After seeing the chart and hearing the patient (in any order), present three cho
 | **[Contest the consent paper]** | Establish whether the ward actually has lawful authority to transfer him | **Commerce → Contracts — The Signed Consent** |
 | **[Examine the surgeon's notes]** | Check whether any medical treatment actually requires this operation | **Scholarship → Investigation — Notes for the Living** |
 
-**Exact short spoken player lines (proposed):**
+**Approved short spoken player lines:**
 
 A. **PLAYER:** “I'll go with the trolley. I want to see where they're taking him.”
 
@@ -92,9 +92,9 @@ After Stage 4, the common [The Empty Sheet] encounter and [The Night Door] encou
 
 ## Implementation and approval boundary
 
-**Already LOCKED:** Teaching Bed adult patient, blue surgical guide marks, awake and restrained, thumbprint claim, exact chart text, coerced medically unnecessary demonstration, Claudia's fever-ward heating quote and institutional motive, the three named second skills/tasks, one +1 skill level at branch selection and the shared zero-reward tutorial economy.
+**Already LOCKED:** Teaching Bed adult patient, blue surgical guide marks, awake and restrained, thumbprint claim, exact chart text, coerced medically unnecessary demonstration, Claudia's revised fever-ward coal argument and institutional motive, the three named second skills/tasks, one +1 skill level at branch selection and the shared zero-reward tutorial economy.
 
-**PROPOSED NOW:** physical scene staging, optional player/patient exchange, fuller Claudia interaction, visible choice labels, player one-liners and Claudia convergence.
+**APPROVED IN STAGE 3:** physical scene staging, optional player/patient exchange, fuller Claudia interaction, visible choice labels, player one-liners and Claudia convergence.
 
 **TBD:** surgical procedure specifics (do not author graphic details), chart visual asset, patient identity and exact transfer time, funding contract rules beyond this single case, exact camera/staging, and procedural names in the ordinary job systems.
 
