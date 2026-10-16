@@ -1,6 +1,6 @@
-# Stitcher — Stage 7: Treatment After Owler (PROPOSED)
+# Stitcher — Stage 7: Treatment After Owler (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The generic **10-coin medical service**, one common home, and patient-safe resolution are already approved in the [shared onboarding](../shared-structure.md), [Stitcher story](README.md) and [Owler fight](owler-fight.md). This draft proposes the brief Stitcher clinic dialogue and its connection to the established shared Care / Treatment panel. The same treatment system is used for every background.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved the exact Stitcher clinician exchange, after-Owler clinic arrival, and reusable 10-coin Care / Treatment flow. The service, patient-safe outcome and common home are already locked in [shared onboarding](../shared-structure.md), [Stitcher story](README.md) and [Owler fight](owler-fight.md). Medical mechanics and the perfectly uninjured player case remain shared-system TBD.
 
 ## S07-A — Reach ordinary medical care
 
@@ -12,7 +12,7 @@ Owler has left the night door and the adult patient is now safe in normal ward c
 
 Use the **existing care provider role**, e.g. **CLINICIAN** (unnamed), at Cinder Row Infirmary. It is a regular hospital service, **not Claudia's personal treatment minigame or a separate Stitcher-only clinic**. The medical staff member is not secretly involved in the teaching contract and doesn't need an invented biography.
 
-## S07-B — Proposed dialogue
+## S07-B — Approved dialogue
 
 *An ordinary clinician points toward an examination seat.*
 
@@ -62,7 +62,7 @@ The clinic dialogue does not give the provider knowledge of which Stage 4 job th
 - Persist medical-service completion, debit of **10 coins once**, actual Health and condition results, one branch finding and Owler victory/defeat. Reload cannot re-charge or replay the handover scene.
 - Keep tutorial combat and both work tasks at **0 coins and 0 ordinary XP**. Normal medical jobs outside onboarding pay normally.
 - **Already LOCKED:** one generic 10-coin tutorial service for every origin, identical rented home, patient-safe outcome, no forced wound, no clinical item reward.
-- **Proposed in Stage 7:** the simple Owler-related dialogue, irony of a ward worker paying for care at their own infirmary, and the ordinary local treatment-area arrival.
+- **Approved in Stage 7:** the exact Owler-related dialogue, the irony of a ward worker paying for care at their own infirmary, and the ordinary local treatment-area arrival. Preserve the spoken lines verbatim unless the user requests changes.
 - **TBD:** precise combat wounds, treatment effects, service duration, care interface labels, healthy-fighter medical handling, and exact city/infirmary travel geometry.
 
 Related: [Stage 6 approved](owler-fight.md), [Stitcher master](README.md), [common home and identical speech](../shared-home-rent-ending.md), [Millhand clinic reference](../millhand/clinic-treatment.md), [Bellrunner care reference](../bellrunner/clinic-treatment.md).
