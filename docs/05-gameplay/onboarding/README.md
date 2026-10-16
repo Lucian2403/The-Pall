@@ -52,8 +52,10 @@
 
 ## Scrapper opening (current)
 
-- [Stage 1 — Ignatius Smog at Rust Yard](scrapper/opening-dialogue.md) — **REVISED PLAIN-LANGUAGE PROPOSAL 2026-10-16**, simple old-pump instructions and optional approved fresh-air quip; awaits approval.
-- [Stage 2 — Strip a Condemned Pump](scrapper/condemned-pump-interaction.md) — **REVISED PLAIN-LANGUAGE PROPOSAL 2026-10-16**, remove two outer plates, free a rusty bolt, sort good metal from junk; awaits approval.
+- [Stage 1 — Ignatius Smog at Rust Yard](scrapper/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-16**, simple old-pump instructions and his established fresh-air quip.
+- [Stage 2 — Strip a Condemned Pump](scrapper/condemned-pump-interaction.md) — **APPROVED AND LOCKED 2026-10-16**, remove two outer plates, free a rusty bolt, sort good metal from junk.
+- [Stage 3 — The Last Dry Floor discovery](scrapper/last-dry-floor-discovery.md) — **PROPOSED 2026-10-16**, three plain-language decisions; story facts locked.
+- [Stage 4 — Three follow-up jobs](scrapper/second-task-branches.md) — **PROPOSED 2026-10-16**, Construction / Navigation / Logistics; job identities locked.
 
 ## Stitcher opening (current)
 
