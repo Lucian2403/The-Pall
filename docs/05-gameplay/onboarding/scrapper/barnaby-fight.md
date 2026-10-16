@@ -1,6 +1,6 @@
-# Scrapper — Stage 6: Barnaby Rusk's Fight at the Pump (PROPOSED)
+# Scrapper — Stage 6: Barnaby Rusk's Fight at the Pump (APPROVED ENCOUNTER)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The local nonlethal fight with **Barnaby Rusk**, a competing yard breaker, his pay motive and the **pump remains uncut** ending are already locked in the [Scrapper master](README.md). This proposes the playable encounter, win/lose dialogue and safe continuation. The short [Stage 5 Copper Claim / Red Lever scenes](barnaby-confrontation.md) are proposed, pending approval. **The turn-based combat rules and all exact numbers are still TBD.**
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The user approved the genuine nonlethal fight, route-independent pump safety, brief win/lose dialogue and worker intervention after defeat. Barnaby's identity, paid copper motive and the **pump remains uncut** ending were previously locked in the [Scrapper master](README.md); [Stage 5](barnaby-confrontation.md) is also approved. **Turn-based combat rules and numerical values remain TBD.**
 
 ## S06-A — Where the fight starts
 
@@ -104,8 +104,8 @@ The player's next step is the common **10-coin** medical consultation/treatment 
 
 **Already locked:** Barnaby Rusk, the human fight, his paid-copper motive, preventing the cut for now, no loot/pay/ordinary XP and non-blocking defeat, 10-coin care then shared Stage 8.
 
-**Proposed now:** fight location, observable arm swing, player positioning based on Stage 5, brief Barnaby victory exchange, Smog's witnessed intervention on defeat, ordinary pump-running check and shared handoff.
+**APPROVED IN STAGE 6:** fight location, observable arm swing, player positioning based on Stage 5, brief Barnaby victory exchange, Smog's witnessed intervention on defeat, ordinary pump-running check and shared handoff. Preserve these spoken lines unless revised by the user.
 
 **TBD:** specific enemy tool and stats, initiative, unarmed/guard/position mechanics, actual injury and Health outcomes, difficulty balance, clinical services, combat animation and map collision.
 
-Related: [Stage 5 proposal](barnaby-confrontation.md), [Scrapper overview](README.md), [shared tutorial rules](../shared-structure.md), [Millhand encounter reference](../millhand/flint-fight.md).
+Related: [Stage 5 approved](barnaby-confrontation.md), [Scrapper overview](README.md), [shared tutorial rules](../shared-structure.md), [Millhand encounter reference](../millhand/flint-fight.md).
