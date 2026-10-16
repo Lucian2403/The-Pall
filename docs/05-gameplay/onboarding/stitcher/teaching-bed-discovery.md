@@ -1,6 +1,6 @@
 # Stitcher — Stage 3: The Teaching Bed (APPROVED)
 
-**Status: APPROVED AND LOCKED (2026-10-16), with Claudia's revised spoken line.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). This document proposes the actual playable discovery, Claudia/player exchange, and the three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
+**Status: APPROVED AND LOCKED (2026-10-16), with Claudia's revised spoken line.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). The user approved the playable discovery, Claudia/player exchange, revised fever-ward coal line, and three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
 
 ## S03-A — A bed that isn't on the round
 
