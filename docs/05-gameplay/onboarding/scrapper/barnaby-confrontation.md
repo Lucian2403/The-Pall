@@ -1,6 +1,6 @@
-# Scrapper — Stage 5: The Copper Claim / The Red Lever (PROPOSED)
+# Scrapper — Stage 5: The Copper Claim / The Red Lever (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The two scene names, Rust Yard setting, **Barnaby Rusk** as a piece-rate scrap worker, his desire to cut copper for payment, and the coming fight are **already locked in the [Scrapper overview](README.md)**. This document proposes the exact dialogue, actions and transition to the short fight. [Stage 3](last-dry-floor-discovery.md) and the three [Stage 4 jobs](second-task-branches.md) are now **APPROVED AND LOCKED**.
+**Status: APPROVED AND LOCKED (2026-10-16).** The user approved both pre-fight interactions, route-aware exchanges, Smog's refusal to let Barnaby cut the pipe, and the three choices before combat. The two scene names and Barnaby's identity/motive were already locked in the [Scrapper overview](README.md). [Stage 3](last-dry-floor-discovery.md) and the three [Stage 4 jobs](second-task-branches.md) are also **APPROVED AND LOCKED**.
 
 ## Scene S05-A — The Copper Claim
 
@@ -105,7 +105,7 @@ The handle has **not** been pulled. Barnaby is **still a few steps from it**. Th
 
 **ALREADY LOCKED:** scene titles, Barnaby's identity and paid copper motive, three possible Stage 4 findings, one fight after two interactions, pump kept running through the local ending.
 
-**PROPOSED:** precise argument and branch responses, Smog's on-site stop order, ordinary red stop handle and three positioning responses.
+**APPROVED IN STAGE 5:** precise argument and branch responses, Smog's on-site stop order, ordinary red stop handle and three positioning responses. Preserve the spoken lines unless the user requests changes.
 
 **TBD:** exact yard geometry, work tool used in the fight, health/defence numbers, whether a route's paperwork is shown through an inventory-free job screen or journal.
 
