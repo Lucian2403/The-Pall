@@ -67,5 +67,7 @@ Player activities, time, world economy and authored interactive events.
 - [Scrapper: Stage 4 Construction / Navigation / Logistics jobs (approved)](onboarding/scrapper/second-task-branches.md)
 - [Scrapper: Stage 5 The Copper Claim and Red Lever (approved)](onboarding/scrapper/barnaby-confrontation.md)
 - [Scrapper: Stage 6 Barnaby turn-based fight and win/lose outcomes (approved encounter)](onboarding/scrapper/barnaby-fight.md)
-- [Scrapper: Stage 7 ordinary ten-coin medical visit (proposed)](onboarding/scrapper/clinic-treatment.md)
+- [Scrapper: Stage 7 ordinary ten-coin medical visit (approved)](onboarding/scrapper/clinic-treatment.md)
 - [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
+- [Inkbound: Stage 1 Erwin Buro plain opening dialogue (proposed)](onboarding/inkbound/opening-dialogue.md)
+- [Inkbound: Stage 2 The Winter Register ordinary Investigation work (proposed)](onboarding/inkbound/winter-register-interaction.md)
