@@ -1,6 +1,6 @@
-# Stitcher — Stage 6: Owler at the Night Door (PROPOSED)
+# Stitcher — Stage 6: Owler at the Night Door (APPROVED ENCOUNTER)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** This follows the two proposed [Stage 5 service-corridor interactions](owler-confrontation.md). The patient's non-consensual teaching transfer, Owler's approved identity as the Night Porter, the local rescue, shared turn-based PvE and 10-coin clinic/home continuation are already locked in the [Stitcher master](README.md). These combat beats and spoken endings are new proposals. All numerical combat rules remain undecided.
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The user approved the encounter and explicitly replaced three spoken lines (one victory, two defeat) with the exact wording below. This follows approved [Stage 5 service-corridor interactions](owler-confrontation.md). The patient rescue, Owler's identity and common clinic/home continuation are locked; combat numbers and formulas remain TBD.
 
 ## S06-A — What the fight is actually about
 
@@ -38,7 +38,7 @@ Victory is **nonlethal**: the player uses normal combat choices to make Owler un
 
 **OWLER:** “Fine. I'll tell them you wouldn't let me through.”
 
-**PLAYER:** “Tell them he wouldn't go.”
+**PLAYER:** “Tell them whatever you want.”
 
 He can complain to the school; he does not suddenly become compassionate or disclose a secret surgeon's name. His paid transfer fails. The player gets a clear **combat victory**.
 
@@ -52,13 +52,13 @@ Defeat is a genuine loss. Owler can overpower the Stitcher with normal combat ou
 
 *Claudia steps into the doorway and sees the fallen worker and the gathered witnesses.*
 
-**CLAUDIA:** “That's enough, Owler. I'm not paying for a brawl in my ward. Get out.”
+**CLAUDIA:** “This brawl can raise some questions. Get out now!”
 
 **OWLER:** “You'll answer for the school, then.”
 
-**CLAUDIA:** “They can come to me.”
+**CLAUDIA:** “Know your place! I'll just smile to them. Get out!”
 
-Owler backs off **because the contested transfer is physically withheld, witnessed, and now carries professional consequences**, not because the defeated player somehow beat him. Claudia is defending her authority and avoiding a public ward scandal, not turning into an empathetic rescuer.
+Owler backs off **because the contested transfer is physically withheld, witnessed, and now carries professional consequences**, not because the defeated player somehow beat him. Claudia is defending her authority, not turning into an empathetic rescuer. She expects to smooth over the school's questions with her appearance and charm, which she knowingly uses to escape scrutiny; this is her belief, not a guarantee that a smile defeats witnessed objections or written evidence.
 
 The player remains **defeated**, receives whatever actual injury/Health consequences the shared combat system determines, and is helped to the ordinary clinical service by an unnamed worker. Owler takes **no coins, clothes, bag, papers or equipment**. There is no rematch requirement and no abrupt teleporting to the rented home.
 
@@ -95,6 +95,6 @@ The clinic may take place using the normal Cinder Row medical service (if availa
 
 **Already locked:** human opponent, nonlethal encounter, patient rescue, normal post-fight care, common starter equipment/economy and home ending.
 
-**Proposed for Stage 6:** telegraphed shove/strike, obstacle-dependent battle entry, Owler's two narrow outcome scenes, ward intervention on defeat, Claudia's cold institutional cancellation and final patient safety.
+**Approved in Stage 6:** telegraphed shove/strike, obstacle-dependent battle entry, Owler's two narrow outcome scenes (with the user's three exact replacement lines), ward intervention on defeat, Claudia's cold institutional cancellation and final patient safety. Preserve these spoken lines verbatim.
 
-Related: [Stage 5 proposed](owler-confrontation.md), [Stitcher master](README.md), [shared Stage 8](../shared-home-rent-ending.md), [Millhand encounter reference](../millhand/flint-fight.md).
+Related: [Stage 5 approved](owler-confrontation.md), [Stitcher master](README.md), [shared Stage 8](../shared-home-rent-ending.md), [Millhand encounter reference](../millhand/flint-fight.md).
