@@ -52,8 +52,8 @@
 
 ## Scrapper opening (current)
 
-- [Stage 1 — Ignatius Smog at Rust Yard](scrapper/opening-dialogue.md) — **PROPOSED 2026-10-16**, ordinary condemned-pump order and optional fresh-air exchange; approved NPC and hub unchanged.
-- [Stage 2 — Strip a Condemned Pump](scrapper/condemned-pump-interaction.md) — **PROPOSED 2026-10-16**, reusable Mechanics disassembly and grading before *The Last Dry Floor*.
+- [Stage 1 — Ignatius Smog at Rust Yard](scrapper/opening-dialogue.md) — **REVISED PLAIN-LANGUAGE PROPOSAL 2026-10-16**, simple old-pump instructions and optional approved fresh-air quip; awaits approval.
+- [Stage 2 — Strip a Condemned Pump](scrapper/condemned-pump-interaction.md) — **REVISED PLAIN-LANGUAGE PROPOSAL 2026-10-16**, remove two outer plates, free a rusty bolt, sort good metal from junk; awaits approval.
 
 ## Stitcher opening (current)
 
