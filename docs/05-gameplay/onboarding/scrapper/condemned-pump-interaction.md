@@ -1,117 +1,132 @@
-# Scrapper — Stage 2: Strip a Condemned Pump, Ordinary Mechanics Work (PROPOSED)
+# Scrapper — Stage 2: Strip a Condemned Pump (SIMPLIFIED PROPOSAL)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** This follows [Ignatius Smog's proposed Stage 1 dialogue](opening-dialogue.md). The job title, permanent Rust Yard hub, Mechanics Major Skill and first-task structure are [already locked](README.md). This document designs **ordinary reusable disassembly, inspection and grading interactions**, all completed before the unique *Last Dry Floor* discovery in Stage 3.
+**Status: REVISED PROPOSAL (2026-10-16); NOT LOCKED.** The previous Stage 2 buried an easy hands-on job under technical vocabulary. This rewrite shows the player exactly **what they see, what they remove, why each choice matters, and what finishing the job looks like**. It does not change the [locked Scrapper story](README.md), Mechanics +3 or the later [Stage 3 — The Last Dry Floor](README.md).
 
-## What is being stripped — and what is not
+## The job in one sentence
 
-The condemned auxiliary drainage pump stands along Rust Yard's old culvert wall. The salvage docket treats the machine as scrap. For this **first supervised clearance**, the foreman has assigned **only detachable outer fittings, covers and nonessential mounting hardware** that the yard has identified as accessible. The **drive, pressure-bearing assembly, main pipe, outlet and working drainage connection are explicitly out of scope**.
+**Take two old metal plates off a pump's outside stand, deal with a rusty bolt, and sort the pieces into “keep” and “scrap.”** Leave the large water pipe alone.
 
-A yard-owned tool bench is available. The player is a Scrapper with **Mechanics +3** at creation, not a novice inventing machinery safety rules or a master engineer. The work should be understandable on an ordinary low-level industrial machine and re-usable for other condemned pumps, broken boilers and scrap-yard mechanical lots. Do not create a dedicated tutorial-only pump minigame.
+*The pump stands beside a water drain at Rust Yard. A couple of old metal plates are bolted to its iron stand. Ignatius has marked those outer plates for removal; they are not part of the moving machine.*
 
-**Caution for production:** the later revealed pump is still serving occupied cellars. Never permit opening a live pressure joint, exposing moving drives or disabling its supply as a supposedly safe low-level stripping action. The safe external-work zone must be physically isolated from the pump's live components in the eventual art/geometry. If that cannot be made technically credible, move the removable parts to an adjacent **already detached side casing** rather than telling the player to dismantle a running drive guard.
+This is the physical object shown in the job screen. The character uses the **yard's tools** and doesn't get a new tool or weapon.
 
-## S02-A — Take stock
+## S02-A — See what you're working on
 
-**[Read the salvage docket]**
+**[Read the work slip]**
 
-A normal work-order panel shows:
+> **Strip a Condemned Pump — Mechanics**
+>
+> Remove the old metal plates from the pump's stand.
+>
+> **Keep:** straight, usable metal pieces and bolts.  
+> **Scrap:** pieces too bent or broken to use again.  
+> **Leave alone:** the large pipe and the pump's working parts.  
+> **This yard clean-up job is unpaid.**
 
-| Field | Content |
+A little UI subtitle can say **“Condemned = marked for scrap.”** Don't ask the player to know the word in advance.
+
+**[Look at the metal plates]**
+
+The player can see the two plates, the bolts holding them, and the pipe that must stay untouched. A small highlighted area marks **only the parts safe to remove**. This is just a clear visual boundary, not an invented mechanic.
+
+The game should not ask a player to make a technically expert diagnosis. Basic visual differences—straight metal, badly bent metal, a rusty bolt—are enough.
+
+## S02-B — Take the first plate off
+
+**[Pick up the yard spanner]**
+
+*The plate is held to the stand with bolts. If they all come loose at once, the plate might slip and hit the ground.*
+
+Choose one:
+
+| Player action | What happens |
 | --- | --- |
-| Job | **Strip a Condemned Pump — Mechanics** |
-| Source | Rust Yard's own condemned-stock clearance |
-| Target | Exterior, nonessential fittings on the culvert-wall pump |
-| Keep | Reusable external brackets, sound fasteners and usable covers if their condition warrants |
-| Scrap | Failed or bent parts that cannot be economically reused |
-| Do not touch | Main drainage pipe, drive, live joints, pressure-bearing casing and outlet |
-| Job pay | **0 coins and 0 ordinary XP in this tutorial clearance**; outside onboarding this same interaction is normally paid |
-| Equipment | Yard-owned hand tools, returned to their bench |
-| Required action | **[Inspect the outer fittings]** |
+| **[Hold the plate steady while loosening the bolts]** | Takes a little longer, but the plate is less likely to be bent |
+| **[Undo the bolts right away]** | Quicker, but the plate may slip and get dented |
 
-This is not an invitation to select a global pump Shutdown control. At this point the player has **not** noticed a working load, warning cloth or signalling knocks. A condemned-stock label does not give the player permission to disregard the limited work order.
+Both are ordinary, legal work choices. Neither makes the large pipe burst, and neither forces a failure. If the plate gets dented, the game shows that condition before sorting it; it never invents an injury to the player or people nearby.
 
-**[Inspect the outer fittings]** — show visible wear on exterior fasteners, a sound bracket and an old guard/cover. Mark their current state in the ordinary inspection layer; exact quality grades, item IDs, weight and numerical yields remain TBD.
+**[Lift the plate free]**
 
-## S02-B — Choose a removal order
+*The plate is off. The pipe is untouched.*
 
-Before touching a tool, let the player choose:
+## S02-C — One rusty bolt on the second plate
 
-| Choice | Genuine consequence |
+*The second plate is harder. One bolt is rusted tight and will not turn.*
+
+**[Look at the stuck bolt]**
+
+Choose one:
+
+| Player action | What the player understands |
 | --- | --- |
-| **[Back off the cover fasteners first]** | Standard direct dismantling. Quicker if the fasteners cooperate, but the older bracket still carries some load from the loose cover and can resist removal |
-| **[Support the cover before loosening it]** | A little more preparation, but reduces the chance of bending the reusable bracket during removal |
+| **[Put some oil on it and try slowly]** | Safer for the old bolt, but takes time |
+| **[Try reaching it from the other side]** | Takes extra work to get a better grip with the yard tools |
+| **[Pull harder]** | Quicker, but the bolt might snap or the plate might bend |
 
-Either is a legal safe way to remove *nonessential outer hardware*, as eventually supported by shared Mechanics interaction quality/time rules. The safer choice isn't free; it takes more preparation. The quicker choice isn't a hidden compulsory failure.
+The **oil is a little of the yard's working supply**, not a new inventory item, recipe or permanent consumable. The other side must be visibly reachable; don't offer a choice that geometry cannot support.
 
-**[Choose a yard tool]** — use a plausible workshop spanner/wrench or supporting clamp **from the yard bench**, not a starter item. Tools are work props that stay at Rust Yard. Do not give the player a lasting wrench on accepting or finishing the task.
+If the player breaks the bolt, show it breaking. The broken metal goes into the scrap pile later; the second plate is still removable with ordinary work/rework. It is **not** a surprise permanent failure or a reason the pump stops working.
 
-## S02-C — Routine complication: a stubborn fastener
+**[Take off the second plate]**
 
-As the worker begins removing the outer fittings, **one corroded fastener will not turn freely**.
+At the end of this step, the player has **two removed outer plates and their bolts** to examine. Only those nonessential pieces have been taken off.
 
-**Job text (not dialogue):** *One of the cover bolts holds fast. The bracket shifts a little when you put force on it.*
+## S02-D — Keep the good parts; scrap the bad ones
 
-**[Examine the bolt and bracket]** — reveal whether the bracket is being stressed; do not require the player to identify hidden materials by guesswork. Then offer three ordinary Mechanics responses:
+**[Look over the pieces]** — the game shows clearly which are straight and still usable, and which are cracked, badly bent or broken. Exact item IDs, condition ratings, prices and yield formulas are for the shared Mechanics/economy systems later.
 
-1. **[Ease the bolt free with a second spanner]** — support the bracket and work the bolt loose slowly, protecting the cover and fastener. More handling time; preserves good condition if inspection confirms it.
-2. **[Take off the neighbouring mount first]** — remove a different accessible, nonessential support to relieve strain before returning to the stubborn bolt. More steps/time; useful when the original angle is awkward.
-3. **[Force the bolt]** — faster but risks twisting the bracket or shearing the fastener. If it breaks, the damaged pieces are graded as scrap and the player must complete a normal rework/record step. The forceful choice is not a guaranteed way to preserve valuable parts.
+For each piece the player selects either:
 
-Do not let a scripted break damage the **live drainage pipe**, stop the pump or injure cellar residents during the ordinary Stage 2 loop. The mishap can cost salvage quality, material yield (if normal work rules support it) or job time, but **does not give permanent player-owned scrap or an invented injury system**. Once the mistake is visible, allow honest correction without an unavoidable hard fail.
+- **[Put with the good pieces]** — if still useful at the yard.
+- **[Put in the scrap pile]** — if too damaged.
 
-Where the work art cannot safely support removing that neighbouring piece, replace it with another already-identified detachable support. The important reusable mechanics are tool choice, sequence, time/condition trade-off, and a straightforward fix.
+A straight plate can be kept for yard reuse. A broken bolt cannot. If the player puts something in the wrong place, **[Look again]** allows them to correct it.
 
-## S02-D — Inspect and sort the recovered hardware
+**[Count the pieces]** — the work slip shows plain words:
 
-After the outer parts are detached:
+> **Good pieces:** [count from actual work]  
+> **Scrap pieces:** [count from actual work]  
+> **Pump pipe:** Not touched.
 
-**[Check recovered condition]** — review each accessible piece using familiar quality categories. Do not assign fixed condition numbers, prices or invented item recipes here.
+Do **not** invent fixed counts beyond the two visible plates, a coin value, or an extra stock item for the player. Bolts and any damaged pieces use normal work-prop quantities when the actual job data exists. All metal belongs to the yard.
 
-**[Sort the pieces]** — send viable brackets/fasteners to the yard's **reuse bin**, and severely bent or broken pieces to the **scrap bin**.
+## S02-E — Tell Ignatius you're done
 
-- A careful player can preserve more reusable stock.
-- A hurried player may have made scrap out of a sound fastener, but should not be told that poor-quality metal is fit for use.
-- If the player misgrades a piece, **[Inspect again]** allows correction; sorting never awards loot to the player's bag. Employer-owned salvage stays in the yard.
-- The final mechanical work summary shows parts recovered, rejects, any damage and estimated ordinary yard value only if later economy systems provide the value. Do **not** settle personal wages from that appraisal during onboarding.
+*Ignatius looks at the two piles. He coughs.*
 
-**[Record the strip tally]** — a repeatable Mechanics job close-out form reflects exactly what was removed and the player's actual condition choices. Do not let a reload multiply recovered parts or wages.
+**SMOG:** “All done?”
 
-## S02-E — Foreman sign-off
-
-*Ignatius looks over the tally and the sorted fittings. His cough interrupts him for a moment.*
-
-**SMOG:** “All off?”
-
-**PLAYER:** “The outside fittings. I left the pipe alone.”
+**PLAYER:** “Just the plates. Didn't touch the pipe.”
 
 **SMOG:** “Good. Put the tools back.”
 
-**[Return yard tools]** and **[Close the clearance docket]** conclude **only the normal stripping job**. These lines work whether the player preserved every part or broke one; the written tally holds that distinction. If there is a serious misgrade, Ignatius can ask for a recount through ordinary job validation, without another authored NPC dialogue tree.
+**[Put the yard tools back] → [Finish the job]**
 
-The **0-coin, 0-ordinary-XP** tutorial clearance has been stated on the docket since entry. No promise of withheld wages, no unexpected fee and no bonus for the choice to protect parts. Recurring *Strip a Condemned Pump* jobs outside this personal opening pay the usual coin/skill XP according to future general Mechanics rules.
+The job screen shows **“Pump exterior cleared. Metal sorted.”** If the player broke a bolt, the work record reflects that. If they worked carefully, it reflects that too. This is the end of a normal, reusable Mechanics task, not a reward animation handing out free metal.
 
-## S02-F — Hand over to Stage 3: The Last Dry Floor
+The scripted first job pays **0 coins and 0 ordinary Mechanics XP**, made clear before accepting. Regular Rust Yard jobs outside onboarding remain normally paid and award skill XP. The player still has the universal Basic Clothes, Crude Small Bag and **20 coins**, plus the already-granted Mechanics +3.
 
-Only **after** the docket has been closed, the routine tools returned and the external housing area is cleared does the one-off *Last Dry Floor* discovery become available. **Stage 3 begins** when the player notices the old pressure dial cycling, finds the warning cloth (“DON'T STOP IT. WATER REACHES THE BEDS.”) and hears three deliberate knocks beneath the iron floor.
+## S02-F — Only now: the different story begins
 
-Do **not** put any of these clues in the Stage 2 dialogue, choice text, reward screen or incidental status message. Likewise, no premature encounter with Barnaby Rusk, no trip into the occupied cellar, and no choice of second Major Skill before the discovery. The pump's essential drainage link remains uncut.
+After the player has done the ordinary job and put the yard tools away, **Stage 3 — The Last Dry Floor** can start. The player then notices that this supposedly useless pump still seems to be working, sees a cloth warning and hears three knocks from below. That's when they discover the pump is keeping occupied underground rooms dry.
 
-## System/persistence guardrails
+**No early hints in Stage 2:** no moving pressure dial, no warning cloth, no knocks, no cellar residents, no Barnaby Rusk and no choice of second Major Skill. The player has not removed the big pipe or shut off the machine.
 
-- Reusable job sequence: **read docket → inspect exterior → choose removal order/tool → resolve stuck fastener → inspect and grade → sort → sign off**. These are ordinary Mechanics family actions, not special origin-exclusive UI.
-- Work interactions appear within the first two minutes of the job under the approved [Jobs and Time](../../jobs/jobs-and-time.md) rule; world time continues during choices. If the base job timer ends while an action remains unresolved, completion waits for the interaction.
-- The job must have legible risks/rework and equal access to required tools. No hidden high-skill gate, no unannounced auto-break due to an invisible stat, and no forced manual click at the far end of a long work timer.
-- Persist the condition/grade outcome of the **yard's work order** but do not mint player items. The character keeps **Basic Clothes, Crude Small Bag, 20 coins and Mechanics +3** after Stage 2.
-- Only the Stage 3 choice can grant **+1 level in a different Major Skill (Industry, Fieldcraft or Commerce)**, once.
-- The story incident is limited to the **initial** condemned auxiliary drainage pump; future repeatable pump jobs cannot repeatedly trigger the under-yard cellar story.
-- No spontaneous barrel of live steam, player fatality, new disease, secret Pall influence, or side-plot about Ignatius's cough. A routine bolt problem is enough.
+## Rules for making this believable and easy to understand
+
+- **Safety:** the two removable plates belong to the pump's *outside stand* and are not covers shielding moving gears, water-pressure joints or the main pipe. The production art must show a separate, accessible area. If the machine art cannot support this safely, put those spare outer pieces on a detached adjacent casing while keeping the job's core actions and later discovery.
+- **Reusable Mechanics work:** look at parts → choose care or speed → loosen bolts → handle a stuck one → separate reusable metal from scrap → show the foreman what was done.
+- **Readable options:** names like **[Pull harder]** and **[Count the pieces]** belong on buttons. “Corroded fastener,” “quality grading,” “docket reconciliation,” “auxiliary drainage pump” and “removal order” are development vocabulary, **not required player vocabulary**.
+- **Beginner-friendly:** yard tools provided, no hidden skill test, no forced late click after a timer, no fatal mistake. Choice affects time and whether the metal remains useful, not whether people are drowned before the story begins.
+- **Continuity:** this is ordinary first work, so no wages or ordinary XP, no loot, no extra skill grant and no hidden repeatable cellar-quest trigger. Stage 3's later branch choice alone grants +1 in Industry, Fieldcraft or Commerce.
 
 ## Approval boundary
 
-**Already locked:** Rust Yard and Ignatius, initial auxiliary drainage pump, Mechanics +3, external-only first strip, reusability as a normal job, zero tutorial rewards, and *The Last Dry Floor* as the later unique reveal.
+**Already LOCKED:** Rust Yard and Ignatius, official job name *Strip a Condemned Pump*, first task uses Mechanics +3, no tutorial wages/XP/loot, the connection to the still-running drainage pump, and Stage 3's later reveal.
 
-**Proposed for Stage 2:** exact docket view, two removal-order choices, workshop tool handling, three remedies for one corroded fastener, part grading and tally, Ignatius's short sign-off, and safe Stage 3 handoff.
+**REVISED PROPOSAL:** two clearly identified plates on the stand, simple remove/hold choices, three ways to handle a rusty bolt, keep/scrap sorting, count, Ignatius's plain sign-off and a clearly separate later story twist.
 
-**TBD:** actual machine geometry, strain/load simulation, quality and salvage formulas, exact job duration, names/stats of actual recoverable materials, yard tool asset IDs, wages/XP outside the tutorial, and finalized UI copy.
+**TBD:** how the physical pump stand looks, exact bolt/part counts and conditions, time and material-quality formulas, normal paid job rewards, item/animation definitions and shared job interface.
 
-Related: [Scrapper master story](README.md), [Stage 1 proposed](opening-dialogue.md), [shared onboarding](../shared-structure.md), [jobs and time](../../jobs/jobs-and-time.md), [dialogue style](../../interactions/dialogue-style-guide.md).
+Related: [Stage 1 simplified dialogue](opening-dialogue.md), [Scrapper master](README.md), [Jobs and Time](../../jobs/jobs-and-time.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md).
