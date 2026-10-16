@@ -50,6 +50,11 @@
 - [Stage 7 — Clinic after the boar](squatter/clinic-treatment.md) — **APPROVED AND LOCKED 2026-10-15**, shared medical details TBD.
 - [Stage 8 — Identical home and rent notice for all six](shared-home-rent-ending.md) — **COMMON APPROVED AND LOCKED 2026-10-15**, no Squatter-specific variant.
 
+## Scrapper opening (current)
+
+- [Stage 1 — Ignatius Smog at Rust Yard](scrapper/opening-dialogue.md) — **PROPOSED 2026-10-16**, ordinary condemned-pump order and optional fresh-air exchange; approved NPC and hub unchanged.
+- [Stage 2 — Strip a Condemned Pump](scrapper/condemned-pump-interaction.md) — **PROPOSED 2026-10-16**, reusable Mechanics disassembly and grading before *The Last Dry Floor*.
+
 ## Stitcher opening (current)
 
 - [Stage 1 — Claudia Cyka's harsher opening](stitcher/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-16**. Her harsh, beautiful and calculating character direction is locked.
