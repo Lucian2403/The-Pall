@@ -56,8 +56,10 @@
 - [Stage 2 — Strip a Condemned Pump](scrapper/condemned-pump-interaction.md) — **APPROVED AND LOCKED 2026-10-16**, remove two outer plates, free a rusty bolt, sort good metal from junk.
 - [Stage 3 — The Last Dry Floor discovery](scrapper/last-dry-floor-discovery.md) — **APPROVED AND LOCKED 2026-10-16**, three plain-language decisions.
 - [Stage 4 — Three follow-up jobs](scrapper/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-16**, Construction / Navigation / Logistics.
-- [Stage 5 — The Copper Claim / The Red Lever](scrapper/barnaby-confrontation.md) — **PROPOSED 2026-10-16**, Barnaby dispute and three tactical approaches.
-- [Stage 6 — Barnaby's fight and two outcomes](scrapper/barnaby-fight.md) — **PROPOSED 2026-10-16**, genuine fight, safe continuation; global combat numbers TBD.
+- [Stage 5 — The Copper Claim / The Red Lever](scrapper/barnaby-confrontation.md) — **APPROVED AND LOCKED 2026-10-16**, Barnaby dispute and three tactical approaches.
+- [Stage 6 — Barnaby's fight and two outcomes](scrapper/barnaby-fight.md) — **APPROVED ENCOUNTER 2026-10-16**, genuine win/defeat and safe continuation; global combat numbers TBD.
+- [Stage 7 — Clinic after Barnaby's fight](scrapper/clinic-treatment.md) — **PROPOSED 2026-10-16**, standard ten-coin treatment and plain dialogue.
+- [Stage 8 — Common home and identical rent notice](shared-home-rent-ending.md) — **ALREADY APPROVED FOR ALL SIX BACKGROUNDS**; no Scrapper-specific variation.
 
 ## Stitcher opening (current)
 
