@@ -4,7 +4,7 @@
 
 **Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing (10-coin tutorial treatment) and common home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](../shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
 
-**Stages 1–2 APPROVED AND LOCKED (2026-10-17):** [Erwin Buro's opening dialogue](opening-dialogue.md) and [The Winter Register interactions and dialogue](winter-register-interaction.md) were approved with his user-defined contrast between genteel affectation and ordinary clerk speech. **Stage 3 — [The Acceptable Losses discovery](acceptable-losses-discovery.md) and Stage 4 — [The Coal Waiver / The Door Count / The Short Cart](second-task-branches.md) are PROPOSED (2026-10-17)**; their specific dialogue and interaction choices await approval. Underlying scene premise, route identities and the single +1 different-Major-Skill rule remain locked.
+**Stages 1–2 APPROVED AND LOCKED (2026-10-17):** [Erwin Buro's opening dialogue](opening-dialogue.md) and [The Winter Register interactions and dialogue](winter-register-interaction.md) were approved with his user-defined contrast between genteel affectation and ordinary clerk speech. **Stage 3 — [The Acceptable Losses discovery](acceptable-losses-discovery.md) and Stage 4 — [The Coal Waiver / The Door Count / The Short Cart](second-task-branches.md) are APPROVED AND LOCKED (2026-10-17)**. **Stage 5 — [The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) and Stage 6 — [Silas Pumpard's fight](silas-pumpard-fight.md) are PROPOSED (2026-10-17)**; their new dialogue and encounter outcomes await approval. Global combat figures remain TBD.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -27,7 +27,7 @@ Generic phases: accept regular work terms/time, with tutorial pay unavailable; c
 
 ## The twist — The Acceptable Losses (LOCKED)
 
-The [Stage 3 exact loose-sheet discovery and Erwin exchange](acceptable-losses-discovery.md) are **PROPOSED (2026-10-17)** for user approval, while the word change **EXPECTED → AUTHORIZED**, Ward Six quote and three Major Skill choices remain locked at story level.
+The [Stage 3 exact loose-sheet discovery and Erwin exchange](acceptable-losses-discovery.md) are **APPROVED AND LOCKED (2026-10-17)**, while the word change **EXPECTED → AUTHORIZED**, Ward Six quote and three Major Skill choices remain locked at story level.
 
 
 Tucked inside the ordinary winter census is a supplementary column, not meant to be copied for the public roll. It lists a row of overcrowded tenements, their coal allotment, and an estimate of how many inhabitants may die if the heat is cut back.
@@ -42,7 +42,7 @@ Erwin Buro urges the player to finish the copy. He knows too much about what the
 
 ### Three first-event responses → unpaid tutorial tasks based on ordinary jobs (LOCKED)
 
-[Stage 4's three complete work scenes and dialogue](second-task-branches.md) are **PROPOSED (2026-10-17)**. They use separate, understandable Contracts, Navigation and Hauling work, and converge only after the chosen job.
+[Stage 4's three complete work scenes and dialogue](second-task-branches.md) are **APPROVED AND LOCKED (2026-10-17)**. They use separate, understandable Contracts, Navigation and Hauling work, and converge only after the chosen job.
 
 
 | Inkbound's choice | Second unpaid tutorial task and different Major Skill | Local discovery/consequence |
@@ -54,6 +54,9 @@ Erwin Buro urges the player to finish the copy. He knows too much about what the
 All three second tutorial tasks reuse genuine normal gameplay but give 0 coins/ordinary XP. At branch selection the character gains **+1 level in Commerce, Fieldcraft or Industry**, respectively, one time. Ordinary repeatable jobs outside the tutorial pay/level normally. They don't make the player powerful enough to solve an entire city's heating problem, and no special starting items or additional bonuses beyond that single +1 Major Skill level are implied.
 
 ## Two follow-up interactions and common enemy (LOCKED narrative)
+
+**Stage 5 — [The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) and Stage 6 — [Silas Pumpard's fight](silas-pumpard-fight.md) are PROPOSED (2026-10-17)**. The new documents supply branch-specific resident exchanges, a confrontational fuel watchman, three positional choices and real combat win/lose consequences without opening the locked coal box. The pre-existing story events and Silas identity remain locked; **new dialogue and fight staging are NOT yet approved**.
+
 
 **Interaction 1 — The Sealed Stove:** On the route toward home, the Inkbound sees a padlocked communal coal box outside a cold tenement. A resident asks whether the census writer has come to count the living or the dead. The player may show their branch's docket, inspect the sealed box or identify the shortage. Each route yields different intelligible dialogue and a small immediate consequence: an appeal number, a safe access route or one arriving cart. None magically replaces an entire winter ration.
 
