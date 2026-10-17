@@ -1,6 +1,6 @@
-# Inkbound — Stage 2: The Winter Register, Ordinary Book-Checking Work (REVISED PROPOSAL)
+# Inkbound — Stage 2: The Winter Register, Ordinary Book-Checking Work (APPROVED)
 
-**Status: REVISED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** Erwin's user-defined upper-class pretensions, admiration of wealth and unpolished speech slips are LOCKED character direction, while these exact new Stage 2 lines still await approval. Follows [Erwin Buro's proposed Stage 1](opening-dialogue.md). The regular **Scholarship / Investigation** work, paired household lists, one ordinary copied-number or missing-seal complication, and the later **Stage 3 — The Acceptable Losses** reveal are already established in [Inkbound's locked story](README.md). This document provides **plain, playable work choices** before any disturbing evidence appears.
+**Status: APPROVED AND LOCKED (2026-10-17).** The user approved the revised smudged-number exchange, conditional guessed-error exchange, class-aspiring closing dialogue and underlying ordinary work interactions. Follows [Erwin Buro's approved Stage 1](opening-dialogue.md). The regular **Scholarship / Investigation** work, paired household lists, one ordinary copied-number or missing-seal complication, and the later **Stage 3 — The Acceptable Losses** reveal are already established in [Inkbound's locked story](README.md). This document provides **plain, playable work choices** before any disturbing evidence appears.
 
 ## What the player is actually doing
 
@@ -136,8 +136,8 @@ The original records stay at the Civic Copying Office. The later question is **w
 
 **ALREADY LOCKED:** Civic Copying Office, Erwin Buro, Scholarship +3, ordinary The Winter Register check/copy job, zero first-task rewards, later Acceptable Losses reveal.
 
-**PROPOSED IN REVISED STAGE 2:** the unchanged ordinary work loop and two-list example, but with longer choice-aware Erwin exchanges at the smudged number, a conditional reply if a guessed number is wrong, a more personal sign-off, and the same strict separation from Stage 3. Erwin's user-defined social pretensions are LOCKED, not the exact proposed lines.
+**APPROVED IN STAGE 2:** the unchanged ordinary work loop and two-list example, the longer choice-aware Erwin exchanges at the smudged number, the conditional reply for an incorrect guess, his personal sign-off, and the strict separation from Stage 3. Preserve exact dialogue unless explicitly revised.
 
 **TBD:** source-data generation, exact work time, paid job wages and XP, player skill impact on error rates, visual page layout and item identifiers.
 
-Related: [Stage 1 revised proposal](opening-dialogue.md), [Inkbound master](README.md), [game-wide jobs](../../jobs/jobs-and-time.md), [spoken dialogue guide](../../interactions/dialogue-style-guide.md).
+Related: [Stage 1 approved](opening-dialogue.md), [Inkbound master](README.md), [game-wide jobs](../../jobs/jobs-and-time.md), [spoken dialogue guide](../../interactions/dialogue-style-guide.md).
