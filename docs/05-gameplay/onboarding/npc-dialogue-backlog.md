@@ -33,7 +33,7 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 
 ## Dialogue production, still PROPOSED / TO AUTHOR
 
-1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand, Bellrunner and Squatter Stage 1 openings are approved and locked; Stitcher Stages 1-7 are approved and locked, and Stage 8 uses the already-approved universal home and rent ending, completing Stitcher's narrative onboarding; Scrapper Stages 1–7 are **APPROVED AND LOCKED**, with the shared Stage 8 completing that origin's narrative onboarding; Inkbound Stages 1–2 are **PROPOSED (2026-10-16)** and await approval.**
+1. **Six opening conversations** with existing named recurring NPCs: establish familiar workplace, introduce ordinary reusable work interactions, and avoid a misleading promise of tutorial rewards. **Millhand, Bellrunner and Squatter Stage 1 openings are approved and locked; Stitcher Stages 1-7 are approved and locked, and Stage 8 uses the already-approved universal home and rent ending, completing Stitcher's narrative onboarding; Scrapper Stages 1–7 are **APPROVED AND LOCKED**, with the shared Stage 8 completing that origin's narrative onboarding; Inkbound Stages 1–2 are **REVISED PROPOSALS (2026-10-17)** and await approval; Erwin's newly defined social aspirations and mixed high/low voice are LOCKED.**
 2. **Six unique twist reveals** after the ordinary first-task interactions; three consequential response choices each.
 3. **Eighteen second-task follow-ups** (six origins × three routes) using the different Major Skill, their ordinary job interaction families, and role-labelled minor NPCs where needed.
 4. **Twelve pre-combat interactions** (two per origin), with choice-aware dialogue from the locked opponent where the opponent speaks; Squatter uses observation/animal behaviour instead of human speech.
@@ -90,8 +90,8 @@ Use NPCs only when needed for a playable interaction; avoid bloating the cast wi
 - [Scrapper — Barnaby Rusk fight and outcomes, Stage 6 (APPROVED ENCOUNTER 2026-10-16)](scrapper/barnaby-fight.md)
 - [Scrapper — Ordinary clinic after Barnaby, Stage 7 (APPROVED AND LOCKED 2026-10-16)](scrapper/clinic-treatment.md)
 - [Scrapper — Shared Stage 8 home, identical rent notice and speech (ALREADY APPROVED)](shared-home-rent-ending.md)
-- [Inkbound — Erwin Buro at Civic Copying Office, Stage 1 (PROPOSED 2026-10-16)](inkbound/opening-dialogue.md)
-- [Inkbound — The Winter Register copying/checking job, Stage 2 (PROPOSED 2026-10-16)](inkbound/winter-register-interaction.md)
+- [Inkbound — Erwin Buro at Civic Copying Office, Stage 1 (REVISED PROPOSAL 2026-10-17)](inkbound/opening-dialogue.md)
+- [Inkbound — The Winter Register copying/checking job, Stage 2 (REVISED DIALOGUE PROPOSAL 2026-10-17)](inkbound/winter-register-interaction.md)
 - [Stitcher — Stage 8 identical common home, rent and closing speech (SHARED APPROVED)](shared-home-rent-ending.md)
 - **Future continuity (LOCKED):** if a future quest features Flint, write a brief conditional response based on the persisted **Millhand fight victory/defeat**. Exact future dialogue is not written/locked; do not invent a new quest merely to deliver the line.
 
