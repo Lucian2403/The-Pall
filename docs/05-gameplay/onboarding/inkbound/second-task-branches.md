@@ -1,6 +1,6 @@
-# Inkbound — Stage 4: The Coal Waiver / The Door Count / The Short Cart (PROPOSED)
+# Inkbound — Stage 4: The Coal Waiver / The Door Count / The Short Cart (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** The three second jobs, their different Major Skills and narrow discoveries are LOCKED at outline level in [Inkbound's master story](README.md). This page proposes accessible work actions, small choices and natural dialogue. It follows [Stage 3 — The Acceptable Losses](acceptable-losses-discovery.md) (scene/dialogue proposed), after **APPROVED AND LOCKED** [Stage 1](opening-dialogue.md) and [Stage 2](winter-register-interaction.md).
+**Status: APPROVED AND LOCKED (2026-10-17).** The user approved the ordinary Contracts, Navigation and Hauling work interactions, specific branch findings, exact spoken lines, and one-branch continuation. [Stage 3 — The Acceptable Losses](acceptable-losses-discovery.md) and [Stages 1–2](README.md) are also approved. Numerical systems remain TBD.
 
 ## Shared rules before any branch
 
@@ -194,8 +194,8 @@ At the sealed box the player may present only **their chosen branch's evidence**
 
 **Already LOCKED:** job names, skill pairs and route findings, Stage 5/6 story structure, no first two tutorial job rewards.
 
-**PROPOSED IN STAGE 4:** the practical interactions, option labels, counter clerk/route worker/driver/resident/receiver dialogue, receipt and delivery consequences, and branch continuity to Stage 5.
+**APPROVED IN STAGE 4:** the practical interactions, option labels, counter clerk/route worker/driver/resident/receiver dialogue, receipt and delivery consequences, and branch continuity to Stage 5. Preserve exact spoken lines unless revised by the user.
 
 **TBD:** exact form fields, coal quantities, cart carrying figures, route distances, time costs, currency and XP on normal repeatable jobs, and item assets.
 
-Related: [Inkbound master](README.md), [Stage 3 proposal](acceptable-losses-discovery.md), [shared onboarding](../shared-structure.md), [dialogue guide](../../interactions/dialogue-style-guide.md).
+Related: [Inkbound master](README.md), [Stage 3 approved](acceptable-losses-discovery.md), [shared onboarding](../shared-structure.md), [dialogue guide](../../interactions/dialogue-style-guide.md).
