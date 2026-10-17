@@ -1,6 +1,6 @@
-# Inkbound — Stage 1: Erwin Buro at the Civic Copying Office (REVISED PROPOSAL)
+# Inkbound — Stage 1: Erwin Buro at the Civic Copying Office (APPROVED)
 
-**Status: REVISED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** Erwin's personality direction is user-defined and LOCKED: he admires wealth and genteel status without possessing either; he tries to speak like an aristocrat, but practical, common speech slips out when pressed. This is a revised dialogue draft only; the stage still awaits approval. The **Civic Copying Office**, **Erwin Buro, Senior Copy Clerk**, and **The Winter Register** ordinary Scholarship / Investigation job are LOCKED in the [Inkbound master storyline](README.md). This document proposes the exact first scene, character voice, unpaid-work explanation and transition into a regular book-checking job. The disturbing **Acceptable Losses** annex is reserved strictly for Stage 3, after ordinary work.
+**Status: APPROVED AND LOCKED (2026-10-17).** The user approved the revised dialogue, showing Erwin's genteel pretensions and plain working-clerk language slipping through. His personality direction is also user-defined and LOCKED. The **Civic Copying Office**, **Erwin Buro, Senior Copy Clerk**, and **The Winter Register** ordinary Scholarship / Investigation job are LOCKED in the [Inkbound master storyline](README.md). This document proposes the exact first scene, character voice, unpaid-work explanation and transition into a regular book-checking job. The disturbing **Acceptable Losses** annex is reserved strictly for Stage 3, after ordinary work.
 
 ## Stage 1: the office and the work
 
@@ -64,8 +64,8 @@ The Inkbound starts with **Scholarship +3** at character creation, normal starti
 
 **Already LOCKED:** the office and NPC identities, copy-and-check first job, Scholarship +3, common starter kit, no first-job pay/XP, Stage 3's later hidden column and three second-skill choices.
 
-**Proposed in revised Stage 1:** the exact longer, characterful exchange, optional pay exchange, polished-stand/frayed-cuff staging, transparent reason for the unpaid correction and the unchanged plain-language work card. Only Erwin's personality direction is already LOCKED.
+**APPROVED IN STAGE 1:** the exact longer, characterful exchange, optional pay exchange, polished-stand/frayed-cuff staging, transparent reason for the unpaid correction and the unchanged plain-language work card. Preserve approved lines verbatim unless the user requests changes.
 
 **TBD:** office art and exact location in Grand Cylinder City, inkstand/cuff appearance approval, final UI card design, normal copying-job earnings, job time and Erwin's detailed knowledge of Ward Six. No biography beyond the user-defined social aspiration is implied.
 
-Related: [Inkbound master](README.md), [Stage 2 proposal](winter-register-interaction.md), [dialogue style](../../interactions/dialogue-style-guide.md), [shared onboarding](../shared-structure.md).
+Related: [Inkbound master](README.md), [Stage 2 approved](winter-register-interaction.md), [dialogue style](../../interactions/dialogue-style-guide.md), [shared onboarding](../shared-structure.md).
