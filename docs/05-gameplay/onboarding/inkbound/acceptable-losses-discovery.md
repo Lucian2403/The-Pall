@@ -4,9 +4,9 @@
 
 ## I03-A — An extra page
 
-**Trigger:** only after the player has completed the usual [Winter Register](winter-register-interaction.md) work: compared both lists, dealt with the blurred entry, handed Erwin the clean copy and had the ordinary task closed. This supplementary sheet never appears in the normal copy/verification choices and is not a repeatable discovery on future paid office work.
+**Trigger:** only after the player has completed the usual [Winter Register](winter-register-interaction.md) work: compared both lists, dealt with the blurred entry, returned the old books, handed Erwin the clean copy and had the ordinary task closed. This supplementary sheet never appears in the normal copy/verification choices and is not a repeatable discovery on future paid office work.
 
-*As the Inkbound lifts the old books to return them to their shelf, a thin folded sheet slips from between the covers. It is not part of the clean household copy just finished.*
+*Erwin opens a separate winter volume to put the finished copy with the office papers. A thin folded sheet slips from between its pages and lands beside the player's hand. It is not part of the clean household copy just finished.*
 
 **[Pick up the loose sheet]**
 
