@@ -52,8 +52,8 @@
 
 ## Inkbound opening (current)
 
-- [Stage 1 — Erwin Buro at the Civic Copying Office](inkbound/opening-dialogue.md) — **PROPOSED 2026-10-16**, natural work talk, transparent unpaid office-checking assignment.
-- [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **PROPOSED 2026-10-16**, compare two household lists, correct a smudged number, hand in a clean copy; later reveal reserved for Stage 3.
+- [Stage 1 — Erwin Buro at the Civic Copying Office](inkbound/opening-dialogue.md) — **REVISED PROPOSAL 2026-10-17**, dialogue now reflects his locked aristocratic ambitions and ordinary-clerk slips; not yet approved.
+- [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **REVISED PROPOSAL 2026-10-17**, same work, fuller Erwin dialogue at the smudge and sign-off; Stage 3 reveal still held back.
 
 ## Scrapper opening (current)
 
