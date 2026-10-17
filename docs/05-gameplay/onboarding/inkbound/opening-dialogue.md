@@ -1,28 +1,48 @@
-# Inkbound — Stage 1: Erwin Buro at the Civic Copying Office (PROPOSED)
+# Inkbound — Stage 1: Erwin Buro at the Civic Copying Office (REVISED PROPOSAL)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** The **Civic Copying Office**, **Erwin Buro, Senior Copy Clerk**, and **The Winter Register** ordinary Scholarship / Investigation job are LOCKED in the [Inkbound master storyline](README.md). This document proposes the exact first scene, character voice, unpaid-work explanation and transition into a regular book-checking job. The disturbing **Acceptable Losses** annex is reserved strictly for Stage 3, after ordinary work.
+**Status: REVISED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** Erwin's personality direction is user-defined and LOCKED: he admires wealth and genteel status without possessing either; he tries to speak like an aristocrat, but practical, common speech slips out when pressed. This is a revised dialogue draft only; the stage still awaits approval. The **Civic Copying Office**, **Erwin Buro, Senior Copy Clerk**, and **The Winter Register** ordinary Scholarship / Investigation job are LOCKED in the [Inkbound master storyline](README.md). This document proposes the exact first scene, character voice, unpaid-work explanation and transition into a regular book-checking job. The disturbing **Acceptable Losses** annex is reserved strictly for Stage 3, after ordinary work.
 
 ## Stage 1: the office and the work
 
-*Inside the Civic Copying Office, two open books lie on Erwin Buro's desk. The windows are stained dark with soot. Beside the inkpot sits a small dish of sand for drying writing.*
+*Inside the Civic Copying Office, two open books lie on Erwin Buro's desk. The windows are stained dark with soot. The small brass stand for his inkpot is polished; the cuff showing beneath his coat is frayed.*
 
-*Erwin slides the books towards the Inkbound. One has corrections written beside some of its entries.*
+*Erwin pulls the cuff into place and motions the Inkbound over. One of the books has corrections written in the margin.*
 
-**ERWIN:** “Two winter lists. One's been corrected. Check the numbers, then make me a clean copy.”
+**ERWIN:** “Ah, there you are. Come, I've a little work requiring a careful hand.”
+
+**PLAYER:** “What needs doing?”
+
+**ERWIN:** “Two winter lists. One's been corrected, but I won't have us sending out a dirty copy. We are a respectable office.”
+
+**PLAYER:** “We're in a back street.”
+
+**ERWIN:** “A respectable office in a back street. There's no shame in that.”
+
+*He turns the corrected book towards the player.*
+
+**ERWIN:** “Check where the numbers differ, then write them out neatly. The good paper's on the desk.”
 
 **PLAYER (optional):** “And the pay?”
 
-**ERWIN (optional reply):** “Not for this one. We're putting our own books right.”
+**ERWIN (optional reply):** “Regrettably, there's no separate fee for putting our own books right.”
 
-**ERWIN (convergence, including when optional exchange is skipped):** “If two numbers don't agree, put a mark beside them. I'll look before it goes out.”
+**PLAYER (optional follow-up):** “So nothing?”
+
+**ERWIN (optional reply):** “Aye, nothing. You think I'm pleased about it?”
+
+**ERWIN (convergence, including when the pay exchange is skipped):** “If a number's hard to read, mark it for me. Don't go guessing and waste a good sheet.”
 
 **[Take the work sheet]** → opens the ordinary **The Winter Register** work order with clear description of which two lists to compare, where the final copy goes, and its exceptional **0-coin / 0-ordinary-XP** status. **[Begin copying]** → [Stage 2](winter-register-interaction.md).
 
 ## Character voice and reasoning
 
-Erwin is a senior clerk who has learned to worry about small mistakes reaching the city office. He is careful, worn down and protective of the municipal copying account that keeps this room working. He **is not yet a proven criminal** or secretly explaining the later Ward Six figures. He sounds like a man with a desk full of work rather than a legal textbook. He does not explain what a register or inkpot is to someone who already works in the copying trade.
+**Erwin's newly user-defined personality is LOCKED:** He likes the life and manners of the rich but is not himself rich. He tries to sound like a well-bred gentleman, with careful phrasing and an insistence that the office be considered respectable. When challenged over wages, the state of the premises or a costly error, his ordinary workman's voice slips through. His polished inkpot stand and frayed cuff are **proposed visual staging**, not an invented family history or proof of a past fortune.
 
-The optional pay question provides mild friction without an argument. The job is a **once-only internal correction of the office's own records**, not a new paid commission from the city. It's an ordinary type of work, but in this particular tutorial occurrence no outside customer has paid for an extra checking round. The player sees the exceptional **unpaid** rule before accepting; ordinary paid copying jobs still award coins and relevant Scholarship XP.
+The contrast is small and audible: **“Regrettably, there's no separate fee”** becomes **“Aye, nothing. You think I'm pleased about it?”** The player notices the difference between his claim of respectability and the back-street reality. He doesn't deliver a lesson about class, speak in elaborate fake aristocratic dialect, or make a witty speech every time he opens his mouth.
+
+Erwin is also a senior clerk worried about mistakes and losing the municipal account that keeps his staff working. He **is not yet a proven criminal** or secretly explaining the later Ward Six figures. He knows the Inkbound already works here, so his instructions concern the two real books and their corrections, not how paper or ink work.
+
+The optional pay question brings out the contrast between his attempted fine manners and immediate frustration; it need not become a long argument. The job is a **once-only internal correction of the office's own records**, not a new paid commission from the city. It's an ordinary type of work, but in this particular tutorial occurrence no outside customer has paid for an extra checking round. The player sees the exceptional **unpaid** rule before accepting; ordinary paid copying jobs still award coins and relevant Scholarship XP.
 
 The later horror must **not** be foreshadowed in the spoken conversation. Erwin does not yet mention Ward Six, heat reductions, coal, expected deaths, authorized losses, special columns, or Silas Pumpard.
 
@@ -44,8 +64,8 @@ The Inkbound starts with **Scholarship +3** at character creation, normal starti
 
 **Already LOCKED:** the office and NPC identities, copy-and-check first job, Scholarship +3, common starter kit, no first-job pay/XP, Stage 3's later hidden column and three second-skill choices.
 
-**Proposed in Stage 1:** exact dialogue, office staging, small optional pay exchange, transparent reason for the unpaid correction and plain-language work card.
+**Proposed in revised Stage 1:** the exact longer, characterful exchange, optional pay exchange, polished-stand/frayed-cuff staging, transparent reason for the unpaid correction and the unchanged plain-language work card. Only Erwin's personality direction is already LOCKED.
 
-**TBD:** office art and place in Grand Cylinder City, final UI card design, normal copying-job earnings, job time, Erwin's further personal traits and his detailed knowledge of Ward Six.
+**TBD:** office art and exact location in Grand Cylinder City, inkstand/cuff appearance approval, final UI card design, normal copying-job earnings, job time and Erwin's detailed knowledge of Ward Six. No biography beyond the user-defined social aspiration is implied.
 
 Related: [Inkbound master](README.md), [Stage 2 proposal](winter-register-interaction.md), [dialogue style](../../interactions/dialogue-style-guide.md), [shared onboarding](../shared-structure.md).
