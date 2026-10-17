@@ -4,7 +4,7 @@
 
 **Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing (10-coin tutorial treatment) and common home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](../shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
 
-**Stages 1–2 REVISED PROPOSALS (2026-10-17):** [Erwin Buro's opening dialogue](opening-dialogue.md) and [The Winter Register interactions and dialogue](winter-register-interaction.md) now express his newly user-defined personality: he admires wealth and the manners of the upper classes, although he is not rich. His attempts at refined speech break into plain, sometimes irritated working-clerk language when pay, wasted paper or mistakes come up. **This character direction is LOCKED; the exact proposed dialogue remains unapproved.** The first stage assigns an unpaid office record check, the second compares two lists and corrects a blurred number, and **The Acceptable Losses** sheet still appears only in Stage 3.
+**Stages 1–2 APPROVED AND LOCKED (2026-10-17):** [Erwin Buro's opening dialogue](opening-dialogue.md) and [The Winter Register interactions and dialogue](winter-register-interaction.md) were approved with his user-defined contrast between genteel affectation and ordinary clerk speech. **Stage 3 — [The Acceptable Losses discovery](acceptable-losses-discovery.md) and Stage 4 — [The Coal Waiver / The Door Count / The Short Cart](second-task-branches.md) are PROPOSED (2026-10-17)**; their specific dialogue and interaction choices await approval. Underlying scene premise, route identities and the single +1 different-Major-Skill rule remain locked.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -18,7 +18,7 @@ The Inkbound character already works in the copying trade. Character creation gr
 
 ## First unpaid tutorial job: The Winter Register — Scholarship / Investigation (LOCKED)
 
-The [proposed Stage 1 dialogue](opening-dialogue.md) and [proposed Stage 2 ordinary job](winter-register-interaction.md) give an accessible, reusable work experience before the unique Stage 3 discovery. The player compares household counts, checks corrections and fixes one blurred entry without needing specialist accounting terms.
+The [approved Stage 1 dialogue](opening-dialogue.md) and [approved Stage 2 ordinary job](winter-register-interaction.md) give an accessible, reusable work experience before the unique Stage 3 discovery. The player compares household counts, checks corrections and fixes one blurred entry without needing specialist accounting terms.
 
 
 A routine copy-and-verification assignment. The player checks ward rosters, reconciles household counts, distinguishes original from amended totals and flags mismatched column entries. This is normal, reusable **Investigation** work, not a tutorial-exclusive puzzle.
@@ -26,6 +26,9 @@ A routine copy-and-verification assignment. The player checks ward rosters, reco
 Generic phases: accept regular work terms/time, with tutorial pay unavailable; compare two rolls, select the correct source, decide which discrepancy to investigate; resolve a normal missing-seal or transcription complication; submit accepted tutorial work for 0 coins/ordinary XP. The narrative twist triggers **only after those generic interactions**. The original personal record numbers and coal allocation remain task/quest props, not free permanent inventory items.
 
 ## The twist — The Acceptable Losses (LOCKED)
+
+The [Stage 3 exact loose-sheet discovery and Erwin exchange](acceptable-losses-discovery.md) are **PROPOSED (2026-10-17)** for user approval, while the word change **EXPECTED → AUTHORIZED**, Ward Six quote and three Major Skill choices remain locked at story level.
+
 
 Tucked inside the ordinary winter census is a supplementary column, not meant to be copied for the public roll. It lists a row of overcrowded tenements, their coal allotment, and an estimate of how many inhabitants may die if the heat is cut back.
 
@@ -38,6 +41,9 @@ This isn't a supernatural prophecy or a main-story mystery. The underlying horro
 Erwin Buro urges the player to finish the copy. He knows too much about what the column means, but not necessarily who approved it.
 
 ### Three first-event responses → unpaid tutorial tasks based on ordinary jobs (LOCKED)
+
+[Stage 4's three complete work scenes and dialogue](second-task-branches.md) are **PROPOSED (2026-10-17)**. They use separate, understandable Contracts, Navigation and Hauling work, and converge only after the chosen job.
+
 
 | Inkbound's choice | Second unpaid tutorial task and different Major Skill | Local discovery/consequence |
 | --- | --- | --- |
