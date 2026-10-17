@@ -1,6 +1,6 @@
-# Inkbound — Stage 2: The Winter Register, Ordinary Book-Checking Work (PROPOSED)
+# Inkbound — Stage 2: The Winter Register, Ordinary Book-Checking Work (REVISED PROPOSAL)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-16); NOT LOCKED.** Follows [Erwin Buro's proposed Stage 1](opening-dialogue.md). The regular **Scholarship / Investigation** work, paired household lists, one ordinary copied-number or missing-seal complication, and the later **Stage 3 — The Acceptable Losses** reveal are already established in [Inkbound's locked story](README.md). This document provides **plain, playable work choices** before any disturbing evidence appears.
+**Status: REVISED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** Erwin's user-defined upper-class pretensions, admiration of wealth and unpolished speech slips are LOCKED character direction, while these exact new Stage 2 lines still await approval. Follows [Erwin Buro's proposed Stage 1](opening-dialogue.md). The regular **Scholarship / Investigation** work, paired household lists, one ordinary copied-number or missing-seal complication, and the later **Stage 3 — The Acceptable Losses** reveal are already established in [Inkbound's locked story](README.md). This document provides **plain, playable work choices** before any disturbing evidence appears.
 
 ## What the player is actually doing
 
@@ -60,17 +60,35 @@ Choose one:
 
 No number for the blurred entry is canonized here; the later implementation chooses an actual legible source and must be consistent. The player is not asked to recognize a signature forged by a stranger or uncover a policy about coal in this routine work.
 
-If the player asks Erwin to check the smudge, use one short situational exchange:
+If the player asks Erwin to check the smudge, his attempt at polished courtesy gives way to real irritation when he sees how much work the blot creates:
 
 **PLAYER:** “Can you read this? The ink's gone across the number.”
 
-**ERWIN:** “Bring it here. Let's see the first book.”
+**ERWIN:** “Allow me.”
 
-*Erwin checks the other page and points to the legible entry.*
+*He bends over the page, then holds it nearer the window.*
 
-**ERWIN:** “There. Copy that one.”
+**ERWIN:** “Oh, for heaven's sake. They've made a proper mess of it.”
 
-No grand comment about ink being mightier than law, no cheeky aphorism and no forced elaborate period dialect.
+**PLAYER:** “Can't you make it out?”
+
+**ERWIN:** “Not through that muck, I can't. Bring me the older book.”
+
+*Erwin finds the clear entry and turns the book towards the player.*
+
+**ERWIN:** “There. That's the number. Write it plainly, if you please. Paper isn't free.”
+
+If the player instead chooses **[Put down your best guess]** and Erwin catches a wrong figure during the normal final check, use a **different short response** that acknowledges that actual player choice (not a generic error bark):
+
+**ERWIN:** “Where did this number come from?”
+
+**PLAYER:** “The ink covered it. I guessed.”
+
+**ERWIN:** “Guessed? We are meant to be a respectable office. Damn it, get the older book. I'm not answering for a number you made up.”
+
+**[Correct the number]** returns the page to the ordinary proofread flow. No extra wage or punishment, just rework. If the player reads the source correctly alone, neither exchange fires; no forced conversation.
+
+The clipped **“Allow me”** and **“if you please”** are the voice Erwin wants; **“muck,” “proper mess,” “Damn it”** and the fretting over wasted paper are the voice he actually has when work goes wrong. Do not give him a fake accent or a constant stream of aristocratic greetings.
 
 ## S02-D — Finish the normal work
 
@@ -78,13 +96,17 @@ No grand comment about ink being mightier than law, no cheeky aphorism and no fo
 
 **[Put the books back] → [Give Erwin the copy]**
 
-*Erwin looks down the clean page. He compares the changed entry once more, then puts it with the finished work.*
+*Erwin reads down the clean page. The corrected household count is marked, and the blurred line has been checked against the older book. He straightens the finished copy on his desk.*
 
-**ERWIN:** “Finished?”
+**ERWIN:** “There. A page fit for a gentleman's desk.”
 
-**PLAYER:** “I found a change in the numbers. It's marked.”
+**PLAYER:** “It's a list of houses.”
 
-**ERWIN:** “Good. Put the old books back.”
+**ERWIN:** “And if a number's wrong, we'll do it all again. I'd sooner not.”
+
+*He pushes the older books towards the player.*
+
+**ERWIN:** “Put them back, carefully. That cover's nearly worn through, and we've no money for another.”
 
 **[Finish the work]** — closes the normal **The Winter Register** job. This exceptional office correction round gives **0 coins and 0 ordinary Scholarship XP** as advertised before entry. The player keeps their original 20 coins, Basic Clothes, Crude Small Bag and Scholarship +3. No ordinary copying task is being disguised as a quest reward.
 
@@ -114,8 +136,8 @@ The original records stay at the Civic Copying Office. The later question is **w
 
 **ALREADY LOCKED:** Civic Copying Office, Erwin Buro, Scholarship +3, ordinary The Winter Register check/copy job, zero first-task rewards, later Acceptable Losses reveal.
 
-**PROPOSED IN STAGE 2:** visible two-list example, two reasonable ways to use a corrected number, one smudged-number problem with three remedies, a short optional Erwin exchange, the final proofreading and sign-off, and the exact split between routine work and the hidden Stage 3 document.
+**PROPOSED IN REVISED STAGE 2:** the unchanged ordinary work loop and two-list example, but with longer choice-aware Erwin exchanges at the smudged number, a conditional reply if a guessed number is wrong, a more personal sign-off, and the same strict separation from Stage 3. Erwin's user-defined social pretensions are LOCKED, not the exact proposed lines.
 
 **TBD:** source-data generation, exact work time, paid job wages and XP, player skill impact on error rates, visual page layout and item identifiers.
 
-Related: [Stage 1 proposed](opening-dialogue.md), [Inkbound master](README.md), [game-wide jobs](../../jobs/jobs-and-time.md), [spoken dialogue guide](../../interactions/dialogue-style-guide.md).
+Related: [Stage 1 revised proposal](opening-dialogue.md), [Inkbound master](README.md), [game-wide jobs](../../jobs/jobs-and-time.md), [spoken dialogue guide](../../interactions/dialogue-style-guide.md).
