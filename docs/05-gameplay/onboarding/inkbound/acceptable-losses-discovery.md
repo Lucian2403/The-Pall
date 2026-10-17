@@ -1,6 +1,6 @@
-# Inkbound — Stage 3: The Acceptable Losses (PROPOSED)
+# Inkbound — Stage 3: The Acceptable Losses (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** The winter deaths entry, **EXPECTED** overwritten by **AUTHORIZED**, the exact Ward Six line, Erwin's awareness and three choices are already locked at outline level in the [Inkbound master](README.md). The scene, exact dialogue and player-facing actions below are new proposals. [Stage 1](opening-dialogue.md) and [Stage 2](winter-register-interaction.md) are **APPROVED AND LOCKED**; Erwin's aspirational gentlemanly voice with flashes of ordinary speech is **LOCKED character direction**.
+**Status: APPROVED AND LOCKED (2026-10-17).** The user approved the exact loose-sheet discovery, Erwin's genteel-to-common exchange, plain-language three choices and their skill destinations. The Ward Six loss sheet was previously locked at outline level in the [Inkbound master](README.md). [Stage 1](opening-dialogue.md) and [Stage 2](winter-register-interaction.md) are **APPROVED AND LOCKED**; Erwin's aspirational gentlemanly voice with flashes of ordinary speech is **LOCKED character direction**.
 
 ## I03-A — An extra page
 
@@ -78,7 +78,7 @@ The player is not offered an abstract “good versus evil” slider. These are t
 | **[Check the houses]** | Go to the listed addresses and learn whether people actually live there and how a coal cart could reach them | **Fieldcraft +1** / Navigation — **The Door Count** |
 | **[Follow the coal delivery]** | Check the cart that's supposed to bring coal to Ward Six and see whether its load matches the paper | **Industry +1** / Hauling — **The Short Cart** |
 
-**Choice-specific player responses (proposed exact dialogue):**
+**Choice-specific player responses (approved exact dialogue):**
 
 A. **PLAYER:** “I'll go to the coal office. I want to see who signed this.”
 
@@ -103,8 +103,8 @@ He wants the copying office left out of a potentially embarrassing dispute. He h
 
 **Already LOCKED:** the hidden deaths-and-coal column; crossed-out **EXPECTED**, overwritten **AUTHORIZED**; exact Ward Six quote and number nine; Erwin's reluctance; three distinct branch skill/job pairs.
 
-**PROPOSED IN STAGE 3:** the loose-sheet staging, plain inspection actions, exact Erwin/player exchange, the three spoken responses and a short common Erwin exit.
+**APPROVED IN STAGE 3:** the loose-sheet staging, plain inspection actions, exact Erwin/player exchange, the three spoken responses and common Erwin exit. Preserve spoken lines verbatim unless the user explicitly changes them.
 
 **TBD:** source handwriting/ink art, actual coal amounts, household identities, municipal form layout, service addresses, timings and numerical job systems.
 
-Related: [Inkbound master](README.md), [approved Winter Register Stage 2](winter-register-interaction.md), [proposed Stage 4 jobs](second-task-branches.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md).
+Related: [Inkbound master](README.md), [approved Winter Register Stage 2](winter-register-interaction.md), [approved Stage 4 jobs](second-task-branches.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md).
