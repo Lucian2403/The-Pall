@@ -52,8 +52,10 @@
 
 ## Inkbound opening (current)
 
-- [Stage 1 — Erwin Buro at the Civic Copying Office](inkbound/opening-dialogue.md) — **REVISED PROPOSAL 2026-10-17**, dialogue now reflects his locked aristocratic ambitions and ordinary-clerk slips; not yet approved.
-- [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **REVISED PROPOSAL 2026-10-17**, same work, fuller Erwin dialogue at the smudge and sign-off; Stage 3 reveal still held back.
+- [Stage 1 — Erwin Buro at the Civic Copying Office](inkbound/opening-dialogue.md) — **APPROVED AND LOCKED 2026-10-17**, including Erwin's class-aspiring voice.
+- [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **APPROVED AND LOCKED 2026-10-17**, plain record-checking work and richer Erwin dialogue.
+- [Stage 3 — The Acceptable Losses discovery](inkbound/acceptable-losses-discovery.md) — **PROPOSED 2026-10-17**, exact Ward Six revelation and three skill choices.
+- [Stage 4 — The Coal Waiver / The Door Count / The Short Cart](inkbound/second-task-branches.md) — **PROPOSED 2026-10-17**, distinct Contracts, Navigation and Hauling activities.
 
 ## Scrapper opening (current)
 
