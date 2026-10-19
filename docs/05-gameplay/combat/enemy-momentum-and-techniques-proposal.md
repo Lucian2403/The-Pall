@@ -1,6 +1,6 @@
-# The Pall Combat — NPC Momentum and Special Techniques (PROPOSED)
+# The Pall Combat — NPC Momentum and Special Techniques (APPROVED PRINCIPLES)
 
-**Status: PROPOSED FOR USER REVIEW — 2026-10-19. NOT YET APPROVED OR NUMERICALLY BALANCED.** Companion to [Part 4: Momentum Generation & Spending](momentum-generation-and-spending-proposal.md), the [approved combat foundation](approved-combat-foundation.md) and [accepted action families](standard-action-menu-proposal.md). The user asks whether hostile NPCs should also build Momentum and use special abilities. **Recommendation: YES, with mechanical parity and deliberately different knowledge/behaviour.** This is a proposal, not a new game-wide locked rule.
+**Status: APPROVED PRINCIPLES (2026-10-19); NUMBERS AND NAMED ABILITIES REMAIN PLAYTEST CANDIDATES.** The user accepted **the same Momentum mechanics for enemy NPCs and players, individual enemy pools, readable enemy Momentum, appropriate differentiated techniques and honest one-action combat**. Human, animal and trained-elite action choices differ by capabilities and motivations, not cheated resources. The exact visibility format (number vs visual band), individual NPC loadouts, proposed Hook and Pull / Driving Blow techniques, AI weights and all combat numerical balance remain TBD. See [Part 4 approved prototype](momentum-generation-and-spending-proposal.md).
 
 ## Design principle
 
@@ -133,6 +133,6 @@ A simple AI priority sequence is enough to start: (1) survive unavoidable immedi
 - Confirm 20/35/50 technique expense bands only after actual combat tests; do not lock them from these examples.
 - Whether longer, heavily trained engagements need optional justified nonzero initial Momentum (recommend **not in first version**).
 
-**Review boundary:** This is a proposed NPC extension and numeric stress test, not an approved catalog of Flint/Silas/boar moves, enemy stats or new lore. The basic player Momentum prototype itself remains numerically PROPOSED.
+**Review boundary:** NPC Momentum parity and appropriate special techniques are **approved principles**, while the examples are **illustrative, not an approved Flint/Silas/boar move catalogue**, numeric enemy stats or new lore. Momentum figures are **agreed playtest starting values**, subject to testing. [Part 5 Enemy AI](enemy-ai-decision-system-proposal.md) is the next distinct proposal requiring review.
 
 Related: [Momentum Part 4](momentum-generation-and-spending-proposal.md), [combat foundation](approved-combat-foundation.md), [Initiative and intent](initiative-and-intent-proposal.md), [skills](../../01-player/skills-progression.md), [equipment](../../04-equipment/core/equipment-system.md), [onboarding fights](../onboarding/README.md).
