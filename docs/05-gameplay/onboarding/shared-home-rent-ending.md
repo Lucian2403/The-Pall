@@ -49,7 +49,7 @@ Use this shared scene rather than producing six copied home/rent scripts.
 - Preserve the **specific branch choice/second Major Skill +1**, the one localized story finding, whether Benny was told (Squatter only, if applicable), and the distinct encounter victory/defeat result for the current background. None of these change rent or the home.
 - First and second scripted jobs and the introductory fight award **zero wages, ordinary XP or loot**. No reward or equipment is added at Stage 8. Normal repeatable work afterward follows normal rewards.
 - This is closure of the personal starting incident, not a resolution of the poorhouse, closed night-shift site or overarching storyline.
-- The cross-background unresolved **perfect-no-damage clinic visit** is still an open shared Health-system question and cannot be fixed by creating a compulsory wound at home.
+- **Clinic rule LOCKED 2026-10-19:** [The shared clinic examination](shared-clinic-examination-policy.md) costs 10 coins whether injured or unhurt. When unhurt, the clinician examines the character without giving unnecessary treatment. No injury is created at combat or at home to justify the fee.
 
 ## QA: compare across six origins
 
