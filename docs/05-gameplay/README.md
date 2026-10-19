@@ -75,4 +75,4 @@ Player activities, time, world economy and authored interactive events.
 - [Inkbound: Stage 4 Coal Waiver / Door Count / Short Cart (approved)](onboarding/inkbound/second-task-branches.md)
 - [Inkbound: Stage 5 The Sealed Stove and Coal Hook (approved)](onboarding/inkbound/sealed-stove-confrontation.md)
 - [Inkbound: Stage 6 Silas Pumpard PvE encounter and outcomes (approved encounter)](onboarding/inkbound/silas-pumpard-fight.md)
-- [Inkbound: Stage 7 ordinary clinic visit (proposed)](onboarding/inkbound/clinic-treatment.md)
+- [Inkbound: Stage 7 ordinary clinic visit (approved)](onboarding/inkbound/clinic-treatment.md)
