@@ -4,7 +4,7 @@
 
 ## I06-A — Why the fight happens
 
-Silas is paid to guard the communal coal allotment and its padlocked box outside a cold tenement. He has orders not to release fuel without authorization. Several residents are standing nearby. The Inkbound has refused to hand over the papers showing **one** of the three findings about Ward Six.
+Silas is paid to guard the communal coal allotment and its padlocked box outside a cold tenement. He has orders not to release fuel without authorization. Several residents are standing nearby. The Inkbound has refused to hand over **two folded personal work notes**, guaranteed by the selected Stage 4 job. One records the shared Ward Six heating discovery; one records **only that branch's finding**. Neither note is a tradeable inventory item, and the original official papers remain with their offices.
 
 *Silas raises an arm, trying to shove the Inkbound away from the box. His short work hook is in his other hand. Behind him, the padlock and official seal remain intact.*
 
@@ -34,7 +34,7 @@ Give the new player a genuine first turn and an understandable chance to defend 
 
 The Inkbound uses the ordinary combat rules to make Silas unable or unwilling to continue the attack. The outcome is nonlethal; Silas can retreat without being killed or robbed.
 
-*Silas backs away from the Inkbound. He looks at the residents watching him. He has not got the papers, and the coal box is still locked.*
+*Silas backs away from the Inkbound. He looks at the residents watching him. He has not got the two work notes, and the coal box is still locked.*
 
 **SILAS:** “Fine. Keep your bloody papers.”
 
@@ -70,7 +70,7 @@ Defeat must be real: the Inkbound can be beaten through the actual turn-based co
 
 Silas stops **because he has already protected the lock and now faces witnesses to a public beating**, not because the player somehow defeated him. Importantly, **he does not need to flee or renounce his watchman post** on defeat. He stays by the padlock and the player is driven away from the immediate area. This is meaningfully worse than winning the fight but allows the tutorial to proceed without murdering the player or erasing evidence.
 
-He takes **no coins, clothes, bag, journal findings or physical starter gear**. The player receives actual Health/injury effects from the shared combat engine; the helpers are ordinary bystanders, not newly named NPCs or a permanent party. The signed papers, appeal note, route record or coal tally are not destroyed: the job findings remain at their originating office and in the quest record rather than in a confiscatable bag.
+He takes **no coins, clothes, bag, journal findings or physical starter gear**. The player receives actual Health/injury effects from the shared combat engine; the helpers are ordinary bystanders, not newly named NPCs or a permanent party. The two player-written notes are not lost, and the original signed orders, appeal entry, route record and coal tally remain at their respective offices. Each fact stays in the quest journal. Silas cannot confiscate the official originals by confronting the player here.
 
 ## I06-E — One local ending, three distinct findings
 
@@ -105,3 +105,5 @@ After victory, the Inkbound reaches ordinary city care by normal travel. After d
 **TBD:** combat numbers, movement, guard/attack actions, combat AI, exactly which tool Silas wields, Health/injury effects, treatment effects, exact visual map and animation.
 
 Related: [Inkbound master](README.md), [Stage 5 approved](sealed-stove-confrontation.md), [Stage 4 approved](second-task-branches.md), [common tutorial structure](../shared-structure.md).
+
+**User-approved continuity correction (2026-10-19):** the Inkbound always has two personal, non-loot work notes during this fight. Silas is trying to take **real visible papers**, but no branch has been granted an official document or permanent inventory reward. The earlier Stage 4 evidence stays in the journal after either result.
