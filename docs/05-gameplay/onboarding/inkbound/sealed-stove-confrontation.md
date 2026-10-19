@@ -8,7 +8,7 @@
 
 The stove, box and padlock must be easy to recognize without knowledge of boilers or heating systems: **there is coal under lock, and the people nearby are cold**. The old fuel limit is still on the books.
 
-*One resident looks at the papers the Inkbound carries.*
+*One resident notices two small folded notes in the Inkbound's hand. The Inkbound wrote them after the chosen Stage 4 job: one about the Ward Six coal cut, the other about the one finding from that job. The original council records remain at their offices.*
 
 **RESIDENT:** “You're from the counting office, aren't you?”
 
@@ -24,11 +24,11 @@ The resident has not read the private mortality sheet and should not mysteriousl
 
 **[Look at the locked coal box]** — confirms that the padlock and official seal are intact. The stove is cold; there is no authorized fuel release posted here. This is **inspection only**, not a prompt to steal fuel, smash the lock or invent a lock-picking system.
 
-**[Tell the resident what you found]** — exactly one branch-specific exchange:
+**[Tell the resident what you found]** — exactly one branch-specific exchange. The player can show the relevant handwritten note from their own Stage 4 work; they are **not** showing the original official council or delivery paper:
 
 ### A — The Coal Waiver (Commerce / Contracts)
 
-*The Inkbound can show the resident the appeal entry or read its reference from the work record. No new collectible paper is issued.*
+*The Inkbound can show the resident their own note of the appeal reference and delay, taken from the work record. The original appeal stays at the office. No collectible paper is issued.*
 
 **PLAYER:** “The office has your appeal. They won't look at it until spring.”
 
@@ -36,7 +36,7 @@ The resident has not read the private mortality sheet and should not mysteriousl
 
 **PLAYER:** “I've put the delay down in writing. Here's the number they gave it.”
 
-**RESIDENT:** “A number, then. Will a number open that lock?”
+**RESIDENT:** “So you've got their number. Are they going to give us any coal?”
 
 **PLAYER:** “No. But they can't say the letter was never brought in.”
 
@@ -94,7 +94,7 @@ There is anger and exhaustion, not a dramatic speech. The ward has gained **a po
 
 **SILAS:** “Not without an order. You know that.”
 
-*He points his hook at the Inkbound's papers.*
+*He points his hook at the Inkbound's two folded notes. They are visible in the player's hand, not owned inventory items.*
 
 **SILAS:** “What have you brought them?”
 
@@ -136,7 +136,7 @@ For either physical positioning choice, he instead says:
 
 - Stage 5 has **two distinct interactions**: inspect the fuel box and speak with the resident; then refuse Silas's paper demand and choose a position. No free item, lock-picking action, moral slider or custom minigame.
 - **One branch only:** know the appeal number (Commerce) **or** the passable route (Fieldcraft) **or** the delivered-but-short consignment (Industry). Do not manufacture the other two findings. The overarching Ward Six loss-sheet discovery belongs to all routes and remains recorded.
-- “Papers” are the player's ordinary work slips and recorded findings, **not irreplaceable physical loot to seize**. Silas has no authority to delete the player's earlier finding from the journal. Whether a branch paper is displayed physically is visual scripting TBD.
+- **User-approved paper continuity fix (2026-10-19):** all Stage 4 routes conclude with two small folded notes written by the Inkbound. These are physically **visible** in Stage 5 and Stage 6, but remain non-loot quest props, not inventory equipment. One records the shared Stage 3 observation and one the chosen Stage 4 fact. Silas demands these actual notes; he has no authority to destroy the player's recorded findings. The original fuel-office papers, survey map and cart receiving record remain with their institutions.
 - The padlocked communal box and stove are nearby props and readable obstacles. They **must not spontaneously supply fuel**, become a personal storage chest, or act as an automatic combat victory.
 - The player has **Scholarship +3**, the one +1 other Major Skill received once at Stage 3, 20 coins, Basic Clothes and a Crude Small Bag. No tutorial wages, ordinary XP, coins or drops.
 - If the player has taken time in Stage 4, arrival/scene scheduling must still let this confrontation occur without having the fuel watchman punish residents off-screen while the player is in an uninterruptible dialogue.
@@ -149,3 +149,5 @@ For either physical positioning choice, he instead says:
 **TBD:** final stove/box art, lock/seal ownership implementation, city map, exact watchman hook tool/stats and shared positioning mechanics.
 
 Related: [Inkbound master](README.md), [approved Stage 4 routes](second-task-branches.md), [Stage 6 approved encounter](silas-pumpard-fight.md), [shared combat/tutorial rules](../shared-structure.md).
+
+**User-approved editing note (2026-10-19):** The Stage 4 physical-note handoff and the resident's figurative “number/open lock” line were corrected without changing the player's approved three branch facts, Silas's speech, fight trigger or ending.
