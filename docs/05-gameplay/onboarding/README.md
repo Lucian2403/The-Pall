@@ -56,8 +56,10 @@
 - [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **APPROVED AND LOCKED 2026-10-17**, plain record-checking work and richer Erwin dialogue.
 - [Stage 3 — The Acceptable Losses discovery](inkbound/acceptable-losses-discovery.md) — **APPROVED AND LOCKED 2026-10-17**, exact Ward Six revelation and three skill choices.
 - [Stage 4 — The Coal Waiver / The Door Count / The Short Cart](inkbound/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-17**, distinct Contracts, Navigation and Hauling activities.
-- [Stage 5 — The Sealed Stove / The Coal Hook](inkbound/sealed-stove-confrontation.md) — **REVISED PROPOSAL 2026-10-19**, resident dialogue adjusted for literal, natural responses; pending approval.
-- [Stage 6 — Silas Pumpard's fight](inkbound/silas-pumpard-fight.md) — **PROPOSED 2026-10-17**, real victory/defeat, no stolen coal or combat loot; numbers TBD.
+- [Stage 5 — The Sealed Stove / The Coal Hook](inkbound/sealed-stove-confrontation.md) — **APPROVED AND LOCKED 2026-10-19**, includes corrected natural resident lines.
+- [Stage 6 — Silas Pumpard's fight](inkbound/silas-pumpard-fight.md) — **APPROVED ENCOUNTER 2026-10-19**, distinct win/defeat; global combat numbers TBD.
+- [Stage 7 — Clinic after Silas](inkbound/clinic-treatment.md) — **PROPOSED 2026-10-19**, ordinary ten-coin examination and condition-appropriate care.
+- [Stage 8 — Shared rented home and rent notice](shared-home-rent-ending.md) — **ALREADY LOCKED**, same speech and notice as all origins.
 
 ## Scrapper opening (current)
 
