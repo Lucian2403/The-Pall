@@ -22,6 +22,7 @@ Player activities, time, world economy and authored interactive events.
 ## First-session onboarding
 
 - [Six background folders and shared onboarding index](onboarding/README.md)
+- [Six-origin onboarding consistency audit (2026-10-19)](onboarding/audits/2026-10-19-six-origin-consistency-audit.md) — prioritized blockers, cross-origin continuity and implementation testing.
 
 - [Shared tutorial structure: unpaid work, +3/+1 skills, 10-coin care and common home/rent](onboarding/shared-structure.md)
 - [Shared Stage 8: identical home, rent notice and Millhand closing speech for all six backgrounds](onboarding/shared-home-rent-ending.md)
