@@ -1,5 +1,9 @@
 # Six-origin onboarding consistency audit — 2026-10-19
 
+## Final clinic policy decision — 2026-10-19
+
+**P0-01 is now RESOLVED IN DESIGN.** The user declined a minor pre-combat injury, asked whether making the enemy's *second* attack hit every time was a simpler alternative, then chose the fallback examination-only solution because a guaranteed second hit cannot reliably occur or cause damage in fair combat. **No first or second attack is forced to hit.** [Shared Stage 7 clinic policy](../shared-clinic-examination-policy.md) is **LOCKED**: every character pays exactly 10 coins for a real post-fight assessment; a healthy fighter is examined, shown “No injuries found. No treatment needed,” and receives **no fake treatment or restoration**. Genuine wounds are treated appropriately within the same fee. All six clinic documents, the shared state contract and common home document now reflect this rule. Implementation and QA are pending; the **remaining P0 combat/nonlethal/Health numerical design** is still open.
+
 ## Remediation update — user approved fixes, 2026-10-19
 
 The user approved the audit's recommended **continuity, source-tracking, literal-dialogue and shared state/QA fixes**. These changes have been entered into the approved story documents and [shared implementation contract](../shared-state-implementation-contract.md). **This is documentation/specification, not evidence of shipped code or successful playtests.** Previous findings below are preserved as the initial audit snapshot; this section records their updated disposition.
@@ -13,10 +17,10 @@ The user approved the audit's recommended **continuity, source-tracking, literal
 | **P1-03 state and duplicate transactions** | **SHARED SPECIFICATION APPROVED; NOT CODED** | [State/QA contract](../shared-state-implementation-contract.md) covers once-only +1, clinical debit, fight result, branch exclusivity and Stage 8 completion. Engine implementation and reconnect tests remain. |
 | **P1-04 exceptional work acceptance** | **SHARED SPECIFICATION APPROVED; NOT CODED** | Origin-by-origin acceptance semantics are in the [contract](../shared-state-implementation-contract.md); no amounts changed. |
 | **P1-06 job/time/solvency** | **TEST REQUIREMENTS ACCEPTED; NUMBERS TBD** | Comparable route effort, early interaction, job payout checks and rent shortfall tests are now explicit in the [contract](../shared-state-implementation-contract.md). Actual tuning remains. |
-| **P0-01 clinic / uninjured victory** | **UNRESOLVED, USER DECISION PENDING** | The user is considering a guaranteed first blow versus a transparent small pre-combat injury versus honest care for a healthy victor. No compulsory injury or new rule has been locked. |
+| **P0-01 clinic / uninjured victory** | **RESOLVED IN APPROVED DESIGN (2026-10-19); NOT CODED** | The user considered making the enemy's second hit guaranteed, but selected the fallback: normal combat, no forced hit/injury, then a **10-coin paid examination for everyone**. When unhurt, the clinician confirms no treatment is needed. [Central clinic rule](../shared-clinic-examination-policy.md) and all six Stage 7 files updated. |
 | **P0-02 nonlethal combat** | **DESIGN/TEST DIRECTION APPROVED; MECHANICS TBD** | One shared withdrawal/disengagement and nonlethal combat system is specified, without inventing enemy statistics or asserting that an engine exists. |
 
-**Important:** The underlying 10-coin clinic fee, common 20 → 10 balance, one +1 Major Skill on choice, and single shared home remain locked. Nothing in the repairs silently decides the injury guarantee or changes these numbers.
+**Important (updated 2026-10-19):** The 10-coin clinic charge and common 20 → 10 balance remain locked. **The injury guarantee is now explicitly rejected**: no guaranteed first/second enemy hit, no compulsory injury, and a healthy player receives an examination without needless treatment. Combat/injury numerical rules are still TBD. The one +1 Major Skill on choice and single shared home remain locked.
 
 
 **Audit type:** deep narrative, cross-origin, economy, skill, timing, NPC knowledge, combat/defeat, prop ownership, state transition and documentation consistency review.
@@ -157,7 +161,7 @@ The [Millhand master](../millhand/README.md) retained older “must suffer visib
 
 ## Recommended order of next work
 
-**First:** choose the shared perfectly-unhurt clinic behavior; define the shared basic turn-based nonlethal win/loss and injury/defeat mechanisms. These determine whether the last two tutorial stages can function honestly.
+**First (revised after user decision):** The [perfectly unhurt clinic policy](../shared-clinic-examination-policy.md) is now LOCKED: a paid ten-coin examination for uninjured and injured characters, with treatment only when needed and no forced first/second strike. **Next design priority is the shared turn-based nonlethal win/loss and injury/defeat mechanisms** and their real numerical balance.
 
 **Second:** resolve Inkbound's physical papers and repeated book-return staging **with user approval of any modified dialogue**, and specify Squatter herb provenance as a real work-data field. These are targeted continuity repairs, not new story arcs.
 
