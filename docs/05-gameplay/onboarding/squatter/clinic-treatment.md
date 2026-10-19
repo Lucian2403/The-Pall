@@ -38,7 +38,7 @@ The provider is a **role-labelled clinician** using the same medical service sys
 
 A **defeat** may involve an actual wound from the animal, and an affected player can receive basic treatment under the later injury rules. A **victory** might still include injury from an exchange; neither label by itself establishes which wound exists.
 
-Likewise, a flawless victory may cause **no injury at all**. The shared tutorial convention calls for a 10-coin visit, but it is still unresolved across all backgrounds exactly how examination-only cases work without punishing an unhurt character or quietly inventing damage. This stage **does not decide that global question** or contradict a clean combat result. Final costs/effects and any conditional examination dialogue must be reconciled across the shared clinic design before implementation.
+Likewise, a flawless victory may cause **no injury at all**. The user has **LOCKED the shared examination-only case (2026-10-19)**: an unhurt Squatter receives a normal check, sees **“No injuries found. No treatment needed.”**, pays 10 coins once and receives no fabricated wound, bandage or healing. A genuinely injured Squatter receives appropriate basic care included in that 10-coin fee. [Common policy](../shared-clinic-examination-policy.md).
 
 The clinician need not know about the buried bone, source-held herbs or Benny's philosophy. Don't insert a speech about the poorhouse or make this clinic conversation secretly another Herbalism job. If the player previously chose Medicine/Herbalism, that does not give free treatment, extra skill gains or an alternative paid fee.
 
@@ -58,6 +58,8 @@ Save the clinic-complete flag and debit atomically; a reload cannot charge anoth
 
 **Approved in Stage 7:** exact dialogue, examination wording, the single pay-and-care interaction in this Squatter scene and the outcome-aware but non-branching arrival. Preserve the spoken lines verbatim unless revised by the user.
 
-**TBD:** actual wound categories, severity, examination-only handling when unhurt, treatment outcomes and service timing. No additional wildlife-disease or infection system is established here.
+**TBD:** actual wound categories, severity, injury-specific treatment outcomes and service timing. **Examination-only handling when unhurt is LOCKED** by the shared policy. No additional wildlife-disease or infection system is established here.
 
 Related: [Stage 6 boar fight](boar-fight.md), [Squatter overview](README.md), [shared clinic](../shared-structure.md), [Millhand care reference](../millhand/clinic-treatment.md), [Bellrunner care reference](../bellrunner/clinic-treatment.md).
+
+**Shared Stage 7 policy LOCKED 2026-10-19:** All six clinics use a 10-coin post-fight examination with injury-appropriate basic care only when genuinely needed. No guaranteed attack hit, compulsory wound, needless treatment, second charge or special origin reward. See [central policy](../shared-clinic-examination-policy.md).
