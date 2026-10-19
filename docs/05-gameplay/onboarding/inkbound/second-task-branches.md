@@ -8,7 +8,7 @@ At Stage 3 the player chose **exactly one** route and was **already awarded +1 l
 
 These are urgent, uncommissioned visits or assistance with a routine work type, not paid shifts. **Each scripted route gives 0 coins, 0 ordinary XP and 0 loot**; outside onboarding, equivalent Contracts, Navigation and Hauling jobs give normal coins and XP. The user knows from Stage 3 that a Ward Six winter coal sheet calls nine projected deaths “acceptable.” Do not grant all three route findings to one character.
 
-Paper, route chalk, coal, carts and office writing supplies belong to their normal employers. Minor clerks, surveyors, drivers and residents need not have personal names.
+Original forms, route chalk, coal, carts and office records remain with their owners. **USER-APPROVED CONTINUITY FIX (2026-10-19):** before leaving the chosen job, the Inkbound writes **two small personal working notes** on ordinary spare paper: one notes the Ward Six coal reduction and the altered winter-loss entry remembered from Stage 3; the other records only the fact learned in the selected Stage 4 job. The official records stay where they belong. The two folded notes remain **visible, quest-only scene props carried to Stage 5 and Stage 6**, not owned inventory, tradeable items, free equipment or a reward. Minor clerks, surveyors, drivers and residents need not have personal names.
 
 ## Route A — The Coal Waiver (Commerce / Contracts)
 
@@ -57,7 +57,7 @@ Choose one ordinary Contracts approach:
 | **[Ask for the written reason]** | The clerk shows the instruction postponing appeals; the Inkbound records that the application is waiting, not approved |
 | **[Put the delay in writing]** | Enter an objection noting that the heating appeal was received but is being held until spring |
 
-Both lead to **[Enter the disputed status]**: the counter records a note that the residents' winter heating request is still unanswered and the delay is challenged. It does **not** approve coal, clear a payment, cancel the order or free the locked communal supply. Any note/copy stays within the job/journal record rather than becoming tradable paper.
+Both lead to **[Enter the disputed status]**: the counter records a note that the residents' winter heating request is still unanswered and the delay is challenged. It does **not** approve coal, clear a payment, cancel the order or free the locked communal supply. The official note/copy stays with the fuel office and in the journal; the player's separate short working notes from the shared Stage 4 handoff are only untradeable scene props.
 
 **CLERK:** “I'll note the objection. I can't change the order.”
 
@@ -114,7 +114,7 @@ At a yard entrance, piles of rubbish block the shortest way into the row of home
 
 **Branch finding:** **The supposed empty buildings are occupied; a resident is burning floorboards; a workable coal-cart route is marked.** This is evidence and access, **not** an automatic coal delivery or the relocation of all the residents.
 
-**[Hand over the route notes]** ends this one emergency check. Normal Navigation jobs of this kind are ordinarily paid; this visit was not a commissioned survey.
+**[Hand over the route notes]** returns the original mapping sheet to the route worker. The player keeps only their own short handwritten summary of the passable street and occupied doors, following the shared Stage 4 work-note rule. Normal Navigation jobs of this kind are ordinarily paid; this visit was not a commissioned survey.
 
 ## Route C — The Short Cart (Industry / Hauling)
 
@@ -167,9 +167,9 @@ No hauling skill gate strands the new character. The driver and the cart remain 
 
 **RECEIVER:** “Then put the shortage on the paper. Don't have them saying we lost it here.”
 
-**[Record what actually arrived]** — mark the difference between the promised load and real delivery. The receiving note doesn't turn missing coal into delivered coal, nor does it let the player open a padlocked communal coal box.
+**[Record what actually arrived]** — record the difference between the amount ordered and the sacks actually delivered. The receiving clerk keeps the delivery record; the player copies the shortage into their own brief working note without acquiring the official slip. This doesn't supply the missing coal or let the player open the padlocked communal coal box.
 
-**Branch finding:** **The contracted cart contained far less coal than Ward Six was promised. The player ensured the smaller shipment arrived and its shortage was recorded.** No permanent fuel supply, proof of theft or magically filled households.
+**Branch finding:** **The loaders put far less coal on the Ward Six cart than the city had ordered. The player ensured the smaller shipment arrived and its shortage was recorded.** No permanent fuel supply, proof of theft or magically filled households.
 
 ## Stage 4 end: one finding, one return path
 
@@ -181,7 +181,7 @@ After **exactly one** of these jobs, the player continues by ordinary city movem
 | **The Door Count** | The listed houses are occupied, one tenant burns floorboards, and a coal-cart route is marked | No new coal has been delivered through this task |
 | **The Short Cart** | The delivered consignment is badly short, and the smaller load's arrival was recorded | It will not heat the ward through winter |
 
-At the sealed box the player may present only **their chosen branch's evidence**. Do not manufacture an appeal reference for the driver branch or make the Contracts player know the secret side streets.
+**[Write down what you found] → [Fold the two working notes]** is the common, short Stage 4 closing action (included in the ordinary job closeout, not a separate reward phase). One small note records the shared Ward Six loss-sheet observation from Stage 3; the second records the **one** selected branch finding. Both are visible quest props carried to Stage 5, then retained after Stage 6 regardless of victory/defeat; no permanent equipment or tradeable paper is added. The original office sheets, route map and delivery tally stay with their owners. At the sealed box the player may present only **their chosen branch's evidence**. Do not manufacture an appeal reference for the driver branch or make the Contracts player know the secret side streets.
 
 ## Common gameplay, money and safety rules
 
@@ -199,3 +199,5 @@ At the sealed box the player may present only **their chosen branch's evidence**
 **TBD:** exact form fields, coal quantities, cart carrying figures, route distances, time costs, currency and XP on normal repeatable jobs, and item assets.
 
 Related: [Inkbound master](README.md), [Stage 3 approved](acceptable-losses-discovery.md), [shared onboarding](../shared-structure.md), [dialogue guide](../../interactions/dialogue-style-guide.md).
+
+**Continuity correction APPROVED 2026-10-19:** Every branch now closes with the same two small working notes, one common Stage 3 fact and one route-specific fact; these are quest props, never reward inventory. Silas can truthfully demand physical papers in Stage 5 regardless of the selected branch, without having read secret official records.
