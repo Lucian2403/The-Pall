@@ -36,7 +36,7 @@ Only the **content** varies by origin. The same stage-completion service, idempo
 | `home_notice_status` | not entered, entered, read, dismissed/completed | single shared home, single rent notice and closing line; no replay after completed |
 | `recorded_work_props` | non-loot per-scene custody/notes/consignment labels | never add to normal tradeable inventory |
 
-**Unresolved global decision:** whether the tutorial guarantees a visible real injury, uses a useful medical examination when unhurt, or changes the clinic payment for a no-damage fight. The user requested options; **no injury mechanism, forced hit or exemption is approved here**. Until resolved, preserve actual Health and the proposed fixed 10-coin shared tutorial charge without inventing treatment.
+**USER DECISION LOCKED 2026-10-19:** The [common clinic examination policy](shared-clinic-examination-policy.md) adopts an ordinary 10-coin post-fight examination even if the player is unhurt, with actual basic care only when needed. **No first- or second-hit 100% accuracy override, scripted wound or pre-fight injury.** All regular attacks obey combat rules. Persist actual Health and do not award medical effects where none are required.
 
 ## Per-origin acceptance rules
 
@@ -74,7 +74,7 @@ Only the **content** varies by origin. The same stage-completion service, idempo
 
 1. The fight records **a legitimate win or legitimate loss**, using a shared nonlethal/disengagement model that also supports the boar's withdrawal. No guaranteed scripted win, forced confiscation or invented weapon rewards.
 2. **Win and lose** both lead to the same normal care service with actual current Health and injuries. Defeat-safe bystanders must have a grounded presence and may not overwrite a defeat into victory.
-3. The canonical onboarding service currently costs exactly 10 coins, taking 20 → 10 when resolved. **The unhurt-character treatment rationale is still unresolved and blocks final implementation.**
+3. **LOCKED:** the canonical onboarding medical **examination** costs exactly 10 coins (20 → 10). With no actual injury, show **“No injuries found. No treatment needed.”** and provide no unwarranted healing; if injured, include appropriate basic treatment in the same fixed fee. There is no guaranteed first/second combat hit, and the [shared clinic policy](shared-clinic-examination-policy.md) replaces the former open edge case.
 4. Treat clinic payment and completion as **one idempotent server transaction**; retries/reloads must not double-charge.
 5. Use the **same home identifier, same rent-notice asset and same stored closing speech** regardless of origin. Rent notice is provisionally “RENT / 150 coins owing.” Rent is not charged at the tutorial; no due date/eviction.
 6. Dismissal of the notice atomically marks onboarding completed. Another reload should not replay the speech or reapply skill, combat or clinic changes.
@@ -86,9 +86,9 @@ Only the **content** varies by origin. The same stage-completion service, idempo
 - 6 Stage 2 jobs complete with no normal wages/XP; verify acceptance rules and stage boundaries.
 - 18 distinct Stage 3/4 branches — exactly one +1 each, different Major Skill, one unique fact, no route leakage.
 - **36 full E2E route/outcome combinations** = 6 origins × 3 choices × 2 legitimate fight outcomes, including one shared clinician and common home.
-- Repeat tests for Stage 5 stances, job mistake correction, one healed/wounded state, an **unhurt victory once clinic policy is decided**, 2× client click, and reload/disconnection immediately before and after skill award, combat resolution, care debit and notice dismissal.
+- Repeat tests for Stage 5 stances, job mistake correction, **one genuine unhurt victory and wounded victory/defeat under the locked 10-coin examination policy**, 2× client click, and reload/disconnection immediately before and after skill award, combat resolution, care debit and notice dismissal.
 - Verify the young boar can **withdraw as a genuine PvE win**, humans can stop fighting without mandatory murder, all characters are beatable as unarmed beginners, and pre-fight positions give real effects.
 - Validate earned money via actual paid jobs after Stage 8; the tutorial's 140-coin rent shortfall must be serviceable once normal wages and rent terms are designed.
 - Validate that game dialogue uses concrete period-appropriate words, not metaphors/personification newly introduced after 2026-10-19, and character-specific speech approved by the user is preserved unless an approved correction supersedes it.
 
-**Change control:** The user approved the audit's consistency repairs and shared implementation direction on 2026-10-19. This document **does not** approve combat/medical balancing, a compulsory first hit, a new player injury, specific monetary job rewards, final rent values or any unrequested additional NPC dialogue.
+**Change control:** The user approved the audit repairs, shared implementation direction and **post-fight clinic examination for genuinely unhurt characters** on 2026-10-19. This document **does not** approve combat/medical balancing, a compulsory first/second hit, an invented injury, specific non-tutorial wage amounts, final rent terms or new mandatory NPC dialogue.
