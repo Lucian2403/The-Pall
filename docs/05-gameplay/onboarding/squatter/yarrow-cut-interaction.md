@@ -6,7 +6,7 @@
 
 The player has accepted Benny's yarrow order. **[Check the order board]** opens the normal Foraging work details: assigned quantity, target plant, marked route, work estimate, the need to preserve regrowth, and the job's **buyer acceptance still pending**. Exact count and duration remain TBD. The initial order is for **usable cut stems**, not roots or an entire uprooted plant.
 
-**[Follow the marked path]** takes the player to a safe, familiar yarrow patch in the protected outskirts near Hedge Shelter. The job remains doable with Basic Clothes and a Crude Small Bag. No starter knife or special gathering tool is assumed. The ordinary Foraging system must offer a supported hand-harvesting/available-site-tool method rather than create a free permanent knife.
+**[Follow the marked path]** takes the player to a familiar yarrow patch in the protected outskirts near Hedge Shelter. **User-approved audit correction (2026-10-19):** record the specific source section of every harvested work-order bundle **without** revealing why the lower edge later becomes suspect. The work area includes a **dry upper public section** and another clearly separately marked section nearer the old drainage boundary; the later [Warm Patch](warm-patch-discovery.md) reveal stays hidden until after the routine job is done. The job remains doable with Basic Clothes and a Crude Small Bag. No starter knife or special gathering tool is assumed. The ordinary Foraging system must offer a supported hand-harvesting/available-site-tool method rather than create a free permanent knife.
 
 ## S02-B — Identify yarrow
 
@@ -25,11 +25,13 @@ After identifying the herb, the player chooses a harvest approach. Both use the 
 
 Neither is a permanent morality label or secret faction reputation. A poor choice can affect time/patch condition under standard systems but cannot destroy the only required tutorial source or make the player unable to complete the job. The offered harvest is no more than the patch can reasonably supply; actual quantity and regrowth mathematics remain TBD.
 
+**Provenance handling, approved:** both harvest approaches allow normal gathering from the mapped upper section; a quicker dense-clump choice may concentrate harvesting pressure but does **not** erase source labels. The tutorial records an actually gathered, separately bundled **upper-section portion** in both variants, sufficient for later buyer inspection, alongside potentially questionable stems from the rest of the working bed. Neither portion is announced as contaminated or medically safe at this stage. The future buyer needs positive source evidence and condition checks before accepting stock, not an assumption that healthy-looking herbs are clean.
+
 **No extra voiced lesson from Benny here.** He gave the job instruction in Stage 1; repeating his love of nature at every click would cheapen it.
 
 ## S02-D — Sort a mixed bundle
 
-On completing the cut, the normal quality-sorting panel shows acceptable yarrow stems and a few stems damp or muddied through ordinary field handling. This is **not yet the medical refuse or outfall revelation**.
+On completing the cut, the normal quality-sorting panel shows acceptable yarrow stems and a few stems damp or muddied through ordinary field handling. **Keep a source-section marker on each bundle** through the sorting, handover and later buyer inspection: `upper_dry_public` or `near_drain_edge` (working data values, not finalized item IDs). Sorting by dampness cannot erase where the stems came from. This is **not yet the medical refuse or outfall revelation**.
 
 **[Check the cuttings]** presents one representative quality decision:
 
@@ -40,7 +42,7 @@ If a sufficient usable quantity is not obtained, **[Gather the shortfall]** retu
 
 ## S02-E — Return to Benny, weigh and finish the ordinary work
 
-**[Return to Hedge Shelter]** brings the cuttings to the familiar communal scale. **[Weigh the usable stems]** compares the work order to the accepted sorted quantity; if it is short, show the difference and allow an ordinary small correction. Benny may check the roots/stems visually, but this is not another multi-paragraph speech.
+**[Return to Hedge Shelter]** brings the cuttings to the familiar communal scale. **[Weigh the usable stems]** compares the work order to the accepted sorted quantity; if it is short, show the difference and allow an ordinary small correction. Benny's ordinary receipt records total usable weight **and bundled source sections**, retained with his custody of the consignment. No new player-owned yarrow item is created. Benny may check the roots/stems visually, but this is not another multi-paragraph speech.
 
 **Approved brief receipt exchange (spoken only after the job quality check):**
 
@@ -67,6 +69,7 @@ Stage 3 must not be framed as Benny sending the Squatter into a suspected hazard
 - False plant ID or inadequate count prompts a fair correction/recollection path, never an irreversible failure or exposure to danger zones.
 - No new bespoke Yarrow tier, plant equipment, inventory item, recipe, new named NPC or permanent injury is defined.
 - Any saved patch pressure uses global environmental resource rules; tutorial access to common yarrow remains reliable despite shared-world depletion.
+- **Harvest provenance is mandatory work data:** each consignment section retains source area, separated bundle and condition flags. The upper/dry portion is eligible for later verification, **not automatically declared clean**. The near-drain section is put on hold when the Stage 3 evidence is discovered. This must work for either Stage 2 harvest approach.
 - The first job's pending acceptance is **not** a final ruling that the whole load is safe, nor a secret assumption about the eventual contaminated patch.
 
 ## Approval boundary
