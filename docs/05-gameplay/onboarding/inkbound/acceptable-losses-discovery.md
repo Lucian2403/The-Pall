@@ -4,7 +4,7 @@
 
 ## I03-A — An extra page
 
-**Trigger:** only after the player has completed the usual [Winter Register](winter-register-interaction.md) work: compared both lists, dealt with the blurred entry, returned the old books, handed Erwin the clean copy and had the ordinary task closed. This supplementary sheet never appears in the normal copy/verification choices and is not a repeatable discovery on future paid office work.
+**Trigger:** only after the player has completed the usual [Winter Register](winter-register-interaction.md) work: compared both lists, dealt with the blurred entry, handed Erwin the clean copy, returned the old books as instructed and had the ordinary task closed. This supplementary sheet never appears in the normal copy/verification choices and is not a repeatable discovery on future paid office work.
 
 *Erwin opens a separate winter volume to put the finished copy with the office papers. A thin folded sheet slips from between its pages and lands beside the player's hand. It is not part of the clean household copy just finished.*
 
@@ -62,7 +62,7 @@ The loose paper is a **quest finding**, not a tradeable item. The official recor
 
 *He looks at the open book, then straightens the loose sheet.*
 
-**ERWIN:** “The clean copy is done. Put the other books away. Leave this one with me.”
+**ERWIN:** “The clean copy is done. Leave this sheet with me. You've other work to see to.”
 
 Erwin believes polished manners and official rank deserve deference, even as the meaning of the page clearly unsettles his orderly world. His language drops abruptly at the prospect of losing money and status. He is protecting the municipal contract that pays for ordinary office work; his fear is real, but it does not make the document harmless or establish that he approved it. Nor does he reveal a secret author or suddenly offer to lead a resistance.
 
@@ -84,7 +84,7 @@ A. **PLAYER:** “I'll go to the coal office. I want to see who signed this.”
 
 B. **PLAYER:** “I'm going to those houses. Somebody ought to count the people who live there.”
 
-C. **PLAYER:** “I'll find the coal cart. The numbers on this page don't heat a room.”
+C. **PLAYER:** “I'll find the coal cart. Those people still need coal this winter.”
 
 Erwin's response is identical to all three:
 
@@ -108,3 +108,5 @@ He wants the copying office left out of a potentially embarrassing dispute. He h
 **TBD:** source handwriting/ink art, actual coal amounts, household identities, municipal form layout, service addresses, timings and numerical job systems.
 
 Related: [Inkbound master](README.md), [approved Winter Register Stage 2](winter-register-interaction.md), [approved Stage 4 jobs](second-task-branches.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md).
+
+**User-approved continuity/literal-dialogue correction (2026-10-19):** Erwin no longer orders a second return of books that the player already shelved at the end of Stage 2. The physical stage order and one line are deliberately amended; the authorized-loss clue, personality, branch choices and timing are unchanged.
