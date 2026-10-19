@@ -1,6 +1,6 @@
-# Inkbound — Stage 7: Clinic After the Fuel Watchman (PROPOSED)
+# Inkbound — Stage 7: Clinic After the Fuel Watchman (APPROVED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-19); NOT LOCKED.** Inkbound [Stage 5](sealed-stove-confrontation.md) and [Stage 6](silas-pumpard-fight.md) are APPROVED AND LOCKED at scene/encounter level, while the ordinary **10-coin** medical visit, original 20-coin starting amount and the [identical shared Stage 8](../shared-home-rent-ending.md) are already locked for every origin. This page proposes **the precise Inkbound clinic dialogue** and applies the existing reusable Care / Treatment flow, without adding a special clinic, medical effect or new named character.
+**Status: APPROVED AND LOCKED (2026-10-19).** The user approved this ordinary clinic arrival, literal clinician dialogue, 10-coin charge and handoff to the single shared home and rent scene. All eight Inkbound narrative onboarding stages are now approved (Stage 8 uses the already locked shared scene). Inkbound [Stage 5](sealed-stove-confrontation.md) and [Stage 6](silas-pumpard-fight.md) are APPROVED AND LOCKED at scene/encounter level, while the ordinary **10-coin** medical visit, original 20-coin starting amount and the [identical shared Stage 8](../shared-home-rent-ending.md) are already locked for every origin. This page proposes **the precise Inkbound clinic dialogue** and applies the existing reusable Care / Treatment flow, without adding a special clinic, medical effect or new named character.
 
 ## S07-A — Leave Ward Six and seek care
 
@@ -11,7 +11,7 @@ Silas Pumpard has stopped attacking, and the ordinary residents have already hea
 - **Both paths:** the player still has **20 coins, Basic Clothes and a Crude Small Bag** before this consultation, together with Scholarship +3 and the one previously granted +1 in Commerce, Fieldcraft or Industry. Silas took no money or belongings; the initial jobs and fight offered zero wages, XP or loot.
 - The provider is an **unnamed CLINICIAN** at a regular city care service. No exclusive Inkbound treatment location, Erwin appearance, new clinician name or special combat-injury item is established.
 
-## S07-B — Dialogue (proposed exact lines)
+## S07-B — Dialogue (approved exact lines)
 
 *At the ordinary clinic, a clinician looks up as the Inkbound comes inside.*
 
@@ -72,7 +72,7 @@ After the line, the normal housing/earnings/crafting game opens. Do **not** crea
 - Player retains basic starting kit; only the single clinic charge reduces 20 coins to 10 during onboarding. First and second tutorial jobs and the fight award **0 coins, 0 ordinary XP and 0 loot**.
 - No new named person, hospital, political power, hidden injury, clinical item or medical mechanic is introduced.
 - **Already locked:** 10-coin ordinary care, shared Health UI, common home/notice/exact closing line, win-or-lose progression and no tutorial loot.
-- **Proposed for Stage 7 approval:** the short literal clinician/player exchange and this origin's simple arrival wording. Once Stage 7 is approved, all eight Inkbound narrative stages will be completed, with Stage 8 already approved globally.
+- **APPROVED IN STAGE 7:** the short literal clinician/player exchange and this origin's simple arrival wording. With Stage 8 already locked globally, all eight Inkbound narrative stages are complete.
 - **Still TBD:** game-wide actual combat values, injury/Health effects, examination-only handling for the unhurt, clinic service durations, regular clinic pricing and final rent system.
 
 Related: [Inkbound master](README.md), [approved Silas fight](silas-pumpard-fight.md), [common Stage 8](../shared-home-rent-ending.md), [shared tutorial structure](../shared-structure.md), [approved Scrapper clinic reference](../scrapper/clinic-treatment.md).
