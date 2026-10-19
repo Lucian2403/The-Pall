@@ -44,7 +44,7 @@ The Smithing foreman gives the player ordinary piecework on identification plate
 3. **First choice (locked set):** **Restamp it**, **Question the foreman**, or **Record the number**.
 4. **First-task closure:** Guther withholds the Smithing wages because the stamped lot is disputed; the scripted task yields 0 coins and 0 ordinary XP. Regular Smithing jobs outside the tutorial still pay. **Do not end the Millhand tutorial quest and do not reveal rent yet.**
 5. **Second job (choice-dependent):** Each response logically sends the character to **one normal, playable job belonging to a different Major Skill**; generic work interactions first, any route-specific discovery/conversation afterwards. The selected different Major Skill receives **+1 level once when this branch is chosen**. This scripted task gives 0 coins / 0 ordinary XP; equivalent normal jobs still pay.
-6. **After the second job, tutorial continues:** two additional player interactions lead to a short PvE fight with an in-world credible opponent. Afterwards, the injured character must access a city treatment or patching interaction, return home with limited coins, and **only then** encounter the rent-due notice. This ends the tutorial; it is **not** the main storyline.
+6. **After the second job, tutorial continues:** two additional player interactions lead to a short PvE fight with an in-world credible opponent. Afterwards, the character must access the shared city care service (treating only actual injuries), return home with limited coins, and **only then** encounter the rent-due notice. This ends the tutorial; it is **not** the main storyline.
 
 Job timers continue during interactions under the general [Jobs and Time](../../jobs/jobs-and-time.md) rules. Both job segments use reusable mechanics that also work outside onboarding.
 
@@ -106,10 +106,10 @@ All three second-job routes return toward the same shared starter-home route as 
 - **Enemy intent preview:** show an intelligible tell such as **"preparing a heavy swing"** or **"recovering from a missed strike"** before the player's choice. Teach recognition of attack patterns without a long text tutorial.
 - **Player actions (illustrative categories):** **Strike** (deal damage when there is an opening); **Guard** (reduce incoming damage / endure the swing); **Reposition** (trade immediate offence for an opening or safer next exchange). Exact Stamina costs, hit probabilities and numbers depend on the general combat design.
 - **Suggested sequence:** defend or reposition against an obvious swing; exploit a short recovery window; finish the staggered enforcer with a couple of sensible exchanges. Wrong decisions cause noticeable extra harm, not an automatic defeat. **Avoid a fixed "press three buttons to win" script**; enemy choices, guard and position should matter.
-- **Outcome:** the enforcer backs away, drops the demand or is subdued. The character remains alive but has a **visible minor injury or Health deficit** needing patching. The antagonist's retreat should resolve the street conflict locally—no forced killing, execution animation or crime/reputation system. Do not award combat/Arms XP during this tutorial.
+- **Outcome:** the enforcer backs away, drops the demand or is subdued. The character remains alive, with their **actual combat Health and any real injuries** carried into the approved clinic; a perfect victory may leave them uninjured. The antagonist's retreat should resolve the street conflict locally—no forced killing, execution animation or crime/reputation system. Do not award combat/Arms XP during this tutorial.
 - **Defeat safety:** if the player loses, the encounter still advances to the medical scene via an appropriate narrative rescue or aid, with appropriately handled injury and the same fixed 10-coin tutorial treatment. Do not make the opening loop unwinnable, force a character reset, or confiscate indispensable starting items.
 
-**Difficulty target:** an attentive new player should win and need care; reckless attacks should leave the player substantially worse off. The exact injury bands, Health values and enemy tuning remain **unapproved** and must be tested using starting 50 maximum Health and baseline Arms skill.
+**Difficulty target (superseded injury assumption corrected):** an attentive new player should have a real chance to win without guaranteed injury; reckless attacks may leave the player substantially worse off. The exact injury bands, Health values and enemy tuning remain **unapproved** and must be tested using starting 50 maximum Health and baseline Arms skill.
 
 ### Early healing design notes (superseded by the approved Stage 7 scene above)
 
@@ -127,11 +127,14 @@ All three second-job routes return toward the same shared starter-home route as 
 
 ### Additional legacy care considerations (refer to approved Stage 7 clinic file)
 
-- After the fight, the player is **hurt enough to need a patch-up**, even though the encounter is survivable; introduce Health, a minor treatable injury, and the city healing service. This must teach a reusable **Medicine / Trauma or NPC care** pathway, not a tutorial-exclusive miracle.
+**Audit clarification (2026-10-19):** Earlier suggestions in this master about every fight causing a visible wound are **SUPERSEDED** by the approved Stage 6–7 fight/clinic scene and shared Health rule: no compulsory or hidden injuries. The 10-coin consultation remains approved, and the uninjured case is an unresolved global design question.
+
+
+- After the fight, the player visits the shared **10-coin city clinic**; only a wound sustained under the actual combat system may be treated. This **supersedes the old assumption of a compulsory minor injury**. This must teach a reusable **Medicine / Trauma or NPC care** pathway, not a tutorial-exclusive miracle.
 - A cheap **city infirmary, surgeon or clinic attendant** treats the character for a **small but meaningful fee** so 10 of the starting 20 coins are spent. The clinician's identity, injury type, healing amount and defeat-to-care transition are TBD.
 - Avoid permanent loss, long convalescence or a service price that makes onboarding impossible. A self-patch alternative is not required unless explicitly approved.
 
-### Home and rent reveal (LOCKED SEQUENCE; Stage 8 wording PROPOSED)
+### Home and rent reveal (LOCKED SEQUENCE; Stage 8 exact wording APPROVED and SHARED)
 
 - The character **returns home after getting patched up**, carrying **little money** relative to coming expenses. This is the first tutorial's natural final location and the point at which the player learns about rent due.
 - The rent notice must appear **at home, after treatment**, not at the foreman's workplace or immediately after the second job. The home is identical for all backgrounds; rent is provisionally 150 coins. Address, deadline, rental authority and penalties remain to be designed.
