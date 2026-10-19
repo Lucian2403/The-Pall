@@ -56,7 +56,7 @@
 - [Stage 2 — The Winter Register](inkbound/winter-register-interaction.md) — **APPROVED AND LOCKED 2026-10-17**, plain record-checking work and richer Erwin dialogue.
 - [Stage 3 — The Acceptable Losses discovery](inkbound/acceptable-losses-discovery.md) — **APPROVED AND LOCKED 2026-10-17**, exact Ward Six revelation and three skill choices.
 - [Stage 4 — The Coal Waiver / The Door Count / The Short Cart](inkbound/second-task-branches.md) — **APPROVED AND LOCKED 2026-10-17**, distinct Contracts, Navigation and Hauling activities.
-- [Stage 5 — The Sealed Stove / The Coal Hook](inkbound/sealed-stove-confrontation.md) — **PROPOSED 2026-10-17**, resident dialogue, branch-specific findings and Silas confrontation.
+- [Stage 5 — The Sealed Stove / The Coal Hook](inkbound/sealed-stove-confrontation.md) — **REVISED PROPOSAL 2026-10-19**, resident dialogue adjusted for literal, natural responses; pending approval.
 - [Stage 6 — Silas Pumpard's fight](inkbound/silas-pumpard-fight.md) — **PROPOSED 2026-10-17**, real victory/defeat, no stolen coal or combat loot; numbers TBD.
 
 ## Scrapper opening (current)
