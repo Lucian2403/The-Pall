@@ -28,6 +28,8 @@ Normal, reusable Foraging interactions:
 
 **Source-of-truth economy guardrail:** Herb material has **no Crude–Masterwork tier**; patch population and harvest pressure are shared-world rules. Introductory required common Yarrow must remain obtainable even when the world patch is depleted or other players have harvested it.
 
+**User-approved harvest provenance repair (2026-10-19):** [Yarrow Cut Stage 2](yarrow-cut-interaction.md) now retains the source section for each harvested bundle under either harvest method. [Stage 4 Apothecary's Weighing](second-task-branches.md) consults those records before accepting the separate dry-upper-ground portion and holds suspect stems. This does not reveal the old outfall during Stage 2 or establish a new disease mechanic. The implementation requirement is included in the [shared onboarding contract](../shared-state-implementation-contract.md).
+
 ## The Warm Patch — LOCKED tutorial-only twist
 
 [Stage 3 scene, clues and branch handoffs](warm-patch-discovery.md) are approved and locked. [Stage 4 route work/dialogue](second-task-branches.md) is approved.
