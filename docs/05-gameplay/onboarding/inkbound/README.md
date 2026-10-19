@@ -4,7 +4,7 @@
 
 **Status: OPENING STORY APPROVED AND LOCKED (2026-10-14).** The user approved **Civic Copying Office**, regular NPC **Erwin Buro, Senior Copy Clerk**, **The Winter Register**, **The Acceptable Losses**, all three second-skill jobs, **The Sealed Stove**, **The Coal Hook**, opponent **Silas Pumpard, Fuel Watchman**, healing (10-coin tutorial treatment) and common home/rent ending. Starting **Scholarship +3**, universal starting kit and [Shared Tutorial Structure](../shared-structure.md) remain locked. Numerical balancing, combat mechanics and any implications beyond this self-contained incident are not yet defined.
 
-**Stages 1–2 APPROVED AND LOCKED (2026-10-17):** [Erwin Buro's opening dialogue](opening-dialogue.md) and [The Winter Register interactions and dialogue](winter-register-interaction.md) were approved with his user-defined contrast between genteel affectation and ordinary clerk speech. **Stage 3 — [The Acceptable Losses discovery](acceptable-losses-discovery.md) and Stage 4 — [The Coal Waiver / The Door Count / The Short Cart](second-task-branches.md) are APPROVED AND LOCKED (2026-10-17)**. **Stage 5 — [The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) is a REVISED PROPOSAL (2026-10-19), and Stage 6 — [Silas Pumpard's fight](silas-pumpard-fight.md) remains PROPOSED (2026-10-17)**; their new dialogue and encounter outcomes await approval. Global combat figures remain TBD.
+**Stages 1–2 APPROVED AND LOCKED (2026-10-17):** [Erwin Buro's opening dialogue](opening-dialogue.md) and [The Winter Register](winter-register-interaction.md) preserve the approved dialogue and Scholarship work. **Stages 3–4 APPROVED AND LOCKED (2026-10-17):** [The Acceptable Losses](acceptable-losses-discovery.md) and [the three second-skill jobs](second-task-branches.md). **Stage 5 [The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) APPROVED AND LOCKED (2026-10-19)** and **Stage 6 [Silas Pumpard's fight](silas-pumpard-fight.md) APPROVED AT ENCOUNTER LEVEL (2026-10-19)**. **Stage 7 [ordinary clinic](clinic-treatment.md) PROPOSED (2026-10-19)**; Stage 8 is the already approved shared home and rent scene.
 
 **Universal Stage 8 (LOCKED 2026-10-15):** After the 10-coin clinic visit, use the identical [shared rented home, rent notice and exact Millhand-origin closing speech](../shared-home-rent-ending.md) that applies to all six backgrounds. Do not draft a different closing speech for this origin.
 
@@ -55,7 +55,7 @@ All three second tutorial tasks reuse genuine normal gameplay but give 0 coins/o
 
 ## Two follow-up interactions and common enemy (LOCKED narrative)
 
-**Stage 5 — [The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) is a REVISED PROPOSAL (2026-10-19), and Stage 6 — [Silas Pumpard's fight](silas-pumpard-fight.md) remains PROPOSED (2026-10-17)**. The new documents supply branch-specific resident exchanges, a confrontational fuel watchman, three positional choices and real combat win/lose consequences without opening the locked coal box. The pre-existing story events and Silas identity remain locked; **new dialogue and fight staging are NOT yet approved**.
+**Stage 5 — [The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) and Stage 6 — [Silas Pumpard's fight](silas-pumpard-fight.md) are APPROVED (2026-10-19)**. Exact dialogue and fight outcome are locked, including the corrected natural resident lines, the witnessed defeat and the unchanged locked coal box. Specific combat numbers remain TBD.
 
 
 **Interaction 1 — The Sealed Stove:** On the route toward home, the Inkbound sees a padlocked communal coal box outside a cold tenement. A resident asks whether the census writer has come to count the living or the dead. The player may show their branch's docket, inspect the sealed box or identify the shortage. Each route yields different intelligible dialogue and a small immediate consequence: an appeal number, a safe access route or one arriving cart. None magically replaces an entire winter ration.
@@ -66,7 +66,7 @@ All three second tutorial tasks reuse genuine normal gameplay but give 0 coins/o
 
 ## Healing and the last page
 
-After the fight the Inkbound is visibly injured and must use the regular paid clinical treatment process, spending the fixed **10-coin** tutorial fee. They return to the **same shared starter home used by every background**, with **10 coins left**. The same bureaucracy that calculated *acceptable losses* has left a **rent-due notice** on their door.
+After the fight, the Inkbound may have **real injuries according to the actual combat result**; never invent a wound after a flawless victory. The [Stage 7 ordinary medical visit](clinic-treatment.md) is **PROPOSED (2026-10-19)** using the common 10-coin consultation and TBD Health system. Then the player returns to the **same shared starter home**, with 10 coins remaining, and triggers the [one common Stage 8 rent notice and identical approved closing speech](../shared-home-rent-ending.md). No Inkbound-specific home or closing dialogue is created.
 
 The episode ends. The ward has obtained a small practical reprieve according to the chosen route; the mortality allowance isn't overturned by one junior scribe, and nothing about this quest starts the overarching main storyline.
 
