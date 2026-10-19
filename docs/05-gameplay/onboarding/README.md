@@ -14,7 +14,8 @@
 ## Shared, not background-specific
 
 - [Common Background Tutorial Structure](shared-structure.md): universal kit, job progression, +3/+1 Major Skill rules, clinic, one starter home, rent sequence and tutorial reward override.
-- [Six-origin deep consistency audit (2026-10-19)](audits/2026-10-19-six-origin-consistency-audit.md): approved-arc coverage, blocking mechanics, Inkbound handoff gaps, legacy document cleanup and implementation QA matrix.
+- [Six-origin deep consistency audit (2026-10-19)](audits/2026-10-19-six-origin-consistency-audit.md): baseline findings plus a dated remediation table for user-approved fixes.
+- [Shared onboarding state and QA contract (2026-10-19)](shared-state-implementation-contract.md): one-time rewards/payments, per-origin pay acceptance, evidence custody, early job interactions, actual win/defeat and 36 end-to-end test cases. This is **approved design, not programmed functionality**.
 - [Shared Stage 8 home and rent notice](shared-home-rent-ending.md): **one identical rent scene and verbatim Millhand closing speech for all six origins**; no origin-specific variants.
 - [NPC and Dialogue Backlog](npc-dialogue-backlog.md): remaining character dialogue and interaction work across all six.
 - [Game-wide Spoken Dialogue Standard](../interactions/dialogue-style-guide.md): locked writing rules and tonal reference for NPC speech.
