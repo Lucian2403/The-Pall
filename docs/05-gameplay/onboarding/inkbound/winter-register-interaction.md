@@ -94,7 +94,7 @@ The clipped **“Allow me”** and **“if you please”** are the voice Erwin w
 
 **[Check the clean copy]** — a readable line-by-line check shows whether the corrected count and smudged entry were copied accurately. If not, the player **[Correct the marked line]** before submitting.
 
-**[Put the books back] → [Give Erwin the copy]**
+**[Give Erwin the copy]**
 
 *Erwin reads down the clean page. The corrected household count is marked, and the blurred line has been checked against the older book. He straightens the finished copy on his desk.*
 
@@ -108,7 +108,7 @@ The clipped **“Allow me”** and **“if you please”** are the voice Erwin w
 
 **ERWIN:** “Put them back, carefully. That cover's nearly worn through, and we've no money for another.”
 
-**[Finish the work]** — closes the normal **The Winter Register** job. This exceptional office correction round gives **0 coins and 0 ordinary Scholarship XP** as advertised before entry. The player keeps their original 20 coins, Basic Clothes, Crude Small Bag and Scholarship +3. No ordinary copying task is being disguised as a quest reward.
+**[Put the books back] → [Finish the work]** — closes the normal **The Winter Register** job. This exceptional office correction round gives **0 coins and 0 ordinary Scholarship XP** as advertised before entry. The player keeps their original 20 coins, Basic Clothes, Crude Small Bag and Scholarship +3. No ordinary copying task is being disguised as a quest reward.
 
 Normal paid jobs of this work family still award coins and Scholarship XP. Errors are discovered through visible records and corrected through simple, reusable source-comparison actions. The current sample entries are not introduced as new tradable documents or permanent world facts.
 
@@ -141,3 +141,5 @@ The original records stay at the Civic Copying Office. The later question is **w
 **TBD:** source-data generation, exact work time, paid job wages and XP, player skill impact on error rates, visual page layout and item identifiers.
 
 Related: [Stage 1 approved](opening-dialogue.md), [Inkbound master](README.md), [game-wide jobs](../../jobs/jobs-and-time.md), [spoken dialogue guide](../../interactions/dialogue-style-guide.md).
+
+**Continuity correction (USER-APPROVED 2026-10-19):** The old books are physically returned **after** Erwin asks, not before. This preserves all approved Stage 2 spoken lines and keeps the separate Stage 3 winter volume available for the hidden page.
