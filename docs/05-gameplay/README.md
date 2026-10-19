@@ -16,7 +16,8 @@ Player activities, time, world economy and authored interactive events.
 ## Combat system
 
 - [Combat foundation — APPROVED PRINCIPLES (2026-10-19)](combat/approved-combat-foundation.md): one action per turn; Standard, Momentum and Contextual actions; real Initiative, readable enemy intent, defensive preparation, one Health pool and nonlethal outcomes. **Exact numbers are not locked.**
-- [Initiative, enemy intent and varied encounters — PROPOSAL](combat/initiative-and-intent-proposal.md): next design layer for review; timing, telegraph clarity, movement, light positioning and encounter identity are not yet approved.
+- [Initiative, enemy intent and varied encounters — APPROVED PRINCIPLES (2026-10-19)](combat/initiative-and-intent-proposal.md): action-order timing, honest committed telegraphs, single basic Move action and lightweight positioning; numbers/edge cases remain TBD.
+- [Standard Action menu — PROPOSED, not locked](combat/standard-action-menu-proposal.md): Attack, Guard, Move, Use, Recover, Withdraw; includes **three beginner and three hypothetical late-game encounter examples**. User approval pending.
 - [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
 
 ## Jobs and content
