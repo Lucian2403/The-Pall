@@ -13,9 +13,11 @@ Player activities, time, world economy and authored interactive events.
 - [Salvaging](exploration/salvaging.md)
 - [Food and survival](survival/food-survival.md)
 
-## Combat system (DISCUSSION DRAFT — not locked)
+## Combat system
 
-- [Turns, Actions, Initiative and Momentum — critique and revised proposal](combat/core-turns-actions-initiative-momentum-proposal.md): 2026-10-19 design discussion; mechanics and numerical values remain subject to user review and testing. Existing Arms, Health and equipment canon is unchanged.
+- [Combat foundation — APPROVED PRINCIPLES (2026-10-19)](combat/approved-combat-foundation.md): one action per turn; Standard, Momentum and Contextual actions; real Initiative, readable enemy intent, defensive preparation, one Health pool and nonlethal outcomes. **Exact numbers are not locked.**
+- [Initiative, enemy intent and varied encounters — PROPOSAL](combat/initiative-and-intent-proposal.md): next design layer for review; timing, telegraph clarity, movement, light positioning and encounter identity are not yet approved.
+- [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
 
 ## Jobs and content
 
