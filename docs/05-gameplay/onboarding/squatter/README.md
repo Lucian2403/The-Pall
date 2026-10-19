@@ -47,9 +47,9 @@ Three agreed first-event choices send the player to distinct **unpaid tutorial a
 
 **Job/skill guardrail:** The first and second scripted tutorial tasks give 0 coins and 0 ordinary XP. The chosen second-task Major Skill (Commerce, Medicine or Industry) gains exactly +1 level when the route is selected, once. Their normal repeatable job versions still pay coins/XP. No route requires unearned mastery, specialist tools, new unique crafted items, or a new Major Skill.
 
-## Two follow-up interactions after second job — LOCKED story beats, proposed scripts
+## Two follow-up interactions after second job — APPROVED scenes
 
-[Stage 5 bank/boar interaction and dialogue](boar-confrontation.md) is approved. [Stage 6 fight and outcome design](boar-fight.md) and [Stage 7 clinic visit](clinic-treatment.md) are proposed.
+[Stage 5 bank/boar interaction and dialogue](boar-confrontation.md), [Stage 6 fight and outcomes](boar-fight.md), and [Stage 7 clinic visit](clinic-treatment.md) are all APPROVED AND LOCKED at their respective scene/encounter levels. Numerical combat and Health effects remain TBD.
 
 **Interaction 1, "The Rustling Bank" (LOCKED):** Returning toward the city gate along the edge of the disturbed drainage ground, the player sees rooted soil shifting and hears scraping among the reeds. Choose whether to inspect tracks, take the raised path or investigate a fresh tear in the ground. The choices determine information/position, not whether the mandatory combat exists. A Fieldcraft-aware player may identify animal signs sooner.
 
@@ -58,7 +58,7 @@ Three agreed first-event choices send the player to distinct **unpaid tutorial a
 ### Short fight, care and home — agreed story direction; mechanics TBD
 
 - **LOCKED opponent:** a desperate young, injured **wild boar**, not another hired thug. The encounter should allow a frightened, unarmed novice to **drive it off** using sensible defensive positioning or environmental shelter rather than requiring them to kill an adult boar bare-handed. Tutorial combat grants no XP or loot; difficulty, animal AI, Health loss and defeat fallback must be defined later in the global turn-based combat system. If testing reveals unfair difficulty, the encounter mechanics/setting can be tuned without silently replacing the locked opponent.
-- **Injury and care:** the player suffers a plausible minor wound (e.g., torn forearm from a glancing tusk/abrasion; wounds/bleeding rules TBD), seeks **paid city medical treatment**, learns inspection and patching, then returns home. Do not lock disease or permanent injury mechanics based on this pitch.
+- **Injury and care (UPDATED to approved Stage 6–7):** the player may take a real wound during the boar fight, but a perfectly safe victory does **not** cause a scripted cut. Both victory and defeat lead to the standard **10-coin clinic service**, with actual injuries treated under the later shared Health rules, followed by the identical shared home. Do not infer a guaranteed wound or new disease mechanics from older pitch notes.
 - **Ending:** use the **single [shared Stage 8 home-and-rent scene](../shared-home-rent-ending.md)** already approved for all backgrounds, not a separate Squatter script. After the 10-coin clinic visit, the player returns to the identical home with 10 coins remaining, reads the same provisional 150-coin rent notice, puts it down, and **speaks the exact Millhand-origin closing line used by all six backgrounds**. Then the tutorial ends. No separate rent collector, due date, home variation or overarching story is introduced.
 
 ## Locked versus to be designed
