@@ -13,6 +13,10 @@ Player activities, time, world economy and authored interactive events.
 - [Salvaging](exploration/salvaging.md)
 - [Food and survival](survival/food-survival.md)
 
+## Combat system (DISCUSSION DRAFT — not locked)
+
+- [Turns, Actions, Initiative and Momentum — critique and revised proposal](combat/core-turns-actions-initiative-momentum-proposal.md): 2026-10-19 design discussion; mechanics and numerical values remain subject to user review and testing. Existing Arms, Health and equipment canon is unchanged.
+
 ## Jobs and content
 
 - [Jobs and time](jobs/jobs-and-time.md)
