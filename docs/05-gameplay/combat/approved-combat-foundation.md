@@ -40,6 +40,8 @@ Difficulty must follow **readable danger and costly trade-offs**, not invisible 
 
 ## Immediate next design document
 
-[Part 2 — Initiative, telegraphs and distinct encounter pacing](initiative-and-intent-proposal.md) is **a proposal for further review**, not automatically approved by acceptance of this foundation. It defines a minimal way to make Flint, Silas and the boar play differently without giving them special combat currencies or scripted outcomes.
+[Part 2 — Initiative, telegraphs and distinct encounter pacing](initiative-and-intent-proposal.md) is **APPROVED AT PRINCIPLE LEVEL (2026-10-19)**: action timing, honest precommitted telegraphs, single basic Move and light positions. [Part 3 — the six-action Standard menu](standard-action-menu-proposal.md) is the **next PROPOSAL**, not yet approved. Numerical values, extra buttons and combat balance remain subject to review.
 
 **References:** [character rules](../../01-player/character-system.md), [Arms tree](../../01-player/skills-progression.md), [equipment rules](../../04-equipment/core/equipment-system.md), [all six onboarding fights](../onboarding/README.md), [clinic policy](../onboarding/shared-clinic-examination-policy.md).
+
+**Example presentation requirement (USER-AGREED 2026-10-19):** All future combat system design proposals should include **two or three concrete beginner/low-stakes and two or three high-end-game fight examples**, explicitly separating hypothetical endgame stress tests from established world canon. Exact values remain open until tested.
