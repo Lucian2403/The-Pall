@@ -1,6 +1,6 @@
 # Bellrunner — Stage 7: Clinic Visit (APPROVED)
 
-**Status: APPROVED AND LOCKED (2026-10-15)** for the clinic conversation and ordinary service sequence. The perfect-no-damage case remains open for the common Health system.
+**Status: APPROVED AND LOCKED (2026-10-15)** for the clinic dialogue and ordinary service sequence. **The no-damage case was resolved game-wide (2026-10-19):** charge 10 coins for examination even when unhurt, without unnecessary treatment. [Policy](../shared-clinic-examination-policy.md).
 
 ## Arrival
 
@@ -28,6 +28,8 @@ Following the Dogman fight, the courier reaches the ordinary city clinic. On vic
 
 ## Boundaries
 
-The visit follows the shared tutorial's clinic price and economy. The clinician has no special information about the Shift Marshal or the earlier worksite. The fight outcome and chosen branch finding remain recorded. No forced wound, new medical item or bonus quest. Specific Health recovery is TBD. For a player who took no damage, preserve the accurate unhurt condition; how the shared system handles an examination-only consultation remains open across all backgrounds.
+The visit follows the shared tutorial's clinic price and economy. The clinician has no special information about the Shift Marshal or the earlier worksite. The fight outcome and chosen branch finding remain recorded. No forced wound, new medical item or bonus quest. Specific Health recovery is TBD. For a player who took no damage, preserve the accurate unhurt condition and show the shared examination result **“No injuries found. No treatment needed.”** The fee is still 10 coins once and no dressing/Health change occurs. [Common rule](../shared-clinic-examination-policy.md).
 
 Related: [Dogman fight](dogman-fight.md), [Bellrunner overview](README.md), [shared onboarding](../shared-structure.md), [Millhand clinic](../millhand/clinic-treatment.md).
+
+**Shared Stage 7 policy LOCKED 2026-10-19:** All six clinics use a 10-coin post-fight examination with injury-appropriate basic care only when genuinely needed. No guaranteed attack hit, compulsory wound, needless treatment, second charge or special origin reward. See [central policy](../shared-clinic-examination-policy.md).
