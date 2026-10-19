@@ -17,7 +17,8 @@ Player activities, time, world economy and authored interactive events.
 
 - [Combat foundation — APPROVED PRINCIPLES (2026-10-19)](combat/approved-combat-foundation.md): one action per turn; Standard, Momentum and Contextual actions; real Initiative, readable enemy intent, defensive preparation, one Health pool and nonlethal outcomes. **Exact numbers are not locked.**
 - [Initiative, enemy intent and varied encounters — APPROVED PRINCIPLES (2026-10-19)](combat/initiative-and-intent-proposal.md): action-order timing, honest committed telegraphs, single basic Move action and lightweight positioning; numbers/edge cases remain TBD.
-- [Standard Action menu — PROPOSED, not locked](combat/standard-action-menu-proposal.md): Attack, Guard, Move, Use, Recover, Withdraw; includes **three beginner and three hypothetical late-game encounter examples**. User approval pending.
+- [Six Standard Action families — APPROVED PRINCIPLES](combat/standard-action-menu-proposal.md): Attack, Guard, Move, Use, Recover, Withdraw; exact action balance and Momentum income remain open.
+- [Momentum generation and spending — PROPOSED for review](combat/momentum-generation-and-spending-proposal.md): **Basic Strike and Basic Guard CAN generate Momentum** on meaningful outcomes; candidate +10 / +8 / tactical Move +5, with three beginner and three hypothetical endgame worked examples; not locked.
 - [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
 
 ## Jobs and content
