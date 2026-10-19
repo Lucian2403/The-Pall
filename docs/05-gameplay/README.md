@@ -73,5 +73,5 @@ Player activities, time, world economy and authored interactive events.
 - [Inkbound: Stage 2 The Winter Register and Erwin dialogue (approved)](onboarding/inkbound/winter-register-interaction.md)
 - [Inkbound: Stage 3 The Acceptable Losses and three choices (approved)](onboarding/inkbound/acceptable-losses-discovery.md)
 - [Inkbound: Stage 4 Coal Waiver / Door Count / Short Cart (approved)](onboarding/inkbound/second-task-branches.md)
-- [Inkbound: Stage 5 The Sealed Stove and Coal Hook (proposed)](onboarding/inkbound/sealed-stove-confrontation.md)
+- [Inkbound: Stage 5 The Sealed Stove and Coal Hook (revised proposal)](onboarding/inkbound/sealed-stove-confrontation.md)
 - [Inkbound: Stage 6 Silas Pumpard PvE encounter and outcomes (proposed)](onboarding/inkbound/silas-pumpard-fight.md)
