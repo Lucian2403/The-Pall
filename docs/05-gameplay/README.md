@@ -19,6 +19,7 @@ Player activities, time, world economy and authored interactive events.
 - [Initiative, enemy intent and varied encounters — APPROVED PRINCIPLES (2026-10-19)](combat/initiative-and-intent-proposal.md): action-order timing, honest committed telegraphs, single basic Move action and lightweight positioning; numbers/edge cases remain TBD.
 - [Six Standard Action families — APPROVED PRINCIPLES](combat/standard-action-menu-proposal.md): Attack, Guard, Move, Use, Recover, Withdraw; exact action balance and Momentum income remain open.
 - [Momentum generation and spending — PROPOSED for review](combat/momentum-generation-and-spending-proposal.md): **Basic Strike and Basic Guard CAN generate Momentum** on meaningful outcomes; candidate +10 / +8 / tactical Move +5, with three beginner and three hypothetical endgame worked examples; not locked.
+- [Enemy Momentum and combat techniques — PROPOSED for review](combat/enemy-momentum-and-techniques-proposal.md): one resource system for player and NPCs, individual enemy pools, behavior-appropriate special moves, visible costs and three beginner/three high-end hypothetical examples. Not locked.
 - [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
 
 ## Jobs and content
