@@ -1,6 +1,6 @@
-# The Pall Combat — Part 5: Enemy AI Decisions, Pressure and Encounter Identity (PROPOSED)
+# The Pall Combat — Part 5: Enemy AI Decisions, Pressure and Encounter Identity (APPROVED PRINCIPLES)
 
-**Status: PROPOSAL FOR REVIEW (2026-10-19); NOT APPROVED OR IMPLEMENTED.** Builds on the [accepted combat foundation](approved-combat-foundation.md), [approved Initiative principles](initiative-and-intent-proposal.md), [six Standard Action families](standard-action-menu-proposal.md), [Momentum playtest rules](momentum-generation-and-spending-proposal.md) and [approved enemy Momentum parity](enemy-momentum-and-techniques-proposal.md). The user wants **hard, varied fights with a simple shared combat core** and requires **2–3 low-stakes and 2–3 high-end-game worked examples** for each new design system. This proposal has three of each. The late-game cases are hypothetical stress tests, not approved lore, content or weapon data.
+**Status: APPROVED AT THE AI DESIGN-PRINCIPLE LEVEL (2026-10-19); NOT IMPLEMENTED OR NUMERICALLY LOCKED.** Builds on the [accepted combat foundation](approved-combat-foundation.md), [approved Initiative principles](initiative-and-intent-proposal.md), [six Standard Action families](standard-action-menu-proposal.md), [Momentum playtest rules](momentum-generation-and-spending-proposal.md) and [approved enemy Momentum parity](enemy-momentum-and-techniques-proposal.md). The user wants **hard, varied fights with a simple shared combat core** and requires **2–3 low-stakes and 2–3 high-end-game worked examples** for each new design system. This proposal has three of each. The late-game cases are hypothetical stress tests, not approved lore, content or weapon data.
 
 ## 1. Design judgment: difficult is not the same as clairvoyant
 
@@ -178,10 +178,10 @@ This should allow designers to add an opponent mostly through a **data record an
 
 ## Recommendation for next decisions
 
-**Approve the general model if it holds up:** one common **objective + style + legality + utility** NPC evaluator; one precommitted action; no mid-turn reading of player input; independent Momentum pools; no hidden bonus attacks; meaningful retreat/surrender policies; graduated competence and deliberate, bounded variation.
+**APPROVED PRINCIPLES (2026-10-19):** one common **objective + style + legality + utility** NPC evaluator; one precommitted action; no mid-turn reading of player input; independent Momentum pools; no hidden bonus attacks; meaningful retreat/surrender policies; graduated competence and deliberate, bounded variation. The specific weights and NPC loadouts remain open.
 
 **Keep open:** scoring weights, stochastic choice among best options, exactly what players see of enemy intent/readiness, Combat Experience tuning, multi-enemy encounter limits and the exact end-of-fight surrender/retreat thresholds. Do not add a second special AI resource bar or bespoke mechanics merely to make bosses “unique.”
 
-**If accepted, Part 6 should define the shared damage, protection and actual injury-trigger rules**, using three beginner and three high-end examples. It must respect existing one Health pool, limb-specific injury/Health ceiling and the locked examination-only outcome for uninjured wins. Later work should separate actual weapon profiles, stamina/fatigue and skill modifiers from AI policy.
+**Part 6 now defines the agreed damage, protection and actual injury-trigger architecture**, using three beginner and three high-end examples. It must respect existing one Health pool, limb-specific injury/Health ceiling and the locked examination-only outcome for uninjured wins. Later work should separate actual weapon profiles, stamina/fatigue and skill modifiers from AI policy.
 
 **References:** [combat core](approved-combat-foundation.md), [Initiative rules](initiative-and-intent-proposal.md), [Momentum](momentum-generation-and-spending-proposal.md), [NPC Momentum parity](enemy-momentum-and-techniques-proposal.md), [Health](../../01-player/character-system.md), [Squatter boar](../onboarding/squatter/boar-fight.md), [Flint](../onboarding/millhand/flint-fight.md), [Silas](../onboarding/inkbound/silas-pumpard-fight.md).
