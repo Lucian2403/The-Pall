@@ -22,7 +22,8 @@ Player activities, time, world economy and authored interactive events.
 - [Enemy Momentum and combat techniques — APPROVED PRINCIPLES (2026-10-19)](combat/enemy-momentum-and-techniques-proposal.md): player/NPC resource parity, independent pools, visible enemy readiness and plausible abilities; exact technique loadouts/balance TBD.
 - [Enemy AI decision-making — APPROVED PRINCIPLES (2026-10-19)](combat/enemy-ai-decision-system-proposal.md): objective-based legal action evaluation with committed enemy intent; precise AI weights remain open.
 - [Damage, Protection and Injuries — APPROVED ARCHITECTURE (2026-10-19)](combat/damage-protection-injuries-proposal.md): one Health pool, actual hit→protection→Guard→damage→conditional wounds/Health Ceiling; damage and armour figures still hypothetical.
-- [Hit Chance, Aimed Attacks and Combat Skills — PART 7 PROPOSED](combat/hit-chance-aiming-and-skills-proposal.md): single attack-contact check, Head/Torso/Limbs, bounded Arms/subskill contribution, Focus and range/cover, distinct firearm activation; 3 novice and 3 hypothetical endgame tests.
+- [Hit Chance, Aimed Attacks and Combat Skills — APPROVED PRINCIPLES (2026-10-19)](combat/hit-chance-aiming-and-skills-proposal.md): single attack-contact check, Head/Torso/Limbs, bounded Arms/subskill contribution, Focus and range/cover, distinct firearm activation; **sample percentages and formulas remain test-only**.
+- [Stamina, Fatigue, Composure, Stress and Focus — PART 8 PROPOSED](combat/stamina-fatigue-composure-stress-focus-proposal.md): two spendable reserves, two harmful conditions, derived Focus, Recover choice and meaningful overexertion; 3 beginner and 3 hypothetical late-game fight cases. **Not approved or implemented**.
 - [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
 
 ## Jobs and content
