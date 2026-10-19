@@ -45,9 +45,9 @@ The scene is ordinary and unshowy. The clinician doesn't ask about the under-yar
 
 The ordinary recurring medical service remains reusable throughout the city; non-tutorial prices, recovery rules, examination-only cases and skill interactions are defined globally, not by the Scrapper scene. This scripted visit grants **0 XP and no loot**.
 
-### A character who took no damage
+### A character who took no damage — resolved game-wide (2026-10-19)
 
-The shared first-session design calls for a **10-coin clinical visit**, but a well-played fight may involve no injuries. Do **not** quietly add a scrape to make the price seem justified. How a perfectly healthy character is offered a meaningful paid examination is an **open issue shared by all six backgrounds**. This Stage 7 draft doesn't decide that question or change the previously locked tutorial economy.
+If Barnaby does not injure the Scrapper, the clinician conducts the ordinary examination for the same **10-coin** fee. The interface displays **“No injuries found. No treatment needed.”** without inventing a wound, reducing Health or applying a dressing. If Barnaby caused actual injuries, basic care is included at the same price. No forced second enemy hit is allowed. [Common policy](../shared-clinic-examination-policy.md).
 
 ## S07-C — One shared Stage 8, not a separate ending
 
@@ -72,3 +72,5 @@ After the clinic, the player goes home with **10 coins** and plays the one [alre
 **APPROVED IN STAGE 7:** plain spoken dialogue and the ordinary clinic arrival, exam, price, payment and leave interactions. With this scene approved, the Scrapper's **eight narrative onboarding stages are complete** because Stage 8 was approved globally already.
 
 Related: [Scrapper story](README.md), [approved Stage 6](barnaby-fight.md), [universal Stage 8](../shared-home-rent-ending.md), [Millhand clinic reference](../millhand/clinic-treatment.md), [common onboarding](../shared-structure.md).
+
+**Shared Stage 7 policy LOCKED 2026-10-19:** All six clinics use a 10-coin post-fight examination with injury-appropriate basic care only when genuinely needed. No guaranteed attack hit, compulsory wound, needless treatment, second charge or special origin reward. See [central policy](../shared-clinic-examination-policy.md).
