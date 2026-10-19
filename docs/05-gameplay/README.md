@@ -20,8 +20,9 @@ Player activities, time, world economy and authored interactive events.
 - [Six Standard Action families — APPROVED PRINCIPLES](combat/standard-action-menu-proposal.md): Attack, Guard, Move, Use, Recover, Withdraw; exact action balance and Momentum income remain open.
 - [Momentum generation and spending — APPROVED PROTOTYPE (2026-10-19)](combat/momentum-generation-and-spending-proposal.md): Basic Strike +10, effective Guard +8, defensive Move +5; encounter-local 0–100 meter and 20/35/50 technique brackets **for balancing trials**, not final stats.
 - [Enemy Momentum and combat techniques — APPROVED PRINCIPLES (2026-10-19)](combat/enemy-momentum-and-techniques-proposal.md): player/NPC resource parity, independent pools, visible enemy readiness and plausible abilities; exact technique loadouts/balance TBD.
-- [Enemy AI decision-making — PROPOSED, for review](combat/enemy-ai-decision-system-proposal.md): one objective-based evaluator, committed legal action before player choice, varying NPC skill and risk, escape logic, and three beginner/three hypothetical endgame examples.
-- [Damage, Protection and Injuries — PART 6 PROPOSED, not locked](combat/damage-protection-injuries-proposal.md): one Health pool, location-specific protection, conditional wounds/Health Ceiling, test-only damage formulas, three beginner and three hypothetical late-game comparisons.
+- [Enemy AI decision-making — APPROVED PRINCIPLES (2026-10-19)](combat/enemy-ai-decision-system-proposal.md): objective-based legal action evaluation with committed enemy intent; precise AI weights remain open.
+- [Damage, Protection and Injuries — APPROVED ARCHITECTURE (2026-10-19)](combat/damage-protection-injuries-proposal.md): one Health pool, actual hit→protection→Guard→damage→conditional wounds/Health Ceiling; damage and armour figures still hypothetical.
+- [Hit Chance, Aimed Attacks and Combat Skills — PART 7 PROPOSED](combat/hit-chance-aiming-and-skills-proposal.md): single attack-contact check, Head/Torso/Limbs, bounded Arms/subskill contribution, Focus and range/cover, distinct firearm activation; 3 novice and 3 hypothetical endgame tests.
 - [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
 
 ## Jobs and content
