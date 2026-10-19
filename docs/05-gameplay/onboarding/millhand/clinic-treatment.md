@@ -62,15 +62,9 @@ The exchange is practical: the bill includes the dressing, but **10 coins is hal
 - **No loot, skill increase, ordinary XP, consumable item gift, future debt, charity coupon or injury-specific additional charge.**
 - **[Leave the clinic]** transitions into normal city movement; then the character returns to the same common starter home. The rent notice is **not** shown at the clinic.
 
-## A real design edge case — a player who takes zero damage
+## Unhurt victory — resolved for all six backgrounds (LOCKED 2026-10-19)
 
-The shared tutorial requires a clinic visit and 10-coin payment. Stage 6 also forbids secretly hurting a perfectly played character. Both principles stand; **we do not resolve them by inventing damage or quietly changing the clinic's fee.**
-
-Before implementing combat, pick one transparent world-consistent reason for every possible outcome to have a paid treatment or examination, or adjust how the fight is designed so an authentic treatable condition arises under normal rules. Examples of *directions for later review*, **NOT decisions**:
-- The encounter can cause a **visible legitimate condition from an actual supported action** (e.g., guarding a hard club strike has a known physical cost) even without losing Health; the player sees it happen and may avoid/mitigate it through real combat rules. **No forced invisible bruise.**
-- A genuine assessment/medical service may be justified if it has a real in-game medical purpose, though **charging 10 coins merely to look at a perfectly healthy character risks feeling punitive**. Do not use this as a story workaround without user approval.
-
-The exact zero-damage exception remains **OPEN** until a shared combat/injury design establishes it. No claims about fixed restorative Health numbers or injury prevalence should be treated as canon.
+The user chose **ordinary combat without any guaranteed hit**, followed by the regular **10-coin examination whether hurt or unhurt**. If the Millhand has full Health and no wound, the clinician confirms **“No injuries found. No treatment needed.”** through the shared UI; no dressing or healing is performed. The approved **“Needs cleaning. I'll dress it.”** line plays **only** if an actual treatable cut/scrape exists. Unhurt and other injury types must not trigger that line. The service still charges exactly 10 coins once. See the [common clinic policy](../shared-clinic-examination-policy.md).
 
 ## Role and asset scope
 
@@ -90,3 +84,5 @@ The exact zero-damage exception remains **OPEN** until a shared combat/injury de
 **LOCKED:** examine → speak → priced 10-coin treatment → pay once → treatment result → leave; exact dialogue shown for an injury that needs cleaning/dressing; no added clinician name or persistent loot; preserve the win/lose Flint outcome. **TBD:** injury-specific alternative lines, clinic appearance/name, precise medical effects/duration, and an honest handling of a perfect uninjured combat result under the future common combat/injury system.
 
 Related: [approved Flint fight](flint-fight.md), [Millhand tutorial](README.md), [common tutorials](../shared-structure.md), [character Health](../../../01-player/character-system.md), [game-wide dialogue standard](../../interactions/dialogue-style-guide.md).
+
+**Shared Stage 7 policy LOCKED 2026-10-19:** All six clinics use a 10-coin post-fight examination with injury-appropriate basic care only when genuinely needed. No guaranteed attack hit, compulsory wound, needless treatment, second charge or special origin reward. See [central policy](../shared-clinic-examination-policy.md).
