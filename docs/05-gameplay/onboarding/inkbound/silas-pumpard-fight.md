@@ -1,6 +1,6 @@
-# Inkbound — Stage 6: Silas Pumpard at the Coal Box (PROPOSED)
+# Inkbound — Stage 6: Silas Pumpard at the Coal Box (APPROVED ENCOUNTER)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** A short, realistic turn-based PvE fight with the named **Silas Pumpard, Fuel Watchman**, nonlethal victory and survivable defeat were already locked at story-outline level in [Inkbound's master](README.md). The detailed [Stage 5 — The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) is proposed and sets the confrontation. Stage 3 and Stage 4 are approved. **All combat numbers, equipment stats, wounds and AI still belong to the shared TBD combat system.**
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-19).** The user accepted the fight after reviewing the revised Stage 5. A short turn-based PvE encounter with **Silas Pumpard, Fuel Watchman**, genuine nonlethal victory and survivable defeat was already locked at outline level. [Stage 5 — The Sealed Stove / The Coal Hook](sealed-stove-confrontation.md) is now approved. **Specific combat numbers, equipment stats, wounds and AI remain shared-system TBD.**
 
 ## I06-A — Why the fight happens
 
@@ -100,8 +100,8 @@ After victory, the Inkbound reaches ordinary city care by normal travel. After d
 
 **Already LOCKED:** Silas identity/job, short human opponent, basic nonlethal combat, no combat rewards, recoverable defeat, ordinary clinic and universal home.
 
-**PROPOSED IN STAGE 6:** observable opening move, combat-position continuity, precise victory/defeat lines, bystander intervention with Silas keeping the box on defeat, and branch-specific unresolved aftermath.
+**APPROVED IN STAGE 6:** observable opening move, combat-position continuity, precise victory/defeat lines, bystander intervention with Silas keeping the box on defeat, and branch-specific unresolved aftermath. Preserve exact spoken dialogue unless the user requests a change.
 
 **TBD:** combat numbers, movement, guard/attack actions, combat AI, exactly which tool Silas wields, Health/injury effects, treatment effects, exact visual map and animation.
 
-Related: [Inkbound master](README.md), [Stage 5 proposal](sealed-stove-confrontation.md), [Stage 4 approved](second-task-branches.md), [common tutorial structure](../shared-structure.md).
+Related: [Inkbound master](README.md), [Stage 5 approved](sealed-stove-confrontation.md), [Stage 4 approved](second-task-branches.md), [common tutorial structure](../shared-structure.md).
