@@ -1,6 +1,6 @@
-# The Pall Combat — Part 3: The Standard Action Menu (PROPOSED)
+# The Pall Combat — Part 3: The Standard Action Menu (APPROVED FAMILIES)
 
-**Status: PROPOSED FOR USER APPROVAL — 2026-10-19. NOT LOCKED.** The [combat foundation](approved-combat-foundation.md) and [Initiative/Intent/Movement principles](initiative-and-intent-proposal.md) are accepted at the conceptual level, without numerical balance yet. This draft proposes **one compact action menu** reused for unarmed scuffles, hunting, armed enemies, mechanical hazards and advanced encounters. The **user requires 2–3 low-stakes and 2–3 late-game examples in each future system draft**. This document contains **three of each**, including conditional examples that do not establish new enemies/items as canon.
+**Status: SIX STANDARD ACTION FAMILIES ACCEPTED IN PRINCIPLE (2026-10-19); MOMENTUM NUMBERS AND TRIGGERS NOT YET LOCKED.** The user accepted the proposed six-command menu but explicitly wants to review how **Basic Strike and Basic Guard generate Momentum** before approving those details. Both can and should earn Momentum when relevant under the [Part 4 Momentum discussion proposal](momentum-generation-and-spending-proposal.md); this document never bans their income. Numerical action costs, attack/guard rewards, recovery, damage, movement and balancing remain OPEN. The user requests **2–3 beginner and 2–3 high-end-game examples** in future system drafts; this file includes three of each.
 
 ## 1. Design verdict
 
@@ -34,7 +34,7 @@ The menu should be usable by an unarmed newcomer at zero Arms specialization and
 - Acts as a **defensive preparation**, able to take effect before an incoming attack regardless of the defender's slower Attack timing. It consumes the one action.
 - A relevant blow can still injure the character, depending on attack, guard effectiveness, protection and real Health calculations.
 - Guarding a charging boar with bare hands **should generally be less reliable than stepping clear of its approach**, even if Guard can reduce injury severity.
-- **Guard does not inherently build Momentum:** only a genuinely challenged, successful defense is eligible under later Momentum rules. The value remains TBD.
+- **Basic Guard MAY EARN MOMENTUM (important clarification):** guarding an actually threatening attack successfully earns an eventual defensive Momentum reward; unthreatened Guard spam does not. The proposed [Part 4 model](momentum-generation-and-spending-proposal.md) illustrates **+8 on a genuinely mitigated blow**, but exact numbers and trigger criteria await the user's approval and testing.
 
 ### Move
 
@@ -130,10 +130,10 @@ These are **illustrative encounter tests ONLY**. Named locations beyond the curr
 
 ## 9. Decision checkpoint — all proposed, not yet canon
 
-**My recommendation:** approve the **six Standard Action family names and their tactical jobs**, with **Attack/Guard/Move/Use** as daily essentials, **Recover** as risky resource management and **Withdraw** as real outcome-seeking. Keep Momentum/Contextual as alternative one-action options. Do not add Evasive Step as a new button until the Move/Guard distinction has been playtested.
+**APPROVED AT ACTION-FAMILY LEVEL (2026-10-19):** **Attack, Guard, Move, Use, Recover, Withdraw** as the six basic commands, with Momentum and Contextual actions as alternative single actions. The user's requested Momentum income review is not a rejection of Strike/Guard Momentum: the actual earn/spend figures are under **separate review in [Part 4](momentum-generation-and-spending-proposal.md)**. No Evasive Step button is approved, nor are combat numeric effects locked.
 
 **Still open for further work:** exact Attack timing/ranges, position move distance, when Guard works against projectiles, Stamina consumption/recovery, effect of Composure/Focus, ammo reload lengths and capacities, ordinary bandage legality, retreat probability/cost, group attacks, advanced techniques and numerical Momentum gain/loss.
 
-**Next after review:** **Part 4 — Momentum generation, decay and technique categories**, again with **2–3 low-stakes and 2–3 late-game worked examples**. Then damage and Health before tuning six onboarding encounters.
+**Next in review:** [Part 4 — Momentum generation, decay and technique categories](momentum-generation-and-spending-proposal.md), with 3 beginner and 3 hypothetical endgame worked examples. Then damage and Health before tuning the six onboarding encounters.
 
 **References:** [approved core](approved-combat-foundation.md), [approved Initiative principles](initiative-and-intent-proposal.md), [Arms tree](../../01-player/skills-progression.md), [Equipment](../../04-equipment/core/equipment-system.md), [character Health / Stamina](../../01-player/character-system.md), [six onboarding encounter index](../onboarding/README.md).
