@@ -1,6 +1,6 @@
 # Inkbound — Stage 5: The Sealed Stove / The Coal Hook (PROPOSED)
 
-**Status: PROPOSED FOR USER APPROVAL (2026-10-17); NOT LOCKED.** Both interactions, the communal coal box, the resident's accusation, and **Silas Pumpard, Fuel Watchman**, are already LOCKED at story-outline level in the [Inkbound master](README.md). This file proposes their playable staging, words and tactical entry into [Stage 6](silas-pumpard-fight.md). Stages [1](opening-dialogue.md), [2](winter-register-interaction.md), [3](acceptable-losses-discovery.md) and [4](second-task-branches.md) are **APPROVED AND LOCKED**. Preserve their exact dialogue and one chosen branch.
+**Status: REVISED PROPOSAL (2026-10-19); NOT LOCKED.** Three player lines and their immediate replies were rewritten at the user's request for direct, natural speech and literal descriptions without metaphors or personification. Stage 5 as a whole still awaits approval. Both interactions, the communal coal box, the resident's accusation, and **Silas Pumpard, Fuel Watchman**, are already LOCKED at story-outline level in the [Inkbound master](README.md). This file proposes their playable staging, words and tactical entry into [Stage 6](silas-pumpard-fight.md). Stages [1](opening-dialogue.md), [2](winter-register-interaction.md), [3](acceptable-losses-discovery.md) and [4](second-task-branches.md) are **APPROVED AND LOCKED**. Preserve their exact dialogue and one chosen branch.
 
 ## I05-A — The Sealed Stove
 
@@ -16,9 +16,9 @@ The stove, box and padlock must be easy to recognize without knowledge of boiler
 
 **RESIDENT:** “Come to count the living, have you? Or the dead?”
 
-**PLAYER:** “I saw what's written about this street.”
+**PLAYER:** “No. I saw they've ordered less coal for this street. I came to see how you're managing.”
 
-**RESIDENT:** “Then you know we've got no coal to spare. Look at that lock.”
+**RESIDENT:** “Managing? We can't even keep that stove lit. Look at the lock.”
 
 The resident has not read the private mortality sheet and should not mysteriously quote its nine-loss figure. The Inkbound has not come with legal authority to cut the lock.
 
@@ -48,7 +48,7 @@ The resident has not read the private mortality sheet and should not mysteriousl
 
 **RESIDENT:** “We've told them often enough.”
 
-**PLAYER:** “There's a street a coal cart can get down. The yard way's blocked.”
+**PLAYER:** “The yard entrance is blocked with rubbish. I found another street a coal cart can use to reach these houses.”
 
 **RESIDENT:** “Then show us. The last cart never came near our door.”
 
@@ -58,11 +58,11 @@ The resident has not read the private mortality sheet and should not mysteriousl
 
 ### C — The Short Cart (Industry / Hauling)
 
-**PLAYER:** “I was with the coal cart. They sent less than the paper promised.”
+**PLAYER:** “I helped with the coal cart. They didn't load nearly as much as they were meant to.”
 
 **RESIDENT:** “But it came?”
 
-**PLAYER:** “Yes. What was on it reached the ward. The rest was never loaded.”
+**PLAYER:** “Yes. We delivered the sacks we had. They didn't give us any more.”
 
 **RESIDENT:** “Then where's ours?”
 
