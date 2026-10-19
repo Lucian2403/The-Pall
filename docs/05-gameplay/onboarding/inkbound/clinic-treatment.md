@@ -44,9 +44,9 @@ The clinician is interested in examining the patient, not in arguing over coal p
 
 This is the **same provider service used by Millhand, Bellrunner, Squatter, Stitcher and Scrapper**, not a separate Investigation or Scholarship job. Being a copyist does not grant Medicine experience or a special price. No XP or item reward is awarded.
 
-### Perfectly unhurt player (shared open issue)
+### Perfectly unhurt player — resolved shared policy (2026-10-19)
 
-A genuinely flawless fight may leave the Inkbound with no wounds. The tutorial's common economy presently sets the examination/clinic visit to ten coins for every origin, but **the shared Health design has not fully decided how an examination-only visit should be handled when treatment is unnecessary**. Do not silently create damage or invent a new medical rule in this background. The precise treatment benefits, time, and final handling of that edge case remain common-system TBD.
+A genuinely flawless fight may leave the Inkbound with no wounds. The clinician performs a standard **10-coin examination**, confirms the actual condition via **“No injuries found. No treatment needed.”** and gives no needless dressing, Health restoration or hidden injury. If there are real injuries, the same fee includes ordinary basic care. This is the **LOCKED cross-origin decision**; only actual treatment effects and service time remain TBD. [Common policy](../shared-clinic-examination-policy.md).
 
 ## S07-D — Hand off to the single shared Stage 8
 
@@ -73,6 +73,8 @@ After the line, the normal housing/earnings/crafting game opens. Do **not** crea
 - No new named person, hospital, political power, hidden injury, clinical item or medical mechanic is introduced.
 - **Already locked:** 10-coin ordinary care, shared Health UI, common home/notice/exact closing line, win-or-lose progression and no tutorial loot.
 - **APPROVED IN STAGE 7:** the short literal clinician/player exchange and this origin's simple arrival wording. With Stage 8 already locked globally, all eight Inkbound narrative stages are complete.
-- **Still TBD:** game-wide actual combat values, injury/Health effects, examination-only handling for the unhurt, clinic service durations, regular clinic pricing and final rent system.
+- **Still TBD:** game-wide actual combat values, injury/Health effects, clinic service durations, regular clinic pricing and final rent system.
 
 Related: [Inkbound master](README.md), [approved Silas fight](silas-pumpard-fight.md), [common Stage 8](../shared-home-rent-ending.md), [shared tutorial structure](../shared-structure.md), [approved Scrapper clinic reference](../scrapper/clinic-treatment.md).
+
+**Shared Stage 7 policy LOCKED 2026-10-19:** All six clinics use a 10-coin post-fight examination with injury-appropriate basic care only when genuinely needed. No guaranteed attack hit, compulsory wound, needless treatment, second charge or special origin reward. See [central policy](../shared-clinic-examination-policy.md).
