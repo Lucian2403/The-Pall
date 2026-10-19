@@ -183,7 +183,7 @@ If the player attempts an unaffordable demanding technique, explain the reason r
 
 **APPROVED E (WITH 20-POINT GATE).** Use credible actual battle incidents for Composure loss and Stress, not an invisible “every enemy turn −5 mental points.” Keep player agency at low Composure unless a separately defined genuine incapacitation effect occurs.
 
-**TEST-ONLY F.** **Numeric candidates are not locked**: 100-point example scales, costs 8/5/6/2, Recover +16 Stamina / +12 Composure, low-Stamina threshold 20, Fatigue +5/+10 and Focus 0/−3/−8/−15/−25 pp bands are **for test simulations only**. No permanent balance or equipment stat is locked here.
+**APPROVED BOUNDARY / TEST-ONLY VALUES F.** The **20-or-lower Stamina/Composure onset rule** and usual fresh **80–100 Stamina** are approved at the working 0–100 scale. By contrast, the absolute future maximum reserve, individual action costs 8/5/6/2, Recover +16 Stamina / +12 Composure, Fatigue +5/+10 increments and Focus 0/−3/−8/−15/−25 pp bands remain **test inputs**, not final gameplay numbers.
 
 **NEXT:** define the actual wound/status treatment & healing timing **or** weapon families and Stamina costs; prioritize a runnable one-on-one combat prototype once these shared rules are stable. Keep **three novice + three hypothetical endgame** worked cases in every following subsystem.
 
