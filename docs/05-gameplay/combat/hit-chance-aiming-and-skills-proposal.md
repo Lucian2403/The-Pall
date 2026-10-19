@@ -1,6 +1,6 @@
-# The Pall Combat — Part 7: Hit Chance, Aimed Attacks and Combat Skills (PROPOSED)
+# The Pall Combat — Part 7: Hit Chance, Aimed Attacks and Combat Skills (APPROVED PRINCIPLES)
 
-**Status: USER-REVIEW PROPOSAL — 2026-10-19. NOT LOCKED OR IMPLEMENTED.** Follows [Part 5 AI — approved principles](enemy-ai-decision-system-proposal.md) and [Part 6 Damage / Protection / Injuries — approved architecture](damage-protection-injuries-proposal.md). The objective is **demanding combat with one readable accuracy calculation**, not a maze of invisible independent dice. All accuracy values below are **hypothetical testing fixtures**, not actual weapon stats, NPC balancing or approved skill coefficients. Per user request: **three concrete beginner examples and three hypothetical high-end-game examples**.
+**Status: USER-APPROVED DESIGN PRINCIPLES — 2026-10-19; NOT IMPLEMENTED. All trial numbers and untested formulas remain OPEN TO BALANCING.** Follows [Part 5 AI — approved principles](enemy-ai-decision-system-proposal.md) and [Part 6 Damage / Protection / Injuries — approved architecture](damage-protection-injuries-proposal.md). The objective is **demanding combat with one readable accuracy calculation**, not a maze of invisible independent dice. All accuracy values below are **hypothetical testing fixtures**, not actual weapon stats, NPC balancing or approved skill coefficients. Per user request: **three concrete beginner examples and three hypothetical high-end-game examples**.
 
 ## 1. Recommended core philosophy
 
@@ -185,22 +185,22 @@ The [already locked Firing Mechanism component family](../../03-resources/compon
 14. Prevent head-target spam being mathematically dominant. If head wound benefits overwhelmingly exceed its lower contact rate, revise wound payoff or aim penalty; do not hide a punitive die.
 15. Never apply a “critical” and “penetration” independent probability stack to double-count the same strike without explicit later approval.
 
-## 10. Decisions proposed (NOT YET LOCKED)
+## 10. Design decisions accepted at principle level (NUMBERS NOT LOCKED)
 
-**A.** Use **one** contact probability roll for an ordinary attack, after legal reach and action timing. Distinguish firearm **activation** from aiming and contact.
+**APPROVED A.** Use **one** contact probability roll for an ordinary attack, after legal reach and action timing. Distinguish firearm **activation** from aiming and contact.
 
-**B.** Keep the three aim choices *inside Attack*, with **Torso reliable / Limbs less reliable / Head least reliable**, conditional consequences from actual injury rules.
+**APPROVED B.** Keep the three aim choices *inside Attack*, with **Torso reliable / Limbs less reliable / Head least reliable**, conditional consequences from actual injury rules.
 
-**C.** Use a **small additive percentage-point model** with bounded Major Arms contribution and modest existing-branch specialization; skill progression principally adds tools and technique choices, not guaranteed hits.
+**APPROVED C.** Use a **small additive percentage-point model** with bounded Major Arms contribution and modest existing-branch specialization; skill progression principally adds tools and technique choices, not guaranteed hits.
 
-**D.** Treat Focus as the only derived precision condition interface, avoid repeated penalties for the same underlying injury/stress, and keep DEX/STR/INT/RES primarily in their previously approved attribute roles.
+**APPROVED D.** Treat Focus as the only derived precision condition interface, avoid repeated penalties for the same underlying injury/stress, and keep DEX/STR/INT/RES primarily in their previously approved attribute roles.
 
-**E.** Let actual weapon family, distance, legal cover, mobility and maintained rifle sights modify the same contact probability; don't bolt on independent per-component reliability rolls.
+**APPROVED E.** Let actual weapon family, distance, legal cover, mobility and maintained rifle sights modify the same contact probability; don't bolt on independent per-component reliability rolls.
 
-**F.** Test **70% candidate weapon base, Head −25 pp, Limbs −12 pp, partial cover −20 pp and a candidate 5–95% eligible-attack clamp** for illustration ONLY. These values may be too forgiving or too punishing and must be tested against real encounter outcomes and gear. They are NOT approved or canonical.
+**TEST-ONLY F (NOT FINALIZED).** Trial **70% candidate weapon base, Head −25 pp, Limbs −12 pp, partial cover −20 pp and a candidate 5–95% eligible-attack clamp** for illustration ONLY. These values may be too forgiving or too punishing and must be tested against real encounter outcomes and gear. They are NOT approved or canonical.
 
-**Next** after user review: Part 8 should define **Stamina, Fatigue, Composure, Stress and Focus interactions** and action resources, then weapon classes, wound/medical thresholds, nonlethal outcomes and an executable encounter prototype. Continue the required **three low-stakes + three hypothetical endgame** tests for each major design.
+**Next:** [Part 8 — Stamina, Fatigue, Composure, Stress and Focus](stamina-fatigue-composure-stress-focus-proposal.md) proposes **Stamina, Fatigue, Composure, Stress and Focus interactions** and action resources, then weapon classes, wound/medical thresholds, nonlethal outcomes and an executable encounter prototype. Continue the required **three low-stakes + three hypothetical endgame** tests for each major design.
 
-**Change control:** this is a proposed document, not a numerical balance lock or shipped browser code. The already-approved six onboarding story outcomes, skills, equipment quality/durability, manufacturer component stats, 50 starting Health and 10-coin no-wound examination remain untouched.
+**Change control:** this document's structural accuracy/skill design is **APPROVED**, but **no starting accuracy, aim/cover modifier, skill coefficient, accuracy clamp or firearm weapon-profile number is locked**, and no browser combat code has shipped. The already-approved six onboarding story outcomes, skills, equipment quality/durability, manufacturer component stats, 50 starting Health and 10-coin no-wound examination remain untouched.
 
 Related: [Skills](../../01-player/skills-progression.md), [Character](../../01-player/character-system.md), [Damage](damage-protection-injuries-proposal.md), [Initiative](initiative-and-intent-proposal.md), [Enemy AI](enemy-ai-decision-system-proposal.md), [Firing mechanisms](../../03-resources/components/mechanical/firing-mechanisms.md), [Rifle sights](../../03-resources/final-products/weapon-fittings/rifle-sights.md).
