@@ -130,9 +130,9 @@ At a yard entrance, piles of rubbish block the shortest way into the row of home
 
 **DRIVER:** “That's all they've put on.”
 
-**PLAYER:** “But the paper says there should be more.”
+**PLAYER:** “The loaders were supposed to put more on.”
 
-**DRIVER:** “Paper's got a lot of coal on it. Shame we can't burn that.”
+**DRIVER:** “Then go and ask them why they didn't. This is all I've got.”
 
 **PLAYER:** “You knew it was short?”
 
