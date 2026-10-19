@@ -2,7 +2,7 @@
 
 **Status: APPROVED AND LOCKED (2026-10-15).** The user approved the three distinct work loops, occupational dialogue, branch evidence handling and convergence. Stage 1 [Benny](opening-dialogue.md), Stage 2 [Yarrow Cut](yarrow-cut-interaction.md), and Stage 3 [The Warm Patch](warm-patch-discovery.md) are also APPROVED. Exact numerical rules remain TBD. The three job families and their core discoveries were already locked in the [Squatter overview](README.md).
 
-The player has seen dressings caught in the yarrow, a human finger bone and warm drainage bricks by the old poorhouse ground. Those observations **raise a question**, not a medical diagnosis or an established supernatural explanation. Benny's order is weighed but its **full buyer acceptance remains disputed**. Staff in each branch know only what the player tells them or what they inspect themselves.
+The player has seen dressings caught in the yarrow, a human finger bone and warm drainage bricks by the old poorhouse ground. Those observations **raise a question**, not a medical diagnosis or an established supernatural explanation. Benny's order is weighed but its **full buyer acceptance remains disputed**. **User-approved provenance correction (2026-10-19):** [Stage 2](yarrow-cut-interaction.md) now records the actual harvest section and sorting condition for each separate bundle. That record stays with Benny's consignment when it reaches the buyer, rather than relying on the apparent cleanliness of the stems. Staff in each branch know only what the player tells them or what they inspect themselves.
 
 ## A — The Apothecary's Weighing (Commerce → Trading)
 
@@ -12,7 +12,7 @@ The player has seen dressings caught in the yarrow, a human finger bone and warm
 
 1. **[Check the delivery against the weight note]** — compare Benny's recorded usable weight to the delivery, with damaged or damp bundles plainly visible; fix an accounting mismatch if necessary. No hidden value puzzle.
 2. **[Sort for the buyer's inspection]**, choosing **[Separate doubtful stems first]** (more checking time, clearer separation) or **[Weigh each marked group]** (more repeated handling, clearer per-group weight). This is a real quantity/condition trading task, not a dialogue quiz.
-3. **[Compare the accepted and held weights]** — buyer inspects the separated groups and checks source records. A **confirmed clean portion** from the demonstrably separate, dry upper public ground may be taken into the buyer's ordinary inventory. Its separation must be grounded in source notes and normal inspection; healthy appearance alone does **not** prove uncontaminated medicine. The buyer holds/rejects the suspicious group and **does not sell it as medicinal stock**. Exact quality proof and accepted weight follow the general system; the tutorial needs a distinguishable safe subsection regardless of Stage 2 harvesting method.
+3. **[Compare the accepted and held weights]** — buyer checks the actual Stage 2 source-section labels, source condition and separated group weights. A verified portion from the **dry upper public section** can enter the buyer's ordinary inventory **only when the available normal inspection and independent source evidence support it**. The stems grown near the newly suspect drain edge are held; healthy appearance alone cannot prove safety. The buyer **does not sell doubtful stems as medicinal stock**. A distinct upper-section portion is guaranteed to have been harvested under either Stage 2 approach, but the amount accepted still requires verification; no recipe, special toxin test or hidden guarantee is invented.
 4. **[Record the partial receipt]** — the buyer records only what was accepted. This is not approval of the full disputed yarrow order.
 
 *The apothecary rubs gray residue from a tied stem against a scrap of paper.*
@@ -29,9 +29,9 @@ The player has seen dressings caught in the yarrow, a human finger bone and warm
 
 **Player choice:** **[Ask what will happen to the held bundle]** or **[Check the accepted weight]**. The first gets “It stays here, off the shelves, till we know where it came from.” The second opens the receipt with accepted and rejected weights. Both lead to the same concrete finding.
 
-**Revelation:** The apothecary recognizes the disposal-ground residue but pragmatically buys the **verifiably clean portion**, while refusing the doubtful stems. He knows there's a risk and chooses a limited transaction, not the sale of unsafe medicine.
+**Revelation:** The apothecary recognizes disposal-ground residue and accepts **only the portion verified as from a separate safe source using the preserved section records and routine checks**, while holding doubtful stems. He knows there's a risk and chooses a limited transaction, not the sale of unsafe medicine.
 
-**Payment clarity:** the partial receipt settles only the portion credited to **Benny's consignment account**. It is not a wage receipt to the player or full acceptance of the original Yarrow Cut assignment. That full-batch order remains unresolved, hence no tutorial worker payment clears. Do not imply the player received the buyer's coins and then had them taken away; no cash goes into the character's inventory.
+**Payment clarity:** the partial receipt settles only the accepted portion credited to **Benny's consignment account**, grouped by recorded harvest source. It is not a wage receipt to the player or full acceptance of the original Yarrow Cut assignment. That full-batch order remains unresolved, hence no tutorial worker payment clears. Do not imply the player received the buyer's coins and then had them taken away; no cash goes into the character's inventory.
 
 **End:** The player has an accurate trade record and knows that a buyer has seen similar marks before, but cannot name the source of the drain or claim every yarrow plant is tainted. The rejected goods stay with the apothecary, under hold, not as player loot.
 
