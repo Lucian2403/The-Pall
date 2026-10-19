@@ -1,6 +1,6 @@
-# The Pall Combat — Part 2: Initiative, Intent and Encounter Variety (PROPOSED)
+# The Pall Combat — Part 2: Initiative, Intent and Encounter Variety (APPROVED PRINCIPLES)
 
-**Status: PROPOSED FOR USER DISCUSSION, NOT LOCKED (2026-10-19).** The [one-action Momentum-based combat foundation](approved-combat-foundation.md) is approved in principle. The precise mechanisms below deliberately remain subject to challenge. Goals: every turn offers a rational decision, the enemy can't cheat after seeing player input, and the same small action set creates different fights.
+**Status: APPROVED PRINCIPLES (2026-10-19).** The user accepted the recommended Initiative, committed telegraphs, Guard preparation and basic Move/Reposition as one zero-Momentum Standard Action, and a lightweight relative-position design. **The former discussion text below is retained as the design rationale and still flags untested options and numerical TBDs; acceptance does not approve every speculative setting or an additional Evasive Step button.** Goals: every turn offers a rational decision, the enemy can't cheat after seeing player input, and the same small action set creates different fights.
 
 ## 1 — One initiative order, not three competing speed systems
 
@@ -84,10 +84,14 @@ Do not solve these by artificially forcing the second enemy hit to land or by ma
 
 **Round starts:** AI action committed → show observed intent, position, resources and real terrain. **Player chooses one action**. Defensive postures establish, then actions resolve by a single practical timing order and range/target eligibility. Recompute actual Health, injuries, Momentum, Stamina, equipment state and the real win/lose/withdraw outcome. Only then format and display the factual log.
 
-**Explicitly open:** formula and ties for timing, whether an Evasive Step is separate or a Move variant, contact/near/far exact meanings, tracking versus fixed attacks, enemy telegraph clarity at low Focus, move legality, group enemies, cancel versus weakens rules, Momentum values and how a human enemy yields nonlethally.
+**Explicitly open:** formula and ties for timing, contact/near/far exact meanings, tracking versus fixed attacks, enemy telegraph clarity at low Focus, move legality, group enemies, cancel versus weakens rules, Momentum values and how a human enemy yields nonlethally. **Do not add a separate Evasive Step command by default**; start with the existing Move action and revisit only if meaningful playtesting requires it.
 
 ## Proposal checkpoint for user feedback
 
-**Recommend adopting next:** **action-timing-based Initiative**, honest precommitted telegraphs with varying detail, protected Guard before enemy contact, actionable zero-Momentum Reposition, and small relative-distance/obstacle states. **Do not yet lock values, skill modifiers, or extra buttons.** After discussing this layer, Part 3 should define **the smallest complete standard action menu**, then Momentum generation/spending, and only then test combat numbers against the six onboarding fights and normal Grey Marches enemies.
+**APPROVED AT PRINCIPLE LEVEL (2026-10-19):** **action-timing-based Initiative**, honest precommitted telegraphs with varying detail, protected Guard before enemy contact, one basic zero-Momentum Reposition action, and small relative-distance/obstacle states. **Do not yet lock values, skill modifiers, an Evasive Step button or additional submechanics.** [Part 3 — the complete Standard Action menu](standard-action-menu-proposal.md) is the next PROPOSAL. Exact round formulas, actual distances, tie rules and UI are still pending.
 
 Related: [approved core principles](approved-combat-foundation.md), [earlier critique](core-turns-actions-initiative-momentum-proposal.md), [Flint](../onboarding/millhand/flint-fight.md), [boar](../onboarding/squatter/boar-fight.md), [Silas](../onboarding/inkbound/silas-pumpard-fight.md).
+
+## User's forward-looking example requirement (2026-10-19)
+
+For each future system proposal, show **two or three concrete low-stakes combat examples and two or three high-end-game combat examples**, illustrating meaningful turn choices and plausible outcomes. Endgame examples are conditional design tests, **not newly locked enemies, weapons or locations**. Preserve the small shared action menu and existing world canon.
