@@ -46,9 +46,9 @@ Use the **existing care provider role**, e.g. **CLINICIAN** (unnamed), at Cinder
 4. **[Pay 10 coins and accept care]**: with the established zero tutorial wages/XP/loot and no other spending, coins go from **20 to 10**. The actual Health restoration, wound effects, time cost and potential diagnosis remain global-system TBD. Do not award Medicine XP because the Stitcher has received care.
 5. **[Leave the infirmary]**: Stage 7 completes once and hands off to the **identical [shared Stage 8](../shared-home-rent-ending.md)**. No new mandatory job or institution-related side quest interrupts the home transition.
 
-### Unhurt victory: unresolved for all six backgrounds
+### Unhurt victory: shared examination policy LOCKED (2026-10-19)
 
-A successful player may have taken **no combat damage**. Do **not** invent a cut, bruise, infection or bandage so the 10-coin scene makes narrative sense. The common tutorial asks for one paid medical service, yet the right handling of a completely healthy character remains open across *all* backgrounds. This draft preserves that known tension; it does not silently rule that a healthy Stitcher needs a dressing or lock a separate examination-only tariff. Resolve globally in the Health/Care design later.
+A successful player may have taken **no combat damage**. The user approved an ordinary **10-coin examination** even when the Stitcher is entirely healthy; the clinician shows **“No injuries found. No treatment needed.”** and performs no needless treatment or healing. A genuine wound receives basic care included in the same fee. No guaranteed hit, pre-combat injury or new clinical tariff applies. [Common policy](../shared-clinic-examination-policy.md).
 
 ### Institutional aftermath stays local
 
@@ -63,6 +63,8 @@ The clinic dialogue does not give the provider knowledge of which Stage 4 job th
 - Keep tutorial combat and both work tasks at **0 coins and 0 ordinary XP**. Normal medical jobs outside onboarding pay normally.
 - **Already LOCKED:** one generic 10-coin tutorial service for every origin, identical rented home, patient-safe outcome, no forced wound, no clinical item reward.
 - **Approved in Stage 7:** the exact Owler-related dialogue, the irony of a ward worker paying for care at their own infirmary, and the ordinary local treatment-area arrival. Preserve the spoken lines verbatim unless the user requests changes.
-- **TBD:** precise combat wounds, treatment effects, service duration, care interface labels, healthy-fighter medical handling, and exact city/infirmary travel geometry.
+- **TBD:** precise combat wounds, treatment effects, service duration, care interface labels, and exact city/infirmary travel geometry. Examination-only care for a healthy fighter is now resolved in the shared policy.
 
 Related: [Stage 6 approved](owler-fight.md), [Stitcher master](README.md), [common home and identical speech](../shared-home-rent-ending.md), [Millhand clinic reference](../millhand/clinic-treatment.md), [Bellrunner care reference](../bellrunner/clinic-treatment.md).
+
+**Shared Stage 7 policy LOCKED 2026-10-19:** All six clinics use a 10-coin post-fight examination with injury-appropriate basic care only when genuinely needed. No guaranteed attack hit, compulsory wound, needless treatment, second charge or special origin reward. See [central policy](../shared-clinic-examination-policy.md).
