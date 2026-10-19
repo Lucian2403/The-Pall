@@ -1,6 +1,6 @@
-# Inkbound — Stage 5: The Sealed Stove / The Coal Hook (PROPOSED)
+# Inkbound — Stage 5: The Sealed Stove / The Coal Hook (APPROVED)
 
-**Status: REVISED PROPOSAL (2026-10-19); NOT LOCKED.** Three player lines and their immediate replies were rewritten at the user's request for direct, natural speech and literal descriptions without metaphors or personification. Stage 5 as a whole still awaits approval. Both interactions, the communal coal box, the resident's accusation, and **Silas Pumpard, Fuel Watchman**, are already LOCKED at story-outline level in the [Inkbound master](README.md). This file proposes their playable staging, words and tactical entry into [Stage 6](silas-pumpard-fight.md). Stages [1](opening-dialogue.md), [2](winter-register-interaction.md), [3](acceptable-losses-discovery.md) and [4](second-task-branches.md) are **APPROVED AND LOCKED**. Preserve their exact dialogue and one chosen branch.
+**Status: APPROVED AND LOCKED (2026-10-19).** The user approved Stage 5 after the requested three resident/player line corrections: direct replies, a clear route explanation and literal wording without personification. Preserve all spoken dialogue verbatim unless explicitly changed. Both interactions, the communal coal box, the resident's accusation, and **Silas Pumpard, Fuel Watchman**, are already LOCKED at story-outline level in the [Inkbound master](README.md). This file records their approved playable staging, words and tactical entry into [Stage 6](silas-pumpard-fight.md). Stages [1](opening-dialogue.md), [2](winter-register-interaction.md), [3](acceptable-losses-discovery.md) and [4](second-task-branches.md) are **APPROVED AND LOCKED**. Preserve their exact dialogue and one chosen branch.
 
 ## I05-A — The Sealed Stove
 
@@ -144,8 +144,8 @@ For either physical positioning choice, he instead says:
 
 **Already LOCKED:** Sealed Stove, Coal Hook, Silas Pumpard/Fuel Watchman, piece of evidence from each route, imminent fight.
 
-**PROPOSED IN STAGE 5:** the exact resident/Silas exchanges, inspections, strict branch knowledge, coal-box setting and three physical/spoken pre-fight responses.
+**APPROVED IN STAGE 5:** the exact resident/Silas exchanges (including the three corrected lines), inspections, strict branch knowledge, coal-box setting and three physical/spoken pre-fight responses.
 
 **TBD:** final stove/box art, lock/seal ownership implementation, city map, exact watchman hook tool/stats and shared positioning mechanics.
 
-Related: [Inkbound master](README.md), [approved Stage 4 routes](second-task-branches.md), [Stage 6 proposal](silas-pumpard-fight.md), [shared combat/tutorial rules](../shared-structure.md).
+Related: [Inkbound master](README.md), [approved Stage 4 routes](second-task-branches.md), [Stage 6 approved encounter](silas-pumpard-fight.md), [shared combat/tutorial rules](../shared-structure.md).
