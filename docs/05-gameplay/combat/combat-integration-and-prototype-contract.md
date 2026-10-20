@@ -1,6 +1,6 @@
 # The Pall — Combat Part 10: Integration Contract and Runnable Vertical-Slice Proof (PROPOSAL)
 
-**Status: PROPOSED FOR USER REVIEW (2026-10-20).** Parts 1–9 are now accepted at their recorded principle/architecture levels, including [Part 9's approved wound and medical rules](wounds-bleeding-incapacitation-treatment-proposal.md). The test values and pending policies remain open. The repository is currently **pre-production documentation**, not an operational browser MMO. A separately packaged **Node.js combat test harness** was executed in the design session with 16 automated tests passing, but the harness **is NOT a shipped client, backend or a production system**. Its source is delivered as a standalone conversation artifact; do not claim it has already been deployed to GitHub or production unless actually committed there.
+**Status: PROPOSED FOR USER REVIEW (2026-10-20).** Parts 1–9 are now accepted at their recorded principle/architecture levels, including [Part 9's approved wound and medical rules](wounds-bleeding-incapacitation-treatment-proposal.md). The test values and pending policies remain open. The repository is currently **pre-production documentation**, not an operational browser MMO. A separately packaged **Node.js combat test harness** was executed in the design session with 18 automated tests passing, but the harness **is NOT a shipped client, backend or a production system**. Its source is delivered as a standalone conversation artifact; do not claim it has already been deployed to GitHub or production unless actually committed there.
 
 ## Purpose and deliberately narrow scope
 
@@ -53,12 +53,12 @@ States: `CREATED -> AWAITING_PLAYER_ACTION -> RESOLVING -> AWAITING_PLAYER_ACTIO
 ## 4. What is actually included in the isolated Node.js harness
 
 **Exploratory prototype scope (not canon):**
-- Node.js ESM, no third-party packages; `node --test test.mjs` passed **16 test cases** on 2026-10-20 in the local session.
+- Node.js ESM, no third-party packages; `node --test test.mjs` passed **18 test cases** on 2026-10-20 in the local session.
 - `newEncounter('flint'|'boar'|'silas', options)` and pure `step(state, selectedAction, {requestId, expectedRevision})`; deterministic test RNG state and event log.
 - One actor per side; actual committed visible intent; Action Timing and Guard setup; Basic Attack, Guard, Move, Recover, Use held bandage, Withdraw, experimental Momentum technique.
 - Both player and NPC earn individual provisional Momentum; accurate defensive Move can award +5, meaningful Guard +8, Basic Strike +10. Stamina decreases on effort and Fatigue can accumulate at ≤20. Recover does not cure wounds. A bandage does not heal the underlying cut.
 - Basic physically qualifying cut bleeding; exactly one test bleed tick in round cleanup; Health 0 = real downed defeat; boar withdrawing once player opens its path = nonlethal player victory.
-- Per-action `requestId` receipt and revision validation **in an in-memory state object**. This tests logic but is **not** a substitute for actual server transactions or a persisted idempotency table.
+- Per-action `requestId` receipt and revision validation **in an in-memory state object**. A late QA check corrected equal-speed defensive movement: when the existing deterministic tie-breaker lets Move complete before a committed charge, a genuinely avoided attack can award the same +5 candidate Momentum as a strictly faster Move. **Actual tie-break policy remains to be approved for production.** This tests logic but is **not** a substitute for actual server transactions or a persisted idempotency table.
 
 **Not implemented in the harness:** equipped armor/penetration, Focus+Arms formula, firearms/misfires/ammunition, full injury recovery/Trauma, stress shock application, full enemy AI decision scoring, multiple enemies, real clinic/payment and all story triggers. Their approved rules are written above for later integration. The harness has a hard-coded *test* AI and numeric damage fixtures; a passing test does not prove balance or real encounter fairness.
 
