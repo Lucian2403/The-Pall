@@ -1,6 +1,8 @@
 # Squatter — Stage 6: The Injured Boar Fight (APPROVED ENCOUNTER)
 
-**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-15).** The user approved the readable boar charge, terrain-based defensive options, nonlethal disengagement victory, safe defeat handoff and preservation of both results. The foe is an ordinary **young, injured wild boar**, not a monster or a hunting reward. Exact combat formulas, injury types and AI values remain TBD under the shared turn-based system.
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-15).**
+
+**ADDITIONAL NUMERIC DECISION — USER APPROVED (2026-10-20):** The young injured boar starts this Stage 6 fight at **30 current Health / 65 base maximum Health**. Its leg injury is genuinely pre-existing and should influence its movement/condition; this is **not 30/30**, and the encounter must not automatically refill it. **65 is its starting base maximum rather than an injury-lowered ceiling** unless a separate approved mechanic later specifies otherwise. Other combat statistics (charge damage/accuracy, guard, mobility, stamina, wound thresholds, AI weights, escape geometry) remain balance-test-only. The player starts with the existing canonical **50 maximum Health**. This specifically supersedes the earlier browser prototype's arbitrary boar 20/20 fixture. The user approved the readable boar charge, terrain-based defensive options, nonlethal disengagement victory, safe defeat handoff and preservation of both results. The foe is an ordinary **young, injured wild boar**, not a monster or a hunting reward. Exact combat formulas, injury types and AI values remain TBD under the shared turn-based system.
 
 ## What actually needs to happen
 
