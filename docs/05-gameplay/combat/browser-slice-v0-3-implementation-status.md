@@ -36,3 +36,25 @@
 7. **Three hypothetical endgame stress cases (NOT canon):** human rifle duelist with equal biological Health progression but real armor; two opponents with independently committed intentions/Momentum; industrial pressure hazard plus bleeding/limb injury. These are **not implemented** in v0.3 and remain integration tests for later.
 
 **Change control:** user-approved boar Health **30/65** remains fixed until expressly revised. Flint/Silas **50/50** are approved as a fair prototype starting configuration, not permanent NPC lore beyond this slice. Everything else in v0.3 remains measured, tested and adjustable. No claim of production readiness.
+
+
+## First actual human playtest of v0.3 — 2026-10-20
+
+**Player feedback (observed, not inferred):**
+- The new version is **better**.
+- Flint remains **easy to defeat**.
+- The player **lost twice to Silas Pumpard** but believes the encounter is beatable. Two losses are not proof that Silas is statistically overpowered; neither do the seeded tests establish that he is balanced.
+- The boar's prior trivial-exit problem is **considered solved in the player's tested difficult-exit setup/preset**. Do not reopen that encounter solely because a scripted bot can solve a correct route reliably.
+
+**Grounded engine explanation:** Silas uses a **sharp** work-hook profile with 68% trial accuracy and a provisional sharp wound rule: an actual landed hit causing at least 6 net Health harm can create **Light Bleeding**, subsequently ticking once per round. Silas also has Guard and an earned-Momentum **Hook and Draw**, and his baseline human Health is 50/50. Flint uses a blunt club, so the elementary bleed branch cannot trigger from his basic strikes. This difference may help explain why Silas is tougher in human play, but the actual cause of the two losses was **not logged or reported** and should not be asserted.
+
+**Scripted verification reference:** the existing `npm run simulate` on the available v0.3 archive reports for 500 seeds per strategy: **Flint** 367/500 Basic Strike, 390/500 Guard/Strike, 396/500 scripted react; **Silas** 343/500 Basic Strike, 373/500 Guard/Strike, 353/500 scripted react. These are only simulation-policy outcomes, not human win rates or proof of appropriate difficulty. They show a smaller difference than the player's small two-attempt sample might suggest. **Do not change balance numbers on the basis of two Silas losses alone.**
+
+**Recommended next iteration priority (not a committed code change):**
+1. **Keep v0.3 boar difficult-exit movement** unchanged pending additional contradictory player evidence. Maintain locked boar 30/65.
+2. **Tighten Flint's tactical AI**, not his human 50 Health: investigate overexposure after failed heavy attacks, retreat too early, defensive responses and whether blunt club threats remain meaningful. Do not inflate raw damage solely to force defeats.
+3. **Instrument Silas losses** with end-of-fight summaries: actions, incoming net damage, bleeds/ticks, effective Guard use, Momentum technique hits, starting position and remaining enemy Health. Use this to separate tactical difficulty from punishing bleed arithmetic.
+4. **Preserve differences in NPC identity**: Flint should be imposing and straightforward; Silas can be guarded and opportunistic. They need not have identical player win rates, but both should reward genuine informed decisions over click-spam.
+5. **Avoid new mechanic expansion** until more human playtest data identifies actual balance bottlenecks. No new numeric canon established here.
+
+**Approval status:** This section records player experience and suggests targeted testing. The player has not approved or requested changing Flint/Silas damage, bleed, AI percentages or earned Momentum brackets from v0.3 in this exchange.
