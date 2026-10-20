@@ -1,6 +1,6 @@
-# The Pall Combat — Part 9: Wounds, Bleeding, Incapacitation and Treatment (PROPOSAL)
+# The Pall Combat — Part 9: Wounds, Bleeding, Incapacitation and Treatment (APPROVED PRINCIPLES)
 
-**Status: PROPOSED FOR USER REVIEW (2026-10-19), NOT APPROVED OR IMPLEMENTED.** Builds on [Part 6 — APPROVED damage / protection / injuries](damage-protection-injuries-proposal.md), [Part 8 — APPROVED Stamina / Composure / conditions](stamina-fatigue-composure-stress-focus-proposal.md), [Character Health](../../01-player/character-system.md), [Medicine skills](../../01-player/skills-progression.md), and the [LOCKED six-origin clinic policy](../onboarding/shared-clinic-examination-policy.md). **Three beginner and three late-game examples** are included. All numeric bleed rates, treatment effects and thresholds here are **trial candidates only**. This is a game-system design for The Pall, not medical guidance.
+**Status: USER-APPROVED DESIGN PRINCIPLES (2026-10-20); NOT IMPLEMENTED OR NUMERICALLY LOCKED.** Builds on [Part 6 — APPROVED damage / protection / injuries](damage-protection-injuries-proposal.md), [Part 8 — APPROVED Stamina / Composure / conditions](stamina-fatigue-composure-stress-focus-proposal.md), [Character Health](../../01-player/character-system.md), [Medicine skills](../../01-player/skills-progression.md), and the [LOCKED six-origin clinic policy](../onboarding/shared-clinic-examination-policy.md). **Three beginner and three late-game examples** are included. All numeric bleed rates, treatment effects and thresholds here are **trial candidates only**. This is a game-system design for The Pall, not medical guidance.
 
 ## Design objective
 
@@ -167,20 +167,22 @@ These are **stress tests only**, not newly confirmed NPCs, combat weapons, clini
 15. **Balance telemetry:** frequency of minor/serious/critical wounds by zone and damage type; number of bleed ticks before control/downed; bandage usage, success by Trauma skill; clinic costs relative to activity profit; wound recovery duration; early survival after nonlethal defeat; whether late-game injuries cause tedious prolonged downtime.
 16. **Idempotent transactional state:** persist combat action, seeded RNG, current Health, effective cap, wound updates, bleed process key, item consumption, downed/outcome and clinic payment. Retry/disconnect cannot duplicate wounds/ticks, restore a used dressing or charge 10 again.
 
-## 10. Approval questions — design recommendations, NOT locked
+## 10. Approved design principles and remaining open questions
 
-**A.** Use **impact-only, minor, serious and critical** result bands, with wounds qualifying from actual post-protection/Guard impacts rather than from an additional universal wound die.
+**APPROVED A.** Use **impact-only, minor, serious and critical** result bands, with wounds qualifying from actual post-protection/Guard impacts rather than from an additional universal wound die.
 
-**B.** Use **one aggregate active Bleeding status per actor**, with clearly stated severity and **one tick during each round's cleanup**. **Test-only** Light/Moderate/Severe bleed harm of −1/−2/−3 Health per cleanup, not final balance. Controlled bleeding doesn't instantly recur without a new actual event.
+**APPROVED B.** Use **one aggregate active Bleeding status per actor**, with clearly stated severity and **one tick during each round's cleanup**. **Test-only** Light/Moderate/Severe bleed harm of −1/−2/−3 Health per cleanup, not final balance. Controlled bleeding doesn't instantly recur without a new actual event.
 
-**C.** **0 current Health means Downed / unable to act, not automatically permanently dead**. A valid defeat remains defeat; human surrender/animal withdrawal can also produce win/loss without Health 0. Permanent death, revive/respawn, gear loss and wilderness extraction policy should be approved separately.
+**APPROVED C.** **0 current Health means Downed / unable to act, not automatically permanently dead**. A valid defeat remains defeat; human surrender/animal withdrawal can also produce win/loss without Health 0. Permanent death, revive/respawn, gear loss and wilderness extraction policy should be approved separately.
 
-**D.** Treatment has **three separate operations**: control ongoing bleeding, restore current Health (to actual effective cap), and resolve lasting injury/recover cap. In combat, **Use** consumes one action and real supplies. **Medicine → Trauma** aids field care; difficult procedures fit **Surgery** and facilities, not a seventh Combat Medic skill.
+**APPROVED D.** Treatment has **three separate operations**: control ongoing bleeding, restore current Health (to actual effective cap), and resolve lasting injury/recover cap. In combat, **Use** consumes one action and real supplies. **Medicine → Trauma** aids field care; difficult procedures fit **Surgery** and facilities, not a seventh Combat Medic skill.
 
-**E.** Locked introductory clinic remains 10 coins for exam/basic care as needed, with actual injury-appropriate treatment and uninjured examination-only outcome, and an honest playable handoff from any real defeat. Non-tutorial NPC clinic costs and all healing times remain OPEN.
+**APPROVED E (CONFIRMATION OF PRIOR CANON).** Locked introductory clinic remains 10 coins for exam/basic care as needed, with actual injury-appropriate treatment and uninjured examination-only outcome, and an honest playable handoff from any real defeat. Non-tutorial NPC clinic costs and all healing times remain OPEN.
 
-**F.** Decide later whether/how lethal wilderness and future PvP defeat differ, and how active bleeding interacts with real world time and disconnections; no secretly invented death or permadeath system now.
+**APPROVED WORK BOUNDARY F.** Decide later whether/how lethal wilderness and future PvP defeat differ, and how active bleeding interacts with real world time and disconnections; no secretly invented death or permadeath system now.
 
-**Next recommendation:** after Part 9 is approved, proceed to a narrow **Combat Integration / Runnable Vertical Slice** contract (server-authoritative state machine, event log, actual three tutorial encounter fixtures and comprehensive automated tests) before expanding into a large catalog of weapon techniques or items. Any later weapon-family and medical recipe work must use the approved combat rules and remain data-driven.
+**Next:** proceed to [Part 10 — Combat Integration and Runnable Prototype Contract](combat-integration-and-prototype-contract.md), with an accompanying isolated runnable proof-of-concept. This is not yet a production browser MMO. A narrow **Combat Integration / Runnable Vertical Slice** contract (server-authoritative state machine, event log, actual three tutorial encounter fixtures and comprehensive automated tests) before expanding into a large catalog of weapon techniques or items. Any later weapon-family and medical recipe work must use the approved combat rules and remain data-driven.
 
 **Related:** [Character](../../01-player/character-system.md), [Part 6 damage architecture](damage-protection-injuries-proposal.md), [Part 8 reserve and condition rules](stamina-fatigue-composure-stress-focus-proposal.md), [Medicine skills](../../01-player/skills-progression.md), [Onboarding clinic](../onboarding/shared-clinic-examination-policy.md), [Stitcher Trauma job](../onboarding/stitcher/morning-dressings-interaction.md), [Medicinal herbs](../../03-resources/raw/herbs-and-harvesting.md).
+
+**Approval note, 2026-10-20:** The user approved Part 9. Bleed tick **−1/−2/−3**, exact severity thresholds, treatment timing, injury recovery duration, death/respawn, wilderness extraction and pricing beyond the fixed introductory 10-coin service are still **open balance and policy**. The approval does not imply any code is production-ready.
