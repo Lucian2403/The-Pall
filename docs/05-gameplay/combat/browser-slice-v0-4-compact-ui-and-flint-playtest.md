@@ -18,7 +18,7 @@
 
 - Trial ordinary Flint club impact now rolls within **14–17 unguarded raw damage** before protection/Guard. Critical or special attacks and tactical openings can exceed that basic range, and attacks may still **miss**.
 - Flint still starts **50/50 Health**; player **50/50**, Silas **50/50**, boar **30/65** (the boar Health is specifically user-locked).
-- Fluent NPC Guard decision frequency greatly reduced, currently around **5.5% of committed actions** in a scripted 200–500 seed repeated-Attack test, not literally zero. He retains his Momentum-spending **Driving Blow** and simple aggressive character. Silas's defensive logic was intentionally not changed.
+- Flint NPC Guard decision frequency greatly reduced, currently around **5.5% of committed actions** in a scripted 200–500 seed repeated-Attack test, not literally zero. He retains his Momentum-spending **Driving Blow** and simple aggressive character. Silas's defensive logic was intentionally not changed.
 - The very high damage would otherwise have caused a **serious wound on nearly every 15+ raw club hit** with the previous prototype threshold. For this trial, blunt serious-wound eligibility now starts at **19 net Health damage**, after Guard. That remains **provisional**, subject to approved conditional wound mechanics.
 - No special opponent privileges: no forced hit, no instant weapon execution and no guaranteed player wound.
 
