@@ -71,3 +71,34 @@ Use **events-first narration**, not just a larger random synonym dictionary:
 3. **Pressure-workshop struggle:** equipment/steam hazards can be detected by audible/physical cues, not always exact imminent outcome; player can choose cover, attack or valve interaction with real exposure risk, no compulsory mystery debuff.
 
 **Approval boundary:** User approved **Part 1–9 core principles** but has NOT approved the current enemy HP, weapon damage ranges, 70% hit baseline, AI percentages, intent-display precision, boar one-bit path shortcut, or final UI/UX art. This document is **recorded feedback and proposed next revision**, not locked rules and not a shipped v0.3.
+
+
+## Health parity objection — user playtest follow-up (2026-10-20)
+
+**User observation:** Why does the player have **50 Health** while Flint (**24**), Silas (**22**) and the injured boar (**20**) have approximately half? The user suggested making the fight fair. **Diagnosis:** enemy HP numbers were arbitrary short-fight prototype tuning, **not an approved canonical rule** or a believable human physiological distinction. This player criticism is VALID. Current v0.2 has no serious game-world justification for the discrepancy.
+
+**RECOMMENDATION FOR v0.3, NOT YET NUMERICALLY APPROVED:**
+
+1. **Apply player–NPC Health parity to equivalent uninjured humans.** A baseline untrained/rested adult human NPC should start from the same **50 maximum Health** scale already canon for a new player, rather than reducing opponents to 20–25 merely because they appear during onboarding. Flint and Silas are candidates for **50/50 test fixtures**. A real previous injury, exceptional competence, natural progression or other **already modeled conditions** may justifiably change current Health or effective Health Ceiling; NPCs follow the **same** rules as players. This does not mean every human in the world is identically healthy.
+2. **Animal physiology is not tied to human numbers.** The ordinary **young injured boar** gets a plausible species-specific maximum/current Health and genuine existing-leg effects, to be tested and approved. Do not silently assign every animal 50, and do not reward an open safe route only after depleting its Health.
+3. **Health symmetry is NOT the same as fair combat.** Currently the unarmed player averages about 6 raw impact (range 4–8 trial) while Flint's club averages 10 (range 7–13); 50/50 attrition alone could turn the fight from trivial into disproportionately punishing. Keep **meaningful Guard, movement, action timing, limited weapon range, actual opposing hit chance, Momentum** and **objective-based nonlethal retreat** important.
+4. **Make nonlethal outcomes causal and earned.** Flint's objective is intimidation/collection, not murdering the Millhand. Silas's is guarding the locked coal box, not dying over it. Their surrender/withdrawal should depend on credible situation, injury, physical opening, onlookers, their objectives and risk, using **real shared AI**, **not an unexplained one-line trigger at fixed 2 turns or an automatic win when enemy Health reaches 25**. An actual defeat can still occur.
+5. **Don't retune damage to undo parity.** No secret +300% player damage, forced NPC misses or boss-only 200+ Health. Difficulty should emerge from real equipment, skilled choices and terrain while a beginner can still win unarmed.
+6. **Audit all six onboarding enemies**, not just these three. Human Dogman, Owler and Barnaby should follow the same basic Health scale if comparable. No new fixed values, names, rewards or story changes are approved here.
+7. **Do not promote test 50/50 for Flint and Silas to item/NPC canon without playtesting**. It is the recommended starting parameter for simulation and the next prototype, not a finalized loadout.
+
+**Why we cannot simply double Flint's HP without other work:** with an approximate 70% successful unarmed hit and average 6 raw impact, expected damage per attack before mitigation is about **4.2**. Burning 50 Health directly would take **roughly 12 attacks** if Flint neither guards nor withdraws. A club at average raw 10 and a comparable 70% hit chance produces about **7 expected impact per attack**, threatening the player in roughly **7–8 attacks** before defence. These back-of-envelope figures are **not simulation output** and ignore real Guard, positioning, stamina, surrender and wound states. They show that equal Health should be paired with **meaningful nonlethal objectives and real counterplay**, not a deathmatch.
+
+### Beginner stress examples (three approved story situations)
+
+- **Millhand / Flint:** proposed **50/50 vs 50/50** initial Health, unarmed vs club; a readable but not exact-threat telegraph, real cart cover, Guard and movement. Flint can be pressured into **genuine retreat** even while still above 0 Health, without hardcoding a compulsory quick victory; the player can still lose.
+- **Inkbound / Silas:** proposed **50/50 vs 50/50** uninjured human baseline; Silas actually defends a sealed box and cannot be forced to surrender his assigned property. If he disengages, he can remain a watchman; no automatic coal reward or confiscation of papers.
+- **Squatter / young injured boar:** real species/age and existing injury affect current Health, mobility and threat. Safe route and animal withdrawal remain genuine nonlethal victory; combat need not grind the boar's Health, and a lone Move no longer guarantees an instant win.
+
+### Hypothetical later-game tests (NOT new canon)
+
+- **Grey Marches rifle pursuer:** a competent human adversary's Health comes from the same human progression curve as the player's; danger from rifle, range and timing rather than arbitrary boss HP.
+- **Armoured industrial watchman:** a human baseline Health still applies; real protection, cover and defensive stance—not inflated biological Health—determine resilience.
+- **Wounded veteran duellist:** a trained human could possess a higher earned base Health than 50 within the existing exceptional approach-to-100 curve, but active injury lowers effective Health Ceiling consistently for player and NPC.
+
+**Approval boundary:** The user requested an explanation and a fairer fight, but has **not yet locked the specific NPC Health, surrender/withdraw thresholds or animal Health values**. Record the parity principle as an explicit v0.3 recommendation; no ZIP was changed during this discussion.
