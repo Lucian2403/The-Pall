@@ -53,6 +53,7 @@ Player activities, time, world economy and authored interactive events.
 - [Remaining dialogue checklist and approved NPC names](onboarding/npc-dialogue-backlog.md)
 - [Millhand / Guther Anvil: approved opening conversation](onboarding/millhand/opening-dialogue.md)
 - [Millhand: worker-plate Smithing gameplay (approved interaction)](onboarding/millhand/platework-interaction.md)
+- [Millhand First Integrated Playable v0.1 — TESTED STAGES 1–2 (2026-10-21)](onboarding/millhand/first-integrated-playable-v0-1-implementation.md): local character creation, exact Guther dialogue, reusable Smithing platework with three material paths, saved/validated progress; **29 new tests + 49 unchanged combat tests passing**. Downloadable source archive delivered in conversation; individual source files **not yet committed to GitHub**. UI/UX explicitly temporary.
 - [Millhand: approved Missing Stamp discovery and Guther dialogue](onboarding/millhand/missing-stamp-discovery.md)
 - [Millhand: approved second-task Hauling / Contracts / Investigation routes](onboarding/millhand/second-task-branches.md)
 - [Millhand: approved Flint Wage Claim, Cornered and local narrative resolution](onboarding/millhand/flint-confrontation.md)
