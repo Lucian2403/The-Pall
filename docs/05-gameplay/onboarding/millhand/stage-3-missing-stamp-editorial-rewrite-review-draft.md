@@ -80,7 +80,7 @@ The user-facing result shows **both actual dates** and the worker number after a
 
 **PLAYER:** “Then why were we told to stamp his number?”
 
-**GUTHER:** “I don't know. And I can't sign this lot with those dates on it. The council won't pay us till they settle it.”
+**GUTHER:** “I don't know. And I can't sign this lot, not after seeing those dates. The council won't pay us till they settle it.”
 
 **PLAYER:** “So that's all we're going to do?”
 
@@ -98,7 +98,7 @@ The following three alternatives appear together after the preceding conversatio
 
 **PLAYER:** “I'll stamp the worker number again. Then I'll take the plates to the depot.”
 
-**GUTHER:** “Only the worker number. Leave the inspector's mark alone. Take the lot to the depot when you're done. I won't sign it as approved.”
+**GUTHER:** “Only the worker number. Leave the inspector's mark alone. Take the lot to the depot when you're done. I won't sign to say the lot is approved.”
 
 *You return to the bench for one more worker-number mark before taking the lot to the depot.*
 
