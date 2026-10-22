@@ -32,7 +32,9 @@
 
 **PLAYER CHOICE 1 — Read the demand.**
 
-*You read the contractor's paper. You find the disputed plate lot reference and the same cancelled worker number you found in the council's records. The contractor has entered a processing charge against you as the worker assigned to the lot. There is no record of wages being paid to you. No amount is specified in this draft.*
+*You read the contractor's paper. You find the disputed plate lot reference and the same cancelled worker number you found in the council's records. The contractor has entered a processing charge against you as the worker assigned to the lot. There is no record of wages being paid to you.*
+
+**Authoring constraint:** The contractor charge has no established numerical amount; do not invent one.
 
 **PLAYER:** “Why have they put the charge on me?”
 
