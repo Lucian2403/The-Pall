@@ -62,7 +62,7 @@
 
 **Spoken player dialogue: first person** when the player selects an actual speech response. NPC speech follows each NPC's established voice.
 
-**Personal journal: first person, factual.** Record what the player did, saw, chose or learned and only what the persisted game state confirms. Journal entries are not newly invented inner thoughts or feelings. For third-person/reference records or system descriptions, use a neutral register rather than forcing “I”.
+**Personal journal: first person, personal and natural.** The player character may react, complain, doubt, feel relief or embarrassment, swear occasionally and add retrospective observations in their own voice. This is a journal, not a formal incident report or a copy of the combat log. Preserve the actual choices, findings and victory/defeat; do not invent wounds, exact combat events, received payments or facts belonging to an unplayed branch. A journal opinion (“I didn't think I'd manage it”) may be subjective without needing a numerical stat. Character reputation claims (“Everybody knows how tough Flint is”) are proposed world colour only until approved as character knowledge; do not generalise unapproved claims across the setting. For reference records or system descriptions, use a neutral register rather than forcing “I”.
 
 **Button labels:** concise imperatives naming the player's act (“Read the work paper”, “Straighten the corner”). They are not spoken dialogue and need no pronouns.
 
@@ -71,10 +71,16 @@
 **Example:**
 - Narration: “You haven't checked the number on the work paper. You cannot stamp the plate correctly yet.”
 - Player dialogue: “When do we get paid?”
-- Journal: “I checked the work paper and set the number stamps.”
+- Journal: “I checked the work paper and set the stamps. Had to go over the number twice to be sure.” *(Only if that second check actually happened; otherwise omit it.)*
 - Button: “Set the number stamps.”
 
 This mixed convention applies **game-wide**, including all six origin tutorials, future encounters, combat descriptions, jobs, logs and location scenes. The user expressly approved it after reviewing the Stage 2 viewpoint issue. It changes prose conventions, not quest outcomes or gameplay mechanics.
+
+## Combat log versus personal Journal (2026-10-22)
+
+The **approved combat log is a separate, existing system**. Preserve its exact messages, action/event formatting, turn chronology, mechanical rules and tests; **do not rewrite it during narrative/editorial reviews**. The Stage 6 writing review affects only the scene framing before and after combat and the character's personal Journal, not the combat log. Never use a newly written diary line to imply an unrecorded hit, injury or tactical event. This separation is a direct user correction to the Stage 6 review draft.
+
+The owner's current request expressly allows a more subjective and informal **first-person diary voice** for the player Journal, overriding the older blanket “factual only” restriction. The Journal can sound pleased, tired, surprised, angry or uncertain in retrospect, where sensible. Scene narration and wrong-object interactions remain second-person and literal; no personification. Review earlier Stage 1–4 diary copy for this richer voice during the eventual dialogue integration, but do not silently rewrite already approved scene text.
 
 ## Strict object-language check — approved 2026-10-22
 
