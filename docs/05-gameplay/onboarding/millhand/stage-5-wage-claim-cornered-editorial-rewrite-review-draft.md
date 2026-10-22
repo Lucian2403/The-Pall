@@ -20,7 +20,7 @@
 
 **PLAYER:** “Yes.”
 
-**FLINT:** “They've stopped that lot. The contractor wants money for the delay. Your name's on the work paper.”
+**FLINT:** “They've stopped that lot. The contractor wants money for the delay. They've got you down for the job.”
 
 **PLAYER:** “I haven't been paid for that work.”
 
@@ -32,11 +32,11 @@
 
 **PLAYER CHOICE 1 — Read the demand.**
 
-*You read the contractor's paper. It lists the disputed plate lot and the same cancelled worker number you found in the council's records. The contractor has entered a processing charge against you as the worker assigned to the lot. There is no record here of wages being paid to you. No amount is established for this scene.*
+*You read the contractor's paper. You find the disputed plate lot reference and the same cancelled worker number you found in the council's records. The contractor has entered a processing charge against you as the worker assigned to the lot. There is no record of wages being paid to you. No amount is specified in this draft.*
 
 **PLAYER:** “Why have they put the charge on me?”
 
-**FLINT:** “Your name's on the job. The contractor sent me to collect it.”
+**FLINT:** “They've got you down for the work. The contractor sent me to collect it.”
 
 **PLAYER CHOICE 2 — Ask who sent him.**
 
@@ -44,7 +44,7 @@
 
 **FLINT:** “The contractor sent me. I work for him.”
 
-*Flint lets you look at the paper. You see the lot reference, the cancelled worker number and the charge entered against you. The paper does not show that you received any wages.*
+*Flint holds the paper where you can read it. You find the lot reference, the cancelled worker number and the charge entered against you. There is no record of wages paid to you.*
 
 Both choices expose the contractor's role and the same essential evidence; neither makes Flint a council officer. “Read the demand” is a physical inspection; the other is an explicit spoken challenge. Both retain the chance to examine the document as a read-only prop afterward.
 
@@ -62,7 +62,7 @@ Both choices expose the contractor's role and the same essential evidence; neith
 
 **FLINT:** “Yes.”
 
-*You can bring up what you found during your second job. Only the line from your actual Stage 4 route appears.*
+**PLAYER ACTION:** Tell Flint what you found in your second job. Only the spoken response from your actual Stage 4 route is available. It does not appear or advance automatically.
 
 ### Route-specific evidence — only one is present
 
