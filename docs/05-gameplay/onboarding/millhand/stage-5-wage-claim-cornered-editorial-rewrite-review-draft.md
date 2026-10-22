@@ -146,23 +146,33 @@ All scene observations are in **second person**, literal and restricted to facts
 
 No red highlight identifies the right response. Each required utterance remains visible until the user advances or selects the next explicit speech option. The 1.2-second presentation delay belongs to actions with committed outcomes, never autoplay.
 
-## Journal — factual first-person record
+## Journal — first-person personal account (Revised 2026-10-22)
 
-**After first exchange:**
-*Flint stopped me in the passage on my way home. He said the contractor wanted money because the council had stopped Anvil's plate lot. I had not been paid.*
+This is the Millhand's private account of a bad day, not a transcript or clerk's report. A little anger, fatigue and ordinary disbelief belong here. Record only the facts from this player's route; the speaker may add their own reaction without inventing other discoveries.
 
-**After reading or challenging the demand:**
-*The contractor entered a processing charge against me as the worker assigned to the lot. The contractor's paper used the cancelled worker number. Flint was sent to collect money, not by the council.*
+**After first meeting Flint:**
 
-**Only the actual prior route:**
-- **Depot:** *I told Flint the depot received numbered metal plates and recorded them as plates. The contractor's paper listed workers.*
-- **Contracts:** *I told Flint the Contracts clerk had recorded my complaint about the two sealed entries. Flint had not been told about it.*
-- **Records:** *I told Flint the council had entered wages against the cancelled number after the worker's death. Flint did not know who had made those entries.*
+*I was heading home when Flint stopped me in the passage. The contractor wants money because the council held up Anvil's plates. What a fine business. They haven't paid us, and now they want me to pay them.*
 
-**After Cornered:**
-*Flint would not let me pass without paying him. He drew his club. I chose how to defend myself.*
+**After examining or challenging the charge:**
 
-**If a stance-specific entry is kept, record only the chosen act:** *I braced myself* / *I tried to move around him* / *I used the nearby cart as cover*. No narrative claim that the player escaped or won yet.
+*I checked the contractor's paper. They've put the charge against me, and there's that same dead worker's number again. Flint wasn't sent by the council. The contractor sent him. He came for money, nothing else.*
+
+**Only the selected second-job route is recorded:**
+
+- **Depot:** *I told Flint I delivered metal plates. The depot clerk recorded them properly, and I have the receipt. The contractor's paper had workers written on it. Still no answer for that.*
+- **Contracts:** *I told him about the two council records and the complaint I made. Nobody had told him. Seems he was only given enough information to collect the money.*
+- **Records:** *I told him about the wages entered after the man's death. Flint didn't know who made those entries. I don't think he much cared, either.*
+
+**After Flint blocks the passage:**
+
+*I told him I was going home. He wouldn't move. Took hold of his club instead. I had to decide how to get past him.*
+
+**Optional stance note — only the chosen action:**
+
+*I braced myself.* / *I tried to move around him.* / *I used the nearby work cart as cover.*
+
+No outcome is entered here until Stage 6 resolves; no invented damage, hidden thoughts before the fight or other branch's evidence.
 
 ## Non-negotiable continuity
 
