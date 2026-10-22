@@ -227,7 +227,7 @@ The clerk explains the authority they actually hold. Neither entry is declared f
 
 **Action:** Check the wage record.
 
-*You find the same worker number in a wage entry made after the recorded death. The related shift records also contain that number. The council kept entering wages under it after the worker was recorded dead.*
+*You find the same worker number in a wage entry made after the recorded death. The related shift records also contain that number. The worker was still listed in the wage records after the council recorded his death.*
 
 **Visible finding:** The number appears in wage records dated after the recorded death.
 
@@ -247,7 +247,7 @@ The clerk explains the authority they actually hold. Neither entry is declared f
 
 **PLAYER:** “Do you know who changed it?”
 
-**ARCHIVE ASSISTANT:** “No. I wasn't told.”
+**ARCHIVE ASSISTANT:** “No. I don't know.”
 
 The assistant confirms only their lack of knowledge. They do not imply they witnessed the alteration or know its purpose.
 
@@ -257,7 +257,7 @@ The assistant confirms only their lack of knowledge. They do not imply they witn
 
 **Choice 1: Compare the entries above and below it.**
 
-*You examine the writing around the scraped area. The neighbouring entries give you enough information to confirm that the removed writing was part of the same set of wage records. The worker number still appears in the later tally.*
+*You compare the entries above and below the damaged line. The worker number still appears in the later wage record. You cannot read the writing that was scraped away.*
 
 **Choice 2: Compare the shift book with the wage record.**
 
