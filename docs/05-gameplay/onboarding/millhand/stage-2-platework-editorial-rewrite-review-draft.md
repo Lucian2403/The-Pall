@@ -1,6 +1,6 @@
 # Millhand — Stage 2: Marking the Worker Plates
 
-**Status: COMPLETE EDITORIAL REWRITE DRAFT FOR REVIEW (2026-10-22), NOT YET APPROVED OR IN THE GAME BUILD.** Follows the newly approved [Stage 1 Revision 02](opening-dialogue.md) and the established [platework mechanics](platework-interaction.md). This proposes replacement of Stage 2's player-facing words, not its Smithing rules, number values, ownership, payouts or Stage 3 discovery.
+**Status: EDITORIAL REWRITE REVISION 02 FOR REVIEW (2026-10-22), NOT YET APPROVED OR IN THE GAME BUILD.** Follows the newly approved [Stage 1 Revision 02](opening-dialogue.md) and the established [platework mechanics](platework-interaction.md). This proposes replacement of Stage 2's player-facing words, not its Smithing rules, number values, ownership, payouts or Stage 3 discovery.
 
 ## Specific problems in current Stage 2
 - “Inspect the docket and blanks”, “Match the dies to the docket”, “Check the impression”, “Rework the mark” are correct metalworking vocabulary, but needlessly hard as first-use tutorial verbs.
@@ -24,7 +24,7 @@
 **Player action (work paper):** Read the work paper.
 
 **Result:**
-*The paper shows the worker number to stamp on the plates. The stamps must be set to match it.*
+*The paper shows the worker number to stamp on the plates. You must arrange the number stamps to match the number on the paper.*
 
 The actual number comes from future authored data and must be displayed consistently, not invented for this draft.
 
@@ -37,7 +37,7 @@ The actual number comes from future authored data and must be displayed consiste
 *The number is set. You pull a plate from the pile. One corner is bent, and the plate rocks when you press it against the bench.*
 
 ### Step 3 — The bent plate
-**Instruction:** The plate will not lie flat. Decide what to do with it.
+**Instruction:** One corner is bent. Decide whether to straighten the plate, take another or stamp it as it is.
 
 **Player action (metal plate):** Look at the bent plate.
 
@@ -72,7 +72,7 @@ All three options remain valid. The first two lead to a clear mark on inspection
 *The number is clear. It matches the work paper.*
 
 **Poor result (stamped while bent):**
-*The plate moved under the stamps. Part of the number is too faint to read. It needs more work.*
+*The plate moved under the stamps. Part of the number is too faint to read. You need to correct it before handing the plate in.*
 
 **If poor, choose one of two ways forward:**
 
@@ -111,32 +111,34 @@ These details may be shown when the player examines objects outside a required c
 
 | Object | Observation |
 | --- | --- |
-| Work paper | The council's work order. It shows which number to put on the plates. |
+| Work paper | The council's work order, with the number to stamp on each plate written on it. |
 | Metal plates, before handling | Plain pieces of metal, ready for stamping. |
 | Bent plate | One corner is out of shape. The plate rocks on the bench. |
-| Number stamps | Small metal tools with numbers on their ends. Together they make the number on a plate. |
-| Hammer | Heavy enough to press the stamps into the metal. |
+| Number stamps | Small metal tools with numbers cut into their ends. Workers arrange them and strike them with a hammer to stamp metal. |
+| Hammer | A heavy hammer used to strike the number stamps against a metal plate. |
 | Guther | Guther is busy with the workshop. He has told you to finish the plates. |
 | Finished plate | The number is clear and matches the paper. |
 | Poor plate | Part of the number is hard to read. |
 
-## Wrong-object responses — authored by circumstance, not random insults
+## Wrong-object responses — literal, contextual player observations
 
-Each entry is a possible **player observation**, not unseen NPC speech. Use each only in the phase that makes it true. Variations should rotate without repeating the same line immediately; repeated errors remain harmless and do not alter server work state, coin or time.
+The selected object and work phase determine which remarks are eligible. These are observations from the player's viewpoint, **not dialogue spoken by workshop objects or unseen NPCs**. A wrong selection is harmless: no server action, reward change, resource cost or work advancement. Text variation comes from a real difference in the situation, not a quota of jokes.
 
-| Situation | Candidate remarks |
+**Strict no-personification policy:** The text must never attribute speech, thought, intent, feeling, judgement or human action to a tool, paper, metal part or other nonliving object. Also avoid figurative shortcuts such as “asking for trouble”, “the hammer's ready”, “the number's giving trouble”, and “reading won't flatten it”. Describe what the player has or has not done, what they can see and what will physically happen.
+
+| Situation | Candidate player observations |
 | --- | --- |
-| Hammer before reading the paper | “No use swinging yet. You don't know which number to make.” / “The hammer's ready. You're not.” |
-| Plate before reading the paper | “A plate without a number is just metal. Read the order first.” / “It looks like every other plate on the bench. For now.” |
-| Hammer before setting the stamps | “Those stamps still need setting. A hard blow won't fix the wrong number.” / “You could hit it now. Then you could explain the mess to Guther.” |
-| Paper after the stamps are already set, while dealing with the bent plate | “The number's right. It's the plate that's giving trouble.” / “Reading it again won't flatten that corner.” |
-| Hammer while the plate is bent | “That corner won't stay down. Hitting it now is asking for more work.” / “You can make a bad mark quickly, but you'd still have to fix it.” |
-| Hammer immediately after stamping, before checking | “You've struck it once. See what the metal looks like before doing more.” / “More hammering won't tell you if the number can be read.” |
-| Work paper while a poor mark needs fixing | “The number on the paper hasn't changed. The one on the plate needs attention.” |
-| Metal plate while the lot is ready for final review | “This one is marked. Look over the work before you hand it in.” |
-| Hammer after the lot is complete | “The work's done. Put that bloody thing down.” / “No one is paying you for another blow.” |
+| Hammer before reading the paper | “I haven't checked the work paper yet. I don't even know which number to stamp.” / “I need to read the number before I start.” |
+| Plate before reading the paper | “I can't mark this plate until I know the correct number.” / “The plate has no number on it yet. I should read the work paper.” |
+| Hammer before setting the stamps | “I haven't set the correct number on the stamps. If I use the hammer now, I'll mark the plate incorrectly.” / “I need to arrange the number stamps before I strike.” |
+| Work paper while handling the bent plate | “I've already checked the number. Now I need to straighten this plate or take another.” / “I know which number to use. One corner of the plate is bent.” |
+| Hammer while deciding what to do with the bent plate | “The plate is bent. If I stamp it like this, part of the number might come out badly.” / “I should decide whether to use this plate or replace it before striking.” |
+| Hammer after stamping but before inspection | “I've stamped the number once. I should check it before I use the hammer again.” / “I should see whether the whole number can be read.” |
+| Work paper while the mark needs fixing | “The work paper has the correct number. I need to fix the weak mark on the plate.” |
+| Plate when all marks are ready for final review | “The number on this plate is clear. I need to check the whole lot before handing in the work.” |
+| Hammer after the lot is complete | “I've finished marking the plates. I need to return the work paper to Guther.” / “I don't need the hammer again for this lot.” |
 
-**Humour guideline:** occasional dry annoyance; no stand-up routine, cynical proverb, modern insult or mockery of a player's English. Guther is not claimed to say these lines. Prefer three accurate contextual lines over thirty interchangeable quips. The game may display the expected task in the written instruction, but must not highlight the correct clickable object.
+**Humour guideline:** Do not force jokes into inspection/error text. Mature humour is acceptable when grounded in a person saying or doing something credible, and does not require giving tools human traits. The expected task may appear as a plain written instruction; the interface must not visually highlight the correct object.
 
 ## Journal copy — Stage 2
 
@@ -154,7 +156,7 @@ Each entry is a possible **player observation**, not unseen NPC speech. Use each
 - Stamp anyway: *I used the bent plate without straightening it.*
 
 **If the impression was poor:**
-*The stamped number was hard to read. I had to correct the mark or use another plate.*
+*I could not read the whole stamped number. I corrected it or used another plate.*
 
 **Once the lot is reviewed:**
 *The plates are marked. They still need council approval before anyone is paid.*
