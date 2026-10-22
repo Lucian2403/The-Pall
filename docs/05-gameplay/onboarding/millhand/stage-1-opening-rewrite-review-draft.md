@@ -67,7 +67,7 @@ The branch converges on the same work instruction. If the player chooses “Leav
 
 ### Common work instruction (after either dialogue path)
 **GUTHER:**
-> "You know the work. Match the numbers and mind the stock. If a blank won't lie flat, sort it before you swing. Bring the docket back when you're done."
+> "Match what's written. If a blank won't lie flat, sort it before you swing. Look over the marks, then bring me the docket."
 
 **Player action:** Take the council docket.
 
