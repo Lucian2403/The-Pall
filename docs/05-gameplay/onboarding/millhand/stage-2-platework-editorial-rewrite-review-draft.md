@@ -1,6 +1,6 @@
 # Millhand — Stage 2: Marking the Worker Plates
 
-**Status: EDITORIAL REWRITE REVISION 03 — SECOND-PERSON NARRATION PASS (2026-10-22), NOT YET APPROVED OR IN THE GAME BUILD.** Follows the newly approved [Stage 1 Revision 02](opening-dialogue.md) and the established [platework mechanics](platework-interaction.md). This proposes replacement of Stage 2's player-facing words, not its Smithing rules, number values, ownership, payouts or Stage 3 discovery.
+**Status: APPROVED EDITORIAL CANON — REVISION 03 (2026-10-22).** The project owner approved the mixed-perspective and no-personification rewrite. **This wording has not yet been installed in the playable browser build.** Follows the newly approved [Stage 1 Revision 02](opening-dialogue.md) and the established [platework mechanics](platework-interaction.md). This proposes replacement of Stage 2's player-facing words, not its Smithing rules, number values, ownership, payouts or Stage 3 discovery.
 
 ## Specific problems in current Stage 2
 - “Inspect the docket and blanks”, “Match the dies to the docket”, “Check the impression”, “Rework the mark” are correct metalworking vocabulary, but needlessly hard as first-use tutorial verbs.
@@ -202,4 +202,4 @@ This edit proposes **new words only**, not a new puzzle or recipe. Keep the sour
 
 The 1.2-second action-feedback cadence remains presentation-only. No automatic dialogue progression, no correct-object halos, no mock penalty for harmless examination. Exact numbers, work timings, material counts and economic probabilities remain open.
 
-**Editorial note:** Stage 1 was approved in Revision 02. This Stage 2 rewrite is **awaiting separate user approval** and has not replaced the original Stage 2 design document or any executable copy.
+**Editorial note:** Stage 1 Revision 02 and Stage 2 Revision 03 are both approved. This document governs Stage 2 player-facing copy; the earlier [platework mechanics](platework-interaction.md) still govern work logic and the three outcomes. The executable copy remains older until the next integration pass.
