@@ -1,6 +1,6 @@
 # Millhand Stage 4 — Three Second Jobs: full editorial rewrite, Revision 01
 
-**STATUS: EDITORIAL PROPOSAL FOR PLAYER REVIEW — NOT APPROVED, NOT IN THE PLAYABLE BUILD (2026-10-22).** This document proposes every principal Stage 4 scene, work instruction, NPC exchange, choice/result, error response and journal entry for all three routes. The [original approved Stage 4 document](second-task-branches.md) remains authoritative for gameplay flow, three task families, skills and constraints. This follows approved [Stage 1](opening-dialogue.md), [Stage 2](stage-2-platework-editorial-rewrite-review-draft.md) and [Stage 3](stage-3-missing-stamp-editorial-rewrite-review-draft.md) editorial versions.
+**STATUS: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner. This wording has **not yet been installed in the playable build**. This document proposes every principal Stage 4 scene, work instruction, NPC exchange, choice/result, error response and journal entry for all three routes. The [original approved Stage 4 document](second-task-branches.md) remains authoritative for gameplay flow, three task families, skills and constraints. This follows approved [Stage 1](opening-dialogue.md), [Stage 2](stage-2-platework-editorial-rewrite-review-draft.md) and [Stage 3](stage-3-missing-stamp-editorial-rewrite-review-draft.md) editorial versions.
 
 ## Editorial diagnosis of the former Stage 4
 
@@ -304,4 +304,4 @@ All three branches end only **after** their substantive job is completed. The us
 | Contracts | Commerce +1 | Same worker dead for compensation, active for contract charges; both sealed | Dispute recorded, no clearance |
 | Records | Scholarship +1 | Same number in death/wage records; scraped correction | Findings recorded |
 
-**No new IDs, calendar dates, item ownership, wages, standard XP, loot, criminal/reputation flags or mystery resolution.** All player-facing text remains under review until the project owner expressly approves Revision 01. The currently playable Stage 4 remains older and is not updated by the documentation commit.
+**No new IDs, calendar dates, item ownership, wages, standard XP, loot, criminal/reputation flags or mystery resolution.** The project owner approved Revision 01 on 2026-10-22. The playable Stage 4 retains older dialogue and must receive these approved words during the next integration pass.
