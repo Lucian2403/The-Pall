@@ -50,7 +50,7 @@ The actual number comes from future authored data and must be displayed consiste
    *You put the bent plate with the rejected pieces and take another from the workshop pile.*
    **Consequence:** less handling of the damaged plate, but one more plate used.
 3. **Stamp it anyway.**
-   *The plate still rocks. You hold it as well as you can and go ahead.*
+   *You leave the plate as it is. It still rocks under your hand, but you mean to stamp it anyway.*
    **Consequence:** the mark will be poor and must be dealt with after checking. Do not reveal that hidden result in the option's pre-choice description.
 
 All three options remain valid. The first two lead to a clear mark on inspection in the current prototype; the third creates an inspectable poor mark, not a softlock.
