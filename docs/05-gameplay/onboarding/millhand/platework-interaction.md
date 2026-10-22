@@ -2,6 +2,10 @@
 
 **Status: INTERACTION STRUCTURE APPROVED AND LOCKED (2026-10-14).** User approved docket inspection, mark/die matching, the bent-blank work complication, three alternatives (straighten / replace / stamp anyway), stamp/inspect/rework as needed, and the boundary before the later unique Missing Stamp reveal. Normal Smithing interactions stay reusable. **Exact serial numbers, durations, formulas, appearance, item records and other numerical implementation remain TBD; illustrative UI copy is not separately final.** See [approved Guther opening](opening-dialogue.md), [Millhand story](README.md), [dialogue style standard](../../interactions/dialogue-style-guide.md), [jobs](../../jobs/jobs-and-time.md) and [crafting](../../crafting/crafting-workflow.md).
 
+## Editorial override (APPROVED 2026-10-22)
+
+The owner has approved the full player-facing [Stage 2 Revision 03](stage-2-platework-editorial-rewrite-review-draft.md), which governs the scene narration, action names, work instructions, wrong-object feedback and factual Journal text. The earlier illustrative UI wording and old Guther quotations below are retained as **historical mechanical examples**, not current dialogue. The currently approved opening is [Stage 1 Revision 02](opening-dialogue.md). **This approval does not mean the runnable prototype has been updated.** Mechanical choices and work results in this document remain authoritative.
+
 ## Design intent and guardrails
 
 The first Millhand task is **ordinary worker-plate stamping piecework**, a low-level supervised **Craftsmanship / Smithing** activity at the established regular workshop. The player already knows the job. Introduce ordinary reusable work controls without a lecture, twitch minigame, secret timed click, or one-off quest-specific apparatus. The normal preparation/handling work must be completed **before** *The Missing Stamp* revelation. The municipal worker plates are **employer-owned work/order props**; no new tradeable "Worker Plate" component, recipe, market slot or starting item is proposed.
