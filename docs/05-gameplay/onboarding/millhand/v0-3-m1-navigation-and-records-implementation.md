@@ -1,5 +1,7 @@
 # Millhand v0.3 M1 — Browser shell and full-page records (2026-10-22)
 
+**PLAYTEST CORRECTION (2026-10-22): M1 NAVIGATION-ONLY PRESENTATION WAS REJECTED BY THE PROJECT OWNER.** Functional test results remain valid, but the owner found it to be the same dashboard with minor layout changes. This milestone must NOT be described as an approved UI/UX result. Subsequent work requires actual in-scene object interactions and a distinct Guther dialogue experience rather than only rearranged navigation. See the separately packaged interactive local prototype after this feedback; it also remains subject to visual review.
+
 **Status: COMPLETED LOCAL FOUNDATION INCREMENT, NOT FINAL v0.3 UI.** This record follows the approved [v0.3 rebuild plan](v0-3-executable-ui-rebuild-plan.md). The runnable source is supplied as `The_Pall_Millhand_v0_3_M1_Foundation.zip` in the 2026-10-22 project conversation, **not yet committed as individual GitHub prototype files**. This milestone does not claim M2 spatial interactions, M3 action-delay/audio hook, or M4 documentary artwork are finished.
 
 ## Real modifications in M1
