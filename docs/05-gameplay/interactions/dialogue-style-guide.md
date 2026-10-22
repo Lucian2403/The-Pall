@@ -1,6 +1,6 @@
 # The Pall — Spoken Dialogue Standard
 
-**Status (2026-10-14): LOCKED GAME-WIDE DIALOGUE WRITING STANDARD AND TONE CALIBRATION.** This standard applies to every NPC conversation, quest scene, event dialogue, combat encounter and in-world spoken exchange across the whole game, not only origin tutorials. The **Guther Anvil opening, third revision, is explicitly approved as a concrete tonal benchmark**, while new character dialogue remains subject to individual approval. Do not copy Guther's precise personality into other characters.
+**Status (updated 2026-10-22): GAME-WIDE SPOKEN AND INTERACTION WRITING STANDARD.** This standard applies to every NPC conversation, quest scene, event dialogue, combat encounter and in-world spoken exchange across the whole game, not only origin tutorials. The **Guther Anvil Stage 1 Revision 02 (2026-10-22) is approved**, while new character dialogue remains subject to individual approval. Do not copy Guther's precise personality into other characters.
 
 ## User's locked writing requirements
 
@@ -9,7 +9,7 @@
 3. **Vary cadence according to thought.** A short sentence is for emphasis or a genuine quick response. Longer sentences are allowed when the thought needs room. Do not manufacture a short/long pattern.
 4. **Be specific when evidence exists.** Use established objects, actions, names, documents, quantities and relationships rather than vague claims. **Do not invent facts, backstory, private memories, experiences, emotions, doubts, biographical details or "realistic" filler** just to decorate a line.
 5. **No synthetic humanity.** No slang, typos, mannerisms, exaggerated accents, quirky tics or forced verbal imperfections added just to make dialogue look human.
-   **Additional user rule (LOCKED 2026-10-19):** Write dialogue and new player-facing prose literally. **Do not use metaphors or personification.** In particular, papers, numbers, orders, records and other objects cannot promise, want, decide, accuse or otherwise act like people. If a document records a promise or an order, identify the person or office responsible: e.g. “They loaded fewer sacks than they were meant to,” not “the paper promised more coal.” Make route and mechanical descriptions concrete and causally clear. This rule applies to new dialogue and revisions across all origins; preserve already approved text unless the user explicitly requests a correction.
+   **Additional user rule (RECONFIRMED WITHOUT EXCEPTION 2026-10-22):** Write dialogue and new player-facing prose literally. **Do not use metaphors or personification.** In particular, papers, numbers, orders, records and other objects cannot promise, want, decide, accuse or otherwise act like people. If a document records a promise or an order, identify the person or office responsible: e.g. “They loaded fewer sacks than they were meant to,” not “the paper promised more coal.” Make route and mechanical descriptions concrete and causally clear. This rule applies to new dialogue and revisions across all origins; preserve already approved text unless the user explicitly requests a correction.
 6. **Critique before rewriting.** Before rewriting an existing passage, identify the **specific lines** that are generic, over-polished, repetitive, corporate, awkward to speak or otherwise wrong, and explain each issue clearly.
 7. **Period constraint:** The Pall is a gritty **19th-century-inspired industrial world**. Dialogue must avoid modern institutions, pop references, administrative buzzwords and borrowed modern street slang. Use plausible work vocabulary and class/power differences, but do not overstuff with faux-Victorian dialect or theatrical archaisms.
 8. **References / creative direction:** take lessons about subtext, status, bargaining, interruptions and lived-in institutional speech from *The Wire*, especially the user's linked **"Game Day"** transcript (https://transcripts.foreverdreaming.org/viewtopic.php?t=42338), and humour that can arise from extended conversational pressure and the ridiculous seriousness of mundane stakes, as found in Tarantino's work. **Do not imitate scripts verbatim, lift scenes, transplant modern slang, or reproduce a director's signature verbal gimmicks.** Original voices and setting-specific humour only.
@@ -55,10 +55,15 @@
 - **Flint** (wage enforcer), **Dogman** (unofficial guard), **Owler** (Night Porter), **Barnaby Rusk** (breaker), **Silas Pumpard** (Fuel Watchman) are named opponents, without unapproved backstories or catchphrases.
 - Minor role-labelled NPCs may remain unnamed under the revised global NPC rule.
 
+
+## Strict object-language check — approved 2026-10-22
+
+Before any dialogue, inspection, journal entry or error remark is accepted, check that every described action belongs to the correct agent. Only a person can decide, believe, ask, tell, accuse, complain, promise, want or intend. A hammer cannot be “ready”, a crooked stamp cannot “give trouble”, a paper cannot “tell” the player anything and reading cannot “flatten” a metal corner. Replace such phrases with literal statements of what the character did, what a visible object physically does, and the likely consequence. Ordinary physical descriptions—metal bending, a plate rocking on a bench, soot falling—are not personification. This prohibition takes precedence over creative-writing references, rhythm, dark humour and any earlier permissive guidance. The rejected Stage 2 draft prompted this explicit review gate.
+
 ## Draft review checklist
 
 Before accepting any dialogue, ask: **What does this speaker want now? Why use these words on this person? What is hidden rather than explained? Does the next answer actually respond? Could a shorter exchange do the same work? Would a real speaker say it aloud? Is the humour earned by the situation, or has a joke been stapled on? Is every concrete detail supported by locked world/game documents?**
 
 ## Approval workflow
 
-The **user's rules and restrained-friction calibration above are LOCKED**. **Guther's third-draft opening dialogue was explicitly approved and is canonical**. All future scenes must receive careful line-by-line review for spoken cadence, character motive, specificity, period appropriateness, gratuitous jokes and artificial polish. Specific new dialogue stays PROPOSED until explicitly approved.
+The **user's rules and restrained-friction calibration above are LOCKED**. **Guther's Stage 1 Revision 02 is the currently approved opening**. All future scenes must receive careful line-by-line review for spoken cadence, character motive, specificity, period appropriateness, gratuitous jokes and artificial polish. Specific new dialogue stays PROPOSED until explicitly approved.
