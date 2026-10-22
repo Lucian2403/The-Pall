@@ -74,7 +74,7 @@ No correct-action glow, forced “tutorial guard”, hidden reaction timer or au
 
 **Trigger:** The authoritative combat result is **player victory** (including an authorised Flint retreat or surrender outcome, as applicable). No scripted automatic victory.
 
-*Flint steps back. He still has his club, but he no longer blocks the passage. You wait until he has moved clear, then walk past him.*
+*Flint steps aside. You wait until there is room to pass, then leave.*
 
 **Encounter result:** You defeated Flint.
 
@@ -94,7 +94,7 @@ Only select this variant if the combat outcome supports it. Flint is not killed 
 
 *You are knocked down and cannot get past Flint. Voices come from the far end of the passage. Other workers have heard the fight.*
 
-*Two workers enter the passage. Flint looks toward them, then moves away. He leaves without collecting any money.*
+*Other workers enter the passage. Flint looks toward them, then moves away. He leaves without collecting any money.*
 
 *One of the workers comes over and helps you get to a place where you can receive medical care.*
 
@@ -130,7 +130,7 @@ These messages must correspond to the actual combat state and must not spend a t
 ## Journal — factual first-person entries
 
 **On encounter entry:**
-*Flint blocked the passage home and threatened me with a short club. I chose to defend myself.* Only record the actually selected pre-fight stance in the separate Stage 5 entry.
+*Flint blocked the passage home and threatened me with a short club. We fought.* Only record the actually selected pre-fight stance in the separate Stage 5 entry.
 
 **After victory:**
 *I defeated Flint and got past him. He did not collect the contractor's charge. The council has still not paid for the plates.*
