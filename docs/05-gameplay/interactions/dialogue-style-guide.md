@@ -56,6 +56,26 @@
 - Minor role-labelled NPCs may remain unnamed under the revised global NPC rule.
 
 
+## Approved narrative perspective (2026-10-22)
+
+**Default narration and interface feedback: second person.** Describe observable actions, circumstances and physical results with “you”, or use a neutral factual observation where smoother. In-character wrong-object interactions are also **second person**, not first-person internal monologues; do not assign unchosen thoughts, feelings, motives, movement or moral judgments to the protagonist.
+
+**Spoken player dialogue: first person** when the player selects an actual speech response. NPC speech follows each NPC's established voice.
+
+**Personal journal: first person, factual.** Record what the player did, saw, chose or learned and only what the persisted game state confirms. Journal entries are not newly invented inner thoughts or feelings. For third-person/reference records or system descriptions, use a neutral register rather than forcing “I”.
+
+**Button labels:** concise imperatives naming the player's act (“Read the work paper”, “Straighten the corner”). They are not spoken dialogue and need no pronouns.
+
+**Wrong-object feedback:** describe the unmet requirement or physical condition without an automatically committed game action, self-critical comment, joke quota or a tool acting like a person. Never use “I haven't…” for a narration/error message. Do not highlight the right object visually; readers can use approved instructions and observations to reason about the job.
+
+**Example:**
+- Narration: “You haven't checked the number on the work paper. You cannot stamp the plate correctly yet.”
+- Player dialogue: “When do we get paid?”
+- Journal: “I checked the work paper and set the number stamps.”
+- Button: “Set the number stamps.”
+
+This mixed convention applies **game-wide**, including all six origin tutorials, future encounters, combat descriptions, jobs, logs and location scenes. The user expressly approved it after reviewing the Stage 2 viewpoint issue. It changes prose conventions, not quest outcomes or gameplay mechanics.
+
 ## Strict object-language check — approved 2026-10-22
 
 Before any dialogue, inspection, journal entry or error remark is accepted, check that every described action belongs to the correct agent. Only a person can decide, believe, ask, tell, accuse, complain, promise, want or intend. A hammer cannot be “ready”, a crooked stamp cannot “give trouble”, a paper cannot “tell” the player anything and reading cannot “flatten” a metal corner. Replace such phrases with literal statements of what the character did, what a visible object physically does, and the likely consequence. Ordinary physical descriptions—metal bending, a plate rocking on a bench, soot falling—are not personification. This prohibition takes precedence over creative-writing references, rhythm, dark humour and any earlier permissive guidance. The rejected Stage 2 draft prompted this explicit review gate.
