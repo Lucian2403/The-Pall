@@ -35,7 +35,7 @@
 > Steel rings at the far benches, two sharp blows and a third that comes late. The air carries hot scale and damp cloth. Guther sets a folded council docket beside a tray of plate blanks and opens it with a thumb dark from work. The numbering dies are within reach.
 
 **GUTHER:**
-> "Another lot from the council. Worker plates. The numbers are on the docket."
+> "Council's brought more plates. Worker numbers this time. See that docket? Don't touch the dies till you've read it."
 
 **Player choices (mutually available):**
 - **Spoken:** "When do we get paid?"
@@ -46,7 +46,7 @@
 > "When do we get paid?"
 
 **GUTHER:**
-> "Their inspector has to take the lot first. Then the wages. That's what they've told me."
+> "Inspector signs for the lot first. Then they pay. That's what the council says."
 
 **Player choices:**
 - **Spoken:** "And you believe them?"
