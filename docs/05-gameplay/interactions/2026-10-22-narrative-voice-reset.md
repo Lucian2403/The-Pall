@@ -1,6 +1,6 @@
 # The Pall — Narrative voice reset, editorial direction (2026-10-22)
 
-**Status:** Direct user-provided writing direction, applicable to editorial rewrites; not an approval of any particular revised scene. Supersedes the blanket 2026-10-19 prohibition on figurative language where it conflicts with the newer explicit request for sensory, rhythmically varied prose. Gameplay lore and existing quest mechanics are not thereby changed.
+**Status:** Direct user-provided writing direction, applicable to editorial rewrites; not an approval of any particular revised scene. Adds sensory precision and varied cadence while **preserving and strengthening the prohibition on personification**. The user reaffirmed the absolute no-personification rule on 2026-10-22. Gameplay lore and existing quest mechanics are not thereby changed.
 
 ## Reference traits, not imitation
 - **Cormac McCarthy**: density of material observation, weathering, fatal consequences, physical detail and long-vs-short cadence when a scene earns it. Do not imitate recognisable passages, punctuation conventions or borrowed biblical rhetoric.
@@ -15,10 +15,13 @@
 4. **Variety without a formula:** use long sentences, fragments, colloquialisms, blunt replies and occasional imperfections only where motivated. Avoid fixed quotas, mechanical 'burstiness', ornamental synonyms, deliberately inserted typos and fake period accents. Authored human variance beats randomized surface variation.
 5. **Period plausibility:** late-industrial / 19th-century-influenced spoken English; no corporate phrases, contemporary slang or noir catchphrase mimicry.
 6. **Humour:** sparing, dark, potentially adult, arising from real situational incongruity or a character's temperament. Never a free-floating joke or a 'quip after every click'. Profanity only where earned, not an atmosphere substitute.
-7. **No stylistic absolutism:** bleakness does not mean every person declares nihilism, nor that all dialogue is cryptic. Clear practical instructions remain useful. Metaphor may occur, but personification of paperwork and empty mechanical similes should be rare.
+7. **No personification, without exceptions in new player-facing text:** tools, metal, documents, numbers, buildings, equipment and other nonliving objects must not speak, think, intend, judge, complain, want, decide or perform human actions. Avoid figurative shortcuts that disguise what physically happened (for example, “the hammer's ready”, “reading won't flatten it”, “the plate is asking for trouble” and “the number's giving trouble”). Literal physical verbs such as *the plate rocks on the bench*, *the metal bends*, *the fire burns* and *the hammer strikes the metal when the worker swings it* are permitted when factually accurate. Describe the character's actions, evidence and consequences. Dark humour is character-based, not object-based. Being bleak doesn't require cryptic or decorative dialogue.
 8. **One playable stage at a time:** record old scene weaknesses, draft the full replacement scene including narration, choices, system messages and journal copy, check unchanged state flow and player agency, and obtain owner approval before updating executable canonical dialogue. Avoid automatic dialogue progression.
 9. **Narrative should not invent rules:** keep established origins, item ownership, character starting attributes, money rules and the staged timing of discoveries. Exact serials, dates and payoff details still TBD.
 10. **Maintain first-person voice discipline:** avoid inventing the protagonist's private history or emotions in third-person or journal copy; if a player character speaks, that line is an explicit selected response.
 
 ## Stage 1 scope
 The next file, `docs/05-gameplay/onboarding/millhand/stage-1-opening-rewrite-review-draft.md`, proposes new Stage 1 writing only. The old approved dialogue remains in `opening-dialogue.md` until a new version is approved. No engine source is altered by this document.
+
+## Editorial correction (2026-10-22)
+Stage 2's first rewrite included several prohibited remarks assigning figurative human action to tools or using nonliteral statements in error feedback. The user rejected them expressly. The strict literal-language rule above controls all subsequent scene, journal and interaction revisions, regardless of references to McCarthy, Hemingway or Chandler. Those authors are inspirations for economy, material detail and social observation—not permission to copy their figurative devices.
