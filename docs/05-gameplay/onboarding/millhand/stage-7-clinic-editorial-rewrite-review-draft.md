@@ -1,4 +1,4 @@
-# Millhand — Stage 7: Clinic editorial review
+# Millhand — Stage 7: The Clinic — Editorial Revision 01
 
 Status: Draft, pending approval, 2026-10-23.
 
@@ -109,9 +109,9 @@ Continue toward the same starter rented home through normal city travel. No rent
 
 **After arrival:**
 
-*Went to get checked after that business with Flint. I was hoping it wouldn't cost much. Should've known better.*
+*Made it to the clinic after the fight with Flint. I've not got much money left, but I ought to get checked.*
 
-**After an examination that finds no injury:**
+**After paying for an examination that finds no injury:**
 
 *They couldn't find anything wrong with me. Good. Still cost ten coins just to be examined. Half my money gone, and I haven't earned a thing today.*
 
