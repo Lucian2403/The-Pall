@@ -1,5 +1,17 @@
 # Shared Stage 8 — Return Home and Rent Notice (LOCKED FOR ALL SIX)
 
+## Owner correction — stronger final rent notice (2026-10-23)
+
+After testing Millhand v0.6, the owner rejected the previous bare `RENT — 150 coins owing` player-facing presentation as weak. The **revised provisional copy being playtested** is:
+
+> **FINAL NOTICE**
+>
+> **[player name], you have to pay 150 coins in rent, or you are out. No discussion.**
+
+This is an in-world written demand delivered to the shared rented home, not the narrator's voice or an object speaking. It must use the actual player name and a shared rent amount. It replaces the older short notice text **for the next shared Stage 8 version** across all six origins, subject to a final UX review. Do not confuse the stronger warning with an already implemented eviction mechanic: no payment deadline, countdown, automatic removal or landlord NPC is defined yet. The amount **150 coins is still a provisional game-design value**; the word “provisional” is not printed on the player's in-world notice. The old short notice text lower in this document is historical, superseded for v0.6.1 playtesting.
+
+The exact **spoken closing line after putting down the notice remains unchanged and approved**. Housing location, shared nature, currency and stage completion rules are unchanged.
+
 **Status: COMMON ONBOARDING SCENE AND EXACT SHARED CLOSING SPEECH APPROVED / LOCKED (2026-10-15).** The universal home and rent structure were already locked in [shared-structure.md](shared-structure.md); the user explicitly confirmed that **both the rent notice and the Millhand closing line are identical for all six backgrounds, without origin-specific variations**. This is the single canonical source for Stage 8's reusable housing scene. Do **not** create six independent rent notices, different amounts, housing locations or equivalent reskins.
 
 ## One scene, every origin
