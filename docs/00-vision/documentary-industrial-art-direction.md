@@ -2,7 +2,15 @@
 
 **Status: USER-APPROVED VISUAL DOCTRINE.** This is a project-wide direction for illustration, world scenes, NPC portraits, objects and the browser interface. It does **not** certify the v0.2 screenshots or current placeholder assets as final art. Visual details and canon must stay consistent with established lore and individual approved scenes.
 
-## Identity
+## Updated owner-approved art direction — 2026-10-23
+
+**This later owner instruction overrides the original visual *rendering-style* requirement below.** The user selected the supplied **Guther Anvil illustration** as the decisive artistic reference and explicitly called for a stylized, painterly MMORPG look, closer to **Albion Online / World of Warcraft-style readability** than documentary realism. **This is now the game’s chosen asset rendering direction.** The original text below remains useful for setting, functional workmanship, ordinary people's clothing, economic realism and restraint, but its literal/documentary rendering preference must not be treated as the current art-style constraint.
+
+**Implement as:** painterly stylized 3D/illustrative volumes, clearly readable silhouettes, believable proportions with controlled exaggeration for screen-scale recognition, purposeful warm practical light, tangible worn materials and strong character/environment consistency. Retain The Pall's 19th-century industrial setting, hardship, practical equipment and grounded social themes. **Do not** import WoW or Albion IP, icons, characters, locations or fantasy tropes. Avoid cartoonish slapstick, random magical effects, decorative cogs and excessive UI ornament. This update controls **style**, not approved lore, mechanics or asset-specific final acceptance.
+
+**UI clarification:** NPC dialogue belongs in a **small CRPG-style floating popup inside the current illustrated scene**, never as a full-width transcript section or a separate conversation page. The scene remains visually primary. Explicit response selection advances dialogue. Object inspection on mobile stays **inline below the visible workbench**. Final dimensions and the exact workshop composition remain subject to UX testing. Gate 02 v0.4 tests this compact popup pattern.
+
+## Historical initial identity (superseded where rendering style conflicts)
 **Industrial naturalism first, restrained archival/engraved influence second.** Nearly documentary in observation, with only slight departure from realism when it improves coherence, character or legibility. Stylishness comes from editorial discipline and recognisable craft—not fantasy exaggeration, ornamental density, or theatrical lighting.
 
 The city should look lived in and functioning before the player's arrival. Workshop tools must look fit for work, and people must resemble workers rather than posed protagonists. Human-scale subjects (hands, benches, rooms, streets, records and routine labour) carry the setting. Enormous infrastructure can appear, but must not turn every view into a heroic skyline.
