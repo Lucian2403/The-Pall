@@ -1,6 +1,6 @@
 # Millhand — Stage 6: The Fight with Flint — Editorial Revision 02
 
-**STATUS: EDITORIAL REVISION 02 — PROPOSED FOR APPROVAL, NOT INTEGRATED (2026-10-22).** This rewrite covers only the **encounter opening, post-fight story, and personal Journal**. The already-approved standalone combat log and combat v0.5.1 system—including every combat-event message, turn record, move name, telegraph, damage result, opponent behaviour and test—are **out of scope and must not change**. The inherited [Stage 6 encounter contract](flint-fight.md) remains mechanically authoritative. No new combat rules, numeric values or scripted hit are proposed.
+**STATUS: APPROVED EDITORIAL CANON — STAGE 6 REVISION 02 (2026-10-23).** The project owner approved the encounter framing and personal Journal revision. **Not yet integrated into the playable Millhand build.** This rewrite covers only the **encounter opening, post-fight story, and personal Journal**. The already-approved standalone combat log and combat v0.5.1 system—including every combat-event message, turn record, move name, telegraph, damage result, opponent behaviour and test—are **out of scope and must not change**. The inherited [Stage 6 encounter contract](flint-fight.md) remains mechanically authoritative. No new combat rules, numeric values or scripted hit are proposed.
 
 ## Editorial correction requested by the owner
 
