@@ -1,6 +1,23 @@
 # The Pall — Visual Production Gate 02: Workshop interaction wireframe v0.1
 
-**Status: MOBILE INLINE INSPECTION APPROVED AS DIRECTION; V0.4 COMPACT CRPG POPUP PROPOSED FOR REVIEW (2026-10-23).** No final UX or art sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+**Status: V0.5 REFERENCE-MATCHED COMPACT CONVERSATION/WORKBENCH SHELL PROPOSED FOR OWNER REVIEW (2026-10-23).** The prior v0.4 in-scene floating overlay was rejected; no final UX or asset sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+
+## Gate 02 v0.5 — owner reference matched, replacing rejected v0.4 (2026-10-23)
+
+**Owner feedback:** “Damn it. You did nothing what I asked. Look again at the reference and do it again.” The v0.4 bottom-left popup **over the scenic artwork is rejected**. The user's latest supplied side-by-side desktop/mobile image is the target for this revision. Do not treat the earlier “floating over the scene” interpretation as more authoritative than the latest concrete screenshot.
+
+**v0.5 review file:** `The_Pall_Gate02_Reference_Matched_v05.html` — an interactive **self-contained HTML** downloadable in this conversation. For this layout examination it uses **crops of the user's provided concept screenshot**, not a newly invented workshop illustration or production-ready game assets. Original example worker digits in the concept artwork remain **reference-only**, not game canon.
+
+**Correct placement:**
+- **Desktop:** persistent rail/top status, city banner, narrow stage header, large workshop artwork, then **two adjacent small lower panels:** left = compact Guther portrait, single current speech and selected responses; right = four work-object actions. The workshop artwork is never covered by an arbitrary 455px speech overlay. Conversation and object selection live in the same game screen, not a separate full-screen route.
+- **Mobile:** header/status, stage summary, centered Guther/workbench scene, four-object strip **immediately below**, compact dialogue card **below the object strip**, bottom navigation. No floating speech card covers Guther's face.
+- Work phase replaces the dialogue card with factual inspection/actions: desktop left inspection area next to object strip; mobile all three bent-plate options directly below object strip, with no dead portrait panel consuming phone height.
+- **Actual approved** Stage 1 opening/pay/trust words, player-name placeholder substituted as “Player” only in this preview, Stage 2 physical interaction sequence, no invented currency. The 1.2-second real gameplay cadence is **not** simulated by this visual-layout prototype.
+- Reviewer-state controls are outside the game frame instead of overlapping the work objects.
+
+**Verification:** Chromium rendered at **1440×900, 390×844, and 320×680**. No JavaScript exceptions or horizontal overflow; completed a preview interaction from opening → wage exchange → reading work paper → setting stamps → stamping bent plate → inspecting poor mark → fixing → returning work paper at all three viewport widths. This is **functional preview verification, not a first-time-user test**.
+
+**Creative director caveat:** The copied image contains sample number **1047** printed on the illustrated paper and stamps, which was in the owner's reference. This **cannot be made canonical** without an explicit game-data decision. Do not use it as an actual worker ID in game logic; request a source art revision or replace the prop art before final production. Another caveat is that a user-supplied concept screenshot is not an independent proof of accessible touch targets and detailed responsive production assets. Gate 02 v0.5 is **pending owner visual review**.
 
 ## Gate 02 v0.4 — Small CRPG dialogue popup, owner-requested correction (2026-10-23)
 
