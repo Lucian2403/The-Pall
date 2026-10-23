@@ -2,6 +2,20 @@
 
 **Status: V0.5 REFERENCE-MATCHED COMPACT CONVERSATION/WORKBENCH SHELL PROPOSED FOR OWNER REVIEW (2026-10-23).** The prior v0.4 in-scene floating overlay was rejected; no final UX or asset sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
 
+## Gate 02 v0.7 — home-page content boundary and object-gated actions (2026-10-23)
+
+**Owner's correction:** The prior modular prototype stretched the workshop, dialogue and work UI beyond the home-page's red-marked **content region under the city banner**. It also displayed player-action choices without first clicking the matching in-world asset. Both are design failures, not minor polish requests.
+
+**Artifact prepared for review:** `The_Pall_Workshop_Contained_Interactions_v07.html` (self-contained local HTML in the conversation, using supplied modular Guther/workshop/prop assets; game engine not modified). A cropped strip of the user-supplied home-page **concept** illustrates the city banner only; its words are not new lore/game data.
+
+**Layout requirement and measured result:** Desktop at 1440×900: workshop block sits approximately x=353–1323, y=304–877, **970×573px**, following the independent city banner at y=74–297. The entire story scene, interaction card and dialogue panel are within this single under-banner content block. The desktop main shell is constrained to 1232px rather than expanding with the browser. Mobile uses the same ordering and a scrolling compact stack, not a full-screen dialogue takeover.
+
+**Action-discovery contract:** No persistent quick-action list or always-on “Set stamps” button. Default object inspection text is neutral. Hover swaps idle prop to the already supplied lifted-angle image, with **no circles, glows or hints identifying the correct item**. **Only clicking the actual asset** opens its detail and context-appropriate player action(s) (e.g. click number stamps → “Set the number stamps”). Completing a committed work action clears the selected object, so the next step's player-action control remains hidden until the player selects another object. Wrong-object clicks remain harmless and do not unlock a false work action. Narrative work outcomes are shown in the separate story card; the assets do not need one new image for every state. Keyboard focus remains accessible, without calling out the correct object.
+
+**QA run:** Chromium inline-document tests at **1440×900, 390×844, 320×700**: no JS errors, no horizontal overflow. Verified manual Guther progression, no work actions before selecting an object, stamps control truly absent before clicking stamps, three bent-plate options, the faint-stamp/repair branch, and the final work-paper return. All three viewport runs reached the final demo state. These tests validate rendering and the click sequence, **not** uncoached newcomer usability.
+
+**No canon change:** Worker number/date unknown, no invented payment, XP or combat rules. The sample city banner is visual reference reuse, not proof that unrelated sample text or statistics are canonical. Current layout and visual scale remain **pending owner approval**. No game backend, saved state, combat log or other stage changed.
+
 ## Gate 02 v0.6 — Modular illustrative assets, owner design correction (2026-10-23)
 
 **Status: owner-defined interaction rules; assembled HTML remains a candidate requiring owner review.** The user explicitly corrected earlier requirements for literal scene simulation:
