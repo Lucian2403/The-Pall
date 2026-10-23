@@ -2,6 +2,22 @@
 
 **Status: V0.5 REFERENCE-MATCHED COMPACT CONVERSATION/WORKBENCH SHELL PROPOSED FOR OWNER REVIEW (2026-10-23).** The prior v0.4 in-scene floating overlay was rejected; no final UX or asset sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
 
+## Gate 02 v0.6 — Modular illustrative assets, owner design correction (2026-10-23)
+
+**Status: owner-defined interaction rules; assembled HTML remains a candidate requiring owner review.** The user explicitly corrected earlier requirements for literal scene simulation:
+
+> The Pall is a text-based browser MMO. Workshop visuals should inspire and immerse, **not** reproduce every character action or player viewpoint literally. Guther can be cropped to fit; the workbench props need only **inactive/default and active/hover** artwork, with a different lifted angle on mouse hover, **no circling or correct-answer outline**.
+
+**Already supplied complete scene kit:** `download.png` as empty bench/workshop background; `GutherAnvil_front.png` and `GutherAnvil_back.png` as portrait/cutout options; four idle/hover prop pairs: `councilWork(.png/_hover.png)`, `numberStamps(.png/_hover.png)`, `metalPlate(.png/_hover.png)`, `hammer(.png/_hover.png)`. Guther front can be cropped or masked behind the painted bench. The background and props share the painterly industrial identity sufficiently for a first UI composition; the artwork is **illustrative**, not an action-by-action simulation.
+
+**New prototype attached to conversation:** `The_Pall_Workshop_Modular_Assets_v06.html` (one self-contained interactive HTML, compressed copies of real supplied assets embedded; original uploads untouched). The default work object is its supplied PNG, while pointer hover displays the supplied `_hover` alternate-angle image with a restrained vertical lift. Clicking/touching selects the object for the inline text-based interaction; keyboard accessible alternatives are available. No halo, ring, correct-answer pulse or fake item cards over the artwork. Stage 1 approved Guther words and the principal Stage 2 choices are included as a demo; not a server state machine or final visual sign-off.
+
+**Art/UX boundary:** Do **not** insist that Guther lean, that hammer contact align to a plate, that bent/faint/repaired plates each have a separate commissioned illustration, or that the rendered scene track each small narrative gesture. Use the supplied ambient props and text for changing quest state. New asset variants may be requested only for a demonstrated usability/appearance need after playtesting. Preserve the compact CRPG dialogue card and readable work actions in the same shell.
+
+**Browser verification:** Headless Chromium rendered v0.6 at 1440px and 390px with no horizontal overflow or JavaScript exceptions. It completed the demo choice path from Guther's opening through council paper, number stamps, stamping a bent plate, faint inspection, fixing the mark, final review and returning the paper. Clicking props before Guther finishes speaking does not skip his conversation. The illustrated prop alternate angles swap on hover and selection. An additional 320px smoke check is planned separately. **This is local prototype verification, not owner approval or first-time-user evidence.**
+
+**Remaining material issues:** The supplied stamp kit includes **alphabet letters as well as numbers**; acceptable as a general workshop rack illustration, but do not describe every individual visible stamp as purely numerical. The paper's forms are decorative; any actual required worker number must be displayed dynamically in readable UI text, not invented from art. Props must remain recognizable when shrunk on mobile. The final scene composition must still be reviewed before applying it to other origins.
+
 ## Gate 02 v0.5 — owner reference matched, replacing rejected v0.4 (2026-10-23)
 
 **Owner feedback:** “Damn it. You did nothing what I asked. Look again at the reference and do it again.” The v0.4 bottom-left popup **over the scenic artwork is rejected**. The user's latest supplied side-by-side desktop/mobile image is the target for this revision. Do not treat the earlier “floating over the scene” interpretation as more authoritative than the latest concrete screenshot.
