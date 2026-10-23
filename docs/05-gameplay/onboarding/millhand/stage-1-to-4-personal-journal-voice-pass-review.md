@@ -1,6 +1,6 @@
 # Millhand — Journal Voice Review: Stages 1–4
 
-**Status: proposed (2026-10-23), not approved.** No scene dialogue, combat logs or mechanics change. The Journal is a personal first-person account, using only actions and evidence the player actually experienced.
+**Status: APPROVED BY OWNER (2026-10-23).** Personal first-person Journal voice is canonical; original approved scenes and choices remain unchanged. The v0.6 local prototype integrates first-person diary entries, with the detailed full set retained here for later polish. No scene dialogue, combat logs or mechanics change. The Journal is a personal first-person account, using only actions and evidence the player actually experienced.
 
 ## Stage 1 — At the workshop
 
