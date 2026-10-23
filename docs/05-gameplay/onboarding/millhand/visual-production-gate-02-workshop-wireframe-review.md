@@ -1,6 +1,38 @@
 # The Pall — Visual Production Gate 02: Workshop interaction wireframe v0.1
 
-**Status: MOBILE INLINE INTERACTION DIRECTION CHOSEN BY OWNER (2026-10-23); V0.2 REVISION FOR REVIEW.** The detailed wireframe is not yet approved. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+**Status: MOBILE INLINE DIRECTION CHOSEN; V0.3 CONVERSATION-OVERLAY VISUAL DIRECTION PROPOSED FOR REVIEW (2026-10-23).** No final UX or art sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+
+## v0.3 — visual-direction revision following owner references (2026-10-23)
+
+**Owner feedback:** The prior neutral HTML wireframe did not make the intended product easy to imagine. The owner supplied two visual references: a **desktop/mobile home-page hierarchy** and a **Guther workshop conversation with a black/brass dialogue box across the lower part of the scene**. They explicitly rejected taking over the entire screen for a dialogue scene.
+
+**New artifact:** `The_Pall_Gate02_Workshop_Visual_Direction_v03.html` (self-contained interactive HTML supplied in the project conversation). It is **a design prototype only**, not the existing server-connected Millhand game, not approved production artwork, and not a replacement for the accepted separate combat UI.
+
+### What changed
+
+1. **Dialogue is now a bounded overlay within the workshop illustration.** A character-facing scene remains visible above it; the name tab identifies Guther. The lower box carries one approved utterance and only available player replies. Choices and Continue advance manually; a Hide control does not advance the exchange. The demo stores the current dialogue step when hidden and reopened.
+2. **The shell is now closer to the owner's homepage reference:** left navigation on desktop, limited genuine top stats (50/50 Health, 20 coins, Craftsmanship +3), restrained typography and dark timber/iron framing. The original illustrative “Focus / Ash / Day 12 / Market / Registrar / Hut C-17” from the uploaded concept has **not** been imported into canon. Unbuilt destinations are visibly inactive in this review file.
+3. **Inline workbench inspection remains** and the object choices stay directly below the scene; there is no modal page for inspecting a plate. At narrow widths, selecting an object lets the workbench remain in view while the player scrolls down the inspection choices. All objects get the same neutral affordance; none is highlighted as the correct answer.
+4. **Visible physical work states** are illustrated with simple plate overlays (bent, faint and clear), using no invented worker number.
+5. The owner's Guther illustration was cropped to exclude the unrelated dialogue text and embedded solely as a **temporary background for the dialogue framing study**. The **metalwork environment remains an existing schematic SVG**; the two art styles are **not** a proposed final coherent set. No final Guther likeness or final forge design is approved from these references.
+
+### Mechanical/behavioural verification
+
+Chrome/Playwright rendered v0.3 at **1440, 390 and 320 pixels** from an inline local HTML document, with no JavaScript errors or horizontal overflow. The bent plate fixture exposed all three valid decisions and the conversation fixture exposed the two approved opening responses. The pay branch remained selectable, and the paper-reading action advanced to setting the stamps. The prototype is local client-only and saves nothing. Browser DOM verification does not prove real user comprehension.
+
+### Creative-director findings still blocking Gate 02 sign-off
+
+- **Scene material mismatch (major):** the illustrated Guther reference and grey practical workbench SVG have incompatible fidelity. This is tolerated only for reviewing conversation-box scale and hierarchy. Creating final UI artwork on this basis would repeat the earlier drift.
+- **Mobile work scale (major):** even with sticky workshop visibility, props are visually small on a 320–390 px canvas. A neutral object-access strip mitigates tapping but may create redundant menu interactions. Test actual object recognition and successful taps with a human before accepting it.
+- **Dialogue length (moderate):** Guther's long wage explanation needs internal scrolling or modest resizing on small handsets. Do not truncate the approved utterance or autoplay; real-device test is required.
+- **Art-direction discipline (major):** the user's illustrative Guther image uses a stylized rendering, while the locked global direction is documentary industrial naturalism. Treat this supplied reference as **composition/UI inspiration only** unless the owner explicitly approves changing or broadening the visual doctrine.
+- **Unbuilt destinations and game systems:** rail items are disabled because this is a design study. Do not use it as evidence that all navigation destinations are functional.
+
+### Recommended next review gate (not automatically approved)
+
+**Confirm Gate 02's conversation overlay and shared shell geometry** (including portrait framing and mobile legibility), then conduct **one representative workshop art-composition proof** where the work paper, plates, stamps, hammer and Guther are credible objects in the **same visual style**. Test object-scale interaction with the approved inline mobile UX. Only then prepare finalized assets; combat layout remains a separate already-approved interaction pattern to integrate later, not to redesign here.
+
+This v0.3 revision is **proposed**, pending owner feedback. No narrative, combat log, story outcomes, clinic rules, rent logic or executable Millhand source was modified.
 
 ## Owner decision and v0.2 correction — 2026-10-23
 
