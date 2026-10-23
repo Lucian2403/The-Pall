@@ -1,6 +1,25 @@
 # The Pall — Visual Production Gate 02: Workshop interaction wireframe v0.1
 
-**Status: MOBILE INLINE DIRECTION CHOSEN; V0.3 CONVERSATION-OVERLAY VISUAL DIRECTION PROPOSED FOR REVIEW (2026-10-23).** No final UX or art sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+**Status: MOBILE INLINE INSPECTION APPROVED AS DIRECTION; V0.4 COMPACT CRPG POPUP PROPOSED FOR REVIEW (2026-10-23).** No final UX or art sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+
+## Gate 02 v0.4 — Small CRPG dialogue popup, owner-requested correction (2026-10-23)
+
+**Status: NEW PROTOTYPE FOR OWNER REVIEW, NOT SIGNED OFF.** Owner explicitly rejected v0.3's overly large conversation panel and reiterated that the Guther reference establishes a stylized painterly art direction, closer to Albion Online / WoW readable proportions. The [art-direction record](../../../00-vision/documentary-industrial-art-direction.md) now states that later rendering-style decision without changing the game's industrial setting.
+
+**Attached artifact:** `The_Pall_Gate02_Workshop_Compact_Dialogue_v04.html` — a self-contained **local interactive HTML**, not game code or an executable server state migration. Desktop and phone PNG review captures were made from this exact HTML. The Guther illustration is the provided reference embed, while the Stage 2 workbench remains a schematic. Neither image is certified final production art.
+
+**Specific corrections:**
+- Contained dialogue box at the **bottom-left of the scene**, maximum **455 px desktop** width (36% of the scene at 1440 px) and compact mobile card. It is not a full-width dialogue section or a separate page.
+- Retain the scene and Guther's face above the panel; full Stage 1 approved lines and choices in a small internally scrollable box when necessary. On 390-px phone a normal two-choice panel occupied about **32%** of the scene height; at 320 px, about **47%**. Long lines stay readable without truncation or automatic advance.
+- Hide temporarily closes **only** the dialogue popup, preserving the same Guther camera. **Resume conversation** reopens the same line and responses; it does not advance the game. There is no replacement by workbench art while the dialogue is hidden.
+- The workshop stage title and surrounding navigation persist in conversation mode. The other scenes stay outside this gate.
+- On narrow screens, demo/reviewer-only controls collapse into a single disclosure by default, so they do not push the game interface below the viewport. Mobile bottom navigation stays visible.
+- Stage 2 object inspection stays below the workshop, with the actual three bent-plate choices. No new correct-object highlight, bogus worker number or gameplay rule.
+- Visual outline palette is a temporary interface proposal; full final workshop objects and other scene art must be painted in the locked Guther-compatible style **after** overlay geometry is accepted.
+
+**Checks:** The embedded HTML was rendered by headless Chromium at **1440×900, 390×844 and 320×650** with no browser JS errors or horizontal overflow. Verified opening wage branch, longer Guther speech, its two choices, Hide/Resume without advancing, and the three Stage 2 bent-plate options. Mobile screenshot checks show the active popup within the same scene and the illustration visible above. Automated checks are **not a user playtest**. The v0.4 source is not yet in GitHub (the Markdown review record is).
+
+**Creative-director assessment:** This corrects the concrete popup scale and interaction regression, but the **workbench itself still looks like a schematic** and is not representative stylized production art. Do not infer that overall workshop layout or finished Guther portrait is approved. The next gate after owner review is one coherent painterly workshop composition using the exact actual object list, with no invented IDs/dates.
 
 ## v0.3 — visual-direction revision following owner references (2026-10-23)
 
