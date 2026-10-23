@@ -40,3 +40,29 @@
 **When the work is finished:**
 
 *The plates are marked and checked. I'd like to be paid for this, but the inspector still has to approve the lot.*
+
+## Stage 3 — The Missing Stamp
+
+**After reading the slip:**
+
+*The council recorded this worker as dead after the workshop fire. I copied down the number. Why send it back with our plates?*
+
+**After looking at the returned plate:**
+
+*The returned plate has the same number. Someone from the council inspected it, and there's a date beside the mark.*
+
+**Only after examining both pieces of evidence:**
+
+*That's the number I stamped today. They recorded the worker as dead, but the inspector's mark came later. The dates don't match. Something's wrong here.*
+
+**After speaking to Guther:**
+
+*Showed Guther the papers. He saw the dates, but couldn't explain them. Says he won't sign the lot until the council settles it, so we still won't be paid. Grand.*
+
+**One route choice only:**
+
+- **Restamp / Industry:** *I'll stamp the worker number again and take the plates to the depot. I'm leaving the inspector's mark alone.*
+- **Contracts / Commerce:** *I'm going to Contracts. They sent the work paper. Someone there ought to know why we're stamping a dead man's number.*
+- **Records / Scholarship:** *Wrote down the number. I'll check the other council records myself. Guther's got nothing else here that could explain it.*
+
+No exact worker numbers or dates are invented; the same values must appear across the inspected records and Journal when the game provides them.
