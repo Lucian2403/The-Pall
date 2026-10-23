@@ -78,3 +78,15 @@ This text is Millhand-specific. The shared home scene and the exact spoken closi
 *I keep thinking about those plates and the dead worker's number. I don't know who made the mistake, or whether it was a mistake at all. But I can't spend all my time on it. I've got rent to pay. Might see what work Guther has, or make something I can sell.*
 
 The Journal can express doubt without claiming proof of deliberate falsification. It must not reveal any Stage 4 branch the player did not choose. Prefer a single final diary entry if a second would merely repeat the scene.
+
+## Interaction and persistence checks
+
+- Re-reading the notice before dismissing it: same amount and content, no transaction.
+- No rent payment option or due date is introduced in the tutorial.
+- Open Journal or Inventory normally; preserve the actual chosen branch, recorded outcome, and 10-coin balance.
+- Leaving and returning home before dismissal must not invent a punishment or repeat completed rewards.
+- Completion is recorded only after reading and putting down the notice and the shared spoken line; a reload cannot repeat it.
+- The home is shared by all origins, without special storage, location, items or rent variants.
+- The council incident is left unresolved; the character remains free to do normal work after the tutorial.
+
+The notice and the already approved spoken line are **not** candidates for substantive rewriting. This proposal changes second-person framing and the Millhand-specific personal Journal, pending approval.
