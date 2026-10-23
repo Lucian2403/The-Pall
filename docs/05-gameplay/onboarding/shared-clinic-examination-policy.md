@@ -1,5 +1,13 @@
 # Common Stage 7 — Post-Fight Clinic Examination (LOCKED 2026-10-19)
 
+## Owner correction — full post-clinic readiness for regular play (2026-10-23)
+
+The owner explicitly rejected the v0.6 test behaviour that left a character at their post-fight Health (or artificially stabilised at 1 Health). The new **onboarding exit requirement** is that immediately after the paid 10-coin examination/basic care, the player begins ordinary play with **full 50/50 Health and default starting combat condition**. Restore default Stamina/Composure, clear Fatigue/Stress, Momentum, bleeding and active wounds or other combat-only penalties. The values are the character's normal starting values, not necessarily 100 for every reserve. **Preserve base attributes, acquired skills, items, coins, route decisions and the historical original combat log.** 
+
+The Millhand v0.6.1 test integration currently resets Health to 50, Stamina 90, Composure 80, Fatigue 0, Stress 0, Momentum 0, bleed 0, wounds []. These are **prototype defaults** inherited from the combat fixture, not new universally locked numeric maxima. When the shared persistent Health system is completed, restore from its actual default character state, not literal per-origin values.
+
+The ten-coin fee is still paid **once**. Unhurt characters receive an examination without a fabricated injury or wound dressing, although the tutorial transition resets spent combat-only reserves. The historic fight outcome and injuries remain inspectable in the retained combat chronicle. This supersedes earlier paragraphs suggesting a wounded player should leave this tutorial with uncleared combat Health or a 1-Health floor. It does **not** introduce a general free-healing service for normal gameplay without separate design approval.
+
 **Status: USER-APPROVED GAME-WIDE RULE (2026-10-19).** The user rejected a compulsory minor pre-combat injury and asked whether a guaranteed second enemy hit would be simpler. Because the second hit is not certain to occur (the player may finish the fight or the enemy may be unable to attack) and because a guaranteed hit would bypass normal hit/defence play, the user explicitly chose **option three: fair, ordinary combat followed by the normal clinic even when unhurt**. Applies identically to all six background origins; it supersedes all old “healthy fight handling TBD” statements.
 
 ## Locked rule
