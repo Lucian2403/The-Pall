@@ -1,6 +1,6 @@
 # Millhand — Stage 7: The Clinic — Editorial Revision 01
 
-Status: Draft, pending approval, 2026-10-23.
+**Status: APPROVED BY OWNER on 2026-10-23 (EDITORIAL CANON).** Original clinic mechanics and combat log stay unchanged; newly approved unhurt and other-injury text remains conditional on real medical state. Playable v0.6 uses a clearly identified temporary stabilization rule after defeat.
 
 The approved shared clinic mechanics and combat log are unchanged. This writing review covers medical scene dialogue and the personal Journal only.
 
