@@ -51,3 +51,30 @@ This is the **exact same spoken line** for Millhand, Bellrunner, Squatter, Stitc
 
 After the line is displayed and acknowledged, mark onboarding complete **once**. The character stays at home and can use regular game features. No forced next job or additional storyline scene.
 
+## Scene 8C — Completion
+
+**UI message:**
+
+**Millhand opening complete.**
+
+The council has not paid for the plate lot. The dispute over the worker number remains unresolved.
+
+**10 coins remaining. Rent notice: 150 coins (provisional).**
+
+This is factual interface text, not spoken dialogue. Keep the selected Stage 4 evidence and Flint win/loss outcome in the Journal.
+
+After completion, the character remains at home with access to normal play, including paid work and crafting/trading where actually supported. There is no forced follow-up quest or invented wage amount.
+
+## Millhand Journal — first-person personal account
+
+This text is Millhand-specific. The shared home scene and the exact spoken closing line remain identical across all six backgrounds.
+
+**After reading the notice:**
+
+*Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.*
+
+**Optional later reflection, not a required extra step:**
+
+*I keep thinking about those plates and the dead worker's number. I don't know who made the mistake, or whether it was a mistake at all. But I can't spend all my time on it. I've got rent to pay. Might see what work Guther has, or make something I can sell.*
+
+The Journal can express doubt without claiming proof of deliberate falsification. It must not reveal any Stage 4 branch the player did not choose. Prefer a single final diary entry if a second would merely repeat the scene.
