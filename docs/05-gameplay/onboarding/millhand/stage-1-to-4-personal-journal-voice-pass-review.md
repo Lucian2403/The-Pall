@@ -10,7 +10,7 @@
 
 **Only if the player asked about wages:**
 
-*Asked when we get paid. After the inspector signs, Guther says. He doesn't seem too sure of that himself. Well, the plates won't mark themselves.* 
+*Asked when we get paid. After the inspector signs, Guther says. He doesn't seem too sure of that himself. Well, I've still got the work to do.* 
 
 **Only if the player also pressed Guther about trusting the council:**
 
