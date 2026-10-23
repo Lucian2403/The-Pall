@@ -2,6 +2,10 @@
 
 **Working decision — 2026-10-23.** This is the assistant's recommended production route, not a new change to previously locked quest mechanics or a claim of owner approval for every future implementation choice.
 
+## Progress update — first complete Millhand playtest exists (2026-10-23)
+
+The owner approved Stages 7–8 and early Journal updates. A runnable **local v0.6 Millhand all-eight-stage prototype** was built in the conversation, attached as `The_Pall_Millhand_v0_6_Complete_Playtest.zip`. See [v0.6 integration and QA notes](millhand/v0-6-complete-playtest-integration.md). It passes **84 Millhand tests** plus **49 unchanged combat tests**, and an instrumented Chromium UI smoke test. It is **not final UI/UX, a production release or proof of enjoyment**. The full local source is in the attached ZIP rather than the GitHub repository. The next gate is **hands-on user playtest**, especially Flint and clinic, before revisiting the other five origins.
+
 ## What is approved and what is not built
 
 - **Millhand Stages 1–6** have fresh approved editorial rewrites. Stage 5 Revision 01 (with the new personal Journal) and Stage 6 Revision 02 were explicitly approved by the owner on 2026-10-23. The **combat log and separate combat v0.5.1 system are already approved and must not be rewritten** during story editing.
