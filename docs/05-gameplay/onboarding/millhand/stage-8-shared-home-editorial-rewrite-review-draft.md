@@ -1,6 +1,6 @@
 # Millhand — Stage 8: Return Home — Editorial Revision 01
 
-**STATUS: EDITORIAL PROPOSAL FOR REVIEW (2026-10-23). NOT APPROVED OR INSTALLED.** Stage 8 is a **shared scene for all six backgrounds**, so the approved home, notice, spoken closing line and completion rules in [shared-home-rent-ending.md](../shared-home-rent-ending.md) remain authoritative. This draft proposes clearer second-person narration and a personal **Millhand-specific Journal**, not a new home, rent system or shared dialogue variation.
+**STATUS: APPROVED EDITORIAL CANON (2026-10-23).** The shared exact notice and closing speech remain the already locked common Stage 8. The Millhand narration and personal Journal were approved in this editorial pass. This is implemented in the local v0.6 playtest prototype, not a final home/rent system. Stage 8 is a **shared scene for all six backgrounds**, so the approved home, notice, spoken closing line and completion rules in [shared-home-rent-ending.md](../shared-home-rent-ending.md) remain authoritative. This draft proposes clearer second-person narration and a personal **Millhand-specific Journal**, not a new home, rent system or shared dialogue variation.
 
 ## What needs a small editorial change
 
