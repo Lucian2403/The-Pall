@@ -1,6 +1,6 @@
 # The Pall — Visual Production Gate 01: Millhand Workshop UX Contract
 
-**Status: DESIGN DIRECTOR PROPOSAL FOR OWNER REVIEW — NOT APPROVED (2026-10-23).** This is one deliberately narrow decision gate, not authorization to regenerate all assets, restyle combat or implement a new version. The owner asked for strict, candid, step-by-step design review and to preserve previous approvals. This document records evaluation criteria and the next action. Acceptance of this brief must be explicit before proceeding to Stage 2 interaction wireframes.
+**Status: OWNER ACCEPTED AS WORKING SCOPE ('agree for now'), 2026-10-23 — NOT AN ART/UX SIGN-OFF.** This is one deliberately narrow decision gate, not authorization to regenerate all assets, restyle combat or implement a new version. The owner asked for strict, candid, step-by-step design review and to preserve previous approvals. This document records evaluation criteria and the next action. Acceptance of this brief must be explicit before proceeding to Stage 2 interaction wireframes.
 
 ## What we already know — do not reopen without cause
 
