@@ -66,3 +66,58 @@
 - **Records / Scholarship:** *Wrote down the number. I'll check the other council records myself. Guther's got nothing else here that could explain it.*
 
 No exact worker numbers or dates are invented; the same values must appear across the inspected records and Journal when the game provides them.
+
+## Stage 4 — Three second-job routes
+
+Only include entries from the player's **chosen route**, and only after the related action or discovery actually happens.
+
+### Depot / Industry
+
+**After choosing how to transport the plates:**
+- **Secured together:** *Fastened the plates together to carry them to the depot.*
+- **Smaller loads:** *Carried the plates in smaller groups. More trips, but less weight at once.*
+
+**After the mismatch:**
+
+*Delivered metal plates to the depot. Someone had entered “workers” on the delivery list. Workers! The clerk could see what I'd brought.*
+
+**After the completed receipt:**
+
+*The depot recorded the goods as plates in the end. I've got a receipt, but I still don't know why that other entry was wrong. No pay for this job, either.*
+
+### Contracts / Commerce
+
+**After reading both official entries:**
+
+*One entry treats the man as dead for compensation. In the other they still charge for him as if he were alive. Both have council seals. How can they accept both?*
+
+**Only the chosen method:**
+- **Seal check:** *I asked the clerk to check both seals. Both entries had been accepted. Still no explanation.*
+- **Written complaint:** *I marked what was wrong on the work paper. The clerk recorded my complaint.*
+
+**After submitting:**
+
+*Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.*
+
+### Records / Scholarship
+
+**After the date comparison:**
+
+*Found the worker in the death register. Then I found the same number in later wage records. They were still using it after he died.*
+
+**After noticing damage:**
+
+*Someone scraped writing from an entry. The archive assistant didn't know who had done it. I wasn't going to damage the page any further.*
+
+**Only the actual comparison:**
+- **Neighbouring entries:** *I compared the entries around the damaged one. The number is still there in the later wage record.*
+- **Shift book:** *I checked the shift book against the wage record. Both have that number after the recorded death.*
+
+**After recording the finding:**
+
+*Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.*
+
+## Integration note
+
+These are review candidates for the Millhand's personal Journal, not a change to approved Stages 1–4 scenes. The approved Stage 5 and 6 personal diary drafts already use this style. Stage 7 and Stage 8 editorial drafts extend it through the tutorial ending. The separate approved combat log remains exactly as defined.
+
