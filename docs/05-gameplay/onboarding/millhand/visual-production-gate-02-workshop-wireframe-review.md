@@ -1,8 +1,20 @@
 # The Pall — Visual Production Gate 02: Workshop interaction wireframe v0.1
 
-**Status: PROPOSED FOR OWNER REVIEW (2026-10-23); NOT APPROVED.** Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
+**Status: MOBILE INLINE INTERACTION DIRECTION CHOSEN BY OWNER (2026-10-23); V0.2 REVISION FOR REVIEW.** The detailed wireframe is not yet approved. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
 
-## Actual deliverables
+## Owner decision and v0.2 correction — 2026-10-23
+
+**Owner instruction:** “For Gate 02, I prefer keeping the workshop visible with inline object inspection. Revise the mobile wireframe.”
+
+**Decision accepted for this review iteration.** The **focused mobile inspection mode from v0.1 is REJECTED / SUPERSEDED**; do not refer to it as the current recommendation. This is an approval of the **inline direction**, **not** final Gate 02 layout/asset approval.
+
+**New artifact:** `The_Pall_Gate02_Workshop_Wireframe_v02_Inline_Mobile.html` (conversation download, self-contained, no backend or asset dependencies). The workbench **never disappears** when an object is selected. Instead, the workshop compresses vertically on a narrow screen, remains visible directly above a contiguous read-only inspection and action panel, and sticks to the top of the visible area while scrolling a lengthy inspection. The selected object's outline simply denotes selection; no correct-object highlight is shown. A small Close control clears the selection. Desktop continues to show the original side-by-side inspection/action panels.
+
+**Verified in headless Chromium:** at 390×844, 375×667 and 320×650, with Bent Plate selected, the physical workbench and all three legal bent-plate decision buttons remained visible and selectable; no horizontal overflow or browser JavaScript exceptions occurred. At 1440×900 the original desktop composition remained intact. A full mobile test path `paper → stamps → bent plate as-is → hammer → poor mark → fix mark` passed, including staged result transitions. This is test evidence for rendering and click mechanics, not evidence that a new player finds it intuitive.
+
+**Critical next review:** the compressed mobile silhouettes are still small and crude. The workbench is visible, but it may be difficult to recognise the real difference between an object, its label and a hotspot in final art. Test at real device dimensions with a fresh reader; if the compact bench creates mis-taps, revise geometry rather than abandon the chosen inline model without owner consultation. Do not authorize final assets or a new integrated gameplay build based solely on this correction.
+
+## Historical v0.1 deliverables and rationale
 
 A **self-contained interactive HTML review file** was authored and provided as a conversation attachment: `The_Pall_Gate02_Workshop_Wireframe_v01.html`. It is **not** a server, runnable Millhand game, production UI or final artistic reference. Source and render proof currently exist in the conversation downloads **rather than individual GitHub source files**. Desktop/mobile screenshots were rendered for Start work, Bent-plate decision, Poor mark and Dialogue states; explanatory notes were also supplied in `Gate02_Workshop_Review_Notes.md`.
 
