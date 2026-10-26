@@ -8,7 +8,7 @@ Civilization survives inside protected industrial cities while the hazardous wor
 
 ## Core loop
 
-City → choose objective → work/train/trade → choose outside objective → prepare → Grey Marches / Ashlands → encounter, discovery, puzzle or ambush → return or continue deeper → heal, sell, craft, rest, research or trade → repeat.
+City → choose objective → work/train/trade → choose outside objective → prepare → Grey Marches / Pall → encounter, discovery, puzzle or ambush → return or continue deeper → heal, sell, craft, rest, research or trade → repeat.
 
 ## Locked principles
 

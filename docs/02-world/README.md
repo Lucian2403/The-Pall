@@ -1,12 +1,9 @@
-# World
+# World and Setting
 
-World ecology and entities. Resource locations and collection systems live in the resource and gameplay areas.
+- [The Plume, regions and what is deliberately unknown](the-plume-and-regions.md) — approved catastrophe foundation and location progression
+- [Animals, livestock and hunting](ecology/animals-livestock-and-hunting.md) — provisional ecological and economic systems
+- [The Pall — player-facing opening](../05-gameplay/onboarding/world-introduction.md) — approved introduction
+- [First-playable geographic boundary](../00-vision/first-playable-scope.md)
+- [Phase One regional materials](../03-resources/catalogue/phase-one-resource-audit.md)
 
-## Ecology
-
-- [Animals, livestock and hunting](ecology/animals-livestock-and-hunting.md)
-
-## Related
-
-- [Resource acquisition](../03-resources/raw/resource-acquisition.md)
-- [Salvaging](../05-gameplay/exploration/salvaging.md)
+Keep historical catastrophe **The Plume** distinct from the present-day hazardous **Pall**. Its ultimate cause is not known.

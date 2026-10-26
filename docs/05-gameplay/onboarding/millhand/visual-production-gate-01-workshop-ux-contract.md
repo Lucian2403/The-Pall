@@ -4,7 +4,7 @@
 
 ## What we already know — do not reopen without cause
 
-1. Project-wide aesthetic is the [approved Documentary Industrial Art Direction](../../../00-vision/documentary-industrial-art-direction.md): industrial naturalism, legible practical workspaces, believable manufacture, ordinary lighting, slight archival/engraved influence for records; no steampunk ornament, cinematic smoke, bloom or grunge obstructing information.
+1. Project-wide aesthetic is the [approved Documentary Industrial Art Direction](../../../00-vision/art-direction.md): industrial naturalism, legible practical workspaces, believable manufacture, ordinary lighting, slight archival/engraved influence for records; no steampunk ornament, cinematic smoke, bloom or grunge obstructing information.
 2. The tutorial has eight approved story stages. Millhand's current executable local builds are **functional experimental tools, not final UI**. Source ZIPs are not established as GitHub's canonical executable source.
 3. The user rejects floating paper cards instead of actual physical objects, invisible required next actions, stylistically inconsistent job/combat layouts, pseudo-NPC agency and automatic dialogue advancement. These are substantive design defects, not taste-only objections.
 4. Interaction navigation should be physical and spatial **where that helps**, with equivalent plain-text/keyboard access. The user explicitly rejected visually highlighting the correct object or an omnipresent “right answer” cue.

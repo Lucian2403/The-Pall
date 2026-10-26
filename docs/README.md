@@ -1,24 +1,37 @@
 # The Pall — Design Documentation
 
-Canonical pre-production specifications for the game. **Chat proposes. Docs decide. Structured game data tunes. Code implements.**
+This directory is the **design source of truth**. Approved decisions are distinguished from provisional balances, proposals, and historical implementation reports.
 
-## Documentation areas
+## Begin here
 
-- [00 — Vision](00-vision/README.md): core fantasy, principles and project boundaries, including [first playable scope](00-vision/first-playable-scope.md).
-- [01 — Player](01-player/README.md): character attributes, state, skills and progression.
-- [02 — World](02-world/README.md): world ecology, fauna and hunting.
-- [03 — Resources and Item Production](03-resources/README.md): **raw → refined → components → final products**, plus catalogue and audits.
-- [04 — Equipment](04-equipment/README.md): equipment rules and data contracts.
-- [05 — Gameplay Systems](05-gameplay/README.md): crafting workflow, economy, jobs, survival, salvage and interactive content.
-- [06 — Bases and Facilities](06-bases/README.md): workstations, room limits and facility progression.
+1. [The Pall — approved world introduction](05-gameplay/onboarding/world-introduction.md)
+2. [The Plume and geographical progression](02-world/the-plume-and-regions.md)
+3. [Choose Your Background — approved character-creation copy](05-gameplay/onboarding/background-selection-introduction.md)
+4. [Character creation rules](01-player/character-creation.md)
+5. [Six origin stories and onboarding](05-gameplay/onboarding/README.md)
+6. [Combat specification index](05-gameplay/combat/README.md)
 
-## Navigation and housekeeping
+## Documentation by subject
 
-- [Resource production overview](03-resources/README.md) is the entry point for all production chains.
-- [Old → new document paths](MIGRATION.md) records the 2026-10-12 repository organization migration.
-- Existing multi-topic specifications remain together to preserve design decisions; sections may be split later only if warranted.
-- New documents should live under the system they define. Cross-domain concepts should link to their canonical specification rather than duplicate it.
+| Area | What it owns |
+| --- | --- |
+| [00 — Vision](00-vision/README.md) | Design pillars, visual direction, first-playable scope |
+| [01 — Player](01-player/README.md) | Attributes, character creation, skills and progression |
+| [02 — World](02-world/README.md) | The Plume, regions, ecology |
+| [03 — Resources](03-resources/README.md) | Raw materials, refining, components, production and audits |
+| [04 — Equipment](04-equipment/README.md) | Gear rules and item schema |
+| [05 — Gameplay](05-gameplay/README.md) | Onboarding, combat, jobs, crafting, trading, survival |
+| [06 — Bases](06-bases/README.md) | Facilities and workstations |
+| [07 — Technology](07-technology/README.md) | Architecture decisions, account work and implementation boundaries |
+| [Historical archive](archive/README.md) | Superseded playtest builds, former plans and past proposals |
 
-## Pre-implementation next work
+## How to interpret statuses
 
-Agree the Phase One vertical slice and the first player experience, then design the playable location, activity, encounter and equipment loops before extensive content production.
+- **APPROVED / LOCKED:** preserve the specific decision and approved wording unless the owner changes it.
+- **PARTIALLY APPROVED:** approved principles are binding, but listed numbers and open mechanics are not.
+- **PROVISIONAL / PROPOSED:** working design; not permission to treat example values as canon.
+- **HISTORICAL ARCHIVE:** evidence of earlier work or decisions, not the current implementation specification. Keep for traceability.
+
+**Authority when documents overlap:** newer explicitly approved corrections govern the affected text or behavior; structural rules remain in their dedicated canonical document. In particular, Millhand's approved editorial scripts govern player-facing wording, while stage interaction files govern unchanged mechanics. [Millhand's editorial map](05-gameplay/onboarding/millhand/INDEX.md) identifies the split.
+
+Keep historical reports out of active indexes. Do not silently promote test values, superseded art direction, or proposed rules to approved canon.

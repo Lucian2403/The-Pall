@@ -4,7 +4,7 @@
 
 ## Editorial override (APPROVED 2026-10-22)
 
-The owner has approved the full player-facing [Stage 2 Revision 03](stage-2-platework-editorial-rewrite-review-draft.md), which governs the scene narration, action names, work instructions, wrong-object feedback and factual Journal text. The earlier illustrative UI wording and old Guther quotations below are retained as **historical mechanical examples**, not current dialogue. The currently approved opening is [Stage 1 Revision 02](opening-dialogue.md). **This approval does not mean the runnable prototype has been updated.** Mechanical choices and work results in this document remain authoritative.
+The owner has approved the full player-facing [Stage 2 Revision 03](stage-2-approved-script.md), which governs the scene narration, action names, work instructions, wrong-object feedback and factual Journal text. The earlier illustrative UI wording and old Guther quotations below are retained as **historical mechanical examples**, not current dialogue. The currently approved opening is [Stage 1 Revision 02](opening-dialogue.md). **This approval does not mean the runnable prototype has been updated.** Mechanical choices and work results in this document remain authoritative.
 
 ## Design intent and guardrails
 

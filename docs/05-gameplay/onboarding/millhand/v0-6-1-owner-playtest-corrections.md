@@ -32,4 +32,4 @@ The illustrated Stage 4 props and general world UI are temporary and still need 
 
 The next milestone is testing this corrective ZIP on the owner's local machine, collecting actual usability and gameplay observations, and **preserving approved decisions** rather than silently substituting another UI design.
 
-Related: [owner-directed shared rent warning](../shared-home-rent-ending.md), [owner-directed full-condition clinic exit](../shared-clinic-examination-policy.md), and [v0.6 integration notes](v0-6-complete-playtest-integration.md).
+Related: [owner-directed shared rent warning](../shared-home-rent-ending.md), [owner-directed full-condition clinic exit](../shared-clinic-examination-policy.md), and [v0.6 integration notes](../../../archive/history/05-gameplay/onboarding/millhand/v0-6-complete-playtest-integration.md).

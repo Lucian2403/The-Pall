@@ -2,7 +2,7 @@
 
 ## Editorial status override — 2026-10-22
 
-The project owner approved [Stage 3 Missing Stamp Revision 01](stage-3-missing-stamp-editorial-rewrite-review-draft.md). Its new dialogue, scene narration, object descriptions, and journal copy **supersede the historical spoken/UI text below**, while the evidence structure, two inspections, one-time three-way skill grant, and all mechanical constraints in this document remain authoritative. The latest wording has **not yet been integrated into the playable browser prototype**.
+The project owner approved [Stage 3 Missing Stamp Revision 01](stage-3-approved-script.md). Its new dialogue, scene narration, object descriptions, and journal copy **supersede the historical spoken/UI text below**, while the evidence structure, two inspections, one-time three-way skill grant, and all mechanical constraints in this document remain authoritative. The latest wording has **not yet been integrated into the playable browser prototype**.
 
 **Status: APPROVED AND LOCKED SCENE / DIALOGUE (2026-10-14).** User approved the returned reference plate and cancellation slip, the same-number/date contradiction, both inspection actions, Guther's entire common exchange and all three player/foreman response lines. The first-task reward rules, [approved Stage 2 platework](platework-interaction.md) and strict [Spoken Dialogue Standard](../../interactions/dialogue-style-guide.md) remain canonical. Dates, worker ID, assets, work timings and other implementation details remain TBD.
 
