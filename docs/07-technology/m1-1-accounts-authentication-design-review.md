@@ -1,4 +1,7 @@
-# M1.1 — Accounts & Authentication: design review (PROPOSED)
+# M1.1 — Accounts & Authentication: design review
+
+> **Owner approval update (2026-10-26):** Better Auth, self-hosted in the existing PostgreSQL/Fastify/SvelteKit stack, with email/password, verification and password recovery **APPROVED**. No owned game domain yet; local messages are captured with Docker Mailpit and may be addressed to a personal test email without leaving the machine. Source candidate is committed under `platform/`, but runtime/QA verification is **NOT YET PASSED**. See [M1.1 local QA plan](../../platform/M1_1_LOCAL_AUTH_QA.md). Character slots, naming, deletion, intro and lore remain undecided.
+
 
 **Date:** 2026-10-26. **Status: PROPOSED / NOT APPROVED FOR IMPLEMENTATION.** This is the next functional gate after M0. No auth provider, identity policy, or numeric limit is approved by creating this document.
 
