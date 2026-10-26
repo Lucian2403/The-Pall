@@ -122,8 +122,8 @@
 </section>
 
 <style>
-  .workshop {width:100%;color:#f3e3ce;font-family:Georgia,'Times New Roman',serif}
-  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;width:100%;aspect-ratio:1774 / 887;min-height:clamp(510px,calc(100dvh - 310px),920px);background:#271b14;border:0;box-sizing:border-box}
+  .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:Georgia,'Times New Roman',serif}
+  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:1;min-width:0;width:100%;min-height:clamp(450px,calc(100dvh - 350px),1100px);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 38% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
@@ -156,7 +156,7 @@
   .inspection small {color:#bda990}
   .inspection button {padding:8px 12px;color:#f4dcbb;background:#403126;border:1px solid #816343;cursor:pointer}
   @media(max-width:700px){
-    .scene {display:flex;flex-direction:column;aspect-ratio:auto;min-height:0;}
+    .scene {display:flex;flex-direction:column;flex:0 0 auto;min-height:0;}
     .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
     .environment {object-fit:cover;object-position:39% center}
     .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
