@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, {LogController} from 'fastify';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
 import {registerAuthRoutes} from './auth-routes.js';
@@ -8,7 +8,7 @@ import {advanceFixture} from '@the-pall/game-core';
 // M0 ONLY: fixed server-owned test identity, loopback host, no production users.
 const ACTOR = '00000000-0000-4000-8000-000000000001';
 const pool = new pg.Pool({connectionString: process.env.DATABASE_URL});
-const api = Fastify({logger: true, disableRequestLogging: true, bodyLimit: 16 * 1024});
+const api = Fastify({logger: true, logController: new LogController({disableRequestLogging: true}), bodyLimit: 16 * 1024});
 registerAuthRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {
