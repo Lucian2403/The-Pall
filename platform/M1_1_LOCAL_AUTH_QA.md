@@ -1,7 +1,21 @@
 # M1.1 — Local Better Auth + Mailpit QA
 
 **Date:** 2026-10-26  
-**Status: COMMITTED IMPLEMENTATION CANDIDATE — NOT TESTED ON OWNER'S NODE 24/DOCKER ENVIRONMENT.** The code is for local development, not public deployment. **Better Auth + email/password + verification/reset + self-hosted Postgres were approved by the owner.**
+**Status: PARTIALLY VERIFIED ON OWNER'S NODE 24/DOCKER ENVIRONMENT (2026-10-26); M1.1 IS NOT YET COMPLETE.** The code is for local development, not public deployment. **Better Auth + email/password + verification/reset + self-hosted Postgres were approved by the owner.**
+
+## Owner QA evidence — 2026-10-26
+
+The owner explicitly confirmed **PASS** for the following three steps after resolving a duplicate API process on port 8788 and verifying the PostgreSQL auth schema:
+
+1. **Account registration:** successful in the local account UI.
+2. **Verification email:** received in local Mailpit.
+3. **Email verification link:** successfully completed.
+
+Evidence is the owner's reported manual browser test, not independent server-log or automated test verification. These results **do not** establish that sign-in, durable session recovery, sign-out revocation, password reset, or multiple-account isolation work. No login credentials or links were shared.
+
+**Next manual QA gate:** sign in with the verified account; open `http://127.0.0.1:5173/api/me`, expect verified account JSON; refresh and confirm session; sign out, expect HTTP 401; request a password reset and use only the Mailpit link; verify old password fails and new password succeeds. Run `npm run verify:api` as M0 regression after the auth tests.
+
+**Additional acceptance before M1.1 closure:** verify session survives an API process restart, run auth-specific negative and multi-user access tests (at minimum account A/B session separation; character ownership tests become meaningful in M1.2), perform package TypeScript checks, and commit the updated `platform/package-lock.json` after dependency resolution.
 
 ## Why no The Pall domain or personal SMTP is needed
 
