@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand v0.4 — Unguided workshop, Missing Stamp and the three Stage 4 routes
 
 **Status: PLAYABLE LOCAL IMPLEMENTATION TESTED, NOT YET USER APPROVED (2026-10-22).** The runnable project is supplied in the project conversation as `The_Pall_Millhand_v0_4_Stages_3_4.zip`. GitHub holds this documentation but **not** the executable source tree as individual committed files. This is a real new playable milestone after the v0.3 interactive correction, not a restyling-only milestone.
@@ -29,4 +31,4 @@ User described v0.3 layout as **better, not good**. No final UI, Guther look, wo
 
 Next coherent milestone is Stage 5 The Wage Claim and Cornered using the locked branch-specific Flint dialogue, followed by integration with the proven combat v0.5.1 engine in Stage 6. Do not pretend that the old standalone combat demo is already wired into Millhand, and do not implement the clinic or home until real combat result/health persistence is available.
 
-References: [approved Stage 3](missing-stamp-discovery.md), [approved Stage 4](second-task-branches.md), [Stage 5 locked dialogue](flint-confrontation.md), [art doctrine](../../../00-vision/documentary-industrial-art-direction.md), [v0.3 interactive correction](v0-3-interactive-correction-after-rejected-m1.md).
+References: [approved Stage 3](../../../../../05-gameplay/onboarding/millhand/missing-stamp-discovery.md), [approved Stage 4](../../../../../05-gameplay/onboarding/millhand/second-task-branches.md), [Stage 5 locked dialogue](../../../../../05-gameplay/onboarding/millhand/flint-confrontation.md), [art doctrine](../../../../../00-vision/documentary-industrial-art-direction.md), [v0.3 interactive correction](v0-3-interactive-correction-after-rejected-m1.md).

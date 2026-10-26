@@ -1,6 +1,8 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # The Pall Millhand v0.3 — executable rebuild plan and acceptance gates
 
-**Status: ACTIVE DEVELOPMENT PLAN (2026-10-22).** The approved global visual doctrine is [Documentary Industrial Art Direction](../../../00-vision/documentary-industrial-art-direction.md) (correct repository-relative path: `../../../00-vision/documentary-industrial-art-direction.md`). This file is an implementation contract, not a claim that v0.3 is already complete. v0.2 UI was rejected as an artistic dashboard; preserve v0.2 functioning gameplay, not its presentation.
+**Status: ACTIVE DEVELOPMENT PLAN (2026-10-22).** The approved global visual doctrine is [Documentary Industrial Art Direction](../../../../../00-vision/documentary-industrial-art-direction.md) (correct repository-relative path: `../../../00-vision/documentary-industrial-art-direction.md`). This file is an implementation contract, not a claim that v0.3 is already complete. v0.2 UI was rejected as an artistic dashboard; preserve v0.2 functioning gameplay, not its presentation.
 
 ## Scope
 Rebuild runnable local Millhand **Stages 1–2** as a persistent browser-game interface with a genuine spatial workshop and separate destination pages. Do **not** implement Stage 3–8 yet; do not change the approved narrative, underlying world/economy or the standalone combat v0.5.1 module.

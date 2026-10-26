@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand v0.3 M1 — Browser shell and full-page records (2026-10-22)
 
 **PLAYTEST CORRECTION (2026-10-22): M1 NAVIGATION-ONLY PRESENTATION WAS REJECTED BY THE PROJECT OWNER.** Functional test results remain valid, but the owner found it to be the same dashboard with minor layout changes. This milestone must NOT be described as an approved UI/UX result. Subsequent work requires actual in-scene object interactions and a distinct Guther dialogue experience rather than only rearranged navigation. See the separately packaged interactive local prototype after this feedback; it also remains subject to visual review.
@@ -10,7 +12,7 @@
 - Journal, Inventory, Character and Conversation History are now full-page routes rather than modal side drawers; navigation uses browser hash routes and updates active destination.
 - Pages use actual character state: 20 starting coins, 50 maximum Health, 5 in each STR/DEX/INT/RES, Craftsmanship +3 and actual initial Basic Clothes/Crude Small Bag. Journal reflects current Stage 1/2 progress without Stage 3 disclosure.
 - The same local storage save key and real `/api/characters` authorization/revision/requestId workflow are preserved. Navigating records is client-side only and does not execute game actions.
-- The old v0.2 artwork is **temporarily retained and expressly not approved** under the newly locked global [Documentary Industrial Art Direction](../../../00-vision/documentary-industrial-art-direction.md). Screenshot samples are included solely for inspection of M1 routing and layouts, not to request final visual approval.
+- The old v0.2 artwork is **temporarily retained and expressly not approved** under the newly locked global [Documentary Industrial Art Direction](../../../../../00-vision/documentary-industrial-art-direction.md). Screenshot samples are included solely for inspection of M1 routing and layouts, not to request final visual approval.
 - Four additional source-code foundation tests assert real destinations, no fake system pages, retained authoritative action requests and responsive navigation rules. No new narrative, jobs, resources, reward, stage or underlying combat logic.
 
 ## Verification

@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand First Integrated Playable v0.1 — Character Creation + Stages 1–2
 
 **Status: EXECUTABLE LOCAL IMPLEMENTATION BUILT AND TESTED (2026-10-21). PRE-PRODUCTION, NOT FINAL UI/UX.** The associated user explicitly cautioned that this is **NOT** the final user interface or experience; it is only a **temporary testing shell**. The project conversation supplies `The_Pall_Millhand_Slice_v0_1.zip` as the runnable **source archive**, including the preserved combat baseline. **This GitHub document records the milestone; the runnable source is not yet committed as individual repository files.** Do not claim the code is already in GitHub or the full eight-stage tutorial is finished.
@@ -55,4 +57,4 @@ Stage 3 Missing Stamp revelation/dialogue and all three branch choices; Stage 4 
 
 **Next milestone:** user playtests the actual flow and feedback; then implement the **Stage 3 Missing Stamp** exactly as approved (two inspections, Guther exchange, three choices, +1 different Major Skill once) without exposing any of its story clues during the ordinary work task.
 
-References: [Millhand locked overview](README.md), [Guther opening](opening-dialogue.md), [Smithing task](platework-interaction.md), [Stage 3 Missing Stamp](missing-stamp-discovery.md), [integrated implementation plan](first-integrated-playable-implementation-plan.md), [shared state QA](../shared-state-implementation-contract.md).
+References: [Millhand locked overview](../../../../../05-gameplay/onboarding/millhand/README.md), [Guther opening](../../../../../05-gameplay/onboarding/millhand/opening-dialogue.md), [Smithing task](../../../../../05-gameplay/onboarding/millhand/platework-interaction.md), [Stage 3 Missing Stamp](../../../../../05-gameplay/onboarding/millhand/missing-stamp-discovery.md), [integrated implementation plan](first-integrated-playable-implementation-plan.md), [shared state QA](../../../../../05-gameplay/onboarding/shared-state-implementation-contract.md).

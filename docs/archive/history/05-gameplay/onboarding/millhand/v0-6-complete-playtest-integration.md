@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand v0.6 — Complete local playtest integration
 
 **Status: a runnable, local eight-stage preproduction prototype created 2026-10-23, NOT the final UI/UX or a production release.** The actual runnable package is attached in the conversation as `The_Pall_Millhand_v0_6_Complete_Playtest.zip`. This documentation commit records QA and the integration boundary; **it is not itself a GitHub commit containing the full prototype source**.
@@ -6,17 +8,17 @@
 
 The owner expressly approved all eight Millhand stage rewrites, including Stage 7 clinic, Stage 8 common home, and the more personal Stages 1–4 Journal update on 2026-10-23.
 
-- [Stage 1 — Guther opening](opening-dialogue.md) Revision 02
-- [Stage 2 — Smithing](stage-2-platework-editorial-rewrite-review-draft.md) Revision 03
-- [Stage 3 — The Missing Stamp](stage-3-missing-stamp-editorial-rewrite-review-draft.md) Revision 01
-- [Stage 4 — All three second-job routes](stage-4-three-routes-editorial-rewrite-review-draft.md) Revision 01
-- [Stage 5 — Flint's contractor charge](stage-5-wage-claim-cornered-editorial-rewrite-review-draft.md), including revised Journal
-- [Stage 6 — Flint's fight](stage-6-flint-fight-editorial-rewrite-review-draft.md) Revision 02, explicitly retaining the existing combat-log system
-- [Stage 7 — Clinic](stage-7-clinic-editorial-rewrite-review-draft.md) Revision 01
-- [Stage 8 — Shared home](stage-8-shared-home-editorial-rewrite-review-draft.md) Revision 01
-- [Stages 1–4 — personal Journal](stage-1-to-4-personal-journal-voice-pass-review.md)
+- [Stage 1 — Guther opening](../../../../../05-gameplay/onboarding/millhand/opening-dialogue.md) Revision 02
+- [Stage 2 — Smithing](../../../../../05-gameplay/onboarding/millhand/stage-2-approved-script.md) Revision 03
+- [Stage 3 — The Missing Stamp](../../../../../05-gameplay/onboarding/millhand/stage-3-approved-script.md) Revision 01
+- [Stage 4 — All three second-job routes](../../../../../05-gameplay/onboarding/millhand/stage-4-approved-script.md) Revision 01
+- [Stage 5 — Flint's contractor charge](../../../../../05-gameplay/onboarding/millhand/stage-5-approved-script.md), including revised Journal
+- [Stage 6 — Flint's fight](../../../../../05-gameplay/onboarding/millhand/stage-6-approved-script.md) Revision 02, explicitly retaining the existing combat-log system
+- [Stage 7 — Clinic](../../../../../05-gameplay/onboarding/millhand/stage-7-approved-script.md) Revision 01
+- [Stage 8 — Shared home](../../../../../05-gameplay/onboarding/millhand/stage-8-approved-script.md) Revision 01
+- [Stages 1–4 — personal Journal](../../../../../05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md)
 
-The official [game-wide spoken and interaction standard](../../interactions/dialogue-style-guide.md) governs perspective, literal descriptions, no personification and the diary-versus-combat-log separation.
+The official [game-wide spoken and interaction standard](../../../../../05-gameplay/interactions/dialogue-style-guide.md) governs perspective, literal descriptions, no personification and the diary-versus-combat-log separation.
 
 ## What the v0.6 local build demonstrates
 

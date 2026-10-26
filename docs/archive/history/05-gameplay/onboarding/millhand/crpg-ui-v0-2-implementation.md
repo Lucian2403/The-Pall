@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand browser UI v0.2 — CRPG presentation and implemented local prototype
 
 **Status (2026-10-21): USER-REQUESTED UI/UX REDESIGN IMPLEMENTED IN LOCAL RUNNABLE ARCHIVE, NOT FINAL ART.** The October 21 project conversation supplies `The_Pall_Millhand_Slice_v0_2.zip`. This repository document records the milestone; **the v0.2 runnable source and generated test assets are not yet committed as individual repository files**. Do not confuse documentation with a deployed browser game.
@@ -28,4 +30,4 @@ Stage 1 Guther's approved words are still spoken verbatim. Stage 2 implements th
 
 **Next story implementation milestone remains Stage 3 Missing Stamp**, with exactly the previously approved two inspections, Guther exchange, one irrevocable route and one +1 other Major Skill award. This UI pass is separate from that work. Stage 4–8 implementation and source-code GitHub synchronization are still pending.
 
-References: [Millhand approved overview](README.md), [approved Guther opening](opening-dialogue.md), [reusable platework](platework-interaction.md), [Stage 3 Missing Stamp](missing-stamp-discovery.md), [first integrated playable v0.1](first-integrated-playable-v0-1-implementation.md), and [shared state contract](../shared-state-implementation-contract.md).
+References: [Millhand approved overview](../../../../../05-gameplay/onboarding/millhand/README.md), [approved Guther opening](../../../../../05-gameplay/onboarding/millhand/opening-dialogue.md), [reusable platework](../../../../../05-gameplay/onboarding/millhand/platework-interaction.md), [Stage 3 Missing Stamp](../../../../../05-gameplay/onboarding/millhand/missing-stamp-discovery.md), [first integrated playable v0.1](first-integrated-playable-v0-1-implementation.md), and [shared state contract](../../../../../05-gameplay/onboarding/shared-state-implementation-contract.md).

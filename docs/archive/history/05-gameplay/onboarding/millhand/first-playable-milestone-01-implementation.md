@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand Integrated Browser Slice — Milestone 01 (Stages 1–2)
 
 **Status: EXECUTABLE LOCAL DEMO PACKAGED AND TESTED (2026-10-21). NOT THE FINAL GAME UI/UX. NOT PRODUCTION MULTIPLAYER CODE.** This is the first delivered portion of the [user-approved Millhand integrated implementation plan](first-integrated-playable-implementation-plan.md).
@@ -14,7 +16,7 @@ The companion download is **`The_Pall_Millhand_Slice_v0_1.zip`**, attached to th
 ## Implemented and verified
 
 - **Character creation:** name and male/female *portrait placeholder*; STR / DEX / INT / RES 5; **50 maximum Health**, **20 coins**, **Craftsmanship +3 exactly once** and only **Basic Clothes + one Crude Small Bag**.
-- **Stage 1 Guther Anvil dialogue:** the **verbatim approved lines** from [Guther's opening](opening-dialogue.md), including optional **“And the pay?” → “When their inspector accepts the lot.” → “You trust that?” → “No. You can ask him.”**, or skipping directly to approved convergence. **[Take the docket]** advances to Stage 2.
+- **Stage 1 Guther Anvil dialogue:** the **verbatim approved lines** from [Guther's opening](../../../../../05-gameplay/onboarding/millhand/opening-dialogue.md), including optional **“And the pay?” → “When their inspector accepts the lot.” → “You trust that?” → “No. You can ask him.”**, or skipping directly to approved convergence. **[Take the docket]** advances to Stage 2.
 - **Stage 2 Smithing:** inspect the docket and blanks, match numbering dies, respond to the approved once-per-tutorial bent blank by **Straighten / Replace / Stamp as-is**, strike and inspect the imprint, correct or reject a flawed mark, finish batch and **return the docket**.
 - **Real branch-dependent work consequences** within the prototype: straightening conserves workshop stock at qualitative time cost; replacement uses employer stock; stamping an uneven blank leads to a poor impression requiring a follow-up repair/discard decision. Exact material quantities, elapsed times and probability/grade formulas are still unapproved, so **none are invented as permanent economy numbers**. Employer-owned tools/plates are **never given to player inventory**.
 - **Correct onboarding exceptions:** no first-job wage, ordinary XP, additional items or bonus skill levels. The +1 second Major Skill belongs to **Stage 3 route choice later**, not this build.
@@ -42,4 +44,4 @@ The companion download is **`The_Pall_Millhand_Slice_v0_1.zip`**, attached to th
 
 **UX boundary:** The user explicitly said that this prototype's UI/UX will not be the final interface. All current colours, screen layout, placeholders and copy outside locked spoken dialogue are temporary verification conveniences. Do not reinterpret them as the eventual city/workshop/main-game navigation design.
 
-References: [approved Guther dialogue](opening-dialogue.md), [approved Smithing Stage 2](platework-interaction.md), [Millhand plan](first-integrated-playable-implementation-plan.md), [shared state contract](../shared-state-implementation-contract.md).
+References: [approved Guther dialogue](../../../../../05-gameplay/onboarding/millhand/opening-dialogue.md), [approved Smithing Stage 2](../../../../../05-gameplay/onboarding/millhand/platework-interaction.md), [Millhand plan](first-integrated-playable-implementation-plan.md), [shared state contract](../../../../../05-gameplay/onboarding/shared-state-implementation-contract.md).

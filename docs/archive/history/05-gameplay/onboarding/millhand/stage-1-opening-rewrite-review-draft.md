@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand Stage 1 — Opening at Guther's bench (complete editorial rewrite, review draft)
 
 **Status: PROPOSED REPLACEMENT — NOT APPROVED, NOT MERGED INTO EXECUTABLE CODE (2026-10-22).** Stage 1 only. Historical `opening-dialogue.md` stays unchanged for comparison. The quest stage, starting kit, reward rules, Guther's job and the Stage 2 Smithing action sequence are not rewritten here. This proposal applies the [new narrative voice direction](../../interactions/2026-10-22-narrative-voice-reset.md).

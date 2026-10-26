@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand v0.2 — user playtest UI/UX review and v0.3 direction (2026-10-22)
 
 **Status: USER FEEDBACK RECORDED. v0.2 PRESENTATION NOT APPROVED. Proposed v0.3 direction is NOT yet an art-style lock or implemented feature.** This explicitly supersedes any interpretation that the local v0.2 visual presentation was accepted because 42/42 new tests and 49/49 unchanged combat tests passed. Those results establish function/integrity only.

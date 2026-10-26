@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand v0.3 — Interactive Correction after rejected M1 (2026-10-22)
 
 **Status: RUNNABLE CORRECTIVE LOCAL PROTOTYPE; USER HAS NOT APPROVED ITS UX OR ART.** Owner rejected the preceding navigation-only v0.3 M1 release as the same artistic dashboard with small layout changes. The M1 documentation is now explicitly marked rejected. This corrective build is a separate local source archive `The_Pall_Millhand_v0_3_Interactive_Correction.zip`; individual executable source files are **still not committed to GitHub**.
@@ -20,4 +22,4 @@ Original `millhand.mjs`, persistence and combat rules are untouched; approved Gu
 ## Honest artistic limit
 The workshop scene currently uses a **purpose-drawn, diagram-like SVG spatial placement graphic** and the previous Guther test portrait, **not production-quality documentary realism**. This does not fulfil the approved final artistic requirement. Sound files and final workshop, city or NPC artwork are not included. The owner must separately evaluate whether actual scene interaction is directionally right. Only after positions and viewpoint are reviewed should canonical grounded scene assets and Guther likeness be requested and integrated. No approval is inferred by test success.
 
-References: [v0.2 rejection](2026-10-22-v0-2-ui-playtest-review-and-v0-3-direction.md), [v0.3 plan](v0-3-executable-ui-rebuild-plan.md), [approved art doctrine](../../../00-vision/documentary-industrial-art-direction.md).
+References: [v0.2 rejection](2026-10-22-v0-2-ui-playtest-review-and-v0-3-direction.md), [v0.3 plan](v0-3-executable-ui-rebuild-plan.md), [approved art doctrine](../../../../../00-vision/documentary-industrial-art-direction.md).

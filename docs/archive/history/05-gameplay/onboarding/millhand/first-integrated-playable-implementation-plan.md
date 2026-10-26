@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand — First Integrated Playable Implementation Plan
 
 **Status: IMPLEMENTATION ROADMAP / PROPOSED TECHNICAL EXECUTION (2026-10-21).** The user agreed to progress beyond the satisfactory local combat v0.5.1 prototype into a complete playable Millhand chapter. This plan does **not** alter any locked narrative, starting resources, rewards, combat values, clinic price, or housing outcome. It is a local browser vertical slice, **not** a production MMO or claim that the chapter is already implemented.
@@ -5,9 +7,9 @@
 ## Inputs available
 
 - Original runnable companion archive: `The_Pall_Combat_Browser_Slice_v0_5_1.zip` in the conversation; its source consists of `combat.mjs`, `server.mjs`, `store.mjs`, browser assets, and tests, with the existing 49 passing rule/API checks.
-- [Millhand overview and all Stage 1–8 approved dialogue/content](README.md).
-- [Shared onboarding structure](../shared-structure.md), [state and idempotency contract](../shared-state-implementation-contract.md), [six-origin clinic rule](../shared-clinic-examination-policy.md), [shared Stage 8](../shared-home-rent-ending.md).
-- [Jobs and time rules](../../jobs/jobs-and-time.md) and [first playable geographic scope](../../../00-vision/first-playable-scope.md).
+- [Millhand overview and all Stage 1–8 approved dialogue/content](../../../../../05-gameplay/onboarding/millhand/README.md).
+- [Shared onboarding structure](../../../../../05-gameplay/onboarding/shared-structure.md), [state and idempotency contract](../../../../../05-gameplay/onboarding/shared-state-implementation-contract.md), [six-origin clinic rule](../../../../../05-gameplay/onboarding/shared-clinic-examination-policy.md), [shared Stage 8](../../../../../05-gameplay/onboarding/shared-home-rent-ending.md).
+- [Jobs and time rules](../../../../../05-gameplay/jobs/jobs-and-time.md) and [first playable geographic scope](../../../../../00-vision/first-playable-scope.md).
 - Current project game-data workbook, for **read-only cross-checks** unless the user explicitly requests updates to game data.
 
 ## Recommended default

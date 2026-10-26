@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
+
 # Millhand v0.4.1 — Dialogue playback correction and editorial reset
 
 **Status: LOCAL CORRECTIVE BUILD TESTED; WRITING/UX NOT YET USER APPROVED (2026-10-22).** Runnable source archive is supplied in the project conversation as `The_Pall_Millhand_v0_4_1_Dialogue_Control_Fix.zip`. Individual source files are not yet committed to GitHub.
@@ -25,4 +27,4 @@ The owner dislikes all existing scene wording, dialogue and interaction copy des
 
 Previous text approval is not irrevocable. The **next design milestone** should be an editorial pass with new scene-by-scene dialogue samples and visual inspection, accepting/adjusting the writing before expanding Flint's confrontation, clinic and home. Do not silently change approved dialogue during this bug-fix patch and do not pretend that this patch itself satisfies the creative revision.
 
-References: [Stages 1–8](README.md), [approved Stage 3 original](missing-stamp-discovery.md), [approved Stage 4 original](second-task-branches.md), [v0.4 implementation record](v0-4-stage3-stage4-unguided-implementation.md).
+References: [Stages 1–8](../../../../../05-gameplay/onboarding/millhand/README.md), [approved Stage 3 original](../../../../../05-gameplay/onboarding/millhand/missing-stamp-discovery.md), [approved Stage 4 original](../../../../../05-gameplay/onboarding/millhand/second-task-branches.md), [v0.4 implementation record](v0-4-stage3-stage4-unguided-implementation.md).
