@@ -67,3 +67,23 @@ npm run build -w @the-pall/web
 Sign in to your existing character, visit `/characters`, select that saved character, then choose **Enter [starting location]**. Advance the script manually; try its optional dialogue and backtracking. At the work-paper/route/ward/yard handoff the scene must stop and display that Stage 2 is not connected. Refresh must not change your saved coins, Major Skill bonus or tutorial Stage 1. A signed-out or different-account browser must not open a privately owned character's page or opening.
 
 **Documentation discipline:** keep future M1.3 fixes and pass/fail checkpoints here, not in another new milestone Markdown. The design source of truth remains `docs/` and Git history records individual patches.
+
+### Workshop asset integration — owner correction, 2026-10-26
+
+The first actual Millhand workshop illustration is now wired into the **Stage 1 opening screen** at `/characters/<owned-uuid>/opening`. Four static cutouts are positioned on the workbench with small **icon-and-label clickable targets**. Clicking an icon opens the object's approved read-only description. **There are no idle/hover image pairs or sprite swaps.** It follows the latest user-supplied screenshot, and the stage dialogue still uses approved Guther lines and player choices. The Stage 2 **gameplay state machine is not yet integrated**; the opening still stops at its handoff.
+
+**One-time asset install:** The submitted `smithingAssets.zip` contains seven source images. We prepared a browser-optimized 7-image WebP folder preserving owner-supplied art (note the source hammer is named `hammer_hover.png`, **but it is treated as the sole static hammer**). Binary images were **not** transferred by the GitHub connector; the source code is committed, but the images must be extracted locally into `apps/web/static/workshop/`.
+
+From `The-Pall\platform` in PowerShell, after saving the accompanying `smithing_web_assets_for_project.zip` archive into Windows Downloads:
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\smithing_web_assets_for_project.zip" -DestinationPath ".\apps\web\static" -Force
+npm run verify:workshop-assets
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+With API and web servers already running, open the saved Millhand character's **Enter Smithing workshop** route. Inspect each of the four icons and verify that only inspection text appears until Stage 2 is actually implemented. On mobile confirm the icons are individually tappable and no intro choices are hidden. Other five origin openings remain on the prior text-led route.
+
+The WebP archive must ultimately be committed to GitHub under `apps/web/static/workshop/` for reproducible installs; do **not** commit another test report or the large original ZIP to source control. `npm run verify:workshop-assets` checks each WebP locally. This entry documents a **candidate layout awaiting owner browser review**, not finished Stage 2 mechanics or final UI art acceptance.
