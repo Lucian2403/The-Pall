@@ -123,12 +123,12 @@
   .workshop {width:100%;color:#f3e3ce;font-family:Georgia,'Times New Roman',serif}
   .scene {position:relative;width:100%;aspect-ratio: 1774 / 887;overflow:hidden;background:#271b14;border:1px solid #66432d;box-sizing:border-box}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-  .guther {position:absolute;bottom:8%;left:13%;height:87%;max-width:none;width:auto;object-fit:contain;z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
+  .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 38% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
   .prop-art {position:absolute;z-index:2;max-width:none;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0b0709a1)}
   .prop-art.stamps {width:23%;height:31%;bottom:5%;left:1.5%}
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
-  .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0}
+  .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0;transform:rotate(-32deg)}
   .dialogue {position:absolute;z-index:4;left:43%;top:12%;width:35%;max-height:66%;overflow:auto;box-sizing:border-box;padding:13px 15px 15px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
   .speaker {font:600 10px/1.4 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4c3524;margin:0 0 8px}
   .dialogue-line,.narration {margin:0 0 10px;font-size:clamp(12px,1.3vw,17px);line-height:1.4}
@@ -155,7 +155,7 @@
   @media(max-width:700px){
     .scene {aspect-ratio:4 / 5;}
     .environment {object-fit:cover;object-position:39% center}
-    .guther {height:50%;left:0;bottom:38%}
+    .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}
