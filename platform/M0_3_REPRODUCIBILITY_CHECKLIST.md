@@ -1,6 +1,6 @@
 # M0.3 — Reproducible installation and build gate
 
-**Status:** Owner reports `npm ci`, unit tests, Svelte typecheck and production web build **all pass after switching to Node 24** (2026-10-26); final API-on-Node-24 smoke check remains for formal M0 closure.  
+**Status: PASSED / CLOSED (owner-reported, 2026-10-26).** Clean dependency install, six unit tests, Svelte typecheck, production web build and all seven API/PostgreSQL checks passed using Node 24. M0 is complete as a **local development foundation only**, not a production service.  
 **Context:** M0.2 API/DB, browser action/refresh and API restart all passed locally and are documented in [M0_2_QA_EVIDENCE.md](M0_2_QA_EVIDENCE.md). This gate adds *no game rules* or UI redesign.
 
 ## Execution evidence — 2026-10-26 (owner-reported)
@@ -25,7 +25,7 @@ The owner confirmed **"All passed"** in response to the four-command rerun under
 
 The original Node 22 output above is retained for troubleshooting history; it is *not* the accepted target runtime result. The lockfile is committed in `platform/package-lock.json`.
 
-**Single remaining M0 runtime-parity check:** with Docker/PostgreSQL running, start the API under Node 24 (`node --version` and `npm run dev:api`) and repeat `npm run verify:api`. Prior browser/restart checks passed against the earlier running API; avoid claiming the same tests were repeated after runtime change unless confirmed.
+**Node 24 API parity — owner confirmed (2026-10-26):** After switching to Node 24 and rerunning the clean-install/build suite, the owner reported **all seven API checks passed under Node 24**. This closes the final runtime-specific M0 gate. Previous browser integration, refresh persistence and API-restart checks were confirmed separately during M0.2; a fresh browser/restart repetition under Node 24 was not separately reported. No deployment or real-player state has been verified.
 
 ## A. Capture and publish the dependency lockfile
 
