@@ -1,6 +1,21 @@
 # M1.2 — Persistent account-owned characters: local QA
 
-**Status (2026-10-26): IMPLEMENTATION CANDIDATE COMMITTED, NOT YET RUN/APPROVED ON OWNER'S POSTGRESQL ENVIRONMENT.** The existing M1.1 auth flows and approved intros remain unchanged.
+**Status (2026-10-26): OWNER-REPORTED CHARACTER CREATION/UI AND ANONYMOUS API SECURITY SMOKE TESTS PASSED; REMAINING PERSISTENCE AND MULTI-USER REGRESSION QA OPEN.** The existing M1.1 auth flows and approved intros remain unchanged.
+
+## Owner manual and API smoke results — 2026-10-26
+
+The owner reports that they logged in, created and named a character, then viewed that character's origin-specific starting section in the UI. **Browser character-create and selected-character view: PASS (owner-reported).** This is evidence of an operational character API/database path; it does not independently establish restart persistence, all starting grants, cross-account isolation or slot/race behavior.
+
+The owner ran `npm run verify:characters-unauthenticated` and reported:
+- **PASS:** API reachable.
+- **PASS:** Anonymous character roster rejected.
+- **PASS:** Anonymous character detail rejected.
+- **PASS:** Anonymous character creation rejected.
+- **PASS:** Forged user/session cannot list characters.
+
+The Vite development server logged two proxy `ECONNREFUSED 127.0.0.1:8788` errors for `/api/characters/catalogue` and `/api/me` at approximately 16:34. These indicate the API listener was temporarily unavailable at those request times; the later API smoke run successfully connected. **Likely a startup/restart overlap, but not proven**. If errors recur while the API is intended to be up, inspect `npm run dev:api` terminal and retry `http://127.0.0.1:8788/health`; no DB reset is indicated. The `npm warn Unknown user config "_email"` warning is unrelated to HTTP access.
+
+**Not yet independently reported:** explicit `npm run test:unit`, `npm run check:api`, `npm run check:web`, `npm run build -w @the-pall/web` outputs; persistence through API restart; global name collision; idempotent retry; concurrent creation/slot limits; Account A/B character-detail isolation. These must not be marked PASS by inference.
 
 ## Boundary and approved content
 
