@@ -2,6 +2,14 @@
 
 **Status (2026-10-26): implementation candidate committed; browser/API build and owner visual QA pending.** This does **not** authorize character creation or any game-design rule that remains open.
 
+## Owner QA result — 2026-10-26
+
+The owner confirmed that login, the approved universal world introduction, six-background selection and selected background's character-preview section **render and function locally**. **Browser presentation/flow: PASS (owner-reported).**
+
+The `npm run verify:character-catalogue` command exited with `FAILED: fetch failed`. This is a **transport/connection failure**, not a result of the anonymous or forged-identity assertions; the API auth-negative test is therefore **NOT YET VERIFIED**. The unrelated npm warning `Unknown user config "_email"` does not explain a Node `fetch` connection failure.
+
+**Troubleshooting:** The verifier calls `http://127.0.0.1:8788` directly (the same target as Vite's `/api` proxy). The owner should keep `npm run dev:api` running in a separate terminal, verify `http://127.0.0.1:8788/health`, then run `npm run verify:character-catalogue` from a third terminal. Commit `e12b9a7d25e238609e2b5a2ea0463e2e8b4a92de` adds diagnostic error codes and an explicit health check. Do not claim this security smoke test passed until the output confirms it.
+
 ## Source of truth
 
 - `docs/05-gameplay/onboarding/world-introduction.md`: approved universal world opening following first authentication.
