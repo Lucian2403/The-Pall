@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {registerAuthRoutes} from './auth-routes.js';
 import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js';
 import {registerCharacterRoutes} from './character-routes.js';
+import {registerMillhandWorkRoutes} from './millhand-work-routes.js';
 import {parseFixtureAction} from '@the-pall/contracts';
 import {advanceFixture} from '@the-pall/game-core';
 
@@ -14,6 +15,7 @@ const api = Fastify({logger: true, logController: new LogController({disableRequ
 registerAuthRoutes(api);
 registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);
+registerMillhandWorkRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {
   const {rows} = await pool.query('SELECT revision, value FROM dev_action_state WHERE actor_id = $1', [ACTOR]);
