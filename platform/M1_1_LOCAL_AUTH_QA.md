@@ -1,7 +1,19 @@
 # M1.1 — Local Better Auth + Mailpit QA
 
 **Date:** 2026-10-26  
-**Status: CORE FUNCTIONAL AUTH FLOW PASSED (owner-reported, 2026-10-26); M1.1 SECURITY/REPRODUCIBILITY GATE STILL OPEN.** The code is for local development, not public deployment. **Better Auth + email/password + verification/reset + self-hosted Postgres were approved by the owner.**
+**Status: M1.1 LOCAL FUNCTIONAL QA PASSED (owner-reported, 2026-10-26).** Public-release security certification, abuse controls and deployment are separate future gates. The code is for local development, not public deployment. **Better Auth + email/password + verification/reset + self-hosted Postgres were approved by the owner.**
+
+## M1.1 final owner report — 2026-10-26
+
+After the registration, verification, sign-in, recovery and restart tests below, the owner reported **"All tests passed. Let's move on."** in response to the final QA run consisting of:
+- `npm run verify:auth-unauthenticated` — anonymous, forged-identity header and fake-token access rejected.
+- `npm run verify:api` — earlier M0 database/idempotency/concurrency regression.
+- `npm run test:unit`, `npm run check:web`, and `npm run build -w @the-pall/web` — unit/type/build regression.
+- Manual isolation of Account A in a normal browser from Account B in an incognito browser, including independent signout.
+
+The **updated Better Auth dependency lockfile is present in GitHub**. It was originally committed with tarball download URLs pinned to a private npm proxy; on 2026-10-26 those URLs were changed to standard npm registry URLs, **without changing versions or integrity hashes** (commit `656f7ab877e3d64fee15ca33c32a33568087b0cf`). Because that URL change was not yet independently run through `npm ci` on the owner's machine, **reproducible installation of this normalized lockfile remains a small follow-up validation**; it does not block beginning M1.2 design.
+
+**Boundary:** The results are user-reported local QA, not independent penetration testing. The authentication system is **not yet approved for public hosting**: email domain, TLS, abuse limits, CSRF/session review, incident response, privacy and backups remain separate launch work. No character ownership APIs exist yet; authenticated character ownership must be explicitly tested in M1.2.
 
 ## Owner QA evidence — 2026-10-26
 
