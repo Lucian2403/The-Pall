@@ -1,4 +1,7 @@
-# M1.2 — Starting Catalogue QA (read-only design foundation)
+# M1.2 — Starting Catalogue QA (historical read-only foundation)
+
+> **2026-10-26 update:** This file records the earlier read-only catalogue milestone. Persistent character creation has since been implemented as an **unverified local candidate**. Follow [M1.2 Persistent Characters QA](M1_2_PERSISTENT_CHARACTERS_QA.md) for the current migration, API and browser tests; older language below describes the prior stage, not a current ban on creating a `POST /api/characters` implementation.
+
 
 **Status:** source and tests committed; **not yet executed against owner Node 24**. This is a safe implementation precursor, NOT an account-owned character creation service.
 
