@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {APPROVED_BACKGROUND_SELECTION} from '$lib/approved-introductions';
 
   type OriginFact = {origin: string; socialRole: string; majorSkill: string};
@@ -20,6 +21,66 @@
   let selectedOrigin = $state<string | null>(null);
   let selectedSex = $state<'Male' | 'Female'>('Male');
   const selected = $derived(catalogue?.origins.find(o => o.origin === selectedOrigin) ?? null);
+  type Roster = {revision: number; slots: {used: number; limit: number}};
+  let roster = $state<Roster | null>(null);
+  let name = $state('');
+  let busy = $state(false);
+  let creationMessage = $state('');
+  let pendingRequestId: string | null = null;
+  let pendingSignature: string | null = null;
+
+  async function refreshRoster() {
+    const response = await fetch('/api/characters', {cache: 'no-store'});
+    if (!response.ok) {roster = null; return;}
+    roster = await response.json() as Roster;
+  }
+
+  async function createCharacter() {
+    if (!selected || !roster || busy || roster.slots.used >= roster.slots.limit) return;
+    busy = true;
+    creationMessage = '';
+    const signature = JSON.stringify([name, selected.origin, selectedSex, roster.revision]);
+    if (signature !== pendingSignature || !pendingRequestId) {
+      pendingRequestId = crypto.randomUUID();
+      pendingSignature = signature;
+    }
+    try {
+      const response = await fetch('/api/characters', {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({
+          name, origin: selected.origin, sex: selectedSex,
+          requestId: pendingRequestId, expectedRevision: roster.revision
+        })
+      });
+      const body = await response.json() as {error?: string; character?: {id: string}};
+      if (response.ok && body.character) {
+        pendingRequestId = null;
+        pendingSignature = null;
+        await goto('/characters');
+        return;
+      }
+      const errors: Record<string, string> = {
+        invalid_name: 'Name must be 3–24 characters and contain letters with internal spaces, apostrophes or hyphens.',
+        name_taken: 'That character name is already in use.',
+        slots_full: 'All six character slots are occupied.',
+        stale_revision: 'Your character list changed. Review it and try again.',
+        invalid_origin: 'Select an approved origin.',
+        invalid_sex: 'Select a portrait variant.',
+        idempotency_key_reuse: 'This request was already used for another character. Review the form.'
+      };
+      creationMessage = errors[body.error ?? ''] ?? 'Character creation failed: ' + (body.error ?? 'server error');
+      if (body.error === 'stale_revision' || body.error === 'slots_full' || body.error === 'idempotency_key_reuse') {
+        await refreshRoster();
+        pendingRequestId = null;
+      }
+    } catch {
+      creationMessage = 'Cannot reach the API. You can retry with the same request; it will not duplicate a saved character.';
+    } finally {
+      busy = false;
+    }
+  }
+
 
   onMount(() => {
     void (async () => {
@@ -34,6 +95,7 @@
           return;
         }
         catalogue = data;
+        await refreshRoster();
         loading = 'ready';
       } catch {loading = 'unavailable';}
     })();
@@ -58,7 +120,7 @@
       <p>Check the local API and PostgreSQL, then refresh.</p>
       <a href="/account">Account</a>
     {:else}
-      <p class="eyebrow">THE PALL · CHARACTER CREATION / READ-ONLY PREVIEW</p>
+      <p class="eyebrow">THE PALL · CHARACTER CREATION / CHARACTER CREATION</p>
       <h1>{APPROVED_BACKGROUND_SELECTION.heading}</h1>
       <p class="intro">{APPROVED_BACKGROUND_SELECTION.introduction}</p>
 
@@ -90,7 +152,7 @@
 
       {#if selected}
         <section class="preview" aria-label="Selected character preview">
-          <p class="eyebrow">UNSAVED CHARACTER PREVIEW</p>
+          <p class="eyebrow">CHARACTER STARTING PREVIEW</p>
           <h2>{selected.origin}</h2>
           <p class="small">Select the portrait variant. Final portrait artwork has not yet been approved or connected.</p>
           <div class="variant" role="group" aria-label="Portrait sex">
@@ -108,17 +170,30 @@
               <p>Maximum Health: {catalogue.startingFacts.maximumHealth}</p>
               <p>Starting coins: {catalogue.startingFacts.startingCoins}</p>
               <p>Starting equipment: {catalogue.startingFacts.starterItemDisplayNames.join(', ')}</p>
-              <p class="small">No character is created or saved on this page. Naming, slot limits and deletion policy are awaiting approval.</p>
+              <p class="small">Basic Clothes and Crude Small Bag are recorded as starter requirements, not equippable item IDs yet.</p>
             </div>
           </div>
+          <form class="creation" onsubmit={(event) => {event.preventDefault(); void createCharacter();}}>
+            <label for="character-name">Character name</label>
+            <input id="character-name" type="text" bind:value={name} minlength="3" maxlength="80" autocomplete="off" required placeholder="3–24 visible characters" />
+            <p class="small">Character names are globally unique, regardless of case. Character deletion and renaming are not available in this version.</p>
+            {#if roster}
+              <p class="small">Character slots: {roster.slots.used} / {roster.slots.limit}</p>
+              <button class="confirm" type="submit" disabled={busy || roster.slots.used >= roster.slots.limit}>{busy ? 'Creating…' : 'Create character'}</button>
+            {:else}
+              <p role="alert">Character database unavailable. Run the M1.2 migration and restart the API; preview is still available.</p>
+            {/if}
+            {#if creationMessage}<p role="alert">{creationMessage}</p>{/if}
+          </form>
         </section>
       {/if}
 
       <nav class="bottom">
-        <a href="/introduction">Return to the world introduction</a>
+        <a href="/introduction">World introduction</a>
+        <a href="/characters">Your characters</a>
         <a href="/account">Account</a>
       </nav>
-      <p class="development">M1.2 preview only. The background descriptions are approved word for word; layout and portrait placeholders are not final.</p>
+      <p class="development">M1.2 development interface. Background descriptions are approved word for word; layout, assets and unintegrated tutorial scenes are not final.</p>
     {/if}
   </main>
 </div>
@@ -158,4 +233,10 @@
     .preview-content {grid-template-columns: 1fr;}
     .portrait {min-height: 145px;}
   }
+  .creation {margin-top:24px;border-top:1px solid #655039;padding-top:24px;max-width:550px;}
+  .creation label {display:block;margin-bottom:8px;}
+  .creation input {width:100%;box-sizing:border-box;padding:12px;background:#f5f0e6;color:#24211d;font:17px Georgia,serif;}
+  .creation .confirm {padding:12px 18px;background:#5b4028;color:#f9e2b9;border:1px solid #b48f60;cursor:pointer;}
+  .creation .confirm:disabled {opacity:.5;cursor:not-allowed;}
+  .creation [role=alert] {color:#f0b9a9;line-height:1.5;}
 </style>
