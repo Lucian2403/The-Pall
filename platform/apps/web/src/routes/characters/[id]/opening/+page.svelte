@@ -3,10 +3,13 @@
   import {page} from '$app/state';
   import {APPROVED_STAGE_ONE, type StageOneScene} from '$lib/approved-stage-one';
   import WorkshopScene from '$lib/WorkshopScene.svelte';
+  import TutorialShell from '$lib/TutorialShell.svelte';
 
   type Character = {
     id: string; name: string; sex: string; origin: string;
     startingLocation: string;
+    coins: number;
+    health: {current: number; maximum: number};
     tutorial: {stage: number; status: string};
   };
   let character = $state<Character | null>(null);
@@ -55,92 +58,88 @@
   const displayText = $derived(beat?.text.replaceAll('[player name]', character?.name ?? '[player name]') ?? '');
 </script>
 
+
 <svelte:head><title>The Pall — Origin Opening</title></svelte:head>
-<main>
-  {#if status === 'checking'}
-    <p role="status">Loading your character's opening…</p>
-  {:else if status === 'login'}
-    <h1>Sign in required</h1>
-    <p><a href="/account">Sign in</a></p>
-  {:else if status === 'missing'}
-    <h1>Character not found</h1>
-    <p>This character either does not exist or does not belong to this account.</p>
-  {:else if status === 'not-ready'}
-    <h1>Opening not available</h1>
-    <p>The requested character is not at the beginning of an approved origin opening.</p>
-  {:else if status === 'unavailable' || !scene || !character || !beat}
-    <h1>Character service unavailable</h1>
-    <p>Check that the local API and PostgreSQL are running.</p>
-  {:else}
-    <p class="eyebrow">THE PALL · {character.origin.toUpperCase()} · STAGE 1</p>
-    <h1>{scene.location}</h1>
-    <p class="context">{character.name} · {character.sex} · {scene.npc}</p>
+
+{#if status === 'ready' && scene && character && beat}
+  <TutorialShell {character}>
     {#if character.origin === 'Millhand'}
       <WorkshopScene
         characterName={character.name}
-        beat={beat}
-        advance={advance}
+        {beat}
+        {advance}
         goBack={back}
         canGoBack={visited.length > 0}
       />
     {:else}
-    <section class="setting" aria-label="Scene">
-      <p class="state-note">APPROVED SCRIPT PREVIEW · STAGE 1 NOT YET COMMITTED</p>
-      {#if beat.kind === 'narration'}
-        <p class="narration">{displayText}</p>
-      {:else if beat.kind === 'speech'}
-        <div class="dialogue">
+      <section class="story-scene" aria-label={scene.location + ' opening'}>
+        <p class="story-eyebrow">{character.origin} · {scene.npc}</p>
+        {#if beat.kind === 'narration'}
+          <p class="narration">{displayText}</p>
+        {:else if beat.kind === 'speech'}
           <p class="speaker">{beat.speaker === 'Player' ? character.name : beat.speaker}</p>
           <p class="line">“{displayText}”</p>
+        {:else if beat.kind === 'choice'}
+          <p class="speaker">Your response</p>
+        {:else}
+          <p class="handoff">[{displayText}]</p>
+          <p class="muted">Stage 2 is not yet connected. No work has begun, and no progress, equipment, coins or XP were awarded.</p>
+        {/if}
+        <div class="actions">
+          {#if beat.kind === 'choice' && beat.choices}
+            {#each beat.choices as choice}
+              <button type="button" onclick={() => advance(choice.next)}>{choice.label}</button>
+            {/each}
+          {:else if beat.next}
+            <button type="button" onclick={() => {if (beat?.next) advance(beat.next);}}>Continue</button>
+          {/if}
+          {#if visited.length}
+            <button class="secondary" type="button" onclick={back}>Previous line</button>
+          {/if}
         </div>
-      {:else if beat.kind === 'choice'}
-        <p class="prompt">{displayText}</p>
-      {:else}
-        <p class="handoff">[{displayText}]</p>
-        <p class="muted">The Stage 2 work interaction is not connected to saved character state yet. No job began and no progress, money, items or XP were awarded.</p>
-      {/if}
-      <div class="actions">
-        {#if beat.kind === 'choice' && beat.choices}
-          {#each beat.choices as choice}
-            <button type="button" onclick={() => advance(choice.next)}>{choice.label}</button>
-          {/each}
-        {:else if beat.next}
-          <button type="button" onclick={() => advance(beat.next)}>Continue</button>
-        {/if}
-        {#if visited.length}
-          <button class="secondary" type="button" onclick={back}>Previous line</button>
-        {/if}
-      </div>
-    </section>
+      </section>
     {/if}
-    <p class="muted">Dialogue is advanced only by your choices. This preview is replayable and does not update your saved tutorial stage.</p>
-  {/if}
-  <nav>
-    <a href={'/characters/' + page.params.id}>Character details</a>
-    <a href="/characters">All characters</a>
-  </nav>
-</main>
+    <p class="preview-note">This dialogue is a read-only, replayable Stage 1 preview. Choices advance only when clicked; the saved tutorial stage is unchanged.</p>
+  </TutorialShell>
+{:else}
+  <main class="fallback">
+    {#if status === 'checking'}
+      <p role="status">Loading your character's opening…</p>
+    {:else if status === 'login'}
+      <h1>Sign in required</h1>
+      <p><a href="/account">Sign in</a></p>
+    {:else if status === 'missing'}
+      <h1>Character not found</h1>
+      <p>This character either does not exist or does not belong to this account.</p>
+    {:else if status === 'not-ready'}
+      <h1>Opening not available</h1>
+      <p>The requested character is not at the beginning of an approved origin opening.</p>
+    {:else}
+      <h1>Character service unavailable</h1>
+      <p>Check that the local API and PostgreSQL are running.</p>
+    {/if}
+    <nav class="fallback-nav">
+      <a href={'/characters/' + page.params.id}>Character details</a>
+      <a href="/characters">All characters</a>
+    </nav>
+  </main>
+{/if}
 
 <style>
   :global(body){margin:0;background:#151717;color:#e6dece;font-family:Georgia,'Times New Roman',serif}
   :global(a){color:#e0bc8b}
-  main{max-width:860px;margin:5vh auto;padding:clamp(20px,4vw,38px);box-sizing:border-box;background:#24221f;border:1px solid #756047}
-  h1{font-weight:normal;font-size:clamp(30px,4vw,42px);margin:10px 0 12px}
-  .eyebrow{font:11px/1.6 sans-serif;letter-spacing:.15em;color:#c7a37a}
-  .context{color:#d4c0a0;margin-bottom:24px}
-  .setting{border:1px solid #756047;background:#2b2925;padding:clamp(20px,4vw,36px);min-height:220px}
-  .state-note{font:11px/1.5 sans-serif;letter-spacing:.08em;color:#aaa092;margin:0 0 24px}
-  .narration{font-style:italic;line-height:1.7;font-size:19px;max-width:650px}
-  .dialogue{max-width:650px}
-  .speaker{font:12px/1.5 sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#d5b184}
-  .line{font-size:22px;line-height:1.55}
-  .prompt{font-size:17px;color:#d3be9e}
+  .fallback{max-width:760px;margin:6vh auto;padding:30px;background:#24221f;border:1px solid #756047}
+  .fallback h1{font-weight:normal}
+  .fallback-nav{display:flex;gap:24px;flex-wrap:wrap;border-top:1px solid #574633;padding-top:20px;margin-top:22px}
+  .story-scene{background:#28241f;border:1px solid #76583a;padding:clamp(20px,4vw,38px);min-height:300px}
+  .story-eyebrow,.speaker{font:12px/1.5 sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#d9b88c}
+  .narration{font-style:italic;font-size:19px;line-height:1.65;max-width:790px}
+  .line{font-size:21px;line-height:1.55;max-width:790px}
   .handoff{font-size:22px;color:#ebd5b3}
-  .muted{color:#b7ac9d;font:13px/1.6 sans-serif}
-  .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
-  button{background:#5c422e;color:#f6dfba;border:1px solid #b08d5f;cursor:pointer;padding:12px 17px;min-height:44px;font:15px/1.4 Georgia,serif;text-align:left}
-  button:hover{background:#785738}
-  button:focus-visible{outline:2px solid #ffe2af;outline-offset:2px}
-  button.secondary{background:#2c2925;color:#c5b4a0;border-color:#65513d}
-  nav{display:flex;gap:26px;flex-wrap:wrap;border-top:1px solid #594a39;padding-top:22px;margin-top:24px;font:14px sans-serif}
+  .muted,.preview-note{color:#b7ac9d;font:13px/1.6 sans-serif}
+  .preview-note{margin:14px 6px 4px}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+  .actions button{background:#5b402b;border:1px solid #a98250;color:#f6dfba;cursor:pointer;padding:12px 17px;font:15px/1.4 Georgia,serif;min-height:44px}
+  .actions button:focus-visible{outline:2px solid #ffe2af;outline-offset:2px}
+  .actions .secondary{background:#32271f}
 </style>
