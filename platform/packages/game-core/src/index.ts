@@ -8,3 +8,6 @@ export function advanceFixture(state: FixtureState): FixtureState {
 
 export {ORIGIN_CATALOGUE, APPROVED_STARTING_FACTS, previewCharacterStart} from './character-creation.js';
 export type {Origin, CharacterSex} from './character-creation.js';
+
+export {INITIAL_PLATEWORK, WORK_ACTIONS, WORK_ACTION_OBJECT, availableActions, advancePlatework, PlateworkInvalidAction} from './millhand-platework.js';
+export type {PlateworkState, PlateworkAction, WorkPhase, Handling, Correction} from './millhand-platework.js';
