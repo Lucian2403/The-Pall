@@ -29,13 +29,19 @@
     beat,
     advance,
     goBack,
-    canGoBack
+    canGoBack,
+    takeWorkPaper,
+    takingWork = false,
+    handoffError = ''
   }: {
     characterName: string;
     beat: StageOneBeat;
     advance: (next: string) => void;
     goBack: () => void;
     canGoBack: boolean;
+    takeWorkPaper?: () => Promise<void>;
+    takingWork?: boolean;
+    handoffError?: string;
   } = $props();
 
   let selected = $state<PropKey | null>(null);
@@ -87,7 +93,7 @@
       {:else}
         <p class="speaker">Guther's work</p>
         <p class="dialogue-line">[{say}]</p>
-        <p class="small">Stage 2 gameplay is not yet connected. This is the end of the read-only opening.</p>
+        <p class="small">You can now take the paper and begin the saved workshop task.</p>
       {/if}
 
       <div class="responses">
@@ -98,6 +104,10 @@
         {:else if beat.next}
           <button type="button" onclick={() => {selected = null; if (beat.next) advance(beat.next);}}>Continue</button>
         {/if}
+        {#if beat.kind === 'handoff' && takeWorkPaper}
+          <button type="button" disabled={takingWork} onclick={() => {void takeWorkPaper();}}>{takingWork ? 'Saving…' : 'Take the work paper'}</button>
+        {/if}
+        {#if handoffError}<p role="alert" class="handoff-error">{handoffError}</p>{/if}
         {#if canGoBack}
           <button class="back" type="button" onclick={() => {selected = null; goBack();}}>Previous line</button>
         {/if}
@@ -141,6 +151,8 @@
   .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:12px/1.35 Georgia,serif;padding:7px 9px;min-height:30px;cursor:pointer}
   .responses button:hover,.responses button:focus-visible {outline:2px solid #d3a86a;outline-offset:1px}
   .responses .back {background:#57412c;color:#f6e9d8}
+  .responses button:disabled{opacity:.55;cursor:not-allowed}
+  .handoff-error{font:12px/1.4 sans-serif;color:#873523;margin:6px 0}
   .prop-marker {position:absolute;z-index:5;bottom:1%;background:none;border:0;color:#f3e8d2;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0}
   .prop-marker.stamps{left:3%;width:21%}
   .prop-marker.plates{left:27%;width:21%}
