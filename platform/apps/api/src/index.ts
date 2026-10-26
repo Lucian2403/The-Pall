@@ -2,6 +2,7 @@ import Fastify, {LogController} from 'fastify';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
 import {registerAuthRoutes} from './auth-routes.js';
+import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js';
 import {parseFixtureAction} from '@the-pall/contracts';
 import {advanceFixture} from '@the-pall/game-core';
 
@@ -10,6 +11,7 @@ const ACTOR = '00000000-0000-4000-8000-000000000001';
 const pool = new pg.Pool({connectionString: process.env.DATABASE_URL});
 const api = Fastify({logger: true, logController: new LogController({disableRequestLogging: true}), bodyLimit: 16 * 1024});
 registerAuthRoutes(api);
+registerCharacterCatalogueRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {
   const {rows} = await pool.query('SELECT revision, value FROM dev_action_state WHERE actor_id = $1', [ACTOR]);
