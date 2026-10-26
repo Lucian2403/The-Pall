@@ -37,6 +37,20 @@ No public service or signup page should be exposed. Keep localhost binding and t
    npm run auth:migrate
    ```
    **Stop if this reports an error or proposes unexpected table changes.** Do not delete database volumes or run `down -v`.
+### First migration run: expected warning versus failure
+
+On a **new** database, Better Auth 1.7 can log `ERROR [Better Auth]: Database schema mismatch` listing `user`, `session`, `account`, and `verification` **before** the programmatic migration runs. This is an initial schema diagnosis, not proof the migration failed. Our `npm run auth:migrate` uses `getMigrations(auth.options)` followed by `runMigrations()`. A successful run ends with `Better Auth local schema migration finished.`
+
+**Do not also run `npx auth migrate`.** In this monorepo the Better Auth config is at `apps/api/src/auth.ts` rather than the CLI's default search locations. Bare `npx auth migrate` can report `No configuration file found` even after our programmatic migration succeeded. It is redundant.
+
+For a **read-only** check that the four tables now exist, run from the Git-tracked `platform` directory:
+
+```powershell
+docker compose exec -T postgres psql -U pall_dev -d pall_dev -c "SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename IN ('user','session','account','verification') ORDER BY tablename;"
+```
+
+Expected: **four rows** (`account`, `session`, `user`, `verification`). If fewer appear, stop and share the result; do not rerun migrations blindly or remove volumes.
+
 8. Verify local package/TypeScript checks:
    ```powershell
    npm run test:unit
