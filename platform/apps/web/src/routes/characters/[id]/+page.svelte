@@ -71,6 +71,12 @@
       {#if character.tutorial.stage === 1 && character.tutorial.status === 'NOT_STARTED'}
         <p><a class="enter" href={'/characters/' + character.id + '/opening'}>Enter {character.startingLocation}</a></p>
         <p class="muted">This opening is replayable. Stage 2 and server-owned work progression are not connected yet.</p>
+      {:else if character.origin === 'Millhand' && character.tutorial.stage === 2}
+        <p><a class="enter" href={'/characters/' + character.id + '/millhand/work'}>Continue marking the plates</a></p>
+        <p class="muted">The work is saved after each action. No wages or ordinary XP are awarded during this tutorial job.</p>
+      {:else if character.origin === 'Millhand' && character.tutorial.stage === 3}
+        <p class="muted">The platework is complete and the work paper has been returned. Stage 3 is not connected to the authenticated game yet.</p>
+        <p><a class="enter" href={'/characters/' + character.id + '/millhand/work'}>Review finished platework</a></p>
       {:else}
         <p class="muted">This character is not at the start of Stage 1. No other origin's opening will be substituted.</p>
       {/if}
