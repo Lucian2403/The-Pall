@@ -26,6 +26,9 @@
     "auth:status": "node --env-file=.env scripts/auth-check-schema.mjs",
     "verify:auth-unauthenticated": "node scripts/verify-auth-boundary.mjs",
     "verify:canonical-copy": "node scripts/verify-approved-intro-copy.mjs",
-    "verify:character-catalogue": "node scripts/verify-character-catalogue.mjs"
+    "verify:character-catalogue": "node scripts/verify-character-catalogue.mjs",
+    "characters:migrate": "node --env-file=.env scripts/characters-migrate.mjs",
+    "check:api": "npm run build:packages && npm run check -w @the-pall/api",
+    "verify:characters-unauthenticated": "node scripts/verify-characters-unauthenticated.mjs"
   }
 }
