@@ -14,3 +14,6 @@ export function parseFixtureAction(value: unknown): FixtureAction {
   if (!Number.isSafeInteger(v.expectedRevision) || (v.expectedRevision as number) < 0) throw new Error('invalid_revision');
   return {action: 'advance_fixture', requestId: v.requestId, expectedRevision: v.expectedRevision as number};
 }
+
+export {INITIAL_CHARACTER_SLOT_LIMIT, CHARACTER_ORIGINS, normalizeCharacterName, parseCreateCharacterCommand} from './character-creation.js';
+export type {CharacterOrigin, CharacterSex, CreateCharacterCommand} from './character-creation.js';
