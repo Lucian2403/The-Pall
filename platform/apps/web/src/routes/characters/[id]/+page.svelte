@@ -60,7 +60,12 @@
       <p>Starting equipment requirements: {character.starterItemRequirements.map(item => item.name + ' × ' + item.quantity).join(', ')}</p>
       <p class="muted">Items are not equippable or tradable until their authoritative records are defined.</p>
     </section>
-    <p class="muted">This character is saved to your account. The origin-specific Stage 1 scene is not yet connected to this authenticated state; gameplay entry will follow in M1.3/M1.4. Selecting an origin does not start another character's tutorial.</p>
+    {#if character.tutorial.stage === 1 && character.tutorial.status === 'NOT_STARTED'}
+      <p><a class="action" href={'/characters/' + character.id + '/opening'}>Enter {character.startingLocation}</a></p>
+      <p class="muted">Your approved Stage 1 opening is available as a replayable dialogue preview. Starting work and saving tutorial progress are not yet implemented.</p>
+    {:else}
+      <p class="muted">This character has a saved tutorial state beyond the current Stage 1 opening preview. No incorrect origin scene will be substituted.</p>
+    {/if}
   {/if}
   <nav><a href="/characters">Return to character selection</a> · <a href="/account">Account</a></nav>
 </main>
@@ -73,5 +78,6 @@
   section{border:1px solid #564632;background:#2b2925;padding:20px;margin:22px 0}
   .eyebrow{font:11px sans-serif;letter-spacing:.16em;color:#c7a37a}
   .muted{color:#b6ad9c;line-height:1.5}
+  .action{display:inline-block;padding:12px 18px;background:#503a27;color:#f0d7af;border:1px solid #ac895b;text-decoration:none}
   nav{border-top:1px solid #574633;padding-top:20px;margin-top:28px}
 </style>
