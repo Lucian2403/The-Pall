@@ -51,7 +51,7 @@ No public service or signup page should be exposed. Keep localhost binding and t
    npm run dev:web
    ```
 10. Open `http://127.0.0.1:5173/account`. Register using a **test password you do not reuse anywhere** and any email address; a personal email may be used but its actual inbox will receive nothing. Open Mailpit `http://127.0.0.1:8025`, open the verification message, click its link and return to Account to sign in. Email verification should be required before a session can be issued.
-11. Check `http://127.0.0.1:8788/api/me` in a new browser tab **using the page at 5173?** Because the cookie is scoped to host `127.0.0.1`, both ports generally share the host cookie. Prefer testing through `http://127.0.0.1:5173/api/me` to follow the same-origin proxy; it should return the signed-in user's safe ID/email/verification flag. After sign-out it must return **HTTP 401**.
+11. Open `http://127.0.0.1:5173/api/me` in a new tab (via the same-origin Vite proxy). When signed in, it should return your test account's ID/email/verified flag. After sign-out it must return **HTTP 401**.
 12. Use Forgot Password at `/account`, inspect the reset email in Mailpit, click its link, set a different password, confirm the old password no longer works and the new password does.
 13. Run the existing `npm run verify:api` regression suite after the auth server starts; M0 behaviour must be unchanged.
 
