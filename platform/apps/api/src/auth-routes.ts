@@ -14,7 +14,9 @@ export function registerAuthRoutes(app: FastifyInstance) {
         ...(request.method === 'POST' ? {body: JSON.stringify(request.body ?? {})} : {})
       }));
       reply.code(response.status);
-      response.headers.forEach((value, key) => reply.header(key, value));
+      response.headers.forEach((value, key) => { if (key.toLowerCase() !== 'set-cookie') reply.header(key, value); });
+      const cookies = response.headers.getSetCookie();
+      if (cookies.length) reply.header('set-cookie', cookies);
       return reply.send(response.body ? await response.text() : null);
     }
   });
