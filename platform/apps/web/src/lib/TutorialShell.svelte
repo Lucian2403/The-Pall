@@ -108,10 +108,11 @@
 </nav>
 
 <style>
-  :global(body){margin:0;background:#131312;color:#eee3d0;font-family:Georgia,'Times New Roman',serif}
+  :global(html){width:100%;min-height:100%;margin:0;padding:0}
+  :global(body){width:100%;min-height:100%;margin:0;padding:0;background:#131312;color:#eee3d0;font-family:Georgia,'Times New Roman',serif}
   :global(*){box-sizing:border-box}
-  .frame{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1530px;margin:10px auto 22px;padding:0 8px;min-width:0}
-  .rail{display:flex;flex-direction:column;min-width:0;background:#171715;border:1px solid #6a513a;border-radius:7px 0 0 7px;min-height:670px}
+  .frame{display:grid;grid-template-columns:230px minmax(0,1fr);width:100%;max-width:none;min-width:0;min-height:100vh;min-height:100dvh;margin:0;padding:0}
+  .rail{display:flex;flex-direction:column;min-width:0;background:#171715;border:0;border-right:1px solid #56412d;border-radius:0;min-height:100%}
   .identity{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:24px 10px 22px;min-height:126px;text-decoration:none;color:#f0dfc7;border-bottom:1px solid #715237;background:linear-gradient(160deg,#28231e,#111110);text-align:center}
   .wordmark{font-size:32px;line-height:1.1;letter-spacing:.035em;text-shadow:0 2px #000}
   .motto{font:10px/1.5 sans-serif;letter-spacing:.27em;color:#d0a979}
@@ -125,7 +126,7 @@
   .nav-rule{border-top:1px solid #403429;margin:8px 17px 12px}
   .locked-heading{margin:0;padding:0 19px;font:10px/1.5 sans-serif;letter-spacing:.1em;color:#aa8a62}
   .rail-footer{margin-top:auto;min-height:125px;display:flex;flex-direction:column;justify-content:end;gap:5px;padding:19px 22px 23px;color:#c7a273;font:12px sans-serif;letter-spacing:.22em;background:linear-gradient(transparent,#24201a);line-height:1.3}
-  .right{min-width:0;border:1px solid #6a513a;border-left:0;background:#1c1a18;border-radius:0 7px 7px 0}
+  .right{display:flex;flex-direction:column;min-width:0;min-height:100vh;min-height:100dvh;border:0;background:#1c1a18;border-radius:0}
   .topbar{display:flex;align-items:stretch;min-height:75px;background:linear-gradient(#141413,#090a0a);border-bottom:2px solid #73543b}
   .player,.stat{display:flex;align-items:center;gap:11px;padding:11px 17px;border-right:1px solid #3e352b;min-width:0}
   .player{min-width:190px}
@@ -148,7 +149,7 @@
   .location-icon{font-size:24px;color:#d9b782}
   .chapter-meta{margin-left:auto;color:#c1aa8d;font-size:14px;white-space:nowrap}
   .exit-link{padding:7px 9px;border:1px solid #705236;color:#e5c39a;text-decoration:none;font-size:12px;white-space:nowrap}
-  .chapter-content{min-width:0;padding:12px 14px 16px}
+  .chapter-content{flex:1;min-width:0;padding:0}
   .onboarding-footer{border-top:1px solid #4d3928;padding:12px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .mobile-nav{display:none}
   @media(max-width:1100px){
@@ -161,9 +162,9 @@
     .chapter-meta{display:none}
   }
   @media(max-width:760px){
-    .frame{display:block;margin:0;padding:0 0 75px}
+    .frame{display:block;width:100%;min-height:100vh;min-height:100dvh;margin:0;padding:0}
     .rail{display:none}
-    .right{border:0;border-radius:0}
+    .right{min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding-bottom:calc(65px + env(safe-area-inset-bottom))}
     .topbar{min-height:62px}
     .player{min-width:0;flex:1;padding:8px}
     .avatar{height:42px;width:42px;font-size:24px}
@@ -180,7 +181,7 @@
     .chapter-bar{padding:10px;gap:8px}
     .chapter-label{font-size:19px}
     .exit-link{font-size:11px;margin-left:auto}
-    .chapter-content{padding:9px}
+    .chapter-content{padding:0}
     .mobile-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:#11100f;border-top:1px solid #89643c;z-index:30;min-height:65px;padding-bottom:env(safe-area-inset-bottom)}
     .mobile-nav a,.mobile-nav>span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:7px 2px;color:#dec8aa;text-decoration:none;font:11px sans-serif}
     .mobile-nav a[aria-current]{background:#423020}
