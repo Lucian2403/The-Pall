@@ -11,7 +11,8 @@
   "dependencies": {
     "@sveltejs/kit": "^2.0.0",
     "better-auth": "1.7.12",
-    "svelte": "^5.0.0"
+    "svelte": "^5.0.0",
+    "@the-pall/game-core": "0.0.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",
