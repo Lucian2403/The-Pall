@@ -2,6 +2,7 @@
   import {onMount} from 'svelte';
   import {page} from '$app/state';
   import {APPROVED_STAGE_ONE, type StageOneScene} from '$lib/approved-stage-one';
+  import WorkshopScene from '$lib/WorkshopScene.svelte';
 
   type Character = {
     id: string; name: string; sex: string; origin: string;
@@ -74,6 +75,15 @@
     <p class="eyebrow">THE PALL · {character.origin.toUpperCase()} · STAGE 1</p>
     <h1>{scene.location}</h1>
     <p class="context">{character.name} · {character.sex} · {scene.npc}</p>
+    {#if character.origin === 'Millhand'}
+      <WorkshopScene
+        characterName={character.name}
+        beat={beat}
+        advance={advance}
+        goBack={back}
+        canGoBack={visited.length > 0}
+      />
+    {:else}
     <section class="setting" aria-label="Scene">
       <p class="state-note">APPROVED SCRIPT PREVIEW · STAGE 1 NOT YET COMMITTED</p>
       {#if beat.kind === 'narration'}
@@ -102,6 +112,7 @@
         {/if}
       </div>
     </section>
+    {/if}
     <p class="muted">Dialogue is advanced only by your choices. This preview is replayable and does not update your saved tutorial stage.</p>
   {/if}
   <nav>
