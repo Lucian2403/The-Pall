@@ -15,7 +15,17 @@ The owner ran `npm run verify:characters-unauthenticated` and reported:
 
 The Vite development server logged two proxy `ECONNREFUSED 127.0.0.1:8788` errors for `/api/characters/catalogue` and `/api/me` at approximately 16:34. These indicate the API listener was temporarily unavailable at those request times; the later API smoke run successfully connected. **Likely a startup/restart overlap, but not proven**. If errors recur while the API is intended to be up, inspect `npm run dev:api` terminal and retry `http://127.0.0.1:8788/health`; no DB reset is indicated. The `npm warn Unknown user config "_email"` warning is unrelated to HTTP access.
 
-**Not yet independently reported:** explicit `npm run test:unit`, `npm run check:api`, `npm run check:web`, `npm run build -w @the-pall/web` outputs; persistence through API restart; global name collision; idempotent retry; concurrent creation/slot limits; Account A/B character-detail isolation. These must not be marked PASS by inference.
+**Not yet independently reported:** explicit `npm run test:unit`, `npm run check:api`, `npm run check:web`, `npm run build -w @the-pall/web` outputs; persistence through API restart; idempotent retry; concurrent creation/slot limits; Account A/B character-detail isolation. These must not be marked PASS by inference.
+
+## Additional owner screenshot evidence — 2026-10-26
+
+The owner supplied three screenshots and stated "All good":
+
+1. **Character detail page: "Character service unavailable"** with instructions to check local API and PostgreSQL. This is a correctly displayed failure state, **not a successful persistence-after-restart assertion**. It can occur while the API is restarting, consistent with earlier Vite proxy `ECONNREFUSED` logs; whether it recovered without further errors is not demonstrated by this screenshot alone.
+2. **Character creation form: `Morelli`, "Character slots: 1 / 6", "That character name is already in use."** This supports **PASS: duplicate-name protection** and presence of a persisted character slot in the active session. It is not a proof of all idempotency/concurrency cases.
+3. **Background selection: "Account required — Sign in before choosing a background."** This supports **PASS: signed-out/private-session access blocked**. It is **not** the Account B while authenticated cross-account character-isolation check; an authenticated B session must separately be unable to inspect A's known character ID.
+
+**Remaining before full M1.2 persistence QA closure:** confirm that the character detail page loads and retains Morelli's state after an API restart; confirm that a different **authenticated** Account B sees only its own roster and gets generic not-found for Account A's character URL; test creation idempotency/concurrent revision protection and report missing unit/type/build outputs where appropriate. Do not invent PASS results for these cases.
 
 ## Boundary and approved content
 
