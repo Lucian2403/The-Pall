@@ -49,3 +49,21 @@ Design review: [six origins, approved starting facts, and still-open account pol
 After the approved first-login and read-only background preview, the app now has **account-owned character creation and roster selection**. Local development policy: six slots/account; 3–24-character normalized globally unique names; multiple origins allowed; no rename/deletion. Character creation is a single PostgreSQL transaction with idempotency receipts, account revision locking and server-owned starting facts. Item IDs and usable equipment are deliberately **not** invented: Basic Clothes/Crude Small Bag are stored as pending starter requirements. All six characters have the correct starting location but no playable Stage 1 integration yet.
 
 **Do not assume this code is verified just because GitHub contains it.** Run the additive schema with `npm run characters:migrate` using the existing `.env DATABASE_URL`, then `npm run test:unit`, `npm run check:api`, `npm run check:web`, `npm run build -w @the-pall/web`, and `npm run verify:characters-unauthenticated` while the API runs. Full details, manual Account A/B tests and warnings about permanent occupied slots: [M1.2 Persistent QA](M1_2_PERSISTENT_CHARACTERS_QA.md). Nothing here has changed the M0 test fixture or approved scripts.
+
+## M1.3 — Owned character → approved Stage 1 dialogue (committed candidate)
+
+**Scope:** The world introduction and character roster already exist. An authenticated character can now open `/characters/<owned-uuid>/opening` via **Enter [starting location]** on the character-detail page. The UI fetches the saved, account-owned character through `GET /api/characters/:id`, chooses **only that origin's** approved opening, and shows one dialogue beat at a time with explicit choices. All six origins have their own scripts. The Millhand scene retains Guther's optional pay exchange and player-name substitution; the other five retain their respective approved voices and optional branches. No static page preview can move a character forward, award coins/XP, create items or invoke Stage 2.
+
+**Do not treat this as completed gameplay or final art.** The new origin-opening route is a **read-only, replayable M1.3 content handoff**; Stage 1/2 real job actions, saved dialogue state, final assets, durable chapter progression and the common eight-stage onboarding are subsequent integration work. The script copy came from `docs/05-gameplay/onboarding/<origin>/opening-dialogue.md`; `npm run check:web` now checks exact Stage 1 textual parity and that all branches converge without entering Stage 2.
+
+**Current owner QA:** This candidate is committed but **not yet tested on the owner's Node 24 browser environment**. M1.2 functional creation, duplicate-name and anonymous API checks passed; after-restart persistence and authenticated Account A/B character-detail isolation remain unconfirmed until explicitly tested.
+
+**Local M1.3 acceptance** (use the same local API, Postgres and web servers; no new migration):
+```powershell
+git pull --ff-only
+npm run check:web
+npm run build -w @the-pall/web
+```
+Sign in to your existing character, visit `/characters`, select that saved character, then choose **Enter [starting location]**. Advance the script manually; try its optional dialogue and backtracking. At the work-paper/route/ward/yard handoff the scene must stop and display that Stage 2 is not connected. Refresh must not change your saved coins, Major Skill bonus or tutorial Stage 1. A signed-out or different-account browser must not open a privately owned character's page or opening.
+
+**Documentation discipline:** keep future M1.3 fixes and pass/fail checkpoints here, not in another new milestone Markdown. The design source of truth remains `docs/` and Git history records individual patches.
