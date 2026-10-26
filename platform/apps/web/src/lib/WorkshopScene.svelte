@@ -1,15 +1,16 @@
 <script lang="ts">
   import type {StageOneBeat} from '$lib/approved-stage-one';
+  import WorkshopObjectIcon from '$lib/WorkshopObjectIcon.svelte';
 
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
-  type PropSpec = {name: string; label: string; icon: string; image: string; observation: string};
+  type PropSpec = {name: string; label: string; image: string; observation: string};
   const props: Record<PropKey, PropSpec> = {
     stamps: {
-      name: 'Number stamps', label: 'Number stamps', icon: '▦', image: '/workshop/number-stamps.webp',
+      name: 'Number stamps', label: 'Number stamps', image: '/workshop/number-stamps.webp',
       observation: 'Small metal tools with numbers cut into their ends. Workers arrange them and strike them with a hammer to stamp metal.'
     },
     plates: {
-      name: 'Metal plates', label: 'Metal plates', icon: '▤', image: '/workshop/metal-plates.webp',
+      name: 'Metal plates', label: 'Metal plates', image: '/workshop/metal-plates.webp',
       observation: 'Plain pieces of metal, ready for stamping.'
     },
     paper: {
@@ -17,7 +18,7 @@
       observation: "The council's work order, with the number to stamp on each plate written on it."
     },
     hammer: {
-      name: 'Hammer', label: 'Hammer', icon: '⚒', image: '/workshop/hammer.webp',
+      name: 'Hammer', label: 'Hammer', image: '/workshop/hammer.webp',
       observation: 'A heavy hammer used to strike the number stamps against a metal plate.'
     }
   };
@@ -96,7 +97,7 @@
           onclick={() => inspect(key)}
         >
           <span class="pin" aria-hidden="true"></span>
-          <span class="tag"><span class="symbol" aria-hidden="true">{props[key].icon}</span>{props[key].label}</span>
+          <span class="tag"><span class="symbol" aria-hidden="true"><WorkshopObjectIcon kind={key} /></span>{props[key].label}</span>
         </button>
       {/each}
     </div>
@@ -128,7 +129,7 @@
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
   .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0}
-  .dialogue {position:absolute;z-index:4;left:43%;top:12%;width:35%;max-height:66%;overflow:auto;box-sizing:border-box;padding:13px 15px 15px;border:2px solid #58351e;border-radius:5px;background:#efe0bf url('') ;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
+  .dialogue {position:absolute;z-index:4;left:43%;top:12%;width:35%;max-height:66%;overflow:auto;box-sizing:border-box;padding:13px 15px 15px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
   .speaker {font:600 10px/1.4 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4c3524;margin:0 0 8px}
   .dialogue-line,.narration {margin:0 0 10px;font-size:clamp(12px,1.3vw,17px);line-height:1.4}
   .narration{font-style:italic}
