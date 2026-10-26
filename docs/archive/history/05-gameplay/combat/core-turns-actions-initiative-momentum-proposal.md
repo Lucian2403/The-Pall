@@ -1,4 +1,4 @@
-> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
 
 # Combat — Part 1: Turns, Actions, Initiative and Momentum (DISCUSSION DRAFT)
 

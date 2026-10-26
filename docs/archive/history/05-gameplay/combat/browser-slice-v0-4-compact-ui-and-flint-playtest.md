@@ -1,4 +1,4 @@
-> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](https://github.com/Lucian2403/The-Pall/tree/main/docs) for current rules.
 
 # Browser Combat v0.4 — Compact Interface, Readable Costs, Stronger Flint
 
