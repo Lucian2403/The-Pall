@@ -1,6 +1,6 @@
 # M0.3 — Reproducible installation and build gate
 
-**Status:** Node 22 run passed build/tests, but Node 24 runtime parity is **still required** to close M0.  
+**Status:** Owner reports `npm ci`, unit tests, Svelte typecheck and production web build **all pass after switching to Node 24** (2026-10-26); final API-on-Node-24 smoke check remains for formal M0 closure.  
 **Context:** M0.2 API/DB, browser action/refresh and API restart all passed locally and are documented in [M0_2_QA_EVIDENCE.md](M0_2_QA_EVIDENCE.md). This gate adds *no game rules* or UI redesign.
 
 ## Execution evidence — 2026-10-26 (owner-reported)
@@ -18,6 +18,14 @@
 **Separate non-blocking warning:** npm config `_email` is obsolete; it does not cause the test or build failures. Do not advise removing unrelated npm config blindly.
 
 **Remaining action:** use Node 24 in a new terminal and rerun `npm ci`, `npm run test:unit`, `npm run check:web`, `npm run build -w @the-pall/web`; confirm the prior local API/browser checks remain valid under that runtime. No game rules or new features are part of this gate.
+
+## Node 24 rerun evidence — 2026-10-26
+
+The owner confirmed **"All passed"** in response to the four-command rerun under Node 24, following the previous report identifying Node v22.20.0. We therefore mark **M0.3 clean install, six unit tests, Svelte checks and web production build: PASS (owner-reported)**.
+
+The original Node 22 output above is retained for troubleshooting history; it is *not* the accepted target runtime result. The lockfile is committed in `platform/package-lock.json`.
+
+**Single remaining M0 runtime-parity check:** with Docker/PostgreSQL running, start the API under Node 24 (`node --version` and `npm run dev:api`) and repeat `npm run verify:api`. Prior browser/restart checks passed against the earlier running API; avoid claiming the same tests were repeated after runtime change unless confirmed.
 
 ## A. Capture and publish the dependency lockfile
 
