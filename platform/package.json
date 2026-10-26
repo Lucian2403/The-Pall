@@ -23,6 +23,7 @@
     "verify:api": "node scripts/verify-api.mjs",
     "mail:up": "docker compose up -d mailpit",
     "auth:migrate": "node --env-file=.env --import tsx scripts/auth-migrate.ts",
-    "auth:status": "node --env-file=.env scripts/auth-check-schema.mjs"
+    "auth:status": "node --env-file=.env scripts/auth-check-schema.mjs",
+    "verify:auth-unauthenticated": "node scripts/verify-auth-boundary.mjs"
   }
 }
