@@ -1,7 +1,9 @@
 # M1.2 — Character Selection & Creation: implementation review
 
 **Date:** 2026-10-26  
-**Status:** **PROPOSAL FOR OWNER REVIEW** — approved character gameplay rules are preserved, while still-open account policies below are **not yet authorized for implementation**.
+**Status:** **INITIAL LOCAL M1.2 POLICY ACCEPTED / IMPLEMENTATION CANDIDATE**, owner-run persistence/security QA pending. The approved character gameplay rules and canon are unchanged.
+
+> **Owner implementation approval (2026-10-26):** The owner approved moving forward with account-owned persistent character creation after the read-only intro and authorization checks passed. For this **local M1.2 development pass**, the previously proposed initial defaults are being used: six character slots, 3–24-character normalized globally unique names, no deletion/rename, duplicate origins permitted. Characters of all six origins may be saved but must show a clear **non-playable/tutorial-not-integrated** warning. Public-release moderation, full item IDs and final portrait/sign-in policy remain open. The executable implementation and QA instructions are in [M1.2 Persistent Characters](../../platform/M1_2_PERSISTENT_CHARACTERS_QA.md); the source candidate has **not yet passed owner PostgreSQL QA**.
 
 ## Goal
 
@@ -41,7 +43,7 @@ The [documentation home](../README.md) now explicitly designates the following a
 
 **After creation:** return to selection, then select to enter the **correct** origin-specific Stage 1 introductory scene when that route is implemented. During staged implementation, a character may be selectable without a playable origin route; never silently redirect Bellrunner to Guther.
 
-## Open product decisions — owner sign-off needed before writing account-owned character mutations
+## Initial M1.2 account policies — local development defaults accepted; public-release policy remains open
 
 | Decision | Recommended starting policy (PROPOSED) | Reason |
 | --- | --- | --- |
@@ -53,7 +55,7 @@ The [documentation home](../README.md) now explicitly designates the following a
 | Staging six origins | **Show all six in preview; label non-playable routes clearly**. Provisional creation gating for unimplemented origin chapters must be approved before UX implementation | Avoid creating characters with no functional way into the game; cannot claim all six stories are integrated when only Millhand is. |
 | Character switching | Selection is per user session/request; **never** store a global active character on the account that changes under another device | Avoid accidentally applying commands to a different character across tabs or devices. |
 
-These are not new lore or approved mechanics. They must be explicitly accepted or revised before implementing `POST /characters` and the character creation screens.
+These are account/product policies for the initial local development pass, **not new lore or gameplay skill mechanics**. Live M1.2 account-owned character creation is now being implemented; final public-release policy and moderation remain subject to review.
 
 ## Proposed backend boundaries
 
@@ -82,4 +84,4 @@ These are not new lore or approved mechanics. They must be explicitly accepted o
 - Build a **read-only, pure TypeScript catalogue** of the six canonical origins, associated Major Skill and approved base starting facts; unit-test all origin/sex combinations.
 - Draft (but do not apply) character schema/API contracts and reusable UI structure. **Do not expose live character creation, placeholder final names, or persist starter item records** until outstanding policies are approved.
 
-**Next owner review:** select/revise **slot count, names, deletion, duplicate origins and staged availability**. The existing skill/attribute/starter-kit rules need no new vote.
+**Next owner QA:** run the additive migration, API + browser creation tests, idempotency/concurrency and Account A/B isolation using the linked persistent character checklist. The existing skill/attribute/starter-kit rules need no new vote.
