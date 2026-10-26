@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {authClient} from '$lib/auth-client';
 
   type Account = {id: string; email: string; emailVerified: boolean};
@@ -30,7 +31,11 @@
       } else if (mode === 'login') {
         const result = await authClient.signIn.email({email, password});
         message = result.error?.message ?? 'Signed in.';
-        if (!result.error) await loadAccount();
+        if (!result.error) {
+          await loadAccount();
+          // Pending an approved one-time completion flag, the intro is replayable.
+          await goto('/introduction');
+        }
       } else {
         const result = await authClient.requestPasswordReset({
           email, redirectTo: '/account/reset-password'
@@ -62,6 +67,7 @@
   {#if account}
     <p>Signed in as <strong>{account.email}</strong></p>
     <p>Email verified: {account.emailVerified ? 'Yes' : 'No'}</p>
+    <p><a href="/introduction">Read world introduction</a> · <a href="/backgrounds">Preview backgrounds</a></p>
     <button disabled={busy} onclick={() => {void logout();}}>Sign out</button>
   {:else}
     <nav aria-label="Account actions">
