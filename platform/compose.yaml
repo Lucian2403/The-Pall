@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pall_dev
+      POSTGRES_USER: pall_dev
+      POSTGRES_PASSWORD: pall_dev_local_only
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pall_pg_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pall_dev -d pall_dev"]
+      interval: 3s
+      retries: 20
+volumes:
+  pall_pg_dev:
