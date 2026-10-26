@@ -11,6 +11,13 @@
 | **Scrapper** | [Scrapper](scrapper/README.md) | Mechanics +3 |
 | **Inkbound** | [Inkbound](inkbound/README.md) | Scholarship +3 |
 
+## Pre-character creation copy — approved 2026-10-26
+
+- [The Pall — World Introduction](world-introduction.md): approved universal first-login introduction, including the Plume and the uncertain cause of the catastrophe.
+- [Choose Your Background — Selection Introduction](background-selection-introduction.md): approved character-creation copy for the six backgrounds, their distinctive work histories and +3 Major Skill advantages.
+
+These are **player-facing approved texts**, not new lore mechanics or replacements for the six origin-specific Stage 1 scenes. Show the world introduction after initial authentication and before background selection; present the background text during character creation.
+
 ## Shared, not background-specific
 
 - [Common Background Tutorial Structure](shared-structure.md): universal kit, job progression, +3/+1 Major Skill rules, clinic, one starter home, rent sequence and tutorial reward override.
