@@ -24,6 +24,55 @@ The registration/email and five session/recovery results are **owner-reported ma
 
 **Additional acceptance before M1.1 closure:** verify session survives an API process restart, run auth-specific negative and multi-user access tests (at minimum account A/B session separation; character ownership tests become meaningful in M1.2), perform package TypeScript checks, and commit the updated `platform/package-lock.json` after dependency resolution.
 
+## Final M1.1 local QA — two-account isolation and dependency reproducibility
+
+**Precondition:** all previously reported registration, email verification, sign-in, logout, recovery and API-restart checks passed. Use test-only credentials; do not share them.
+
+**A. Pull and run non-mutating boundary + M0 regression checks**
+
+From a Git-tracked `The-Pall\platform` PowerShell window, with the existing API and PostgreSQL running:
+
+```powershell
+git status --short
+git pull --ff-only
+npm run verify:auth-unauthenticated
+npm run verify:api
+npm run test:unit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+- `verify:auth-unauthenticated` checks HTTP 401 for no cookie and forged identity headers, without creating accounts or modifying database state.
+- `verify:api` checks the original M0 fixture transaction rules; it deliberately increments **only** the non-economic test counter.
+- Tests/build are regressions; success requires no runtime or TypeScript errors under Node 24.
+
+**B. Two-account isolation (manual browser test)**
+
+1. In a **normal** browser window, sign in as verified test **Account A**; open `http://127.0.0.1:5173/api/me`, and **locally note** returned `id` and `email`.
+2. In a **private/incognito** browser window, go to `http://127.0.0.1:5173/account`; ensure `/api/me` is **401 before sign-in**.
+3. Register and verify a **separate Account B** through Mailpit; then sign in as B in the private window. `/api/me` must return B's account ID (different from A), not A's. Do not reuse A's email.
+4. Refresh A's original normal window and `/api/me`. It must still return A, not B.
+5. Sign out B in private browsing. Its `/api/me` must become **401**; A's normal-window session must remain authorized and unchanged.
+
+**C. Publish the dependency lockfile**
+
+The assistant introduced Better Auth/Nodemailer package manifest changes but **could not regenerate `package-lock.json` with npm**. Your previous `npm install` likely updated the tracked lockfile locally. Check it and commit **only that file**, excluding local secrets and generated data:
+
+```powershell
+git status --short
+npm install
+git add package-lock.json
+git diff --cached --stat
+git commit -m "Lock M1.1 authentication dependencies"
+git push origin main
+```
+
+If `git commit` says `nothing to commit`, check GitHub's `platform/package-lock.json` for `better-auth` before assuming it is already tracked. Do **not** commit `.env`, tokens, Mailpit messages, `node_modules`, or session data. Don't force push if Git rejects a non-fast-forward.
+
+After the lockfile is published, optionally rerun `npm ci` with both node servers stopped, to prove the new lockfile is reproducible. Then restart API/web if continuing testing.
+
+**Acceptance:** All A/B and regression checks PASS, the M1.1 dependency lockfile is committed, and an `npm ci` pass on Node 24 follows. This closes **local M1.1**, not public launch security review or future character-ownership authorization.
+
 ## Why no The Pall domain or personal SMTP is needed
 
 Register a test account using your own personal email address, if desired. **Mailpit will intercept the message and display it locally; the message will NOT arrive in that external inbox.** No personal mailbox password, SMTP credential or production domain is needed. Our test sender is the reserved invalid address `no-reply@thepall.invalid` and exists **only inside Mailpit**.
