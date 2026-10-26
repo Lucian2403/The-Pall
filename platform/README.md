@@ -105,3 +105,46 @@ The user approved the shared sidebar/topbar and directed the entire game frame t
 This rule applies to the **pre-Stage-8 guided presentation**. The post-Stage-8 Home dashboard remains locked and unimplemented. All character statistics continue to be read from server-owned state and no additional game systems have been unlocked.
 
 Local QA: `git pull --ff-only`, `npm run check:web`, `npm run build -w @the-pall/web`; refresh `/characters/<owned-character-id>/opening` and `/characters/<owned-character-id>`. Check desktop widths 1440 and 1920, mobile widths 390 and 320, and full-screen/zoom settings. Verify no dark margins outside the shell, no unwanted horizontal overflow, readable dialogue and four independently tappable work-object icons. Expect vertical **document** scrolling only when necessary. This is a layout-only candidate until the owner's visual check passes; there is no API or database migration.
+
+### M1.3 → M1.4 playable Millhand Stage 1–2 slice (2026-10-26)
+
+**Status:** Source committed as an implementation candidate; **not yet verified against the owner's running PostgreSQL, Svelte build or browser**. This extends the previously approved full-viewport guided UI; the post-Stage-8 Home dashboard remains locked.
+
+**Canon:** `docs/05-gameplay/onboarding/millhand/opening-dialogue.md` (Stage 1 R02), `stage-2-approved-script.md` (Stage 2 R03), and `platework-interaction.md` (mechanics). The Stage 1 **Take the work paper** button now calls an account-owned, idempotent work command. PostgreSQL advances the selected Millhand from Stage 1 NOT_STARTED to Stage 2 IN_PROGRESS and creates a work record atomically. Reload or return through Character/Scene resumes that exact saved work phase.
+
+**Stage 2 flow:** **Read the work paper** → **Set the number stamps** → **Look at the bent plate** → one of **Straighten**, **Put it aside. Take another**, or **Stamp it anyway** → **Stamp the number** → **Check the stamped number** → if poor, **Fix the mark** or **Put the bad plate aside. Use another** → **Finish checking** → **Return the work paper**. Returning the paper marks saved Stage 2 COMPLETE and opens Stage 3 NOT_STARTED, but *does not yet present the Stage 3 story or work*. The four static shop props use only **icon-gated** contextual actions and neutral read-only inspections; clicking other objects has no work side effect. All approved result text, including the deterministic poor-mark recovery path, is retained.
+
+**Important content gate:** The actual council worker number/serial identifier is **not authored in the approved documents**. No fictional number, worker identity or date has been inserted. The prototype therefore confirms stamp matching **conceptually** rather than implementing a numeric puzzle. It declares this openly on the Stage 2 page, so the stage should **not** be called fully content-complete until that number/data mapping is approved.
+
+**Persistent guarantees:** A valid Better Auth account owns the character; the server rejects foreign character IDs and requests with client-supplied unexpected fields. A per-character PostgreSQL lock serializes mutations, expected revision detects stale tabs, and durable per-character request receipts replay repeated UUIDs without repeated results. No player coins, ordinary XP, inventory, bonus Major Skill or market item rows are changed by this tutorial. One illustrative representative plate and exactly one bent-plate choice, no invented durations, costs or weights.
+
+**Local QA from `The-Pall\platform` (Node 24, Docker/Postgres already running):** Stop API/web Node watchers first, preserve the existing Docker volume; do NOT use `docker compose down -v`.
+
+```powershell
+git status --short
+git pull --ff-only
+npm ci
+npm run test:unit
+npm run check:api
+npm run check:web
+npm run build -w @the-pall/web
+npm run platework:migrate
+```
+
+Start API `npm run dev:api` and web `npm run dev:web` in separate PowerShell terminals. From a third terminal:
+
+```powershell
+npm run verify:millhand-work-unauthenticated
+npm run verify:characters-unauthenticated
+```
+
+**Manual QA with a saved Millhand at Stage 1** (do not create or delete extra characters just for this test):
+1. At `/characters`, select the character; **Enter Smithing workshop**. Follow the approved optional Guther dialogue to **Take the work paper**. Click once: character should persist as Stage 2 IN_PROGRESS, at `/characters/<id>/millhand/work`.
+2. Select **Council order**, click **Read the work paper**. Click the wrong hammer first or after reading—observe only; it must not progress. Select **Number stamps** then **Set the number stamps**.
+3. Select **Metal plates** and **Look at the bent plate**, choose one of the three valid methods. For the best coverage on this one durable character choose **Stamp it anyway**; then select Hammer, stamp, select Metal plates, inspect the poor mark, and fix or replace it. All alternate choices are covered by unit tests without consuming six character slots.
+4. Select **Council order** to finish checking; select it again to return the paper. The character becomes Stage 3 NOT_STARTED, **without playing or revealing the later mystery**.
+5. At **each phase**, refresh once and verify same work step/branch/character Health/Coins; restart only the API once mid-task if practical. No repeated grants. On mobile, no separate scrollbar inside the popup.
+6. In a signed-out/incognito window, `/api/characters/<id>/millhand/work` must be HTTP 401; with a **different signed-in account**, the URL must return generic 404. Test same request-id replay / cross-tab stale revision via devtools only if comfortable, since the server guarantees are not yet independently verified.
+7. If any test or migration fails, **stop and report the first error** with secrets redacted. Do not try to reset the DB or manually edit the tutorial stage.
+
+There is no new art requirement, no new character creation grant, and no separate QA Markdown report. Work item/copy parity and full public-release security remain future acceptance gates.
