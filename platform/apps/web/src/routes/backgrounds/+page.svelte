@@ -176,7 +176,7 @@
           <form class="creation" onsubmit={(event) => {event.preventDefault(); void createCharacter();}}>
             <label for="character-name">Character name</label>
             <input id="character-name" type="text" bind:value={name} minlength="3" maxlength="80" autocomplete="off" required placeholder="3–24 visible characters" />
-            <p class="small">Character names are globally unique, regardless of case. Character deletion and renaming are not available in this version.</p>
+            <p class="small">Character names are globally unique, regardless of case. Character deletion and renaming are not available in this version. All six origins can be saved, but their playable tutorials are not yet connected; each new character will occupy one of your six slots.</p>
             {#if roster}
               <p class="small">Character slots: {roster.slots.used} / {roster.slots.limit}</p>
               <button class="confirm" type="submit" disabled={busy || roster.slots.used >= roster.slots.limit}>{busy ? 'Creating…' : 'Create character'}</button>
