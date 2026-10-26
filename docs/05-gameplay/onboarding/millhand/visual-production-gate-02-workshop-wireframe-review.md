@@ -2,6 +2,16 @@
 
 **Status: V0.5 REFERENCE-MATCHED COMPACT CONVERSATION/WORKBENCH SHELL PROPOSED FOR OWNER REVIEW (2026-10-23).** The prior v0.4 in-scene floating overlay was rejected; no final UX or asset sign-off. Gate 01 was accepted by the owner **as a working scope** (“Agree for now”), not visual sign-off. The next deliverable is a deliberately unpolished Stage 2 workbench wireframe.
 
+## Gate 02 — Owner asset and interaction correction (2026-10-26; latest direction)
+
+**Supersedes the older idle/hover-pair rule below for the current Stage 1–2 implementation.** The owner supplied `smithingAssets.zip` and a workshop composition reference. **Use one static illustrated asset per object**; do not require different-angle hover files or animate/lift cutouts on hover. Four workshop work objects (number stamps, metal plates, council work paper and hammer) are visually identified by **compact icon-and-label controls anchored over/in front of their actual position**, like the latest reference screen. The icon is a neutral affordance, **not a hint about which action is correct**. Clicking/tapping one object opens that object's contextual inspection and available action; do not expose task actions globally before the appropriate object is selected.
+
+**Actual supplied archive contents:** `download.webp` (opaque workshop background), `GutherAnvil_front.png`, `GutherAnvil_back.png`, `numberStamps.png`, `workshop_stock_plates_v01.png`, `councilWork.png`, and `hammer_hover.png`. The last file is **simply the provided static hammer art despite its historical filename**. The ZIP has **no separate hover pairs**. There is no need to request them, regenerate the assets, or depend on obsolete `metalPlate.png`/`hammer.png` naming.
+
+**Layout:** Guther and the four independently positioned props remain in one contained, illustrated workshop scene; keep the CRPG-style compact dialogue and interactions within the game content region below the city header, not in an unrelated full-screen menu. On mobile, stack or reposition the interaction controls without cutting off the work objects; every icon/label is keyboard and touch accessible. No permanently baked labels or action text inside the art.
+
+This updates presentation only. Canonical Stage 1/Stage 2 wording, mechanic branches, server-owned state, wages and XP rules are unchanged. Earlier idle/hover mockup history below is **superseded** wherever it conflicts with this 2026-10-26 correction.
+
 ## Gate 02 v0.7 — home-page content boundary and object-gated actions (2026-10-23)
 
 **Owner's correction:** The prior modular prototype stretched the workshop, dialogue and work UI beyond the home-page's red-marked **content region under the city banner**. It also displayed player-action choices without first clicking the matching in-world asset. Both are design failures, not minor polish requests.
