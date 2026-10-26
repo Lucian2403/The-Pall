@@ -5,7 +5,7 @@
 
 ## Goal
 
-A signed-in account can inspect its own characters, choose an owned character, and (once name/slot policies are approved) create a durable starting character exactly once. This follows [M1.1 Better Auth local QA](../../platform/M1_1_LOCAL_AUTH_QA.md) and precedes world/background introduction (M1.3) and actual Millhand/Guther workshop integration (M1.4). Character identity is **not** the Better Auth account name.
+A signed-in account can inspect its own characters, choose an owned character, and (once name/slot policies are approved) create a durable starting character exactly once. This follows [M1.1 Better Auth local QA](../../platform/M1_1_LOCAL_AUTH_QA.md). The **already-approved universal world introduction** is presented following first authentication and **before the character-selection/creation experience**; character choice is followed by background-specific Stage 1 (the next content-integration milestone). Character identity is **not** the Better Auth account name.
 
 ## Already approved — do not reopen
 
@@ -18,15 +18,28 @@ The authoritative design is [Character Creation — Phase One](character-creatio
 5. Origin → skill: **Millhand/Craftsmanship**, **Bellrunner/Industry**, **Squatter/Fieldcraft**, **Stitcher/Medicine**, **Scrapper/Mechanics**, **Inkbound/Scholarship**.
 6. The chosen origin determines the start job hub and tailored eight-stage onboarding chapter. It does not lock the character into a profession forever. Male/Female choices do not alter gameplay bonuses or quest branches.
 7. Stage 3 branch +1 skill, unpaid tutorial jobs/combat, clinic 10 coins and provisional 150-coin rent are **later onboarding mechanics**, not character creation rewards.
-8. No automatic world-lore dump or assumption that the character is an amnesiac. Intro narration is an independent M1.3 review.
+8. The [approved universal world introduction](../05-gameplay/onboarding/world-introduction.md) is shown after first authentication, before background choice; this is **approved exact copy**, not a still-open text draft. The [approved background-selection introduction](../05-gameplay/onboarding/background-selection-introduction.md) is presented during origin selection, verbatim. These scenes provide lore to the **player** without pretending the **character** suffers amnesia.
+
+## Canonical content handoff — updated documentation, 2026-10-26
+
+The [documentation home](../README.md) now explicitly designates the following as player-facing **approved** wording and authoritative order:
+
+1. **First authenticated entry:** [THE PALL world introduction](../05-gameplay/onboarding/world-introduction.md), shown before background selection. No extra origins, spoiler exposition, explanation of the Plume's unknown cause, or mechanically binding claims should be invented from this text.
+2. **Choosing an origin:** [CHOOSE YOUR BACKGROUND](../05-gameplay/onboarding/background-selection-introduction.md), including **all six exact descriptions and Advantage lines**. The generic `socialRole` strings in the pure game-core catalogue are programming metadata/QA aids **not replacements for approved on-screen copy**.
+3. **After character creation/selection:** correct origin-specific [onboarding script](../05-gameplay/onboarding/README.md); the six origin folders have approved [Stage 1 opening dialogue](../05-gameplay/onboarding/millhand/opening-dialogue.md) and their own job hubs. A selected Bellrunner does not begin at Guther's bench.
+4. **Millhand Stage 1–8:** use the [active editorial authority map](../05-gameplay/onboarding/millhand/INDEX.md), separating mechanical encounter contracts from the latest approved player-facing stage scripts and Journal wording. Never pull superseded writing from prototype history.
+5. **Visual direction:** [current painterly/low-detail art and in-scene CRPG dialogue](../00-vision/art-direction.md), not the archived near-photorealistic doctrine.
+6. **World terms:** [The Plume / regions lore foundation](../02-world/the-plume-and-regions.md) distinguishes historical Plume from present-day Pall; the ultimate cause remains unknown. Grey Marches precede the Pall. Older use of “Ashlands” is historical shorthand, **not an extra compulsory region**.
+
+**Presentation/state decisions still open:** whether the universal intro can be replayed or skipped, how its first-login completion is persisted, and how much is displayed at once. These are UI/session decisions; do not silently alter the already approved prose. **No gameplay creation mutation follows from this addendum alone.**
 
 ## What M1.2 should look like
 
 **Account character list:** display only the signed-in account's own character cards (name, origin, fixed portrait, current state). Offer **Select** and **New character** where policy and capacity permit. No invented power rating, combat statistics or imaginary scene progress.
 
-**Character creation:** choose origin (six short social-role summaries), Male/Female portrait variant, type character name, inspect the **fixed** starter stats/kit and +3 Major Skill, then confirm. No point distribution, rolling or respec buttons. The artist-approved portraits may arrive later; placeholder silhouettes must be visibly tagged *development-only*, not silently accepted final art.
+**Character creation:** choose origin using the [approved background-selection copy](../05-gameplay/onboarding/background-selection-introduction.md) **verbatim**, Male/Female portrait variant, type character name, inspect the **fixed** starter stats/kit and +3 Major Skill, then confirm. No point distribution, rolling or respec buttons. The artist-approved portraits may arrive later; placeholder silhouettes must be visibly tagged *development-only*, not silently accepted final art.
 
-**After creation:** return to selection, then select to enter the **correct** background introduction at M1.3. During staged implementation, a character may be selectable without a playable origin route; never silently redirect Bellrunner to Guther.
+**After creation:** return to selection, then select to enter the **correct** origin-specific Stage 1 introductory scene when that route is implemented. During staged implementation, a character may be selectable without a playable origin route; never silently redirect Bellrunner to Guther.
 
 ## Open product decisions — owner sign-off needed before writing account-owned character mutations
 
