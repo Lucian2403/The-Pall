@@ -12,7 +12,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children}: {character: SavedCharacter; children: Snippet} = $props();
+  let {character, children, activePage = 'scene'}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'} = $props();
   const chapter = $derived('/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
 
@@ -37,10 +37,10 @@
       <span class="motto">A CITY ENDURES</span>
     </a>
     <nav class="nav-list" aria-label="Available pages">
-      <a class="nav-entry active" href={chapter} aria-current="page">
+      <a class:active={activePage === 'scene'} class="nav-entry" href={chapter} aria-current={activePage === 'scene' ? 'page' : undefined}>
         <span class="nav-icon" aria-hidden="true">⌂</span><span>Current scene</span>
       </a>
-      <a class="nav-entry" href={detail}>
+      <a class:active={activePage === 'character'} class="nav-entry" href={detail} aria-current={activePage === 'character' ? 'page' : undefined}>
         <span class="nav-icon" aria-hidden="true">◈</span><span>Character</span>
       </a>
       <a class="nav-entry" href="/characters">
@@ -101,8 +101,8 @@
 </div>
 
 <nav class="mobile-nav" aria-label="Tutorial navigation">
-  <a href={chapter} aria-current="page"><span aria-hidden="true">⌂</span>Scene</a>
-  <a href={detail}><span aria-hidden="true">◈</span>Character</a>
+  <a href={chapter} aria-current={activePage === 'scene' ? 'page' : undefined}><span aria-hidden="true">⌂</span>Scene</a>
+  <a href={detail} aria-current={activePage === 'character' ? 'page' : undefined}><span aria-hidden="true">◈</span>Character</a>
   <a href="/characters"><span aria-hidden="true">☰</span>Characters</a>
   <span aria-disabled="true"><span aria-hidden="true">▣</span>More later</span>
 </nav>
