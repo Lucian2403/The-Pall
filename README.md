@@ -27,3 +27,7 @@ Current locked foundations include:
 ## Data
 
 Structured gameplay data and balancing are maintained separately from design prose and are intended to become database seed/configuration data.
+
+## Platform source (M0.2)
+
+The Node/TypeScript + SvelteKit + PostgreSQL technical foundation is tracked under **[platform/](platform/)**. For first-time setup from the older ZIP download, see **[platform/GIT_WORKFLOW.md](platform/GIT_WORKFLOW.md)**. The integration gate has **not** passed until the corrected local verification suite, clean-clone install, restart check and dependency lockfile are verified. Do not mistake this development fixture for the actual Millhand gameplay.
