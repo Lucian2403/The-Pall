@@ -20,6 +20,8 @@
     "db:status": "docker compose ps",
     "db:stop": "docker compose stop postgres",
     "db:migrate": "node scripts/db-migrate.mjs",
-    "verify:api": "node scripts/verify-api.mjs"
+    "verify:api": "node scripts/verify-api.mjs",
+    "mail:up": "docker compose up -d mailpit",
+    "auth:migrate": "node --env-file=.env --import tsx scripts/auth-migrate.ts"
   }
 }
