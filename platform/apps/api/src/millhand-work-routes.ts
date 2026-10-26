@@ -19,7 +19,11 @@ function parseCommand(body: unknown): Payload {
   if (typeof obj.requestId !== 'string' || !UUID.test(obj.requestId)) throw Error('invalid_request_id');
   if (!Number.isSafeInteger(obj.expectedRevision) || (obj.expectedRevision as number) < 0) throw Error('invalid_revision');
   if (obj.action !== 'take_work_paper' && !WORK_ACTIONS.includes(obj.action as PlateworkAction)) throw Error('invalid_action');
-  return obj as Payload;
+  return {
+    action: obj.action as Payload['action'],
+    requestId: obj.requestId as string,
+    expectedRevision: obj.expectedRevision as number
+  };
 }
 function snapshot(char: CharacterState, work: PlateworkState | null) {
   return {
