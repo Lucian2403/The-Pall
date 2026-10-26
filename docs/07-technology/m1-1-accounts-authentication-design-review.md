@@ -1,9 +1,9 @@
 # M1.1 — Accounts & Authentication: design review
 
-> **Owner approval update (2026-10-26):** Better Auth, self-hosted in the existing PostgreSQL/Fastify/SvelteKit stack, with email/password, verification and password recovery **APPROVED**. No owned game domain yet; local messages are captured with Docker Mailpit and may be addressed to a personal test email without leaving the machine. Source candidate is committed under `platform/`, but runtime/QA verification is **NOT YET PASSED**. See [M1.1 local QA plan](../../platform/M1_1_LOCAL_AUTH_QA.md). Character slots, naming, deletion, intro and lore remain undecided.
+> **Owner approval update (2026-10-26):** Better Auth, self-hosted in the existing PostgreSQL/Fastify/SvelteKit stack, with email/password, verification and password recovery **APPROVED**. No owned game domain yet; local messages are captured with Docker Mailpit and may be addressed to a personal test email without leaving the machine. Source candidate is committed under `platform/`, but runtime/QA verification is **NOT YET PASSED**. See [M1.1 local QA plan](../../platform/M1_1_LOCAL_AUTH_QA.md). Character slots, naming and deletion remain undecided. The universal first-login introduction and six-background selection copy have subsequently been approved, but their account/character-creation integration remains future work; see [world introduction](../05-gameplay/onboarding/world-introduction.md) and [background introduction](../05-gameplay/onboarding/background-selection-introduction.md).
 
 
-**Date:** 2026-10-26. **Status: PROPOSED / NOT APPROVED FOR IMPLEMENTATION.** This is the next functional gate after M0. No auth provider, identity policy, or numeric limit is approved by creating this document.
+**Initial review status (historical):** This document began as a proposal. The dated owner approval above supersedes the original provider/method uncertainty; remaining policies and decisions are still open. Do not read older proposed options below as newer rejections or approvals.
 
 ## Purpose
 

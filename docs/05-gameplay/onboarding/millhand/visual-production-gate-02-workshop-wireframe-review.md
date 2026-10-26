@@ -51,7 +51,7 @@
 
 ## Gate 02 v0.4 — Small CRPG dialogue popup, owner-requested correction (2026-10-23)
 
-**Status: NEW PROTOTYPE FOR OWNER REVIEW, NOT SIGNED OFF.** Owner explicitly rejected v0.3's overly large conversation panel and reiterated that the Guther reference establishes a stylized painterly art direction, closer to Albion Online / WoW readable proportions. The [art-direction record](../../../00-vision/documentary-industrial-art-direction.md) now states that later rendering-style decision without changing the game's industrial setting.
+**Status: NEW PROTOTYPE FOR OWNER REVIEW, NOT SIGNED OFF.** Owner explicitly rejected v0.3's overly large conversation panel and reiterated that the Guther reference establishes a stylized painterly art direction, closer to Albion Online / WoW readable proportions. The [art-direction record](../../../00-vision/art-direction.md) now states that later rendering-style decision without changing the game's industrial setting.
 
 **Attached artifact:** `The_Pall_Gate02_Workshop_Compact_Dialogue_v04.html` — a self-contained **local interactive HTML**, not game code or an executable server state migration. Desktop and phone PNG review captures were made from this exact HTML. The Guther illustration is the provided reference embed, while the Stage 2 workbench remains a schematic. Neither image is certified final production art.
 

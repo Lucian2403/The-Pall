@@ -21,4 +21,4 @@
 
 [Browser combat v0.5.1 retreat correction](browser-slice-v0-5-1-retreat-fix.md) is the last preferred local playtest baseline recorded here. It is **not a shipped game or permanent global balance**. The young injured tutorial boar's separately approved 30/65 Health is recorded in the [Squatter encounter](../onboarding/squatter/boar-fight.md), not inferred from trial human combat numbers.
 
-Older browser prototypes, the unapproved early Part 1 discussion, and the superseded integration proposal are in the [historical archive](../../../archive/README.md).
+Older browser prototypes, the unapproved early Part 1 discussion, and the superseded integration proposal are in the [historical archive](../../archive/README.md).
