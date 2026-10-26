@@ -123,7 +123,7 @@
 
 <style>
   .workshop {width:100%;color:#f3e3ce;font-family:Georgia,'Times New Roman',serif}
-  .scene {position:relative;width:100%;aspect-ratio:1774 / 887;min-height:510px;background:#271b14;border:1px solid #66432d;box-sizing:border-box}
+  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;width:100%;aspect-ratio:1774 / 887;min-height:clamp(510px,calc(100dvh - 310px),920px);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 38% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
@@ -132,7 +132,7 @@
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
   .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0;transform:rotate(-32deg)}
-  .dialogue {position:absolute;z-index:4;left:44%;top:9%;width:43%;box-sizing:border-box;padding:13px 15px 15px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
+  .dialogue {position:relative;grid-column:2;z-index:4;align-self:start;width:100%;margin:clamp(24px,3vw,50px) 0 24px;min-width:0;max-height:none;overflow:visible;box-sizing:border-box;padding:14px 17px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
   .speaker {font:600 10px/1.4 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4c3524;margin:0 0 8px}
   .dialogue-line,.narration {margin:0 0 10px;font-size:clamp(12px,1.3vw,17px);line-height:1.4}
   .narration{font-style:italic}
@@ -156,7 +156,7 @@
   .inspection small {color:#bda990}
   .inspection button {padding:8px 12px;color:#f4dcbb;background:#403126;border:1px solid #816343;cursor:pointer}
   @media(max-width:700px){
-    .scene {aspect-ratio:auto;min-height:0;}
+    .scene {display:flex;flex-direction:column;aspect-ratio:auto;min-height:0;}
     .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
     .environment {object-fit:cover;object-position:39% center}
     .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
@@ -164,7 +164,7 @@
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}
     .prop-art.hammer {width:27%;height:30%;right:0;bottom:8%}
-    .dialogue {position:relative;top:auto;left:auto;width:auto;margin:0 8px 10px;padding:14px;box-shadow:0 4px 10px #0007}
+    .dialogue {position:relative;top:auto;left:auto;width:100%;margin:0;padding:14px;border-radius:0;box-shadow:0 4px 10px #0007}
     .dialogue-line,.narration {font-size:16px;line-height:1.5}
     .prop-marker {bottom:2%}
     .prop-marker.stamps {left:0;width:24%}
@@ -173,5 +173,5 @@
     .prop-marker.hammer {right:0;width:25%}
     .tag {font:10px/1.1 sans-serif;min-height:28px;padding:3px 2px;gap:3px;white-space:normal}
   }
-  @media(max-width:380px){.dialogue{margin:0 5px 8px}.tag{font-size:9px}}
+  @media(max-width:380px){.dialogue{margin:0;padding:12px}.tag{font-size:9px}}
 </style>
