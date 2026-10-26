@@ -50,6 +50,7 @@
 <!-- The text/game-state is separate from the static artwork. No on-hover image swapping. -->
 <section class="workshop" aria-label="Guther's workshop">
   <div class="scene">
+    <div class="illustration">
     <img class="environment" src="/workshop/environment.webp" alt="The smithing workshop, with a forge, bench and distant city" />
     <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil, the smithing foreman" />
 
@@ -58,6 +59,22 @@
     <img class="prop-art paper" src={workshopObjects.paper.image} alt="" aria-hidden="true" />
     <img class="prop-art hammer" src={workshopObjects.hammer.image} alt="" aria-hidden="true" />
 
+    <div class="prop-markers" aria-label="Workshop objects">
+      {#each keys as key}
+        <button
+          class:chosen={selected === key}
+          class="prop-marker {key}"
+          type="button"
+          aria-pressed={selected === key}
+          aria-label={'Inspect ' + workshopObjects[key].name}
+          onclick={() => inspect(key)}
+        >
+          <span class="pin" aria-hidden="true"></span>
+          <span class="tag"><span class="symbol" aria-hidden="true"><WorkshopObjectIcon kind={key} /></span>{workshopObjects[key].label}</span>
+        </button>
+      {/each}
+    </div>
+    </div>
     <div class="dialogue" aria-label="Workshop conversation">
       {#if beat.kind === 'speech'}
         <p class="speaker">{beat.speaker === 'Player' ? characterName : beat.speaker}</p>
@@ -86,22 +103,6 @@
         {/if}
       </div>
     </div>
-
-    <div class="prop-markers" aria-label="Workshop objects">
-      {#each keys as key}
-        <button
-          class:chosen={selected === key}
-          class="prop-marker {key}"
-          type="button"
-          aria-pressed={selected === key}
-          aria-label={'Inspect ' + workshopObjects[key].name}
-          onclick={() => inspect(key)}
-        >
-          <span class="pin" aria-hidden="true"></span>
-          <span class="tag"><span class="symbol" aria-hidden="true"><WorkshopObjectIcon kind={key} /></span>{workshopObjects[key].label}</span>
-        </button>
-      {/each}
-    </div>
   </div>
 
   {#if selected}
@@ -122,7 +123,8 @@
 
 <style>
   .workshop {width:100%;color:#f3e3ce;font-family:Georgia,'Times New Roman',serif}
-  .scene {position:relative;width:100%;aspect-ratio: 1774 / 887;overflow:hidden;background:#271b14;border:1px solid #66432d;box-sizing:border-box}
+  .scene {position:relative;width:100%;aspect-ratio:1774 / 887;min-height:510px;background:#271b14;border:1px solid #66432d;box-sizing:border-box}
+  .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 38% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
   .prop-art {position:absolute;z-index:2;max-width:none;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0b0709a1)}
@@ -130,7 +132,7 @@
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
   .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0;transform:rotate(-32deg)}
-  .dialogue {position:absolute;z-index:4;left:43%;top:12%;width:35%;max-height:66%;overflow:auto;box-sizing:border-box;padding:13px 15px 15px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
+  .dialogue {position:absolute;z-index:4;left:44%;top:9%;width:43%;box-sizing:border-box;padding:13px 15px 15px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
   .speaker {font:600 10px/1.4 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4c3524;margin:0 0 8px}
   .dialogue-line,.narration {margin:0 0 10px;font-size:clamp(12px,1.3vw,17px);line-height:1.4}
   .narration{font-style:italic}
@@ -154,15 +156,16 @@
   .inspection small {color:#bda990}
   .inspection button {padding:8px 12px;color:#f4dcbb;background:#403126;border:1px solid #816343;cursor:pointer}
   @media(max-width:700px){
-    .scene {aspect-ratio:4 / 5;}
+    .scene {aspect-ratio:auto;min-height:0;}
+    .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
     .environment {object-fit:cover;object-position:39% center}
     .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}
     .prop-art.hammer {width:27%;height:30%;right:0;bottom:8%}
-    .dialogue {top:6%;left:33%;width:64%;max-height:56%;padding:10px 11px}
-    .dialogue-line,.narration {font-size:12px}
+    .dialogue {position:relative;top:auto;left:auto;width:auto;margin:0 8px 10px;padding:14px;box-shadow:0 4px 10px #0007}
+    .dialogue-line,.narration {font-size:16px;line-height:1.5}
     .prop-marker {bottom:2%}
     .prop-marker.stamps {left:0;width:24%}
     .prop-marker.plates {left:25%;width:24%}
@@ -170,5 +173,5 @@
     .prop-marker.hammer {right:0;width:25%}
     .tag {font:10px/1.1 sans-serif;min-height:28px;padding:3px 2px;gap:3px;white-space:normal}
   }
-  @media(max-width:380px){.dialogue{left:29%;width:69%;max-height:58%}.tag{font-size:9px}}
+  @media(max-width:380px){.dialogue{margin:0 5px 8px}.tag{font-size:9px}}
 </style>
