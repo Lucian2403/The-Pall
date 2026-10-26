@@ -32,6 +32,16 @@ A player securely creates/accesses **one account** that can own **characters**, 
 | Account recovery / email changes | **Open**; require secure design | Risk of account takeover and customer support |
 | Age/access, moderation and privacy | To be addressed before public launch | Legal and operations obligations vary by jurisdiction |
 
+## Recommended technical candidate (review pending, 2026-10-26)
+
+**My proposal: self-hosted Better Auth**, wired into the current **Fastify API**, **SvelteKit client** and **existing PostgreSQL**. This is a candidate, **not an approved dependency or implementation commitment**. The library has official integration documentation for Fastify (https://better-auth.com/docs/integrations/fastify), SvelteKit (https://better-auth.com/docs/integrations/svelte-kit), and PostgreSQL using the `pg` Pool (https://better-auth.com/docs/adapters/postgresql). It supports email/password, session management, verification and recovery features; verify exact version, cookie/CORS and migration behaviour during implementation.
+
+**Why this candidate:** minimum new infrastructure; accounts remain in our own Postgres database; compatible with existing TypeScript stack; no per-active-user identity SaaS bill. The cost is that **we own security patching, outbound transactional email, abuse controls, rate limiting, privacy and uptime**. A managed identity provider (e.g. Supabase Auth) reduces some operational burden but adds hosted integration, billing, availability and provider-specific concerns; it remains a valid alternative.
+
+**Suggested first sign-in experience (requires owner approval):** email + password; email verification and password reset; no mandatory Google/Steam/Discord account. Public release must have a reliable email sender, rate limiting and email-verified access policy; for local tests, an isolated mail catcher may be used to observe verification messages without sending actual mail.
+
+**No implementation of account or auth code is authorized by this proposed design document** until the owner approves the user-facing sign-in method and platform choice. Other decisions (character slot count, naming, deletion and intro) remain open until their respective design gates.
+
 ## Technical contracts to establish now
 
 - PostgreSQL `account`, provider-linked identity and `session` boundaries; character records later point to an immutable, server-owned `account_id`. Do not make character names a foreign key.
