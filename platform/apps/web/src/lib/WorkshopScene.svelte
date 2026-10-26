@@ -15,7 +15,7 @@
       observation: 'Plain pieces of metal, ready for stamping.'
     },
     paper: {
-      name: 'Work paper', label: 'Council order', icon: '▤', image: '/workshop/council-work.webp',
+      name: 'Work paper', label: 'Council order', image: '/workshop/council-work.webp',
       observation: "The council's work order, with the number to stamp on each plate written on it."
     },
     hammer: {
@@ -79,7 +79,7 @@
             <button type="button" onclick={() => {selected = null; advance(choice.next);}}>{choice.label}</button>
           {/each}
         {:else if beat.next}
-          <button type="button" onclick={() => {selected = null; advance(beat.next!);}}>Continue</button>
+          <button type="button" onclick={() => {selected = null; if (beat.next) advance(beat.next);}}>Continue</button>
         {/if}
         {#if canGoBack}
           <button class="back" type="button" onclick={() => {selected = null; goBack();}}>Previous line</button>
