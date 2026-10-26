@@ -1,7 +1,7 @@
 # M1.1 — Local Better Auth + Mailpit QA
 
 **Date:** 2026-10-26  
-**Status: PARTIALLY VERIFIED ON OWNER'S NODE 24/DOCKER ENVIRONMENT (2026-10-26); M1.1 IS NOT YET COMPLETE.** The code is for local development, not public deployment. **Better Auth + email/password + verification/reset + self-hosted Postgres were approved by the owner.**
+**Status: CORE FUNCTIONAL AUTH FLOW PASSED (owner-reported, 2026-10-26); M1.1 SECURITY/REPRODUCIBILITY GATE STILL OPEN.** The code is for local development, not public deployment. **Better Auth + email/password + verification/reset + self-hosted Postgres were approved by the owner.**
 
 ## Owner QA evidence — 2026-10-26
 
@@ -11,9 +11,16 @@ The owner explicitly confirmed **PASS** for the following three steps after reso
 2. **Verification email:** received in local Mailpit.
 3. **Email verification link:** successfully completed.
 
-Evidence is the owner's reported manual browser test, not independent server-log or automated test verification. These results **do not** establish that sign-in, durable session recovery, sign-out revocation, password reset, or multiple-account isolation work. No login credentials or links were shared.
+The owner also reported **five further PASS results**:
+- Verified-account login: PASS.
+- Browser refresh retained authenticated session: PASS.
+- Logout revoked access; `GET /api/me` returned HTTP 401: PASS.
+- Password recovery: PASS (Mailpit reset flow, old password rejected/new password accepted according to the requested scenario).
+- API process restart retained the authenticated session: PASS.
 
-**Next manual QA gate:** sign in with the verified account; open `http://127.0.0.1:5173/api/me`, expect verified account JSON; refresh and confirm session; sign out, expect HTTP 401; request a password reset and use only the Mailpit link; verify old password fails and new password succeeds. Run `npm run verify:api` as M0 regression after the auth tests.
+The registration/email and five session/recovery results are **owner-reported manual browser evidence**, not independent automated integration tests. No credentials, cookies or links were shared. These results establish functional local login and recovery, but **do not yet prove multi-account isolation or public security readiness**.
+
+**Next QA gate:** run M0 regression `npm run verify:api` and a no-cookie/forged-header auth endpoint regression; then verify Account A and Account B produce **different IDs** in isolated browser sessions. Finally run `npm run test:unit`, `npm run check:web`, `npm run build -w @the-pall/web`, and commit the locally regenerated `platform/package-lock.json`.
 
 **Additional acceptance before M1.1 closure:** verify session survives an API process restart, run auth-specific negative and multi-user access tests (at minimum account A/B session separation; character ownership tests become meaningful in M1.2), perform package TypeScript checks, and commit the updated `platform/package-lock.json` after dependency resolution.
 
