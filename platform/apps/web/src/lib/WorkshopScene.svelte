@@ -4,6 +4,7 @@
 
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
   type PropSpec = {name: string; label: string; image: string; observation: string};
+  const keys = ['stamps', 'plates', 'paper', 'hammer'] as const;
   const props: Record<PropKey, PropSpec> = {
     stamps: {
       name: 'Number stamps', label: 'Number stamps', image: '/workshop/number-stamps.webp',
@@ -87,7 +88,7 @@
     </div>
 
     <div class="prop-markers" aria-label="Workshop objects">
-      {#each (['stamps', 'plates', 'paper', 'hammer'] as const) as key}
+      {#each keys as key}
         <button
           class:chosen={selected === key}
           class="prop-marker {key}"
