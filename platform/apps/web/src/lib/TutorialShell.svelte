@@ -13,7 +13,9 @@
   };
 
   let {character, children, activePage = 'scene'}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'} = $props();
-  const chapter = $derived('/characters/' + encodeURIComponent(character.id) + '/opening');
+  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 2
+    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
+    : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
 
   // The owner-approved normal Home dashboard unlocks after the shared Stage 8
