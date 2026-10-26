@@ -34,6 +34,6 @@ Every gameplay-related requirement must have one of these states:
 
 ## Evidence and limitation
 
-A local scaffold revised on 2026-10-24 has **six passing pure-unit tests** (four request validation, two deterministic fixture) using Node 22 tooling and TypeScript 5.8.3. Node 24 dependency builds and live PostgreSQL/browser tests are **not yet verified**, so **M0 has not passed**. Local source package: `The_Pall_Platform_M0_1_Source.zip` in the accompanying ChatGPT conversation; code is **not claimed committed** to GitHub. See [ADR-0001](adr-0001-web-native-mmo-foundation.md) and [Millhand first integrated implementation plan](../05-gameplay/onboarding/millhand/first-integrated-playable-implementation-plan.md).
+A local scaffold revised on 2026-10-24 has **six passing pure-unit tests** (four request validation, two deterministic fixture) using Node 22 tooling and TypeScript 5.8.3. Node 24 dependency builds and live PostgreSQL/browser tests are **not yet verified**, so **M0 has not passed**. Local source package: `The_Pall_Platform_M0_1_Source.zip` in the accompanying ChatGPT conversation; code is **not claimed committed** to GitHub. See [ADR-0001](adr-0001-web-native-mmo-foundation.md) and [Millhand first integrated implementation plan](../archive/history/05-gameplay/onboarding/millhand/first-integrated-playable-implementation-plan.md).
 
 **Blocking principle:** No further actual game logic expands until a relevant mechanic is approved; no further actual MMO implementation expands beyond M0 until real database and integration tests pass.

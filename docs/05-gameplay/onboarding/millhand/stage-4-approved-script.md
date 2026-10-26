@@ -1,6 +1,6 @@
 # Millhand Stage 4 — Three Second Jobs: full editorial rewrite, Revision 01
 
-**STATUS: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner. This wording has **not yet been installed in the playable build**. This document proposes every principal Stage 4 scene, work instruction, NPC exchange, choice/result, error response and journal entry for all three routes. The [original approved Stage 4 document](second-task-branches.md) remains authoritative for gameplay flow, three task families, skills and constraints. This follows approved [Stage 1](opening-dialogue.md), [Stage 2](stage-2-platework-editorial-rewrite-review-draft.md) and [Stage 3](stage-3-missing-stamp-editorial-rewrite-review-draft.md) editorial versions.
+**STATUS: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner. This wording has **not yet been installed in the playable build**. This document proposes every principal Stage 4 scene, work instruction, NPC exchange, choice/result, error response and journal entry for all three routes. The [original approved Stage 4 document](second-task-branches.md) remains authoritative for gameplay flow, three task families, skills and constraints. This follows approved [Stage 1](opening-dialogue.md), [Stage 2](stage-2-approved-script.md) and [Stage 3](stage-3-approved-script.md) editorial versions.
 
 ## Editorial diagnosis of the former Stage 4
 

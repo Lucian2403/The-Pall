@@ -97,9 +97,9 @@ Godot is a useful renderer for animated 2D/3D games. The owner explicitly does n
 
 ## Canon / references
 
-- [First integrated playable plan](../05-gameplay/onboarding/millhand/first-integrated-playable-implementation-plan.md)
+- [First integrated playable plan](../archive/history/05-gameplay/onboarding/millhand/first-integrated-playable-implementation-plan.md)
 - [Workshop Gate 02 review](../05-gameplay/onboarding/millhand/visual-production-gate-02-workshop-wireframe-review.md)
-- [Combat integration contract](../05-gameplay/combat/combat-integration-and-prototype-contract.md)
+- [Combat integration contract](../archive/history/05-gameplay/combat/combat-integration-and-prototype-contract.md)
 - [Shared onboarding state contract](../05-gameplay/onboarding/shared-state-implementation-contract.md)
 - Official current documentation: Svelte (https://svelte.dev/docs/svelte/overview), Node release schedule (https://nodejs.org/en/about/previous-releases), PostgreSQL (https://www.postgresql.org/docs/current/).
 

@@ -1,6 +1,6 @@
 # The Pall Combat — Accepted Foundation (APPROVED PRINCIPLES)
 
-**Status: APPROVED PRINCIPLES (2026-10-19); DETAILS AND NUMERICAL BALANCE STILL OPEN.** The user accepted the critique/revised approach in [Part 1's discussion record](core-turns-actions-initiative-momentum-proposal.md) and stated the primary design goal: **individual fights should be demanding and as varied as their circumstances justify, without a complicated core**. This approval does **not** lock every suggested number, attack name, submechanic or untested balance value.
+**Status: APPROVED PRINCIPLES (2026-10-19); DETAILS AND NUMERICAL BALANCE STILL OPEN.** The user accepted the critique/revised approach in [Part 1's discussion record](../../archive/history/05-gameplay/combat/core-turns-actions-initiative-momentum-proposal.md) and stated the primary design goal: **individual fights should be demanding and as varied as their circumstances justify, without a complicated core**. This approval does **not** lock every suggested number, attack name, submechanic or untested balance value.
 
 ## Essential design identity
 

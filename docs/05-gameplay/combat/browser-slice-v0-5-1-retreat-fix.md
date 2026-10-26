@@ -34,7 +34,7 @@ This narrow gate prevents obviously irrational surrender, but the long-term appr
 
 **Next human playtest:** verify Flint does not flee while comfortably winning; check he remains beatable through mixed decisions. No changes to the compact UI, delayed impact or numeric ability tooltip in this maintenance patch.
 
-Related: [v0.5 baseline](browser-slice-v0-5-pacing-and-ability-details.md), [Enemy AI approved principles](enemy-ai-decision-system-proposal.md), [Part 9 wounded/downed](wounds-bleeding-incapacitation-treatment-proposal.md).
+Related: [v0.5 baseline](../../archive/history/05-gameplay/combat/browser-slice-v0-5-pacing-and-ability-details.md), [Enemy AI approved principles](enemy-ai-decision-system-proposal.md), [Part 9 wounded/downed](wounds-bleeding-incapacitation-treatment-proposal.md).
 
 
 ## User playtest checkpoint — satisfactory working foundation (2026-10-21)

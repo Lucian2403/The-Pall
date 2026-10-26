@@ -90,7 +90,7 @@ Do not solve these by artificially forcing the second enemy hit to land or by ma
 
 **APPROVED AT PRINCIPLE LEVEL (2026-10-19):** **action-timing-based Initiative**, honest precommitted telegraphs with varying detail, protected Guard before enemy contact, one basic zero-Momentum Reposition action, and small relative-distance/obstacle states. **Do not yet lock values, skill modifiers, an Evasive Step button or additional submechanics.** [Part 3 — the complete Standard Action menu](standard-action-menu-proposal.md) is the next PROPOSAL. Exact round formulas, actual distances, tie rules and UI are still pending.
 
-Related: [approved core principles](approved-combat-foundation.md), [earlier critique](core-turns-actions-initiative-momentum-proposal.md), [Flint](../onboarding/millhand/flint-fight.md), [boar](../onboarding/squatter/boar-fight.md), [Silas](../onboarding/inkbound/silas-pumpard-fight.md).
+Related: [approved core principles](approved-combat-foundation.md), [earlier critique](../../archive/history/05-gameplay/combat/core-turns-actions-initiative-momentum-proposal.md), [Flint](../onboarding/millhand/flint-fight.md), [boar](../onboarding/squatter/boar-fight.md), [Silas](../onboarding/inkbound/silas-pumpard-fight.md).
 
 ## User's forward-looking example requirement (2026-10-19)
 

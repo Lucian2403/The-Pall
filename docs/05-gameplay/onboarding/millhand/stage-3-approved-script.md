@@ -1,6 +1,6 @@
 # Millhand Stage 3 — The Missing Stamp: editorial rewrite, Revision 01
 
-**Status: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner after review. This revision replaces the historical Stage 3 *player-facing words* in [the original mechanical design](missing-stamp-discovery.md); the original document still governs unchanged event logic, evidence and rewards. **Approved words are not yet installed in the playable build.** This follows approved [Stage 1 Revision 02](opening-dialogue.md), approved [Stage 2 Revision 03](stage-2-platework-editorial-rewrite-review-draft.md), and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
+**Status: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner after review. This revision replaces the historical Stage 3 *player-facing words* in [the original mechanical design](missing-stamp-discovery.md); the original document still governs unchanged event logic, evidence and rewards. **Approved words are not yet installed in the playable build.** This follows approved [Stage 1 Revision 02](opening-dialogue.md), approved [Stage 2 Revision 03](stage-2-approved-script.md), and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
 
 ## Precise editorial critique of the previous wording
 
