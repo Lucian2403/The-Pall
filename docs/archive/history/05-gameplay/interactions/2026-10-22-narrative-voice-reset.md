@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # The Pall — Narrative voice reset, editorial direction (2026-10-22)
 
 **Status:** Direct user-provided writing direction, applicable to editorial rewrites; not an approval of any particular revised scene. Adds sensory precision and varied cadence while **preserving and strengthening the prohibition on personification**. The user reaffirmed the absolute no-personification rule on 2026-10-22. Gameplay lore and existing quest mechanics are not thereby changed.

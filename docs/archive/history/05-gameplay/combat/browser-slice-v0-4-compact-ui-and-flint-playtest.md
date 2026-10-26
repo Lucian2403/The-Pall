@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Browser Combat v0.4 — Compact Interface, Readable Costs, Stronger Flint
 
 **Status: BUILT AS STANDALONE LOCAL DEMO (2026-10-20); USER PLAYTEST PENDING.** The source is delivered as the separate conversation ZIP `The_Pall_Combat_Browser_Slice_v0_4.zip`, **not** as source files committed by this documentation change. This note follows [v0.3 implementation](browser-slice-v0-3-implementation-status.md), the user's 2026-10-20 hand-on UI screenshot annotations, and their explicit direction to reduce footprint because combat will coexist with other MMO sections. The local program is **not an MMO server or production-ready UI**.
@@ -46,4 +48,4 @@ The **boar** remains a 30/65 injured animal with real position/exit logic; **Sil
 
 **Next priority:** collect hands-on evidence for Flint's first-encounter lethality and the compact action/intent scan hierarchy; revise **his AI or ability pacing** if the fight becomes punishing even to good tactical play. The compact UI is a direction to evaluate, not permanent visual approval.
 
-References: [Part 10 integration contract](combat-integration-and-prototype-contract.md), [v0.3](browser-slice-v0-3-implementation-status.md), [approved boar Health](../onboarding/squatter/boar-fight.md).
+References: [Part 10 integration contract](combat-integration-and-prototype-contract.md), [v0.3](browser-slice-v0-3-implementation-status.md), [approved boar Health](../../../../05-gameplay/onboarding/squatter/boar-fight.md).

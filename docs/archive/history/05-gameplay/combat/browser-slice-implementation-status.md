@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Combat Part 10 — Browser Slice v0.1, Implementation Status
 
 **Status: EXECUTABLE LOCAL PROTOTYPE CREATED AND TESTED (2026-10-20); NOT PRODUCTION CODE.** This is the implemented follow-up to the [Combat Part 10 integration contract](combat-integration-and-prototype-contract.md), continuing the previously approved 18-test isolated JavaScript combat spike. The runnable browser-slice ZIP was attached to the corresponding ChatGPT project conversation as `The_Pall_Combat_Browser_Slice_v0_1.zip`. **This document is committed in GitHub; the source ZIP is a conversation download, not a repository commit.** Do not infer a code path in GitHub from this page.
@@ -30,4 +32,4 @@ Not a hosted/live MMO, not a multiplayer world, not production authentication, T
 4. Finish physical cover/armor/aim, weapon activation, appropriate Momentum techniques and healing, measuring balance under large simulation batches.
 5. Only later expand to multiple opponents, world economy integration and load testing.
 
-**Canon references:** [Part 1 approved combat](approved-combat-foundation.md), [Momentum](momentum-generation-and-spending-proposal.md), [Health and injury](wounds-bleeding-incapacitation-treatment-proposal.md), [six-origin state/QA contract](../onboarding/shared-state-implementation-contract.md).
+**Canon references:** [Part 1 approved combat](../../../../05-gameplay/combat/approved-combat-foundation.md), [Momentum](../../../../05-gameplay/combat/momentum-generation-and-spending-proposal.md), [Health and injury](../../../../05-gameplay/combat/wounds-bleeding-incapacitation-treatment-proposal.md), [six-origin state/QA contract](../../../../05-gameplay/onboarding/shared-state-implementation-contract.md).

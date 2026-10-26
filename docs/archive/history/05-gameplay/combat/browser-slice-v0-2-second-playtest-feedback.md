@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Combat Browser Slice v0.2 — Second Player Playtest, Difficulty and Information
 
 **Status: PLAYER FEEDBACK CONFIRMED / NEXT REVISION REQUIREMENTS PROPOSED, 2026-10-20. NOT A NEW APPROVAL OF NUMERIC STATS, ENEMY ABILITIES, UI OR SCRIPTED OUTCOMES.** This note tracks hands-on gameplay reports and targeted inspection of the actual v0.2 ZIP source code; it is a backlog and design proposal, **not an implementation claim or a commit of source code**.

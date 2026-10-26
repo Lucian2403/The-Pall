@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # The Pall — Close the Editorial Loop, Begin Playable Production
 
 **Working decision — 2026-10-23.** This is the assistant's recommended production route, not a new change to previously locked quest mechanics or a claim of owner approval for every future implementation choice.

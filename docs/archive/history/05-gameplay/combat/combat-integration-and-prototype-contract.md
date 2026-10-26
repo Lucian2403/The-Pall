@@ -1,6 +1,8 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # The Pall — Combat Part 10: Integration Contract and Runnable Vertical-Slice Proof (PROPOSAL)
 
-**Status: PROPOSED FOR USER REVIEW (2026-10-20).** Parts 1–9 are now accepted at their recorded principle/architecture levels, including [Part 9's approved wound and medical rules](wounds-bleeding-incapacitation-treatment-proposal.md). The test values and pending policies remain open. The repository is currently **pre-production documentation**, not an operational browser MMO. A separately packaged **Node.js combat test harness** was executed in the design session with 18 automated tests passing, but the harness **is NOT a shipped client, backend or a production system**. Its source is delivered as a standalone conversation artifact; do not claim it has already been deployed to GitHub or production unless actually committed there.
+**Status: PROPOSED FOR USER REVIEW (2026-10-20).** Parts 1–9 are now accepted at their recorded principle/architecture levels, including [Part 9's approved wound and medical rules](../../../../05-gameplay/combat/wounds-bleeding-incapacitation-treatment-proposal.md). The test values and pending policies remain open. The repository is currently **pre-production documentation**, not an operational browser MMO. A separately packaged **Node.js combat test harness** was executed in the design session with 18 automated tests passing, but the harness **is NOT a shipped client, backend or a production system**. Its source is delivered as a standalone conversation artifact; do not claim it has already been deployed to GitHub or production unless actually committed there.
 
 ## Purpose and deliberately narrow scope
 
@@ -124,4 +126,4 @@ The harness should be treated as a discardable technical spike. A durable produc
 
 **Still open:** technology stack, whether to promote/replace the exploratory JS harness, accurate weapon and injury values, enemy combat loadouts, UI design, multiplayer scaling, death/respawn and wilderness extraction. No permanent decisions are made by running the spike.
 
-References: [Part 9](wounds-bleeding-incapacitation-treatment-proposal.md), [Part 8](stamina-fatigue-composure-stress-focus-proposal.md), [Part 7](hit-chance-aiming-and-skills-proposal.md), [AI](enemy-ai-decision-system-proposal.md), [six-origin state contract](../onboarding/shared-state-implementation-contract.md), [first playable scope](../../00-vision/first-playable-scope.md).
+References: [Part 9](../../../../05-gameplay/combat/wounds-bleeding-incapacitation-treatment-proposal.md), [Part 8](../../../../05-gameplay/combat/stamina-fatigue-composure-stress-focus-proposal.md), [Part 7](../../../../05-gameplay/combat/hit-chance-aiming-and-skills-proposal.md), [AI](../../../../05-gameplay/combat/enemy-ai-decision-system-proposal.md), [six-origin state contract](../../../../05-gameplay/onboarding/shared-state-implementation-contract.md), [first playable scope](../../../../00-vision/first-playable-scope.md).

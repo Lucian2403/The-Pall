@@ -1,10 +1,12 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Combat Browser Slice v0.3 — Health Parity, Intent, Boar Terrain, Defensive Openings
 
 **Status: WORKING STANDALONE LOCAL PROTOTYPE (2026-10-20); 37/37 Node unit / HTTP integration tests PASS.** The companion `The_Pall_Combat_Browser_Slice_v0_3.zip` is provided in the associated project conversation, not yet committed as source to this GitHub repository. All source, runnable HTTP server, browser assets and tests live inside that ZIP. **This is not a production or hosted MMO.** Review against [user feedback](browser-slice-v0-2-second-playtest-feedback.md).
 
 ## Binding user decision: injured boar 30/65
 
-**USER-APPROVED SPECIFIC VALUE:** The young, ordinary, already-injured boar enters the Squatter tutorial fight with **30 current Health out of 65 base maximum Health**. This is now recorded in [the canonical boar encounter](../onboarding/squatter/boar-fight.md). Its existing leg injury is present in encounter state and does not automatically impose an extra unseen bleeding wound. A newly incurred qualifying injury can still affect state normally. Boar starting 30/65 is distinct from full Health 65/65 and the superseded v0.2 20/20 fixture.
+**USER-APPROVED SPECIFIC VALUE:** The young, ordinary, already-injured boar enters the Squatter tutorial fight with **30 current Health out of 65 base maximum Health**. This is now recorded in [the canonical boar encounter](../../../../05-gameplay/onboarding/squatter/boar-fight.md). Its existing leg injury is present in encounter state and does not automatically impose an extra unseen bleeding wound. A newly incurred qualifying injury can still affect state normally. Boar starting 30/65 is distinct from full Health 65/65 and the superseded v0.2 20/20 fixture.
 
 **APPROVED TEST DIRECTION, NUMERIC PARITY NOT A GLOBAL NPC STAT:** Flint and Silas Pumpard now start with **50/50 Health** as ordinary, not-presently-wounded human opponents; the novice player remains **50/50**. This replaces v0.2's arbitrary Flint 24 and Silas 22. **No universal identical Health for all future humans or animals is implied.** Combat damage bands (unarmed 4–8, Flint club 7–13, Silas hook 5–11, boar charge 8–16), hit odds, Guard mitigation, action costs, enemy AI weights and proposed technique abilities remain **provisional test values**, not locked lore/item data.
 

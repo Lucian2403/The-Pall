@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Browser Combat Slice v0.2 — Playtest Feedback, Corrections and Open Balance
 
 **Status: IMPLEMENTED IN A SEPARATE LOCAL PROTOTYPE (2026-10-20); NOT APPROVED FINAL BALANCE.** This is a development note following the user's hands-on test of v0.1. The **standalone source ZIP** is delivered in the corresponding project conversation, not stored in GitHub by this documentation change. No major combat rules, named special attacks, damage values, NPC stats or visual style are automatically locked by this iteration.
@@ -47,4 +49,4 @@ These are actual player-observed deficiencies and warrant changing the engine an
 
 **Follow-up direction:** improve gameplay feeling and decision quality before continuing to design new combat systems or declaring browser-MMO implementation complete. Avoid changing locked six-origin story consequences or the one-time 10-coin clinic examination policy.
 
-Related: [Part 10 contract](combat-integration-and-prototype-contract.md), [Browser v0.1 status](browser-slice-implementation-status.md), [approved combat foundation](approved-combat-foundation.md), [Momentum](momentum-generation-and-spending-proposal.md).
+Related: [Part 10 contract](combat-integration-and-prototype-contract.md), [Browser v0.1 status](browser-slice-implementation-status.md), [approved combat foundation](../../../../05-gameplay/combat/approved-combat-foundation.md), [Momentum](../../../../05-gameplay/combat/momentum-generation-and-spending-proposal.md).

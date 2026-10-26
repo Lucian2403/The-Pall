@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Combat Browser Slice v0.5 — Easier Flint, Attack-Spam Trade-Off, Delayed Impact and Ability Details
 
 **Status: EXECUTABLE LOCAL PROTOTYPE PREPARED (2026-10-20); PLAYER PLAYTEST NOT YET APPROVED.** Companion ZIP: `The_Pall_Combat_Browser_Slice_v0_5.zip` provided as a conversation artifact, **not a source-code commit in GitHub**. This development note follows the user's hands-on v0.4 playtest: all fights harder, Flint especially punitive for newcomers, repeated Basic Strike seeming more successful than thoughtful decisions, desire for a **1–1.5-second impact delay**, reserved room for future combat levels/abilities and numeric descriptions for even basic actions. Player finds **Silas the most natural/engaging** so his distinct design should not be artificially flattened.
@@ -36,4 +38,4 @@
 
 **Approval boundary:** The user has asked to build/test these proposals, but has **not permanently approved trial Flint 49% accuracy, Guard 68%, 11/14 Stamina costs, +18pp overcommit vulnerability, or 1.25 s as the final production cadence**. The boar's starting **30/65** is already user-approved and unchanged.
 
-Related: [v0.4 build](browser-slice-v0-4-compact-ui-and-flint-playtest.md), [Part 8 Stamina/Focus](stamina-fatigue-composure-stress-focus-proposal.md), [Part 9 wounds](wounds-bleeding-incapacitation-treatment-proposal.md), [Combat integration](combat-integration-and-prototype-contract.md).
+Related: [v0.4 build](browser-slice-v0-4-compact-ui-and-flint-playtest.md), [Part 8 Stamina/Focus](../../../../05-gameplay/combat/stamina-fatigue-composure-stress-focus-proposal.md), [Part 9 wounds](../../../../05-gameplay/combat/wounds-bleeding-incapacitation-treatment-proposal.md), [Combat integration](combat-integration-and-prototype-contract.md).

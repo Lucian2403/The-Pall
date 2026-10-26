@@ -1,3 +1,5 @@
+> **Historical archive.** Superseded planning or prototype record; see [active documentation](../../../../README.md) for current rules.
+
 # Documentation Reorganization — 2026-10-12
 
 The following files were **moved, not rewritten for gameplay balance**. Relative links were updated after the move. This table preserves their earlier paths for searching commit history and old notes. Old GitHub URLs may no longer resolve; use the corresponding new paths.
