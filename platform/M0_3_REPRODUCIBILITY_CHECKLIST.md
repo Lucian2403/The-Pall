@@ -1,7 +1,23 @@
 # M0.3 — Reproducible installation and build gate
 
-**Status:** awaiting owner verification on local Node.js 24 + Windows PowerShell.  
+**Status:** Node 22 run passed build/tests, but Node 24 runtime parity is **still required** to close M0.  
 **Context:** M0.2 API/DB, browser action/refresh and API restart all passed locally and are documented in [M0_2_QA_EVIDENCE.md](M0_2_QA_EVIDENCE.md). This gate adds *no game rules* or UI redesign.
+
+## Execution evidence — 2026-10-26 (owner-reported)
+
+**Four command sequence completed successfully** on Windows PowerShell:
+- `npm ci`: installed 173 packages; no installation failure.
+- `npm run test:unit`: 4/4 contracts and 2/2 game-core tests passed.
+- `npm run check:web`: Svelte reported zero errors and zero warnings.
+- `npm run build -w @the-pall/web`: Vite client and SSR builds succeeded. `adapter-auto` displayed its expected informational notice because no hosting platform is selected.
+
+**Repository check:** `platform/package-lock.json` is present in the GitHub default branch (lockfile v3). This establishes repository tracking, not necessarily a full fresh-clone test.
+
+**Blocking runtime discrepancy:** the command output reports **Node v22.20.0 and npm 11.6.1**, but `platform/package.json` requires **Node >=24 <27**. `npm ci` reports `EBADENGINE`; it remains a warning, so the tests pass, but full M0.3 acceptance is **not met** until repeated under Node 24. Do **not** loosen the engine range simply to hide this warning.
+
+**Separate non-blocking warning:** npm config `_email` is obsolete; it does not cause the test or build failures. Do not advise removing unrelated npm config blindly.
+
+**Remaining action:** use Node 24 in a new terminal and rerun `npm ci`, `npm run test:unit`, `npm run check:web`, `npm run build -w @the-pall/web`; confirm the prior local API/browser checks remain valid under that runtime. No game rules or new features are part of this gate.
 
 ## A. Capture and publish the dependency lockfile
 
