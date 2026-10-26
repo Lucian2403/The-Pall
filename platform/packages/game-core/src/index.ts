@@ -5,3 +5,6 @@ export function advanceFixture(state: FixtureState): FixtureState {
   if (state.revision < 0 || state.value < 0 || state.revision >= Number.MAX_SAFE_INTEGER || state.value >= Number.MAX_SAFE_INTEGER) throw new Error('invalid_fixture_state');
   return {revision: state.revision + 1, value: state.value + 1};
 }
+
+export {ORIGIN_CATALOGUE, APPROVED_STARTING_FACTS, previewCharacterStart} from './character-creation.js';
+export type {Origin, CharacterSex} from './character-creation.js';
