@@ -1,6 +1,6 @@
 # The Pall — M0.2 Git-tracked platform foundation
 
-This tracked `platform/` directory contains the M0.2 developer fixture, local setup conveniences and a corrected idempotency verifier. Follow **[GIT_WORKFLOW.md](GIT_WORKFLOW.md)** when moving from the earlier standalone ZIP or pulling later changes. It is not a game, it is not a deployed server and has **not** passed the full M0 gate. The only game operation is a non-economic test counter. No approved gameplay/visuals/combat have been changed.
+This tracked `platform/` directory contains the M0.2 developer fixture, local setup conveniences and a corrected idempotency verifier. Follow **[GIT_WORKFLOW.md](GIT_WORKFLOW.md)** when moving from the earlier standalone ZIP or pulling later changes. It is not a game or deployed server. **M0.2 local PostgreSQL/API and browser/restart checks have passed**, while the full M0 gate awaits a committed dependency lockfile and reproducible clean build. The only game operation is a non-economic test counter. No approved gameplay/visuals/combat have been changed.
 
 ## Simple sequence
 
@@ -23,10 +23,11 @@ If a step fails, **stop there** and copy the error message plus the command you 
 
 - **You:** local Node 24 installation, Docker Desktop running, commands, return output or error.
 - **Assistant:** code fixes, specs, domain boundaries, QA plan and guided troubleshooting, preserving approved combat and Millhand decisions.
-- **Not yet verified:** clean Node 24 build, browser interaction, live PostgreSQL tests, production security, restart evidence and a verified committed dependency lockfile. These must be evidenced before calling M0 complete.
+- **Verified locally by owner (2026-10-26):** API/PostgreSQL idempotency, invalid/stale/concurrent requests, browser interaction/refresh and restart recovery. See [M0.2 QA evidence](M0_2_QA_EVIDENCE.md).
+- **Still required for full M0:** committed lockfile, clean `npm ci`, Svelte typecheck and web build under Node 24. See [M0.3 reproducibility checklist](M0_3_REPRODUCIBILITY_CHECKLIST.md). Production security, load testing, account identity and deployments are separate future work.
 
 See `docs/DECISION_BOUNDARIES.md` for the policy on undecided game rules. The existing `M0_STATUS.md` describes M0.1 historical status, not the outcome of your local setup.
 
 ## Source control
 
-The complete M0.2 application is now committed under `platform/` in `Lucian2403/The-Pall`. The ZIP-based folder will not receive updates from `git pull` unless it was already set up as a Git checkout. See [GIT_WORKFLOW.md](GIT_WORKFLOW.md) for the one-time move. The verification script's previous false negative due to JSON object property order is fixed in the tracked source; the owner's Docker-backed rerun is still needed.
+The complete M0.2 application is now committed under `platform/` in `Lucian2403/The-Pall`. The ZIP-based folder will not receive updates from `git pull` unless it was already set up as a Git checkout. See [GIT_WORKFLOW.md](GIT_WORKFLOW.md) for the one-time move. The corrected verification script passed on the owner's local Docker-backed setup. For the remaining clean-install verification, follow [M0.3](M0_3_REPRODUCIBILITY_CHECKLIST.md).
