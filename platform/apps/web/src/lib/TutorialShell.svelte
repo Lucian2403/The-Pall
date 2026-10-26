@@ -149,7 +149,7 @@
   .location-icon{font-size:24px;color:#d9b782}
   .chapter-meta{margin-left:auto;color:#c1aa8d;font-size:14px;white-space:nowrap}
   .exit-link{padding:7px 9px;border:1px solid #705236;color:#e5c39a;text-decoration:none;font-size:12px;white-space:nowrap}
-  .chapter-content{flex:1;min-width:0;padding:0}
+  .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
   .onboarding-footer{border-top:1px solid #4d3928;padding:12px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .mobile-nav{display:none}
   @media(max-width:1100px){
