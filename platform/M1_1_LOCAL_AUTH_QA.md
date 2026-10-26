@@ -43,13 +43,25 @@ On a **new** database, Better Auth 1.7 can log `ERROR [Better Auth]: Database sc
 
 **Do not also run `npx auth migrate`.** In this monorepo the Better Auth config is at `apps/api/src/auth.ts` rather than the CLI's default search locations. Bare `npx auth migrate` can report `No configuration file found` even after our programmatic migration succeeded. It is redundant.
 
-For a **read-only** check that the four tables now exist, run from the Git-tracked `platform` directory:
+### If Docker Compose says "service postgres is not running"
+
+This can happen after migrating from the earlier ZIP project to the Git-tracked checkout: **the PostgreSQL container can be running under the previous Compose project name**, while `docker compose exec postgres` in the new checkout checks only the new project's service. The application's `DATABASE_URL` can still connect normally.
+
+**Do not start another Postgres container or remove volumes just to run a read-only query.** Use the new application-level check instead:
 
 ```powershell
-docker compose exec -T postgres psql -U pall_dev -d pall_dev -c "SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename IN ('user','session','account','verification') ORDER BY tablename;"
+git pull --ff-only
+npm run auth:status
 ```
 
-Expected: **four rows** (`account`, `session`, `user`, `verification`). If fewer appear, stop and share the result; do not rerun migrations blindly or remove volumes.
+This uses `DATABASE_URL` from the current ignored `.env`, queries `pg_tables`, and makes **no data changes**. Expected:
+
+```text
+Better Auth tables found: account, session, user, verification
+PASS: All 4 Better Auth tables exist in the application database.
+```
+
+If the query fails to connect, inspect `docker ps --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"` and share the output (not `.env` or credentials). Investigate a port/container mismatch rather than deleting anything. The earlier `docker compose exec` command is **superseded** for this transition.
 
 8. Verify local package/TypeScript checks:
    ```powershell
