@@ -67,7 +67,7 @@
   {#if account}
     <p>Signed in as <strong>{account.email}</strong></p>
     <p>Email verified: {account.emailVerified ? 'Yes' : 'No'}</p>
-    <p><a href="/introduction">Read world introduction</a> · <a href="/backgrounds">Preview backgrounds</a></p>
+    <p><a href="/introduction">Read world introduction</a> · <a href="/characters">Your characters</a> · <a href="/backgrounds">Create a character</a></p>
     <button disabled={busy} onclick={() => {void logout();}}>Sign out</button>
   {:else}
     <nav aria-label="Account actions">
