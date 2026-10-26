@@ -1,6 +1,7 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {page} from '$app/state';
+  import {goto} from '$app/navigation';
   import {APPROVED_STAGE_ONE, type StageOneScene} from '$lib/approved-stage-one';
   import WorkshopScene from '$lib/WorkshopScene.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -16,6 +17,35 @@
   let scene = $state<StageOneScene | null>(null);
   let nodeId = $state('');
   let visited = $state<string[]>([]);
+  let takingWork = $state(false);
+  let handoffError = $state('');
+  let pendingTakeRequestId: string | null = null;
+
+  async function takeWorkPaper() {
+    if (takingWork || !character || character.origin !== 'Millhand' || beat?.kind !== 'handoff') return;
+    takingWork = true;
+    handoffError = '';
+    pendingTakeRequestId ??= crypto.randomUUID();
+    try {
+      const response = await fetch('/api/characters/' + encodeURIComponent(character.id) + '/millhand/work', {
+        method: 'POST', headers: {'content-type': 'application/json'},
+        body: JSON.stringify({action:'take_work_paper',expectedRevision:0,requestId:pendingTakeRequestId})
+      });
+      if (response.ok) {
+        pendingTakeRequestId = null;
+        await goto('/characters/' + character.id + '/millhand/work');
+        return;
+      }
+      const body = await response.json() as {error?:string};
+      if (response.status === 409 && (body.error === 'wrong_work_phase' || body.error === 'stale_revision')) {
+        await goto('/characters/' + character.id + '/millhand/work');
+        return;
+      }
+      handoffError = 'Could not begin the work: ' + (body.error ?? response.status);
+    } catch {
+      handoffError = 'The API could not be reached. Retry this handoff; it will not duplicate the work.';
+    } finally {takingWork = false;}
+  }
   let status = $state<'checking' | 'ready' | 'login' | 'missing' | 'not-ready' | 'unavailable'>('checking');
 
   const beat = $derived(scene?.nodes[nodeId] ?? null);
@@ -39,6 +69,10 @@
         if (!response.ok) {status = 'unavailable'; return;}
         const body = await response.json() as {character: Character};
         character = body.character;
+        if (character.origin === 'Millhand' && character.tutorial.stage === 2) {
+          await goto('/characters/' + character.id + '/millhand/work');
+          return;
+        }
         const originScene = APPROVED_STAGE_ONE[body.character.origin];
         if (!originScene || body.character.tutorial.stage !== 1 || body.character.tutorial.status !== 'NOT_STARTED') {
           status = 'not-ready';
@@ -70,6 +104,9 @@
         {advance}
         goBack={back}
         canGoBack={visited.length > 0}
+        {takeWorkPaper}
+        {takingWork}
+        {handoffError}
       />
     {:else}
       <section class="story-scene" aria-label={scene.location + ' opening'}>
@@ -99,7 +136,7 @@
         </div>
       </section>
     {/if}
-    <p class="preview-note">This dialogue is a read-only, replayable Stage 1 preview. Choices advance only when clicked; the saved tutorial stage is unchanged.</p>
+    <p class="preview-note">Dialogue choices advance only when clicked. {character.origin === 'Millhand' ? 'Taking the work paper commits Stage 2 to your saved character.' : 'This opening remains a read-only preview.'}</p>
   </TutorialShell>
 {:else}
   <main class="fallback">
