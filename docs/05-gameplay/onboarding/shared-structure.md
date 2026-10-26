@@ -2,6 +2,16 @@
 
 **Status: LOCKED structural design (2026-10-13).** This architecture applies to **all six** starting backgrounds: Millhand, Bellrunner, Squatter, Stitcher, Scrapper and Inkbound.
 
+## Tutorial UI versus normal Home — owner decision (2026-10-26)
+
+**The full illustrated Home dashboard and its standard navigation are not shown during the eight-stage origin tutorial.** The owner-selected desktop/mobile Home blueprint is the **post-onboarding normal-game interface**, first available only **after Stage 8 completes**. The six backgrounds instead use deliberately guided, stage-specific layouts that expose only the interactions appropriate to the current scene, work task, incident, encounter or clinic. This presentation may be tightly scripted, but the underlying account-owned character, resources, results, stage transitions and one-time effects must remain authoritative and persistent on the server.
+
+**Transition point:** Stage 8 still happens in the **same shared rented home**, with the approved rent notice, player response and completion action documented in [Shared Stage 8](shared-home-rent-ending.md). The normal Home dashboard unlocks **only after the Stage 8 closing interaction marks onboarding complete successfully and exactly once**. Do not reveal rent, new quests, unrestricted actions or post-tutorial Home panels early just because the dashboard artwork exists.
+
+**Scope distinction:** the Stage 8 home scene is an authored tutorial interaction; the later Home page is a general personal/city overview, not an automatic teleport to the rented room. Existing character, inventory and journal data must remain consistent as the shell changes. Normal Home cards are supplied by actual implemented systems and progression gates, never hardcoded sample currencies, jobs, notices or NPCs from concept mockups.
+
+**Implementation direction:** preserve reusable underlying scene/dialogue/job components and server-side contracts while allowing an intentionally constrained onboarding shell. Do not build or enable the full dashboard as part of the current Stage 1/2 gameplay integration. Treat its visual structure as approved **direction for post-tutorial design**, not final asset or feature sign-off.
+
 ## Required E2E sequence
 
 1. **Choose name, Male/Female portrait and background.** STR/DEX/INT/RES all start at 5; chosen background grants **+3 levels in one Major Skill**, before any tutorial quest.
