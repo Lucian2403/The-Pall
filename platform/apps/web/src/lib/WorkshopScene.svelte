@@ -5,7 +5,7 @@
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
   type PropSpec = {name: string; label: string; image: string; observation: string};
   const keys = ['stamps', 'plates', 'paper', 'hammer'] as const;
-  const props: Record<PropKey, PropSpec> = {
+  const workshopObjects: Record<PropKey, PropSpec> = {
     stamps: {
       name: 'Number stamps', label: 'Number stamps', image: '/workshop/number-stamps.webp',
       observation: 'Small metal tools with numbers cut into their ends. Workers arrange them and strike them with a hammer to stamp metal.'
@@ -53,10 +53,10 @@
     <img class="environment" src="/workshop/environment.webp" alt="The smithing workshop, with a forge, bench and distant city" />
     <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil, the smithing foreman" />
 
-    <img class="prop-art stamps" src={props.stamps.image} alt="" aria-hidden="true" />
-    <img class="prop-art plates" src={props.plates.image} alt="" aria-hidden="true" />
-    <img class="prop-art paper" src={props.paper.image} alt="" aria-hidden="true" />
-    <img class="prop-art hammer" src={props.hammer.image} alt="" aria-hidden="true" />
+    <img class="prop-art stamps" src={workshopObjects.stamps.image} alt="" aria-hidden="true" />
+    <img class="prop-art plates" src={workshopObjects.plates.image} alt="" aria-hidden="true" />
+    <img class="prop-art paper" src={workshopObjects.paper.image} alt="" aria-hidden="true" />
+    <img class="prop-art hammer" src={workshopObjects.hammer.image} alt="" aria-hidden="true" />
 
     <div class="dialogue" aria-label="Workshop conversation">
       {#if beat.kind === 'speech'}
@@ -94,11 +94,11 @@
           class="prop-marker {key}"
           type="button"
           aria-pressed={selected === key}
-          aria-label={'Inspect ' + props[key].name}
+          aria-label={'Inspect ' + workshopObjects[key].name}
           onclick={() => inspect(key)}
         >
           <span class="pin" aria-hidden="true"></span>
-          <span class="tag"><span class="symbol" aria-hidden="true"><WorkshopObjectIcon kind={key} /></span>{props[key].label}</span>
+          <span class="tag"><span class="symbol" aria-hidden="true"><WorkshopObjectIcon kind={key} /></span>{workshopObjects[key].label}</span>
         </button>
       {/each}
     </div>
@@ -107,8 +107,8 @@
   {#if selected}
     <div class="inspection" role="status">
       <div>
-        <strong>{props[selected].name}</strong>
-        <p>{props[selected].observation}</p>
+        <strong>{workshopObjects[selected].name}</strong>
+        <p>{workshopObjects[selected].observation}</p>
         {#if !readyForWork}
           <small>This is inspection only. Continue the conversation to receive the work paper.</small>
         {:else}
