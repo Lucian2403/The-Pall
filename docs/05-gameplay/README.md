@@ -1,105 +1,18 @@
 # Gameplay Systems
 
-Player activities, time, world economy and authored interactive events.
+Use the subject indexes rather than old version-by-version prototype reports.
 
-## Crafting and economy
+| System | Canonical entry point |
+| --- | --- |
+| Background onboarding and six origin stories | [Onboarding index](onboarding/README.md) |
+| Turn-based combat | [Combat specification index](combat/README.md) |
+| Spoken and interaction writing rules | [Game-wide dialogue style guide](interactions/dialogue-style-guide.md) |
+| Generated interactions | [Interaction generation](interactions/interaction-generation.md) |
+| Jobs and time | [Jobs and time](jobs/jobs-and-time.md) |
+| Crafting workflow | [Crafting](crafting/crafting-workflow.md) |
+| Trade and markets | [Market and trade](economy/market-and-trade.md) |
+| Player employment and ownership | [Player-owned industry](economy/player-owned-industry.md) |
+| Exploration and salvage | [Salvaging](exploration/salvaging.md) |
+| Food and survival | [Food and survival](survival/food-survival.md) |
 
-- [Crafting workflow](crafting/crafting-workflow.md)
-- [Market and trade](economy/market-and-trade.md)
-- [Player-owned industry](economy/player-owned-industry.md)
-
-## Field and survival
-
-- [Salvaging](exploration/salvaging.md)
-- [Food and survival](survival/food-survival.md)
-
-## Combat system
-
-- [Combat foundation — APPROVED PRINCIPLES (2026-10-19)](combat/approved-combat-foundation.md): one action per turn; Standard, Momentum and Contextual actions; real Initiative, readable enemy intent, defensive preparation, one Health pool and nonlethal outcomes. **Exact numbers are not locked.**
-- [Initiative, enemy intent and varied encounters — APPROVED PRINCIPLES (2026-10-19)](combat/initiative-and-intent-proposal.md): action-order timing, honest committed telegraphs, single basic Move action and lightweight positioning; numbers/edge cases remain TBD.
-- [Six Standard Action families — APPROVED PRINCIPLES](combat/standard-action-menu-proposal.md): Attack, Guard, Move, Use, Recover, Withdraw; exact action balance and Momentum income remain open.
-- [Momentum generation and spending — APPROVED PROTOTYPE (2026-10-19)](combat/momentum-generation-and-spending-proposal.md): Basic Strike +10, effective Guard +8, defensive Move +5; encounter-local 0–100 meter and 20/35/50 technique brackets **for balancing trials**, not final stats.
-- [Enemy Momentum and combat techniques — APPROVED PRINCIPLES (2026-10-19)](combat/enemy-momentum-and-techniques-proposal.md): player/NPC resource parity, independent pools, visible enemy readiness and plausible abilities; exact technique loadouts/balance TBD.
-- [Enemy AI decision-making — APPROVED PRINCIPLES (2026-10-19)](combat/enemy-ai-decision-system-proposal.md): objective-based legal action evaluation with committed enemy intent; precise AI weights remain open.
-- [Damage, Protection and Injuries — APPROVED ARCHITECTURE (2026-10-19)](combat/damage-protection-injuries-proposal.md): one Health pool, actual hit→protection→Guard→damage→conditional wounds/Health Ceiling; damage and armour figures still hypothetical.
-- [Hit Chance, Aimed Attacks and Combat Skills — APPROVED PRINCIPLES (2026-10-19)](combat/hit-chance-aiming-and-skills-proposal.md): single attack-contact check, Head/Torso/Limbs, bounded Arms/subskill contribution, Focus and range/cover, distinct firearm activation; **sample percentages and formulas remain test-only**.
-- [Stamina, Fatigue, Composure, Stress and Focus — APPROVED PRINCIPLES (2026-10-19)](combat/stamina-fatigue-composure-stress-focus-proposal.md): rested fresh fights usually start with 80–100 Stamina without per-encounter refill; Fatigue begins from real physical exertion at Stamina ≤20, Stress from mental pressure at Composure ≤20, both gradual; Recover choice and derived Focus. Exact costs, gains and penalties remain test-only.
-- [Wounds, Bleeding, Incapacitation and Medical Treatment — APPROVED PRINCIPLES (2026-10-20)](combat/wounds-bleeding-incapacitation-treatment-proposal.md): impact-only/minor/serious/critical wounds, one bounded bleed state, downed at zero Health, staged treatment; **rates, thresholds and wilderness outcomes remain open**.
-- [Combat Integration and Runnable Prototype — PART 10 PROPOSED](combat/combat-integration-and-prototype-contract.md): authoritative state machine, committed intent, atomic idempotent action contract, 3 onboarding test fixtures, 3 hypothetical endgame stress tests, and a tested **standalone Node harness** (not shipped or multiplayer). **Awaiting approval**.
-- [Combat Browser Slice v0.1 — EXECUTABLE LOCAL PROTOTYPE (2026-10-20)](combat/browser-slice-implementation-status.md): local Node.js HTTP server, file-backed restart persistence, safe idempotent action submissions, responsive browser UI and **23 passing rule/API tests**. Source ZIP delivered in conversation; **not a deployed MMO or code committed to GitHub**. Browser click automation blocked in execution environment.
-- [Combat Browser Slice v0.2 — PLAYER FEEDBACK & TESTED REWORK (2026-10-20)](combat/browser-slice-v0-2-playtest-response.md): repair Flint's repeated fixed-damage attacks and unused Momentum, enable trial damage variance and NPC techniques, rewrite combat narrative, replace browser UI; **28 Node tests passed** and standalone source ZIP supplied in conversation. Balancing/UI acceptance remain OPEN; GitHub contains a development note rather than the runnable code.
-- [Combat v0.2 second hands-on review — CRITICAL ISSUES OPEN (2026-10-20)](combat/browser-slice-v0-2-second-playtest-feedback.md): enemy intent is over-disclosed, boar's any-Move pathOpen trigger gives automatic retreat, logs reuse tiny text sets, Flint remains too easy; *action then subtype* UX retained. **Most numbers are prototype-only**, including all enemy Health/damage. v0.3 revisions PROPOSED, not locked.
-- [Combat Browser Slice v0.3 — TESTED LOCAL REWORK (2026-10-20)](combat/browser-slice-v0-3-implementation-status.md): Flint/Silas **50/50 Health** trial parity; boar **USER-APPROVED 30/65**, now in canonical Squatter encounter; coarse telegraphs, real boar route states, three grounded Stage 5 positions, temporary defensive openings, varied chronicle and preserved action→subtype UX. **37 Node checks pass.** Runnable code in conversation ZIP, not committed to GitHub.
-- [Combat Browser Slice v0.4 — COMPACT UI & STRONGER FLINT (2026-10-20)](combat/browser-slice-v0-4-compact-ui-and-flint-playtest.md): smaller embeddable UI and expandable chronicle, high-contrast cost/cue, removed redundant copy, structured post-fight breakdown; Flint trial basic blunt **14–17** and seldom Guards. **40/40 tests pass**, but simulated Flint difficulty increased dramatically and needs hands-on review. Source ZIP available in the conversation, not deployed or committed to GitHub.
-- [Combat Browser Slice v0.5 — PACING, ANTI-SPAM & ABILITY DETAILS (2026-10-20)](combat/browser-slice-v0-5-pacing-and-ability-details.md): Flint retains 14–17 raw impact but with slower trial accuracy, a more useful Guard, visible overcommitted stance and 11/14 Stamina strike costs; compact server-driven numerical descriptions plus 1.25-second client-side impact reveal. **46/46 tests PASS**; Silas Attack-spam balance OPEN. Runnable ZIP is a conversation artifact, not GitHub source.
-- [Combat Browser Slice v0.5.1 — RETREAT LOGIC CORRECTION (2026-10-20)](combat/browser-slice-v0-5-1-retreat-fix.md): Flint no longer voluntarily retreats at 18/50 while player is almost down at 2/50 and he can still press. Nonlethal surrender remains possible when warranted; no descriptions or balance values locked. **49/49 tests PASS.** Code ZIP delivered in conversation.
-- [Combat Part 1 — initial critique / discussion record](combat/core-turns-actions-initiative-momentum-proposal.md): retained for the reasons behind the approved foundation and open design questions.
-
-## Jobs and content
-
-- [Jobs and time](jobs/jobs-and-time.md)
-- [Interaction generation](interactions/interaction-generation.md)
-- [Spoken dialogue style guide — game-wide locked writing requirements](interactions/dialogue-style-guide.md)
-
-## First-session onboarding
-
-- [Six background folders and shared onboarding index](onboarding/README.md)
-- [Six-origin onboarding consistency audit (2026-10-19)](onboarding/audits/2026-10-19-six-origin-consistency-audit.md) — prioritized blockers, approved repairs and remaining tests.
-- [Onboarding state / persistence / QA contract (2026-10-19)](onboarding/shared-state-implementation-contract.md) — approved implementation requirements, not shipped code.
-- [Post-combat clinic examination policy (LOCKED 2026-10-19)](onboarding/shared-clinic-examination-policy.md) — no forced injury, a 10-coin assessment even for an unharmed winner, and condition-appropriate care.
-
-- [Shared tutorial structure: unpaid work, +3/+1 skills, 10-coin care and common home/rent](onboarding/shared-structure.md)
-- [Shared Stage 8: identical home, rent notice and Millhand closing speech for all six backgrounds](onboarding/shared-home-rent-ending.md)
-- [Remaining dialogue checklist and approved NPC names](onboarding/npc-dialogue-backlog.md)
-- [Millhand / Guther Anvil: approved opening conversation](onboarding/millhand/opening-dialogue.md)
-- [Millhand: worker-plate Smithing gameplay (approved interaction)](onboarding/millhand/platework-interaction.md)
-- [Millhand First Integrated Playable v0.1 — TESTED STAGES 1–2 (2026-10-21)](onboarding/millhand/first-integrated-playable-v0-1-implementation.md): local character creation, exact Guther dialogue, reusable Smithing platework with three material paths, saved/validated progress; **29 new tests + 49 unchanged combat tests passing**. Downloadable source archive delivered in conversation; individual source files **not yet committed to GitHub**. UI/UX explicitly temporary.
-- [Millhand: approved Missing Stamp discovery and Guther dialogue](onboarding/millhand/missing-stamp-discovery.md)
-- [Millhand: approved second-task Hauling / Contracts / Investigation routes](onboarding/millhand/second-task-branches.md)
-- [Millhand: approved Flint Wage Claim, Cornered and local narrative resolution](onboarding/millhand/flint-confrontation.md)
-- [Millhand: approved Flint fight encounter, persistent win/loss callback](onboarding/millhand/flint-fight.md)
-- [Millhand integrated browser prototype — MILESTONE 01 IMPLEMENTED (2026-10-21)](onboarding/millhand/first-playable-milestone-01-implementation.md): character creation, approved Guther conversation and Stage 2 Smithing job; **42 new tests + 49 unchanged combat tests pass**. Local ZIP is a conversation artifact; UI explicitly temporary and code GitHub synchronization remains outstanding.
-- [Millhand: approved 10-coin medical treatment and clinician dialogue](onboarding/millhand/clinic-treatment.md)
-- [Millhand: approved Stage 8 return home, rent notice and short self-directed ending](onboarding/millhand/home-rent-ending.md)
-- [Millhand: Smithing workshop, branching tutorial and wage enforcer](onboarding/millhand/README.md)
-- [Bellrunner: Hector D. Smoke Stage 1 opening conversation (approved)](onboarding/bellrunner/opening-dialogue.md)
-- [Bellrunner: Shift Dispatch Stage 2 courier work (approved)](onboarding/bellrunner/shift-dispatch-interaction.md)
-- [Bellrunner: The Wrong Bell Stage 3 discovery and branch choices (approved)](onboarding/bellrunner/wrong-bell-discovery.md)
-- [Bellrunner: Stage 4 three second-skill work tasks and dialogue (approved)](onboarding/bellrunner/second-task-branches.md)
-- [Bellrunner: Stage 5 Dogman confrontation (approved)](onboarding/bellrunner/dogman-confrontation.md)
-- [Bellrunner: Stage 6 Dogman fight (approved encounter)](onboarding/bellrunner/dogman-fight.md)
-- [Bellrunner: Stage 7 clinic dialogue and medical visit (approved)](onboarding/bellrunner/clinic-treatment.md)
-- [Bellrunner: Stage 8 shared home and rent notice (approved)](onboarding/bellrunner/home-rent-ending.md)
-- [Bellrunner: The Wrong Bell, three routes and Shift Marshal's dogman (locked)](onboarding/bellrunner/README.md)
-- [Squatter: Hedge Shelter, Herb Dealer, The Warm Patch and wild boar encounter (locked)](onboarding/squatter/README.md)
-- [Squatter: Benny Ben Stage 1 opening dialogue (approved)](onboarding/squatter/opening-dialogue.md)
-- [Squatter: Yarrow Cut Stage 2 gathering work (approved)](onboarding/squatter/yarrow-cut-interaction.md)
-- [Squatter: The Warm Patch Stage 3 discovery (approved)](onboarding/squatter/warm-patch-discovery.md)
-- [Squatter: Stage 4 Trading / Herbalism / Construction routes (approved)](onboarding/squatter/second-task-branches.md)
-- [Squatter: Stage 5 The Rustling Bank / Nowhere to Step (approved)](onboarding/squatter/boar-confrontation.md)
-- [Squatter: Stage 6 injured boar fight and outcomes (approved encounter)](onboarding/squatter/boar-fight.md)
-- [Squatter: Stage 7 clinic dialogue and care (approved)](onboarding/squatter/clinic-treatment.md)
-- [Stitcher: Cinder Row Infirmary, The Teaching Bed and Night Porter (locked)](onboarding/stitcher/README.md)
-- [Stitcher: Claudia Cyka revised Stage 1 harsher opening (approved)](onboarding/stitcher/opening-dialogue.md)
-- [Stitcher: Stage 2 Morning Dressings reusable Trauma job (approved)](onboarding/stitcher/morning-dressings-interaction.md)
-- [Stitcher: Stage 3 The Teaching Bed and Claudia's revised line (approved)](onboarding/stitcher/teaching-bed-discovery.md)
-- [Stitcher: Stage 4 three second-skill job routes (approved)](onboarding/stitcher/second-task-branches.md)
-- [Stitcher: Stage 5 The Empty Sheet / The Night Door (approved)](onboarding/stitcher/owler-confrontation.md)
-- [Stitcher: Stage 6 Owler fight with win/loss outcomes (approved, revised dialogue)](onboarding/stitcher/owler-fight.md)
-- [Stitcher: Stage 7 standard 10-coin care visit (approved)](onboarding/stitcher/clinic-treatment.md)
-- [Scrapper: Rust Yard / Ignatius Smog / The Last Dry Floor, three branches and Barnaby Rusk (locked)](onboarding/scrapper/README.md)
-- [Scrapper: Stage 1 Ignatius Smog's plain-language Rust Yard opening (approved)](onboarding/scrapper/opening-dialogue.md)
-- [Scrapper: Stage 2 simple condemned-pump Mechanics job (approved)](onboarding/scrapper/condemned-pump-interaction.md)
-- [Scrapper: Stage 3 The Last Dry Floor scene (approved)](onboarding/scrapper/last-dry-floor-discovery.md)
-- [Scrapper: Stage 4 Construction / Navigation / Logistics jobs (approved)](onboarding/scrapper/second-task-branches.md)
-- [Scrapper: Stage 5 The Copper Claim and Red Lever (approved)](onboarding/scrapper/barnaby-confrontation.md)
-- [Scrapper: Stage 6 Barnaby turn-based fight and win/lose outcomes (approved encounter)](onboarding/scrapper/barnaby-fight.md)
-- [Scrapper: Stage 7 ordinary ten-coin medical visit (approved)](onboarding/scrapper/clinic-treatment.md)
-- [Inkbound: Civic Copying Office / Erwin Buro / The Acceptable Losses, three branches and Silas Pumpard (locked)](onboarding/inkbound/README.md)
-- [Inkbound: Stage 1 Erwin Buro class-aspiring dialogue (approved)](onboarding/inkbound/opening-dialogue.md)
-- [Inkbound: Stage 2 The Winter Register and Erwin dialogue (approved)](onboarding/inkbound/winter-register-interaction.md)
-- [Inkbound: Stage 3 The Acceptable Losses and three choices (approved)](onboarding/inkbound/acceptable-losses-discovery.md)
-- [Inkbound: Stage 4 Coal Waiver / Door Count / Short Cart (approved)](onboarding/inkbound/second-task-branches.md)
-- [Inkbound: Stage 5 The Sealed Stove and Coal Hook (approved)](onboarding/inkbound/sealed-stove-confrontation.md)
-- [Inkbound: Stage 6 Silas Pumpard PvE encounter and outcomes (approved encounter)](onboarding/inkbound/silas-pumpard-fight.md)
-- [Inkbound: Stage 7 ordinary clinic visit (approved)](onboarding/inkbound/clinic-treatment.md)
+Previous browser-combat iterations and obsolete Millhand implementation records are stored in the [historical archive](../archive/README.md). They are not authoritative rules or final balance.
