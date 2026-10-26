@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS player_character_create_receipts (
   request_id UUID NOT NULL,
   request_hash TEXT NOT NULL,
   character_id UUID NOT NULL REFERENCES player_characters(id) ON DELETE RESTRICT,
+  result JSONB NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (account_id, request_id)
 );
