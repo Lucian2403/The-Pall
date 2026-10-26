@@ -50,7 +50,7 @@
         {/each}
       </div>
       <nav class="bottom">
-        <a class="action" href="/backgrounds">Continue to background selection</a>
+        <a class="action" href="/characters">Continue to character selection</a>
         <a class="secondary" href="/account">Account</a>
       </nav>
       <p class="development">M1.2 presentation preview. The text is approved; layout, repeat-on-login behaviour and final artwork are not.</p>
