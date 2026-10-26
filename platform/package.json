@@ -1,0 +1,25 @@
+{
+  "name": "the-pall-platform",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build:packages": "npm run build -w @the-pall/contracts && npm run build -w @the-pall/game-core",
+    "dev:web": "npm run dev -w @the-pall/web",
+    "dev:api": "npm run build:packages && npm run dev -w @the-pall/api",
+    "test:unit": "npm run build:packages && npm run test -w @the-pall/contracts && npm run test -w @the-pall/game-core",
+    "check:web": "npm run check -w @the-pall/web",
+    "db:up": "docker compose up -d postgres",
+    "db:status": "docker compose ps",
+    "db:stop": "docker compose stop postgres",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "verify:api": "node scripts/verify-api.mjs"
+  }
+}
