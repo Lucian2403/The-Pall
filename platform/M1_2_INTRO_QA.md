@@ -1,14 +1,22 @@
 # M1.2 — Approved introductory screens and read-only background selection
 
-**Status (2026-10-26): implementation candidate committed; browser/API build and owner visual QA pending.** This does **not** authorize character creation or any game-design rule that remains open.
+**Status (2026-10-26): LOCAL M1.2 INTRO/READ-ONLY CATALOGUE FUNCTIONAL SMOKE GATE PASSED (owner-reported).** Full visual sign-off, all twelve portrait previews, and persistent character creation remain separate gates.
 
 ## Owner QA result — 2026-10-26
 
 The owner confirmed that login, the approved universal world introduction, six-background selection and selected background's character-preview section **render and function locally**. **Browser presentation/flow: PASS (owner-reported).**
 
-The `npm run verify:character-catalogue` command exited with `FAILED: fetch failed`. This is a **transport/connection failure**, not a result of the anonymous or forged-identity assertions; the API auth-negative test is therefore **NOT YET VERIFIED**. The unrelated npm warning `Unknown user config "_email"` does not explain a Node `fetch` connection failure.
+The first invocation of `npm run verify:character-catalogue` produced `FAILED: fetch failed` because the test did not establish an HTTP connection. After API availability was confirmed, the owner reran the improved verifier and reported **all three PASS lines**:
 
-**Troubleshooting:** The verifier calls `http://127.0.0.1:8788` directly (the same target as Vite's `/api` proxy). The owner should keep `npm run dev:api` running in a separate terminal, verify `http://127.0.0.1:8788/health`, then run `npm run verify:character-catalogue` from a third terminal. Commit `e12b9a7d25e238609e2b5a2ea0463e2e8b4a92de` adds diagnostic error codes and an explicit health check. Do not claim this security smoke test passed until the output confirms it.
+```text
+PASS: Local API reachable
+PASS: Anonymous character catalogue access rejected
+PASS: Forged account/session identity rejected
+```
+
+PowerShell `Test-NetConnection 127.0.0.1 -Port 8788` also reported `TcpTestSucceeded : True`, and the API health endpoint returned `status : ok`. **The connection problem is resolved and the M1.2 catalogue access smoke test PASSED.** No authentication-code, database, or game-rule change was required. An unrelated npm `_email` config warning is non-blocking.
+
+**Evidence boundary:** These are owner-reported local checks, not a third-party security review. The owner confirmed browsing the intro, choosing one background, and seeing its character section; this does not yet prove all six background cards, all twelve portrait variants or final visual design received detailed owner sign-off.
 
 ## Source of truth
 
@@ -59,7 +67,7 @@ From the **Git checkout** `The-Pall\platform`, not the old ZIP:
 - Anonymous UI/API denied.
 - Any screenshot or console error, **without cookies or credentials**.
 
-**Gate remains open** until these checks and owner visual review pass.
+**Functional smoke gate passed:** the browser flow and the anonymous/forged-request API check passed on the owner's workstation. Detailed six-background/portrait visual review and later account-owned character persistence are not yet signed off.
 
 ## Still open; not implicitly approved
 
