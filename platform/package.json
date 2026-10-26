@@ -15,7 +15,7 @@
     "dev:web": "npm run dev -w @the-pall/web",
     "dev:api": "npm run build:packages && npm run dev -w @the-pall/api",
     "test:unit": "npm run build:packages && npm run test -w @the-pall/contracts && npm run test -w @the-pall/game-core",
-    "check:web": "npm run check -w @the-pall/web",
+    "check:web": "npm run verify:canonical-copy && npm run check -w @the-pall/web",
     "db:up": "docker compose up -d postgres",
     "db:status": "docker compose ps",
     "db:stop": "docker compose stop postgres",
@@ -24,6 +24,7 @@
     "mail:up": "docker compose up -d mailpit",
     "auth:migrate": "node --env-file=.env --import tsx scripts/auth-migrate.ts",
     "auth:status": "node --env-file=.env scripts/auth-check-schema.mjs",
-    "verify:auth-unauthenticated": "node scripts/verify-auth-boundary.mjs"
+    "verify:auth-unauthenticated": "node scripts/verify-auth-boundary.mjs",
+    "verify:canonical-copy": "node scripts/verify-approved-intro-copy.mjs"
   }
 }
