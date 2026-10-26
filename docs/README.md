@@ -35,3 +35,8 @@ This directory is the **design source of truth**. Approved decisions are disting
 **Authority when documents overlap:** newer explicitly approved corrections govern the affected text or behavior; structural rules remain in their dedicated canonical document. In particular, Millhand's approved editorial scripts govern player-facing wording, while stage interaction files govern unchanged mechanics. [Millhand's editorial map](05-gameplay/onboarding/millhand/INDEX.md) identifies the split.
 
 Keep historical reports out of active indexes. Do not silently promote test values, superseded art direction, or proposed rules to approved canon.
+
+## Documentation maintenance policy
+
+Keep this tree lean. **Do not create a new Markdown report for every implementation patch, local QA pass, or small milestone.** Approved lore/dialogue/mechanics remain in their existing canonical subject documents. Use the existing [platform README](../platform/README.md) for the current technical milestone, test commands and outstanding gates; Git commits and issues carry granular implementation history. Retain older QA files as historical evidence until a deliberate documentation-curation pass, without cloning them into new active reports. Add a new design document only for a genuinely new canonical specification that has no appropriate home, not as routine status narration.
+
