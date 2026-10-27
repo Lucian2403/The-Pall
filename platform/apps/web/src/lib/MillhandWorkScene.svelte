@@ -39,7 +39,7 @@
       <img class="environment" src="/workshop/environment.webp" alt="Smithing workshop with a forge and the city outside" />
       <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil standing by the workbench" />
       <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil" title="Talk to Guther Anvil"
-        onclick={() => {talkingToGuther=true;selected=null;}}>
+        onclick={() => {talkingToGuther=true;}}>
         <span class="npc-label">Talk to Guther</span>
       </button>
       {#each objects as object (object.key)}
