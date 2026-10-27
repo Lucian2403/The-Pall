@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import type {PlateworkAction, PlateworkState} from '@the-pall/game-core';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -35,6 +36,12 @@
       if(!c.ok||!w.ok){status='unavailable';return;}
       const body=await c.json() as {character:Character};
       const snapshot=await w.json() as WorkSnapshot;
+      // Returning players do not land on a completed-work confirmation card.
+      // Saved Stage 2 completion is already the validated Stage 3 handoff.
+      if (body.character.origin==='Millhand' && snapshot.stage>=3 && snapshot.work?.phase==='COMPLETE') {
+        await goto('/characters/'+encodeURIComponent(characterId)+'/millhand/missing-stamp',{replaceState:true});
+        return;
+      }
       character=body.character;
       work=snapshot;
       status=snapshot.work?'ready':'stage-one';
@@ -63,6 +70,12 @@
         work=result;
         if(character)character={...character,tutorial:{stage:result.stage,status:result.tutorialStatus}};
         retryId=null;retrySignature=null;
+        // A confirmed server-owned return_paper transaction is the scene
+        // transition. No separate footer button, timer or second POST.
+        if(action==='return_paper' && result.work?.phase==='COMPLETE' && result.stage===3) {
+          await goto('/characters/'+encodeURIComponent(character.id)+'/millhand/missing-stamp',{replaceState:true});
+          return;
+        }
       } else {
         errorMessage=result.error==='stale_revision'
           ? 'Your work changed in another tab. The current state has been reloaded.'
@@ -85,9 +98,6 @@
   <TutorialShell {character}>
     <MillhandWorkScene work={work.work} available={work.availableActions} 
       pending={committing} {errorMessage} {perform}/>
-    {#if work.work.phase==='COMPLETE'}
-      <p class="work-complete">The work paper was returned. <a href={'/characters/'+character.id+'/millhand/missing-stamp'}>Continue to The Missing Stamp</a></p>
-    {/if}
   </TutorialShell>
 {:else}
   <main class="fallback">
@@ -106,6 +116,5 @@
   .fallback{max-width:760px;margin:6vh auto;padding:30px;background:#24221f;border:1px solid #756047}
   .fallback h1{font-weight:normal}
   .fallback nav{margin-top:25px;border-top:1px solid #574633;padding-top:20px}
-  .work-complete{margin:0;padding:18px;background:#30271e;color:#e8d4b7;font:14px/1.6 sans-serif}
   .data-gate{margin:0;padding:9px 14px;background:#171513;color:#b09d88;font:12px/1.45 sans-serif}
 </style>
