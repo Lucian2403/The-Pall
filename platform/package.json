@@ -37,6 +37,7 @@
     "platework:migrate": "node --env-file=.env scripts/platework-migrate.mjs",
     "missing-stamp:migrate": "node --env-file=.env scripts/missing-stamp-migrate.mjs",
     "verify:millhand-work-unauthenticated": "node scripts/verify-millhand-work-unauthenticated.mjs",
-    "verify:missing-stamp-unauthenticated": "node scripts/verify-missing-stamp-unauthenticated.mjs"
+    "verify:missing-stamp-unauthenticated": "node scripts/verify-missing-stamp-unauthenticated.mjs",
+    "verify:dev-rewind": "node scripts/verify-dev-stage-rewind.mjs"
   }
 }
