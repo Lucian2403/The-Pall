@@ -12,7 +12,7 @@
   };
   type WorkSnapshot = {
     stage:number;tutorialStatus:string;work:PlateworkState|null;
-    availableActions:PlateworkAction[];requiredNumberAuthored:boolean;workerNumber:string|null;
+    availableActions:PlateworkAction[];
     tutorialPayout:{coins:number;ordinaryXp:number;items:number};
   };
   let character = $state<Character|null>(null);
@@ -83,13 +83,10 @@
 
 {#if status==='ready' && character && work?.work}
   <TutorialShell {character}>
-    <MillhandWorkScene work={work.work} available={work.availableActions} workerNumber={work.workerNumber}
+    <MillhandWorkScene work={work.work} available={work.availableActions} 
       pending={committing} {errorMessage} {perform}/>
     {#if work.work.phase==='COMPLETE'}
       <p class="work-complete">The work paper was returned. <a href={'/characters/'+character.id+'/millhand/missing-stamp'}>Continue to The Missing Stamp</a></p>
-    {/if}
-    {#if !work.requiredNumberAuthored}
-      <p class="data-gate">Development note: the actual council worker number is not yet authored. No numeric identification or stamp-matching puzzle is being claimed as final.</p>
     {/if}
   </TutorialShell>
 {:else}
