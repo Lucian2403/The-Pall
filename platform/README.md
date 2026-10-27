@@ -309,3 +309,25 @@ npm run second-job:migrate
 ```
 
 Run the migration only after the build checks succeed; stop at the first failure. Restart the API and frontend afterward, then revisit your already saved Stage 4 character. Test each branch and both alternative methods, the route-specific journal, the 5/7/4 distinct spoken lines, account ownership, stale-request rejection, Stage 5 boundary and the developer rewind. **These checks have not been run against the owner's local PostgreSQL or browser from the connector environment.**
+
+### Owner UI Kit v1 — restrained visual integration (2026-10-27)
+
+The owner supplied `The-Pall-UI-Kit-v1.zip`, a separate transparent sidebar illustration and a city panorama matching `resources/TheCityVista.png` in the ZIP. Rather than saturate every screen, pass 01 integrates only the owner's compact logo, unobtrusive city-banner artwork, footer illustration, typography and **real saved Health bar**. Dialogue stays in the small workshop popup. New Standard is applied to work, dialogue and ordinary prose; Bebas Neue is used for restrained small labels. Beyond Wonderland is installed but is not applied broadly.
+
+**Licensing:** New Standard and Bebas Neue include SIL OFL licenses; Beyond Wonderland's readme permits commercial use. CF Industrial Fabrics is labeled **non-commercial**, and Stranger Friz **personal-use only**. The local installer excludes both restricted fonts. It copies the included licenses for the three permitted fonts. Full details and art handoff: [Owner UI Kit v1](../docs/00-vision/owner-ui-kit-v1-integration.md).
+
+**Run from Windows PowerShell inside `The-Pall\platform`**, with the uploaded files in your Downloads folder (change the paths to wherever you actually saved them):
+
+```powershell
+git pull --ff-only
+powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-ui-kit.ps1 `
+  -KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip" `
+  -SidebarImage "$env:USERPROFILE\Downloads\the_pall_sidebar_illustration_transparent.png"
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Restart the frontend. No database migration, quest reset or new character is required. The original ZIP is the local source for the binary art and font files; the GitHub source commit contains the installer and styling, **not the binary fonts or images**. The standalone City image need not be copied again because it is identical to the ZIP's `TheCityVista.png`. If the source files are in another directory, point the installer there.
+
+Stamina and Fatigue fill textures, buttons and dialogue frame are available as static source assets for later review. No fictitious stamina/fatigue readings, city navigation, inventory buttons or unrelated new interactions have been implemented. Check the artwork and typography at mobile and desktop before authorizing more decoration or a universal dialogue-frame replacement. Local browser rendering remains to be verified by the owner.
