@@ -10,6 +10,9 @@
     "apps/*",
     "packages/*"
   ],
+  "dependencies": {
+    "pg": "^8.0.0"
+  },
   "scripts": {
     "build:packages": "npm run build -w @the-pall/contracts && npm run build -w @the-pall/game-core",
     "dev:web": "npm run dev -w @the-pall/web",
