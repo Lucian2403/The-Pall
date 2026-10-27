@@ -59,17 +59,19 @@ export const MISSING_STAMP_ROUTES: Readonly<Record<MissingStampBranch, {
  */
 export function missingStampJournal(
   state:{slipRead:boolean;plateRead:boolean;phase:string;branch:string|null},
-  evidence:MissingStampEvidence|null
+  evidence:MissingStampEvidence|null,
+  slip:{workerNumber:string;recordedDeathDate:string}|null,
+  plate:{workerNumber:string;inspectionDate:string}|null
 ):readonly string[] {
   const entries:string[] = [
     'I returned the finished work paper to Guther. A returned plate and a folded cancellation slip were with the council\'s papers.'
   ];
-  if(evidence && state.slipRead)
-    entries.push('I read a cancellation slip for worker number '+evidence.workerNumber+
-      '. The council recorded the worker as dead after a fire in a locked workshop. The date was '+evidence.recordedDeathDate+'.');
-  if(evidence && state.plateRead)
-    entries.push('I examined a returned plate with worker number '+evidence.workerNumber+
-      '. It had a separate council inspector\'s mark dated '+evidence.inspectionDate+'.');
+  if(slip && state.slipRead)
+    entries.push('I read a cancellation slip for worker number '+slip.workerNumber+
+      '. The council recorded the worker as dead after a fire in a locked workshop. The date was '+slip.recordedDeathDate+'.');
+  if(plate && state.plateRead)
+    entries.push('I examined a returned plate with worker number '+plate.workerNumber+
+      '. It had a separate council inspector\'s mark dated '+plate.inspectionDate+'.');
   if(evidence && state.slipRead && state.plateRead)
     entries.push('The two records have the same worker number as one of the plates I stamped. The inspection date came after the recorded death.');
   if(state.phase==='CONFRONT'||state.phase==='DECISION'||state.branch!==null)
