@@ -193,7 +193,7 @@
 </section>
 
 <style>
-  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#efdecb;font-family:Georgia,'Times New Roman',serif}
+  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#efdecb;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
   /* Row 1 is reserved for the CRPG dialogue. Row 2 holds the physical bench props.
      Their footprints cannot intersect, including when the longest choice is shown. */
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
@@ -210,11 +210,11 @@
   .evidence{position:relative;z-index:4;grid-column:1/-1;grid-row:2;align-self:end;justify-self:center;
     width:min(490px,48%);display:flex;align-items:end;justify-content:center;gap:12px;margin:0 0 13px}
   .evidence button{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:3px;
-    flex:1;min-width:0;margin:0;padding:0;background:transparent;border:0;color:#f3dfc1;cursor:pointer;font:13px/1.3 Georgia,serif}
+    flex:1;min-width:0;margin:0;padding:0;background:transparent;border:0;color:#f3dfc1;cursor:pointer;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
   .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(102px,12vw,158px);
     pointer-events:none;filter:drop-shadow(0 5px 6px #0009)}
   .evidence-label{display:block;box-sizing:border-box;width:100%;max-width:205px;min-height:29px;padding:5px 6px;
-    background:#16130feb;border:1px solid #92704b;font:clamp(11px,1.06vw,13px)/1.25 Georgia,serif;text-align:center}
+    background:#16130feb;border:1px solid #92704b;font:clamp(11px,1.06vw,13px)/1.25 var(--pall-font-reading,Georgia,serif);text-align:center}
   .evidence button:hover .evidence-label,.evidence button:focus-visible .evidence-label,
   .evidence button.seen .evidence-label{border-color:#e9bd73;background:#312415}
   .evidence button:focus-visible{outline:2px solid #f2d28f;outline-offset:3px}
@@ -229,7 +229,7 @@
   .stage-narration{font-style:italic}
   .instruction{font-weight:bold;font-size:14px;line-height:1.4;margin:14px 0}
   .choices{display:flex;flex-direction:column;gap:7px;margin-top:13px}
-  .choices button{width:100%;padding:10px 12px;min-height:40px;text-align:left;font:14px/1.4 Georgia,serif;border:1px solid #6d5235;background:#241d16;color:#f7e6c9;cursor:pointer}
+  .choices button{width:100%;padding:10px 12px;min-height:40px;text-align:left;font:14px/1.4 var(--pall-font-reading,Georgia,serif);border:1px solid #6d5235;background:#241d16;color:#f7e6c9;cursor:pointer}
   .choices button:hover:not(:disabled),.choices button:focus-visible{background:#423022;outline:2px solid #c49d65;outline-offset:1px}
   .choices button:disabled{opacity:.5;cursor:default}
   .choices .leave{background:#503c29}
@@ -248,8 +248,8 @@
     background:#e8d6b6;color:#2c2119;border-top:2px solid #9a7147}
   .journal-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;max-width:930px;margin:0 auto 15px}
   .journal-kicker{font:600 10px sans-serif;letter-spacing:.14em;color:#6d5037}
-  .journal-heading h2{font:normal 24px Georgia,serif;margin:6px 0 0}
-  .journal-entries{max-width:930px;margin:0 auto;font:15px/1.55 Georgia,serif}
+  .journal-heading h2{font:normal 24px var(--pall-font-reading,Georgia,serif);margin:6px 0 0}
+  .journal-entries{max-width:930px;margin:0 auto;font:15px/1.55 var(--pall-font-reading,Georgia,serif)}
   .journal-entries p{margin:9px 0}
   .error{font:13px/1.4 sans-serif;color:#873523}
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif}
