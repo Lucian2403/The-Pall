@@ -85,6 +85,37 @@ The repository already contains a **draft**, unapproved set of work/city/lore co
 
 Each receives distinct, unforced responses—not one interchangeable script with names swapped. The existing three draft topics remain usable review starting points.
 
+### Candidate personal-background topics for the other recurring job-givers
+
+All five replies below are **NEW BIOGRAPHICAL PROPOSALS, NOT CANON**. They are intended to complement the existing three-topic drafts. Their tone and facts require separate owner approval; none should be displayed as established character history yet.
+
+**Hector D. Smoke — Dispatch Master**
+- **PLAYER:** “Did you ever run the routes yourself?”
+- **HECTOR:** “I carried notices before I was put in charge of sending them. So when a runner says a route takes longer than the clerk allows, I listen.”
+- Optional follow-up: “And do you change the time?” / **HECTOR:** “If the runner can show me where he was held up, I'll put it in the book. I won't put down a time he never made.”
+
+**Benny Ben — Herb Dealer**
+- **PLAYER:** “How did you get into gathering herbs?”
+- **BENNY:** “Started by learning which plants were useful, and which patches would grow back after cutting. There's no sense selling every last root and having nothing next season.”
+- Optional follow-up: “Did someone teach you?” / **BENNY:** “Some things I was shown. Others I had to learn by looking properly. You can do harm if you pull up a plant without knowing what it is.”
+
+**Claudia Cyka — Matron**
+- **PLAYER:** “Have you been in charge here long?”
+- **CLAUDIA:** “Long enough to know exactly what gets left undone when nobody checks. I have patients to examine and staff to keep working.”
+- Optional follow-up: “Were you always a matron?” / **CLAUDIA:** “No. And I remember what ward work requires. Now get on with yours.”
+
+**Ignatius Smog — Yard Foreman**
+- **PLAYER:** “Have you always worked with scrap?”
+- **IGNATIUS:** “I've worked on machines when they could still be used. Now I see what can be taken from them when they're finished. Good metal's still good metal.”
+- Optional follow-up: “Would you rather repair them?” / **IGNATIUS:** “If somebody pays for the repair, yes. If they send it here for breaking, I take out what we can use.”
+
+**Erwin Buro — Senior Copy Clerk**
+- **PLAYER:** “How did you become the senior clerk?”
+- **ERWIN:** “By copying the entries properly and finding mistakes before our books went out. After some years they gave me charge of the other clerks.”
+- Optional follow-up: “Was that what you wanted?” / **ERWIN:** “A sound position is worth having. I did hope it might come with a somewhat finer office.”
+
+These topics are intentionally tied to work and authority rather than manufactured revelations. If approved, they should occupy a short conversation branch alongside each character's distinct work, city and lore branches, not a shared biography questionnaire.
+
 ## Acceptance checks
 
 - Choosing “How did you come to run this place?” immediately shows Guther's answer without a second player-line screen.
