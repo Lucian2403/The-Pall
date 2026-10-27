@@ -41,3 +41,86 @@
   --pall-parchment: #e9d8b7;
   --pall-brass-muted: #aa8659;
 }
+
+/*
+ * The Pall shared dialogue and actions — owner-supplied nine-slice art.
+ * The illustration's metal corners retain their proportions while the paper
+ * centre can grow with genuinely long dialogue. Do not apply these to scenery
+ * props, NPC click targets, the city banner, journals or the character sheet.
+ */
+.frame .chapter-content :is(.workshop,.second-job) :is(.dialogue,.work-card,.work-dialogue) {
+  box-sizing:border-box;
+  border:22px solid transparent;
+  border-image-source:url('/ui-kit/frames/dialogue-frame.png');
+  border-image-slice:165 190 155 190 fill;
+  border-image-width:22px 25px 22px 25px;
+  border-image-repeat:stretch;
+  border-radius:0;
+  background-color:#e9d9bb;
+  color:#2a1c13;
+  padding:7px 13px 9px;
+  box-shadow:0 7px 18px #0008;
+}
+.frame .chapter-content :is(.workshop,.second-job) :is(.heading,.eyebrow) {
+  font:normal 15px/1.15 var(--pall-font-label,'Arial Narrow',sans-serif);
+  letter-spacing:.09em;
+  color:#624328;
+}
+.frame .chapter-content :is(.workshop,.second-job) .speaker {
+  font:normal 15px/1.15 var(--pall-font-label,'Arial Narrow',sans-serif);
+  letter-spacing:.075em;
+  color:#684528;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button {
+  box-sizing:border-box;
+  width:100%;
+  min-height:44px;
+  border:11px solid transparent;
+  border-image-source:url('/ui-kit/buttons/button-normal.png');
+  border-image-slice:76 111 74 111 fill;
+  border-image-width:11px 19px 11px 19px;
+  border-image-repeat:stretch;
+  border-radius:0;
+  background-color:transparent;
+  color:#332319;
+  padding:2px 16px;
+  text-align:left;
+  font:normal 14px/1.35 var(--pall-font-reading,Georgia,serif);
+  text-shadow:none;
+  cursor:pointer;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button:hover:not(:disabled) {
+  border-image-source:url('/ui-kit/buttons/button-hover.png');
+  background-color:transparent;
+  color:#23160d;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button:active:not(:disabled) {
+  border-image-source:url('/ui-kit/buttons/button-pressed.png');
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button:focus-visible {
+  outline:2px solid #e6ba75;
+  outline-offset:2px;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button:disabled {
+  opacity:.55;
+  cursor:default;
+}
+/* Avoid squeezing a tiny popup if a player uses a narrow phone. The actual
+ * dialogue stays in the CRPG scene and never becomes a separate page. */
+@media(max-width:700px){
+  .frame .chapter-content :is(.workshop,.second-job) :is(.dialogue,.work-card,.work-dialogue){
+    border-width:18px;
+    border-image-width:18px 21px 18px 21px;
+    padding:7px 9px;
+  }
+  .frame .chapter-content :is(.workshop,.second-job)
+  :is(.responses,.actions,.choices) > button{
+    padding:3px 13px;
+    min-height:42px;
+  }
+}
