@@ -6,6 +6,7 @@ import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js'
 import {registerCharacterRoutes} from './character-routes.js';
 import {registerMillhandWorkRoutes} from './millhand-work-routes.js';
 import {registerMissingStampRoutes} from './millhand-missing-stamp-routes.js';
+import {registerMillhandSecondJobRoutes} from './millhand-second-job-routes.js';
 import {registerMillhandStageRewindRoutes} from './millhand-stage-rewind-routes.js';
 import {parseFixtureAction} from '@the-pall/contracts';
 import {advanceFixture} from '@the-pall/game-core';
@@ -19,6 +20,7 @@ registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);
 registerMillhandWorkRoutes(api);
 registerMissingStampRoutes(api);
+registerMillhandSecondJobRoutes(api);
 registerMillhandStageRewindRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {
