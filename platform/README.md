@@ -366,3 +366,23 @@ The owner observed that the prior UI kit pass did not actually display `frames/d
 **Local update:** After `git pull --ff-only`, the previously installed frame/button PNGs are available without reinstall. From `platform`, run `npm run verify:owner-ui-kit`, `npm run check:web`, `npm run build -w @the-pall/web`; restart the web server and refresh. The extended verification checks actual CSS references to the three button states, dialogue frame and universal avatar slot. No migration required for these changes.
 
 **Review gate:** User must confirm desktop/mobile text, corner proportions and button readability. No browser/device rendering is verified by the GitHub connector. **Avatar art is still required**: obtain the owner portrait ZIP/directory (image IDs and format), then add a global selection/persistence workflow shared by every origin. Do not use Millhand default avatars for other backgrounds or pretend the character initial is approved avatar artwork.
+
+### UI frame screenshot correction — remove white gutters and preserve button endcaps (2026-10-27)
+
+The original owner frame/button artwork had substantial transparent padding. The first CSS pass treated the uncropped PNGs as nine-slice sources, then drew a solid beige rectangular backdrop behind the translucent corners. It also squeezed decorated button caps into too-narrow borders. This has been corrected in `apps/web/src/lib/pall-owner-ui.css`.
+
+**Asset requirement:** Source CSS now references four **alpha-trimmed** siblings of the existing supplied PNGs: `frames/dialogue-frame-trim.png` and `buttons/button-{normal,hover,pressed}-trim.png`. The user has a companion ZIP **The_Pall_UI_Cropped_Frames_Patch.zip**, generated directly from the uploaded original kit with no stylistic changes. From `platform`, extract the patch ZIP (preserving `apps/web/static/ui-kit` relative paths), or rerun the updated `scripts/install-owner-ui-kit.ps1` with the original ZIP to generate the same files on Windows using System.Drawing. The originals remain installed and unmodified.
+
+**Visual corrections:** The dialogue image now has a transparent CSS backing, calibrated nine-slice cuts and physical content insets. Button caps have reserved border widths and keep all three source states without stretching their ends. The city heading returns to plain, readable serif; Bebas Neue remains for the compact game labels. No character, quest or SQL changes occur.
+
+**Local steps from `platform`:**
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\The_Pall_UI_Cropped_Frames_Patch.zip" -DestinationPath "." -Force
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Restart Vite or refresh with cache bypass. The owner has indicated a **single portrait collection for all origins**. Actual avatar images have not been provided in the kit/project uploads, so the topbar currently shows the initial fallback. Once the avatar ZIP is available, wire a shared portrait catalogue and persistent avatar selection independent of origin; don't fabricate or silently select a portrait. The visual corrections above were simulated using the owner's cropped PNGs, but still require real browser review and narrow/mobile QA.
