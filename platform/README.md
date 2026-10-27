@@ -211,6 +211,16 @@ Do not run a destructive reset or recreate the player's Millhand. Migration `db/
 **Build/QA status:** Commits have been source-checked against approved dialogue, but this connector environment cannot run a local Svelte build, PostgreSQL migration or browser playtest. Treat this as an implementation candidate until local commands pass.
 
 
+### M1.5 owner correction — artwork and gameplay unlock (2026-10-27)
+
+This update **supersedes the earlier Stage 3 content-gate section above**. Stage 2 stamping is a reusable work interaction, not a number-entry/matching game. The returned plate and cancellation slip are new owner-supplied transparent assets. Their identifying details are shown through text in the compact CRPG popup, not painted into the images. Both evidence inspections are persisted in any order; after both, the relative death/inspection-date contradiction appears and **Show Guther the papers** becomes available even when no exact worker number or date has been authored. Previously saved Stage 3 characters at `READY_TO_SPEAK` can continue with no reset.
+
+The interface expects two real cutouts at:
+- `apps/web/static/workshop/returned-reference-plate.webp`
+- `apps/web/static/workshop/cancellation-slip.webp`
+
+The companion art ZIP contains those two files under `apps/web/static/workshop/`. Extract the archive from the `platform` directory (keep folder paths); **the GitHub code commit alone does not install these binary assets locally**. The WebP files preserve transparency and the owner's artwork. No new database migration or character reset is needed beyond the existing Stage 3 tables. Restart both servers after `git pull --ff-only` and extraction; run `npm run test:unit`, `npm run check:api`, `npm run check:web` and `npm run build -w @the-pall/web` before browser QA. Ensure the user can now proceed to the Stage 4 boundary and that the +1 Major Skill is only committed once at route selection.
+
 ### Windows dependency install recovery — Vite/pg not found (2026-10-27)
 
 The Windows errors `'vite' is not recognized` and `ERR_MODULE_NOT_FOUND: pg` both mean npm dependencies are not available to the relevant workspace/script. `vite` is a web workspace **devDependency**, so production-only installs omit it. Root migration scripts import `pg` directly; `platform/package.json` now declares `pg` as a root dependency and `platform/package-lock.json` is synchronised. Node 24 is within the supported engines range.
