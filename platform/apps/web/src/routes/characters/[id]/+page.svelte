@@ -75,8 +75,11 @@
         <p><a class="enter" href={'/characters/' + character.id + '/millhand/work'}>Continue marking the plates</a></p>
         <p class="muted">The work is saved after each action. No wages or ordinary XP are awarded during this tutorial job.</p>
       {:else if character.origin === 'Millhand' && character.tutorial.stage === 3}
-        <p class="muted">The platework is complete and the work paper has been returned. Stage 3 is not connected to the authenticated game yet.</p>
-        <p><a class="enter" href={'/characters/' + character.id + '/millhand/work'}>Review finished platework</a></p>
+        <p><a class="enter" href={'/characters/' + character.id + '/millhand/missing-stamp'}>Examine the returned council papers</a></p>
+        <p class="muted">The Missing Stamp has persistent evidence and dialogue. Actual worker number and dates are still awaiting authoring.</p>
+      {:else if character.origin === 'Millhand' && character.tutorial.stage === 4}
+        <p><a class="enter" href={'/characters/' + character.id + '/millhand/missing-stamp'}>Review The Missing Stamp decision</a></p>
+        <p class="muted">Stage 4's chosen second job is not yet connected.</p>
       {:else}
         <p class="muted">This character is not at the start of Stage 1. No other origin's opening will be substituted.</p>
       {/if}
