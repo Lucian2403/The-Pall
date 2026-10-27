@@ -4,7 +4,7 @@ The origin's [story master](README.md) retains narrative structure and mechanica
 
 | Stage | Mechanics / encounter contract | Approved player-facing copy |
 | --- | --- | --- |
-| 1 — Workshop opening | [Opening dialogue](opening-dialogue.md) | [Approved Stage 1 Revision 02](opening-dialogue.md) |
+| 1 — Workshop opening | [Opening dialogue](opening-dialogue.md) | [Approved Stage 1 Revision 03](opening-dialogue.md) |
 | 2 — Worker plates | [Platework interaction](platework-interaction.md) | [Stage 2 Revision 03](stage-2-approved-script.md) |
 | 3 — Missing Stamp | [Discovery mechanics](missing-stamp-discovery.md) | [Stage 3 Revision 01](stage-3-approved-script.md) |
 | 4 — Three second jobs | [Route mechanics](second-task-branches.md) | [Stage 4 Revision 01](stage-4-approved-script.md) |
