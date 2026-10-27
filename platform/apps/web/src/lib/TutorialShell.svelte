@@ -77,6 +77,8 @@
         const data=await response.json() as {error?:string};
         if(response.status===409 && data.error==='stale_stage'){
           rewindError='This character moved to another stage. Reload this page before testing again.';
+        }else if(response.status===503 && data.error==='second_job_schema_missing'){
+          rewindError='Stage 4 database setup is missing. Run npm run second-job:migrate from platform, then restart the API.';
         }else{
           rewindError='Could not rewind: '+(data.error??response.status);
         }
