@@ -7,8 +7,8 @@ import {APPROVED_STARTING_FACTS} from './character-creation.js';
 import {MISSING_STAMP_ROUTE_SKILL} from './millhand-missing-stamp.js';
 import type {MissingStampBranch} from './millhand-missing-stamp.js';
 
-export type MillhandRewindStage = 2 | 3 | 4;
-export type MillhandRewindTarget = 1 | 2 | 3;
+export type MillhandRewindStage = 2 | 3 | 4 | 5;
+export type MillhandRewindTarget = 1 | 2 | 3 | 4;
 export type MillhandRewindPlan = Readonly<{
   fromStage:MillhandRewindStage;
   toStage:MillhandRewindTarget;
@@ -16,6 +16,7 @@ export type MillhandRewindPlan = Readonly<{
   resetPlatework:boolean;
   removePlatework:boolean;
   removeMissingStamp:boolean;
+  removeSecondJob:boolean;
 }>;
 
 export class MillhandRewindInvalid extends Error {
@@ -33,9 +34,10 @@ export function planMillhandRewind(
   bonuses:Readonly<Record<string,number>>,
   branch:MissingStampBranch|null,
   plateworkPhase:string|null,
-  missingStampPhase:string|null
+  missingStampPhase:string|null,
+  secondJobPhase:string|null=null
 ): MillhandRewindPlan {
-  if(stage!==2 && stage!==3 && stage!==4)throw new MillhandRewindInvalid();
+  if(stage!==2 && stage!==3 && stage!==4 && stage!==5)throw new MillhandRewindInvalid();
   if(!bonuses || typeof bonuses!=='object' || Array.isArray(bonuses))throw new MillhandRewindInvalid('unsafe_skill_state');
   if((bonuses.Craftsmanship??null)!==APPROVED_STARTING_FACTS.originMajorSkillBonusLevels)
     throw new MillhandRewindInvalid('unsafe_skill_state');
@@ -43,12 +45,18 @@ export function planMillhandRewind(
     throw new MillhandRewindInvalid('unsafe_work_state');
   if(stage===2 && (plateworkPhase===null || plateworkPhase==='COMPLETE'))
     throw new MillhandRewindInvalid('unsafe_work_state');
-  if(stage===4 && (!branch || missingStampPhase!=='SELECTED'))
+  if(stage>=4 && (!branch || missingStampPhase!=='SELECTED'))
     throw new MillhandRewindInvalid('unsafe_stage_three_state');
   if(stage===3 && branch && missingStampPhase!=='RESTAMP')
     throw new MillhandRewindInvalid('unsafe_stage_three_state');
   if(stage===2 && (branch!==null || missingStampPhase!==null))
     throw new MillhandRewindInvalid('unsafe_stage_three_state');
+  if(stage===5 && secondJobPhase!=='DONE')
+    throw new MillhandRewindInvalid('unsafe_second_job_state');
+  if(stage===4 && secondJobPhase==='DONE')
+    throw new MillhandRewindInvalid('unsafe_second_job_state');
+  if(stage<=3 && secondJobPhase!==null)
+    throw new MillhandRewindInvalid('unsafe_second_job_state');
 
   const expected:Record<string,number> = {Craftsmanship:APPROVED_STARTING_FACTS.originMajorSkillBonusLevels};
   if(branch){
@@ -62,9 +70,10 @@ export function planMillhandRewind(
   return {
     fromStage:stage,
     toStage:(stage-1) as MillhandRewindTarget,
-    nextBonuses:{Craftsmanship:APPROVED_STARTING_FACTS.originMajorSkillBonusLevels},
+    nextBonuses:stage===5?expected:{Craftsmanship:APPROVED_STARTING_FACTS.originMajorSkillBonusLevels},
     resetPlatework:stage===3,
     removePlatework:stage===2,
-    removeMissingStamp:stage>=3
+    removeMissingStamp:stage>=3&&stage<5,
+    removeSecondJob:stage>=4
   };
 }
