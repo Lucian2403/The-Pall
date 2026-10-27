@@ -35,7 +35,7 @@ export const APPROVED_GUTHER_OPTIONAL_DIALOGUE: readonly GutherTopic[] = [
         followUp: "You think I'm too stupid to understand?"
       },
       {
-        reply: "I don't care what you think. Next to the Cylinder, your opinion counts for nothing. Now get back to work."
+        reply: "I don't care what you think. The Cylinder's bigger than both of us. Your opinion won't change a thing. Now get back to work."
       }
     ]
   },
