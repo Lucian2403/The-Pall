@@ -148,3 +148,13 @@ npm run verify:characters-unauthenticated
 7. If any test or migration fails, **stop and report the first error** with secrets redacted. Do not try to reset the DB or manually edit the tutorial stage.
 
 There is no new art requirement, no new character creation grant, and no separate QA Markdown report. Work item/copy parity and full public-release security remain future acceptance gates.
+
+### Recurring NPC conversation review — optional, non-mutating (2026-10-27)
+
+**Owner request:** Explicit player speech choices should advance directly to the NPC reply, not show the selected player line twice. This applies to all six Stage 1 conversations. `resolveStageOneChoice` now skips the redundant player speech beat **only after clicking an explicit spoken choice**; ordinary unprompted dialogue remains unchanged.
+
+All six recurring starting NPCs now have a reusable optional conversation component covering **their work, Grand Cylinder City, and the Plume/Pall**. Guther's existing illustrated person can be clicked in **Millhand Stage 1 and at every Stage 2 platework phase**, including after completion; asking something and closing returns to the exact work/dialogue state, with **no stage, coin, XP, inventory or quest mutation**. The other five origins expose **Talk to [NPC]** on their existing Stage 1 text-first scene. Real artwork for them is not invented. NPC interaction does not replace the approved scene or its work-handoff controls.
+
+**Editorial gate (IMPORTANT):** These **18 new answers are NOT APPROVED** and are explicitly labelled `DRAFT — AWAITING OWNER APPROVAL` on screen. They contain **no invented detailed personal biography**; the origins' approved roles and voice ledger don't provide those details. The full six-NPC proposed texts are added **in-place** to [Dialogue Style Guide](../docs/05-gameplay/interactions/dialogue-style-guide.md), under the marked draft review section. Owner must approve or revise them **before** changing their status or treating the lines as permanent story canon. An extension of `npm run verify:canonical-copy` checks that the runnable draft matches the reviewed texts and every selected Stage 1 player speech leads directly to the reply.
+
+Local test: `git pull --ff-only`, `npm run check:web`, `npm run build -w @the-pall/web`, then refresh an owned Millhand's opening or saved Stage 2 work screen. Click Guther, choose any optional question, verify **no duplicate rendering of the player's prompt**, select "Ask something else" and "Return to work", then continue the saved job where you left off. Repeat with a Bellrunner/Stitcher origin opening if available. There are **no new database migrations or assets**. Source committed; user's browser/build verification still pending.
