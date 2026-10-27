@@ -1,5 +1,6 @@
 <script lang="ts">
   import type {StageOneBeat} from '$lib/approved-stage-one';
+  import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
   import WorkshopObjectIcon from '$lib/WorkshopObjectIcon.svelte';
   import NpcConversation from '$lib/NpcConversation.svelte';
 
@@ -32,6 +33,7 @@
     goBack,
     canGoBack,
     takeWorkPaper,
+    skipToWork,
     takingWork = false,
     handoffError = ''
   }: {
@@ -41,6 +43,7 @@
     goBack: () => void;
     canGoBack: boolean;
     takeWorkPaper?: () => Promise<void>;
+    skipToWork: () => void;
     takingWork?: boolean;
     handoffError?: string;
   } = $props();
@@ -91,7 +94,7 @@
     </div>
     <div class="dialogue" aria-label="Workshop conversation">
       {#if talkingToGuther}
-        <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} />
+        <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} skipToWork={() => {talkingToGuther=false;selected=null;skipToWork();}} />
       {:else}
       {#if beat.kind === 'speech'}
         <p class="speaker">{beat.speaker === 'Player' ? characterName : beat.speaker}</p>
@@ -114,6 +117,9 @@
           {/each}
         {:else if beat.next}
           <button type="button" onclick={() => {selected = null; if (beat.next) advance(beat.next);}}>Continue</button>
+        {/if}
+        {#if beat.kind !== 'handoff'}
+          <button type="button" class="skip-to-work" onclick={() => {selected=null;skipToWork();}}>{GUTHER_WORK_SKIP_LINE}</button>
         {/if}
         {#if beat.kind === 'handoff' && takeWorkPaper}
           <button type="button" disabled={takingWork} onclick={() => {void takeWorkPaper();}}>{takingWork ? 'Saving…' : 'Take the work paper'}</button>
@@ -168,6 +174,7 @@
   .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:12px/1.35 Georgia,serif;padding:7px 9px;min-height:30px;cursor:pointer}
   .responses button:hover,.responses button:focus-visible {outline:2px solid #d3a86a;outline-offset:1px}
   .responses .back {background:#57412c;color:#f6e9d8}
+  .responses .skip-to-work{background:#493321;border-color:#a07a4b}
   .responses button:disabled{opacity:.55;cursor:not-allowed}
   .handoff-error{font:12px/1.4 sans-serif;color:#873523;margin:6px 0}
   .prop-marker {position:absolute;z-index:5;bottom:1%;background:none;border:0;color:#f3e8d2;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0}
