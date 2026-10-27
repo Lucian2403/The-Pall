@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import type {MissingStampAction,MissingStampState} from '@the-pall/game-core';
   import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
@@ -79,14 +80,7 @@
 
 {#if status==='ready' && character && snapshot}
   <TutorialShell {character}>
-    <MillhandMissingStampScene {snapshot} {pending} {errorMessage} {perform}/>
-    {#if snapshot.stage===4}
-      <div class="next-stage">
-        Stage 3 is complete. Your route and one-time skill bonus are saved.
-        Stage 4's follow-up job is not yet connected.
-        <a href={'/characters/'+character.id}>Return to character</a>
-      </div>
-    {/if}
+    <MillhandMissingStampScene {snapshot} {pending} {errorMessage} {perform} continueToJob={() => {void goto('/characters/'+encodeURIComponent(characterId)+'/millhand/second-job');}}/>
   </TutorialShell>
 {:else}
   <main class="fallback">
@@ -104,6 +98,4 @@
   :global(a){color:#e0bc8b}
   .fallback{margin:6vh auto;max-width:760px;padding:30px;background:#24221f;border:1px solid #756047}
   .fallback nav{margin-top:25px;border-top:1px solid #574633;padding-top:20px}
-  .next-stage{padding:17px 20px;background:#30271e;color:#e8d4b7;font:14px/1.6 sans-serif}
-  .next-stage a{margin-left:9px}
 </style>
