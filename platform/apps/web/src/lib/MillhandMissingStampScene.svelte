@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type {MissingStampAction,MissingStampState,MissingStampEvidence} from '@the-pall/game-core';
+  import type {MissingStampAction,MissingStampState} from '@the-pall/game-core';
+  import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
   import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
@@ -9,9 +10,10 @@
     state:MissingStampState;
     availableActions:MissingStampAction[];
     contentReady:boolean;
-    slip:{workerNumber:string;recordedDeathDate:string}|null;
-    plate:{workerNumber:string;inspectionDate:string;inspectionMarkPresent:boolean}|null;
-    finding:MissingStampEvidence|null;
+    detailsAuthored:boolean;
+    slip:{workerNumber:string|null;recordedDeathDate:string|null}|null;
+    plate:{workerNumber:string|null;inspectionDate:string|null;inspectionMarkPresent:boolean}|null;
+    finding:ReadableMissingStampEvidence|null;
     majorSkillBonuses:Record<string,number>;
     tutorialPayout:{coins:number;ordinaryXp:number;items:number};
   };
@@ -51,11 +53,11 @@
       <div class="evidence" aria-label="Council evidence on the bench">
         <button type="button" class:seen={state.plateRead} disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
           onclick={() => {void inspect('plate');}}>
-          <span class="item-icon" aria-hidden="true">▤</span><span>Returned plate</span>
+          <img class="evidence-art" src="/workshop/returned-reference-plate.webp" alt="" aria-hidden="true" /><span class="evidence-label">Returned plate</span>
         </button>
         <button type="button" class:seen={state.slipRead} disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
           onclick={() => {void inspect('slip');}}>
-          <span class="item-icon" aria-hidden="true">▧</span><span>Cancellation slip</span>
+          <img class="evidence-art" src="/workshop/cancellation-slip.webp" alt="" aria-hidden="true" /><span class="evidence-label">Cancellation slip</span>
         </button>
       </div>
     </div>
@@ -79,16 +81,16 @@
           {#if inspectedView==='slip' && state.slipRead && snapshot.slip}
             <div class="record" aria-label="Cancellation slip">
               <strong>CANCELLATION SLIP</strong>
-              <p>Worker number: {snapshot.slip.workerNumber}</p>
-              <p>Recorded as: Dead after workshop fire</p>
-              <p>Recorded death date: {snapshot.slip.recordedDeathDate}</p>
+              <p>Recorded as: Dead after a workshop fire with locked doors.</p>
+              <p>Worker number: {snapshot.slip.workerNumber ?? 'Present on the original record'}</p>
+              <p>Recorded death date: {snapshot.slip.recordedDeathDate ?? 'Dated in the council record'}</p>
             </div>
           {:else if inspectedView==='plate' && state.plateRead && snapshot.plate}
             <div class="record" aria-label="Returned reference plate">
               <strong>RETURNED REFERENCE PLATE</strong>
-              <p>Worker number: {snapshot.plate.workerNumber}</p>
-              <p>Council inspector's mark: Present</p>
-              <p>Inspection date: {snapshot.plate.inspectionDate}</p>
+              <p>Worker number: {snapshot.plate.workerNumber ?? 'Stamped into the plate'}</p>
+              <p>Council inspector's mark: Present, separate from your stamping.</p>
+              <p>Inspection date: {snapshot.plate.inspectionDate ?? 'Dated beside the mark'}</p>
             </div>
           {/if}
 
@@ -103,11 +105,7 @@
                 Show Guther the papers
               </button>
             </div>
-          {:else if state.phase==='READY_TO_SPEAK'}
-            <div class="content-gate">
-              <strong>Development content gate</strong>
-              <p>The worker number and the two dated records have not been authored. The inspections are saved, but the contradiction and subsequent dialogue cannot be verified or advanced yet. No number or date is fabricated.</p>
-            </div>
+
           {/if}
           <p class="hint">Select either evidence object on the bench to inspect it again.</p>
 
@@ -172,11 +170,12 @@
   .npc-hotspot{position:absolute;z-index:3;top:12%;left:12%;width:25%;height:50%;display:flex;align-items:end;justify-content:center;background:none;border:0;padding:0 0 10px;color:#f7dfb6;cursor:pointer}
   .npc-hotspot:disabled{cursor:default;opacity:.7}
   .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px sans-serif}
-  .evidence{position:absolute;z-index:4;bottom:5%;left:14%;width:66%;display:flex;justify-content:center;gap:12px;align-items:end}
-  .evidence button{min-width:0;max-width:210px;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;background:#1b1712e8;color:#f3dfc1;border:1px solid #92704b;padding:10px 8px;cursor:pointer;font:13px/1.3 Georgia,serif}
-  .evidence button.seen{border-color:#d2ad76}
-  .evidence button:disabled{opacity:.48;cursor:default}
-  .item-icon{font-size:26px;color:#e1bd85}
+  .evidence{position:absolute;z-index:4;bottom:3%;left:13%;width:67%;display:flex;justify-content:center;gap:4px;align-items:end}
+  .evidence button{min-width:0;max-width:230px;display:flex;flex-direction:column;align-items:center;gap:0;flex:1;background:transparent;color:#f3dfc1;border:1px solid transparent;padding:0 3px 5px;cursor:pointer;font:13px/1.3 Georgia,serif}
+  .evidence button:hover,.evidence button:focus-visible,.evidence button.seen{border-color:#d2ad76;background:#241d1688;outline-offset:2px}
+  .evidence button:disabled{opacity:.55;cursor:default}
+  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(95px,14vw,190px);pointer-events:none;filter:drop-shadow(0 5px 7px #0008)}
+  .evidence-label{display:block;background:#1b1712e8;border:1px solid #92704b;padding:5px 8px;width:100%;font:13px/1.2 Georgia,serif;text-align:center}
   .dialogue{position:relative;z-index:5;grid-column:2;align-self:start;min-width:0;margin:clamp(24px,3vw,50px) 0 24px;padding:15px 18px;border:2px solid #654022;border-radius:5px;background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .eyebrow{font:600 11px sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
   .story,.speech,.finding{font-size:clamp(14px,1.25vw,17px);line-height:1.5;margin:0 0 13px}
@@ -207,9 +206,10 @@
     .environment{object-position:39% center}
     .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%}
-    .evidence{bottom:3%;left:20%;width:78%;gap:5px}
-    .evidence button{font:11px sans-serif;padding:5px}
-    .item-icon{font-size:18px}
+    .evidence{bottom:2%;left:18%;width:79%;gap:4px}
+    .evidence button{padding:0 2px 3px}
+    .evidence-art{height:clamp(75px,21vw,122px)}
+    .evidence-label{font:11px sans-serif;padding:4px 2px}
     .dialogue{margin:0;width:100%;border-radius:0;padding:14px}
     .story,.speech,.finding{font-size:16px}
   }
