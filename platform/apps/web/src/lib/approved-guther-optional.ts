@@ -10,6 +10,9 @@
  * Read-only: no game work actions, quest mutations, money or XP.
  * Source: docs/05-gameplay/onboarding/millhand/guther-optional-conversation.md
  */
+/** Player-selected optional speech to leave the conversation immediately. */
+export const GUTHER_WORK_SKIP_LINE = "Enough talk. Let's work." as const;
+
 export type GutherTopicId = 'background' | 'city' | 'lore' | 'work';
 export type GutherExchange = Readonly<{reply:string; followUp?:string}>;
 export type GutherTopic = Readonly<{
