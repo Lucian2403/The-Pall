@@ -36,7 +36,7 @@
   }: {
     characterName: string;
     beat: StageOneBeat;
-    advance: (next: string) => void;
+    advance: (next: string, fromChoice?: boolean) => void;
     goBack: () => void;
     canGoBack: boolean;
     takeWorkPaper?: () => Promise<void>;
@@ -99,7 +99,7 @@
       <div class="responses">
         {#if beat.kind === 'choice' && beat.choices}
           {#each beat.choices as choice}
-            <button type="button" onclick={() => {selected = null; advance(choice.next);}}>{choice.label}</button>
+            <button type="button" onclick={() => {selected = null; advance(choice.next, true);}}>{choice.label}</button>
           {/each}
         {:else if beat.next}
           <button type="button" onclick={() => {selected = null; if (beat.next) advance(beat.next);}}>Continue</button>
