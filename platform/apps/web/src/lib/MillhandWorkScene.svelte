@@ -2,6 +2,7 @@
   import type {PlateworkState, PlateworkAction} from '@the-pall/game-core';
   import {WORK_ACTION_OBJECT} from '@the-pall/game-core';
   import WorkshopObjectIcon from '$lib/WorkshopObjectIcon.svelte';
+  import NpcConversation from '$lib/NpcConversation.svelte';
   import {PHASE_INSTRUCTION, ACTION_LABEL, resultCopy, observeObject, type ObjectKey} from '$lib/millhand-work-copy';
 
   let {work, available, pending, errorMessage, perform}: {
@@ -19,6 +20,7 @@
     {key:'hammer' as const, label:'Hammer', image:'/workshop/hammer.webp'}
   ];
   let selected = $state<ObjectKey | null>(null);
+  let talkingToGuther = $state(false);
   const contextualActions = $derived(selected ? available.filter(a => WORK_ACTION_OBJECT[a] === selected) : []);
   const result = $derived(resultCopy(work));
   const instruction = $derived(PHASE_INSTRUCTION[work.phase]);
@@ -36,6 +38,10 @@
     <div class="illustration">
       <img class="environment" src="/workshop/environment.webp" alt="Smithing workshop with a forge and the city outside" />
       <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil standing by the workbench" />
+      <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil" title="Talk to Guther Anvil"
+        onclick={() => {talkingToGuther=true;selected=null;}}>
+        <span class="npc-label">Talk to Guther</span>
+      </button>
       {#each objects as object (object.key)}
         <img class="object-art {object.key}" src={object.image} alt="" aria-hidden="true"/>
       {/each}
@@ -52,7 +58,10 @@
       </div>
     </div>
 
-    <aside class="work-card" aria-label="Council platework">
+    <aside class="work-card" aria-label={talkingToGuther ? "Optional conversation with Guther" : "Council platework"}>
+      {#if talkingToGuther}
+        <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} />
+      {:else}
       <p class="heading">MARKING THE PLATES</p>
       <p class="story">{result}</p>
       {#if work.phase !== 'COMPLETE'}
@@ -76,6 +85,7 @@
       {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if pending}<p role="status" class="small">Saving work…</p>{/if}
+      {/if}
     </aside>
   </div>
   <p class="footnote">The council has not paid for this work. The tools and metal remain at the workshop.</p>
@@ -88,6 +98,11 @@
   .illustration{position:absolute;inset:0;overflow:hidden}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 38% 0);pointer-events:none;z-index:1}
+  .npc-hotspot{position:absolute;z-index:3;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;
+    justify-content:center;padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
+  .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px/1.3 sans-serif;text-shadow:0 1px #000}
+  .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label{background:#3c2b19;border-color:#efd092}
+  .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .object-art{position:absolute;z-index:2;max-width:none;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0806069c)}
   .object-art.stamps{width:23%;height:31%;bottom:5%;left:1.5%}
   .object-art.plates{width:25%;height:30%;bottom:5%;left:26%}
@@ -124,6 +139,8 @@
     .illustration{position:relative;inset:auto;width:100%;aspect-ratio:4 / 3}
     .environment{object-position:39% center}
     .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
+    .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
+    .npc-label{font-size:10px}
     .object-art.stamps{width:26%;height:24%;left:0;bottom:9%}
     .object-art.plates{width:29%;height:23%;left:24%;bottom:9%}
     .object-art.paper{width:27%;height:24%;left:49%;bottom:9%}
