@@ -40,6 +40,7 @@
     "verify:millhand-work-unauthenticated": "node scripts/verify-millhand-work-unauthenticated.mjs",
     "verify:missing-stamp-unauthenticated": "node scripts/verify-missing-stamp-unauthenticated.mjs",
     "verify:dev-rewind": "node scripts/verify-dev-stage-rewind.mjs",
-    "verify:stage-four": "node scripts/verify-stage-four.mjs"
+    "verify:stage-four": "node scripts/verify-stage-four.mjs",
+    "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs"
   }
 }
