@@ -93,3 +93,46 @@ for (const [origin, scene] of Object.entries(scenes)) {
   assert.equal(handoffs, 1, `${origin}: requires exactly one Stage 2 handoff`);
   console.log(`PASS: ${origin} Stage 1 retains approved dialogue and optional routes (${done.size} nodes)`);
 }
+
+
+// DRAFT NPC conversations: keep review copy and the in-game proposal in sync.
+// This does not approve any of these lines as canon.
+const proposedFile = readFileSync(resolve(root,'apps/web/src/lib/proposed-npc-dialogue.ts'),'utf8');
+const proposedMarker = 'export const PROPOSED_NPC_DIALOGUE: Readonly<Record<string,NpcDialogue>> = ';
+const proposedStart = proposedFile.indexOf(proposedMarker);
+assert.ok(proposedStart >= 0,'NPC draft catalogue missing');
+const proposedJson = proposedFile.slice(proposedStart + proposedMarker.length);
+const proposedEnd = proposedJson.lastIndexOf(';');
+assert.ok(proposedEnd >= 0,'NPC draft catalogue delimiter missing');
+const proposed = JSON.parse(proposedJson.slice(0,proposedEnd));
+const dialogueGuide = readFileSync(resolve(docs,'..','interactions','dialogue-style-guide.md'),'utf8');
+assert.ok(dialogueGuide.includes('## OPTIONAL RECURRING NPC CONVERSATIONS — DRAFT FOR OWNER REVIEW'));
+assert.deepEqual(Object.keys(proposed),Object.keys(scenes));
+for (const [origin, npc] of Object.entries(proposed)) {
+  assert.equal(npc.topics.length,3,origin+' must have exactly three optional topics');
+  assert.deepEqual(npc.topics.map(x=>x.id),['work','city','lore']);
+  for (const topic of npc.topics) {
+    assert.ok(dialogueGuide.includes('“'+topic.prompt+'”'),origin+' missing draft player choice');
+    assert.ok(dialogueGuide.includes('“'+topic.reply+'”'),origin+' draft NPC answer drifted');
+  }
+}
+console.log('PASS: Six draft NPC conversation sets match existing dialogue review document (NOT CANON).');
+
+// Every displayed player response selectable in the existing Stage 1 graph must
+// lead to its answer without a second player-speech screen.
+const stageFile = readFileSync(resolve(root,'apps/web/src/lib/approved-stage-one.ts'),'utf8');
+assert.ok(stageFile.includes('export function resolveStageOneChoice'));
+for (const [origin,scene] of Object.entries(scenes)) {
+  for (const [id,node] of Object.entries(scene.nodes)) {
+    if (node.kind !== 'choice') continue;
+    for (const choice of node.choices) {
+      const target = scene.nodes[choice.next];
+      assert.ok(target,origin+' missing choice target '+id);
+      if (target.kind==='speech' && target.speaker==='Player') {
+        assert.ok(target.next && scene.nodes[target.next],origin+' missing NPC consequence for '+id);
+        assert.notEqual(scene.nodes[target.next].speaker,'Player',origin+' would still repeat the player choice');
+      }
+    }
+  }
+}
+console.log('PASS: Choice-to-answer paths contain no duplicated player speech beats.');
