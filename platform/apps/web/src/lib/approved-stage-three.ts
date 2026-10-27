@@ -3,7 +3,7 @@
  * Canon: docs/05-gameplay/onboarding/millhand/stage-3-approved-script.md
  * No unapproved dates/number are ever interpolated into this source.
  */
-import type {MissingStampBranch,MissingStampEvidence} from '@the-pall/game-core';
+import type {MissingStampBranch} from '@the-pall/game-core';
 
 export const MISSING_STAMP_OPENING =
   'You hand the work paper back to Guther. On the bench, beside the council papers, are a metal plate returned with the paperwork and a folded slip. The plate is not one of the new plates you have just worked on.';
@@ -13,9 +13,20 @@ export const CANCELLATION_NARRATION =
 export const PLATE_NARRATION =
   "You turn the metal plate over. A worker number has been pressed into the metal. Near it is a separate mark made by a council inspector. A date is stamped beside that mark.";
 
-export function stageThreeFinding(e:MissingStampEvidence) {
-  return 'You place the slip beside the returned plate. The worker number on both is the same as one of the numbers you stamped today. The council recorded the worker as dead on ' +
-    e.recordedDeathDate + ". The inspector's mark is dated " + e.inspectionDate + ' — after the recorded death.';
+/** Relative date evidence is readable without requiring a calendar minigame.
+ * Once canonical dates exist, they appear in the popup; the art never requires them.
+ */
+export type ReadableMissingStampEvidence = Readonly<{
+  workerNumber:string|null;
+  recordedDeathDate:string|null;
+  inspectionDate:string|null;
+}>;
+export function stageThreeFinding(e:ReadableMissingStampEvidence) {
+  const comparison = e.recordedDeathDate && e.inspectionDate
+    ? 'The death was recorded on ' + e.recordedDeathDate +
+      ". The inspector's mark is dated " + e.inspectionDate + ', after the recorded death.'
+    : "The death record carries an earlier date than the inspector's mark on the plate.";
+  return 'You place the slip beside the returned plate. The number on both is the same as one of the numbers you stamped today. ' + comparison;
 }
 
 export const MISSING_STAMP_CONFRONTATION = [
@@ -59,21 +70,23 @@ export const MISSING_STAMP_ROUTES: Readonly<Record<MissingStampBranch, {
  */
 export function missingStampJournal(
   state:{slipRead:boolean;plateRead:boolean;phase:string;branch:string|null},
-  evidence:MissingStampEvidence|null,
-  slip:{workerNumber:string;recordedDeathDate:string}|null,
-  plate:{workerNumber:string;inspectionDate:string}|null
+  evidence:ReadableMissingStampEvidence|null,
+  slip:{workerNumber:string|null;recordedDeathDate:string|null}|null,
+  plate:{workerNumber:string|null;inspectionDate:string|null}|null
 ):readonly string[] {
   const entries:string[] = [
     'I returned the finished work paper to Guther. A returned plate and a folded cancellation slip were with the council\'s papers.'
   ];
   if(slip && state.slipRead)
-    entries.push('I read a cancellation slip for worker number '+slip.workerNumber+
-      '. The council recorded the worker as dead after a fire in a locked workshop. The date was '+slip.recordedDeathDate+'.');
+    entries.push('I read the cancellation slip. The council recorded a worker as dead after a fire in a locked workshop.'+
+      (slip.workerNumber ? ' The worker number was '+slip.workerNumber+'.' : '')+
+      (slip.recordedDeathDate ? ' The recorded death date was '+slip.recordedDeathDate+'.' : ''));
   if(plate && state.plateRead)
-    entries.push('I examined a returned plate with worker number '+plate.workerNumber+
-      '. It had a separate council inspector\'s mark dated '+plate.inspectionDate+'.');
+    entries.push("I examined a returned plate with a council inspector's mark."+
+      (plate.workerNumber ? ' The worker number was '+plate.workerNumber+'.' : '')+
+      (plate.inspectionDate ? ' The mark was dated '+plate.inspectionDate+'.' : ''));
   if(evidence && state.slipRead && state.plateRead)
-    entries.push('The two records have the same worker number as one of the plates I stamped. The inspection date came after the recorded death.');
+    entries.push('Both records carry the same worker number as a plate I stamped. The inspection date is later than the recorded death.');
   if(state.phase==='DECISION'||state.branch!==null)
     entries.push('I showed Guther the records. He could not explain the dates. He would not approve the disputed lot, and the council had not paid us.');
   if(state.branch==='restamp')
