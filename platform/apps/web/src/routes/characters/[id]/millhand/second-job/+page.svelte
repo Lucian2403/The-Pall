@@ -72,7 +72,7 @@
 
 <svelte:head><title>The Pall — Millhand second job</title></svelte:head>
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character}>
+  <TutorialShell {character} sceneLocation={snapshot.state.branch==='restamp'?'Municipal depot':snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
     <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform}/>
     {#if snapshot.state.phase==='DONE'}
       <div class="follow-up">
