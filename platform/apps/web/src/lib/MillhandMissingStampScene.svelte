@@ -2,7 +2,7 @@
   import {tick} from 'svelte';
   import type {MissingStampAction,MissingStampState} from '@the-pall/game-core';
   import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
-  import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
+  import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_HANDOFF,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
 
@@ -72,6 +72,8 @@
         <p class="eyebrow">THE MISSING STAMP · STAGE 3</p>
         {#if state.phase==='INSPECT'||state.phase==='READY_TO_SPEAK'}
           {#if !state.slipRead && !state.plateRead && !inspectedView}
+            <p class="speaker">Guther</p>
+            <p class="speech">“{MISSING_STAMP_HANDOFF}”</p>
             <p class="story">{MISSING_STAMP_OPENING}</p>
           {:else if inspectedView==='slip'}
             <p class="story">{CANCELLATION_NARRATION}</p>
