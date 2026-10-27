@@ -15,6 +15,7 @@ The exact user-supplied wording is installed as a Millhand-only multi-turn conve
 1. Clicking Guther opens the existing compact in-scene CRPG dialogue popup. The workshop illustration and interactable items remain present.
 2. The spoken choice is performed when selected. Immediately show Guther's answer; don't show the selected player line again as a standalone dialogue beat.
 3. A player-controlled follow-up progresses one exchange at a time. No timed speech advancement.
+   Every Guther dialogue moment also presents the player-spoken choice **“Enough talk. Let's work.”**. In Stage 1, this reaches the existing work-paper handoff; it does not start Stage 2 itself. In Stage 2, this dismisses optional conversation and resumes the current saved task without mutating its phase.
 4. Each topic may be left via **Ask something else** or **Return to work**. These are UI commands, not spoken dialogue.
 5. Optional conversation is read-only and preserves the work step, selected object, active pending choice and saved server state. No changes to money, XP, inventory or quest flags.
 6. During Stage 1, the approved introductory conversation resumes unchanged after closing optional dialogue. During Stage 2, all pending actions remain available on returning.
