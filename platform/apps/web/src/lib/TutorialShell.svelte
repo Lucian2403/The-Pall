@@ -3,10 +3,12 @@
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
+  import CharacterAvatar from '$lib/CharacterAvatar.svelte';
 
   type SavedCharacter = {
     id: string;
     name: string;
+    avatarId?: string|null;
     origin: string;
     sex: string;
     coins: number;
@@ -141,7 +143,7 @@
   <div class="right">
     <header class="topbar">
       <div class="player" aria-label="Current saved character">
-        <span class="avatar" aria-hidden="true">{character.name.slice(0, 1).toUpperCase()}</span>
+        <CharacterAvatar name={character.name} avatarId={character.avatarId} />
         <span class="player-label"><strong>{character.name}</strong><small>{character.origin}</small></span>
       </div>
       <div class="resource-strip" aria-label="Character resources">
@@ -238,8 +240,6 @@
   .topbar{display:grid;grid-template-columns:minmax(148px,188px) minmax(0,1fr) auto;
     align-items:stretch;min-height:80px;background:#131311;border-bottom:1px solid #574632}
   .player{display:flex;align-items:center;gap:9px;padding:9px 12px;border-right:1px solid #3e352b;min-width:0}
-  .avatar{display:grid;place-items:center;width:40px;height:44px;border:1px solid #a88452;background:#332819;
-    color:#efdab7;font-size:23px;flex-shrink:0}
   .player-label{display:flex;flex-direction:column;min-width:0;gap:4px}
   .player strong{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .player small{font-size:12px;color:#b3a695}
