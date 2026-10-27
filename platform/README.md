@@ -274,3 +274,38 @@ The owner can now replay stages with the **same character**, rather than repeate
 **To use:** In local development run `git pull --ff-only`, `npm run test:unit`, `npm run verify:dev-rewind`, `npm run check:api`, `npm run check:web` and restart API/web. On a Millhand Stage 4 boundary screen, click **← Back to Stage 3** in the header; after replaying Stage 3, click **← Back to Stage 2**; then **← Back to Stage 1**. Each click asks for confirmation, performs one guarded server save and navigates to the restarted stage. To repeat Stage 3, just rewind 4 → 3 again.
 
 **QA:** Confirm the second branch selection adds exactly one +1 skill after a rewind; a stale tab's old `expectedStage` returns 409 and cannot double rewind. Signed-out and foreign-character reads/writes return 401/404. Verify normal Stage 2 → 3 and Stage 3 → 4 saves continue working. **Local database and browser integration remain unrun from the GitHub connector environment.**
+
+### M1.6 — Millhand Stage 4: three approved second jobs (2026-10-27)
+
+**Implementation candidate, awaiting local compile and owner visual review.** The complete approved [Stage 4 Revision 01](../docs/05-gameplay/onboarding/millhand/stage-4-approved-script.md) is now represented by a branch-specific server state machine, player-controlled NPC conversations, conditional personal journals, and owned PostgreSQL action saves. Stage 4 is **not one repeated paperwork screen**: each of the three skill routes has different required work.
+
+- **Industry / Hauling → Depot Intake Run:** Stage 3 already committed the one additional worker-number mark; the same stamp is **not** performed again. Stage 4 checks the load, chooses between securing all plates and smaller loads, compares the erroneous `workers` delivery-list category against physical plates, speaks with the Depot Clerk (all 5 approved lines), chooses either a truthful direct plate receipt or a requested correction, and completes delivery. Actual time/damage probabilities are unapproved, so there are **no invented rolls, elapsed durations, or damage**.
+- **Commerce / Contracts → Disputed Docket:** Examine the work paper, compare the sealed death-for-compensation and active-for-contract-charge records, speak with the Contracts Clerk (all 7 approved lines), choose a seal check or documented written complaint, then submit. Neither record is silently rewritten.
+- **Scholarship / Investigation → Ledger Reconciliation:** Read the death register, check the later wage records, examine the scraped line, speak with the Archive Assistant (all 4 approved lines), compare either neighbouring lines or the shift book against the wage record, and record the finding. Who damaged the record and why remain unknown.
+
+The Stage 3 selected route is obtained **only from the database**, never from a browser-provided branch or skill. Stage 4 awards **no second +1**, no coins, no ordinary XP and no loot; the Stage 3 one-time award stays intact. The council's inconsistent records remain unexplained. Completion saves Stage 4 `DONE` and enters Stage 5 `NOT_STARTED`; Flint's Stage 5 scene is **not yet wired**, so do not invent his dialogue or start his fight here.
+
+**Data/technical files:** `packages/game-core/src/millhand-second-job.ts`, `apps/api/src/millhand-second-job-routes.ts`, `apps/web/src/lib/approved-stage-four.ts`, `apps/web/src/lib/MillhandSecondJobScene.svelte`, `apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte`. Run the **new additive** migration `npm run second-job:migrate` once after installing dependencies. It creates `player_character_second_job` and the idempotent receipt table; it does **not** erase old character, platework or Missing Stamp saves.
+
+**Stage 3 → Stage 4 continuity:** After Guther finishes his approved final response, the in-dialogue, route-specific next action takes the player to the corresponding job. The action for the restamp branch appears only after the single extra worker-number mark is committed. Saved Stage 4 players reach that job directly through the shared chapter navigation or character screen. The three Stage 4 NPCs use their own approved words, not Guther's optional dialogue. Long journal entries stay outside the active work popup.
+
+**Developer replay:** The local-only, signed-in `← Back to Stage` tool is extended to **Stage 5 → 4**, removing Stage 4 data and receipts but **preserving the chosen Stage 3 +1 skill**. From Stage 4 → 3 it also removes Stage 4 data and the selected Stage 3 skill, so a different branch can be tested. Stage 3 → 2 and Stage 2 → 1 behave as previously documented; future Stage 5 combat/health/currency systems remain outside rewind scope. No new schema is required for the rewind change itself.
+
+**Visual gate:** No owner-approved depot, Contracts-office or records-room backgrounds/transparent prop art are in this integration. The Stage 4 scene uses restrained **schematic functional staging**, not final game artwork. The locations have separate palettes and object arrangements, but their visual presentation is **not signed off**. When the owner supplies those assets, replace only the scene art/hotspots and preserve the interaction/state/reward contract. Do not claim that text labels or schematic shapes satisfy the physical-world UX benchmark.
+
+**Local rollout from `The-Pall\platform`:**
+
+```powershell
+git pull --ff-only
+npm ci --include=dev
+npm run build:packages
+npm run test:unit
+npm run verify:stage-four
+npm run verify:dev-rewind
+npm run check:api
+npm run check:web
+npm run build -w @the-pall/web
+npm run second-job:migrate
+```
+
+Run the migration only after the build checks succeed; stop at the first failure. Restart the API and frontend afterward, then revisit your already saved Stage 4 character. Test each branch and both alternative methods, the route-specific journal, the 5/7/4 distinct spoken lines, account ownership, stale-request rejection, Stage 5 boundary and the developer rewind. **These checks have not been run against the owner's local PostgreSQL or browser from the connector environment.**
