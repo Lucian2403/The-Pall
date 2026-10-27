@@ -1,6 +1,6 @@
-# Millhand Stage 3 — The Missing Stamp: editorial rewrite, Revision 01
+# Millhand Stage 3 — The Missing Stamp: approved script with owner-directed Stage 2 handoff
 
-**Status: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner after review. This revision replaces the historical Stage 3 *player-facing words* in [the original mechanical design](missing-stamp-discovery.md); the original document still governs unchanged event logic, evidence and rewards. **Approved words are not yet installed in the playable build.** This follows approved [Stage 1 Revision 02](opening-dialogue.md), approved [Stage 2 Revision 03](stage-2-approved-script.md), and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
+**Status: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner after review. This revision replaces the historical Stage 3 *player-facing words* in [the original mechanical design](missing-stamp-discovery.md); the original document still governs unchanged event logic, evidence and rewards. **The current playable script includes the owner-requested seamless Stage 2 handoff.** This follows approved [Stage 1 Revision 03](opening-dialogue.md), approved [Stage 2 Revision 03](stage-2-approved-script.md), and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
 
 ## Player-approved interaction clarification (2026-10-27)
 
@@ -26,7 +26,11 @@
 **Location:** Smithing workshop, Grand Cylinder City
 **Scene heading:** The Missing Stamp
 
-*You hand the work paper back to Guther. On the bench, beside the council papers, are a metal plate returned with the paperwork and a folded slip. The plate is not one of the new plates you have just worked on.*
+**On completion of Stage 2:** The player selects *Return the work paper*. The work command saves successfully and the UI enters this stage automatically, without an extra footer link, chapter card or work-complete prompt. A saved character resuming after this transaction enters the Stage 3 scene directly.
+
+**GUTHER:** “All finished, are you? Good. Leave the work paper here. There's a returned plate and a folded slip in with this lot. Have a look at them before I send anything off.”
+
+*Guther sets your finished work paper beside the council bundle. A returned metal plate and a folded slip lie among the papers. The plate is not one of the new plates you have just stamped.*
 
 **Current instruction:** Examine the returned plate and the folded slip.
 
