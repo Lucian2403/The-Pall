@@ -78,8 +78,11 @@
         <p><a class="enter" href={'/characters/' + character.id + '/millhand/missing-stamp'}>Examine the returned council papers</a></p>
         <p class="muted">The Missing Stamp has persistent evidence and dialogue. Actual worker number and dates are still awaiting authoring.</p>
       {:else if character.origin === 'Millhand' && character.tutorial.stage === 4}
-        <p><a class="enter" href={'/characters/' + character.id + '/millhand/missing-stamp'}>Review The Missing Stamp decision</a></p>
-        <p class="muted">Stage 4's chosen second job is not yet connected.</p>
+        <p><a class="enter" href={'/characters/' + character.id + '/millhand/second-job'}>Continue your second job</a></p>
+        <p class="muted">The chosen job and each work action are saved. No extra skill award, coins or ordinary XP are granted by this stage.</p>
+      {:else if character.origin === 'Millhand' && character.tutorial.stage === 5}
+        <p><a class="enter" href={'/characters/' + character.id + '/millhand/second-job'}>Review the finished second job</a></p>
+        <p class="muted">The Wage Claim with Flint is the next stage; its authenticated scene is not connected yet.</p>
       {:else}
         <p class="muted">This character is not at the start of Stage 1. No other origin's opening will be substituted.</p>
       {/if}
