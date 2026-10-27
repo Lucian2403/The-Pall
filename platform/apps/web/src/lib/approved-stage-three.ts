@@ -12,7 +12,7 @@ export const MISSING_STAMP_HANDOFF =
   "All finished, are you? Good. Leave the work paper here. There's a returned plate and a folded slip in with this lot. Have a look at them before I send anything off.";
 
 export const MISSING_STAMP_OPENING =
-  'You hand the work paper back to Guther. On the bench, beside the council papers, are a metal plate returned with the paperwork and a folded slip. The plate is not one of the new plates you have just worked on.';
+  'Guther sets your finished work paper beside the council bundle. A returned metal plate and a folded slip lie among the papers. The plate is not one of the new plates you have just stamped.';
 
 export const CANCELLATION_NARRATION =
   'You unfold the small paper. A worker number has been cancelled. The council recorded the worker as dead after a workshop fire in which the doors were locked.';
