@@ -45,7 +45,7 @@
   async function rewindOneStage(){
     if(!canRewind||rewinding||rewindFromStage===null)return;
     const fromStage=rewindFromStage;
-    if(!window.confirm('TESTING ONLY: Replay Stage '+(fromStage-1)+'? This clears your progress in the current stage and later stages, including the Stage 3 route skill award. Your character will be kept.'))return;
+    if(!window.confirm('TESTING ONLY: Replay Stage '+(fromStage-1)+'? This resets the stage you are returning to and clears any later-stage progress, including a Stage 3 route skill award if earned. Your character will be kept.'))return;
     rewinding=true;
     rewindError='';
     try{
