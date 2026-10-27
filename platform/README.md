@@ -331,3 +331,25 @@ npm run build -w @the-pall/web
 Restart the frontend. No database migration, quest reset or new character is required. The original ZIP is the local source for the binary art and font files; the GitHub source commit contains the installer and styling, **not the binary fonts or images**. The standalone City image need not be copied again because it is identical to the ZIP's `TheCityVista.png`. If the source files are in another directory, point the installer there.
 
 Stamina and Fatigue fill textures, buttons and dialogue frame are available as static source assets for later review. No fictitious stamina/fatigue readings, city navigation, inventory buttons or unrelated new interactions have been implemented. Check the artwork and typography at mobile and desktop before authorizing more decoration or a universal dialogue-frame replacement. Local browser rendering remains to be verified by the owner.
+
+### Owner UI screenshot follow-up — Stage 4 500s, font decode, four meters, city vista (2026-10-27)
+
+The Stage 4 GET and local developer rewind POST were returning HTTP 500. Both routes query Stage 4's second-job tables. In particular, if `0005_millhand_second_job.sql` has **not** been applied to the local PostgreSQL database, the `42P01` missing-table error explains both. API routes now map that specific SQLSTATE to HTTP 503 with `second_job_schema_missing` and `setup: npm run second-job:migrate`. Other errors still require the API's terminal logs; screenshot console alone does not prove the cause.
+
+**Required local database fix**, from `The-Pall\platform` (after a successful dependency install):
+
+```powershell
+git pull --ff-only
+npm run second-job:migrate
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Restart **both** the API and web server. The migration is additive and keeps existing characters, progress, XP, equipment and coins. If 500 remains, copy the **API terminal error**; do not reset or delete the database.
+
+**Visual changes:** The panorama now has enough vertical room for the Grand Cylinder and the workshop/location strip is a smaller 43px row. The Stage 4 route can display its actual current location instead of 'Smithing workshop'. Header resource tracks are Health, Stamina, Fatigue and Focus. **Health is the only currently persistent measured value** in the saved character API; other tracks show ‘—’ (not loaded / not yet tracked), never invented percentages. When combat persistence is added, those three can be populated without changing the shared HUD arrangement.
+
+**Font repair:** Chromium rejected the supplied New Standard OTF with an invalid CFF CharStrings INDEX. Browser CSS no longer loads that binary (so it stops generating OTS console warnings). Georgia is temporarily used for body text; the supplied open-licensed Bebas Neue remains used for compact labels. Keep New Standard in the original kit and request a validated export before re-enabling it. No arbitrary fonts substituted or shared.
+
+**Verification status:** Changes are committed and checked against source references; the developer's local database, API and browser have not been executed from this GitHub integration.
