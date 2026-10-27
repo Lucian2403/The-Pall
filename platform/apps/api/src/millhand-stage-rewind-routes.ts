@@ -130,6 +130,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
       return {stage:plan.toStage,tutorialStatus:status,route:'/characters/'+req.params.id+'/'+route};
     } catch(e) {
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
+      if((e as {code?:string})?.code==='42P01')
+        return reply.code(503).send({error:'second_job_schema_missing',setup:'npm run second-job:migrate'});
       throw e;
     } finally {client.release();}
   });
