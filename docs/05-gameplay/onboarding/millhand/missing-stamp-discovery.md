@@ -6,6 +6,10 @@ The project owner approved [Stage 3 Missing Stamp Revision 01](stage-3-approved-
 
 **Status: APPROVED AND LOCKED SCENE / DIALOGUE (2026-10-14).** User approved the returned reference plate and cancellation slip, the same-number/date contradiction, both inspection actions, Guther's entire common exchange and all three player/foreman response lines. The first-task reward rules, [approved Stage 2 platework](platework-interaction.md) and strict [Spoken Dialogue Standard](../../interactions/dialogue-style-guide.md) remain canonical. Dates, worker ID, assets, work timings and other implementation details remain TBD.
 
+## Owner clarification — playable evidence, not a numeric minigame (2026-10-27)
+
+The Stage 2 stamping operation is reusable job interaction, with **no required worker number or digit-matching puzzle**. For Stage 3, the returned reference plate and cancellation slip are distinct visual objects provided by the owner. Both can be inspected in either order. The resulting text popup narrates that their worker number matches one of the plates stamped earlier and that the inspector's marked date is later than the recorded death. Exact numbers and calendar dates are not necessary to advance, and **are not burned into the asset artwork**. Any specific values later approved belong in the readable popup/journal. This clarification overrides earlier literal-number/date content-gate phrasing below while keeping the approved factual contradiction, Guther exchange, and mutually exclusive branches.
+
 ## Existing situation (LOCKED)
 
 The Millhand has finished ordinary council worker-plate Smithing at Guther's workshop. Its job system reused docket matching, die alignment, a bent-blank incident and mark verification. The scripted first job earns 0 coins and 0 ordinary XP; council acceptance is pending. The player already has +3 Craftsmanship at creation but does **not** receive the +1 second Major Skill until choosing a second-task route.
