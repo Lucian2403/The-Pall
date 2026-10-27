@@ -50,7 +50,7 @@
           <button type="button" class="target {object.key}" class:selected={selected===object.key}
             aria-pressed={selected===object.key}
             aria-label={'Inspect ' + object.label}
-            onclick={() => {selected = selected===object.key ? null : object.key;}}>
+            onclick={() => {talkingToGuther=false; selected = selected===object.key ? null : object.key;}}>
             <span class="pin" aria-hidden="true"></span>
             <span class="label"><WorkshopObjectIcon kind={object.key}/>{object.label}</span>
           </button>
