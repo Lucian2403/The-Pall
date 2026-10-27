@@ -63,4 +63,27 @@ assert.ok(css.includes('--pall-font-reading: Georgia'),'Readable fallback must r
 assert.ok(!css.includes('/ui-kit/fonts/stranger-friz'),'Restricted personal-use font must not load');
 assert.ok(!css.includes('/ui-kit/fonts/cf-industrial'),'Non-commercial font must not load');
 assert.ok(!source.includes('stamina.current')&&!source.includes('fatigue.current'),'Do not invent resource data');
-console.log('PASS: Owner HUD tracks, tall city, licensed font fallback and measured Health wiring.');
+const avatar=readFileSync(resolve(root,'apps/web/src/lib/CharacterAvatar.svelte'),'utf8');
+const installer=readFileSync(resolve(root,'scripts/install-owner-ui-kit.ps1'),'utf8');
+assert.ok(source.includes('CharacterAvatar')&&source.includes('avatarId={character.avatarId}'),
+  'Shared character header must use the reusable avatar slot');
+assert.ok(avatar.includes('/ui-kit/avatars/')&&avatar.includes("extension==='webp'?'png':null"),
+  'Avatar slot must use one shared library for WebP and PNG portraits');
+assert.ok(!avatar.includes('origin')||avatar.includes('never to an origin'),
+  'Avatar images must not be chosen by background or origin');
+assert.ok(installer.includes('[string]$AvatarDirectory')&&installer.includes("Join-Path $target 'avatars'"),
+  'Installer must accept the owner-provided shared avatar directory');
+assert.ok(css.includes("url('/ui-kit/frames/dialogue-frame.png')"),
+  'Apply the supplied dialogue artwork to scene conversation frames');
+for(const state of ['normal','hover','pressed']) {
+  assert.ok(css.includes("url('/ui-kit/buttons/button-"+state+".png')"),
+    'Supplied button artwork state not used: '+state);
+}
+assert.ok(css.includes('border-image-slice:165 190 155 190 fill'),
+  'Dialogue art must resize with nine-slice rather than stretch corners');
+assert.ok(css.includes('border-image-slice:76 111 74 111 fill'),
+  'Button art must resize with nine-slice rather than stretch corners');
+assert.ok(source.includes('--pall-font-decorative'),'Use the supplied permitted decorative font sparingly');
+assert.ok(css.includes('var(--pall-font-label'),'Use Bebas Neue for concise game labels');
+console.log('PASS: Owner HUD, universal portrait slot, dialogue frame and three button-state skins.');
+
