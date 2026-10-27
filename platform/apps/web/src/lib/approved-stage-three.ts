@@ -52,3 +52,33 @@ export const MISSING_STAMP_ROUTES: Readonly<Record<MissingStampBranch, {
     consequence:"You keep a note of the worker number and prepare to look through the council's records."
   }
 };
+
+/**
+ * Approved factual first-person journal, derived from persisted inspections.
+ * Never substitute example dates or unapproved bracket placeholders in-game.
+ */
+export function missingStampJournal(
+  state:{slipRead:boolean;plateRead:boolean;phase:string;branch:string|null},
+  evidence:MissingStampEvidence|null
+):readonly string[] {
+  const entries:string[] = [
+    'I returned the finished work paper to Guther. A returned plate and a folded cancellation slip were with the council\'s papers.'
+  ];
+  if(evidence && state.slipRead)
+    entries.push('I read a cancellation slip for worker number '+evidence.workerNumber+
+      '. The council recorded the worker as dead after a fire in a locked workshop. The date was '+evidence.recordedDeathDate+'.');
+  if(evidence && state.plateRead)
+    entries.push('I examined a returned plate with worker number '+evidence.workerNumber+
+      '. It had a separate council inspector\'s mark dated '+evidence.inspectionDate+'.');
+  if(evidence && state.slipRead && state.plateRead)
+    entries.push('The two records have the same worker number as one of the plates I stamped. The inspection date came after the recorded death.');
+  if(state.phase==='CONFRONT'||state.phase==='DECISION'||state.branch!==null)
+    entries.push('I showed Guther the records. He could not explain the dates. He would not approve the disputed lot, and the council had not paid us.');
+  if(state.branch==='restamp')
+    entries.push('I chose to stamp the worker number again and deliver the lot to the depot. The inspector\'s mark is not part of my work.');
+  if(state.branch==='contracts')
+    entries.push('I chose to take the disputed work paper to the council\'s Contracts office.');
+  if(state.branch==='records')
+    entries.push('I wrote down the worker number and chose to check the council\'s records.');
+  return entries;
+}
