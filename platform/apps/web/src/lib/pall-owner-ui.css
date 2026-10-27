@@ -44,21 +44,23 @@
 
 /*
  * The Pall shared dialogue and actions — owner-supplied nine-slice art.
- * The illustration's metal corners retain their proportions while the paper
- * centre can grow with genuinely long dialogue. Do not apply these to scenery
+ * The owner's transparently padded art is cropped to a tight alpha bounding
+ * box before installation (provided in the companion patch ZIP). Transparent
+ * corner pixels MUST reveal the workshop, never a white/beige CSS backing.
+ * Metal corners retain their proportions while the paper centre expands. Do not apply these to scenery
  * props, NPC click targets, the city banner, journals or the character sheet.
  */
 .frame .chapter-content :is(.workshop,.second-job) :is(.dialogue,.work-card,.work-dialogue) {
   box-sizing:border-box;
-  border:22px solid transparent;
-  border-image-source:url('/ui-kit/frames/dialogue-frame.png');
-  border-image-slice:165 190 155 190 fill;
-  border-image-width:22px 25px 22px 25px;
+  border:27px solid transparent;
+  border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+  border-image-slice:145 190 125 190 fill;
+  border-image-width:27px 31px 25px 31px;
   border-image-repeat:stretch;
   border-radius:0;
-  background-color:#e9d9bb;
+  background:transparent;
   color:#2a1c13;
-  padding:7px 13px 9px;
+  padding:12px 16px 15px;
   box-shadow:0 7px 18px #0008;
 }
 .frame .chapter-content :is(.workshop,.second-job) :is(.heading,.eyebrow) {
@@ -75,16 +77,16 @@
 :is(.responses,.actions,.choices) > button {
   box-sizing:border-box;
   width:100%;
-  min-height:44px;
-  border:11px solid transparent;
-  border-image-source:url('/ui-kit/buttons/button-normal.png');
-  border-image-slice:76 111 74 111 fill;
-  border-image-width:11px 19px 11px 19px;
+  min-height:48px;
+  border:13px solid transparent;
+  border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+  border-image-slice:50 180 45 180 fill;
+  border-image-width:13px 34px 12px 34px;
   border-image-repeat:stretch;
   border-radius:0;
   background-color:transparent;
   color:#332319;
-  padding:2px 16px;
+  padding:2px 12px;
   text-align:left;
   font:normal 14px/1.35 var(--pall-font-reading,Georgia,serif);
   text-shadow:none;
@@ -92,13 +94,13 @@
 }
 .frame .chapter-content :is(.workshop,.second-job)
 :is(.responses,.actions,.choices) > button:hover:not(:disabled) {
-  border-image-source:url('/ui-kit/buttons/button-hover.png');
+  border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
   background-color:transparent;
   color:#23160d;
 }
 .frame .chapter-content :is(.workshop,.second-job)
 :is(.responses,.actions,.choices) > button:active:not(:disabled) {
-  border-image-source:url('/ui-kit/buttons/button-pressed.png');
+  border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
 }
 .frame .chapter-content :is(.workshop,.second-job)
 :is(.responses,.actions,.choices) > button:focus-visible {
@@ -114,9 +116,9 @@
  * dialogue stays in the CRPG scene and never becomes a separate page. */
 @media(max-width:700px){
   .frame .chapter-content :is(.workshop,.second-job) :is(.dialogue,.work-card,.work-dialogue){
-    border-width:18px;
-    border-image-width:18px 21px 18px 21px;
-    padding:7px 9px;
+    border-width:23px;
+    border-image-width:23px 25px 22px 25px;
+    padding:10px 9px;
   }
   .frame .chapter-content :is(.workshop,.second-job)
   :is(.responses,.actions,.choices) > button{
