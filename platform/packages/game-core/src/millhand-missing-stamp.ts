@@ -35,7 +35,7 @@ export function validateMissingStampEvidence(e: MissingStampEvidence): boolean {
     && e.inspectionDate > e.recordedDeathDate;
 }
 
-export const STAGE_THREE_DIALOGUE_BEAT_COUNT = 8 as const;
+export const STAGE_THREE_DIALOGUE_BEAT_COUNT = 9 as const;
 export type MissingStampState = Readonly<{
   revision: number;
   phase: MissingStampPhase;
