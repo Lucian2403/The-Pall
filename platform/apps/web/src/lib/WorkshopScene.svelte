@@ -150,7 +150,7 @@
 </section>
 
 <style>
-  .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
+  .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
   .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:1;min-width:0;width:100%;min-height:clamp(450px,calc(100dvh - 350px),1100px);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
