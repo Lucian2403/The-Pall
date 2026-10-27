@@ -15,11 +15,13 @@
   };
 
   let {character, children, activePage = 'scene'}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'} = $props();
-  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 3
-    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/missing-stamp'
-    : character.origin === 'Millhand' && character.tutorial.stage === 2
-      ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
-      : '/characters/' + encodeURIComponent(character.id) + '/opening');
+  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 4
+    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
+    : character.origin === 'Millhand' && character.tutorial.stage === 3
+      ? '/characters/' + encodeURIComponent(character.id) + '/millhand/missing-stamp'
+      : character.origin === 'Millhand' && character.tutorial.stage === 2
+        ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
+        : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
 
   // Rewind is a development-only server capability. The live game never
