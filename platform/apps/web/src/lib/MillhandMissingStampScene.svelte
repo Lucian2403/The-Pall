@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {MissingStampAction,MissingStampState,MissingStampEvidence} from '@the-pall/game-core';
-  import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES} from '$lib/approved-stage-three';
+  import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
 
@@ -24,8 +24,10 @@
 
   let talkingOptional=$state(false);
   let inspectedView=$state<'slip'|'plate'|null>(null);
+  let journalOpen=$state(false);
   const state=$derived(snapshot.state);
   const beat=$derived(MISSING_STAMP_CONFRONTATION[state.dialogueIndex]??null);
+  const journal=$derived(missingStampJournal(state,snapshot.finding));
   const branchCopy=$derived(state.branch?MISSING_STAMP_ROUTES[state.branch]:null);
   const canAct=(a:MissingStampAction)=>snapshot.availableActions.includes(a)&&!pending;
   async function inspect(which:'slip'|'plate'){
@@ -144,6 +146,15 @@
           {/if}
           <p class="skill">Route: {branchCopy.label}. The associated Major Skill received +1 on the saved route choice.</p>
         {/if}
+        <div class="journal">
+          <button type="button" class="journal-toggle" aria-expanded={journalOpen}
+            onclick={() => {journalOpen=!journalOpen;}}>{journalOpen?'Close journal':'Review journal'}</button>
+          {#if journalOpen}
+            <div class="journal-entries" aria-label="Missing Stamp journal">
+              {#each journal as entry,i (i)}<p>{entry}</p>{/each}
+            </div>
+          {/if}
+        </div>
         {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
         {#if pending}<p role="status" class="hint">Saving…</p>{/if}
       {/if}
@@ -184,6 +195,10 @@
   .content-gate{margin:12px 0;padding:12px 14px;border:1px solid #936f4a;background:#d8c3a0;font:13px/1.5 sans-serif}
   .content-gate p{margin:7px 0 0}
   .hint,.skill{font:12px/1.45 sans-serif;color:#614e39}
+  .journal{border-top:1px solid #b79d7b;margin-top:18px;padding-top:10px}
+  .journal-toggle{padding:7px 9px;background:#d8c7a7;border:1px solid #81654d;color:#3a281b;cursor:pointer;font:12px sans-serif}
+  .journal-entries{padding:5px 0;font:13px/1.5 Georgia,serif}
+  .journal-entries p{margin:9px 0}
   .error{font:13px/1.4 sans-serif;color:#873523}
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif}
   @media(max-width:700px){
