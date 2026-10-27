@@ -107,7 +107,7 @@ assert.ok(proposedEnd >= 0,'NPC draft catalogue delimiter missing');
 const proposed = JSON.parse(proposedJson.slice(0,proposedEnd));
 const dialogueGuide = readFileSync(resolve(docs,'..','interactions','dialogue-style-guide.md'),'utf8');
 assert.ok(dialogueGuide.includes('## OPTIONAL RECURRING NPC CONVERSATIONS — DRAFT FOR OWNER REVIEW'));
-assert.deepEqual(Object.keys(proposed),Object.keys(scenes));
+assert.deepEqual(Object.keys(proposed),Object.keys(scenes).filter(origin=>origin!=='Millhand'));
 for (const [origin, npc] of Object.entries(proposed)) {
   assert.equal(npc.topics.length,3,origin+' must have exactly three optional topics');
   assert.deepEqual(npc.topics.map(x=>x.id),['work','city','lore']);
@@ -116,7 +116,7 @@ for (const [origin, npc] of Object.entries(proposed)) {
     assert.ok(dialogueGuide.includes('“'+topic.reply+'”'),origin+' draft NPC answer drifted');
   }
 }
-console.log('PASS: Six draft NPC conversation sets match existing dialogue review document (NOT CANON).');
+console.log('PASS: Five non-Millhand draft NPC conversation sets match existing dialogue review document (NOT CANON).');
 
 // Every displayed player response selectable in the existing Stage 1 graph must
 // lead to its answer without a second player-speech screen.
@@ -136,3 +136,40 @@ for (const [origin,scene] of Object.entries(scenes)) {
   }
 }
 console.log('PASS: Choice-to-answer paths contain no duplicated player speech beats.');
+
+// Millhand has owner-approved optional dialogue, separate from the five unapproved
+// previews. Verify that all spoken lines stay in sync with the approved file,
+// and that dialogue-skipping never bypasses the Stage 1 work-paper handoff.
+const gutherSource = readFileSync(resolve(root,'apps/web/src/lib/approved-guther-optional.ts'),'utf8');
+const gutherDoc = readFileSync(resolve(docs,'millhand/guther-optional-conversation.md'),'utf8');
+const spoken = [...gutherSource.matchAll(/^\s*(prompt|reply|followUp):\s*(['"])(.*?)\2\s*,?\s*$/gm)];
+assert.equal(spoken.length,22,'Guther must keep all 11 player and 11 NPC lines');
+for (const [,role,,utterance] of spoken) {
+  assert.ok(gutherDoc.includes('“'+utterance+'”'),'Guther dialogue drift: '+role+' '+utterance);
+}
+assert.ok(gutherSource.includes('export const GUTHER_WORK_SKIP_LINE = "Enough talk. Let\'s work."'));
+assert.ok(gutherDoc.includes('“Enough talk. Let\'s work.”'));
+
+const npcUi = readFileSync(resolve(root,'apps/web/src/lib/NpcConversation.svelte'),'utf8');
+const workshopUi = readFileSync(resolve(root,'apps/web/src/lib/WorkshopScene.svelte'),'utf8');
+const workUi = readFileSync(resolve(root,'apps/web/src/lib/MillhandWorkScene.svelte'),'utf8');
+const openingRoute = readFileSync(resolve(root,'apps/web/src/routes/characters/[id]/opening/+page.svelte'),'utf8');
+
+assert.ok(npcUi.includes('{GUTHER_WORK_SKIP_LINE}'));
+assert.ok(npcUi.includes('skipToWork ?? close'), 'Optional NPC skip must close the conversation when no Stage 1 skip is supplied');
+assert.equal((npcUi.match(/class="work-skip"/g)??[]).length,2,'Guther skip must be available in topic menu and each reply');
+assert.ok(npcUi.includes('gutherExchange.followUp'),'Guther follow-up branches missing');
+assert.ok(workshopUi.includes('beat.kind !== \'handoff\''),'Skip action must disappear at the Stage 1 work handoff');
+assert.ok(workshopUi.includes('skipToWork();'),'Stage 1 skip must use the supplied parent callback');
+assert.ok(workshopUi.includes('skipToWork={() => {talkingToGuther=false;selected=null;skipToWork();}}'),
+  'Skipping from optional talk must also skip Stage 1 introduction');
+assert.ok(openingRoute.includes("nodeId = 'take'"),'Stage 1 skip must target the existing handoff');
+assert.ok(openingRoute.includes("scene?.nodes.take?.kind !== 'handoff'"),'Stage 1 skip must validate the target');
+assert.ok(openingRoute.includes('visited = []'),'Skip must clear old dialogue rewind history');
+assert.ok(openingRoute.includes("action:'take_work_paper'"),'Work-paper handoff must still use the server POST');
+assert.ok(workUi.includes('close={() => {talkingToGuther=false;}}'),'Stage 2 NPC skip must return to the unchanged work view');
+assert.ok(workUi.includes('const contextualActions = $derived(selected ? available.filter'),
+  'Stage 2 must restore selected work-object actions after optional talk');
+assert.ok(!npcUi.includes('fetch('),'Optional dialogue must remain read-only');
+console.log('PASS: Guther approved optional dialogue and universal Millhand skip remain consistent and non-mutating.');
+
