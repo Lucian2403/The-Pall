@@ -16,7 +16,7 @@
     tutorialPayout:{coins:number;ordinaryXp:number;items:number}};
   let character=$state<Character|null>(null);
   let snapshot=$state<Snapshot|null>(null);
-  let status=$state<'loading'|'ready'|'login'|'missing'|'stage-three'|'unavailable'>('loading');
+  let status=$state<'loading'|'ready'|'login'|'missing'|'stage-three'|'schema'|'unavailable'>('loading');
   let pending=$state(false);
   let errorMessage=$state('');
   let retryId:string|null=null;
@@ -32,6 +32,7 @@
       if(c.status===401||j.status===401){status='login';return;}
       if(c.status===404||j.status===404){status='missing';return;}
       if(j.status===409){status='stage-three';return;}
+      if(j.status===503){status='schema';return;}
       if(!c.ok||!j.ok){status='unavailable';return;}
       const body=await c.json() as {character:Character};
       character=body.character;
@@ -59,6 +60,7 @@
         retryId=null;retrySignature=null;
       }else{
         errorMessage=body.error==='stale_revision'?'Your saved work changed elsewhere. The scene has been reloaded.'
+          :body.error==='second_job_schema_missing'?'Stage 4 database tables are missing. Run npm run second-job:migrate and restart the API.'
           :body.error==='wrong_second_job_phase'?'That action is not available yet.'
           :'Could not save the work: '+(body.error??response.status);
         if(response.status===409){retryId=null;retrySignature=null;await refresh();}
@@ -84,6 +86,9 @@
     {#if status==='loading'}<p role="status">Loading saved council work…</p>
     {:else if status==='login'}<h1>Sign in required</h1><p><a href="/account">Account</a></p>
     {:else if status==='missing'}<h1>Character not found</h1>
+    {:else if status==='schema'}
+      <h1>Stage 4 setup is incomplete</h1>
+      <p>The council job cannot load until its database tables exist. From the platform folder run <code>npm run second-job:migrate</code>, then restart the API. Your character and earlier work are preserved.</p>
     {:else if status==='stage-three'}
       <h1>Finish The Missing Stamp first</h1>
       <p>Your chosen route must be saved before this job can begin.</p>
