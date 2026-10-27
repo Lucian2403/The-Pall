@@ -52,7 +52,7 @@ export const APPROVED_GUTHER_OPTIONAL_DIALOGUE: readonly GutherTopic[] = [
         followUp: "The whole Cylinder is just for heat and power?"
       },
       {
-        reply: "Just for? Do you know how big this city is? The whole system that supplies its heat and power is housed in the Cylinder. Factories, machines, lights—they all depend on it. Takes a lot of people to keep it running."
+        reply: "Just for? Do you know how big this city is? The whole system that supplies its heat and power is housed in the Cylinder. Factories, machines, lights, they all depend on it. Takes a lot of people to keep it running."
       }
     ]
   },
@@ -78,7 +78,7 @@ export const APPROVED_GUTHER_OPTIONAL_DIALOGUE: readonly GutherTopic[] = [
     prompt: "What else do you make here?",
     exchanges: [
       {
-        reply: "Why? Haven't you got enough work? We do repairs, fittings—whatever ironwork comes through. Today it's council plates. I don't get to choose when the inspector comes.",
+        reply: "Why? Haven't you got enough work? We do repairs, fittings, whatever ironwork comes through. Today it's council plates. I don't get to choose when the inspector comes.",
         followUp: "Is it always this hard to get paid?"
       },
       {
