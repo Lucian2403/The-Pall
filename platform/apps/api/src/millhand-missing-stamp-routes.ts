@@ -65,6 +65,13 @@ export function registerMissingStampRoutes(app:FastifyInstance) {
     );
     if(!ch.rowCount||ch.rows[0].origin!=='Millhand')return reply.code(404).send({error:'not_found'});
     if(ch.rows[0].tutorial_stage<3)return reply.code(409).send({error:'stage_three_not_ready'});
+    // Stage 3 is unlocked only by the persisted completion of Stage 2.
+    // Do not display the returned evidence for a corrupted/manual stage change.
+    const preceding=await db.query<{state:{phase:string}}>(
+      'SELECT state FROM player_character_platework WHERE character_id=$1',[req.params.id]
+    );
+    if(preceding.rows[0]?.state.phase!=='COMPLETE')
+      return reply.code(409).send({error:'stage_two_not_complete'});
     const record=await db.query<{state:MissingStampState}>(
       'SELECT state FROM player_character_missing_stamp WHERE character_id=$1',[req.params.id]
     );
