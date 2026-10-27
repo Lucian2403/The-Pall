@@ -112,7 +112,7 @@
 </section>
 
 <style>
-  .second-job{display:flex;flex-direction:column;flex:1;min-width:0;color:#e6d4bf;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
+  .second-job{display:flex;flex-direction:column;flex:1;min-width:0;color:#e6d4bf;font-family:var(--pall-font-reading,Georgia,serif)}
   .chapter-scene{display:grid;grid-template-columns:minmax(0,53%) minmax(0,47%);grid-template-rows:auto 1fr;gap:0;
     min-height:clamp(570px,calc(100dvh - 245px),900px);
     background:radial-gradient(ellipse at 30% 80%,#5e4b36 0,#27241e 50%,#1c1d20 100%);border-bottom:1px solid #62452d}
