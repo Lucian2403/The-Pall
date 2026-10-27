@@ -1,7 +1,8 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {page} from '$app/state';
-  import type {MissingStampAction,MissingStampState,MissingStampEvidence} from '@the-pall/game-core';
+  import type {MissingStampAction,MissingStampState} from '@the-pall/game-core';
+  import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import MillhandMissingStampScene from '$lib/MillhandMissingStampScene.svelte';
 
@@ -13,10 +14,10 @@
   type StageThreeSnapshot={
     stage:number;tutorialStatus:string;
     state:MissingStampState;availableActions:MissingStampAction[];
-    contentReady:boolean;majorSkillBonuses:Record<string,number>;
-    slip:{workerNumber:string;recordedDeathDate:string}|null;
-    plate:{workerNumber:string;inspectionDate:string;inspectionMarkPresent:boolean}|null;
-    finding:MissingStampEvidence|null;
+    contentReady:boolean;detailsAuthored:boolean;majorSkillBonuses:Record<string,number>;
+    slip:{workerNumber:string|null;recordedDeathDate:string|null}|null;
+    plate:{workerNumber:string|null;inspectionDate:string|null;inspectionMarkPresent:boolean}|null;
+    finding:ReadableMissingStampEvidence|null;
     tutorialPayout:{coins:number;ordinaryXp:number;items:number};
   };
   let character=$state<Character|null>(null);
