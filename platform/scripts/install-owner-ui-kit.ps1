@@ -66,7 +66,7 @@ try {
           $bitmap.Height -lt ($spec.Top + $spec.Height)) {
         throw "Unexpected dimensions for owner's UI image: $($spec.From)"
       }
-      $rect = New-Object System.Drawing.Rectangle(
+      $rect = [System.Drawing.Rectangle]::new(
         [int]$spec.Left, [int]$spec.Top, [int]$spec.Width, [int]$spec.Height
       )
       $cutout = $bitmap.Clone($rect,[System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
