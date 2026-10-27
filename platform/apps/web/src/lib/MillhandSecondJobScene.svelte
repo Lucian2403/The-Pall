@@ -57,13 +57,12 @@
         {/each}
       </div>
       <p class="purpose">{route.task}</p>
-      <p class="art-note">Objects shown schematically while this location's artwork is being developed.</p>
     </div>
     <aside class="work-dialogue" aria-label="Current work interaction">
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
-        <p class="instruction">The job is finished. The Wage Claim with Flint follows, but Stage 5 is not yet connected.</p>
+        <p class="instruction">Your work here is finished.</p>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
@@ -135,7 +134,6 @@
   .metal .symbol{color:#b9bfc2}
   .scene-object.record .symbol{color:#c1b196}
   .purpose{font:13px/1.5 sans-serif;color:#e4d2ba;margin:12px 0 3px}
-  .art-note{font:11px/1.4 sans-serif;color:#b9a98c;margin:0}
   .work-dialogue{grid-column:2;grid-row:1/3;align-self:start;min-width:0;
     background:#eedebd;color:#271c13;border:2px solid #785637;border-radius:5px;
     margin:clamp(20px,2.5vw,43px) clamp(16px,2.3vw,36px) 18px 0;padding:17px 18px;
