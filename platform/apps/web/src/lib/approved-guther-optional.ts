@@ -23,66 +23,66 @@ export type GutherTopic = Readonly<{
 
 export const APPROVED_GUTHER_OPTIONAL_DIALOGUE: readonly GutherTopic[] = [
   {
-    "id": "background",
-    "prompt": "How did you come to run this place?",
-    "exchanges": [
+    id: "background",
+    prompt: "How did you come to run this place?",
+    exchanges: [
       {
-        "reply": "Ha! You think I own this place? It's not my workshop, you idiot. I just make sure their orders get done.",
-        "followUp": "Then who's giving the orders?"
+        reply: "Ha! You think I own this place? It's not my workshop, you idiot. I just make sure their orders get done.",
+        followUp: "Then who's giving the orders?"
       },
       {
-        "reply": "That's above your station. Get back to work!",
-        "followUp": "You think I'm too stupid to understand?"
+        reply: "That's above your station. Get back to work!",
+        followUp: "You think I'm too stupid to understand?"
       },
       {
-        "reply": "I don't care what you think. Next to the Cylinder, your opinion counts for nothing. Now get back to work."
+        reply: "I don't care what you think. Next to the Cylinder, your opinion counts for nothing. Now get back to work."
       }
     ]
   },
   {
-    "id": "city",
-    "prompt": "What do you think of the city?",
-    "exchanges": [
+    id: "city",
+    prompt: "What do you think of the city?",
+    exchanges: [
       {
-        "reply": "There's work here. Foundries, shops, factories. But not enough for everyone trying to get by. So be thankful you've got a job.",
-        "followUp": "And the Grand Cylinder?"
+        reply: "There's work here. Foundries, shops, factories. But not enough for everyone trying to get by. So be thankful you've got a job.",
+        followUp: "And the Grand Cylinder?"
       },
       {
-        "reply": "What about it? You know it gives the city heat and power. Men work there every day. I couldn't tell you how they run it.",
-        "followUp": "The whole Cylinder is just for heat and power?"
+        reply: "What about it? You know it gives the city heat and power. Men work there every day. I couldn't tell you how they run it.",
+        followUp: "The whole Cylinder is just for heat and power?"
       },
       {
-        "reply": "Just for? Do you know how big this city is? The whole system that supplies its heat and power is housed in the Cylinder. Factories, machines, lights—they all depend on it. Takes a lot of people to keep it running."
+        reply: "Just for? Do you know how big this city is? The whole system that supplies its heat and power is housed in the Cylinder. Factories, machines, lights—they all depend on it. Takes a lot of people to keep it running."
       }
     ]
   },
   {
-    "id": "lore",
-    "prompt": "What do you know about the Plume?",
-    "exchanges": [
+    id: "lore",
+    prompt: "What do you know about the Plume?",
+    exchanges: [
       {
-        "reply": "Only what I've heard. The ground broke open, bad fumes and dust spread, and people had to leave their homes. That was long before my time.",
-        "followUp": "And you believe that?"
+        reply: "Only what I've heard. The ground broke open, bad fumes and dust spread, and people had to leave their homes. That was long before my time.",
+        followUp: "And you believe that?"
       },
       {
-        "reply": "Eh... Hard to believe, if you ask me. But I've no better answer. Whatever happened, we're living with it now.",
-        "followUp": "Does anyone know what caused it?"
+        reply: "Eh... Hard to believe, if you ask me. But I've no better answer. Whatever happened, we're living with it now.",
+        followUp: "Does anyone know what caused it?"
       },
       {
-        "reply": "I've heard different answers. I don't know which, if any, is right."
+        reply: "I've heard different answers. I don't know which, if any, is right."
       }
     ]
   },
   {
-    "id": "work",
-    "prompt": "What else do you make here?",
-    "exchanges": [
+    id: "work",
+    prompt: "What else do you make here?",
+    exchanges: [
       {
-        "reply": "Why? Haven't you got enough work? We do repairs, fittings—whatever ironwork comes through. Today it's council plates. I don't get to choose when the inspector comes.",
-        "followUp": "Is it always this hard to get paid?"
+        reply: "Why? Haven't you got enough work? We do repairs, fittings—whatever ironwork comes through. Today it's council plates. I don't get to choose when the inspector comes.",
+        followUp: "Is it always this hard to get paid?"
       },
       {
-        "reply": "Not every job. This lot needs the council's signature, and we haven't got it yet. That's all I can tell you."
+        reply: "Not every job. This lot needs the council's signature, and we haven't got it yet. That's all I can tell you."
       }
     ]
   }
