@@ -5,6 +5,12 @@
  */
 import type {MissingStampBranch} from '@the-pall/game-core';
 
+/** Spoken immediately after the saved Return the work paper action, before
+ * either evidence item is inspected. No mystery revelation yet.
+ */
+export const MISSING_STAMP_HANDOFF =
+  "All finished, are you? Good. Leave the work paper here. There's a returned plate and a folded slip in with this lot. Have a look at them before I send anything off.";
+
 export const MISSING_STAMP_OPENING =
   'You hand the work paper back to Guther. On the bench, beside the council papers, are a metal plate returned with the paperwork and a folded slip. The plate is not one of the new plates you have just worked on.';
 
