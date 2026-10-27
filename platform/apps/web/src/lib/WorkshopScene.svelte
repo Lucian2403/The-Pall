@@ -150,7 +150,7 @@
 </section>
 
 <style>
-  .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:Georgia,'Times New Roman',serif}
+  .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
   .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:1;min-width:0;width:100%;min-height:clamp(450px,calc(100dvh - 350px),1100px);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
@@ -171,7 +171,7 @@
   .narration{font-style:italic}
   .small {color:#654d3c;font-size:11px;line-height:1.3}
   .responses {display:flex;flex-direction:column;gap:5px}
-  .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:12px/1.35 Georgia,serif;padding:7px 9px;min-height:30px;cursor:pointer}
+  .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:12px/1.35 var(--pall-font-reading,Georgia,serif);padding:7px 9px;min-height:30px;cursor:pointer}
   .responses button:hover,.responses button:focus-visible {outline:2px solid #d3a86a;outline-offset:1px}
   .responses .back {background:#57412c;color:#f6e9d8}
   .responses .skip-to-work{background:#493321;border-color:#a07a4b}
