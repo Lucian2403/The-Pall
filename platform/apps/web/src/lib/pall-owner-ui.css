@@ -1,0 +1,47 @@
+/*
+ * Owner-supplied The Pall UI kit — restrained typography tokens, pass 01.
+ * Local assets installed by scripts/install-owner-ui-kit.ps1 from the
+ * owner's original ZIP. Keep component decorations sparse and preserve
+ * actual workshop/quest art as the dominant visual surface.
+ *
+ * New Standard & Bebas Neue: SIL Open Font License.
+ * Beyond Wonderland: supplier readme permits commercial use.
+ * Stranger Friz (personal only) and CF Industrial Fabrics
+ * (non-commercial) are intentionally NOT bundled or referenced.
+ */
+@font-face {
+  font-family: 'Pall New Standard';
+  src: url('/ui-kit/fonts/new-standard-regular.otf') format('opentype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Pall Bebas Neue';
+  src: url('/ui-kit/fonts/bebas-neue-regular.otf') format('opentype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Pall Bebas Neue';
+  src: url('/ui-kit/fonts/bebas-neue-bold.otf') format('opentype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Pall Beyond Wonderland';
+  src: url('/ui-kit/fonts/beyond-wonderland.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+:root {
+  --pall-font-reading: 'Pall New Standard', Georgia, 'Times New Roman', serif;
+  --pall-font-label: 'Pall Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+  --pall-font-decorative: 'Pall Beyond Wonderland', Georgia, serif;
+  --pall-ink: #151411;
+  --pall-parchment: #e9d8b7;
+  --pall-brass-muted: #aa8659;
+}
