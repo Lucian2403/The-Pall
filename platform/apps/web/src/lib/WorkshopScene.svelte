@@ -51,8 +51,9 @@
   const readyForWork = $derived(beat.kind === 'handoff');
 
   function inspect(key: PropKey) {
+    const wasTalking = talkingToGuther;
     talkingToGuther = false;
-    selected = selected === key ? null : key;
+    selected = !wasTalking && selected === key ? null : key;
   }
 </script>
 
@@ -126,7 +127,7 @@
     </div>
   </div>
 
-  {#if selected}
+  {#if selected && !talkingToGuther}
     <div class="inspection" role="status">
       <div>
         <strong>{workshopObjects[selected].name}</strong>
