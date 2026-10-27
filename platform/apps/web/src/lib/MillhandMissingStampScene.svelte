@@ -189,7 +189,7 @@
   /* Row 1 is reserved for the CRPG dialogue. Row 2 holds the physical bench props.
      Their footprints cannot intersect, including when the longest choice is shown. */
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
-    grid-template-rows:auto minmax(195px,1fr);flex:1;width:100%;min-width:0;
+    grid-template-rows:auto minmax(195px,1fr);flex:0 0 auto;width:100%;min-width:0;
     min-height:clamp(550px,calc(100dvh - 250px),1000px);background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
