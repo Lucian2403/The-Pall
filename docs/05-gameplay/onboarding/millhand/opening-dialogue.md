@@ -1,6 +1,6 @@
-# Millhand — Stage 1: The Workshop — APPROVED Revision 02
+# Millhand — Stage 1: The Workshop — APPROVED Revision 03
 
-**Status: APPROVED BY PROJECT OWNER (2026-10-22), EDITORIAL CANON.** Supersedes the October 14 Guther dialogue previously recorded here; that older version remains recoverable in Git history. **This text has not yet been installed into the runnable v0.4.1 client/server.** Its gameplay action IDs and mechanics remain the same except that the new optional “Leave it there” response requires a small after-pay conversation-path addition in the next implementation pass.
+**Status: OWNER-REQUESTED INTRODUCTORY REVISION (2026-10-27).** The owner's latest direction replaces Guther's first spoken line with a direct greeting using the player character's name. The rest of approved Revision 02 (including the optional wages exchange and handoff) remains unchanged. This text is synchronized with the playable Stage 1 scene; the old line is retained in Git history. No new job, reward or branch is created.
 
 ## Character entry
 
@@ -18,7 +18,7 @@ Your work begins at a council plate lot laid out on Guther Anvil's bench.
 
 **GUTHER:**
 
-“The council's sent more plates. Worker numbers again. Read that paper before you touch the stamps.”
+“Hey, [player name]. I see you standing idle. Feels good, does it? Not to me! Come here. I've got work for you. The council's sent more plates. Worker numbers again.”
 
 **PLAYER RESPONSES:**
 1. “When do we get paid?”
@@ -66,4 +66,4 @@ For first use in accessible player-facing speech/UI: **work paper** (technical d
 
 The approved stage keeps Guther Anvil as recurring Smithing Foreman, optional wage conversation, one council plate lot, identical Stage 2 entry and no early Stage 3 reveal. Beginning attributes, skill, inventory, payment/XP rules and worksite ownership remain unchanged. No automatically advancing dialogue. The 1.2-second delay only stages the result after an actual action.
 
-**Editorial note:** This exact approved version replaces the earlier shorter pay exchange; do not silently revert to it when implementing future stages.
+**Editorial note:** Keep the introductory greeting for the first Stage 1 meeting, not every subsequent optional chat or repeatable job. The first speech should be teasing, abrupt and recognisably Guther's rather than a cold, contextless "What do you want?" This owner-requested revision replaces only the initial spoken line; preserve the more developed wage exchange.
