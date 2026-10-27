@@ -39,14 +39,23 @@ function snapshot(ch:CharacterRow,state:MissingStampState) {
     majorSkillBonuses:ch.major_skill_bonuses,
     state,
     availableActions:availableMissingStampActions(state,evidence),
-    contentReady:Boolean(evidence),
-    // Never send a guessed number/date, or an uninspected record.
-    slip: evidence && state.slipRead ? {workerNumber:evidence.workerNumber,recordedDeathDate:evidence.recordedDeathDate} : null,
-    plate: evidence && state.plateRead ? {workerNumber:evidence.workerNumber,inspectionDate:evidence.inspectionDate,inspectionMarkPresent:true} : null,
-    finding: evidence && state.slipRead && state.plateRead ? {
-      workerNumber:evidence.workerNumber,
-      recordedDeathDate:evidence.recordedDeathDate,
-      inspectionDate:evidence.inspectionDate
+    contentReady:true, // Narrative evidence is sufficient; no numeric minigame or artificial gate.
+    detailsAuthored:Boolean(evidence),
+    // Identifying details stay in the popup, not baked into the art. When exact
+    // numbers/dates are unauthored, the observed record still exists in-world.
+    slip:state.slipRead ? {
+      workerNumber:evidence?.workerNumber ?? null,
+      recordedDeathDate:evidence?.recordedDeathDate ?? null
+    } : null,
+    plate:state.plateRead ? {
+      workerNumber:evidence?.workerNumber ?? null,
+      inspectionDate:evidence?.inspectionDate ?? null,
+      inspectionMarkPresent:true
+    } : null,
+    finding:state.slipRead && state.plateRead ? {
+      workerNumber:evidence?.workerNumber ?? null,
+      recordedDeathDate:evidence?.recordedDeathDate ?? null,
+      inspectionDate:evidence?.inspectionDate ?? null
     } : null,
     tutorialPayout:{coins:0,ordinaryXp:0,items:0}
   };
