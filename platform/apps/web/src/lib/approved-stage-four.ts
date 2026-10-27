@@ -142,7 +142,9 @@ export function secondJobJournal(s:SecondJobState):readonly string[]{
   if(s.branch==='records'){
     if(!['READ_DEATH_REGISTER','READ_WAGE_RECORD'].includes(s.phase))
       result.push('Found the worker in the death register. Then I found the same number in later wage records. They were still using it after he died.');
-    if(!['READ_DEATH_REGISTER','READ_WAGE_RECORD','EXAMINE_SCRAPED_ENTRY','SPEAK_ARCHIVE'].includes(s.phase))
+    if(s.phase==='SPEAK_ARCHIVE'||s.phase==='ARCHIVE_DIALOGUE')
+      result.push('Someone had scraped part of an entry from the page. I could not tell what was written there.');
+    if(['CHOOSE_SOURCE','RECORD_FINDING','DONE'].includes(s.phase))
       result.push("Someone scraped writing from an entry. The archive assistant didn't know who had done it. I wasn't going to damage the page any further.");
     if(s.source==='neighbouring_entries')result.push('I compared the entries around the damaged one. The number is still there in the later wage record.');
     if(s.source==='shift_book')result.push('I checked the shift book against the wage record. Both have that number after the recorded death.');
