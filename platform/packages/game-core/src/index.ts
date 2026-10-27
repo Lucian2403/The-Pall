@@ -14,3 +14,6 @@ export type {PlateworkState, PlateworkAction, WorkPhase, Handling, Correction} f
 
 export {AUTHORED_MISSING_STAMP_EVIDENCE,INITIAL_MISSING_STAMP,MISSING_STAMP_ACTIONS,MISSING_STAMP_ROUTE_SKILL,STAGE_THREE_DIALOGUE_BEAT_COUNT,availableMissingStampActions,advanceMissingStamp,validateMissingStampEvidence,MissingStampInvalidAction} from './millhand-missing-stamp.js';
 export type {MissingStampState,MissingStampPhase,MissingStampAction,MissingStampBranch,MissingStampEvidence} from './millhand-missing-stamp.js';
+
+export {planMillhandRewind,MillhandRewindInvalid} from './millhand-rewind.js';
+export type {MillhandRewindPlan,MillhandRewindStage,MillhandRewindTarget} from './millhand-rewind.js';
