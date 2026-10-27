@@ -9,7 +9,7 @@ export type MissingStampBranch = 'restamp' | 'contracts' | 'records';
 export type MissingStampPhase = 'INSPECT' | 'READY_TO_SPEAK' | 'CONFRONT' | 'DECISION' | 'RESTAMP' | 'SELECTED';
 export type MissingStampAction =
   | 'read_cancellation_slip' | 'turn_returned_plate'
-  | 'show_guther' | 'continue_dialogue'
+  | 'show_guther' | 'continue_dialogue' | 'skip_confrontation'
   | 'choose_restamp' | 'choose_contracts' | 'choose_records'
   | 'restamp_worker_number';
 
@@ -53,7 +53,7 @@ export const INITIAL_MISSING_STAMP: MissingStampState = {
 
 export const MISSING_STAMP_ACTIONS = [
   'read_cancellation_slip', 'turn_returned_plate',
-  'show_guther', 'continue_dialogue',
+  'show_guther', 'continue_dialogue', 'skip_confrontation',
   'choose_restamp', 'choose_contracts', 'choose_records',
   'restamp_worker_number'
 ] as const satisfies readonly MissingStampAction[];
@@ -70,7 +70,7 @@ export function availableMissingStampActions(
     }
     case 'READY_TO_SPEAK':
       return evidence && validateMissingStampEvidence(evidence) ? ['show_guther'] : [];
-    case 'CONFRONT': return ['continue_dialogue'];
+    case 'CONFRONT': return ['continue_dialogue','skip_confrontation'];
     case 'DECISION': return ['choose_restamp', 'choose_contracts', 'choose_records'];
     case 'RESTAMP': return ['restamp_worker_number'];
     case 'SELECTED': return [];
@@ -91,6 +91,7 @@ export function advanceMissingStamp(
     case 'read_cancellation_slip': slipRead = true; break;
     case 'turn_returned_plate': plateRead = true; break;
     case 'show_guther': phase = 'CONFRONT'; dialogueIndex = 0; break;
+    case 'skip_confrontation': phase = 'DECISION'; break;
     case 'continue_dialogue':
       if (dialogueIndex < STAGE_THREE_DIALOGUE_BEAT_COUNT - 1) dialogueIndex += 1;
       else phase = 'DECISION';
