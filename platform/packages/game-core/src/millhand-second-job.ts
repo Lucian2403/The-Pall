@@ -54,7 +54,7 @@ export const SECOND_JOB_ACTIONS:readonly SecondJobAction[]=[
   'compare_neighbouring_entries','compare_shift_book','record_finding',
   'continue_dialogue'
 ];
-const DIALOGUE_BEATS={restamp:4,contracts:6,records:4} as const;
+const DIALOGUE_BEATS={restamp:5,contracts:7,records:4} as const;
 
 export function initialSecondJob(branch:MissingStampBranch):SecondJobState {
   const phase:SecondJobPhase=branch==='restamp'?'CHECK_LOAD'
