@@ -16,6 +16,10 @@ const files=[
   'resources/bar-empty.png',
   'resources/hp-fill.png',
   'sidebar-illustration.png',
+  'frames/dialogue-frame-trim.png',
+  'buttons/button-normal-trim.png',
+  'buttons/button-hover-trim.png',
+  'buttons/button-pressed-trim.png',
   'fonts/new-standard-regular.otf',
   'fonts/bebas-neue-regular.otf',
   'fonts/bebas-neue-bold.otf',
@@ -28,7 +32,7 @@ const missing=files.filter(file=>!existsSync(resolve(staticRoot,file)));
 if(missing.length){
   console.error('Missing owner-supplied UI kit assets:');
   for(const file of missing)console.error('  '+file);
-  console.error('Install from the ORIGINAL ZIP with scripts/install-owner-ui-kit.ps1 before checking the interface.');
+  console.error('Install original kit, then unpack The_Pall_UI_Cropped_Frames_Patch.zip from the platform directory.');
   process.exitCode=1;
 }else{
   for(const file of files)assert.ok(statSync(resolve(staticRoot,file)).size>0,'Empty UI asset: '+file);
@@ -73,17 +77,17 @@ assert.ok(!avatar.includes('origin')||avatar.includes('never to an origin'),
   'Avatar images must not be chosen by background or origin');
 assert.ok(installer.includes('[string]$AvatarDirectory')&&installer.includes("Join-Path $target 'avatars'"),
   'Installer must accept the owner-provided shared avatar directory');
-assert.ok(css.includes("url('/ui-kit/frames/dialogue-frame.png')"),
+assert.ok(css.includes("url('/ui-kit/frames/dialogue-frame-trim.png')"),
   'Apply the supplied dialogue artwork to scene conversation frames');
 for(const state of ['normal','hover','pressed']) {
-  assert.ok(css.includes("url('/ui-kit/buttons/button-"+state+".png')"),
+  assert.ok(css.includes("url('/ui-kit/buttons/button-"+state+"-trim.png')"),
     'Supplied button artwork state not used: '+state);
 }
-assert.ok(css.includes('border-image-slice:165 190 155 190 fill'),
+assert.ok(css.includes('border-image-slice:145 190 125 190 fill'),
   'Dialogue art must resize with nine-slice rather than stretch corners');
-assert.ok(css.includes('border-image-slice:76 111 74 111 fill'),
+assert.ok(css.includes('border-image-slice:50 180 45 180 fill'),
   'Button art must resize with nine-slice rather than stretch corners');
-assert.ok(source.includes('--pall-font-decorative'),'Use the supplied permitted decorative font sparingly');
+assert.ok(source.includes('font:normal 29px/1.16 var(--pall-font-reading'),'City title must use legible type rather than the noisy ornamental face');
 assert.ok(css.includes('var(--pall-font-label'),'Use Bebas Neue for concise game labels');
 console.log('PASS: Owner HUD, universal portrait slot, dialogue frame and three button-state skins.');
 
