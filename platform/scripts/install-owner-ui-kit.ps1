@@ -47,6 +47,35 @@ try {
     New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
     Copy-Item -LiteralPath $src -Destination $dest -Force
   }
+  # Source PNGs have large fully transparent gutters. Keep originals intact,
+  # but generate tightly cropped versions for proper CSS nine-slice rendering.
+  # Coordinates measured on the owner's exact v1 supplied PNGs. This uses the
+  # Windows System.Drawing assembly; no third-party crop package is required.
+  Add-Type -AssemblyName System.Drawing
+  foreach ($spec in @(
+    @{ From='frames\dialogue-frame.png'; To='frames\dialogue-frame-trim.png'; Left=48; Top=99; Width=1936; Height=551 },
+    @{ From='buttons\button-normal.png'; To='buttons\button-normal-trim.png'; Left=13; Top=13; Width=1261; Height=203 },
+    @{ From='buttons\button-hover.png'; To='buttons\button-hover-trim.png'; Left=13; Top=11; Width=1261; Height=205 },
+    @{ From='buttons\button-pressed.png'; To='buttons\button-pressed-trim.png'; Left=13; Top=11; Width=1261; Height=207 }
+  )) {
+    $src = Join-Path $target $spec.From
+    $dest = Join-Path $target $spec.To
+    $bitmap = [System.Drawing.Bitmap]::FromFile($src)
+    try {
+      if ($bitmap.Width -lt ($spec.Left + $spec.Width) -or
+          $bitmap.Height -lt ($spec.Top + $spec.Height)) {
+        throw "Unexpected dimensions for owner's UI image: $($spec.From)"
+      }
+      $rect = New-Object System.Drawing.Rectangle(
+        [int]$spec.Left, [int]$spec.Top, [int]$spec.Width, [int]$spec.Height
+      )
+      $cutout = $bitmap.Clone($rect,[System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+      try {
+        $cutout.Save($dest,[System.Drawing.Imaging.ImageFormat]::Png)
+      } finally { $cutout.Dispose() }
+    } finally { $bitmap.Dispose() }
+  }
+  Write-Host 'Generated four alpha-trimmed dialogue/button PNGs for proportional nine-slice scaling.'
   $fonts = Join-Path $target 'fonts'
   New-Item -ItemType Directory -Path $fonts -Force | Out-Null
   $allowed = @(
