@@ -1,5 +1,7 @@
 <script lang="ts">
   import type {Snippet} from 'svelte';
+  import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
 
   type SavedCharacter = {
     id: string;
@@ -19,6 +21,54 @@
       ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
       : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
+
+  // Rewind is a development-only server capability. The live game never
+  // exposes this button, even if someone manually opens an onboarding URL.
+  let canRewind=$state(false);
+  let rewinding=$state(false);
+  let rewindError=$state('');
+  let rewindFromStage=$state<number|null>(null);
+
+  onMount(()=>{
+    if(character.origin!=='Millhand')return;
+    void (async()=>{
+      try{
+        const response=await fetch('/api/characters/'+encodeURIComponent(character.id)+'/dev/rewind-stage',{cache:'no-store'});
+        if(!response.ok)return;
+        const data=await response.json() as {enabled:boolean;canRewind:boolean;stage:number};
+        canRewind=data.enabled&&data.canRewind;
+        rewindFromStage=data.stage;
+      }catch{/* Developer-only capability unavailable; hide control. */}
+    })();
+  });
+
+  async function rewindOneStage(){
+    if(!canRewind||rewinding||rewindFromStage===null)return;
+    const fromStage=rewindFromStage;
+    if(!window.confirm('TESTING ONLY: Replay Stage '+(fromStage-1)+'? This clears your progress in the current stage and later stages, including the Stage 3 route skill award. Your character will be kept.'))return;
+    rewinding=true;
+    rewindError='';
+    try{
+      const response=await fetch('/api/characters/'+encodeURIComponent(character.id)+'/dev/rewind-stage',{
+        method:'POST',headers:{'content-type':'application/json'},
+        body:JSON.stringify({expectedStage:fromStage})
+      });
+      if(!response.ok){
+        const data=await response.json() as {error?:string};
+        if(response.status===409 && data.error==='stale_stage'){
+          rewindError='This character moved to another stage. Reload this page before testing again.';
+        }else{
+          rewindError='Could not rewind: '+(data.error??response.status);
+        }
+        return;
+      }
+      const data=await response.json() as {stage:number;route:string};
+      canRewind=false;
+      await goto(data.route,{replaceState:true,invalidateAll:true});
+    }catch{
+      rewindError='Could not reach the game server. Reload to check the saved stage before retrying.';
+    }finally{rewinding=false;}
+  }
 
   // The owner-approved normal Home dashboard unlocks after the shared Stage 8
   // completion transaction. No post-tutorial capabilities are exposed here.
@@ -93,9 +143,17 @@
         <span>{character.startingLocation}</span>
       </div>
       <div class="chapter-meta">Stage {character.tutorial.stage} · {character.origin}</div>
+      {#if canRewind && rewindFromStage!==null}
+        <button type="button" class="rewind-button" disabled={rewinding}
+          title="Developer testing only: reset the current stage to replay the previous one"
+          onclick={() => {void rewindOneStage();}}>
+          {rewinding?'Rewinding…':'← Back to Stage '+(rewindFromStage-1)}
+        </button>
+      {/if}
       <a href="/characters" class="exit-link">Character selection</a>
     </div>
 
+    {#if rewindError}<p class="rewind-error" role="alert">{rewindError}</p>{/if}
     <div class="chapter-content">
       {@render children()}
     </div>
@@ -153,6 +211,11 @@
   .location-icon{font-size:24px;color:#d9b782}
   .chapter-meta{margin-left:auto;color:#c1aa8d;font-size:14px;white-space:nowrap}
   .exit-link{padding:7px 9px;border:1px solid #705236;color:#e5c39a;text-decoration:none;font-size:12px;white-space:nowrap}
+  .rewind-button{padding:7px 10px;background:#3a2a1b;color:#eed1aa;border:1px solid #aa7841;
+    font:12px/1.3 sans-serif;cursor:pointer;white-space:nowrap}
+  .rewind-button:hover,.rewind-button:focus-visible{background:#634126;outline:2px solid #d0a678}
+  .rewind-button:disabled{opacity:.5;cursor:wait}
+  .rewind-error{margin:0;padding:9px 16px;background:#34231c;color:#f0b7a0;font:13px/1.4 sans-serif}
   .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
   .onboarding-footer{border-top:1px solid #4d3928;padding:12px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .mobile-nav{display:none}
@@ -185,6 +248,8 @@
     .chapter-bar{padding:10px;gap:8px}
     .chapter-label{font-size:19px}
     .exit-link{font-size:11px;margin-left:auto}
+    .rewind-button{padding:7px;font-size:11px;white-space:normal;max-width:125px}
+    .chapter-label{font-size:16px}
     .chapter-content{padding:0}
     .mobile-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:#11100f;border-top:1px solid #89643c;z-index:30;min-height:65px;padding-bottom:env(safe-area-inset-bottom)}
     .mobile-nav a,.mobile-nav>span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:7px 2px;color:#dec8aa;text-decoration:none;font:11px sans-serif}
