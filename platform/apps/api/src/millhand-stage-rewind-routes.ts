@@ -32,7 +32,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
     if(!result.rowCount||result.rows[0].origin!=='Millhand')
       return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
-    return {enabled:true,canRewind:stage>=2&&stage<=4,stage,targetStage:stage>1&&stage<=4?stage-1:null};
+    return {enabled:true,canRewind:stage>=2&&stage<=5,stage,targetStage:stage>1&&stage<=5?stage-1:null};
   });
 
   app.post<{Params:Params}>('/api/characters/:id/dev/rewind-stage',async(req,reply)=>{
@@ -49,7 +49,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
         Object.keys(body).sort().join(',')!=='expectedStage')
       return reply.code(400).send({error:'invalid_body'});
     const expectedStage=(body as {expectedStage:unknown}).expectedStage;
-    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>4)
+    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>5)
       return reply.code(400).send({error:'invalid_stage'});
 
     const client=await db.connect();
@@ -76,13 +76,21 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
       const stamp=await client.query<{state:{phase:string;branch:MissingStampBranch|null}}>(
         'SELECT state FROM player_character_missing_stamp WHERE character_id=$1',[req.params.id]
       );
+      const job=await client.query<{state:{phase:string;branch:MissingStampBranch}}>(
+        'SELECT state FROM player_character_second_job WHERE character_id=$1',[req.params.id]
+      );
+      if(job.rows[0] && job.rows[0].state.branch!==stamp.rows[0]?.state.branch){
+        await client.query('ROLLBACK');transaction=false;
+        return reply.code(409).send({error:'unsafe_second_job_state'});
+      }
       let plan;
       try {
         plan=planMillhandRewind(
           c.rows[0].tutorial_stage,c.rows[0].major_skill_bonuses,
           stamp.rows[0]?.state.branch??null,
           plate.rows[0]?.state.phase??null,
-          stamp.rows[0]?.state.phase??null
+          stamp.rows[0]?.state.phase??null,
+          job.rows[0]?.state.phase??null
         );
       } catch(e) {
         if(!(e instanceof MillhandRewindInvalid))throw e;
@@ -92,6 +100,10 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
 
       // Wipe only the stage replayed (and any dependent future stage). Receipt
       // clearing prevents old successful requests from replaying stale results.
+      if(plan.removeSecondJob){
+        await client.query('DELETE FROM player_character_second_job_receipts WHERE character_id=$1',[req.params.id]);
+        await client.query('DELETE FROM player_character_second_job WHERE character_id=$1',[req.params.id]);
+      }
       if(plan.removeMissingStamp){
         await client.query('DELETE FROM player_character_missing_stamp_receipts WHERE character_id=$1',[req.params.id]);
         await client.query('DELETE FROM player_character_missing_stamp WHERE character_id=$1',[req.params.id]);
@@ -114,7 +126,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
         [req.params.id,plan.toStage,status,JSON.stringify(plan.nextBonuses)]
       );
       await client.query('COMMIT');transaction=false;
-      const route=plan.toStage===1?'opening':plan.toStage===2?'millhand/work':'millhand/missing-stamp';
+      const route=plan.toStage===1?'opening':plan.toStage===2?'millhand/work':plan.toStage===3?'millhand/missing-stamp':'millhand/second-job';
       return {stage:plan.toStage,tutorialStatus:status,route:'/characters/'+req.params.id+'/'+route};
     } catch(e) {
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
