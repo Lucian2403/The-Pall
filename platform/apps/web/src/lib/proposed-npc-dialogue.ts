@@ -1,5 +1,6 @@
 /**
- * PROPOSED, NOT APPROVED — optional recurring NPC conversations.
+ * PROPOSED, NOT APPROVED — non-Millhand recurring NPC conversation previews.
+ * The approved Guther dialogue lives separately in approved-guther-optional.ts.
  * Source of factual boundaries: docs/05-gameplay/interactions/dialogue-style-guide.md,
  * docs/02-world/the-plume-and-regions.md and six origin opening-dialogue.md files.
  * No quest branching, rewards or historical facts are established by this draft.
@@ -9,27 +10,6 @@ export type NpcTopic = Readonly<{id:'work'|'city'|'lore';prompt:string;reply:str
 export type NpcDialogue = Readonly<{npc:string;role:string;topics:readonly NpcTopic[]}>;
 export const NPC_DIALOGUE_STATUS = 'DRAFT — AWAITING OWNER APPROVAL' as const;
 export const PROPOSED_NPC_DIALOGUE: Readonly<Record<string,NpcDialogue>> = {
-  "Millhand": {
-    "npc": "Guther Anvil",
-    "role": "Smithing Foreman",
-    "topics": [
-      {
-        "id": "work",
-        "prompt": "What other work comes through here?",
-        "reply": "Council plates today. Repairs another day. The benches don't stand empty for long. Getting the council to sign for the work, that's another matter."
-      },
-      {
-        "id": "city",
-        "prompt": "What's work like in Grand Cylinder City?",
-        "reply": "There's heat and power from the Grand Cylinder, and plenty that needs making or mending. Doesn't mean the men doing it get paid when they ought to."
-      },
-      {
-        "id": "lore",
-        "prompt": "What do you know about the Plume?",
-        "reply": "There were ruptures. Bad air, dust, people driven out of their homes. That's what I've been told. I can't tell you why it happened."
-      }
-    ]
-  },
   "Bellrunner": {
     "npc": "Hector D. Smoke",
     "role": "Dispatch Master",
