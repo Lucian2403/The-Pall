@@ -17,6 +17,8 @@ The origin's [story master](README.md) retains narrative structure and mechanica
 
 **Optional Guther conversation:** [Approved owner-written Guther workshop dialogue (2026-10-27)](guther-optional-conversation.md) is separate from the Stage 1 opening and Stage 3 Missing Stamp exchanges. The shared small NPC popup handles its player-selected follow-ups; all work state remains unchanged.
 
+**Stage 3 integration candidate (2026-10-27):** The authenticated Missing Stamp route, persistent evidence inspections, Guther dialogue, three route commitments and first-person journal are implemented in source under `platform/apps/web/src/routes/characters/[id]/millhand/missing-stamp/` and `platform/apps/api/src/millhand-missing-stamp-routes.ts`. A non-destructive database migration `0004_millhand_missing_stamp.sql` is required. The **worker number and two dates remain unapproved**; the live conversation/route selection is intentionally gated until those fields can be shown consistently with Stage 2. Local build and playtest are still required.
+
 **Editorial approval does not imply code integration.** Earlier stage mechanics files sometimes contain older, historically approved dialogue. Preserve their interaction and state constraints while using the explicitly approved newer script for narration and speech. Never rewrite the already approved combat log as part of an editorial pass.
 
 Current visual production: [Gate 01 UX contract](visual-production-gate-01-workshop-ux-contract.md), [Gate 02 wireframe review](visual-production-gate-02-workshop-wireframe-review.md). Latest local integration note: [v0.6.1](v0-6-1-owner-playtest-corrections.md). Prior builds are [archived](../../../archive/README.md).
