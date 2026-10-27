@@ -1,13 +1,50 @@
 <script lang="ts">
+  import {APPROVED_GUTHER_OPTIONAL_DIALOGUE, type GutherTopicId} from '$lib/approved-guther-optional';
   import {NPC_DIALOGUE_STATUS, PROPOSED_NPC_DIALOGUE} from '$lib/proposed-npc-dialogue';
+
   let {origin, close}: {origin:string;close:()=>void} = $props();
   const speaker = $derived(PROPOSED_NPC_DIALOGUE[origin]);
   let topic = $state<'work'|'city'|'lore'|null>(null);
   const current = $derived(speaker?.topics.find(x=>x.id===topic) ?? null);
+
+  // Optional Guther conversation is local UI state only. Closing it leaves
+  // the parent scene, pending object selection and server work state unchanged.
+  let gutherTopic = $state<GutherTopicId | null>(null);
+  let gutherStep = $state(0);
+  const gutherCurrent = $derived(APPROVED_GUTHER_OPTIONAL_DIALOGUE.find(t => t.id === gutherTopic) ?? null);
+  const gutherExchange = $derived(gutherCurrent?.exchanges[gutherStep] ?? null);
+  function askGuther(topicId:GutherTopicId) {
+    gutherTopic = topicId;
+    gutherStep = 0;
+  }
+  function changeGutherTopic() {
+    gutherTopic = null;
+    gutherStep = 0;
+  }
 </script>
 
 <section class="conversation" aria-label="Optional conversation">
-  {#if speaker}
+  {#if origin === 'Millhand'}
+    <p class="name">Guther Anvil <span>· Smithing Foreman</span></p>
+    {#if gutherCurrent && gutherExchange}
+      <p class="speech">“{gutherExchange.reply}”</p>
+      <div class="choices">
+        {#if gutherExchange.followUp}
+          <button type="button" onclick={() => {gutherStep += 1;}}>{gutherExchange.followUp}</button>
+        {/if}
+        <button type="button" onclick={changeGutherTopic}>Ask something else</button>
+        <button type="button" onclick={close}>Return to work</button>
+      </div>
+    {:else}
+      <p class="instruction">What do you want to ask?</p>
+      <div class="choices">
+        {#each APPROVED_GUTHER_OPTIONAL_DIALOGUE as option (option.id)}
+          <button type="button" onclick={() => askGuther(option.id)}>{option.prompt}</button>
+        {/each}
+        <button type="button" onclick={close}>Return to work</button>
+      </div>
+    {/if}
+  {:else if speaker}
     <p class="review-note">{NPC_DIALOGUE_STATUS}</p>
     <p class="name">{speaker.npc} <span>· {speaker.role}</span></p>
     {#if current}
