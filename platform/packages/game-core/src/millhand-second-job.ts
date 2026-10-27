@@ -7,12 +7,12 @@
 import type {MissingStampBranch} from './millhand-missing-stamp.js';
 
 export type SecondJobPhase =
-  | 'CHECK_LOAD' | 'CHOOSE_TRANSPORT' | 'COMPARE_DELIVERY' | 'DEPOT_DIALOGUE'
+  | 'CHECK_LOAD' | 'CHOOSE_TRANSPORT' | 'COMPARE_DELIVERY' | 'SPEAK_DEPOT' | 'DEPOT_DIALOGUE'
   | 'CHOOSE_RECEIPT' | 'COMPLETE_DELIVERY'
-  | 'EXAMINE_PAPER' | 'COMPARE_RECORDS' | 'CONTRACTS_DIALOGUE'
+  | 'EXAMINE_PAPER' | 'COMPARE_RECORDS' | 'SPEAK_CONTRACTS' | 'CONTRACTS_DIALOGUE'
   | 'CHOOSE_CHALLENGE' | 'SUBMIT_DISPUTE'
   | 'READ_DEATH_REGISTER' | 'READ_WAGE_RECORD' | 'EXAMINE_SCRAPED_ENTRY'
-  | 'ARCHIVE_DIALOGUE' | 'CHOOSE_SOURCE' | 'RECORD_FINDING'
+  | 'SPEAK_ARCHIVE' | 'ARCHIVE_DIALOGUE' | 'CHOOSE_SOURCE' | 'RECORD_FINDING'
   | 'DONE';
 
 export type SecondJobAction =
@@ -68,17 +68,20 @@ export function availableSecondJobActions(s:SecondJobState):readonly SecondJobAc
     case 'CHECK_LOAD':return ['check_load'];
     case 'CHOOSE_TRANSPORT':return ['secure_plates','carry_smaller_loads'];
     case 'COMPARE_DELIVERY':return ['compare_delivery_list'];
+    case 'SPEAK_DEPOT':return ['speak_to_depot_clerk'];
     case 'DEPOT_DIALOGUE':return ['continue_dialogue'];
     case 'CHOOSE_RECEIPT':return ['record_goods_as_plates','request_delivery_correction'];
     case 'COMPLETE_DELIVERY':return ['complete_delivery'];
     case 'EXAMINE_PAPER':return ['examine_work_paper'];
     case 'COMPARE_RECORDS':return ['compare_official_records'];
+    case 'SPEAK_CONTRACTS':return ['speak_to_contracts_clerk'];
     case 'CONTRACTS_DIALOGUE':return ['continue_dialogue'];
     case 'CHOOSE_CHALLENGE':return ['request_seal_check','mark_conflicting_entries'];
     case 'SUBMIT_DISPUTE':return ['submit_dispute'];
     case 'READ_DEATH_REGISTER':return ['read_death_register'];
     case 'READ_WAGE_RECORD':return ['check_wage_record'];
     case 'EXAMINE_SCRAPED_ENTRY':return ['examine_scraped_entry'];
+    case 'SPEAK_ARCHIVE':return ['speak_to_archive_assistant'];
     case 'ARCHIVE_DIALOGUE':return ['continue_dialogue'];
     case 'CHOOSE_SOURCE':return ['compare_neighbouring_entries','compare_shift_book'];
     case 'RECORD_FINDING':return ['record_finding'];
@@ -97,23 +100,24 @@ export function advanceSecondJob(s:SecondJobState,action:SecondJobAction):Second
     case 'check_load':phase='CHOOSE_TRANSPORT';break;
     case 'secure_plates':transport='secured';phase='COMPARE_DELIVERY';break;
     case 'carry_smaller_loads':transport='smaller_loads';phase='COMPARE_DELIVERY';break;
-    case 'compare_delivery_list':phase='DEPOT_DIALOGUE';dialogueIndex=0;break;
+    case 'compare_delivery_list':phase='SPEAK_DEPOT';break;
+    case 'speak_to_depot_clerk':phase='DEPOT_DIALOGUE';dialogueIndex=0;break;
     case 'record_goods_as_plates':receipt='recorded_plates';phase='COMPLETE_DELIVERY';break;
     case 'request_delivery_correction':receipt='requested_correction';phase='COMPLETE_DELIVERY';break;
     case 'complete_delivery':phase='DONE';break;
     case 'examine_work_paper':phase='COMPARE_RECORDS';break;
-    case 'compare_official_records':phase='CONTRACTS_DIALOGUE';dialogueIndex=0;break;
+    case 'compare_official_records':phase='SPEAK_CONTRACTS';break;
+    case 'speak_to_contracts_clerk':phase='CONTRACTS_DIALOGUE';dialogueIndex=0;break;
     case 'request_seal_check':challenge='seal_check';phase='SUBMIT_DISPUTE';break;
     case 'mark_conflicting_entries':challenge='written_complaint';phase='SUBMIT_DISPUTE';break;
     case 'submit_dispute':phase='DONE';break;
     case 'read_death_register':phase='READ_WAGE_RECORD';break;
     case 'check_wage_record':phase='EXAMINE_SCRAPED_ENTRY';break;
-    case 'examine_scraped_entry':phase='ARCHIVE_DIALOGUE';dialogueIndex=0;break;
+    case 'examine_scraped_entry':phase='SPEAK_ARCHIVE';break;
+    case 'speak_to_archive_assistant':phase='ARCHIVE_DIALOGUE';dialogueIndex=0;break;
     case 'compare_neighbouring_entries':source='neighbouring_entries';phase='RECORD_FINDING';break;
     case 'compare_shift_book':source='shift_book';phase='RECORD_FINDING';break;
     case 'record_finding':phase='DONE';break;
-    case 'speak_to_depot_clerk':case 'speak_to_contracts_clerk':
-    case 'speak_to_archive_assistant':throw new SecondJobInvalidAction();
     case 'continue_dialogue':{
       const count=DIALOGUE_BEATS[s.branch];
       if(dialogueIndex<count-1)dialogueIndex++;
