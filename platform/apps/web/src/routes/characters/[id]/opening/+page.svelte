@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
-  import {APPROVED_STAGE_ONE, type StageOneScene} from '$lib/approved-stage-one';
+  import {APPROVED_STAGE_ONE, resolveStageOneChoice, type StageOneScene} from '$lib/approved-stage-one';
   import WorkshopScene from '$lib/WorkshopScene.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
 
@@ -49,10 +49,11 @@
   let status = $state<'checking' | 'ready' | 'login' | 'missing' | 'not-ready' | 'unavailable'>('checking');
 
   const beat = $derived(scene?.nodes[nodeId] ?? null);
-  function advance(next: string) {
+  function advance(next: string, fromChoice = false) {
     if (!scene?.nodes[next]) return;
+    const target = fromChoice ? resolveStageOneChoice(scene, next) : next;
     visited = [...visited, nodeId];
-    nodeId = next;
+    nodeId = target;
   }
   function back() {
     if (!visited.length) return;
@@ -125,7 +126,7 @@
         <div class="actions">
           {#if beat.kind === 'choice' && beat.choices}
             {#each beat.choices as choice}
-              <button type="button" onclick={() => advance(choice.next)}>{choice.label}</button>
+              <button type="button" onclick={() => advance(choice.next, true)}>{choice.label}</button>
             {/each}
           {:else if beat.next}
             <button type="button" onclick={() => {if (beat?.next) advance(beat.next);}}>Continue</button>
