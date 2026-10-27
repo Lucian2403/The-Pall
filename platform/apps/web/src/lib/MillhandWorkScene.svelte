@@ -92,7 +92,7 @@
 </section>
 
 <style>
-  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#eee1cf;font-family:Georgia,'Times New Roman',serif}
+  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#eee1cf;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
     flex:1;align-content:start;width:100%;min-width:0;min-height:clamp(450px,calc(100dvh - 350px),1100px);background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
@@ -128,7 +128,7 @@
   .inspection p{margin:6px 0}
   .actions{display:flex;flex-direction:column;gap:6px;margin-top:9px}
   .actions button{display:block;width:100%;text-align:left;border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 12px;font:14px/1.4 Georgia,serif;cursor:pointer;min-height:42px}
+    padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer;min-height:42px}
   .actions button:hover,.actions button:focus-visible{background:#423022;outline:1px solid #c49d65}
   .actions button:disabled{opacity:.55;cursor:default}
   .small{font-size:12px;line-height:1.45;color:#614e39}
