@@ -15,6 +15,8 @@ The origin's [story master](README.md) retains narrative structure and mechanica
 
 [Approved personal Journal wording for Stages 1–4](stages-1-4-approved-journal.md) supplies the personal first-person voice; use conditional branch text only when the corresponding game state occurred.
 
+**Optional Guther conversation:** [Approved owner-written Guther workshop dialogue (2026-10-27)](guther-optional-conversation.md) is separate from the Stage 1 opening and Stage 3 Missing Stamp exchanges. The shared small NPC popup handles its player-selected follow-ups; all work state remains unchanged.
+
 **Editorial approval does not imply code integration.** Earlier stage mechanics files sometimes contain older, historically approved dialogue. Preserve their interaction and state constraints while using the explicitly approved newer script for narration and speech. Never rewrite the already approved combat log as part of an editorial pass.
 
 Current visual production: [Gate 01 UX contract](visual-production-gate-01-workshop-ux-contract.md), [Gate 02 wireframe review](visual-production-gate-02-workshop-wireframe-review.md). Latest local integration note: [v0.6.1](v0-6-1-owner-playtest-corrections.md). Prior builds are [archived](../../../archive/README.md).
