@@ -20,6 +20,20 @@ export type StageOneScene = {
   readonly start: string;
   readonly nodes: Readonly<Record<string, StageOneBeat>>;
 };
+/**
+ * A selected player response is already visible on its choice button.
+ * Advance directly to the consequence rather than displaying that same
+ * sentence a second time as its own spoken beat.
+ * Only skip a Player speech node when reached by an actual choice.
+ */
+export function resolveStageOneChoice(scene: StageOneScene, choiceNext: string): string {
+  const node = scene.nodes[choiceNext];
+  if (node?.kind === 'speech' && node.speaker === 'Player' && node.next && scene.nodes[node.next]) {
+    return node.next;
+  }
+  return choiceNext;
+}
+
 export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
   "Millhand": {
     "location": "Smithing workshop",
