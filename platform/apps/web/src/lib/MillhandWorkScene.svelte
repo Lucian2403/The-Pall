@@ -92,7 +92,7 @@
 </section>
 
 <style>
-  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#eee1cf;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
+  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
     flex:1;align-content:start;width:100%;min-width:0;min-height:clamp(450px,calc(100dvh - 350px),1100px);background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
