@@ -9,13 +9,9 @@
  * Stranger Friz (personal only) and CF Industrial Fabrics
  * (non-commercial) are intentionally NOT bundled or referenced.
  */
-@font-face {
-  font-family: 'Pall New Standard';
-  src: url('/ui-kit/fonts/new-standard-regular.otf') format('opentype');
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
+/* The supplied NewStandard-Regular.otf fails Chromium's OTS CFF CharStrings
+ * validation. Preserve its source file but do not request it in the browser.
+ * Use a readable system serif until the artist supplies a validated export. */
 @font-face {
   font-family: 'Pall Bebas Neue';
   src: url('/ui-kit/fonts/bebas-neue-regular.otf') format('opentype');
@@ -38,7 +34,7 @@
   font-weight: 400;
 }
 :root {
-  --pall-font-reading: 'Pall New Standard', Georgia, 'Times New Roman', serif;
+  --pall-font-reading: Georgia, 'Times New Roman', serif;
   --pall-font-label: 'Pall Bebas Neue', 'Arial Narrow', Arial, sans-serif;
   --pall-font-decorative: 'Pall Beyond Wonderland', Georgia, serif;
   --pall-ink: #151411;
