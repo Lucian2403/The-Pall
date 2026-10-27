@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import WorkshopObjectIcon from '$lib/WorkshopObjectIcon.svelte';
+  import NpcConversation from '$lib/NpcConversation.svelte';
 
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
   type PropSpec = {name: string; label: string; image: string; observation: string};
@@ -45,6 +46,7 @@
   } = $props();
 
   let selected = $state<PropKey | null>(null);
+  let talkingToGuther = $state(false);
   const say = $derived(beat.text.replaceAll('[player name]', characterName));
   const readyForWork = $derived(beat.kind === 'handoff');
 
@@ -59,6 +61,10 @@
     <div class="illustration">
     <img class="environment" src="/workshop/environment.webp" alt="The smithing workshop, with a forge, bench and distant city" />
     <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil, the smithing foreman" />
+    <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil"
+      title="Talk to Guther Anvil" onclick={() => {talkingToGuther=true;selected=null;}}>
+      <span class="npc-label">Talk to Guther</span>
+    </button>
 
     <img class="prop-art stamps" src={workshopObjects.stamps.image} alt="" aria-hidden="true" />
     <img class="prop-art plates" src={workshopObjects.plates.image} alt="" aria-hidden="true" />
@@ -82,6 +88,9 @@
     </div>
     </div>
     <div class="dialogue" aria-label="Workshop conversation">
+      {#if talkingToGuther}
+        <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} />
+      {:else}
       {#if beat.kind === 'speech'}
         <p class="speaker">{beat.speaker === 'Player' ? characterName : beat.speaker}</p>
         <p class="dialogue-line">“{say}”</p>
@@ -112,6 +121,7 @@
           <button class="back" type="button" onclick={() => {selected = null; goBack();}}>Previous line</button>
         {/if}
       </div>
+      {/if}
     </div>
   </div>
 
@@ -137,6 +147,11 @@
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 38% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
+  .npc-hotspot {position:absolute;z-index:3;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;justify-content:center;
+    padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
+  .npc-label {padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px/1.3 sans-serif;text-shadow:0 1px #000}
+  .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label {background:#3c2b19;border-color:#efd092}
+  .npc-hotspot:focus-visible {outline:2px solid #efd092;outline-offset:2px}
   .prop-art {position:absolute;z-index:2;max-width:none;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0b0709a1)}
   .prop-art.stamps {width:23%;height:31%;bottom:5%;left:1.5%}
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
@@ -172,6 +187,8 @@
     .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
     .environment {object-fit:cover;object-position:39% center}
     .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
+    .npc-hotspot {left:0;top:7%;width:41%;height:49%;padding-bottom:0}
+    .npc-label {font-size:10px}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}
