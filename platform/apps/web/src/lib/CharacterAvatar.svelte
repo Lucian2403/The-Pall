@@ -12,13 +12,13 @@
   const safeId=$derived(
     avatarId && /^[a-z0-9][a-z0-9_-]{0,63}$/i.test(avatarId) ? avatarId : null
   );
-  let broken=$state(false);
-  $effect(()=>{safeId;broken=false;});
+  let extension=$state<'webp'|'png'|null>('webp');
+  $effect(()=>{safeId;extension='webp';});
 </script>
 <span class:compact class="portrait" role="img" aria-label={'Portrait of '+name}>
-  {#if safeId && !broken}
-    <img src={'/ui-kit/avatars/'+safeId+'.webp'} alt="" aria-hidden="true"
-      onerror={() => {broken=true;}} />
+  {#if safeId && extension}
+    <img src={'/ui-kit/avatars/'+safeId+'.'+extension} alt="" aria-hidden="true"
+      onerror={() => {extension=extension==='webp'?'png':null;}} />
   {:else}
     <span class="initial" aria-hidden="true">{name.slice(0,1).toUpperCase()}</span>
   {/if}
