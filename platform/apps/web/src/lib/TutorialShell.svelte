@@ -270,8 +270,9 @@
     background-color:#222321;display:flex;align-items:end;justify-content:space-between;padding:22px 26px;gap:15px}
   .banner-copy{display:flex;flex-direction:column;gap:5px;text-shadow:0 2px 2px #000}
   .banner-overline{font:13px var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.16em;color:#d3ad7c}
-  /* The supplied ornamental font is used once, for the city name only. */
-  .banner-copy strong{font:normal 31px/1.1 var(--pall-font-decorative,Georgia,serif);letter-spacing:.015em}
+  /* The decorative face becomes illegible at banner scale. Prefer a clear
+     serif title; the supplied logo and restrained Bebas labels carry identity. */
+  .banner-copy strong{font:normal 29px/1.16 var(--pall-font-reading,Georgia,serif);letter-spacing:0;text-shadow:0 2px 4px #000a}
   .banner-copy small{font:13px sans-serif;color:#dac1a2}
   .chapter-bar{display:flex;align-items:center;gap:12px;padding:7px 14px;min-height:43px;background:#151513;border-bottom:1px solid #5b442f}
   .chapter-label{display:flex;align-items:center;gap:9px;font-size:18px;min-width:0}
