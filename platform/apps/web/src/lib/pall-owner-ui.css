@@ -52,7 +52,9 @@
  */
 .frame .chapter-content :is(.workshop,.second-job) :is(.dialogue,.work-card,.work-dialogue) {
   box-sizing:border-box;
-  border:27px solid transparent;
+  border-style:solid;
+  border-color:transparent;
+  border-width:27px 31px 25px 31px;
   border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
   border-image-slice:145 190 125 190 fill;
   border-image-width:27px 31px 25px 31px;
@@ -78,7 +80,9 @@
   box-sizing:border-box;
   width:100%;
   min-height:48px;
-  border:13px solid transparent;
+  border-style:solid;
+  border-color:transparent;
+  border-width:13px 34px 12px 34px;
   border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
   border-image-slice:50 180 45 180 fill;
   border-image-width:13px 34px 12px 34px;
@@ -116,7 +120,7 @@
  * dialogue stays in the CRPG scene and never becomes a separate page. */
 @media(max-width:700px){
   .frame .chapter-content :is(.workshop,.second-job) :is(.dialogue,.work-card,.work-dialogue){
-    border-width:23px;
+    border-width:23px 25px 22px 25px;
     border-image-width:23px 25px 22px 25px;
     padding:10px 9px;
   }
