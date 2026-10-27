@@ -209,3 +209,24 @@ Do not run a destructive reset or recreate the player's Millhand. Migration `db/
 **QA sequence:** Inspect returned plate then slip (or vice versa on a different test state) and refresh after the first inspection, verify the saved record flags, journal, and missing-date authoring notice. Click Guther for optional talk, then resume without losing evidence. Check no new wages, loot or skill level appears from inspections. When actual dates and the shared worker number are approved, re-run both inspection orders, inspect both visible numbers/dates, follow or skip Guther's eight spoken lines, and test the three mutually exclusive route actions (test fixtures/unit tests cover alternate branches without resetting a real character). Check exactly one +1 Major Skill increment on the single saved branch, Stage 4 transition, no fake council inspector mark, and 401/404 for signed-out/foreign-character requests. No optional Guther conversation may mutate the saved Stage 3 revision.
 
 **Build/QA status:** Commits have been source-checked against approved dialogue, but this connector environment cannot run a local Svelte build, PostgreSQL migration or browser playtest. Treat this as an implementation candidate until local commands pass.
+
+
+### Windows dependency install recovery — Vite/pg not found (2026-10-27)
+
+The Windows errors `'vite' is not recognized` and `ERR_MODULE_NOT_FOUND: pg` both mean npm dependencies are not available to the relevant workspace/script. `vite` is a web workspace **devDependency**, so production-only installs omit it. Root migration scripts import `pg` directly; `platform/package.json` now declares `pg` as a root dependency and `platform/package-lock.json` is synchronised. Node 24 is within the supported engines range.
+
+**Use Windows PowerShell, with the dev servers stopped, from the `platform` directory:**
+
+```powershell
+git pull --ff-only
+npm ci --include=dev
+if ($LASTEXITCODE -ne 0) { throw "npm ci failed. Do not run builds or migrations until installation succeeds." }
+node -e "console.log(require.resolve('pg'))"
+npm run build -w @the-pall/web
+if ($LASTEXITCODE -ne 0) { throw "Frontend build failed. Stop here and inspect this error." }
+npm run missing-stamp:migrate
+```
+
+Run `npm run test:unit`, `npm run check:api` and `npm run check:web` after a successful install to diagnose actual code errors separately. This is a **dependency recovery**, not a request to reset the database. The npm warning about `_email` is unrelated.
+
+If `npm ci` fails, capture its **first meaningful ERROR and the exit code**. Do not repeatedly run `vite build` or the migration after installation has failed. If it succeeds but web tooling still cannot be found, inspect `npm config get omit`, `npm config get workspaces` and `npm config get registry` without making global changes.
