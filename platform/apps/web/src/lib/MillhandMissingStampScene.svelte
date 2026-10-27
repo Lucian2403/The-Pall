@@ -193,7 +193,7 @@
 </section>
 
 <style>
-  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#efdecb;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
+  .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#efdecb;font-family:var(--pall-font-reading,Georgia,serif)}
   /* Row 1 is reserved for the CRPG dialogue. Row 2 holds the physical bench props.
      Their footprints cannot intersect, including when the longest choice is shown. */
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
