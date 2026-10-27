@@ -18,11 +18,12 @@
     majorSkillBonuses:Record<string,number>;
     tutorialPayout:{coins:number;ordinaryXp:number;items:number};
   };
-  let {snapshot,pending,errorMessage,perform}:{
+  let {snapshot,pending,errorMessage,perform,continueToJob}:{
     snapshot:Snapshot;
     pending:boolean;
     errorMessage:string;
     perform:(action:MissingStampAction)=>Promise<void>;
+    continueToJob:()=>void;
   }=$props();
 
   let talkingOptional=$state(false);
@@ -144,8 +145,13 @@
             <div class="choices">
               <button type="button" disabled={!canAct('restamp_worker_number')} onclick={() => {void perform('restamp_worker_number');}}>Stamp the worker number again</button>
             </div>
-          {:else}
-            <p class="instruction">Your chosen route is saved. Stage 4 begins with its corresponding follow-up task, which is not yet connected.</p>
+          {:else if state.phase==='SELECTED'}
+            <div class="choices">
+              <button type="button" onclick={continueToJob}>
+                {state.branch==='restamp'?'Take the plates to the depot':
+                  state.branch==='contracts'?'Go to the Contracts office':'Go to the records room'}
+              </button>
+            </div>
           {/if}
           <p class="skill">Route: {branchCopy.label}. The associated Major Skill received +1 on the saved route choice.</p>
         {/if}
