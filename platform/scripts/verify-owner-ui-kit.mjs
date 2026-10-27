@@ -43,7 +43,7 @@ assert.ok(source.includes('/ui-kit/sidebar-illustration.png'),'Sidebar art must 
 assert.ok(source.includes('character.health.current')&&source.includes('character.health.maximum'),'Health bar must use real character values');
 assert.ok(source.includes('aria-valuenow={character.health.current}'),'Resource should be accessible');
 assert.ok(css.includes('Pall New Standard')&&css.includes('Pall Bebas Neue'),'Supplied open-licensed fonts must be wired');
-assert.ok(!css.includes('Stranger Friz')||!css.includes('src: url(\'/ui-kit/fonts/stranger'),'Restricted personal-use font must not load');
-assert.ok(!css.includes('src: url(\'/ui-kit/fonts/cf-industrial'),'Non-commercial font must not load');
+assert.ok(!css.includes('/ui-kit/fonts/stranger-friz'),'Restricted personal-use font must not load');
+assert.ok(!css.includes('/ui-kit/fonts/cf-industrial'),'Non-commercial font must not load');
 assert.ok(!source.includes('stamina.current')&&!source.includes('fatigue.current'),'Do not invent resource data');
 console.log('PASS: Restrained font, logo, city, sidebar and real Health UI wiring.');
