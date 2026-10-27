@@ -52,7 +52,7 @@ export function planMillhandRewind(
 
   const expected:Record<string,number> = {Craftsmanship:APPROVED_STARTING_FACTS.originMajorSkillBonusLevels};
   if(branch){
-    if(!(branch in MISSING_STAMP_ROUTE_SKILL))throw new MillhandRewindInvalid('unsafe_stage_three_state');
+    if(!Object.hasOwn(MISSING_STAMP_ROUTE_SKILL,branch))throw new MillhandRewindInvalid('unsafe_stage_three_state');
     expected[MISSING_STAMP_ROUTE_SKILL[branch]] = 1;
   }
   const sorted=(object:Record<string,number>)=>Object.keys(object).sort()
