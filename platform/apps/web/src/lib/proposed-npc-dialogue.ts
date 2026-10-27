@@ -131,7 +131,7 @@ export const PROPOSED_NPC_DIALOGUE: Readonly<Record<string,NpcDialogue>> = {
       {
         "id": "lore",
         "prompt": "Do the records explain what caused the Plume?",
-        "reply": "I've heard several explanations. None that I'd care to enter in a proper record without proof. We have quite enough doubtful figures to deal with already."
+        "reply": "I've heard several explanations. None that I'd care to enter in a proper record without proof. We don't copy rumours here."
       }
     ]
   }
