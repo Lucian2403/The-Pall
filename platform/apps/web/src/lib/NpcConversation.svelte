@@ -69,7 +69,7 @@
 </section>
 
 <style>
-  .conversation {width:100%;min-width:0;color:#2b1d13;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
+  .conversation {width:100%;min-width:0;color:#2b1d13;font-family:var(--pall-font-reading,Georgia,serif)}
   .review-note{font:10px/1.4 sans-serif;letter-spacing:.06em;color:#855334;margin:0 0 8px}
   .name{font:bold 13px/1.4 sans-serif;color:#523522;margin:0 0 12px}
   .name span{font-weight:normal;color:#674f37}
