@@ -19,7 +19,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene'}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'} = $props();
+  let {character, children, activePage = 'scene', sceneLocation}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string} = $props();
   const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 4
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
     : character.origin === 'Millhand' && character.tutorial.stage === 3
@@ -186,7 +186,7 @@
     <div class="chapter-bar">
       <div class="chapter-label">
         <span class="location-icon" aria-hidden="true">⚒</span>
-        <span>{character.startingLocation}</span>
+        <span>{sceneLocation ?? character.startingLocation}</span>
       </div>
       <div class="chapter-meta">Stage {character.tutorial.stage} · {character.origin}</div>
       {#if canRewind && rewindFromStage!==null}
