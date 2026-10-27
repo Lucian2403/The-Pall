@@ -201,3 +201,40 @@ assert.ok(stage3SceneSource.includes('scrollIntoView') &&
   stage3SceneSource.includes("import {tick} from 'svelte';"),
   'Opening the separate journal should expose it using page scrolling');
 console.log('PASS: Stage3 tabletop evidence and independent journal preserve the compact CRPG dialogue layout.');
+
+
+// Owner-directed seamless Millhand onboarding: the saved Stage2 return_paper
+// action enters Stage3 automatically, and the first speech is Guther's,
+// without the old out-of-character chapter/footer card.
+const stage1Opening = scenes.Millhand.nodes.opening;
+const stage1Doc = readFileSync(resolve(docs,'millhand/opening-dialogue.md'),'utf8');
+assert.equal(stage1Opening.speaker,'Guther');
+assert.ok(stage1Opening.text.startsWith('Hey, [player name]. I see you standing idle.'),
+  'Guther should greet the new Millhand before discussing the work');
+assert.ok(stage1Doc.includes('“'+stage1Opening.text+'”'),
+  'The owner-approved Guther greeting must match Stage1 source');
+assert.ok(workshopUi.includes("beat.text.replaceAll('[player name]', characterName)"),
+  'Stage1 greeting must substitute the saved character name');
+
+const workRouteUI=readFileSync(
+  resolve(root,'apps/web/src/routes/characters/[id]/millhand/work/+page.svelte'),'utf8');
+assert.ok(workRouteUI.includes("if(action==='return_paper' && result.work?.phase==='COMPLETE' && result.stage===3)"),
+  'Stage2 must transition only after a successful server-owned return_paper');
+assert.ok(workRouteUI.includes("snapshot.stage>=3 && snapshot.work?.phase==='COMPLETE'"),
+  'Returning Stage3/4 characters should not be stranded on completed Stage2');
+assert.ok(workRouteUI.includes("await goto('/characters/'+encodeURIComponent(character.id)+'/millhand/missing-stamp'"),
+  'Stage2 handoff must immediately enter Stage3');
+assert.ok(!workRouteUI.includes('class="work-complete"'),
+  'Stage2 must not hide the Stage3 transition in a footer link');
+assert.ok(!workUi.includes('can now be examined in The Missing Stamp'),
+  'Stage2 must not display out-of-character chapter prompts');
+
+const stage3Copy=readFileSync(resolve(root,'apps/web/src/lib/approved-stage-three.ts'),'utf8');
+const stage3Canon=readFileSync(resolve(docs,'millhand/stage-3-approved-script.md'),'utf8');
+const stage3OpeningLine="All finished, are you? Good. Leave the work paper here. There's a returned plate and a folded slip in with this lot. Have a look at them before I send anything off.";
+assert.ok(stage3Copy.includes(stage3OpeningLine));
+assert.ok(stage3Canon.includes('**GUTHER:** “'+stage3OpeningLine+'”'),
+  'Stage3 transition speech must match approved owner revision');
+assert.ok(stage3SceneSource.includes('“{MISSING_STAMP_HANDOFF}”'),
+  'After returning the work paper Guther must speak inside the CRPG popup');
+console.log('PASS: Seamless Stage2 → Stage3 and owner-directed Guther greeting preserve canonical copy.');
