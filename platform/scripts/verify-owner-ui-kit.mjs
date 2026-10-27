@@ -43,6 +43,19 @@ assert.ok(source.includes('/ui-kit/sidebar-illustration.png'),'Sidebar art must 
 assert.ok(source.includes('character.health')&&source.includes('isMeasured(resource.data)'),'Health bar must use real character values');
 for(const label of ['Stamina','Fatigue','Focus']) assert.ok(source.includes("label:'"+label+"'"),'Missing relevant HUD track '+label);
 assert.ok(source.includes('not tracked yet'),'Unauthored resources must be explicitly unavailable');
+assert.ok(source.includes('min-height:clamp(245px,26vw,335px)'),'Grand Cylinder city vista must be taller than the prior narrow banner');
+assert.ok(source.includes("center 12%/cover no-repeat"),'Vista must show the central tower, not only the city walls');
+assert.ok(source.includes('min-height:43px'),'Workshop location strip must remain compact');
+const secondJobUi=readFileSync(resolve(root,'apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte'),'utf8');
+assert.ok(secondJobUi.includes("sceneLocation={snapshot.state.branch==='restamp'"),'Stage4 location heading must follow the chosen job');
+assert.ok(secondJobUi.includes("status==='schema'"),'A missing Stage4 migration must be explainable in the UI');
+const secondJobApi=readFileSync(resolve(root,'apps/api/src/millhand-second-job-routes.ts'),'utf8');
+const rewindApi=readFileSync(resolve(root,'apps/api/src/millhand-stage-rewind-routes.ts'),'utf8');
+for(const endpoint of [secondJobApi,rewindApi]) {
+  assert.ok(endpoint.includes("code==='42P01'")&&endpoint.includes('second_job_schema_missing'),
+    'Missing Stage4 relations must return 503 instead of an opaque 500');
+}
+
 assert.ok(source.includes('aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}'),'Measured resources should be accessible');
 assert.ok(css.includes('Pall Bebas Neue'),'Supplied Bebas Neue font must be wired');
 assert.ok(!css.includes("src: url('/ui-kit/fonts/new-standard-regular.otf')"),'Chromium-rejected New Standard CFF should not be loaded');
