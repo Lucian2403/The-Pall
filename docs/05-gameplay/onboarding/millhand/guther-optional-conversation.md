@@ -30,7 +30,7 @@
 
 **PLAYER:** “The whole Cylinder is just for heat and power?”
 
-**GUTHER:** “Just for? Do you know how big this city is? The whole system that supplies its heat and power is housed in the Cylinder. Factories, machines, lights—they all depend on it. Takes a lot of people to keep it running.”
+**GUTHER:** “Just for? Do you know how big this city is? The whole system that supplies its heat and power is housed in the Cylinder. Factories, machines, lights, they all depend on it. Takes a lot of people to keep it running.”
 
 ## 3. The Plume
 
@@ -50,7 +50,7 @@
 
 **PLAYER:** “What else do you make here?”
 
-**GUTHER:** “Why? Haven't you got enough work? We do repairs, fittings—whatever ironwork comes through. Today it's council plates. I don't get to choose when the inspector comes.”
+**GUTHER:** “Why? Haven't you got enough work? We do repairs, fittings, whatever ironwork comes through. Today it's council plates. I don't get to choose when the inspector comes.”
 
 **PLAYER:** “Is it always this hard to get paid?”
 
