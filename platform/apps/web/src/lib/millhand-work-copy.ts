@@ -15,7 +15,7 @@ export const PHASE_INSTRUCTION: Readonly<Record<WorkPhase, string>> = {
   CORRECT: 'The plate moved under the stamps. Part of the number is too faint to read. You need to correct it before handing the plate in.',
   REVIEW: 'Check that the plates are ready to be sent for approval.',
   RETURN_PAPER: 'Take the work paper back to Guther.',
-  COMPLETE: 'The work paper has been returned. Stage 3 is now ready for integration.'
+  COMPLETE: 'The work paper has been returned. You can now examine the returned council papers.'
 };
 
 export const ACTION_LABEL: Readonly<Record<PlateworkAction, string>> = {
