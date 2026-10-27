@@ -81,7 +81,7 @@
           <p class="small">Select an object on the workbench to examine it.</p>
         {/if}
       {:else}
-        <p class="instruction">The work paper has been returned. The returned council papers can now be examined in The Missing Stamp.</p>
+        <p class="instruction">Guther takes the finished work paper and lays it on the bench beside the council bundle.</p>
       {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if pending}<p role="status" class="small">Saving work…</p>{/if}
