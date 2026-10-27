@@ -1,8 +1,8 @@
 <script lang="ts">
-  import {APPROVED_GUTHER_OPTIONAL_DIALOGUE, type GutherTopicId} from '$lib/approved-guther-optional';
+  import {APPROVED_GUTHER_OPTIONAL_DIALOGUE, GUTHER_WORK_SKIP_LINE, type GutherTopicId} from '$lib/approved-guther-optional';
   import {NPC_DIALOGUE_STATUS, PROPOSED_NPC_DIALOGUE} from '$lib/proposed-npc-dialogue';
 
-  let {origin, close}: {origin:string;close:()=>void} = $props();
+  let {origin, close, skipToWork}: {origin:string;close:()=>void;skipToWork?:()=>void} = $props();
   const speaker = $derived(PROPOSED_NPC_DIALOGUE[origin]);
   let topic = $state<'work'|'city'|'lore'|null>(null);
   const current = $derived(speaker?.topics.find(x=>x.id===topic) ?? null);
@@ -33,7 +33,7 @@
           <button type="button" onclick={() => {gutherStep += 1;}}>{gutherExchange.followUp}</button>
         {/if}
         <button type="button" onclick={changeGutherTopic}>Ask something else</button>
-        <button type="button" onclick={close}>Return to work</button>
+        <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {:else}
       <p class="instruction">What do you want to ask?</p>
@@ -41,7 +41,7 @@
         {#each APPROVED_GUTHER_OPTIONAL_DIALOGUE as option (option.id)}
           <button type="button" onclick={() => askGuther(option.id)}>{option.prompt}</button>
         {/each}
-        <button type="button" onclick={close}>Return to work</button>
+        <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {/if}
   {:else if speaker}
@@ -78,5 +78,6 @@
   .choices{display:flex;flex-direction:column;gap:6px}
   .choices button{width:100%;border:1px solid #624b35;background:#241d16;color:#f5e3c8;text-align:left;cursor:pointer;
     padding:10px 12px;min-height:40px;font:14px/1.4 Georgia,serif}
+  .choices .work-skip{background:#493321;border-color:#a07a4b}
   .choices button:hover,.choices button:focus-visible{background:#503927;outline:2px solid #d9a76e;outline-offset:1px}
 </style>
