@@ -86,3 +86,23 @@ npm run build -w @the-pall/web
 If avatar assets are later supplied in a dedicated folder, invoke `scripts/install-owner-ui-kit.ps1 -KitZip <your-original-zip> -AvatarDirectory <your-portrait-folder>`; WebP or PNG names must match `^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$` before the extension.
 
 **Acceptance:** On all early Millhand workshop stages, the actual brass/iron-edged parchment *dialogue frame* appears around the small NPC conversation, while the owner's beige metal-trimmed button images change with hover/press and support keyboard focus. The transparent props remain visually on the table; expanding the journal still happens separately. The city panorama, resource HUD and logo remain unchanged by this focused correction. Evaluate on desktop and mobile before extending ornamental treatment to the rest of the shell.
+
+## Screenshot correction — alpha margins and distressed font (2026-10-27)
+
+The owner reviewed Stage 1 and identified a **white rectangular strip behind the dialogue frame**, poorly proportioned buttons and an overly distressed Grand Cylinder City heading. These were implementation defects, not problems with the supplied imagery.
+
+**Cause:** The original `dialogue-frame.png` is 2032×774 but its visible artwork occupies a smaller region, with a large transparent gutter at the top/bottom. The previous border-image slicing included that gutter, used an opaque CSS beige fallback behind the entire frame, and allowed the image border to intrude into dialogue text. Button PNGs likewise have transparent margins and had too-small endcap widths. The decorative Beyond Wonderland typeface introduced texture noise in the city heading.
+
+**Fix:** The original owner PNGs are preserved. A companion asset patch / updated Windows installer provides four new alpha-trimmed versions:
+- `ui-kit/frames/dialogue-frame-trim.png` (1936×551, cropped from the owner's original, no stylistic alteration)
+- `ui-kit/buttons/button-normal-trim.png` (1261×203)
+- `ui-kit/buttons/button-hover-trim.png` (1261×205)
+- `ui-kit/buttons/button-pressed-trim.png` (1261×207)
+
+`pall-owner-ui.css` now references these images, uses nine-slice settings calibrated for the cropped source, removes the opaque rectangular backing and reserves sufficient border width for button endcaps and framed dialogue text. Keyboard focus remains visible, and NPC/object click targets stay unskinned. The city title returns to a readable serif; Bebas Neue stays on small labels. There is no need to change the logo or panoramic City art.
+
+**Install:** From the `platform` working directory, after `git pull --ff-only`, unpack `The_Pall_UI_Cropped_Frames_Patch.zip` **into the platform directory**, preserving `apps/web/static/ui-kit/...`. Alternatively, rerun the updated `scripts/install-owner-ui-kit.ps1` with the original full UI kit ZIP; the installer now generates the same four trimmed images automatically using Windows System.Drawing. Then run `npm run verify:owner-ui-kit` and `npm run check:web` and restart the frontend.
+
+**Avatars:** The owner has a universal portrait set, but it is **not present** in any conversation/project uploads or the source UI-kit ZIP. The shared `CharacterAvatar` component already supports a saved `avatarId`, but the API does not yet persist it. Do **not** assign a random, Millhand-specific or inferred portrait. Once the owner uploads the portrait pack, implement a common avatar catalogue and persist each player's selection independently of origin. Until then, the character initial remains an explicit fallback, not final portrait artwork.
+
+**Acceptance:** No pale/white rectangle visible outside the iron frame. All three button states retain full endcaps without covering labels. Workshop objects remain on the physical workbench, and opening a journal doesn't enlarge its NPC popup. The City title is readable without decorative noise. The universal portrait remains pending actual owner files. Local responsive screenshots are still needed for visual signoff.
