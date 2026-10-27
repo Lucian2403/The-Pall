@@ -40,10 +40,14 @@ assert.ok(source.includes("import './pall-owner-ui.css'"),'Shell must import own
 assert.ok(source.includes('/ui-kit/branding/logo-compact.png'),'Shell must show the supplied logo');
 assert.ok(source.includes('/ui-kit/resources/TheCityVista.png'),'City art must be loaded from the original UI kit');
 assert.ok(source.includes('/ui-kit/sidebar-illustration.png'),'Sidebar art must match supplied cutout');
-assert.ok(source.includes('character.health.current')&&source.includes('character.health.maximum'),'Health bar must use real character values');
-assert.ok(source.includes('aria-valuenow={character.health.current}'),'Resource should be accessible');
-assert.ok(css.includes('Pall New Standard')&&css.includes('Pall Bebas Neue'),'Supplied open-licensed fonts must be wired');
+assert.ok(source.includes('character.health')&&source.includes('isMeasured(resource.data)'),'Health bar must use real character values');
+for(const label of ['Stamina','Fatigue','Focus']) assert.ok(source.includes("label:'"+label+"'"),'Missing relevant HUD track '+label);
+assert.ok(source.includes('not tracked yet'),'Unauthored resources must be explicitly unavailable');
+assert.ok(source.includes('aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}'),'Measured resources should be accessible');
+assert.ok(css.includes('Pall Bebas Neue'),'Supplied Bebas Neue font must be wired');
+assert.ok(!css.includes("src: url('/ui-kit/fonts/new-standard-regular.otf')"),'Chromium-rejected New Standard CFF should not be loaded');
+assert.ok(css.includes('--pall-font-reading: Georgia'),'Readable fallback must remain while supplied New Standard OTF is invalid');
 assert.ok(!css.includes('/ui-kit/fonts/stranger-friz'),'Restricted personal-use font must not load');
 assert.ok(!css.includes('/ui-kit/fonts/cf-industrial'),'Non-commercial font must not load');
 assert.ok(!source.includes('stamina.current')&&!source.includes('fatigue.current'),'Do not invent resource data');
-console.log('PASS: Restrained font, logo, city, sidebar and real Health UI wiring.');
+console.log('PASS: Owner HUD tracks, tall city, licensed font fallback and measured Health wiring.');
