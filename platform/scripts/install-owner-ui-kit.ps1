@@ -15,7 +15,8 @@ Never silently copy the last two to a commercial/distributable build.
 [CmdletBinding()]
 param(
   [Parameter(Mandatory=$true)][string]$KitZip,
-  [string]$SidebarImage
+  [string]$SidebarImage,
+  [string]$AvatarDirectory
 )
 $ErrorActionPreference = 'Stop'
 if (-not (Test-Path -LiteralPath $KitZip -PathType Leaf)) { throw "UI kit ZIP not found: $KitZip" }
@@ -75,6 +76,29 @@ try {
     Copy-Item -LiteralPath $SidebarImage -Destination (Join-Path $target 'sidebar-illustration.png') -Force
   } else {
     Write-Warning "Sidebar illustration not specified: rail footer will use its original fallback until you install it."
+  }
+  if ($AvatarDirectory) {
+    if (-not (Test-Path -LiteralPath $AvatarDirectory -PathType Container)) {
+      throw "Avatar directory not found: $AvatarDirectory"
+    }
+    $portraits = @(Get-ChildItem -LiteralPath $AvatarDirectory -File |
+      Where-Object { $_.Extension -in @('.png','.webp') })
+    if ($portraits.Count -eq 0) { throw 'The avatar directory contains no PNG or WebP files.' }
+    $avatarTarget = Join-Path $target 'avatars'
+    New-Item -ItemType Directory -Path $avatarTarget -Force | Out-Null
+    foreach ($portrait in $portraits) {
+      if ($portrait.Name -cnotmatch '^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\.(png|webp)
+  Write-Host "Location: $target"
+  Write-Host 'Restart the web development server and run npm run check:web.'
+} finally {
+  if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
+}
+) {
+        throw "Invalid portrait filename: $($portrait.Name). Use one simple shared avatar ID per filename."
+      }
+      Copy-Item -LiteralPath $portrait.FullName -Destination (Join-Path $avatarTarget $portrait.Name) -Force
+    }
+    Write-Host "Installed $($portraits.Count) universal avatar portraits. None are tied to any origin."
   }
   Write-Host "The Pall UI kit installed. Licensed fonts only; no non-commercial fonts copied."
   Write-Host "Location: $target"
