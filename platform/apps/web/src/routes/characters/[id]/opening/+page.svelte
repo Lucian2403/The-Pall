@@ -5,6 +5,7 @@
   import {APPROVED_STAGE_ONE, resolveStageOneChoice, type StageOneScene} from '$lib/approved-stage-one';
   import WorkshopScene from '$lib/WorkshopScene.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import NpcConversation from '$lib/NpcConversation.svelte';
 
   type Character = {
     id: string; name: string; sex: string; origin: string;
@@ -19,6 +20,7 @@
   let visited = $state<string[]>([]);
   let takingWork = $state(false);
   let handoffError = $state('');
+  let talkingToNpc = $state(false);
   let pendingTakeRequestId: string | null = null;
 
   async function takeWorkPaper() {
@@ -111,6 +113,14 @@
       />
     {:else}
       <section class="story-scene" aria-label={scene.location + ' opening'}>
+        <button type="button" class="npc-access" onclick={() => {talkingToNpc=!talkingToNpc;}}>
+          {talkingToNpc ? 'Return to the introduction' : 'Talk to ' + scene.npc}
+        </button>
+        {#if talkingToNpc}
+          <div class="npc-card">
+            <NpcConversation origin={character.origin} close={() => {talkingToNpc=false;}} />
+          </div>
+        {:else}
         <p class="story-eyebrow">{character.origin} · {scene.npc}</p>
         {#if beat.kind === 'narration'}
           <p class="narration">{displayText}</p>
@@ -135,6 +145,7 @@
             <button class="secondary" type="button" onclick={back}>Previous line</button>
           {/if}
         </div>
+        {/if}
       </section>
     {/if}
     <p class="preview-note">Dialogue choices advance only when clicked. {character.origin === 'Millhand' ? 'Taking the work paper commits Stage 2 to your saved character.' : 'This opening remains a read-only preview.'}</p>
@@ -170,6 +181,8 @@
   .fallback h1{font-weight:normal}
   .fallback-nav{display:flex;gap:24px;flex-wrap:wrap;border-top:1px solid #574633;padding-top:20px;margin-top:22px}
   .story-scene{background:#28241f;border:1px solid #76583a;padding:clamp(20px,4vw,38px);min-height:300px}
+  .npc-access{display:block;margin:0 0 16px;background:#3f3024;color:#f0d2a6;border:1px solid #99734c;padding:9px 13px;cursor:pointer;font:14px Georgia,serif}
+  .npc-card{max-width:640px;padding:18px;background:#efdfbb;border:2px solid #654022;color:#251910}
   .story-eyebrow,.speaker{font:12px/1.5 sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#d9b88c}
   .narration{font-style:italic;font-size:19px;line-height:1.65;max-width:790px}
   .line{font-size:21px;line-height:1.55;max-width:790px}
