@@ -182,4 +182,4 @@ The **user's rules and restrained-friction calibration above are LOCKED**. **Gut
 
 **LORE**  
 **PLAYER CHOICE:** “Do the records explain what caused the Plume?”  
-**ERWIN BURO:** “I've heard several explanations. None that I'd care to enter in a proper record without proof. We have quite enough doubtful figures to deal with already.”
+**ERWIN BURO:** “I've heard several explanations. None that I'd care to enter in a proper record without proof. We don't copy rumours here.”
