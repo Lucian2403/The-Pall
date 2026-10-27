@@ -3,7 +3,7 @@ import {fromNodeHeaders} from 'better-auth/node';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
 import {auth} from './auth.js';
-import {INITIAL_PLATEWORK, WORK_ACTIONS, availableActions, advancePlatework, PlateworkInvalidAction} from '@the-pall/game-core';
+import {INITIAL_PLATEWORK, WORK_ACTIONS, availableActions, advancePlatework, PlateworkInvalidAction, AUTHORED_MISSING_STAMP_EVIDENCE, validateMissingStampEvidence} from '@the-pall/game-core';
 import type {PlateworkAction, PlateworkState} from '@the-pall/game-core';
 
 const db = new pg.Pool({connectionString: process.env.DATABASE_URL});
@@ -26,12 +26,15 @@ function parseCommand(body: unknown): Payload {
   };
 }
 function snapshot(char: CharacterState, work: PlateworkState | null) {
+  const authorized = AUTHORED_MISSING_STAMP_EVIDENCE;
+  const evidence = authorized && validateMissingStampEvidence(authorized) ? authorized : null;
   return {
     stage: char.tutorial_stage,
     tutorialStatus: char.tutorial_status,
     work: work === null ? null : {...work},
     availableActions: work === null ? [] : availableActions(work),
-    requiredNumberAuthored: false, // Don't invent unapproved municipal identifiers.
+    requiredNumberAuthored: Boolean(evidence),
+    workerNumber: evidence && work && work.phase !== 'READ_PAPER' ? evidence.workerNumber : null, // Stage 2/3 share one canonical number.
     ownership: 'employer',         // Never grant the metal/tools to player inventory.
     tutorialPayout: {coins: 0, ordinaryXp: 0, items: 0}
   };
