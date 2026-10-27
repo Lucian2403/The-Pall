@@ -173,3 +173,31 @@ assert.ok(workUi.includes('const contextualActions = $derived(selected ? availab
 assert.ok(!npcUi.includes('fetch('),'Optional dialogue must remain read-only');
 console.log('PASS: Guther approved optional dialogue and universal Millhand skip remain consistent and non-mutating.');
 
+
+// Stage 3 workshop layout: visual props must sit outside the small dialogue
+// card, and the journal must never expand the card or the illustration region.
+// The owner's transparent evidence cutouts are real items, not square UI cards.
+const stage3SceneSource = readFileSync(resolve(root,'apps/web/src/lib/MillhandMissingStampScene.svelte'),'utf8');
+const stage3DialogueEnd = stage3SceneSource.indexOf('</aside>');
+const stage3SceneEnd = stage3SceneSource.indexOf('  </div>\n  <p class="footnote">',stage3DialogueEnd);
+const journalPanelStart = stage3SceneSource.indexOf('<section id="stage-three-journal"');
+assert.ok(stage3DialogueEnd>=0 && stage3SceneEnd>stage3DialogueEnd,'Missing Stamp scene shape changed');
+assert.ok(stage3SceneSource.indexOf('<div class="evidence"')>stage3DialogueEnd,
+  'Evidence must be a separate scene-grid sibling, not overlaying dialogue from inside the illustration');
+assert.ok(stage3SceneSource.indexOf('<div class="evidence"')<stage3SceneEnd,
+  'Evidence must remain part of the workshop scene');
+assert.ok(journalPanelStart>stage3SceneEnd,
+  'Stage3 journal entries must be outside the workshop scene and NPC popup');
+assert.ok(stage3SceneSource.includes('grid-template-rows:auto minmax(195px,1fr)'),
+  'Stage3 desktop layout requires a separate evidence row beneath the dialogue');
+assert.ok(stage3SceneSource.includes('.evidence{grid-column:1;grid-row:1;'),
+  'Mobile evidence must remain over the illustration, above the dialogue');
+for(const name of ['returned-reference-plate.webp','cancellation-slip.webp']) {
+  assert.ok(stage3SceneSource.includes('/workshop/'+name),'Missing supplied Stage3 art '+name);
+}
+assert.ok(!stage3SceneSource.includes('<div class="journal-entries" aria-label'),
+  'Stage3 journal must not be nested inside the NPC dialogue box');
+assert.ok(stage3SceneSource.includes('scrollIntoView') &&
+  stage3SceneSource.includes("import {tick} from 'svelte';"),
+  'Opening the separate journal should expose it using page scrolling');
+console.log('PASS: Stage3 tabletop evidence and independent journal preserve the compact CRPG dialogue layout.');
