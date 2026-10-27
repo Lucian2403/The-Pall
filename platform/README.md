@@ -181,3 +181,31 @@ Canonical implementation order, from `docs/05-gameplay/onboarding/millhand/stage
 7. Validate Stage 2 → Stage 3 routing for an existing saved character without deleting or resetting it. Test inspections in either order, premature conversation denial, Guther line-by-line progression, three mutually exclusive commitments, mobile dialogue and signed-out/foreign-character protection.
 
 The next development work is the Stage 3 state-machine/API/UI integration under these boundaries. Do not claim the stage is complete or testable with canonical numbers and dates before those values are authored.
+
+
+### M1.5 Stage 3 implementation candidate — The Missing Stamp (2026-10-27)
+
+**Committed:** `apps/web/src/routes/characters/[id]/millhand/missing-stamp/+page.svelte` and `MillhandMissingStampScene.svelte` show the existing workshop and Guther artwork with two separate evidence hotspots, owner-approved spoken copy, player-controlled dialogue progression, the three route choices, a read-only factual journal and a way to return to optional Guther talk. The Stage 2 completion screen, character view and shared navigation now link here.
+
+**Server-owned progression:** `packages/game-core/src/millhand-missing-stamp.ts` defines the inspect-in-either-order state machine, evidence validation, nine dialogue beats (eight spoken + one narration), optional player-controlled skip directly to the three mandatory choices, three route selections, and one re-stamp action only for Industry/Hauling. The API stores state and UUID receipts in `player_character_missing_stamp`, enforces account ownership, CSRF origin, expected revision and PostgreSQL row locks. On the **first** committed route selection it increments the selected Major Skill `Industry`, `Commerce` or `Scholarship` by **exactly one level** in the existing character bonuses JSON, once only, with no additional coins, XP or inventory; Contracts and Records proceed to saved Stage 4 `NOT_STARTED`, while Industry completes a one-time worker-number restamp before saved Stage 4. Stage 4 job screens remain unimplemented.
+
+**Mandatory content gate:** `AUTHORED_MISSING_STAMP_EVIDENCE` is explicitly **null** until the owner authorises the worker number and two exact dates. The game allows saved inspections and an approved partial first-person journal, but does **not** fabricate or display numeric evidence. After both objects are inspected, a clearly non-diegetic authoring notice appears and `show_guther` remains disabled. The rest of the stage is structurally implemented and unit-tested with test-only fixtures; it cannot be completed in the running game until real approved values are set. No test fixture value is used in player-facing code. The stamped Stage 2 number was previously conceptual, so this is a cross-stage content reconciliation gate, not simply a copywriting task.
+
+**One-time local setup, from `The-Pall\platform`:**
+
+```powershell
+git pull --ff-only
+npm ci
+npm run build:packages
+npm run test:unit
+npm run check:api
+npm run check:web
+npm run build -w @the-pall/web
+npm run missing-stamp:migrate
+```
+
+Do not run a destructive reset or recreate the player's Millhand. Migration `db/migrations/0004_millhand_missing_stamp.sql` only **adds** Stage 3 state and receipt tables; Stage 2 records remain intact. Restart API and web processes after migration. To inspect the new scene, open an owned Millhand already at Stage 3 or finish Stage 2 through **Return the work paper**, then select **Continue to The Missing Stamp**.
+
+**QA sequence:** Inspect returned plate then slip (or vice versa on a different test state) and refresh after the first inspection, verify the saved record flags, journal, and missing-date authoring notice. Click Guther for optional talk, then resume without losing evidence. Check no new wages, loot or skill level appears from inspections. When actual dates and the shared worker number are approved, re-run both inspection orders, inspect both visible numbers/dates, follow or skip Guther's eight spoken lines, and test the three mutually exclusive route actions (test fixtures/unit tests cover alternate branches without resetting a real character). Check exactly one +1 Major Skill increment on the single saved branch, Stage 4 transition, no fake council inspector mark, and 401/404 for signed-out/foreign-character requests. No optional Guther conversation may mutate the saved Stage 3 revision.
+
+**Build/QA status:** Commits have been source-checked against approved dialogue, but this connector environment cannot run a local Svelte build, PostgreSQL migration or browser playtest. Treat this as an implementation candidate until local commands pass.
