@@ -17,3 +17,6 @@ export type {MissingStampState,MissingStampPhase,MissingStampAction,MissingStamp
 
 export {planMillhandRewind,MillhandRewindInvalid} from './millhand-rewind.js';
 export type {MillhandRewindPlan,MillhandRewindStage,MillhandRewindTarget} from './millhand-rewind.js';
+
+export {SECOND_JOB_ACTIONS,initialSecondJob,availableSecondJobActions,advanceSecondJob,SecondJobInvalidAction} from './millhand-second-job.js';
+export type {SecondJobState,SecondJobPhase,SecondJobAction,SecondJobChoice} from './millhand-second-job.js';
