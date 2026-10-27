@@ -5,9 +5,10 @@
   import NpcConversation from '$lib/NpcConversation.svelte';
   import {PHASE_INSTRUCTION, ACTION_LABEL, resultCopy, observeObject, type ObjectKey} from '$lib/millhand-work-copy';
 
-  let {work, available, pending, errorMessage, perform}: {
+  let {work, available, workerNumber, pending, errorMessage, perform}: {
     work: PlateworkState;
     available: readonly PlateworkAction[];
+    workerNumber: string | null;
     pending: boolean;
     errorMessage: string;
     perform: (action: PlateworkAction) => Promise<void>;
@@ -64,6 +65,7 @@
       {:else}
       <p class="heading">MARKING THE PLATES</p>
       <p class="story">{result}</p>
+      {#if workerNumber}<p class="work-number">Worker number on council work paper: {workerNumber}</p>{/if}
       {#if work.phase !== 'COMPLETE'}
         <div class="rule"></div>
         <p class="instruction">{instruction}</p>
@@ -81,7 +83,7 @@
           <p class="small">Select an object on the workbench to examine it.</p>
         {/if}
       {:else}
-        <p class="instruction">The work paper has been returned. The next chapter is not yet connected.</p>
+        <p class="instruction">The work paper has been returned. The returned council papers can now be examined in The Missing Stamp.</p>
       {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if pending}<p role="status" class="small">Saving work…</p>{/if}
@@ -122,6 +124,7 @@
     min-width:0;padding:15px 18px;border:2px solid #654022;border-radius:5px;background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .heading{font:600 11px sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
   .story{font-size:clamp(13px,1.2vw,17px);line-height:1.5;margin:0 0 12px}
+  .work-number{font:600 13px/1.4 sans-serif;color:#53331d}
   .rule{border-top:1px solid #b29c7e;margin:12px 0}
   .instruction{font-weight:600;font-size:clamp(13px,1.1vw,16px);line-height:1.4;margin:0 0 10px}
   .inspection{border-top:1px solid #bba786;padding-top:10px;font-size:14px;line-height:1.45}
