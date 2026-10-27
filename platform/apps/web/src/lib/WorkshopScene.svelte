@@ -51,6 +51,7 @@
   const readyForWork = $derived(beat.kind === 'handoff');
 
   function inspect(key: PropKey) {
+    talkingToGuther = false;
     selected = selected === key ? null : key;
   }
 </script>
