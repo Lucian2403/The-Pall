@@ -36,7 +36,7 @@
         <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {:else}
-      <p class="instruction">What do you want to ask?</p>
+      <p class="instruction">Ask Guther about:</p>
       <div class="choices">
         {#each APPROVED_GUTHER_OPTIONAL_DIALOGUE as option (option.id)}
           <button type="button" onclick={() => askGuther(option.id)}>{option.prompt}</button>
