@@ -2,6 +2,7 @@
   import type {Snippet} from 'svelte';
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
+  import './pall-owner-ui.css';
 
   type SavedCharacter = {
     id: string;
@@ -23,6 +24,8 @@
         ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
         : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
+  const healthPercent = $derived(character.health.maximum > 0
+    ? Math.max(0,Math.min(100,100 * character.health.current / character.health.maximum)) : 0);
 
   // Rewind is a development-only server capability. The live game never
   // exposes this button, even if someone manually opens an onboarding URL.
@@ -89,7 +92,7 @@
 <div class="frame" data-mode="onboarding">
   <aside class="rail" aria-label="Game navigation">
     <a class="identity" href="/characters">
-      <span class="wordmark">THE PALL</span>
+      <img class="brand-logo" src="/ui-kit/branding/logo-compact.png" alt="The Pall" width="166" height="107" />
       <span class="motto">A CITY ENDURES</span>
     </a>
     <nav class="nav-list" aria-label="Available pages">
@@ -124,7 +127,13 @@
         <span class="avatar" aria-hidden="true">{character.name.slice(0, 1).toUpperCase()}</span>
         <span class="player-label"><strong>{character.name}</strong><small>{character.origin}</small></span>
       </div>
-      <div class="stat"><span class="stat-symbol" aria-hidden="true">✚</span><span><small>Health</small><strong>{character.health.current} / {character.health.maximum}</strong></span></div>
+      <div class="stat health-stat"><span class="stat-symbol" aria-hidden="true">✚</span><span class="health-values"><small>Health</small><strong>{character.health.current} / {character.health.maximum}</strong>
+        <span class="health-track" role="progressbar" aria-label="Health" aria-valuemin="0"
+          aria-valuemax={character.health.maximum} aria-valuenow={character.health.current}>
+          <img src="/ui-kit/resources/hp-fill.png" alt="" aria-hidden="true"
+            style={'clip-path:inset(0 '+(100-healthPercent)+'% 0 0)'} />
+        </span>
+      </span></div>
       <div class="stat"><span class="stat-symbol" aria-hidden="true">◉</span><span><small>Coins</small><strong>{character.coins}</strong></span></div>
       <div class="stat stage"><span class="stat-symbol" aria-hidden="true">▣</span><span><small>Onboarding</small><strong>Stage {character.tutorial.stage} of 8</strong></span></div>
       <div class="account-link"><a href="/account" aria-label="Account settings">Account</a></div>
@@ -136,7 +145,6 @@
         <strong>Grand Cylinder City</strong>
         <small>Guided introduction · {character.origin}</small>
       </div>
-      <span class="art-note">City panorama artwork pending</span>
     </div>
 
     <div class="chapter-bar">
@@ -173,15 +181,15 @@
 
 <style>
   :global(html){width:100%;min-height:100%;margin:0;padding:0}
-  :global(body){width:100%;min-height:100%;margin:0;padding:0;background:#131312;color:#eee3d0;font-family:Georgia,'Times New Roman',serif}
+  :global(body){width:100%;min-height:100%;margin:0;padding:0;background:#131312;color:#eee3d0;font-family:var(--pall-font-reading,Georgia,serif)}
   :global(*){box-sizing:border-box}
   .frame{display:grid;grid-template-columns:230px minmax(0,1fr);width:100%;max-width:none;min-width:0;min-height:100vh;min-height:100dvh;margin:0;padding:0}
   .rail{display:flex;flex-direction:column;min-width:0;background:#171715;border:0;border-right:1px solid #56412d;border-radius:0;min-height:100%}
-  .identity{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:24px 10px 22px;min-height:126px;text-decoration:none;color:#f0dfc7;border-bottom:1px solid #715237;background:linear-gradient(160deg,#28231e,#111110);text-align:center}
-  .wordmark{font-size:32px;line-height:1.1;letter-spacing:.035em;text-shadow:0 2px #000}
-  .motto{font:10px/1.5 sans-serif;letter-spacing:.27em;color:#d0a979}
+  .identity{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px 10px;min-height:114px;text-decoration:none;color:#f0dfc7;border-bottom:1px solid #504030;background:#121211;text-align:center}
+  .brand-logo{width:94%;max-width:174px;height:auto;max-height:94px;object-fit:contain;display:block;filter:drop-shadow(0 1px 3px #0008)}
+  .motto{font:12px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.19em;color:#c09b73}
   .nav-list{display:flex;flex-direction:column;gap:1px;padding:7px}
-  .nav-entry{display:flex;align-items:center;gap:10px;min-height:43px;padding:9px 13px;color:#e9dbc7;text-decoration:none;font-size:16px;border:1px solid transparent;border-radius:3px}
+  .nav-entry{display:flex;align-items:center;gap:10px;min-height:43px;padding:9px 13px;color:#e9dbc7;text-decoration:none;font:16px/1.25 var(--pall-font-reading,Georgia,serif);border:1px solid transparent;border-radius:3px}
   a.nav-entry:hover,a.nav-entry:focus-visible{background:#2e281f;border-color:#836241}
   .nav-entry.active{background:#473426;border-color:#9a6b3d}
   .nav-icon{width:24px;text-align:center;font-family:Georgia,serif;font-size:22px;color:#ddbb88;flex-shrink:0}
@@ -189,9 +197,9 @@
   .lock{margin-left:auto;font-size:13px}
   .nav-rule{border-top:1px solid #403429;margin:8px 17px 12px}
   .locked-heading{margin:0;padding:0 19px;font:10px/1.5 sans-serif;letter-spacing:.1em;color:#aa8a62}
-  .rail-footer{margin-top:auto;min-height:125px;display:flex;flex-direction:column;justify-content:end;gap:5px;padding:19px 22px 23px;color:#c7a273;font:12px sans-serif;letter-spacing:.22em;background:linear-gradient(transparent,#24201a);line-height:1.3}
+  .rail-footer{margin-top:auto;min-height:188px;display:flex;flex-direction:column;justify-content:end;gap:3px;padding:25px 20px 17px;color:#d9b98b;font:13px/1.1 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.23em;background:linear-gradient(0deg,#100e0df2,#100e0d4a 58%,#100e0dbb),url('/ui-kit/sidebar-illustration.png') center center/cover no-repeat;background-color:#181611}
   .right{display:flex;flex-direction:column;min-width:0;min-height:100vh;min-height:100dvh;border:0;background:#1c1a18;border-radius:0}
-  .topbar{display:flex;align-items:stretch;min-height:75px;background:linear-gradient(#141413,#090a0a);border-bottom:2px solid #73543b}
+  .topbar{display:flex;align-items:stretch;min-height:72px;background:#131311;border-bottom:1px solid #574632}
   .player,.stat{display:flex;align-items:center;gap:11px;padding:11px 17px;border-right:1px solid #3e352b;min-width:0}
   .player{min-width:190px}
   .avatar{display:grid;place-items:center;width:49px;height:49px;border:1px solid #a88452;background:#332819;color:#efdab7;font-size:28px;flex-shrink:0}
@@ -199,15 +207,18 @@
   .player strong{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .player small,.stat small{font-size:12px;color:#b3a695}
   .stat strong{font-size:16px;white-space:nowrap}
+  .health-stat{min-width:166px;gap:8px}
+  .health-values{min-width:126px}
+  .health-track{display:block;position:relative;width:133px;height:17px;background:url('/ui-kit/resources/bar-empty.png') center/100% 100% no-repeat}
+  .health-track img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
   .stat-symbol{font-size:25px;color:#ddbc83;border:1px solid #554638;width:33px;height:33px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
   .account-link{margin-left:auto;display:flex;align-items:center;padding:0 15px}
   .account-link a{color:#e1bd88;font:13px sans-serif}
-  .city-banner{position:relative;min-height:140px;border-bottom:1px solid #78583a;background:radial-gradient(ellipse at 72% 95%,#75503577,transparent 60%),linear-gradient(180deg,#282b30,#34312c 58%,#131311);display:flex;align-items:end;justify-content:space-between;padding:22px 26px;gap:15px}
+  .city-banner{position:relative;min-height:143px;border-bottom:1px solid #5f4935;background:linear-gradient(90deg,#11110fd9,#14141263 38%,#17151222),url('/ui-kit/resources/TheCityVista.png') center 50%/cover no-repeat;background-color:#222321;display:flex;align-items:end;justify-content:space-between;padding:17px 23px;gap:15px}
   .banner-copy{display:flex;flex-direction:column;gap:5px;text-shadow:0 2px 2px #000}
-  .banner-overline{font:10px sans-serif;letter-spacing:.15em;color:#d1b28b}
-  .banner-copy strong{font-size:27px;font-weight:normal}
+  .banner-overline{font:13px var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.16em;color:#d3ad7c}
+  .banner-copy strong{font:normal 27px/1.1 var(--pall-font-reading,Georgia,serif)}
   .banner-copy small{font:13px sans-serif;color:#dac1a2}
-  .art-note{font:11px sans-serif;color:#baac9d;text-align:right}
   .chapter-bar{display:flex;align-items:center;gap:15px;padding:12px 18px;min-height:53px;background:#151513;border-bottom:1px solid #76543a}
   .chapter-label{display:flex;align-items:center;gap:11px;font-size:23px;min-width:0}
   .location-icon{font-size:24px;color:#d9b782}
@@ -223,11 +234,13 @@
   .mobile-nav{display:none}
   @media(max-width:1100px){
     .frame{grid-template-columns:188px minmax(0,1fr)}
-    .wordmark{font-size:27px}
     .nav-entry{padding:7px 9px;font-size:15px}
     .stat,.player{padding:10px}
     .stat-symbol{width:28px;height:28px;font-size:20px}
     .stat.stage{display:none}
+    .health-track{width:105px;height:15px}
+    .health-values{min-width:105px}
+    .health-stat{min-width:0}
     .chapter-meta{display:none}
   }
   @media(max-width:760px){
@@ -246,7 +259,6 @@
     .account-link{display:none}
     .city-banner{min-height:115px;padding:16px}
     .banner-copy strong{font-size:23px}
-    .art-note{display:none}
     .chapter-bar{padding:10px;gap:8px}
     .chapter-label{font-size:19px}
     .exit-link{font-size:11px;margin-left:auto}
