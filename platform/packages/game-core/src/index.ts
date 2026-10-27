@@ -11,3 +11,6 @@ export type {Origin, CharacterSex} from './character-creation.js';
 
 export {INITIAL_PLATEWORK, WORK_ACTIONS, WORK_ACTION_OBJECT, availableActions, advancePlatework, PlateworkInvalidAction} from './millhand-platework.js';
 export type {PlateworkState, PlateworkAction, WorkPhase, Handling, Correction} from './millhand-platework.js';
+
+export {AUTHORED_MISSING_STAMP_EVIDENCE,INITIAL_MISSING_STAMP,MISSING_STAMP_ACTIONS,MISSING_STAMP_ROUTE_SKILL,STAGE_THREE_DIALOGUE_BEAT_COUNT,availableMissingStampActions,advanceMissingStamp,validateMissingStampEvidence,MissingStampInvalidAction} from './millhand-missing-stamp.js';
+export type {MissingStampState,MissingStampPhase,MissingStampAction,MissingStampBranch,MissingStampEvidence} from './millhand-missing-stamp.js';
