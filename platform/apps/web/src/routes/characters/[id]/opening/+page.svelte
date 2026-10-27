@@ -63,6 +63,16 @@
     visited = visited.slice(0, -1);
   }
 
+  // Optional dialogue and the scripted opening can be skipped independently of
+  // the server handoff. Stage 2 still begins only when Take the work paper is
+  // committed through the existing protected POST action.
+  function skipMillhandConversation() {
+    if (character?.origin !== 'Millhand' || scene?.nodes.take?.kind !== 'handoff' || takingWork) return;
+    talkingToNpc = false;
+    nodeId = 'take';
+    visited = [];
+  }
+
   onMount(() => {
     void (async () => {
       try {
@@ -108,6 +118,7 @@
         goBack={back}
         canGoBack={visited.length > 0}
         {takeWorkPaper}
+        skipToWork={skipMillhandConversation}
         {takingWork}
         {handoffError}
       />
