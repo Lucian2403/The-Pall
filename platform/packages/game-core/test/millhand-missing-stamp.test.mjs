@@ -25,9 +25,9 @@ for(const order of [['read_cancellation_slip','turn_returned_plate'],['turn_retu
     assert.equal(s.phase,'READY_TO_SPEAK');
     assert.equal(s.slipRead,true);
     assert.equal(s.plateRead,true);
-    assert.deepEqual(availableMissingStampActions(s,null),[]);
-    assert.throws(()=>advanceMissingStamp(s,'show_guther',null),/wrong_stage_three_phase/);
+    assert.deepEqual(availableMissingStampActions(s,null),['show_guther']);
     assert.deepEqual(availableMissingStampActions(s,mock),['show_guther']);
+    assert.equal(advanceMissingStamp(s,'show_guther',null).phase,'CONFRONT');
     assert.throws(()=>advanceMissingStamp(s,order[0],mock),/wrong_stage_three_phase/);
   });
 }
@@ -59,7 +59,7 @@ for(const action of ['choose_restamp','choose_contracts','choose_records']) {
   });
 }
 
-test('The evidence gate rejects invalid dates and prevents the discrepancy proceeding',()=>{
+test('Optional future display dates are validated but never block narrative progression',()=>{
   assert.ok(validateMissingStampEvidence(mock));
   for(const bad of [
     {...mock,inspectionDate:mock.recordedDeathDate},
@@ -69,7 +69,8 @@ test('The evidence gate rejects invalid dates and prevents the discrepancy proce
   ]) {
     assert.equal(validateMissingStampEvidence(bad),false);
     const s=advanceMissingStamp(advanceMissingStamp(INITIAL_MISSING_STAMP,'read_cancellation_slip',bad),'turn_returned_plate',bad);
-    assert.deepEqual(availableMissingStampActions(s,bad),[]);
+    assert.deepEqual(availableMissingStampActions(s,bad),['show_guther']);
+    assert.equal(advanceMissingStamp(s,'show_guther',null).phase,'CONFRONT');
   }
 });
 
@@ -83,4 +84,13 @@ test('Enough talk skips confrontation but never skips choosing one of three rout
   assert.equal(s.branch,null);
   assert.deepEqual(availableMissingStampActions(s,mock),['choose_restamp','choose_contracts','choose_records']);
   assert.throws(()=>advanceMissingStamp(s,'skip_confrontation',mock),/wrong_stage_three_phase/);
+});
+
+test('A returning player already at READY_TO_SPEAK can resume without resetting inspected evidence',()=>{
+  let saved=advanceMissingStamp(INITIAL_MISSING_STAMP,'read_cancellation_slip',null);
+  saved=advanceMissingStamp(saved,'turn_returned_plate',null);
+  const restored=JSON.parse(JSON.stringify(saved));
+  assert.deepEqual(availableMissingStampActions(restored,null),['show_guther']);
+  assert.equal(advanceMissingStamp(restored,'show_guther',null).phase,'CONFRONT');
+  assert.equal(saved.revision,2);
 });
