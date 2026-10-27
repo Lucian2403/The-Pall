@@ -59,9 +59,16 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
     );
     const branch=branchFromSavedStage3(predecessor.rows[0]?.state);
     if(!branch)return reply.code(409).send({error:'stage_three_not_complete'});
-    const job=await db.query<{state:SecondJobState}>(
-      'SELECT state FROM player_character_second_job WHERE character_id=$1',[req.params.id]
-    );
+    let job;
+    try {
+      job=await db.query<{state:SecondJobState}>(
+        'SELECT state FROM player_character_second_job WHERE character_id=$1',[req.params.id]
+      );
+    } catch(e) {
+      if((e as {code?:string})?.code==='42P01')
+        return reply.code(503).send({error:'second_job_schema_missing',setup:'npm run second-job:migrate'});
+      throw e;
+    }
     if(!job.rowCount&&ch.rows[0].tutorial_stage!==4)return reply.code(409).send({error:'missing_second_job_state'});
     const state=job.rows[0]?.state??initialSecondJob(branch);
     if(state.branch!==branch || (ch.rows[0].tutorial_stage>4&&state.phase!=='DONE'))
@@ -166,6 +173,8 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
       return reply.code(200).send(result);
     }catch(e){
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original */}}
+      if((e as {code?:string})?.code==='42P01')
+        return reply.code(503).send({error:'second_job_schema_missing',setup:'npm run second-job:migrate'});
       throw e;
     }finally{client.release();}
   });
