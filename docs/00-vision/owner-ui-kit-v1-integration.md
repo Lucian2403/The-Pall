@@ -61,3 +61,28 @@ The owner's screenshot showed a Chromium OTS failure for `NewStandard-Regular.ot
 - A missing `player_character_second_job` or receipt table now yields a clear HTTP 503 migration instruction instead of opaque HTTP 500. Other 500s still need server logs; do not assume a missing table without SQLSTATE confirmation.
 
 **Local recovery:** `git pull --ff-only`, `npm run second-job:migrate`, restart the API, `npm run verify:owner-ui-kit`, `npm run check:web`, `npm run build -w @the-pall/web`, restart frontend. No data reset, asset reinstallation or font replacement necessary.
+
+## Owner correction — actual dialogue/button kit and universal avatars (2026-10-27)
+
+The first owner UI-kit pass used the logo and HUD, but failed to use the supplied dialogue frame and normal/hover/pressed button artwork. This was not the owner's requested integration. This correction now **uses the original ZIP assets**, with CSS nine-slice (`border-image-slice … fill`) for the compact CRPG dialogue panels and the playable dialogue/work-action buttons in Stages 1–4. Nine-slice preserves decorative corners while permitting long text, localization and compact mobile widths; letters and numeric data remain in HTML, not in images. Journal panels, object labels, NPC interaction hotspots and side navigation remain restrained rather than heavily ornamented.
+
+The allowed fonts now have visibly separate jobs:
+- **Bebas Neue** for dialogue headings/speaker labels and small navigation/HUD labels.
+- **Beyond Wonderland** used *only* for the Grand Cylinder City display title, not across ordinary sentences.
+- **New Standard** is still included in the owner source archive, but its original CFF OpenType file was rejected by Chromium's OTS parser. It is not requested from CSS; reading text currently uses Georgia. A valid New Standard WOFF2 or repaired OTF, supplied by the owner, can later replace this fallback.
+- **CF Industrial Fabrics** and **Stranger Friz** remain excluded due to the licenses bundled with the ZIP; do not ship or reference them for a commercial game without appropriate permissions.
+
+**Avatar contract:** User states that the game's portrait collection is shared by **all origins/backgrounds**. `CharacterAvatar.svelte` is now the shared header portrait component. Its optional `avatarId` comes from the character (not the origin, sex or home area) and selects `static/ui-kit/avatars/<avatarId>.webp` or `.png`. If there is no avatar selection or an asset is missing, the existing letter fallback remains; **the owner's avatar collection has not been uploaded in this ZIP and no portrait is invented**. Once supplied, avatar names must be stable and chosen/persisted for the player regardless of origin. The owner can install existing portrait files from a local directory with the installer optional `-AvatarDirectory` parameter. This is asset plumbing, **not yet a persistent avatar-selection UI or database migration**.
+
+For the owner's local browser, no database migration is necessary for frame/button/font changes. Do not reinstall any existing assets if they are already present; the original installer already copied the frame and all three button-state PNGs. Update the code, validate and refresh:
+
+```powershell
+git pull --ff-only
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+If avatar assets are later supplied in a dedicated folder, invoke `scripts/install-owner-ui-kit.ps1 -KitZip <your-original-zip> -AvatarDirectory <your-portrait-folder>`; WebP or PNG names must match `^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$` before the extension.
+
+**Acceptance:** On all early Millhand workshop stages, the actual brass/iron-edged parchment *dialogue frame* appears around the small NPC conversation, while the owner's beige metal-trimmed button images change with hover/press and support keyboard focus. The transparent props remain visually on the table; expanding the journal still happens separately. The city panorama, resource HUD and logo remain unchanged by this focused correction. Evaluate on desktop and mobile before extending ornamental treatment to the rest of the shell.
