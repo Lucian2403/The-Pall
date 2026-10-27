@@ -2,6 +2,14 @@
 
 **Status: APPROVED EDITORIAL CANON — REVISION 01 (2026-10-22).** Approved by the project owner after review. This revision replaces the historical Stage 3 *player-facing words* in [the original mechanical design](missing-stamp-discovery.md); the original document still governs unchanged event logic, evidence and rewards. **Approved words are not yet installed in the playable build.** This follows approved [Stage 1 Revision 02](opening-dialogue.md), approved [Stage 2 Revision 03](stage-2-approved-script.md), and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
 
+## Player-approved interaction clarification (2026-10-27)
+
+- Stage 2 plate stamping remains a **reusable physical work action**, not a player-facing digit-matching minigame. Players do not have to read, choose or enter a specific worker number during the stamping interaction.
+- The supplied transparent **cancellation slip** and **returned reference plate** are fixed artwork without required dynamic numbers/dates on their surfaces. The readable evidence is presented in the **small workshop dialogue/inspection popup**, not embedded in the art.
+- The same worker number on both Stage 3 records and the fact that the inspector's date follows the recorded death remain factual **narrative findings**. Both inspections in either order reveal the contradiction; exact calendar digits and worker-number text are not prerequisites for confronting Guther or choosing a route.
+- Until exact dates/numbers are separately authored, the popup describes the documented death, the council inspector's dated mark, and their relative order **without inventing a calendar date or printing placeholder tokens**. If exact values are later approved, show them in the popup/journal, not on the cutouts.
+- This clarification supersedes earlier content-gate statements in this document and the original mechanical notes that require literal dates/numeric identifiers before Stage 3 can advance. The nine confrontation beats, three route scripts and one-time skill award remain unchanged.
+
 ## Precise editorial critique of the previous wording
 
 1. **“This number was cancelled. Dead in the fire.”** A very abrupt bit of compressed factual dialogue that sounds like the player presenting a report. Give the actor a natural reason to draw Guther's attention and say what they discovered.
