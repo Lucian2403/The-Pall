@@ -93,3 +93,93 @@ Before accepting any dialogue, ask: **What does this speaker want now? Why use t
 ## Approval workflow
 
 The **user's rules and restrained-friction calibration above are LOCKED**. **Guther's Stage 1 Revision 02 is the currently approved opening**. All future scenes must receive careful line-by-line review for spoken cadence, character motive, specificity, period appropriateness, gratuitous jokes and artificial polish. Specific new dialogue stays PROPOSED until explicitly approved.
+
+## OPTIONAL RECURRING NPC CONVERSATIONS — DRAFT FOR OWNER REVIEW (2026-10-27)
+
+**NOT APPROVED CANON.** These optional, non-mutating exchanges are proposed for repeat visits with the six original work-hub NPCs. The player selects one of three topics; their own selected sentence is **not repeated as a separate dialogue beat**. NPC answers are concise, distinct, limited to information a worker at that location could reasonably possess and must not hint at the later Stage 3 reveal. No invented personal biography, Plume explanation, medical mechanism, promised wages or quest outcome. No reward or tutorial progress change. Until separately approved, the application labels this entire conversation set **DRAFT**.
+
+**UI rules:** NPC itself is always clickable when visually present; in text-only origin views provide a Talk control. The conversation opens in the existing small CRPG dialogue panel and can close to the same job state. No nested scrollbars, auto-advance, player-line echo or dialogue-based progression flag. Exact dialogue pending owner review:
+
+### Millhand — Guther Anvil (Smithing Foreman)
+
+**WORK**  
+**PLAYER CHOICE:** “What other work comes through here?”  
+**GUTHER ANVIL:** “Council plates today. Repairs another day. The benches don't stand empty for long. Getting the council to sign for the work, that's another matter.”
+
+**CITY**  
+**PLAYER CHOICE:** “What's work like in Grand Cylinder City?”  
+**GUTHER ANVIL:** “There's heat and power from the Grand Cylinder, and plenty that needs making or mending. Doesn't mean the men doing it get paid when they ought to.”
+
+**LORE**  
+**PLAYER CHOICE:** “What do you know about the Plume?”  
+**GUTHER ANVIL:** “There were ruptures. Bad air, dust, people driven out of their homes. That's what I've been told. I can't tell you why it happened.”
+
+### Bellrunner — Hector D. Smoke (Dispatch Master)
+
+**WORK**  
+**PLAYER CHOICE:** “What do you handle at the Dispatch House?”  
+**HECTOR D. SMOKE:** “I sort the rounds and record when the runners take them. The notices go out, the receiving marks come back. If something's late, I want to know where it was held.”
+
+**CITY**  
+**PLAYER CHOICE:** “Does every part of the city send notices here?”  
+**HECTOR D. SMOKE:** “Not every part. We've enough with shift notices and the rounds given to this house. A workshop changes its hours, somebody has to tell the workers.”
+
+**LORE**  
+**PLAYER CHOICE:** “Do the runners go into the Pall?”  
+**HECTOR D. SMOKE:** “Not on these rounds. The roads beyond the protected land get harder to follow. I deal with routes I can send somebody along and check when they return.”
+
+### Squatter — Benny Ben (Herb Dealer)
+
+**WORK**  
+**PLAYER CHOICE:** “Why are you so particular about the herbs?”  
+**BENNY BEN:** “Because I want some growing next year. Take every stem and root now, and what do you expect me to sell when the next season comes?”
+
+**CITY**  
+**PLAYER CHOICE:** “Where can plants still grow near the city?”  
+**BENNY BEN:** “Out in the protected land there are farms and little patches that people haven't cleared. Some herbs still grow there. We ought to look after them.”
+
+**LORE**  
+**PLAYER CHOICE:** “What about the living things farther out?”  
+**BENNY BEN:** “I worry about them. The plants and animals can't do anything about what happened to the land. I don't know what's survived beyond the Grey Marches, but I hope some of it has.”
+
+### Stitcher — Claudia Cyka (Matron)
+
+**WORK**  
+**PLAYER CHOICE:** “What do you expect from someone working here?”  
+**CLAUDIA CYKA:** “Change the dressings properly. Watch the wounds. Tell me when something is wrong. I can examine the patient, but I can't do your work and mine.”
+
+**CITY**  
+**PLAYER CHOICE:** “Are the other city infirmaries like this one?”  
+**CLAUDIA CYKA:** “I don't run the other infirmaries. Here, we have patients to attend and not enough clean linen. If you'd rather compare buildings, do it after the ward round.”
+
+**LORE**  
+**PLAYER CHOICE:** “Can you tell when an illness comes from the Pall?”  
+**CLAUDIA CYKA:** “I can examine a patient. I can tell you what I find. I'm not putting a cause to it merely because somebody mentions the Pall.”
+
+### Scrapper — Ignatius Smog (Yard Foreman)
+
+**WORK**  
+**PLAYER CHOICE:** “What's worth keeping from old machinery?”  
+**IGNATIUS SMOG:** “Good metal. Plates, fittings, anything we can use again. The broken pieces go on the heap. Don't mix the two, or I'll have to sort it myself.”
+
+**CITY**  
+**PLAYER CHOICE:** “Does the city send much machinery to this yard?”  
+**IGNATIUS SMOG:** “Enough old iron to keep us busy. Pumps, stands, broken fittings. People still need the metal once the machines are finished with.”
+
+**LORE**  
+**PLAYER CHOICE:** “What do you know about the land beyond the walls?”  
+**IGNATIUS SMOG:** “Not enough to tell you where to walk. I've got machines to strip here. Ask somebody who makes those journeys, not a man standing in a scrap yard.”
+
+### Inkbound — Erwin Buro (Senior Copy Clerk)
+
+**WORK**  
+**PLAYER CHOICE:** “What does a senior copying clerk do?”  
+**ERWIN BURO:** “I check that the books are copied properly and that the work is fit to send out. A mistake costs paper, and paper costs money. That's rather more than merely writing neatly.”
+
+**CITY**  
+**PLAYER CHOICE:** “What do you think of the city's offices?”  
+**ERWIN BURO:** “Some have fine rooms and proper furnishings. Ours is rather more modest. Still, the books must be right. Respectability isn't a matter of having a grand desk.”
+
+**LORE**  
+**PLAYER CHOICE:** “Do the records explain what caused the Plume?”  
+**ERWIN BURO:** “I've heard several explanations. None that I'd care to enter in a proper record without proof. We have quite enough doubtful figures to deal with already.”
