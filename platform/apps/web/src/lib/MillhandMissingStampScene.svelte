@@ -191,8 +191,6 @@
   .record{margin:12px 0;padding:12px;border:1px solid #a88f6d;background:#e5d1a9;font:13px/1.4 sans-serif}
   .record strong{font-size:12px;letter-spacing:.04em}
   .record p{margin:6px 0}
-  .content-gate{margin:12px 0;padding:12px 14px;border:1px solid #936f4a;background:#d8c3a0;font:13px/1.5 sans-serif}
-  .content-gate p{margin:7px 0 0}
   .hint,.skill{font:12px/1.45 sans-serif;color:#614e39}
   .journal{border-top:1px solid #b79d7b;margin-top:18px;padding-top:10px}
   .journal-toggle{padding:7px 9px;background:#d8c7a7;border:1px solid #81654d;color:#3a281b;cursor:pointer;font:12px sans-serif}
