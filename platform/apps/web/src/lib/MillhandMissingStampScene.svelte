@@ -27,7 +27,7 @@
   let journalOpen=$state(false);
   const state=$derived(snapshot.state);
   const beat=$derived(MISSING_STAMP_CONFRONTATION[state.dialogueIndex]??null);
-  const journal=$derived(missingStampJournal(state,snapshot.finding));
+  const journal=$derived(missingStampJournal(state,snapshot.finding,snapshot.slip,snapshot.plate));
   const branchCopy=$derived(state.branch?MISSING_STAMP_ROUTES[state.branch]:null);
   const canAct=(a:MissingStampAction)=>snapshot.availableActions.includes(a)&&!pending;
   async function inspect(which:'slip'|'plate'){
