@@ -69,7 +69,7 @@
 </section>
 
 <style>
-  .conversation {width:100%;min-width:0;color:#2b1d13;font-family:Georgia,'Times New Roman',serif}
+  .conversation {width:100%;min-width:0;color:#2b1d13;font-family:var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
   .review-note{font:10px/1.4 sans-serif;letter-spacing:.06em;color:#855334;margin:0 0 8px}
   .name{font:bold 13px/1.4 sans-serif;color:#523522;margin:0 0 12px}
   .name span{font-weight:normal;color:#674f37}
@@ -77,7 +77,7 @@
   .instruction{font:14px/1.45 sans-serif;margin:6px 0 12px}
   .choices{display:flex;flex-direction:column;gap:6px}
   .choices button{width:100%;border:1px solid #624b35;background:#241d16;color:#f5e3c8;text-align:left;cursor:pointer;
-    padding:10px 12px;min-height:40px;font:14px/1.4 Georgia,serif}
+    padding:10px 12px;min-height:40px;font:14px/1.4 var(--pall-font-reading,Georgia,serif)}
   .choices .work-skip{background:#493321;border-color:#a07a4b}
   .choices button:hover,.choices button:focus-visible{background:#503927;outline:2px solid #d9a76e;outline-offset:1px}
 </style>
