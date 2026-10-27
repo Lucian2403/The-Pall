@@ -1,8 +1,9 @@
 /**
  * Millhand Stage 3 - owner-approved Missing Stamp mechanics.
  * Canon: docs/05-gameplay/onboarding/millhand/stage-3-approved-script.md
- * No dates or worker number are authored yet. A content gate blocks Guther's
- * comparison and branch choice until the same valid evidence is supplied.
+ * Stampwork is a reusable physical interaction, not a number-matching puzzle.
+ * The date contradiction is narrative evidence: exact digits and dates can
+ * be authored later in the popup, but they never block Stage 3 progression.
  * UI dialogue text stays in approved-stage-three.ts; this is only state.
  */
 export type MissingStampBranch = 'restamp' | 'contracts' | 'records';
@@ -19,8 +20,9 @@ export type MissingStampEvidence = Readonly<{
   inspectionDate: string;
 }>;
 
-// Data gate. ONLY replace this null with owner-authorised values validated by
-// validateMissingStampEvidence. Tests use isolated fictional fixtures, never canon.
+// Optional display-only record detail. No player-supplied number or date;
+// exact values are not required for the already-approved narrative finding.
+// If later authored, use the same value on both records and Stage 2 display.
 export const AUTHORED_MISSING_STAMP_EVIDENCE: MissingStampEvidence | null = null;
 
 export function validateMissingStampEvidence(e: MissingStampEvidence): boolean {
@@ -68,8 +70,7 @@ export function availableMissingStampActions(
       if (!s.plateRead) actions.push('turn_returned_plate');
       return actions;
     }
-    case 'READY_TO_SPEAK':
-      return evidence && validateMissingStampEvidence(evidence) ? ['show_guther'] : [];
+    case 'READY_TO_SPEAK': return ['show_guther'];
     case 'CONFRONT': return ['continue_dialogue','skip_confrontation'];
     case 'DECISION': return ['choose_restamp', 'choose_contracts', 'choose_records'];
     case 'RESTAMP': return ['restamp_worker_number'];
