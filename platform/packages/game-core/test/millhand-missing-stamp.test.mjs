@@ -72,3 +72,15 @@ test('The evidence gate rejects invalid dates and prevents the discrepancy proce
     assert.deepEqual(availableMissingStampActions(s,bad),[]);
   }
 });
+
+test('Enough talk skips confrontation but never skips choosing one of three routes',()=>{
+  let s=advanceMissingStamp(INITIAL_MISSING_STAMP,'turn_returned_plate',mock);
+  s=advanceMissingStamp(s,'read_cancellation_slip',mock);
+  s=advanceMissingStamp(s,'show_guther',mock);
+  assert.deepEqual(availableMissingStampActions(s,mock),['continue_dialogue','skip_confrontation']);
+  s=advanceMissingStamp(s,'skip_confrontation',mock);
+  assert.equal(s.phase,'DECISION');
+  assert.equal(s.branch,null);
+  assert.deepEqual(availableMissingStampActions(s,mock),['choose_restamp','choose_contracts','choose_records']);
+  assert.throws(()=>advanceMissingStamp(s,'skip_confrontation',mock),/wrong_stage_three_phase/);
+});
