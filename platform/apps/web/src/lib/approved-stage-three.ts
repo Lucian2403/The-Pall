@@ -74,7 +74,7 @@ export function missingStampJournal(
       '. It had a separate council inspector\'s mark dated '+plate.inspectionDate+'.');
   if(evidence && state.slipRead && state.plateRead)
     entries.push('The two records have the same worker number as one of the plates I stamped. The inspection date came after the recorded death.');
-  if(state.phase==='CONFRONT'||state.phase==='DECISION'||state.branch!==null)
+  if(state.phase==='DECISION'||state.branch!==null)
     entries.push('I showed Guther the records. He could not explain the dates. He would not approve the disputed lot, and the council had not paid us.');
   if(state.branch==='restamp')
     entries.push('I chose to stamp the worker number again and deliver the lot to the depot. The inspector\'s mark is not part of my work.');
