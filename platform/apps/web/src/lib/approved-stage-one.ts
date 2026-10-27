@@ -52,7 +52,7 @@ export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
         "kind": "narration"
       },
       "opening": {
-        "text": "The council's sent more plates. Worker numbers again. Read that paper before you touch the stamps.",
+        "text": "Hey, [player name]. I see you standing idle. Feels good, does it? Not to me! Come here. I've got work for you. The council's sent more plates. Worker numbers again.",
         "next": "options",
         "kind": "speech",
         "speaker": "Guther"
