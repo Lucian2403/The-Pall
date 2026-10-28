@@ -80,3 +80,16 @@ The owner previously supplied `Commerce_Workshop.png` as the **shared Commerce l
 **Important canon distinction:** The supplied art says **Death Register** and **Wage Record**, while the approved Commerce route discusses sealed **compensation** and **contract-charge** records. The UI does not pretend the printed titles have changed and does not rewrite or fabricate the approved sealed-record facts. The books are visual props only; the comparison's authoritative content stays in the previously approved stage script. Confirm this visual/narrative distinction in the owner's browser review before treating the books as final representations of the two sealed entries.
 
 **Local verification:** Extract `The_Pall_Stage4_Commerce_Asset_Patch.zip` relative to `The-Pall/platform`. Run `npm run verify:commerce-art`, `npm run verify:stage-four`, `npm run check:web` and `npm run build -w @the-pall/web`. No migration or new character. The shared Commerce background should be reused when future Commerce locations are implemented, subject to their actual approved context.
+
+
+## Commerce direct-book interaction correction (2026-10-28)
+
+Owner review of the in-browser Contracts office: the two actual book cutouts must **perform** the first two evidence tasks, not merely open optional inspection captions while the parchment dialogue supplies "Examine the work paper" and "Compare the two official records" shortcuts.
+
+The revised `MillhandContractsScene.svelte` requires a deliberate two-step sequence:
+1. While the persisted Commerce phase is `EXAMINE_PAPER`, the player clicks the **Death Register** itself. This invokes the existing server-authoritative `examine_work_paper` action; the Wage Record does not advance the phase.
+2. Only on the following `COMPARE_RECORDS` phase, the player separately clicks the **Wage Record**. This invokes the existing `compare_official_records` action; rechecking the Death Register does not advance the phase.
+
+The two text-action buttons are hidden during these phases. Wrong clicks provide ordinary short feedback and cause **no** network action or state change. Later Contracts Clerk conversation, both dispute choices, journal, payouts and saved route remain exactly as approved. The two physically clickable asset images and their 1.8% hover remain unchanged; there is no auto-selection or auto-advance after choosing the first book.
+
+The existing canonical source file and state action identifiers remain unchanged; scene-specific instructions describe interaction with the two owner-provided books while the underlying approved work-paper and sealed compensation/charge findings remain server-owned. No new illustrated props, dates or worker numbers are fabricated. Test both click orders (including wrong-first/wrong-second), refresh between actions, and verify persistent progression only after the correct book is chosen.
