@@ -264,7 +264,7 @@
   .stat-symbol{font-size:19px;color:#ddbc83;flex-shrink:0}
   .account-link{display:flex;align-items:center;padding:0 10px}
   .account-link a{color:#e1bd88;font:12px sans-serif}
-  .city-banner{position:relative;min-height:clamp(245px,26vw,335px);border-bottom:1px solid #5f4935;
+  .city-banner{position:relative;min-height:clamp(160px,17vw,225px);border-bottom:1px solid #5f4935;
     background:linear-gradient(90deg,#11110fb8,#14141223 43%,#1715120a 75%),
       url('/ui-kit/resources/TheCityVista.png') center 12%/cover no-repeat;
     background-color:#222321;display:flex;align-items:end;justify-content:space-between;padding:22px 26px;gap:15px}
@@ -318,7 +318,7 @@
     .meter-label{font-size:12px}
     .meter-number{font-size:10px}
     .resource-track{height:15px}
-    .city-banner{min-height:205px;padding:18px;background-position:center,center 12%}
+    .city-banner{min-height:152px;padding:16px;background-position:center,center 12%}
     .banner-copy strong{font-size:23px}
     .chapter-bar{padding:7px 9px;gap:7px}
     .chapter-label{font-size:16px}
