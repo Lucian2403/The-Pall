@@ -33,6 +33,22 @@ for(const name of files) assert.ok(scene.includes('/locations/contracts/'+name),
 assert.ok(scene.includes("onclick={() => inspect('death')}")&&
   scene.includes("onclick={() => inspect('wage')}"),
   'Both owner register images must be directly clickable');
+assert.ok(scene.includes("state.phase==='EXAMINE_PAPER'") &&
+  scene.includes("which==='death' && snapshot.availableActions.includes('examine_work_paper')") &&
+  scene.includes("void perform('examine_work_paper')"),
+  'First evidence step must be completed by choosing the Death Register itself');
+assert.ok(scene.includes("state.phase==='COMPARE_RECORDS'") &&
+  scene.includes("which==='wage' && snapshot.availableActions.includes('compare_official_records')") &&
+  scene.includes("void perform('compare_official_records')"),
+  'Second evidence step must require a separate click on the Wage Record');
+assert.ok(scene.includes("state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'") &&
+  scene.includes('Select a book on the counter to examine it.') &&
+  scene.includes("{:else if snapshot.availableActions.length>0}"),
+  'Do not expose dialogue action buttons for either record-inspection step');
+assert.ok(scene.includes("if(pending)return") &&
+  scene.includes("inspectionNote='This is the later record.") &&
+  scene.includes("inspectionNote='You have already examined this book."),
+  'Wrong or repeated book clicks must give feedback without committing server actions');
 assert.ok(scene.includes('scale(1.018)'),'Commerce books should share the subtle hover effect');
 assert.ok(!scene.includes('/workshop/council-work.webp') &&
   !scene.includes('class="work-surface"') &&
@@ -49,5 +65,5 @@ if(missing){
   console.error('Extract The_Pall_Stage4_Commerce_Asset_Patch.zip from the platform directory.');
   process.exitCode=1;
 }else{
-  console.log('PASS: Owner Commerce background and exactly two book assets are installed and wired.');
+  console.log('PASS: Commerce uses two physical book choices, correct ordering and no evidence-action buttons.');
 }

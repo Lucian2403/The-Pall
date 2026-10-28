@@ -21,17 +21,48 @@
   const speaking=$derived(state.phase==='CONTRACTS_DIALOGUE');
   const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.contracts[state.dialogueIndex]:null);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
-  const instruction=$derived(STAGE_FOUR_INSTRUCTIONS[state.phase]);
+  const instruction=$derived(
+    state.phase==='EXAMINE_PAPER'
+      ? 'You have the disputed work paper. Check the register on the counter.'
+      : state.phase==='COMPARE_RECORDS'
+        ? 'Compare the second book with what you have just examined.'
+        : STAGE_FOUR_INSTRUCTIONS[state.phase]
+  );
   const journal=$derived(secondJobJournal(state));
 
   // Only two owner-supplied physical props. The approved compensation/charge
   // comparison remains in the dialogue, not painted onto these book images.
   let inspected=$state<'death'|'wage'|null>(null);
+  let inspectionNote=$state<string|null>(null);
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
 
+  // Each record must be physically selected. The existing server-owned actions
+  // remain authoritative; clicking the wrong book never performs one.
   function inspect(which:'death'|'wage'){
-    inspected=inspected===which?null:which;
+    if(pending)return;
+    inspected=which;
+    if(state.phase==='EXAMINE_PAPER'){
+      if(which==='death' && snapshot.availableActions.includes('examine_work_paper')){
+        inspectionNote=null;
+        void perform('examine_work_paper');
+      }else{
+        inspectionNote='This is the later record. First check the worker’s earlier entry.';
+      }
+      return;
+    }
+    if(state.phase==='COMPARE_RECORDS'){
+      if(which==='wage' && snapshot.availableActions.includes('compare_official_records')){
+        inspectionNote=null;
+        void perform('compare_official_records');
+      }else{
+        inspectionNote='You have already examined this book. Compare its entry with the other record.';
+      }
+      return;
+    }
+    inspectionNote=which==='death'
+      ? 'An open council register with ruled pages worn by use.'
+      : 'An open council wage book with rows prepared for written entries.';
   }
   async function toggleJournal(){
     journalOpen=!journalOpen;
@@ -48,13 +79,13 @@
     <div class="record-props" aria-label="Books on the Contracts office counter">
       <button type="button" class="record-prop death" class:chosen={inspected==='death'}
         aria-pressed={inspected==='death'} aria-label="Inspect the Death Register"
-        onclick={() => inspect('death')}>
+        disabled={pending} onclick={() => inspect('death')}>
         <img src="/locations/contracts/death-register.webp" alt="" aria-hidden="true"/>
         <span>Death register</span>
       </button>
       <button type="button" class="record-prop wage" class:chosen={inspected==='wage'}
         aria-pressed={inspected==='wage'} aria-label="Inspect the Wage Record"
-        onclick={() => inspect('wage')}>
+        disabled={pending} onclick={() => inspect('wage')}>
         <img src="/locations/contracts/wage-record.webp" alt="" aria-hidden="true"/>
         <span>Wage record</span>
       </button>
@@ -82,19 +113,20 @@
         {/if}
       {/if}
 
-      {#if inspected}
+      {#if inspectionNote && inspected}
         <div class="inspection" aria-live="polite">
           <strong>{inspected==='death'?'Death register':'Wage record'}</strong>
-          <p>{inspected==='death'
-            ? 'An open council register, with ruled pages worn by use.'
-            : 'An open council wage book, with rows prepared for written entries.'}</p>
+          <p>{inspectionNote}</p>
         </div>
       {/if}
 
-      {#if snapshot.availableActions.length>0}
+      {#if state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'}
+        <p class="prop-hint">Select a book on the counter to examine it.</p>
+      {:else if snapshot.availableActions.length>0}
         <div class="actions" aria-label="Available Contracts actions">
           {#each snapshot.availableActions as action (action)}
-            <button type="button" disabled={pending} onclick={() => {inspected=null;void perform(action);}}>
+            <button type="button" disabled={pending}
+              onclick={() => {inspected=null;inspectionNote=null;void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
             </button>
           {/each}
@@ -172,6 +204,9 @@
   .inspection{border-top:1px solid #b69b74;margin:9px 0;padding-top:9px;
     font:13px/1.4 sans-serif;color:#493021}
   .inspection strong{color:#2b1c12}
+  .prop-hint{font:600 13px/1.4 var(--pall-font-reading,Georgia,serif);
+    color:#513927;margin:12px 0 0}
+  .record-prop:disabled{cursor:wait}
   .inspection p{margin:4px 0 0}
   .actions{display:flex;flex-direction:column;gap:7px;margin:13px 0 0}
   .actions button{width:100%;min-height:44px;box-sizing:border-box;
