@@ -71,8 +71,9 @@ try {
     $pythonExe = $python.Source
   }
 
-  & $pythonExe @arguments -c 'import fontTools, brotli' 2>$null
-  if ($LASTEXITCODE -ne 0) {
+  # Probe without writing an import traceback to PowerShell's error stream.
+  $hasTools = & $pythonExe @arguments -c "import importlib.util; print(int(all(importlib.util.find_spec(n) is not None for n in ('fontTools','brotli'))))"
+  if ($LASTEXITCODE -ne 0 -or $hasTools -ne '1') {
     Write-Host 'Installing Python fonttools and brotli for the one-time local New Standard conversion…'
     & $pythonExe @arguments -m pip install --user fonttools brotli --disable-pip-version-check
     if ($LASTEXITCODE -ne 0) {
