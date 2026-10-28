@@ -25,8 +25,11 @@ for(const name of files){
 }
 assert.ok(scene.includes('evidencePage===1') &&
   scene.includes('class="record-illustration"') &&
-  scene.includes('max-height:min(34vh,325px)'),
+  scene.includes('max-height:240px'),
   'Owner record images must appear only in the compact second inspection page');
+assert.ok(scene.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
+  scene.includes('class="scene-footer"'),
+  'The evidence pages must be scrollbar-free, with journal actions outside their popup');
 assert.ok(scene.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
   scene.includes('snapshot.plate.workerNumber || snapshot.plate.inspectionDate'),
   'If real numbers or dates are authored, use live data instead of stale printed placeholders');
