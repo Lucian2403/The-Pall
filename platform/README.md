@@ -464,3 +464,24 @@ npm run build -w @the-pall/web
 Install Python 3 if the font installer reports that it is missing; the converter is designed to run only on the owner-supplied font file. Stop on a failed install; do not hide a failing converter by silently loading the original malformed OTF. Restart the web server and refresh. **No database migration or character reset is needed.**
 
 **Upcoming audio gate:** Once the owner's depot scene / this Stage 3 presentation is accepted in the running browser, start a small first sound batch: workshop forge ambience, metal-stamp/hammer impacts, paper interactions and depot machinery/yard ambience. Prefer clean, loopable WAV source (or OGG if already mastered) with separate action cues. Do not wire global music or voiced NPC dialogue without their own design approval.
+
+### Owner fonts — direct WOFF2 installation (supersedes Python conversion, 2026-10-28)
+
+**Current requirement:** The owner can supply **New Standard Regular as a genuine TrueType-outline WOFF2**. The originally supplied `NewStandard-Regular.otf` is OpenType/CFF and fails Chromium's OTS `CFF CharStrings INDEX` validation. Repacking that same broken CFF in a WOFF2 wrapper will not fix it. The corrected export must have TrueType quadratic outlines (WOFF2 header signature `wOF2`, sfnt flavor `0x00010000`). The supplied Bebas Neue archive already has working TTF choices; Beyond Wonderland is permitted under its supplied readme. CF Industrial Fabrics and Stranger Friz are not included because the supplied licenses restrict commercial use.
+
+**The previous Python/fonttools converter installation instructions are obsolete.** The replacement `scripts/install-owner-fonts.ps1` accepts `-NewStandardWoff2` directly and performs no font conversion or Python/pip installation.
+
+Once the owner provides `NewStandard-Regular.woff2` and saves it to Downloads, run this from `The-Pall\platform`:
+
+```powershell
+git pull --ff-only
+powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-fonts.ps1 `
+  -NewStandardWoff2 "$env:USERPROFILE\Downloads\NewStandard-Regular.woff2"
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+**If the Bebas/Beyond fonts need reinstalling too**, add `-KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip"` to that same font installer command. The full UI kit installer also accepts `-NewStandardWoff2` and passes it through. The install script checks that the file is actually a TrueType-outline WOFF2 rather than a renamed/CFF OTF. A browser rendering check is still needed to confirm the font looks correct.
+
+Until the corrected WOFF2 is supplied, the game's reading font falls back to Georgia. This is safe, but `verify:owner-ui-kit` will report the missing font file rather than claiming installation success. No Python, character reset or database migration is needed for typography changes.
