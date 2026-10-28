@@ -188,8 +188,9 @@ assert.ok(stage3SceneSource.indexOf('<div class="evidence"')<stage3SceneEnd,
   'Evidence must remain part of the workshop scene');
 assert.ok(journalPanelStart>stage3SceneEnd,
   'Stage3 journal entries must be outside the workshop scene and NPC popup');
-assert.ok(stage3SceneSource.includes('grid-template-rows:auto minmax(195px,1fr)'),
-  'Stage3 desktop layout requires a separate evidence row beneath the dialogue');
+assert.ok(stage3SceneSource.includes('grid-template-rows:minmax(0,1fr) 178px') &&
+  stage3SceneSource.includes('height:clamp(700px,76vh,810px)'),
+  'Stage3 scene must have a fixed desktop composition independent of dialogue content');
 assert.ok(stage3SceneSource.includes('.evidence{grid-column:1;grid-row:1;'),
   'Mobile evidence must remain over the illustration, above the dialogue');
 for(const name of ['returned-reference-plate.webp','cancellation-slip.webp']) {
@@ -200,6 +201,38 @@ assert.ok(!stage3SceneSource.includes('<div class="journal-entries" aria-label')
 assert.ok(stage3SceneSource.includes('scrollIntoView') &&
   stage3SceneSource.includes("import {tick} from 'svelte';"),
   'Opening the separate journal should expose it using page scrolling');
+assert.ok(stage3SceneSource.includes('let evidencePage=$state(0)') &&
+  stage3SceneSource.includes("inspectedView=which;\n    evidencePage=0;"),
+  'Each item inspection must restart its authored local reading sequence');
+assert.ok(stage3SceneSource.includes("evidencePage===0") &&
+  stage3SceneSource.includes("evidencePage===1") &&
+  stage3SceneSource.includes("evidencePage=2;"),
+  'Stage3 must show observation, record and contradiction on separate Continue pages');
+const firstPart=stage3SceneSource.indexOf("evidencePage===0");
+const recordPart=stage3SceneSource.indexOf("evidencePage===1",firstPart);
+const findingPart=stage3SceneSource.indexOf("<!-- Part 3:",recordPart);
+const firstServerAction=stage3SceneSource.indexOf("perform('show_guther')",firstPart);
+assert.ok(firstPart>=0&&recordPart>firstPart&&findingPart>recordPart&&firstServerAction>findingPart,
+  'Show Guther action is gated to the final evidence page');
+assert.ok(stage3SceneSource.includes('evidencePage=1;') &&
+  stage3SceneSource.includes('evidencePage=2;') &&
+  !stage3SceneSource.includes("perform('continue_dialogue');}}\n                Continue"),
+  'Local evidence page changes must not mutate the server or dialogue revision');
+assert.ok(stage3SceneSource.includes('clip-path:inset(0 0 44% 0)'),
+  'Guther must be cropped above the painted table edge');
+assert.ok(stage3SceneSource.includes("background:#49301d") &&
+  stage3SceneSource.includes("color:#fff1d7"),
+  'Stage3 route labels must remain high contrast on the supplied button art');
+for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
+  const scene=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
+  assert.ok(scene.includes('height:clamp(700px,76vh,810px)') &&
+    scene.includes('clip-path:inset(0 0 44% 0)'),
+    component+' must keep Guther/table composition fixed with a foreground crop');
+  assert.ok(scene.includes('max-height:calc(100% - 48px)'),
+    component+' must keep abnormally long dialogue from resizing the workshop');
+}
+console.log('PASS: Stage3 authored evidence pages, high-contrast routes and stable Guther/workbench composition.');
+
 console.log('PASS: Stage3 tabletop evidence and independent journal preserve the compact CRPG dialogue layout.');
 
 
