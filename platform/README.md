@@ -509,3 +509,21 @@ Restart Vite afterward. An equivalent alternative is `-NewStandardOtf "C:\\path\
 **Licensing:** New Standard embeds SIL OFL 1.1; the original Bebas Neue archive also includes OFL, and Beyond Wonderland is permitted by its supplied readme. The newly uploaded CF Industrial Fabrics TTF explicitly says *free for personal use, commercial use requires purchase* in its name metadata. The Stranger Friz family was accompanied by a *personal use only* notice in the original ZIP. Neither restricted family is imported into a build without the owner's appropriate commercial licenses.
 
 The font binaries supplied to the chat are only inspected, **not distributed** as downloadable artifacts or committed to GitHub.
+
+
+### Fonts without the original UI kit ZIP — standalone OTF workflow (2026-10-28)
+
+The owner no longer has the original `The-Pall-UI-Kit-v1.zip`, but supplied `NewStandard-Regular.otf` directly in the conversation. **The ZIP is not required** for updating New Standard. Save that exact owner-uploaded attachment to a Windows directory (such as Downloads), then run from `The-Pall\\platform`:
+
+```powershell
+git pull --ff-only
+powershell -ExecutionPolicy Bypass -File .\\scripts\\install-owner-fonts.ps1 `
+  -NewStandardOtf "$env:USERPROFILE\\Downloads\\NewStandard-Regular.otf"
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+The script converts the original OpenType/CFF file to a TrueType-outline WOFF2 with Node/npm in a Windows temporary directory; **no Python or original ZIP needed**. It leaves the already installed UI logo, frames, buttons, Bebas Neue and Beyond Wonderland unchanged. If the entire UI kit was deleted (not just the ZIP), these other assets must be restored separately—this standalone-font command cannot recover missing artwork or missing Bebas files.
+
+The other uploaded standalone fonts do not replace the New Standard source. CF Industrial Fabrics and Stranger Friz remain excluded because of their supplied personal/non-commercial licenses. Do not share font binaries through GitHub or the conversation. The converted WOFF2 is installed only in the owner's local static asset directory; full browser success awaits local testing. On a conversion error, stop and return the installer output so the converter itself can be corrected.
