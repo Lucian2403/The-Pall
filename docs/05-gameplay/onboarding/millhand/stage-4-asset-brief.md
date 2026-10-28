@@ -41,3 +41,16 @@
 - `stage4-archive-environment.webp`, `stage4-archive-assistant.webp`, `stage4-death-register.webp`, `stage4-wage-record.webp`, `stage4-scraped-page.webp`, `stage4-shift-book.webp`
 
 **Review gate:** Owner approves the art and physically plausible object placements before this temporary Stage 4 layout becomes visual canon. Do not turn placeholder cards into a permanent game scene.
+
+
+## Depot background received and wired — 2026-10-28
+
+**Owner asset received:** Municipal depot receiving-yard panorama (`depot_background.png`, 1774×887). A faithful WebP conversion (`depot-background.webp`, 263 KB) is packaged in `The_Pall_Stage4_Depot_Asset_Patch.zip` under `apps/web/static/locations/depot/`. It is used only for the **Industry / Hauling** branch, after the player chooses a transport method and reaches the depot.
+
+**Location continuity:** Before the delivery, Stage 4 still uses the existing Guther workshop environment for `CHECK_LOAD` and `CHOOSE_TRANSPORT`, matching the approved A02 sequence. After the transport choice, the depot artwork replaces that background for `COMPARE_DELIVERY`, `SPEAK_DEPOT`, `DEPOT_DIALOGUE`, `CHOOSE_RECEIPT`, `COMPLETE_DELIVERY` and `DONE`. The chapter location heading changes accordingly. No premature travel or additional work-stage state mutations occur.
+
+**Props now:** The existing individually transparent `metal-plates.webp` and `council-work.webp` are reused as clickable objects laid on the supplied workbench / receiving counter. Their labels contain text only. The depot action list and CRPG popup handle the separate delivery list and receiving record; **new illustration assets for those two papers are not necessary for the current playable route**. The four schematic glyph tiles have been removed from the Industry scene. The Depot Clerk still speaks via approved dialogue without a made-up portrait; a distinct owner-approved clerk asset would improve later visual polish, but does not block this implementation. No fabricated names, worker numbers, calendar dates, goods categories, seals or loot.
+
+**Installation gate:** GitHub commits contain the Svelte components and verification only; large user-supplied artwork binaries are not in the repository. Extract the generated owner asset ZIP into the local `The-Pall/platform` directory (not `platform/apps/web`) preserving the `apps/web/static/locations/depot/depot-background.webp` path. Verify with `npm run verify:depot-art`. The scene cannot display its image until the static file is locally installed.
+
+**Preserved user copy:** The owner pushed small dialogue edits. This update did not replace `approved-stage-four.ts` or its canonical script. Stage 2's repeated poor-stamping observation is corrected only by suppressing an instruction when identical to the saved action result; all source strings remain unchanged.
