@@ -96,19 +96,35 @@
           {:else if inspectedView && evidencePage===1}
             <!-- Part 2: the record itself. Identifiers stay in UI, not painted on art. -->
             {#if inspectedView==='slip' && snapshot.slip}
-              <div class="record" aria-label="Cancellation slip">
-                <strong>CANCELLATION SLIP</strong>
-                <p>Recorded as: Dead after a workshop fire with locked doors.</p>
-                <p>Worker number: {snapshot.slip.workerNumber ?? 'Present on the original record'}</p>
-                <p>Recorded death date: {snapshot.slip.recordedDeathDate ?? 'Dated in the council record'}</p>
-              </div>
+              {#if snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate}
+                <!-- Actual authored values must remain live text, never conflict
+                     with the generic wording painted on the owner's artwork. -->
+                <div class="record" aria-label="Cancellation slip">
+                  <strong>CANCELLATION SLIP</strong>
+                  <p>Recorded as: Dead after a workshop fire with locked doors.</p>
+                  <p>Worker number: {snapshot.slip.workerNumber ?? 'Present on the original record'}</p>
+                  <p>Recorded death date: {snapshot.slip.recordedDeathDate ?? 'Dated in the council record'}</p>
+                </div>
+              {:else}
+                <figure class="record-illustration">
+                  <img src="/workshop/cancellation-slip-record.webp"
+                    alt="Cancellation slip. Recorded as dead after a workshop fire with locked doors. Worker number present on the original record. Death date recorded in the council record." />
+                </figure>
+              {/if}
             {:else if inspectedView==='plate' && snapshot.plate}
-              <div class="record" aria-label="Returned reference plate">
-                <strong>RETURNED REFERENCE PLATE</strong>
-                <p>Worker number: {snapshot.plate.workerNumber ?? 'Stamped into the plate'}</p>
-                <p>Council inspector's mark: Present, separate from your stamping.</p>
-                <p>Inspection date: {snapshot.plate.inspectionDate ?? 'Dated beside the mark'}</p>
-              </div>
+              {#if snapshot.plate.workerNumber || snapshot.plate.inspectionDate}
+                <div class="record" aria-label="Returned reference plate">
+                  <strong>RETURNED REFERENCE PLATE</strong>
+                  <p>Worker number: {snapshot.plate.workerNumber ?? 'Stamped into the plate'}</p>
+                  <p>Council inspector's mark: Present, separate from your stamping.</p>
+                  <p>Inspection date: {snapshot.plate.inspectionDate ?? 'Dated beside the mark'}</p>
+                </div>
+              {:else}
+                <figure class="record-illustration">
+                  <img src="/workshop/returned-reference-plate-record.webp"
+                    alt="Returned reference plate. Worker number stamped into the metal. Council inspector's mark present. Inspection date stamped beside the mark." />
+                </figure>
+              {/if}
             {/if}
             {#if snapshot.finding}
               <div class="choices">
@@ -258,6 +274,11 @@
   .route{display:block;width:fit-content;max-width:100%;box-sizing:border-box;
     margin-top:5px;padding:2px 8px;background:#49301d;border:1px solid #63472a;
     color:#fff1d7;font:600 12px/1.45 sans-serif;opacity:1;text-shadow:none}
+  /* Owner's printed evidence art replaces the beige information cards.
+     Preserve aspect ratio and keep the existing three-page dialogue height. */
+  .record-illustration{margin:7px 0 9px;max-width:100%;text-align:center}
+  .record-illustration img{display:block;width:100%;height:auto;
+    max-height:min(34vh,325px);object-fit:contain;filter:drop-shadow(0 3px 5px #291b1533)}
   .record{margin:12px 0;padding:12px;border:1px solid #a88f6d;background:#e5d1a9;font:13px/1.4 sans-serif}
   .record strong{font-size:12px;letter-spacing:.04em}
   .record p{margin:6px 0}
