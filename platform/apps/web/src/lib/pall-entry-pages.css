@@ -1,0 +1,48 @@
+/* Shared restrained art direction for introduction, roster and background choice.
+ * Avoid skinning the onboarding sidebar, header, or footer until the owner
+ * supplies their dedicated assets. Canonical story copy is never in CSS.
+ */
+:root{--entry-ink:#ebdcc4;--entry-warm:#dfb47a;--entry-line:#785a3a}
+.entry-page{min-height:100vh;box-sizing:border-box;padding:clamp(14px,2.5vw,32px);
+  background:#151616;color:var(--entry-ink);font-family:var(--pall-font-reading,Georgia,serif)}
+.entry-page *{box-sizing:border-box}
+.entry-wrap{max-width:1340px;margin:0 auto}
+.entry-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:7px 0 14px;border-bottom:1px solid #775636}
+.entry-nav .brand{display:flex;align-items:center;text-decoration:none;gap:13px;color:#e8d3b1}
+.entry-nav .brand img{width:100px;max-height:67px;object-fit:contain;filter:drop-shadow(0 1px 2px #000)}
+.entry-nav .brand span{font:16px/1 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.14em}
+.entry-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.entry-links a{color:#e6c493;text-decoration:none;font:600 15px/1.3 var(--pall-font-reading,Georgia,serif)}
+.entry-links a:hover{text-decoration:underline}
+.entry-hero{position:relative;overflow:hidden;min-height:clamp(205px,21vw,310px);
+  background:linear-gradient(90deg,#131311df,#13131142 55%,#1313110b),
+    url('/ui-kit/resources/TheCityVista.png') center 26%/cover no-repeat;
+  border:1px solid #65492e;border-top:0;display:flex;align-items:end;padding:24px 30px}
+.entry-hero h1{margin:5px 0 0;color:#f4e4c8;
+  font:600 clamp(29px,3vw,44px)/1.15 var(--pall-font-reading,Georgia,serif);
+  text-shadow:0 2px 4px #090604}
+.entry-eyebrow{display:block;color:#dfba83;font:15px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.13em;text-transform:uppercase}
+.entry-content{padding:clamp(19px,2.4vw,32px);border:1px solid #65503a;border-top:0;background:#211f1bdc}
+.entry-content h2{color:#f3dec0;margin:0 0 12px;font:600 27px/1.2 var(--pall-font-reading,Georgia,serif)}
+.entry-content p{line-height:1.58}
+.entry-muted{color:#c7b69e;font-size:15px}
+.entry-button,.entry-content .entry-button{display:inline-flex;align-items:center;justify-content:center;
+  min-height:39px;padding:9px 15px;text-decoration:none;
+  background:#423020;border:1px solid #a88559;color:#f2d2a4;
+  font:600 15px/1.25 var(--pall-font-reading,Georgia,serif);cursor:pointer}
+.entry-button:hover,.entry-button:focus-visible{background:#62442a;border-color:#dfb47d}
+.entry-button:disabled{opacity:.55;cursor:default}
+.entry-danger{background:#342522;border-color:#985b48;color:#efc8b6}
+.entry-danger:hover,.entry-danger:focus-visible{background:#64352c}
+.entry-divider{border:0;border-top:1px solid #5c4936;margin:24px 0}
+.entry-action-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.entry-error{color:#ffd1b8;font:600 14px/1.45 var(--pall-font-reading,Georgia,serif)}
+.entry-page :focus-visible{outline:2px solid #f1c78e;outline-offset:3px}
+@media(max-width:650px){
+ .entry-nav .brand img{width:75px}
+ .entry-nav .brand span{display:none}
+ .entry-links{gap:12px}
+ .entry-hero{padding:16px;min-height:190px}
+ .entry-content{padding:16px}
+}
