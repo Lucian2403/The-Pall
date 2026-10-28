@@ -17,7 +17,7 @@ const STARTING_LOCATIONS: Record<string, string> = {
   Inkbound: 'Civic Copying Office'
 };
 const columns = `id, name, sex, origin, str, dex, intel, res, max_health, current_health,
-  coins, major_skill_bonuses, starter_item_requirements, starting_location, tutorial_stage, tutorial_status, created_at`;
+  coins, major_skill_bonuses, starter_item_requirements, starting_location, tutorial_stage, tutorial_status, avatar_id, created_at`;
 
 type CharacterRow = {
   id: string; name: string; sex: string; origin: string;
@@ -25,12 +25,12 @@ type CharacterRow = {
   max_health: number; current_health: number; coins: string | number;
   major_skill_bonuses: Record<string, number>;
   starter_item_requirements: {name: string; quantity: number}[];
-  starting_location: string; tutorial_stage: number; tutorial_status: string; created_at: Date;
+  starting_location: string; tutorial_stage: number; tutorial_status: string; avatar_id: string|null; created_at: Date;
 };
 
 function serialize(row: CharacterRow) {
   return {
-    id: row.id, name: row.name, sex: row.sex, origin: row.origin,
+    id: row.id, name: row.name, sex: row.sex, origin: row.origin, avatarId: row.avatar_id,
     attributes: {STR: row.str, DEX: row.dex, INT: row.intel, RES: row.res},
     health: {current: row.current_health, maximum: row.max_health},
     coins: Number(row.coins),
@@ -96,7 +96,7 @@ export function registerCharacterRoutes(app: FastifyInstance) {
     }
     const hash = createHash('sha256').update(JSON.stringify({
       name: cmd.name, nameKey: cmd.nameKey, origin: cmd.origin,
-      sex: cmd.sex, expectedRevision: cmd.expectedRevision
+      sex: cmd.sex, avatarId: cmd.avatarId, expectedRevision: cmd.expectedRevision
     })).digest('hex');
     const client = await pool.connect();
     let committed = false;
@@ -132,15 +132,15 @@ export function registerCharacterRoutes(app: FastifyInstance) {
       const inserted = await client.query(
         `INSERT INTO player_characters
         (id, account_id, name, name_key, sex, origin, str, dex, intel, res, max_health, current_health, coins,
-         major_skill_bonuses, starter_item_requirements, starting_location, tutorial_stage, tutorial_status)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11,$12,$13::jsonb,$14::jsonb,$15,1,'NOT_STARTED')
+         major_skill_bonuses, starter_item_requirements, starting_location, tutorial_stage, tutorial_status, avatar_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11,$12,$13::jsonb,$14::jsonb,$15,1,'NOT_STARTED',$16)
          RETURNING ${columns}`,
         [
           id, session.user.id, cmd.name, cmd.nameKey, cmd.sex, cmd.origin,
           APPROVED_STARTING_FACTS.attributes.STR, APPROVED_STARTING_FACTS.attributes.DEX,
           APPROVED_STARTING_FACTS.attributes.INT, APPROVED_STARTING_FACTS.attributes.RES,
           APPROVED_STARTING_FACTS.maximumHealth, APPROVED_STARTING_FACTS.startingCoins,
-          JSON.stringify(bonuses), JSON.stringify(requirements), STARTING_LOCATIONS[cmd.origin]
+          JSON.stringify(bonuses), JSON.stringify(requirements), STARTING_LOCATIONS[cmd.origin], cmd.avatarId
         ]
       );
       const response = {revision: revision + 1, character: serialize(inserted.rows[0] as CharacterRow)};
@@ -161,5 +161,81 @@ export function registerCharacterRoutes(app: FastifyInstance) {
     } finally {
       client.release();
     }
+  }); 
+  // Every destructive action is account-owned and serialized against the same
+  // account roster revision as creation. No foreign key cascade is assumed.
+  app.delete<{Params:{id:string}}>('/api/characters/:id',async(request,reply)=>{
+    const session=await auth.api.getSession({headers:fromNodeHeaders(request.headers)});
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!CHARACTER_UUID.test(request.params.id))return reply.code(404).send({error:'not_found'});
+    const origin=request.headers.origin;
+    if(origin && origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
+      return reply.code(403).send({error:'invalid_origin'});
+    if(!request.headers['content-type']?.toLowerCase().startsWith('application/json'))
+      return reply.code(415).send({error:'json_required'});
+    const body=request.body;
+    if(!body||typeof body!=='object'||Array.isArray(body)||
+       Object.keys(body).sort().join(',')!=='confirmedName,expectedRevision')
+      return reply.code(400).send({error:'invalid_body'});
+    const {confirmedName,expectedRevision}=body as {confirmedName:unknown;expectedRevision:unknown};
+    if(typeof confirmedName!=='string'||!Number.isSafeInteger(expectedRevision)||(expectedRevision as number)<0)
+      return reply.code(400).send({error:'invalid_body'});
+    const client=await pool.connect();let open=false;
+    try{
+      await client.query('BEGIN');open=true;
+      await client.query('INSERT INTO player_character_account_state(account_id) VALUES ($1) ON CONFLICT DO NOTHING',[session.user.id]);
+      const state=await client.query<{revision:string}>('SELECT revision FROM player_character_account_state WHERE account_id=$1 FOR UPDATE',[session.user.id]);
+      const character=await client.query<{name:string}>('SELECT name FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',[request.params.id,session.user.id]);
+      if(!character.rowCount){await client.query('ROLLBACK');open=false;return reply.code(404).send({error:'not_found'});}
+      if(Number(state.rows[0].revision)!==expectedRevision){
+        await client.query('ROLLBACK');open=false;
+        return reply.code(409).send({error:'stale_revision',currentRevision:Number(state.rows[0].revision)});
+      }
+      if(character.rows[0].name!==confirmedName){
+        await client.query('ROLLBACK');open=false;return reply.code(400).send({error:'confirmation_mismatch'});
+      }
+      // Child rows have ON DELETE RESTRICT. Explicitly clear only this owned
+      // character's receipts and chapter states, then its creation receipts.
+      for(const table of [
+        'player_character_second_job_receipts','player_character_second_job',
+        'player_character_missing_stamp_receipts','player_character_missing_stamp',
+        'player_character_work_receipts','player_character_platework',
+        'player_character_create_receipts'
+      ]){
+        const field=table==='player_character_create_receipts'?'character_id':'character_id';
+        await client.query('DELETE FROM '+table+' WHERE '+field+'=$1',[request.params.id]);
+      }
+      const removed=await client.query('DELETE FROM player_characters WHERE id=$1 AND account_id=$2',[request.params.id,session.user.id]);
+      if(removed.rowCount!==1)throw Error('character_delete_race');
+      await client.query('UPDATE player_character_account_state SET revision=revision+1 WHERE account_id=$1',[session.user.id]);
+      await client.query('COMMIT');open=false;
+      return {deleted:true,revision:Number(state.rows[0].revision)+1};
+    }catch(err){
+      if(open){try{await client.query('ROLLBACK');}catch{}}
+      if((err as {code?:string})?.code==='23503')return reply.code(409).send({error:'character_in_use'});
+      throw err;
+    }finally{client.release();}
   });
+
+  app.patch<{Params:{id:string}}>('/api/characters/:id/avatar',async(request,reply)=>{
+    const session=await auth.api.getSession({headers:fromNodeHeaders(request.headers)});
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!CHARACTER_UUID.test(request.params.id))return reply.code(404).send({error:'not_found'});
+    const origin=request.headers.origin;
+    if(origin && origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
+      return reply.code(403).send({error:'invalid_origin'});
+    if(!request.headers['content-type']?.toLowerCase().startsWith('application/json'))
+      return reply.code(415).send({error:'json_required'});
+    const body=request.body;
+    if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).join(',')!=='avatarId')
+      return reply.code(400).send({error:'invalid_body'});
+    const avatarId=(body as {avatarId:unknown}).avatarId;
+    const character=await pool.query<{sex:string}>('SELECT sex FROM player_characters WHERE id=$1 AND account_id=$2',[request.params.id,session.user.id]);
+    if(!character.rowCount)return reply.code(404).send({error:'not_found'});
+    if(typeof avatarId!=='string'||!new RegExp('^'+character.rows[0].sex.toLowerCase()+'-0[1-8]$').test(avatarId))
+      return reply.code(400).send({error:'invalid_avatar'});
+    await pool.query('UPDATE player_characters SET avatar_id=$3 WHERE id=$1 AND account_id=$2',[request.params.id,session.user.id,avatarId]);
+    return {avatarId};
+  });
+
 }
