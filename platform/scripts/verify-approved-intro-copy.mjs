@@ -218,19 +218,36 @@ assert.ok(stage3SceneSource.includes('evidencePage=1;') &&
   stage3SceneSource.includes('evidencePage=2;') &&
   !stage3SceneSource.includes("perform('continue_dialogue');}}\n                Continue"),
   'Local evidence page changes must not mutate the server or dialogue revision');
-assert.ok(stage3SceneSource.includes('clip-path:inset(0 0 40% 0)'),
-  'Guther must be cropped above the painted table edge');
+assert.ok(stage3SceneSource.includes('class="environment bench-foreground"') &&
+  stage3SceneSource.includes('clip-path:inset(70% 0 0 0)') &&
+  !stage3SceneSource.includes('.guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:'),
+  'Stage 3 must occlude Guther with the matching foreground workshop table, not cut his apron with a horizontal mask');
 assert.ok(stage3SceneSource.includes("background:#49301d") &&
   stage3SceneSource.includes("color:#fff1d7"),
   'Stage3 route labels must remain high contrast on the supplied button art');
 for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
   const scene=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
   assert.ok(scene.includes('height:clamp(700px,76vh,810px)') &&
-    scene.includes('clip-path:inset(0 0 40% 0)'),
-    component+' must keep Guther/table composition fixed with a foreground crop');
+    scene.includes('bench-foreground') &&
+    scene.includes('clip-path:inset(70% 0 0 0)'),
+    component+' must keep a fixed composition and use the real foreground workbench to occlude Guther');
   assert.ok(scene.includes('max-height:calc(100% - 48px)'),
     component+' must keep abnormally long dialogue from resizing the workshop');
 }
+// Real tabletop hitboxes must cover the image, not only the text label.
+for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
+  const source=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
+  assert.ok(source.includes('height:37%')&&source.includes('height:44%'),
+    component+' must provide large transparent object hit areas, including the hammer');
+  assert.ok(source.includes('scale(1.018)')&&source.includes('160ms ease-out'),
+    component+' must use a restrained non-layout-shifting hover enlargement');
+  assert.ok(!source.includes('<WorkshopObjectIcon')&&!source.includes('class="pin"'),
+    component+' tabletop object labels should contain names only, without miniature icons or pins');
+  assert.ok(source.includes('aria-label=')&&source.includes('aria-pressed='),
+    component+' object interactions must remain keyboard and screen-reader accessible');
+}
+assert.ok(stage3SceneSource.includes('.evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}'),
+  'Stage3 inspection art must have the same subtle hover response');
 console.log('PASS: Stage3 authored evidence pages, high-contrast routes and stable Guther/workbench composition.');
 
 console.log('PASS: Stage3 tabletop evidence and independent journal preserve the compact CRPG dialogue layout.');
