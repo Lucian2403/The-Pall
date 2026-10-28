@@ -95,7 +95,7 @@
 <style>
   .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
-    flex:0 0 auto;align-content:start;width:100%;min-width:0;height:clamp(700px,76vh,810px);min-height:0;grid-template-rows:minmax(0,1fr);background:#291d15}
+    flex:0 0 auto;align-content:start;width:100%;min-width:0;height:clamp(535px,62vh,640px);min-height:0;grid-template-rows:minmax(0,1fr);background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;pointer-events:none;z-index:1}
