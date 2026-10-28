@@ -32,11 +32,9 @@
     await tick();
     if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
   }
-  const sceneObjects=$derived(state.branch==='restamp'
-    ? ['Numbered metal plates','Council work paper','Delivery list','Receiving record']
-    : state.branch==='contracts'
-      ? ['Work paper','Compensation record','Contract-charge record','Council seals']
-      : ['Death register','Wage records','Scraped line','Shift book']);
+  // The generic schematic is now limited to the as-yet-unillustrated
+  // Investigation route. Depot and Contracts have their own physical scenes.
+  const sceneObjects=['Death register','Wage records','Scraped line','Shift book'] as const;
 </script>
 
 {#if state.branch==='restamp'}
