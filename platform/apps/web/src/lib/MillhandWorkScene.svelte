@@ -64,8 +64,8 @@
       <p class="heading">MARKING THE PLATES</p>
       <p class="story">{result}</p>
       {#if work.phase !== 'COMPLETE'}
-        <div class="rule"></div>
         {#if instruction !== result}
+          <div class="rule"></div>
           <p class="instruction">{instruction}</p>
         {/if}
         {#if selected}
