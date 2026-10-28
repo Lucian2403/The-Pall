@@ -165,4 +165,27 @@ console.log('PASS: Scholarship records room and three deliberate inspections ret
 
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
+const sharedJournalCss=read('apps/web/src/lib/pall-owner-ui.css');
+assert.ok(sharedJournalCss.includes("font:600 16px/1.55 var(--pall-font-reading") &&
+  sharedJournalCss.includes("font:600 15px/1.3 var(--pall-font-reading") &&
+  sharedJournalCss.includes("color:#24160e"),
+  'Journal body and controls must use the owner's reading face with strong dark-ink contrast');
+for(const name of [
+  'MillhandDepotScene.svelte','MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
+]){
+  const scene=read('apps/web/src/lib/'+name);
+  assert.ok(scene.includes('font:600 15px/1.3 var(--pall-font-reading') &&
+    scene.includes('font:600 16px/1.55 var(--pall-font-reading') &&
+    scene.includes('color:#24160e'),
+    name+' must style journal buttons and prose with New Standard and high contrast');
+  assert.ok(scene.includes("journalOpen?'Close journal':'Review journal'"),
+    name+' must preserve the existing journal toggle interaction');
+}
+const missingStampJournal=read('apps/web/src/lib/MillhandMissingStampScene.svelte');
+assert.ok(missingStampJournal.includes('font:600 15px/1.3 var(--pall-font-reading') &&
+  missingStampJournal.includes('font:600 16px/1.55 var(--pall-font-reading') &&
+  missingStampJournal.includes('color:#24160e'),
+  'Stage3 journal must match the Stage4 text and button typography');
+console.log('PASS: Stage3 and all Stage4 journals share dark readable text and owner-typeface controls.');
+
 console.log('PASS: Stage4 approved dialogue, three jobs, persistent/owned API, navigation and rewind boundaries.');
