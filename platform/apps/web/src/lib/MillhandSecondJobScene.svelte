@@ -79,7 +79,7 @@
         {:else if state.phase==='SPEAK_DEPOT' || state.phase==='CHOOSE_RECEIPT'}
           <p class="context">Workers? You've hauled a bloody load of metal plates all the way here. Not a single man. What the hell are they playing at?</p>
         {:else if state.phase==='SPEAK_CONTRACTS'||state.phase==='CHOOSE_CHALLENGE'}
-          <p class="context">One sealed record lists the worker as dead for compensation. Another lists him as active for contract charges.</p>
+          <p class="context">Dead in one record, working in the other. How the bloody hell does that make sense?</p>
         {:else if state.phase==='SPEAK_ARCHIVE'||state.phase==='CHOOSE_SOURCE'||state.phase==='RECORD_FINDING'}
           <p class="context">The later wage record contains the worker's number. Part of a handwritten entry has been scraped away.</p>
         {/if}

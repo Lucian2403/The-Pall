@@ -53,7 +53,7 @@ export const STAGE_FOUR_INSTRUCTIONS:Record<SecondJobPhase,string>={
   COMPLETE_DELIVERY:'Complete the delivery.',
   EXAMINE_PAPER:'Read the council work paper and find the worker number and seals.',
   COMPARE_RECORDS:'Compare the two official records.',
-  SPEAK_CONTRACTS:'Ask the clerk how the two entries can both be accepted.',
+  SPEAK_CONTRACTS:'Ask the clerk how both records got accepted.',
   CONTRACTS_DIALOGUE:'Speak with the Contracts Clerk.',
   CHOOSE_CHALLENGE:'Decide how to challenge the two entries.',
   SUBMIT_DISPUTE:'Submit the disputed work paper.',
@@ -101,7 +101,7 @@ export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
   request_delivery_correction:'You ask the clerk to check the incorrect goods entry before signing. The clerk reviews the papers and acknowledges that the depot received metal plates. The original entry remains unexplained.',
   complete_delivery:'The depot staff take the plates. The receipt records metal plates, not workers. You have not received any wages.',
   examine_work_paper:'You find the worker number, the council seal and the office responsible for the contract. The clerk brings out the related records.',
-  compare_official_records:'In the compensation record the worker is entered as dead. In the contract-charge record the same worker is entered as active. Both records have council seals.',
+  compare_official_records:'You put the two records side by side. Same worker number on both. One says the man\'s dead, for compensation. The other still has him down as working, with contract charges against his name. And both have council seals.',
   request_seal_check:'The clerk checks how the two records were entered. Both entries appear in the council records with their seals. The clerk cannot explain the difference.',
   mark_conflicting_entries:'You mark the two entries and the difference between them. The clerk records your complaint but changes neither entry.',
   submit_dispute:'The clerk records that the complaint has been received. Both entries remain unchanged. The council has not approved the plate lot, and you are not paid.',
@@ -115,7 +115,7 @@ export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
 
 export const STAGE_FOUR_FINAL={
   restamp:'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
-  contracts:'The clerk records your complaint, but neither sealed entry is changed. The council still hasn\'t approved the plate lot, and you won\'t be paid for the work. There\'s nothing more the clerk can do for you here. You leave the Contracts office.',
+  contracts:'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You leave the Contracts office, pissed off and empty-handed.',
   records:'The number continued to be used in wage records after the recorded death. Part of an entry had been scraped. Who changed it and why remain unknown.'
 } as const;
 

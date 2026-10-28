@@ -78,7 +78,7 @@
           <p class="instruction">{instruction}</p>
         {/if}
         {#if state.phase==='SPEAK_CONTRACTS'||state.phase==='CHOOSE_CHALLENGE'}
-          <p class="context">One sealed record lists the worker as dead for compensation. Another lists him as active for contract charges.</p>
+          <p class="context">Dead in one record, working in the other.</p>
         {/if}
       {/if}
 

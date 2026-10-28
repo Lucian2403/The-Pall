@@ -1,0 +1,93 @@
+{
+  "environment.webp": {
+    "from": "download.webp",
+    "originalDimensions": [
+      1774,
+      887
+    ],
+    "outputDimensions": [
+      1774,
+      887
+    ],
+    "sha256": "d6db21055c66bc0e30bcf16966445fd653147add7a9ca3b5bbb9a490bff10bd5",
+    "size": 143558
+  },
+  "guther-front.webp": {
+    "from": "GutherAnvil_front.png",
+    "originalDimensions": [
+      1024,
+      1536
+    ],
+    "outputDimensions": [
+      1008,
+      1515
+    ],
+    "sha256": "c093db627e692925d43737a255c8394acd23a25671382c5edad98166fb5c58da",
+    "size": 163818
+  },
+  "guther-back.webp": {
+    "from": "GutherAnvil_back.png",
+    "originalDimensions": [
+      1024,
+      1536
+    ],
+    "outputDimensions": [
+      945,
+      1498
+    ],
+    "sha256": "d5dc5f7adee4468541428a6523cae9c9dbaf7045fa4e21b8ecf3eadc059dd827",
+    "size": 199092
+  },
+  "number-stamps.webp": {
+    "from": "numberStamps.png",
+    "originalDimensions": [
+      1254,
+      1254
+    ],
+    "outputDimensions": [
+      530,
+      502
+    ],
+    "sha256": "062fe7ff59d1c23ecf93a66ca3179fc5e6620b7978dba4e1d6c4634d8f4289a1",
+    "size": 59030
+  },
+  "metal-plates.webp": {
+    "from": "workshop_stock_plates_v01.png",
+    "originalDimensions": [
+      767,
+      444
+    ],
+    "outputDimensions": [
+      620,
+      346
+    ],
+    "sha256": "6ccf30b168fa522552856d19582ebd33ff437bddade49b5bd07853165451a322",
+    "size": 59794
+  },
+  "council-work.webp": {
+    "from": "councilWork.png",
+    "originalDimensions": [
+      1254,
+      1254
+    ],
+    "outputDimensions": [
+      550,
+      501
+    ],
+    "sha256": "c48d3a2cec2f00654ccc598735ec286258ffe56eb611e97a4c4b06642b633701",
+    "size": 45954
+  },
+  "hammer.webp": {
+    "from": "hammer_hover.png",
+    "originalDimensions": [
+      1254,
+      1254
+    ],
+    "outputDimensions": [
+      560,
+      561
+    ],
+    "sha256": "a27ed0fde656386e3bf02031634d3d51f5cb3dd19a0b0c51c8a7e2ec642fad8b",
+    "size": 41118
+  }
+}
