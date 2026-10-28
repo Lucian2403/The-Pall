@@ -259,6 +259,17 @@ for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
 }
 assert.ok(stage3SceneSource.includes('.evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}'),
   'Stage3 inspection art must have the same subtle hover response');
+const ownerSkin=readFileSync(resolve(root,'apps/web/src/lib/pall-owner-ui.css'),'utf8');
+assert.ok(stage3SceneSource.includes('margin:0 0 clamp(89px,10vh,112px)') &&
+  stage3SceneSource.includes('margin:0 0 clamp(32px,7vw,54px)'),
+  'Stage3 evidence artwork and click targets must sit on the bench at desktop and mobile widths');
+assert.ok(ownerSkin.includes('color:#21150e') &&
+  ownerSkin.includes('font-weight:600') &&
+  ownerSkin.includes('font:600 15px/1.35 var(--pall-font-reading'),
+  'CRPG dialogue and choice text must use dark ink and a readable weight with owner typography');
+assert.ok(ownerSkin.includes('.choices > button .route') &&
+  ownerSkin.includes('color:#fff1d7'),
+  'Secondary route plaques must retain their light-on-dark contrast');
 console.log('PASS: Stage3 authored evidence pages, high-contrast routes and stable Guther/workbench composition.');
 
 console.log('PASS: Stage3 tabletop evidence and independent journal preserve the compact CRPG dialogue layout.');
