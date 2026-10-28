@@ -97,7 +97,7 @@
     flex:0 0 auto;align-content:start;width:100%;min-width:0;height:clamp(700px,76vh,810px);min-height:0;grid-template-rows:minmax(0,1fr);background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-  .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 44% 0);pointer-events:none;z-index:1}
+  .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 40% 0);pointer-events:none;z-index:1}
   .npc-hotspot{position:absolute;z-index:3;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;
     justify-content:center;padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
   .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px/1.3 sans-serif;text-shadow:0 1px #000}
@@ -138,7 +138,7 @@
     .scene{display:flex;flex-direction:column;flex:0 0 auto;height:auto;min-height:0}
     .illustration{position:relative;inset:auto;width:100%;aspect-ratio:4 / 3}
     .environment{object-position:39% center}
-    .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 44% 0)}
+    .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 40% 0)}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
     .npc-label{font-size:10px}
     .object-art.stamps{width:26%;height:24%;left:0;bottom:9%}
