@@ -189,7 +189,7 @@ assert.ok(stage3SceneSource.indexOf('<div class="evidence"')<stage3SceneEnd,
 assert.ok(journalPanelStart>stage3SceneEnd,
   'Stage3 journal entries must be outside the workshop scene and NPC popup');
 assert.ok(stage3SceneSource.includes('grid-template-rows:minmax(0,1fr) 178px') &&
-  stage3SceneSource.includes('height:clamp(700px,76vh,810px)'),
+  stage3SceneSource.includes('height:clamp(610px,68vh,690px)'),
   'Stage3 scene must have a fixed desktop composition independent of dialogue content');
 assert.ok(stage3SceneSource.includes('.evidence{grid-column:1;grid-row:1;'),
   'Mobile evidence must remain over the illustration, above the dialogue');
@@ -243,7 +243,7 @@ assert.ok(stage3SceneSource.includes("background:#49301d") &&
   'Stage3 route labels must remain high contrast on the supplied button art');
 for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
   const scene=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
-  assert.ok(scene.includes('height:clamp(700px,76vh,810px)') &&
+  assert.ok(scene.includes('height:clamp(535px,62vh,640px)') &&
     scene.includes('bench-foreground') &&
     scene.includes('clip-path:inset(70% 0 0 0)'),
     component+' must keep a fixed composition and use the real foreground workbench to occlude Guther');
