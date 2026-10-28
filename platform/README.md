@@ -575,3 +575,25 @@ Restart the frontend and refresh your existing Commerce-route character; no data
 **Editorial distinction:** The artwork is explicitly titled *Death Register* and *Wage Record*. The approved Commerce dispute's two sealed records are **compensation** and **contract-charge** entries, not those two book titles. The physical books are shown under their real visual names, and the approved comparison is presented in dialogue without changing its lore. The owner can decide later whether these are the permanent visual objects for this route; do not invent replacement record types or change the approved script to make the images fit.
 
 Static source and artwork pixel checks have been performed. A local Svelte compile, API transaction and browser layout test have not been run through the GitHub connector.
+
+
+### Millhand Stage 4 — Scholarship / Investigation records room (2026-10-28)
+
+The **Ledger Reconciliation** route is now implemented using the owner's `Scholarship_workshop.png` records-room background, faithfully converted to lossless WebP and supplied as `The_Pall_Stage4_Scholarship_Asset_Patch.zip`. Extract relative to `The-Pall\\platform`. The image will be installed as `apps/web/static/locations/records/records-room.webp`.
+
+The two clickable book props reuse `/locations/contracts/death-register.webp` and `/locations/contracts/wage-record.webp` from the previously installed Commerce asset pack, with no new duplicate book images. First select Death Register, then select Wage Record, then select Wage Record **again** to examine the damaged entry. These are three distinct, server-persisted actions; incorrect book clicks do not advance progress. No stage-evidence shortcut buttons appear inside the parchment. After these, the approved Archive Assistant dialogue and two alternate source checks remain in the popup. The final saved action records the finding and reaches Stage 5. The ruined line and shift book are described in the script; no visual contents, worker ID or dates are fabricated.
+
+The existing Depot and Commerce scenes and their approved scripts are unchanged. No new migration, wages, ordinary XP, possessions or skill increase.
+
+**Install and check from `The-Pall\\platform`:**
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\\Downloads\\The_Pall_Stage4_Scholarship_Asset_Patch.zip" -DestinationPath "." -Force
+npm run verify:scholarship-art
+npm run verify:stage-four
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+The scholarship art check also requires the two existing Commerce book assets to be installed. Restart the frontend and refresh after the build. Static source assertions have passed; live browser interaction and Svelte compilation remain to be checked in the owner's local environment.
