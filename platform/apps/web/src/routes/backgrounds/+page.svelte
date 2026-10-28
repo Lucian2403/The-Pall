@@ -2,6 +2,10 @@
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
   import {APPROVED_BACKGROUND_SELECTION} from '$lib/approved-introductions';
+  import '$lib/pall-owner-ui.css';
+  import '$lib/pall-entry-pages.css';
+  import AvatarPicker from '$lib/AvatarPicker.svelte';
+  import {originVisual} from '$lib/origin-visuals';
 
   type OriginFact = {origin: string; socialRole: string; majorSkill: string};
   type Catalogue = {
@@ -20,6 +24,7 @@
   let loading = $state<'checking' | 'ready' | 'login' | 'unavailable'>('checking');
   let selectedOrigin = $state<string | null>(null);
   let selectedSex = $state<'Male' | 'Female'>('Male');
+  let selectedAvatarId = $state<string | null>(null);
   const selected = $derived(catalogue?.origins.find(o => o.origin === selectedOrigin) ?? null);
   type Roster = {revision: number; slots: {used: number; limit: number}};
   let roster = $state<Roster | null>(null);
@@ -36,10 +41,10 @@
   }
 
   async function createCharacter() {
-    if (!selected || !roster || busy || roster.slots.used >= roster.slots.limit) return;
+    if (!selected || !selectedAvatarId || !roster || busy || roster.slots.used >= roster.slots.limit) return;
     busy = true;
     creationMessage = '';
-    const signature = JSON.stringify([name, selected.origin, selectedSex, roster.revision]);
+    const signature = JSON.stringify([name, selected.origin, selectedSex, selectedAvatarId, roster.revision]);
     if (signature !== pendingSignature || !pendingRequestId) {
       pendingRequestId = crypto.randomUUID();
       pendingSignature = signature;
@@ -49,7 +54,7 @@
         method: 'POST',
         headers: {'content-type': 'application/json'},
         body: JSON.stringify({
-          name, origin: selected.origin, sex: selectedSex,
+          name, origin: selected.origin, sex: selectedSex, avatarId: selectedAvatarId,
           requestId: pendingRequestId, expectedRevision: roster.revision
         })
       });
@@ -67,6 +72,7 @@
         stale_revision: 'Your character list changed. Review it and try again.',
         invalid_origin: 'Select an approved origin.',
         invalid_sex: 'Select a portrait variant.',
+        invalid_avatar: 'Choose one of the available portraits.',
         idempotency_key_reuse: 'This request was already used for another character. Review the form.'
       };
       creationMessage = errors[body.error ?? ''] ?? 'Character creation failed: ' + (body.error ?? 'server error');
@@ -107,136 +113,134 @@
   <meta name="description" content="The Pall — approved six-background introduction" />
 </svelte:head>
 
-<div class="shell">
-  <main>
-    {#if loading === 'checking'}
-      <p role="status">Checking your account…</p>
-    {:else if loading === 'login'}
-      <h1>Account required</h1>
-      <p>Sign in before choosing a background.</p>
-      <a class="action" href="/account">Sign in</a>
-    {:else if loading === 'unavailable' || !catalogue}
-      <h1>Account service unavailable</h1>
-      <p>Check the local API and PostgreSQL, then refresh.</p>
-      <a href="/account">Account</a>
-    {:else}
-      <p class="eyebrow">THE PALL · CHARACTER CREATION / CHARACTER CREATION</p>
-      <h1>{APPROVED_BACKGROUND_SELECTION.heading}</h1>
-      <p class="intro">{APPROVED_BACKGROUND_SELECTION.introduction}</p>
-
-      <div class="choices" aria-label="Six backgrounds">
-        {#each APPROVED_BACKGROUND_SELECTION.origins as origin}
-          <button
-            class:active={selectedOrigin === origin.origin}
-            aria-pressed={selectedOrigin === origin.origin}
-            onclick={() => {selectedOrigin = origin.origin;}}
-            type="button">
-            <span class="origin-name">{origin.heading}</span>
-            <span class="description">{origin.description}</span>
-            <span class="advantage"><em>Advantage:</em> {origin.advantage}</span>
-          </button>
-        {/each}
-      </div>
-
-      <section class="approved-ending">
-        {#each APPROVED_BACKGROUND_SELECTION.closing as paragraph}
-          <p>
-            {#each paragraph as segment}
-              {#if segment.style === 'strong'}<strong>{segment.text}</strong>
-              {:else if segment.style === 'em'}<em>{segment.text}</em>
-              {:else}{segment.text}{/if}
-            {/each}
-          </p>
-        {/each}
-      </section>
-
-      {#if selected}
-        <section class="preview" aria-label="Selected character preview">
-          <p class="eyebrow">CHARACTER STARTING PREVIEW</p>
-          <h2>{selected.origin}</h2>
-          <p class="small">Select the portrait variant. Final portrait artwork has not yet been approved or connected.</p>
-          <div class="variant" role="group" aria-label="Portrait sex">
-            <button type="button" class:active={selectedSex === 'Male'} aria-pressed={selectedSex === 'Male'} onclick={() => {selectedSex = 'Male';}}>Male</button>
-            <button type="button" class:active={selectedSex === 'Female'} aria-pressed={selectedSex === 'Female'} onclick={() => {selectedSex = 'Female';}}>Female</button>
-          </div>
-          <div class="preview-content">
-            <div class="portrait" role="img" aria-label="{selected.origin} {selectedSex} portrait not yet available">
-              <span>{selected.origin} · {selectedSex}</span>
-              <small>Portrait asset pending</small>
+<div class="entry-page">
+  <div class="entry-wrap">
+    <nav class="entry-nav" aria-label="Page navigation">
+      <a class="brand" href="/introduction"><img src="/ui-kit/branding/logo-compact.png" alt="The Pall"/><span>A CITY ENDURES</span></a>
+      <div class="entry-links"><a href="/characters">Your characters</a><a href="/account">Account</a></div>
+    </nav>
+    <header class="entry-hero">
+      <div><span class="entry-eyebrow">Character creation</span><h1>{APPROVED_BACKGROUND_SELECTION.heading}</h1></div>
+    </header>
+    <main class="entry-content">
+      {#if loading==='checking'}
+        <p role="status">Checking your account…</p>
+      {:else if loading==='login'}
+        <h2>Account required</h2><p>Sign in before choosing a background.</p>
+        <a class="entry-button" href="/account">Sign in</a>
+      {:else if loading==='unavailable'||!catalogue}
+        <h2>Account service unavailable</h2><p>Check the local API and database, then refresh.</p>
+      {:else}
+        <p class="intro">{APPROVED_BACKGROUND_SELECTION.introduction}</p>
+        <div class="origin-layout">
+          <section class="origin-section" aria-label="Choose one of six backgrounds">
+            <div class="origin-grid">
+              {#each APPROVED_BACKGROUND_SELECTION.origins as origin (origin.origin)}
+                <button type="button" class="origin-card" class:active={selectedOrigin===origin.origin}
+                  aria-pressed={selectedOrigin===origin.origin}
+                  onclick={()=>{selectedOrigin=origin.origin;creationMessage='';}}>
+                  <span class="origin-art" style={'background-image:linear-gradient(0deg,#17140fef,#17140f3e),url("'+originVisual(origin.origin).src+'")'}></span>
+                  <span class="origin-text">
+                    <strong>{origin.heading}</strong>
+                    <span>{origin.description}</span>
+                    <small><em>Advantage:</em> {origin.advantage}</small>
+                  </span>
+                </button>
+              {/each}
             </div>
-            <div class="stats">
-              <p><strong>{selected.majorSkill} +{catalogue.startingFacts.originMajorSkillBonusLevels}</strong></p>
-              <p>STR {catalogue.startingFacts.attributes.STR} · DEX {catalogue.startingFacts.attributes.DEX} · INT {catalogue.startingFacts.attributes.INT} · RES {catalogue.startingFacts.attributes.RES}</p>
-              <p>Maximum Health: {catalogue.startingFacts.maximumHealth}</p>
-              <p>Starting coins: {catalogue.startingFacts.startingCoins}</p>
-              <p>Starting equipment: {catalogue.startingFacts.starterItemDisplayNames.join(', ')}</p>
-              <p class="small">Basic Clothes and Crude Small Bag are recorded as starter requirements, not equippable item IDs yet.</p>
+            <div class="approved-ending">
+              {#each APPROVED_BACKGROUND_SELECTION.closing as paragraph}
+                <p>{#each paragraph as segment}
+                  {#if segment.style==='strong'}<strong>{segment.text}</strong>
+                  {:else if segment.style==='em'}<em>{segment.text}</em>
+                  {:else}{segment.text}{/if}
+                {/each}</p>
+              {/each}
             </div>
-          </div>
-          <form class="creation" onsubmit={(event) => {event.preventDefault(); void createCharacter();}}>
-            <label for="character-name">Character name</label>
-            <input id="character-name" type="text" bind:value={name} minlength="3" maxlength="80" autocomplete="off" required placeholder="3–24 visible characters" />
-            <p class="small">Character names are globally unique, regardless of case. Character deletion and renaming are not available in this version. All six origins can be saved, but their playable tutorials are not yet connected; each new character will occupy one of your six slots.</p>
-            {#if roster}
-              <p class="small">Character slots: {roster.slots.used} / {roster.slots.limit}</p>
-              <button class="confirm" type="submit" disabled={busy || roster.slots.used >= roster.slots.limit}>{busy ? 'Creating…' : 'Create character'}</button>
+          </section>
+          <aside class="character-preview" aria-label="Character preview and portrait selection">
+            {#if selected}
+              <span class="entry-eyebrow">Starting character · {selected.origin}</span>
+              <h2>{selected.origin}</h2>
+              <div class="sex-selector" role="group" aria-label="Character sex">
+                <button type="button" class:active={selectedSex==='Male'}
+                  aria-pressed={selectedSex==='Male'}
+                  onclick={()=>{selectedSex='Male';selectedAvatarId=null;}}>Male</button>
+                <button type="button" class:active={selectedSex==='Female'}
+                  aria-pressed={selectedSex==='Female'}
+                  onclick={()=>{selectedSex='Female';selectedAvatarId=null;}}>Female</button>
+              </div>
+              <p class="entry-muted">Choose your portrait. All eight portraits in each set are available to every background.</p>
+              <AvatarPicker sex={selectedSex} selectedId={selectedAvatarId}
+                onSelect={(id)=>{selectedAvatarId=id;}}/>
+              <div class="starting-facts">
+                <p><strong>{selected.majorSkill} +{catalogue.startingFacts.originMajorSkillBonusLevels}</strong></p>
+                <p>STR {catalogue.startingFacts.attributes.STR} · DEX {catalogue.startingFacts.attributes.DEX} · INT {catalogue.startingFacts.attributes.INT} · RES {catalogue.startingFacts.attributes.RES}</p>
+                <p>Maximum Health: {catalogue.startingFacts.maximumHealth}</p>
+                <p>Starting coins: {catalogue.startingFacts.startingCoins}</p>
+                <p>Starting equipment: {catalogue.startingFacts.starterItemDisplayNames.join(', ')}</p>
+                <p class="entry-muted">Equipment names are starter requirements; inventory item IDs are not yet implemented.</p>
+              </div>
+              <form class="creation" onsubmit={(event)=>{event.preventDefault();void createCharacter();}}>
+                <label for="character-name">Character name</label>
+                <input id="character-name" type="text" bind:value={name} minlength="3"
+                  maxlength="80" autocomplete="off" required placeholder="3–24 visible characters"/>
+                {#if roster}
+                  <p class="entry-muted">Character slots: {roster.slots.used} / {roster.slots.limit}</p>
+                  <button class="entry-button" type="submit"
+                    disabled={busy||!selectedAvatarId||roster.slots.used>=roster.slots.limit}>
+                    {busy?'Creating…':'Create character'}
+                  </button>
+                  {#if !selectedAvatarId}<p class="entry-muted">Choose a portrait to continue.</p>{/if}
+                {:else}
+                  <p role="alert" class="entry-error">Character database unavailable.</p>
+                {/if}
+                {#if creationMessage}<p role="alert" class="entry-error">{creationMessage}</p>{/if}
+              </form>
             {:else}
-              <p role="alert">Character database unavailable. Run the M1.2 migration and restart the API; preview is still available.</p>
+              <span class="entry-eyebrow">Your beginning</span>
+              <h2>Choose a background</h2>
+              <p>Choose one of the six backgrounds to see your starting attributes and select a portrait.</p>
             {/if}
-            {#if creationMessage}<p role="alert">{creationMessage}</p>{/if}
-          </form>
-        </section>
+          </aside>
+        </div>
+        <nav class="bottom"><a href="/introduction">World introduction</a><a href="/characters">Your characters</a></nav>
       {/if}
-
-      <nav class="bottom">
-        <a href="/introduction">World introduction</a>
-        <a href="/characters">Your characters</a>
-        <a href="/account">Account</a>
-      </nav>
-      <p class="development">M1.2 development interface. Background descriptions are approved word for word; layout, assets and unintegrated tutorial scenes are not final.</p>
-    {/if}
-  </main>
+    </main>
+  </div>
 </div>
 
 <style>
-  :global(body) {margin: 0; background: #151717; color: #e6dece; font-family: Georgia, 'Times New Roman', serif;}
-  :global(a) {color: #ddba88;}
-  .shell {min-height: 100vh; padding: 32px 18px 50px; background: radial-gradient(ellipse at 60% 5%, #302b26 0%, #151717 66%); box-sizing: border-box;}
-  main {max-width: 1060px; margin: auto; padding: clamp(22px, 4vw, 44px); background: #201f1d; border: 1px solid #675341;}
-  .eyebrow {font: 11px/1.5 sans-serif; letter-spacing: .16em; color: #c9a97e;}
-  h1 {font-size: clamp(30px, 4vw, 44px); font-weight: normal; margin: 12px 0 18px; letter-spacing: .04em;}
-  .intro {font-size: 17px; line-height: 1.55; max-width: 880px; margin-bottom: 26px;}
-  .choices {display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px;}
-  .choices button {padding: 20px; text-align: left; border: 1px solid #64523e; background: #292723; color: #e8dfce; cursor: pointer; font: inherit; display: flex; flex-direction: column; gap: 12px; line-height: 1.42;}
-  .choices button:hover {border-color: #be9868; background: #302b25;}
-  .choices button.active {background: #3b3128; border-color: #e0b881;}
-  .choices button:focus-visible, .variant button:focus-visible {outline: 2px solid #e0b881; outline-offset: 3px;}
-  .origin-name {font: bold 16px/1.3 Georgia, serif; color: #f0d6aa;}
-  .description, .advantage {font-size: 15px;}
-  .advantage {color: #d4c4ad;}
-  .approved-ending {padding: 15px 0 0; max-width: 880px; font-size: 16px; line-height: 1.5;}
-  .approved-ending p {margin: 15px 0;}
-  .preview {margin-top: 32px; padding: 20px; background: #262520; border: 1px solid #6a553b;}
-  .preview h2 {margin: 6px 0 14px; font-weight: normal;}
-  .variant {display: flex; gap: 8px; margin: 16px 0;}
-  .variant button {padding: 10px 22px; background: #342c24; border: 1px solid #816344; color: #e6d6bb; cursor: pointer;}
-  .variant button.active {background: #654b31; border-color: #dab780;}
-  .preview-content {display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: start;}
-  .portrait {min-height: 225px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; background: #1c1c1b; border: 1px dashed #78644b; color: #d9c39e; text-align: center;}
-  .portrait small, .small, .development {font: 12px/1.6 sans-serif; color: #b1a394;}
-  .stats {font-size: 16px; line-height: 1.5;}
-  .stats p {margin: 0 0 14px;}
-  .bottom {display: flex; gap: 24px; flex-wrap: wrap; border-top: 1px solid #5a4837; margin-top: 32px; padding-top: 22px; font: 14px sans-serif;}
-  .development {margin-top: 22px;}
-  @media (max-width: 700px) {
-    .choices {grid-template-columns: 1fr;}
-    .preview-content {grid-template-columns: 1fr;}
-    .portrait {min-height: 145px;}
-  }
-  .creation {margin-top:24px;border-top:1px solid #655039;padding-top:24px;max-width:550px;}
-  .creation label {display:block;margin-bottom:8px;}
-  .creation input {width:100%;box-sizing:border-box;padding:12px;background:#f5f0e6;color:#24211d;font:17px Georgia,serif;}
-  .creation .confirm {padding:12px 18px;background:#5b4028;color:#f9e2b9;border:1px solid #b48f60;cursor:pointer;}
-  .creation .confirm:disabled {opacity:.5;cursor:not-allowed;}
-  .creation [role=alert] {color:#f0b9a9;line-height:1.5;}
+  .entry-hero{min-height:210px;max-height:255px}
+  .intro{max-width:880px;margin:0 0 22px;font:500 18px/1.52 var(--pall-font-reading,Georgia,serif)}
+  .origin-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(330px,.9fr);gap:19px;align-items:start}
+  .origin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .origin-card{display:flex;flex-direction:column;overflow:hidden;text-align:left;min-width:0;padding:0;
+    background:#28231d;border:1px solid #725639;color:#f0e1c9;cursor:pointer}
+  .origin-card:hover,.origin-card:focus-visible{border-color:#cb9f68}
+  .origin-card.active{border:2px solid #efbd80;background:#372a20}
+  .origin-art{display:block;height:105px;background-size:cover;background-position:center 43%}
+  .origin-text{display:flex;flex-direction:column;gap:8px;padding:13px}
+  .origin-text strong{font:600 16px/1.3 var(--pall-font-reading,Georgia,serif);color:#f7daaf}
+  .origin-text>span{font:15px/1.42 var(--pall-font-reading,Georgia,serif)}
+  .origin-text small{font:14px/1.42 var(--pall-font-reading,Georgia,serif);color:#d5c1a2}
+  .approved-ending{border-top:1px solid #634a33;margin-top:20px;padding-top:8px;font-size:15px}
+  .approved-ending p{margin:8px 0}
+  .character-preview{border:1px solid #876b4a;background:#2b261f;padding:20px;position:sticky;top:14px}
+  .character-preview h2{margin:7px 0 14px}
+  .sex-selector{display:flex;gap:8px;margin:9px 0 13px}
+  .sex-selector button{padding:9px 20px;border:1px solid #9a754d;color:#e9d1b1;
+    background:#3c2e22;cursor:pointer;font:600 15px var(--pall-font-reading,Georgia,serif)}
+  .sex-selector button.active{background:#70492b;border-color:#e4b477}
+  .starting-facts{padding:15px 0 3px;border-bottom:1px solid #624a37}
+  .starting-facts p{margin:0 0 9px}
+  .creation{padding:18px 0 3px}
+  .creation label{display:block;margin:0 0 8px}
+  .creation input{width:100%;padding:11px;background:#eee4d1;border:1px solid #9d7b51;
+    font:17px var(--pall-font-reading,Georgia,serif);color:#261b12}
+  .creation .entry-button{margin-top:10px}
+  .bottom{display:flex;gap:20px;border-top:1px solid #664b35;margin-top:22px;padding-top:16px}
+  .bottom a{color:#e7c08b}
+  @media(max-width:920px){.origin-layout{grid-template-columns:1fr}.character-preview{position:static}}
+  @media(max-width:540px){.origin-grid{grid-template-columns:1fr}.origin-art{height:115px}}
 </style>
