@@ -597,3 +597,34 @@ npm run build -w @the-pall/web
 ```
 
 The scholarship art check also requires the two existing Commerce book assets to be installed. Restart the frontend and refresh after the build. Static source assertions have passed; live browser interaction and Svelte compilation remain to be checked in the owner's local environment.
+
+
+### Entry-page redesign and universal character portraits (2026-10-28)
+
+Owner review: the original introduction, character roster and backgrounds pages were unstyled development panels, and the shared city vista / workshop scenes were too tall. The owner asked to preserve the still-unapproved **sidebar, header and footer design** until dedicated assets arrive, retain The Pall logo, and integrate `Avatars.zip` containing 16 portrait choices (eight Male, eight Female), universally available to any of the six backgrounds.
+
+**Implemented:** `apps/web/src/lib/pall-entry-pages.css` unifies the three public entry pages with the already-installed compact logo, restrained New Standard/Bebas typography and the Grand Cylinder City vista. `/introduction` renders the exact canonical approved introduction unchanged. `/characters` now has illustrated character cards with saved portrait, origin/sex, real starting location, tutorial stage, character select, saved portrait change and **Remove**. `/backgrounds` retains all six owner-approved descriptions, advantages and starting stats, and lets players choose from all eight portraits for the currently selected sex. The choice persists with the created character and appears in `CharacterAvatar.svelte` across the onboarding UI.
+
+**Art status:** The two proven origin scene images are Millhand → smithing workshop and Inkbound → Scholarship records room. For Bellrunner, Squatter, Stitcher and Scrapper the roster/cards deliberately use **Grand Cylinder City** as fallback rather than misrepresenting the Depot or Contracts office as their starting hub. Replace these fallbacks when the owner provides the four exact origin location backgrounds. The 16 uploaded portrait images are **one universal library**, not tied to background or starting hub.
+
+**Image pack:** `The_Pall_Avatars_16_Patch.zip` contains sixteen optimised WebP images in `apps/web/static/ui-kit/avatars/male-01.webp` through `male-08.webp` and `female-01.webp` through `female-08.webp`. A high-quality web conversion is used, maintaining each supplied portrait's framing and aspect ratio. No original full-resolution binaries are committed to GitHub. Extract this ZIP relative to `The-Pall/platform`.
+
+**Database:** `db/migrations/0006_character_portraits.sql` adds nullable `avatar_id`, constrained by the saved character's sex; **existing characters are preserved and do not receive a guessed portrait**. They can select one in the redesigned roster. `POST /api/characters` accepts an optional validated avatar ID (the new UI requires explicit selection); `PATCH /api/characters/:id/avatar` changes only an owned character's portrait. `DELETE /api/characters/:id` requires an active verified session, same-origin write, the account's current roster revision and confirmation typed exactly as the character's name. It locks the account/character rows, deletes that owned character's saved tutorial receipts/states, and deletes the character all in one transaction. Foreign keys not yet recognised fail safely rather than cascading. Removing a character **cannot be undone**, which is stated before the action. No automatic deletion is performed when deploying these changes.
+
+**Compact layout:** Onboarding city banner shrinks from `245–335px` to `160–225px`. Stages 1–2 workshop scenes shrink from `700–810px` to `535–640px`, Stage 3 to `610–690px` to fit the evidence without bringing back the scroll bar, and Stage 4 scenes to `565–680px`. Mobile stacked layouts remain content-driven. No progress, author-approved story text, rewards or interactions were rewritten.
+
+**Install, from `The-Pall\\platform`** (after saving ZIP in Downloads):
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\\Downloads\\The_Pall_Avatars_16_Patch.zip" -DestinationPath "." -Force
+npm run characters:portraits-migrate
+npm run verify:avatar-art
+npm run verify:entry-pages
+npm run check:web
+npm run check:api
+npm run test:unit
+npm run build -w @the-pall/web
+```
+Restart API **and** frontend after migration/build. The SQL migration is additive and does not reset characters; do not run Docker volume deletion. Test `/introduction`, `/characters`, `/backgrounds`, each sex's eight portraits, an existing character's portrait update, the typed confirmation for removal (prefer a disposable test character), and every Millhand stage at desktop/mobile viewport. **This connector context has not run a local browser, database migration or TypeScript compile**, so owner-side QA is still required. The test commands may expose issues to correct.
+
+**Known boundary:** The owner's future origin-location background assets, and their future sidebar/header/footer assets, are deliberately deferred. The portrait pack supplied here completes the 16 **character portraits**, not the remaining four origin location illustrations.
