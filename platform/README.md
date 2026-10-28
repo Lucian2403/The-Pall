@@ -546,3 +546,32 @@ npm run build -w @the-pall/web
 ```
 
 Then restart Vite and refresh. This change does not require re-installing the owner fonts, a database migration, or creating a new character. Stage 3 reading page checks and Stage 4 art checks are updated. Source assertions and image pixel comparison were performed; runtime Svelte compilation and browser layout still require the owner's local verification.
+
+### Millhand Stage 4 — Commerce / Contracts physical office (2026-10-28)
+
+Owner confirmed the Commerce branch had already been approved and supplied **two** book images and the previously uploaded Commerce location background. The approved [Disputed Docket route](../docs/05-gameplay/onboarding/millhand/stage-4-approved-script.md) is not reauthored.
+
+`apps/web/src/lib/MillhandContractsScene.svelte` now renders the owner's painterly office background plus **only** two independently clickable physical book cutouts: `death-register.webp` and `wage-record.webp`. They have text-only labels and a restrained 1.8% hover response. The previous four schematic tile placeholders are not shown. The scene retains all server-saved actions and the approved seven-line Contracts Clerk dialogue, the seal-check/written-complaint choice, and personal journal. No client-side click bypasses the approved action sequence. `MillhandSecondJobScene.svelte` now routes Commerce explicitly to this component and Depot to its own previously approved scene. Investigation remains the other unchanged branch.
+
+The three images are provided as the separate ZIP `The_Pall_Stage4_Commerce_Asset_Patch.zip`, with pixel-identical lossless WebP conversions. The archive contains exactly:
+
+- `apps/web/static/locations/contracts/contracts-office.webp` — shared Commerce location background
+- `apps/web/static/locations/contracts/death-register.webp`
+- `apps/web/static/locations/contracts/wage-record.webp`
+
+**Install from `The-Pall\platform` after saving that attached ZIP in Downloads:**
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\The_Pall_Stage4_Commerce_Asset_Patch.zip" -DestinationPath "." -Force
+npm run verify:commerce-art
+npm run verify:stage-four
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Restart the frontend and refresh your existing Commerce-route character; no database migration or new character is needed.
+
+**Editorial distinction:** The artwork is explicitly titled *Death Register* and *Wage Record*. The approved Commerce dispute's two sealed records are **compensation** and **contract-charge** entries, not those two book titles. The physical books are shown under their real visual names, and the approved comparison is presented in dialogue without changing its lore. The owner can decide later whether these are the permanent visual objects for this route; do not invent replacement record types or change the approved script to make the images fit.
+
+Static source and artwork pixel checks have been performed. A local Svelte compile, API transaction and browser layout test have not been run through the GitHub connector.
