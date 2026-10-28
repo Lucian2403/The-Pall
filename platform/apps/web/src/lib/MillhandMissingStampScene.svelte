@@ -28,6 +28,9 @@
 
   let talkingOptional=$state(false);
   let inspectedView=$state<'slip'|'plate'|null>(null);
+  // Local reading pages only. Inspect actions, dialogue and route saves remain
+  // server-owned; navigating between these pages changes no saved progress.
+  let evidencePage=$state(0);
   let journalOpen=$state(false);
   let sceneElement:HTMLDivElement|undefined;
   let journalElement:HTMLElement|undefined;
@@ -49,6 +52,7 @@
     if(state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP')return;
     talkingOptional=false;
     inspectedView=which;
+    evidencePage=0;
     const act=which==='slip'?'read_cancellation_slip':'turn_returned_plate';
     if(canAct(act))await perform(act);
   }
@@ -76,34 +80,44 @@
             <p class="speaker">Guther</p>
             <p class="speech">“{MISSING_STAMP_HANDOFF}”</p>
             <p class="story">{MISSING_STAMP_OPENING}</p>
-          {:else if inspectedView==='slip'}
-            <p class="story">{CANCELLATION_NARRATION}</p>
-          {:else if inspectedView==='plate'}
-            <p class="story">{PLATE_NARRATION}</p>
-          {:else}
-            <p class="story">{MISSING_STAMP_OPENING}</p>
-          {/if}
-
-          {#if inspectedView==='slip' && state.slipRead && snapshot.slip}
-            <div class="record" aria-label="Cancellation slip">
-              <strong>CANCELLATION SLIP</strong>
-              <p>Recorded as: Dead after a workshop fire with locked doors.</p>
-              <p>Worker number: {snapshot.slip.workerNumber ?? 'Present on the original record'}</p>
-              <p>Recorded death date: {snapshot.slip.recordedDeathDate ?? 'Dated in the council record'}</p>
-            </div>
-          {:else if inspectedView==='plate' && state.plateRead && snapshot.plate}
-            <div class="record" aria-label="Returned reference plate">
-              <strong>RETURNED REFERENCE PLATE</strong>
-              <p>Worker number: {snapshot.plate.workerNumber ?? 'Stamped into the plate'}</p>
-              <p>Council inspector's mark: Present, separate from your stamping.</p>
-              <p>Inspection date: {snapshot.plate.inspectionDate ?? 'Dated beside the mark'}</p>
-            </div>
-          {/if}
-
-          <p class="instruction">
-            {state.phase==='INSPECT' ? 'Examine the returned plate and the folded slip.' : 'Both records have been examined.'}
-          </p>
-          {#if snapshot.finding}
+            <p class="hint">Select the returned plate or folded slip on the workbench.</p>
+          {:else if inspectedView && evidencePage===0}
+            <!-- Part 1: the object is read. Do not stack its record and finding here. -->
+            <p class="story">{inspectedView==='slip'?CANCELLATION_NARRATION:PLATE_NARRATION}</p>
+            {#if (inspectedView==='slip' && state.slipRead) || (inspectedView==='plate' && state.plateRead)}
+              <div class="choices">
+                <button type="button" onclick={() => {evidencePage=1;}}>Continue</button>
+              </div>
+            {:else}
+              <p class="hint">Examining the council paper…</p>
+            {/if}
+          {:else if inspectedView && evidencePage===1}
+            <!-- Part 2: the record itself. Identifiers stay in UI, not painted on art. -->
+            {#if inspectedView==='slip' && snapshot.slip}
+              <div class="record" aria-label="Cancellation slip">
+                <strong>CANCELLATION SLIP</strong>
+                <p>Recorded as: Dead after a workshop fire with locked doors.</p>
+                <p>Worker number: {snapshot.slip.workerNumber ?? 'Present on the original record'}</p>
+                <p>Recorded death date: {snapshot.slip.recordedDeathDate ?? 'Dated in the council record'}</p>
+              </div>
+            {:else if inspectedView==='plate' && snapshot.plate}
+              <div class="record" aria-label="Returned reference plate">
+                <strong>RETURNED REFERENCE PLATE</strong>
+                <p>Worker number: {snapshot.plate.workerNumber ?? 'Stamped into the plate'}</p>
+                <p>Council inspector's mark: Present, separate from your stamping.</p>
+                <p>Inspection date: {snapshot.plate.inspectionDate ?? 'Dated beside the mark'}</p>
+              </div>
+            {/if}
+            {#if snapshot.finding}
+              <div class="choices">
+                <button type="button" onclick={() => {evidencePage=2;}}>Continue</button>
+              </div>
+            {:else}
+              <p class="hint">Inspect the other evidence object on the workbench.</p>
+            {/if}
+          {:else if snapshot.finding}
+            <!-- Part 3: one concise finding with the real server-owned action. -->
+            <p class="instruction">Both records have been examined.</p>
             <p class="finding">{stageThreeFinding(snapshot.finding)}</p>
             <p class="finding">The same worker number was recorded as dead before the council inspection date.</p>
             <div class="choices">
@@ -111,10 +125,10 @@
                 Show Guther the papers
               </button>
             </div>
-
+          {:else}
+            <p class="story">{MISSING_STAMP_OPENING}</p>
+            <p class="hint">Inspect the other evidence object on the workbench.</p>
           {/if}
-          <p class="hint">Select either evidence object on the bench to inspect it again.</p>
-
         {:else if state.phase==='CONFRONT' && beat}
           <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
           <p class:stage-narration={'kind' in beat && beat.kind==='narration'} class="speech">
@@ -194,14 +208,16 @@
 
 <style>
   .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#efdecb;font-family:var(--pall-font-reading,Georgia,serif)}
-  /* Row 1 is reserved for the CRPG dialogue. Row 2 holds the physical bench props.
-     Their footprints cannot intersect, including when the longest choice is shown. */
+  /* Fixed-size workshop composition: local Continue pages, not taller scenery.
+     Dialogue occupies the upper row and evidence the lower tabletop row. */
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
-    grid-template-rows:auto minmax(195px,1fr);flex:0 0 auto;width:100%;min-width:0;
-    min-height:clamp(550px,calc(100dvh - 250px),1000px);background:#291d15}
+    grid-template-rows:minmax(0,1fr) 178px;flex:0 0 auto;width:100%;min-width:0;
+    height:clamp(560px,65vh,770px);min-height:0;background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-  .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 38% 0);pointer-events:none;z-index:1}
+  /* The lower figure is clipped at the painted workbench line, revealing the
+     actual background tabletop in front of him. No fake opaque table overlay. */
+  .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 44% 0);pointer-events:none;z-index:1}
   .npc-hotspot{position:absolute;z-index:3;top:12%;left:12%;width:25%;height:50%;display:flex;align-items:end;justify-content:center;background:none;border:0;padding:0 0 10px;color:#f7dfb6;cursor:pointer}
   .npc-hotspot:disabled{cursor:default;opacity:.7}
   .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px sans-serif}
@@ -222,6 +238,7 @@
   .evidence button:disabled .evidence-label{opacity:.7}
   .dialogue{position:relative;z-index:5;grid-column:2;grid-row:1;align-self:start;
     min-width:0;margin:clamp(20px,2.6vw,36px) 0 0;padding:15px 18px;
+    max-height:calc(100% - 40px);overflow-y:auto;overscroll-behavior:contain;
     border:2px solid #654022;border-radius:5px;background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .eyebrow{font:600 11px sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
   .story,.speech,.finding{font-size:clamp(14px,1.25vw,17px);line-height:1.5;margin:0 0 13px}
@@ -233,7 +250,9 @@
   .choices button:hover:not(:disabled),.choices button:focus-visible{background:#423022;outline:2px solid #c49d65;outline-offset:1px}
   .choices button:disabled{opacity:.5;cursor:default}
   .choices .leave{background:#503c29}
-  .route{display:block;color:#d6b78c;font:12px/1.5 sans-serif;margin-top:4px}
+  .route{display:block;width:fit-content;max-width:100%;box-sizing:border-box;
+    margin-top:5px;padding:2px 8px;background:#49301d;border:1px solid #63472a;
+    color:#fff1d7;font:600 12px/1.45 sans-serif;opacity:1;text-shadow:none}
   .record{margin:12px 0;padding:12px;border:1px solid #a88f6d;background:#e5d1a9;font:13px/1.4 sans-serif}
   .record strong{font-size:12px;letter-spacing:.04em}
   .record p{margin:6px 0}
@@ -255,15 +274,15 @@
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif}
   @media(max-width:700px){
     .scene{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;
-      min-height:0;flex:0 0 auto}
+      height:auto;min-height:0;flex:0 0 auto}
     .illustration{position:relative;grid-column:1;grid-row:1;inset:auto;width:100%;aspect-ratio:4/3}
     .environment{object-position:39% center}
-    .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
+    .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 44% 0)}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%}
     .evidence{grid-column:1;grid-row:1;width:min(76%,440px);margin:0 0 8px;gap:7px}
     .evidence-art{height:clamp(70px,20vw,120px)}
     .evidence-label{min-height:25px;font:11px/1.2 sans-serif;padding:5px 3px}
-    .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px}
+    .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px;max-height:none;overflow:visible}
     .story,.speech,.finding{font-size:16px}
     .journal-heading h2{font-size:20px}
     .journal-entries{font-size:14px}
