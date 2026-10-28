@@ -151,10 +151,10 @@
 
 <style>
   .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:1;min-width:0;width:100%;min-height:clamp(450px,calc(100dvh - 350px),1100px);background:#271b14;border:0;box-sizing:border-box}
+  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:1;min-width:0;width:100%;height:clamp(700px,76vh,810px);min-height:0;grid-template-rows:minmax(0,1fr);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-  .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 38% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
+  .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 44% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
   .npc-hotspot {position:absolute;z-index:3;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;justify-content:center;
     padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
   .npc-label {padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px/1.3 sans-serif;text-shadow:0 1px #000}
@@ -165,7 +165,7 @@
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
   .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0;transform:rotate(-32deg)}
-  .dialogue {position:relative;grid-column:2;z-index:4;align-self:start;width:100%;margin:clamp(24px,3vw,50px) 0 24px;min-width:0;max-height:none;overflow:visible;box-sizing:border-box;padding:14px 17px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
+  .dialogue {position:relative;grid-column:2;z-index:4;align-self:start;width:100%;margin:clamp(24px,3vw,50px) 0 24px;min-width:0;max-height:calc(100% - 48px);overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;padding:14px 17px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
   .speaker {font:600 10px/1.4 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4c3524;margin:0 0 8px}
   .dialogue-line,.narration {margin:0 0 10px;font-size:clamp(12px,1.3vw,17px);line-height:1.4}
   .narration{font-style:italic}
@@ -192,17 +192,17 @@
   .inspection small {color:#bda990}
   .inspection button {padding:8px 12px;color:#f4dcbb;background:#403126;border:1px solid #816343;cursor:pointer}
   @media(max-width:700px){
-    .scene {display:flex;flex-direction:column;flex:0 0 auto;min-height:0;}
+    .scene {display:flex;flex-direction:column;flex:0 0 auto;height:auto;min-height:0;}
     .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
     .environment {object-fit:cover;object-position:39% center}
-    .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 38% 0)}
+    .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 44% 0)}
     .npc-hotspot {left:0;top:7%;width:41%;height:49%;padding-bottom:0}
     .npc-label {font-size:10px}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}
     .prop-art.hammer {width:27%;height:30%;right:0;bottom:8%}
-    .dialogue {position:relative;top:auto;left:auto;width:100%;margin:0;padding:14px;border-radius:0;box-shadow:0 4px 10px #0007}
+    .dialogue {position:relative;top:auto;left:auto;width:100%;margin:0;padding:14px;border-radius:0;box-shadow:0 4px 10px #0007;max-height:none;overflow:visible}
     .dialogue-line,.narration {font-size:16px;line-height:1.5}
     .prop-marker {bottom:2%}
     .prop-marker.stamps {left:0;width:24%}
