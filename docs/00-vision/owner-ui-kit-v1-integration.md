@@ -106,3 +106,12 @@ The owner reviewed Stage 1 and identified a **white rectangular strip behind the
 **Avatars:** The owner has a universal portrait set, but it is **not present** in any conversation/project uploads or the source UI-kit ZIP. The shared `CharacterAvatar` component already supports a saved `avatarId`, but the API does not yet persist it. Do **not** assign a random, Millhand-specific or inferred portrait. Once the owner uploads the portrait pack, implement a common avatar catalogue and persist each player's selection independently of origin. Until then, the character initial remains an explicit fallback, not final portrait artwork.
 
 **Acceptance:** No pale/white rectangle visible outside the iron frame. All three button states retain full endcaps without covering labels. Workshop objects remain on the physical workbench, and opening a journal doesn't enlarge its NPC popup. The City title is readable without decorative noise. The universal portrait remains pending actual owner files. Local responsive screenshots are still needed for visual signoff.
+
+
+## Font handoff correction — 2026-10-28
+
+User supplied the five fonts individually. New Standard is the same 2,151-glyph OpenType/CFF original and still needs **outline conversion**, not a renamed file. CF Industrial Fabrics explicitly indicates a personal-use-only license; Stranger Friz was supplied under personal-use terms. Neither will be used in the commercial game unless licensed.
+
+**Updated implementation:** `platform/scripts/install-owner-fonts.ps1` takes `-KitZip` (the original owner's archive) or `-NewStandardOtf`, uses the installed Node/npm runtime and a pinned temporary `fonteditor-core` tool to convert OTF CFF → actual TTF outlines → WOFF2. It does not require Python, and it does not change the app's npm lockfile or share the owner's font binaries. A direct WOFF2 remains optional. The CSS and permitted font roles are unchanged.
+
+Use `npm run verify:owner-ui-kit` after installing; browser output is not certified until the owner runs it. The earlier Python and manually prepared WOFF2 export steps are superseded.
