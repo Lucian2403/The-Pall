@@ -43,6 +43,7 @@
     "verify:stage-four": "node scripts/verify-stage-four.mjs",
     "verify:depot-art": "node scripts/verify-depot-art.mjs",
     "verify:commerce-art": "node scripts/verify-commerce-art.mjs",
+    "verify:scholarship-art": "node scripts/verify-scholarship-art.mjs",
     "verify:stage3-record-art": "node scripts/verify-stage3-record-art.mjs",
     "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs"
   }
