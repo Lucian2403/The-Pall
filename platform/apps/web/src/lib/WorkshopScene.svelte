@@ -1,7 +1,6 @@
 <script lang="ts">
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
-  import WorkshopObjectIcon from '$lib/WorkshopObjectIcon.svelte';
   import NpcConversation from '$lib/NpcConversation.svelte';
 
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
@@ -66,6 +65,9 @@
     <div class="illustration">
     <img class="environment" src="/workshop/environment.webp" alt="The smithing workshop, with a forge, bench and distant city" />
     <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil, the smithing foreman" />
+    <!-- The exact same environment is composited again only over the tabletop.
+         The bench appears in FRONT of Guther instead of clipping his legs. -->
+    <img class="environment bench-foreground" src="/workshop/environment.webp" alt="" aria-hidden="true" />
     <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil"
       title="Talk to Guther Anvil" onclick={() => {talkingToGuther=true;}}>
       <span class="npc-label">Talk to Guther</span>
@@ -86,8 +88,7 @@
           aria-label={'Inspect ' + workshopObjects[key].name}
           onclick={() => inspect(key)}
         >
-          <span class="pin" aria-hidden="true"></span>
-          <span class="tag"><span class="symbol" aria-hidden="true"><WorkshopObjectIcon kind={key} /></span>{workshopObjects[key].label}</span>
+          <span class="tag">{workshopObjects[key].label}</span>
         </button>
       {/each}
     </div>
@@ -154,13 +155,16 @@
   .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:0 0 auto;min-width:0;width:100%;height:clamp(700px,76vh,810px);min-height:0;grid-template-rows:minmax(0,1fr);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-  .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;clip-path:inset(0 0 40% 0);z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
-  .npc-hotspot {position:absolute;z-index:3;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;justify-content:center;
+  .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
+  .bench-foreground {z-index:2;clip-path:inset(70% 0 0 0)}
+  .npc-hotspot {position:absolute;z-index:4;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;justify-content:center;
     padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
   .npc-label {padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px/1.3 sans-serif;text-shadow:0 1px #000}
   .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label {background:#3c2b19;border-color:#efd092}
   .npc-hotspot:focus-visible {outline:2px solid #efd092;outline-offset:2px}
-  .prop-art {position:absolute;z-index:2;max-width:none;object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0b0709a1)}
+  .prop-art {position:absolute;z-index:3;max-width:none;object-fit:contain;pointer-events:none;
+    filter:drop-shadow(0 4px 4px #0b0709a1);transform-origin:center 72%;
+    transition:transform 160ms ease-out}
   .prop-art.stamps {width:23%;height:31%;bottom:5%;left:1.5%}
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
@@ -177,14 +181,18 @@
   .responses .skip-to-work{background:#493321;border-color:#a07a4b}
   .responses button:disabled{opacity:.55;cursor:not-allowed}
   .handoff-error{font:12px/1.4 sans-serif;color:#873523;margin:6px 0}
-  .prop-marker {position:absolute;z-index:5;bottom:1%;background:none;border:0;color:#f3e8d2;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0}
-  .prop-marker.stamps{left:3%;width:21%}
-  .prop-marker.plates{left:27%;width:21%}
-  .prop-marker.paper{left:56%;width:22%}
-  .prop-marker.hammer{right:1%;width:21%}
-  .pin {width:12px;height:12px;box-sizing:border-box;background:#17140f;border:2px solid #e7bb68;border-radius:50%;box-shadow:0 1px 0 #0009}
+  /* The entire visible object area, not just its nameplate, is clickable. */
+  .prop-marker {position:absolute;z-index:5;bottom:1%;background:none;border:0;color:#f3e8d2;
+    cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:0}
+  .prop-marker.stamps{left:1.5%;width:23%;height:37%}
+  .prop-marker.plates{left:26%;width:25%;height:36%}
+  .prop-marker.paper{left:56%;width:23%;height:35%}
+  .prop-marker.hammer{right:0;width:21%;height:44%}
+  .illustration:has(.prop-marker.stamps:is(:hover,:focus-visible)) .prop-art.stamps,
+  .illustration:has(.prop-marker.plates:is(:hover,:focus-visible)) .prop-art.plates,
+  .illustration:has(.prop-marker.paper:is(:hover,:focus-visible)) .prop-art.paper{transform:scale(1.018)}
+  .illustration:has(.prop-marker.hammer:is(:hover,:focus-visible)) .prop-art.hammer{transform:rotate(-32deg) scale(1.018)}
   .tag {display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;min-height:29px;background:#16130fec;border:1px solid #94754b;border-radius:3px;padding:4px 5px;font-size:clamp(10px,1.22vw,14px);line-height:1.15;white-space:nowrap;text-shadow:0 1px 1px #000}
-  .symbol {color:#eac487;font-size:1.15em}
   .prop-marker:hover .tag,.prop-marker:focus-visible .tag,.prop-marker.chosen .tag{border-color:#f0c77c;background:#332616}
   .prop-marker:focus-visible {outline:2px solid #f2d28f;outline-offset:3px}
   .inspection {display:flex;align-items:start;justify-content:space-between;gap:16px;margin-top:8px;padding:13px 16px;border:1px solid #6b5136;background:#24211d;color:#f2e4ce;font-size:14px;line-height:1.45}
@@ -195,7 +203,8 @@
     .scene {display:flex;flex-direction:column;flex:0 0 auto;height:auto;min-height:0;}
     .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
     .environment {object-fit:cover;object-position:39% center}
-    .guther {height:86%;left:-5%;top:2%;clip-path:inset(0 0 40% 0)}
+    .guther {height:86%;left:-5%;top:2%}
+    .bench-foreground{object-position:39% center}
     .npc-hotspot {left:0;top:7%;width:41%;height:49%;padding-bottom:0}
     .npc-label {font-size:10px}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
@@ -205,10 +214,10 @@
     .dialogue {position:relative;top:auto;left:auto;width:100%;margin:0;padding:14px;border-radius:0;box-shadow:0 4px 10px #0007;max-height:none;overflow:visible}
     .dialogue-line,.narration {font-size:16px;line-height:1.5}
     .prop-marker {bottom:2%}
-    .prop-marker.stamps {left:0;width:24%}
-    .prop-marker.plates {left:25%;width:24%}
-    .prop-marker.paper {left:50%;width:24%}
-    .prop-marker.hammer {right:0;width:25%}
+    .prop-marker.stamps {left:0;width:25%;height:33%}
+    .prop-marker.plates {left:24%;width:29%;height:32%}
+    .prop-marker.paper {left:49%;width:27%;height:33%}
+    .prop-marker.hammer {right:0;width:27%;height:39%}
     .tag {font:10px/1.1 sans-serif;min-height:28px;padding:3px 2px;gap:3px;white-space:normal}
   }
   @media(max-width:380px){.dialogue{margin:0;padding:12px}.tag{font-size:9px}}
