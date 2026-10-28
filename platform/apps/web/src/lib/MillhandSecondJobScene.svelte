@@ -70,9 +70,9 @@
         <p class="instruction">{STAGE_FOUR_INSTRUCTIONS[state.phase]}</p>
         {#if result}<p class="result">{result}</p>{/if}
         {#if state.phase==='COMPARE_DELIVERY'}
-          <p class="context">You have brought numbered metal plates to the depot counter. The delivery list is separate from the physical load.</p>
+          <p class="context">At the receiving counter, you set down the last bundle of numbered plates. The delivery list lies nearby, ready to be checked against what you've brought.</p>
         {:else if state.phase==='SPEAK_DEPOT' || state.phase==='CHOOSE_RECEIPT'}
-          <p class="context">The delivery list has the goods entered as “workers”, although only metal plates arrived.</p>
+          <p class="context">Workers? You've hauled a bloody load of metal plates all the way here. Not a single man. What the hell are they playing at?</p>
         {:else if state.phase==='SPEAK_CONTRACTS'||state.phase==='CHOOSE_CHALLENGE'}
           <p class="context">One sealed record lists the worker as dead for compensation. Another lists him as active for contract charges.</p>
         {:else if state.phase==='SPEAK_ARCHIVE'||state.phase==='CHOOSE_SOURCE'||state.phase==='RECORD_FINDING'}

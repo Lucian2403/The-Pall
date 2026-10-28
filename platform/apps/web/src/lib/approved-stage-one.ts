@@ -47,7 +47,7 @@ export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
         "kind": "narration"
       },
       "setting": {
-        "text": "Steel rings at the far benches, two sharp blows and a third that comes late. The air carries hot scale and damp cloth. Guther sets a folded work paper beside a tray of metal plates. His thumb leaves a dark mark along the edge.",
+        "text": "The clang of steel on steel echoed from the far benches, two sharp impacts followed by a third, slightly delayed one. The air hung thick with the smell of hot scale and damp cloth. Guther placed a folded work paper next to a tray filled with metal plates. As he did, his thumb left a dark smudge along the edge of the paper.",
         "next": "opening",
         "kind": "narration"
       },

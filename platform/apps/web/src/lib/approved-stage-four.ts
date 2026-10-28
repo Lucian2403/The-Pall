@@ -95,8 +95,8 @@ export const STAGE_FOUR_ACTION_LABELS:Record<SecondJobAction,string>={
 export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
   check_load:'You count the plates and compare the load with the work paper. The number matches the delivery entry. You check whether any are loose or damaged.',
   secure_plates:'You fasten the plates together for transport. A heavy load can shift if you do not keep it steady.',
-  carry_smaller_loads:'You divide the plates into smaller groups and move them separately. There is less weight to manage each time.',
-  compare_delivery_list:'You check the delivery list. Under the type of goods, someone has written “workers”. You have delivered metal plates. No workers have arrived with you.',
+  carry_smaller_loads:'You split the plates into smaller bundles and carry them to the depot in several trips. Each load is easier to handle, though moving everything takes longer.',
+  compare_delivery_list:'You check the delivery list. Under goods, some fool\'s written “workers”.',
   record_goods_as_plates:'You enter “plates” in the received-goods record. The clerk confirms that the depot received the metal plates.',
   request_delivery_correction:'You ask the clerk to check the incorrect goods entry before signing. The clerk reviews the papers and acknowledges that the depot received metal plates. The original entry remains unexplained.',
   complete_delivery:'The depot staff take the plates. The receipt records metal plates, not workers. You have not received any wages.',
@@ -114,8 +114,8 @@ export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
 };
 
 export const STAGE_FOUR_FINAL={
-  restamp:'The depot recorded the delivered metal plates as plates. The wrong category on the original delivery list remains unexplained. You were not paid.',
-  contracts:'You challenged two sealed records. The council has not resolved their disagreement or approved the plate lot. You were not paid.',
+  restamp:'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
+  contracts:'The clerk records your complaint, but neither sealed entry is changed. The council still hasn\'t approved the plate lot, and you won\'t be paid for the work. There\'s nothing more the clerk can do for you here. You leave the Contracts office.',
   records:'The number continued to be used in wage records after the recorded death. Part of an entry had been scraped. Who changed it and why remain unknown.'
 } as const;
 
