@@ -106,7 +106,15 @@ assert.ok(contractsUi.includes('/locations/contracts/contracts-office.webp') &&
   'Commerce scene needs the owner-approved office and the exact two supplied book illustrations');
 assert.ok(contractsUi.includes("onclick={() => inspect('death')}") &&
   contractsUi.includes("onclick={() => inspect('wage')}"),
-  'Both illustrated books must be clickable without advancing or skipping saved work');
+  'Both illustrated books must be clickable');
+assert.ok(contractsUi.includes("which==='death' && snapshot.availableActions.includes('examine_work_paper')") &&
+  contractsUi.includes("void perform('examine_work_paper')") &&
+  contractsUi.includes("which==='wage' && snapshot.availableActions.includes('compare_official_records')") &&
+  contractsUi.includes("void perform('compare_official_records')"),
+  'Commerce must require separate owner book selections for the two existing saved evidence steps');
+assert.ok(contractsUi.includes("state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'") &&
+  contractsUi.includes("{:else if snapshot.availableActions.length>0}"),
+  'Remove evidence action buttons from dialogue while retaining later Clerk and dispute actions');
 assert.ok(!contractsUi.includes("perform('read_death_register')") &&
   !contractsUi.includes("perform('check_wage_record')") &&
   !contractsUi.includes('class="work-surface"') &&
@@ -120,7 +128,7 @@ assert.ok(contractsUi.includes('STAGE_FOUR_DIALOGUE.contracts') &&
 assert.ok(contractsUi.includes('scale(1.018)') &&
   contractsUi.includes('class="scene-footer"'),
   'Book hover must be subtle, and journal should stay outside the CRPG popup');
-console.log('PASS: Owner Contracts office with only Death Register and Wage Record book props, original Disputed Docket script preserved.');
+console.log('PASS: Contracts requires both book clicks in sequence with no shortcut buttons; Disputed Docket script preserved.');
 
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
