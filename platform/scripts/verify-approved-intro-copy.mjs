@@ -179,7 +179,7 @@ console.log('PASS: Guther approved optional dialogue and universal Millhand skip
 // The owner's transparent evidence cutouts are real items, not square UI cards.
 const stage3SceneSource = readFileSync(resolve(root,'apps/web/src/lib/MillhandMissingStampScene.svelte'),'utf8');
 const stage3DialogueEnd = stage3SceneSource.indexOf('</aside>');
-const stage3SceneEnd = stage3SceneSource.indexOf('  </div>\n  <p class="footnote">',stage3DialogueEnd);
+const stage3SceneEnd = stage3SceneSource.indexOf('  </div>\n  <div class="scene-footer">',stage3DialogueEnd);
 const journalPanelStart = stage3SceneSource.indexOf('<section id="stage-three-journal"');
 assert.ok(stage3DialogueEnd>=0 && stage3SceneEnd>stage3DialogueEnd,'Missing Stamp scene shape changed');
 assert.ok(stage3SceneSource.indexOf('<div class="evidence"')>stage3DialogueEnd,
@@ -191,8 +191,10 @@ assert.ok(journalPanelStart>stage3SceneEnd,
 assert.ok(stage3SceneSource.includes('grid-template-rows:minmax(0,1fr) 178px') &&
   stage3SceneSource.includes('height:clamp(610px,68vh,690px)'),
   'Stage3 scene must have a fixed desktop composition independent of dialogue content');
-assert.ok(stage3SceneSource.includes('.evidence{grid-column:1;grid-row:1;'),
-  'Mobile evidence must remain over the illustration, above the dialogue');
+assert.ok(stage3SceneSource.includes('.evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;') &&
+  stage3SceneSource.includes('height:clamp(74px,6vw,100px)') &&
+  stage3SceneSource.includes('.evidence{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1;'),
+  'Stage3 table props must have a fixed tabletop anchor on desktop and remain in the illustration on mobile');
 for(const name of ['returned-reference-plate.webp','cancellation-slip.webp']) {
   assert.ok(stage3SceneSource.includes('/workshop/'+name),'Missing supplied Stage3 art '+name);
 }
@@ -203,6 +205,12 @@ for(const name of ['returned-reference-plate-record.webp','cancellation-slip-rec
 assert.ok(stage3SceneSource.includes('class="record-illustration"') &&
   stage3SceneSource.includes('max-height:240px'),
   'Printed evidence should remain compact inside the dialogue frame, without growing the scene');
+assert.ok(stage3SceneSource.includes('class:route-choice=') &&
+  stage3SceneSource.includes('let decisionStep=$state<0|1>(0)') &&
+  stage3SceneSource.includes('decisionStep=1;') &&
+  stage3SceneSource.includes('max-height:none;overflow:visible;') &&
+  !stage3SceneSource.includes('overflow-y:auto'),
+  'Stage3 route selection must have separate briefing/choice beats without any nested dialogue scrollbar');
 assert.ok(stage3SceneSource.includes('class:record-view=') &&
   stage3SceneSource.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
   stage3SceneSource.includes('class="scene-footer"') &&
