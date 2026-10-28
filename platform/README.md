@@ -438,3 +438,29 @@ The separate ZIP must be downloaded first from the assistant's attachment; do no
 **Stage 2 duplicate text:** A poor-quality stamp observation was shown both as the saved action result and the identical phase instruction. `MillhandWorkScene.svelte` now suppresses the second rendering and its separator when the strings match. **No owner-edited source copy was overwritten.**
 
 **Visual limitations:** The Depot Clerk portrait/transparent cutout is not supplied. If later desired, request it from the owner's art workflow. Until then, dialogue is in the standard CRPG popup without inventing a face or character design. The Contracts and records-room locations still require artwork. Browser and database testing must be confirmed locally; the GitHub edits alone do not validate the runtime.
+
+
+### Owner Stage 3 record art + locally repaired New Standard — 2026-10-28
+
+The owner supplied **CancellationSlipText.png** and **ReturnedPlate_Text.png** to replace the Stage 3 beige information boxes. The approved text, progression and three-page inspection pacing are unchanged. `MillhandMissingStampScene.svelte` now shows the owner-created slip or plate on page 2 of the correct inspection, within the same restrained frame. The images are not added to the table; the existing transparent tabletop props remain clickable. Display size is constrained by `max-height:min(34vh,325px)` to keep Guther and the table from stretching. When the server eventually has a real worker number or calendar date, live record text takes precedence over the generic wording baked into the owner image.
+
+**Image installation:** `The_Pall_Stage3_Record_Art_Patch.zip` contains two original-appearance, lossless WebP conversions:
+`apps/web/static/workshop/cancellation-slip-record.webp` and `apps/web/static/workshop/returned-reference-plate-record.webp`. Unzip relative to `platform`. No image binaries are embedded in repository source. Verify via `npm run verify:stage3-record-art`.
+
+**Fonts:** The owner asked to activate the permitted typefaces from `The-Pall-UI-Kit-v1.zip`. The original New Standard OTF contains broken CFF outlines for Chromium; `scripts/convert-owner-new-standard.py` locally draws the same outlines as quadratic TrueType glyphs and saves a WOFF2 that the shared CSS now loads as `Pall New Standard`. This conversion was exercised against the supplied 2,151-glyph source and the produced WOFF2 was parsed and checked for Latin text. **The end user's browser build remains untested**; keep Georgia as CSS fallback. `scripts/install-owner-fonts.ps1` reads the owner ZIP, copies SIL-OFL New Standard and Bebas Neue and the commercially permitted Beyond Wonderland, retains licenses and produces this font on the local machine. Two restricted-license faces (CF Industrial Fabrics and Stranger Friz) remain excluded. The old corrupted main UI installer is repaired and delegates its font section to this separate installer. It requires Python 3 and may install `fonttools` and `brotli` through pip if unavailable; no font binaries are published through chat/GitHub.
+
+**Install from `The-Pall\platform`:**
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\The_Pall_Stage3_Record_Art_Patch.zip" -DestinationPath "." -Force
+powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-fonts.ps1 -KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip"
+npm run verify:stage3-record-art
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Install Python 3 if the font installer reports that it is missing; the converter is designed to run only on the owner-supplied font file. Stop on a failed install; do not hide a failing converter by silently loading the original malformed OTF. Restart the web server and refresh. **No database migration or character reset is needed.**
+
+**Upcoming audio gate:** Once the owner's depot scene / this Stage 3 presentation is accepted in the running browser, start a small first sound batch: workshop forge ambience, metal-stamp/hammer impacts, paper interactions and depot machinery/yard ambience. Prefer clean, loopable WAV source (or OGG if already mastered) with separate action cues. Do not wire global music or voiced NPC dialogue without their own design approval.
