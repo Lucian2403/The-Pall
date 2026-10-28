@@ -54,3 +54,14 @@
 **Installation gate:** GitHub commits contain the Svelte components and verification only; large user-supplied artwork binaries are not in the repository. Extract the generated owner asset ZIP into the local `The-Pall/platform` directory (not `platform/apps/web`) preserving the `apps/web/static/locations/depot/depot-background.webp` path. Verify with `npm run verify:depot-art`. The scene cannot display its image until the static file is locally installed.
 
 **Preserved user copy:** The owner pushed small dialogue edits. This update did not replace `approved-stage-four.ts` or its canonical script. Stage 2's repeated poor-stamping observation is corrected only by suppressing an instruction when identical to the saved action result; all source strings remain unchanged.
+
+
+## Depot art revision — colder palette (2026-10-28)
+
+The owner approved the Stage 4 Industry/Hauling transition and supplied `depot_background_cold.png` (1774×887) to replace the warmer depot yard panorama. This new supplied image is stored as a **pixel-identical lossless WebP**, `apps/web/static/locations/depot/depot-background-cold.webp`, delivered in `The_Pall_Stage4_Cold_Depot_Background.zip`.
+
+`MillhandDepotScene.svelte` now requests the **new filename** so previously cached warm artwork cannot persist. The workshop preparation scene, transport handoff, depot interactive props, Depot Clerk dialogue, journal and saved route actions are unchanged. The prior `depot-background.webp` file can remain on disk without being used.
+
+Install: extract the ZIP into `The-Pall/platform`, retaining `apps/web/static/locations/depot/depot-background-cold.webp`; run `npm run verify:depot-art`, then restart the frontend. No database migration or character reset.
+
+This revision supersedes the background filename and artwork noted above. No new assets are required for the delivery list or receiving record.
