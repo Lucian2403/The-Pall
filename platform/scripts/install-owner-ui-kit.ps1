@@ -6,14 +6,16 @@ No account, saved character, database or quest state is changed.
 Usage from The-Pall\platform:
   powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-ui-kit.ps1 -KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip" -SidebarImage "$env:USERPROFILE\Downloads\the_pall_sidebar_illustration_transparent.png"
 
-The font installer repairs New Standard locally; never ship original/derived
-font binaries through GitHub or chat. See install-owner-fonts.ps1.
+New Standard can be installed directly with -NewStandardWoff2 when the owner
+supplies a TrueType-outline WOFF2. No Python or pip required; no fonts are
+published through GitHub or chat. See install-owner-fonts.ps1.
 #>
 [CmdletBinding()]
 param(
   [Parameter(Mandatory=$true)][string]$KitZip,
   [string]$SidebarImage,
-  [string]$AvatarDirectory
+  [string]$AvatarDirectory,
+  [string]$NewStandardWoff2
 )
 $ErrorActionPreference = 'Stop'
 if (-not (Test-Path -LiteralPath $KitZip -PathType Leaf)) {
@@ -112,7 +114,7 @@ try {
   }
 
   # This step also copies original license notices and excludes restricted fonts.
-  & (Join-Path $PSScriptRoot 'install-owner-fonts.ps1') -KitZip $KitZip
+  & (Join-Path $PSScriptRoot 'install-owner-fonts.ps1') -KitZip $KitZip -NewStandardWoff2 $NewStandardWoff2
   Write-Host "The Pall owner UI kit installed at: $target"
 } finally {
   if (Test-Path -LiteralPath $temp) {
