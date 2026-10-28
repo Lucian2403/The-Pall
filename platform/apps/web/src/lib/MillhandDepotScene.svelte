@@ -42,7 +42,7 @@
 
 <section class="second-job depot-job" aria-label="Depot Intake Run, Stage 4">
   <div class="depot-scene">
-    <div class="scene-art" class:at-workshop={atWorkshop}
+    <div class="scene-art" class:preparing={atWorkshop}
       role="img" aria-label={atWorkshop
         ? 'Guther’s workshop, with a wooden workbench before the metalworking equipment'
         : 'Municipal depot receiving yard, with a loading gantry, crates, rail cart and wooden receiving counter'}>
@@ -141,7 +141,7 @@
     height:clamp(680px,75vh,830px);min-height:0;background:#271e18}
   .scene-art{position:absolute;inset:0;z-index:0;
     background:url('/locations/depot/depot-background.webp') center center/cover no-repeat}
-  .scene-art.at-workshop{background-image:url('/workshop/environment.webp')}
+  .scene-art.preparing{background-image:url('/workshop/environment.webp')}
   .scene-art::after{content:'';position:absolute;inset:0;
     background:linear-gradient(90deg,transparent 28%,#160f0b16 58%,#160f0b25 100%);
     pointer-events:none}
