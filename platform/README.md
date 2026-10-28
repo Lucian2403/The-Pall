@@ -485,3 +485,27 @@ npm run build -w @the-pall/web
 **If the Bebas/Beyond fonts need reinstalling too**, add `-KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip"` to that same font installer command. The full UI kit installer also accepts `-NewStandardWoff2` and passes it through. The install script checks that the file is actually a TrueType-outline WOFF2 rather than a renamed/CFF OTF. A browser rendering check is still needed to confirm the font looks correct.
 
 Until the corrected WOFF2 is supplied, the game's reading font falls back to Georgia. This is safe, but `verify:owner-ui-kit` will report the missing font file rather than claiming installation success. No Python, character reset or database migration is needed for typography changes.
+
+
+### New Standard from the owner's original OTF — Node-only path (2026-10-28, latest)
+
+The owner supplied the original `NewStandard-Regular.otf` again alongside the other decorative fonts. Inspection confirmed OpenType/CFF outlines and the embedded New Standard SIL OFL 1.1 notice; this is **not** a browser-ready WOFF2 and merely renaming it would reproduce the Chromium error. This supersedes the earlier instructions to install Python or obtain a new WOFF2 export.
+
+**Implemented:** `scripts/install-owner-fonts.ps1` now accepts the owner's **original UI-kit ZIP** (which already contains this OTF) or `-NewStandardOtf` as input. When only an OTF is supplied, it uses the existing Node.js/npm installation to temporarily install pinned `fonteditor-core@2.6.3` outside the repository, converts CFF to real TrueType outlines, encodes WOFF2 and checks the resulting header/glyphs. The original binary and resulting WOFF2 remain **local only**. No Python/pip, project dependency changes, lockfile edits or uploaded font binaries. Conversion requires npm registry access once, and remains unverified against the owner's local Windows/browser environment.
+
+From `The-Pall\\platform`, using the ZIP you already had:
+
+```powershell
+git pull --ff-only
+powershell -ExecutionPolicy Bypass -File .\\scripts\\install-owner-fonts.ps1 `
+  -KitZip "$env:USERPROFILE\\Downloads\\The-Pall-UI-Kit-v1.zip"
+npm run verify:owner-ui-kit
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Restart Vite afterward. An equivalent alternative is `-NewStandardOtf "C:\\path\\to\\NewStandard-Regular.otf"` when only the font file is available. `-NewStandardWoff2` remains available if the owner supplies a genuine TrueType-outline WOFF2. The UI-kit-wide installer delegates to this script and also uses Node, not Python. If conversion fails, do not load the broken CFF OTF; the CSS still falls back safely to Georgia.
+
+**Licensing:** New Standard embeds SIL OFL 1.1; the original Bebas Neue archive also includes OFL, and Beyond Wonderland is permitted by its supplied readme. The newly uploaded CF Industrial Fabrics TTF explicitly says *free for personal use, commercial use requires purchase* in its name metadata. The Stranger Friz family was accompanied by a *personal use only* notice in the original ZIP. Neither restricted family is imported into a build without the owner's appropriate commercial licenses.
+
+The font binaries supplied to the chat are only inspected, **not distributed** as downloadable artifacts or committed to GitHub.
