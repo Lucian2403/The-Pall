@@ -21,8 +21,9 @@ const files=[
   'buttons/button-hover-trim.png',
   'buttons/button-pressed-trim.png',
   'fonts/new-standard-regular.otf',
-  'fonts/bebas-neue-regular.otf',
-  'fonts/bebas-neue-bold.otf',
+  'fonts/new-standard-regular.woff2',
+  'fonts/bebas-neue-regular.ttf',
+  'fonts/bebas-neue-bold.ttf',
   'fonts/beyond-wonderland.ttf',
   'licenses/NEW-STANDARD-OFL.txt',
   'licenses/BEBAS-NEUE-OFL.txt',
@@ -32,7 +33,7 @@ const missing=files.filter(file=>!existsSync(resolve(staticRoot,file)));
 if(missing.length){
   console.error('Missing owner-supplied UI kit assets:');
   for(const file of missing)console.error('  '+file);
-  console.error('Install original kit, then unpack The_Pall_UI_Cropped_Frames_Patch.zip from the platform directory.');
+  console.error('Install the supplied original kit via scripts/install-owner-ui-kit.ps1, including the repaired font conversion.');
   process.exitCode=1;
 }else{
   for(const file of files)assert.ok(statSync(resolve(staticRoot,file)).size>0,'Empty UI asset: '+file);
@@ -63,7 +64,10 @@ for(const endpoint of [secondJobApi,rewindApi]) {
 assert.ok(source.includes('aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}'),'Measured resources should be accessible');
 assert.ok(css.includes('Pall Bebas Neue'),'Supplied Bebas Neue font must be wired');
 assert.ok(!css.includes("src: url('/ui-kit/fonts/new-standard-regular.otf')"),'Chromium-rejected New Standard CFF should not be loaded');
-assert.ok(css.includes('--pall-font-reading: Georgia'),'Readable fallback must remain while supplied New Standard OTF is invalid');
+assert.ok(css.includes("src: url('/ui-kit/fonts/new-standard-regular.woff2') format('woff2')"),
+  'The repaired local New Standard WOFF2 should be the source for reading');
+assert.ok(css.includes("--pall-font-reading: 'Pall New Standard', Georgia"),
+  'New Standard must be the default with a reliable Georgia fallback');
 assert.ok(!css.includes('/ui-kit/fonts/stranger-friz'),'Restricted personal-use font must not load');
 assert.ok(!css.includes('/ui-kit/fonts/cf-industrial'),'Non-commercial font must not load');
 assert.ok(!source.includes('stamina.current')&&!source.includes('fatigue.current'),'Do not invent resource data');
@@ -89,5 +93,16 @@ assert.ok(css.includes('border-image-slice:50 180 45 180 fill'),
   'Button art must resize with nine-slice rather than stretch corners');
 assert.ok(source.includes('font:normal 29px/1.16 var(--pall-font-reading'),'City title must use legible type rather than the noisy ornamental face');
 assert.ok(css.includes('var(--pall-font-label'),'Use Bebas Neue for concise game labels');
-console.log('PASS: Owner HUD, universal portrait slot, dialogue frame and three button-state skins.');
+const fontFile=resolve(staticRoot,'fonts/new-standard-regular.woff2');
+if(existsSync(fontFile)) {
+  assert.equal(readFileSync(fontFile).toString('ascii',0,4),'wOF2',
+    'The locally converted New Standard must be genuine WOFF2, not a renamed invalid OTF');
+}
+const fontInstaller=readFileSync(resolve(root,'scripts/install-owner-fonts.ps1'),'utf8');
+assert.ok(fontInstaller.includes('convert-owner-new-standard.py') &&
+  fontInstaller.includes('new-standard-regular.woff2') &&
+  !fontInstaller.includes('cf-industrial-fabrics-font.zip') &&
+  !fontInstaller.includes('stranger-friz.zip'),
+  'Install only approved licensed fonts and locally repair the owner CFF font');
+console.log('PASS: Owner HUD, frames/buttons, and three permitted font families with readable New Standard.');
 
