@@ -105,11 +105,22 @@ if(existsSync(fontFile)) {
 }
 const fontInstaller=readFileSync(resolve(root,'scripts/install-owner-fonts.ps1'),'utf8');
 assert.ok(fontInstaller.includes('NewStandardWoff2') &&
+  fontInstaller.includes('NewStandardOtf') &&
+  fontInstaller.includes('convert-owner-new-standard-node.mjs') &&
+  fontInstaller.includes('fonteditor-core@2.6.3') &&
   fontInstaller.includes('new-standard-regular.woff2') &&
   !fontInstaller.includes('convert-owner-new-standard.py') &&
   !fontInstaller.includes('pip install') &&
   !fontInstaller.includes('cf-industrial-fabrics-font.zip') &&
   !fontInstaller.includes('stranger-friz.zip'),
   'Install the owner-supplied WOFF2 directly without Python and exclude restricted fonts');
+const nodeConverter=readFileSync(resolve(root,'scripts/convert-owner-new-standard-node.mjs'),'utf8');
+assert.ok(nodeConverter.includes("type:'otf'") &&
+  nodeConverter.includes("type:'ttf'") &&
+  nodeConverter.includes("type:'woff2'") &&
+  nodeConverter.includes('readUInt32BE(4)!==0x00010000'),
+  'Node converter must rebuild original CFF outlines as TrueType before WOFF2 packaging');
+assert.ok(!fontInstaller.includes('pythonExe') && !fontInstaller.includes('pip install'),
+  'Owner font installation must work without Python');
 console.log('PASS: Owner HUD, frames/buttons, and three permitted font families with readable New Standard.');
 
