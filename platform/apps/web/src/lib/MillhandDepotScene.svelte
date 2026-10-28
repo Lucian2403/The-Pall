@@ -188,15 +188,15 @@
   .saving{font:12px sans-serif;color:#6c5133}
   .journal-trigger{padding-top:11px;margin-top:17px;border-top:1px solid #bca482}
   .journal-button{background:#dbcaab;border:1px solid #8c6d50;color:#3a281b;
-    padding:7px 10px;font:12px sans-serif;cursor:pointer}
+    padding:7px 10px;font:600 15px/1.3 var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .journal-button:is(:hover,:focus-visible){background:#eedabc}
-  .journal{background:#e6d5b5;color:#2b211a;padding:24px clamp(15px,3vw,48px);
+  .journal{background:#e6d5b5;color:#24160e;padding:24px clamp(15px,3vw,48px);
     border-top:2px solid #98714c;scroll-margin-top:12px}
   .journal-head{max-width:960px;display:flex;justify-content:space-between;align-items:center;
     gap:12px;margin:0 auto 17px}
-  .journal-head small{font:10px sans-serif;letter-spacing:.12em;color:#6f583e}
-  .journal-head h2{font:normal 23px var(--pall-font-reading,Georgia,serif);margin:5px 0}
-  .journal>p{max-width:960px;margin:0 auto 10px;font:15px/1.55 var(--pall-font-reading,Georgia,serif)}
+  .journal-head small{font:700 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#47301d}
+  .journal-head h2{font:600 24px/1.25 var(--pall-font-reading,Georgia,serif);color:#25170f;margin:5px 0}
+  .journal>p{max-width:960px;margin:0 auto 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
   @media(max-width:760px){
     .depot-scene{height:auto;overflow:visible}
     .scene-art{position:relative;inset:auto;width:100%;aspect-ratio:2/1}
