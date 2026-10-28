@@ -20,10 +20,7 @@ const files=[
   'buttons/button-normal-trim.png',
   'buttons/button-hover-trim.png',
   'buttons/button-pressed-trim.png',
-  'fonts/new-standard-regular.otf',
   'fonts/new-standard-regular.woff2',
-  'fonts/bebas-neue-regular.ttf',
-  'fonts/bebas-neue-bold.ttf',
   'fonts/beyond-wonderland.ttf',
   'licenses/NEW-STANDARD-OFL.txt',
   'licenses/BEBAS-NEUE-OFL.txt',
@@ -33,7 +30,7 @@ const missing=files.filter(file=>!existsSync(resolve(staticRoot,file)));
 if(missing.length){
   console.error('Missing owner-supplied UI kit assets:');
   for(const file of missing)console.error('  '+file);
-  console.error('Install the supplied original kit via scripts/install-owner-ui-kit.ps1, including the repaired font conversion.');
+  console.error('Install the original UI kit and supply New Standard as a TrueType-outline WOFF2 via scripts/install-owner-fonts.ps1.');
   process.exitCode=1;
 }else{
   for(const file of files)assert.ok(statSync(resolve(staticRoot,file)).size>0,'Empty UI asset: '+file);
@@ -93,16 +90,26 @@ assert.ok(css.includes('border-image-slice:50 180 45 180 fill'),
   'Button art must resize with nine-slice rather than stretch corners');
 assert.ok(source.includes('font:normal 29px/1.16 var(--pall-font-reading'),'City title must use legible type rather than the noisy ornamental face');
 assert.ok(css.includes('var(--pall-font-label'),'Use Bebas Neue for concise game labels');
+for(const weight of ['regular','bold']) {
+  const options=['ttf','otf'].map(ext=>resolve(staticRoot,'fonts/bebas-neue-'+weight+'.'+ext));
+  assert.ok(options.some(candidate=>existsSync(candidate)&&statSync(candidate).size>0),
+    'Bebas Neue '+weight+' must exist as a licensed TTF or OTF');
+}
 const fontFile=resolve(staticRoot,'fonts/new-standard-regular.woff2');
 if(existsSync(fontFile)) {
-  assert.equal(readFileSync(fontFile).toString('ascii',0,4),'wOF2',
-    'The locally converted New Standard must be genuine WOFF2, not a renamed invalid OTF');
+  const bytes=readFileSync(fontFile);
+  assert.equal(bytes.toString('ascii',0,4),'wOF2',
+    'New Standard must be a genuine WOFF2, not an OTF renamed to WOFF2');
+  assert.deepEqual([...bytes.subarray(4,8)],[0,1,0,0],
+    'The web font must contain TrueType outlines, not the rejected OpenType CFF format');
 }
 const fontInstaller=readFileSync(resolve(root,'scripts/install-owner-fonts.ps1'),'utf8');
-assert.ok(fontInstaller.includes('convert-owner-new-standard.py') &&
+assert.ok(fontInstaller.includes('NewStandardWoff2') &&
   fontInstaller.includes('new-standard-regular.woff2') &&
+  !fontInstaller.includes('convert-owner-new-standard.py') &&
+  !fontInstaller.includes('pip install') &&
   !fontInstaller.includes('cf-industrial-fabrics-font.zip') &&
   !fontInstaller.includes('stranger-friz.zip'),
-  'Install only approved licensed fonts and locally repair the owner CFF font');
+  'Install the owner-supplied WOFF2 directly without Python and exclude restricted fonts');
 console.log('PASS: Owner HUD, frames/buttons, and three permitted font families with readable New Standard.');
 
