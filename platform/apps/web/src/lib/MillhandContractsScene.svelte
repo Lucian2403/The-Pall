@@ -219,15 +219,15 @@
   .scene-footer{display:flex;justify-content:space-between;align-items:center;gap:14px;
     padding:9px 14px;background:#201c17;color:#c9b393;font:12px/1.4 sans-serif}
   .journal-button{border:1px solid #987652;background:#d7c5a5;color:#332214;
-    padding:7px 11px;white-space:nowrap;cursor:pointer;font:12px sans-serif}
+    padding:7px 11px;white-space:nowrap;cursor:pointer;font:600 15px/1.3 var(--pall-font-reading,Georgia,serif)}
   .journal-button:is(:hover,:focus-visible){background:#efddbd}
-  .journal{background:#e6d5b5;color:#271c16;padding:22px clamp(14px,3vw,46px);
+  .journal{background:#e6d5b5;color:#24160e;padding:22px clamp(14px,3vw,46px);
     border-top:2px solid #917048;scroll-margin-top:12px}
   .journal-head{display:flex;align-items:center;justify-content:space-between;gap:14px;
     max-width:950px;margin:0 auto 17px}
-  .journal-head small{font:10px sans-serif;letter-spacing:.12em;color:#655139}
-  .journal-head h2{margin:5px 0;font:normal 23px var(--pall-font-reading,Georgia,serif)}
-  .journal>p{max-width:950px;margin:0 auto 10px;font:15px/1.55 var(--pall-font-reading,Georgia,serif)}
+  .journal-head small{font:700 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#47301d}
+  .journal-head h2{margin:5px 0;font:600 24px/1.25 var(--pall-font-reading,Georgia,serif);color:#25170f}
+  .journal>p{max-width:950px;margin:0 auto 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
   @media(max-width:760px){
     .contracts-scene{display:flex;flex-direction:column;height:auto;overflow:visible}
     .office-art{position:relative;inset:auto;aspect-ratio:16/10;width:100%;
