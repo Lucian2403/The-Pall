@@ -243,7 +243,10 @@
   .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label{background:#3c2b19;border-color:#efd092}
   /* The image itself is the prop and hit target. Only the small nameplate is framed. */
   .evidence{position:relative;z-index:4;grid-column:1/-1;grid-row:2;align-self:end;justify-self:center;
-    width:min(490px,48%);display:flex;align-items:end;justify-content:center;gap:12px;margin:0 0 13px}
+    width:min(490px,48%);display:flex;align-items:end;justify-content:center;gap:12px;
+    /* Shift both physical objects and their accessible click targets onto the
+       horizontal wood surface. Never move the labels independently. */
+    margin:0 0 clamp(89px,10vh,112px)}
   .evidence button{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:3px;
     flex:1;min-width:0;margin:0;padding:0;background:transparent;border:0;color:#f3dfc1;cursor:pointer;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
   .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(102px,12vw,158px);
@@ -306,7 +309,8 @@
     .guther{height:86%;left:-5%;top:2%}
     .bench-foreground{object-position:39% center}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%}
-    .evidence{grid-column:1;grid-row:1;width:min(76%,440px);margin:0 0 8px;gap:7px}
+    .evidence{grid-column:1;grid-row:1;width:min(76%,440px);
+      margin:0 0 clamp(32px,7vw,54px);gap:7px}
     .evidence-art{height:clamp(70px,20vw,120px)}
     .evidence-label{min-height:25px;font:11px/1.2 sans-serif;padding:5px 3px}
     .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px;max-height:none;overflow:visible}
