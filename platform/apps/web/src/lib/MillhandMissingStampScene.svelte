@@ -212,7 +212,7 @@
      Dialogue occupies the upper row and evidence the lower tabletop row. */
   .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
     grid-template-rows:minmax(0,1fr) 178px;flex:0 0 auto;width:100%;min-width:0;
-    height:clamp(560px,65vh,770px);min-height:0;background:#291d15}
+    height:clamp(700px,76vh,810px);min-height:0;background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   /* The lower figure is clipped at the painted workbench line, revealing the
