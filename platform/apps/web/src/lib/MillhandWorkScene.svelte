@@ -65,7 +65,9 @@
       <p class="story">{result}</p>
       {#if work.phase !== 'COMPLETE'}
         <div class="rule"></div>
-        <p class="instruction">{instruction}</p>
+        {#if instruction !== result}
+          <p class="instruction">{instruction}</p>
+        {/if}
         {#if selected}
           <div class="inspection">
             <strong>{objects.find(o=>o.key===selected)?.label}</strong>
