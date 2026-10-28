@@ -297,16 +297,16 @@
   .scene-footer .footnote{border:0;padding:0;flex:1;margin:0}
   .journal-outside{flex:none;white-space:nowrap}
   .journal-toggle{padding:7px 10px;background:#d8c7a7;border:1px solid #81654d;color:#3a281b;
-    cursor:pointer;font:12px sans-serif}
+    cursor:pointer;font:600 15px/1.3 var(--pall-font-reading,Georgia,serif)}
   .journal-toggle:hover,.journal-toggle:focus-visible{background:#e7d2ae;border-color:#54351c}
   /* A separate page-flow journal: it cannot stretch the floating dialogue
      or move the tabletop props. The page scrolls; neither panel has a scrollbar. */
   .journal-panel{width:100%;box-sizing:border-box;padding:19px clamp(16px,4vw,46px) 25px;
-    background:#e8d6b6;color:#2c2119;border-top:2px solid #9a7147}
+    background:#e8d6b6;color:#24160e;border-top:2px solid #9a7147;font-synthesis:weight}
   .journal-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;max-width:930px;margin:0 auto 15px}
-  .journal-kicker{font:600 10px sans-serif;letter-spacing:.14em;color:#6d5037}
-  .journal-heading h2{font:normal 24px var(--pall-font-reading,Georgia,serif);margin:6px 0 0}
-  .journal-entries{max-width:930px;margin:0 auto;font:15px/1.55 var(--pall-font-reading,Georgia,serif)}
+  .journal-kicker{font:700 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#47301d}
+  .journal-heading h2{font:600 24px/1.25 var(--pall-font-reading,Georgia,serif);color:#25170f;margin:6px 0 0}
+  .journal-entries{max-width:930px;margin:0 auto;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
   .journal-entries p{margin:9px 0}
   .error{font:13px/1.4 sans-serif;color:#873523}
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif}
