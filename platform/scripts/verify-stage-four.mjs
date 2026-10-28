@@ -130,6 +130,39 @@ assert.ok(contractsUi.includes('scale(1.018)') &&
   'Book hover must be subtle, and journal should stay outside the CRPG popup');
 console.log('PASS: Contracts requires both book clicks in sequence with no shortcut buttons; Disputed Docket script preserved.');
 
+const recordsUi=read('apps/web/src/lib/MillhandRecordsScene.svelte');
+assert.ok(ui.includes("import MillhandRecordsScene from '$lib/MillhandRecordsScene.svelte'") &&
+  ui.includes("state.branch==='records'") &&
+  ui.includes("<MillhandRecordsScene {snapshot} {pending} {errorMessage} {perform}/>"),
+  'Scholarship route must render the owner-approved records room, not schematic tiles');
+assert.ok(recordsUi.includes('/locations/records/records-room.webp') &&
+  recordsUi.includes('/locations/contracts/death-register.webp') &&
+  recordsUi.includes('/locations/contracts/wage-record.webp'),
+  'Scholarship must display the owner's records-room background with the existing death/wage books');
+for(const [phase,which,action] of [
+  ['READ_DEATH_REGISTER','death','read_death_register'],
+  ['READ_WAGE_RECORD','wage','check_wage_record'],
+  ['EXAMINE_SCRAPED_ENTRY','wage','examine_scraped_entry']
+]){
+  assert.ok(recordsUi.includes("state.phase==='"+phase+"'") &&
+    recordsUi.includes("which==='"+which+"' && snapshot.availableActions.includes('"+action+"')") &&
+    recordsUi.includes("void perform('"+action+"')"),
+    'Scholarship must require the correct physical book for '+phase);
+}
+assert.ok(recordsUi.includes('{#if readingPhase}') &&
+  recordsUi.includes('{:else if snapshot.availableActions.length>0}') &&
+  recordsUi.includes('if(pending)return'),
+  'Book inspection must not be automated via dialogue buttons, and duplicates must be blocked');
+assert.ok(recordsUi.includes('STAGE_FOUR_DIALOGUE.records') &&
+  recordsUi.includes('STAGE_FOUR_FINAL.records') &&
+  recordsUi.includes('secondJobJournal(state)') &&
+  recordsUi.includes('snapshot.availableActions'),
+  'Scholarship must retain approved archive dialogue, both source choices and saved journal');
+assert.ok(recordsUi.includes('scale(1.018)') &&
+  !recordsUi.includes('class="work-surface"'),
+  'Scholarship book hover must be subtle, with no schematic placeholder tiles');
+console.log('PASS: Scholarship records room and three deliberate inspections retain approved reconciliation route.');
+
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
 console.log('PASS: Stage4 approved dialogue, three jobs, persistent/owned API, navigation and rewind boundaries.');
