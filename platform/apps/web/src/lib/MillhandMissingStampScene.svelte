@@ -217,7 +217,7 @@
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   /* The lower figure is clipped at the painted workbench line, revealing the
      actual background tabletop in front of him. No fake opaque table overlay. */
-  .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 44% 0);pointer-events:none;z-index:1}
+  .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:inset(0 0 40% 0);pointer-events:none;z-index:1}
   .npc-hotspot{position:absolute;z-index:3;top:12%;left:12%;width:25%;height:50%;display:flex;align-items:end;justify-content:center;background:none;border:0;padding:0 0 10px;color:#f7dfb6;cursor:pointer}
   .npc-hotspot:disabled{cursor:default;opacity:.7}
   .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px sans-serif}
@@ -277,7 +277,7 @@
       height:auto;min-height:0;flex:0 0 auto}
     .illustration{position:relative;grid-column:1;grid-row:1;inset:auto;width:100%;aspect-ratio:4/3}
     .environment{object-position:39% center}
-    .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 44% 0)}
+    .guther{height:86%;left:-5%;top:2%;clip-path:inset(0 0 40% 0)}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%}
     .evidence{grid-column:1;grid-row:1;width:min(76%,440px);margin:0 0 8px;gap:7px}
     .evidence-art{height:clamp(70px,20vw,120px)}
