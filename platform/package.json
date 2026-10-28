@@ -42,6 +42,7 @@
     "verify:dev-rewind": "node scripts/verify-dev-stage-rewind.mjs",
     "verify:stage-four": "node scripts/verify-stage-four.mjs",
     "verify:depot-art": "node scripts/verify-depot-art.mjs",
+    "verify:stage3-record-art": "node scripts/verify-stage3-record-art.mjs",
     "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs"
   }
 }
