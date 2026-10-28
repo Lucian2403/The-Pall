@@ -37,3 +37,17 @@ test('rejects missing, malformed, negative and fractional revisions', () => {
   assert.throws(() => parseCreateCharacterCommand(input({origin: 'Invented'})), /invalid_origin/);
   assert.throws(() => parseCreateCharacterCommand(input({sex: 'Other'})), /invalid_sex/);
 });
+
+test('all six origins can select any one of eight shared portraits per sex',()=>{
+  for(const origin of CHARACTER_ORIGINS)for(const sex of ['Male','Female'])
+    for(let i=1;i<=8;i++){
+      const avatarId=sex.toLowerCase()+'-'+String(i).padStart(2,'0');
+      assert.equal(parseCreateCharacterCommand(input({origin,sex,avatarId})).avatarId,avatarId);
+    }
+});
+test('rejects cross-sex, out-of-library and injected avatar IDs',()=>{
+  for(const avatarId of ['male-00','female-09','../../bad','male-01.png','female-1','unapproved'])
+    assert.throws(()=>parseCreateCharacterCommand(input({avatarId})),/invalid_avatar/);
+  assert.throws(()=>parseCreateCharacterCommand(input({sex:'Male',avatarId:'female-01'})),/invalid_avatar/);
+  assert.equal(parseCreateCharacterCommand(input()).avatarId,null);
+});
