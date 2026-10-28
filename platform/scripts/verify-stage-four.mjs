@@ -69,4 +69,33 @@ assert.ok(stage3Route.includes("/millhand/second-job"), 'Stage3 seamless route n
 assert.ok(shell.includes("character.tutorial.stage >= 4"), 'Shared navigation must select Stage4');
 assert.ok(planner.includes('removeSecondJob:stage>=4'),'Developer rewind must discard later Stage4 work safely');
 assert.ok(dev.includes('player_character_second_job_receipts'),'Developer rewind must clear Stage4 receipts');
+
+const depotUi=read('apps/web/src/lib/MillhandDepotScene.svelte');
+const stage2Ui=read('apps/web/src/lib/MillhandWorkScene.svelte');
+assert.ok(ui.includes("import MillhandDepotScene from '$lib/MillhandDepotScene.svelte'") &&
+  ui.includes("<MillhandDepotScene {snapshot} {pending} {errorMessage} {perform}/>"),
+  'Industry branch must render the depot scene, leaving Contracts and Scholarship intact');
+assert.ok(depotUi.includes("/locations/depot/depot-background.webp") &&
+  depotUi.includes("background-image:url('/workshop/environment.webp')"),
+  'Route A must prepare the plates at the workshop before switching to the owner supplied depot backdrop');
+assert.ok(depotUi.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
+  'Travel to the depot must follow the saved transport choice, not precede it');
+assert.ok(depotUi.includes('/workshop/metal-plates.webp') &&
+  depotUi.includes('/workshop/council-work.webp') &&
+  depotUi.includes('onclick={() => inspect(\'plates\')}') &&
+  depotUi.includes('onclick={() => inspect(\'paper\')}'),
+  'Real reusable plate and council paper art must be clickable, not schematic rectangles');
+assert.ok(!depotUi.includes('class="work-surface"') &&
+  !depotUi.includes('class="symbol"'),
+  'Do not show schematic tile placeholders in the depot');
+assert.ok(depotUi.includes('STAGE_FOUR_DIALOGUE.restamp') &&
+  depotUi.includes('snapshot.availableActions') &&
+  depotUi.includes('secondJobJournal(state)'),
+  'Depot script, server actions and journal must keep their existing saved behavior');
+assert.ok(depotUi.includes('scale(1.018)'),'Depot props must have restrained micro-hover');
+assert.ok(stage2Ui.includes('{#if instruction !== result}') &&
+  stage2Ui.includes('<p class="story">{result}</p>'),
+  'Repeated text must be hidden in the UI without modifying owner-authored Stage2 copy');
+console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
+
 console.log('PASS: Stage4 approved dialogue, three jobs, persistent/owned API, navigation and rewind boundaries.');
