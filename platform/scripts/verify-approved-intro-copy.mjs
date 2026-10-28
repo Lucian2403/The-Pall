@@ -201,8 +201,13 @@ for(const name of ['returned-reference-plate-record.webp','cancellation-slip-rec
     'Owner supplied record image must be shown on the second inspection page: '+name);
 }
 assert.ok(stage3SceneSource.includes('class="record-illustration"') &&
-  stage3SceneSource.includes('max-height:min(34vh,325px)'),
-  'Printed evidence should remain inside the small dialogue frame, without growing the scene');
+  stage3SceneSource.includes('max-height:240px'),
+  'Printed evidence should remain compact inside the dialogue frame, without growing the scene');
+assert.ok(stage3SceneSource.includes('class:record-view=') &&
+  stage3SceneSource.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
+  stage3SceneSource.includes('class="scene-footer"') &&
+  !stage3SceneSource.includes('class="journal-trigger"'),
+  'Evidence reading should not introduce a scroll bar or add a journal action inside the popup');
 assert.ok(stage3SceneSource.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
   stage3SceneSource.includes('snapshot.plate.workerNumber || snapshot.plate.inspectionDate'),
   'When real worker IDs or dates exist, render live values rather than conflicting baked-in image text');
