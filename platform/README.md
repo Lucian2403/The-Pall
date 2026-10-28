@@ -386,3 +386,20 @@ npm run build -w @the-pall/web
 ```
 
 Restart Vite or refresh with cache bypass. The owner has indicated a **single portrait collection for all origins**. Actual avatar images have not been provided in the kit/project uploads, so the topbar currently shows the initial fallback. Once the avatar ZIP is available, wire a shared portrait catalogue and persistent avatar selection independent of origin; don't fabricate or silently select a portrait. The visual corrections above were simulated using the owner's cropped PNGs, but still require real browser review and narrow/mobile QA.
+
+### Millhand workshop reading pace and fixed character scale (2026-10-28)
+
+The owner identified a Stage 3 UX defect: the unpaged evidence inspection stacked (1) initial narration, (2) the council record details, and (3) the whole contradiction plus decision, causing the nine-slice dialogue frame to grow vertically. The scene used auto-sized grid rows and a percentage-sized Guther image, so the entire workshop and NPC grew with that text. Stage 3 route labels were also too faint against the pale button skin.
+
+**Implemented:** `apps/web/src/lib/MillhandMissingStampScene.svelte` now presents an inspected object as **author-controlled, local reading pages**:
+1. The existing narration about the inspected item, then `Continue`.
+2. The existing numbered/dating record details. After inspecting the second item, `Continue` becomes available.
+3. Only after both evidence objects have been saved as inspected: the existing contradiction and the server-authoritative `Show Guther the papers` action.
+
+Page 1 → 2 → 3 is **local UI only**: it does not change the Stage 3 database revision, grant an award, repeat stamping, skip the confrontation or rewrite any approved wording. A resumed Stage 3 character whose evidence was already inspected gets a concise finding and can proceed immediately. The optional conversation and confrontation remain independent. The accepted route choices have a high-contrast dark discipline tag (Industry / Hauling, Commerce / Contracts, Scholarship / Investigation) within the supplied nine-slice buttons.
+
+**Stage composition:** Stage 1, Stage 2 and Stage 3 workshop scenes now use stable desktop heights `clamp(700px,76vh,810px)`, independent of the length of dialogue, and the Guther cutout ends at the painted workbench edge through a crop mask. This keeps the original workshop and table assets untouched. The compact dialogue has an exceptional overflow fallback for extremely small desktop heights; on mobile, the illustrated workshop and popup stack vertically rather than being forcibly clipped. Physical props remain independently clickable and journals still open below the scene.
+
+**Safe owner copy edits:** For Millhand wording, the primary runnable sources are `apps/web/src/lib/approved-stage-one.ts`, `apps/web/src/lib/millhand-work-copy.ts`, `apps/web/src/lib/approved-stage-three.ts` and `apps/web/src/lib/approved-stage-four.ts`. Do not edit `MillhandMissingStampScene.svelte` to alter the prose of `PLATE_NARRATION` or `stageThreeFinding` unless intentionally changing the structure. Keep the matching approved scripts in `docs/05-gameplay/onboarding/millhand/` in sync. `npm run check:web` includes `verify:canonical-copy` and warns about mismatches, then checks Svelte/TypeScript. Characters and stage saves need no migration or reset.
+
+**Owner QA:** After `git pull --ff-only`, `npm run check:web`, `npm run build -w @the-pall/web`, restart the web dev server. Revisit Stage 3 and inspect plate then slip (and vice versa on replay). Observe narration → record → contradiction as separate beats with no oversized panel, and the unchanged `Show Guther` choice after both. Try the three route choices and check their discipline tags can be read. Check Guther stops at the bench edge and does not grow when dialogues change. Stage 1 and 2 should remain at the same visual scale. Compilation/browser rendering has **not** been run in this GitHub connector context.
