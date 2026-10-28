@@ -75,7 +75,7 @@ const stage2Ui=read('apps/web/src/lib/MillhandWorkScene.svelte');
 assert.ok(ui.includes("import MillhandDepotScene from '$lib/MillhandDepotScene.svelte'") &&
   ui.includes("<MillhandDepotScene {snapshot} {pending} {errorMessage} {perform}/>"),
   'Industry branch must render the depot scene, leaving Contracts and Scholarship intact');
-assert.ok(depotUi.includes("/locations/depot/depot-background.webp") &&
+assert.ok(depotUi.includes("/locations/depot/depot-background-cold.webp") &&
   depotUi.includes("background-image:url('/workshop/environment.webp')"),
   'Route A must prepare the plates at the workshop before switching to the owner supplied depot backdrop');
 assert.ok(depotUi.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
