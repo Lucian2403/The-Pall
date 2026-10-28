@@ -196,6 +196,17 @@ assert.ok(stage3SceneSource.includes('.evidence{grid-column:1;grid-row:1;'),
 for(const name of ['returned-reference-plate.webp','cancellation-slip.webp']) {
   assert.ok(stage3SceneSource.includes('/workshop/'+name),'Missing supplied Stage3 art '+name);
 }
+for(const name of ['returned-reference-plate-record.webp','cancellation-slip-record.webp']) {
+  assert.ok(stage3SceneSource.includes('/workshop/'+name),
+    'Owner supplied record image must be shown on the second inspection page: '+name);
+}
+assert.ok(stage3SceneSource.includes('class="record-illustration"') &&
+  stage3SceneSource.includes('max-height:min(34vh,325px)'),
+  'Printed evidence should remain inside the small dialogue frame, without growing the scene');
+assert.ok(stage3SceneSource.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
+  stage3SceneSource.includes('snapshot.plate.workerNumber || snapshot.plate.inspectionDate'),
+  'When real worker IDs or dates exist, render live values rather than conflicting baked-in image text');
+
 assert.ok(!stage3SceneSource.includes('<div class="journal-entries" aria-label'),
   'Stage3 journal must not be nested inside the NPC dialogue box');
 assert.ok(stage3SceneSource.includes('scrollIntoView') &&
