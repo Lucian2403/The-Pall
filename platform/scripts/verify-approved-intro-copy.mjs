@@ -218,7 +218,7 @@ assert.ok(stage3SceneSource.includes('evidencePage=1;') &&
   stage3SceneSource.includes('evidencePage=2;') &&
   !stage3SceneSource.includes("perform('continue_dialogue');}}\n                Continue"),
   'Local evidence page changes must not mutate the server or dialogue revision');
-assert.ok(stage3SceneSource.includes('clip-path:inset(0 0 44% 0)'),
+assert.ok(stage3SceneSource.includes('clip-path:inset(0 0 40% 0)'),
   'Guther must be cropped above the painted table edge');
 assert.ok(stage3SceneSource.includes("background:#49301d") &&
   stage3SceneSource.includes("color:#fff1d7"),
@@ -226,7 +226,7 @@ assert.ok(stage3SceneSource.includes("background:#49301d") &&
 for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
   const scene=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
   assert.ok(scene.includes('height:clamp(700px,76vh,810px)') &&
-    scene.includes('clip-path:inset(0 0 44% 0)'),
+    scene.includes('clip-path:inset(0 0 40% 0)'),
     component+' must keep Guther/table composition fixed with a foreground crop');
   assert.ok(scene.includes('max-height:calc(100% - 48px)'),
     component+' must keep abnormally long dialogue from resizing the workshop');
