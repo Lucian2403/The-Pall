@@ -93,3 +93,22 @@ The revised `MillhandContractsScene.svelte` requires a deliberate two-step seque
 The two text-action buttons are hidden during these phases. Wrong clicks provide ordinary short feedback and cause **no** network action or state change. Later Contracts Clerk conversation, both dispute choices, journal, payouts and saved route remain exactly as approved. The two physically clickable asset images and their 1.8% hover remain unchanged; there is no auto-selection or auto-advance after choosing the first book.
 
 The existing canonical source file and state action identifiers remain unchanged; scene-specific instructions describe interaction with the two owner-provided books while the underlying approved work-paper and sealed compensation/charge findings remain server-owned. No new illustrated props, dates or worker numbers are fabricated. Test both click orders (including wrong-first/wrong-second), refresh between actions, and verify persistent progression only after the correct book is chosen.
+
+
+## Scholarship records room — owner background and direct book actions (2026-10-28)
+
+The owner supplied `Scholarship_workshop.png` (1672×941 RGBA) as the records-room environment for the approved **Ledger Reconciliation**, Stage 4 **Scholarship / Investigation** branch. It is converted losslessly to `apps/web/static/locations/records/records-room.webp` in the separate `The_Pall_Stage4_Scholarship_Asset_Patch.zip`. The WebP was verified pixel for pixel against the source PNG. No new visual lore, location, NPC appearance, numbers or dates are invented.
+
+The dedicated `MillhandRecordsScene.svelte` now replaces the generic four-glyph schematic records room. **Already installed Commerce assets** `/locations/contracts/death-register.webp` and `/locations/contracts/wage-record.webp` are reused because these are the exact two book types named in the approved investigation. Do not duplicate these binaries or require separate copies. The two transparent book images are independently clickable with the same 1.8% hover effect. No third or fourth book image is fabricated.
+
+**Player-controlled phases, using existing saved actions**:
+1. Click **Death Register** during `READ_DEATH_REGISTER`, server action `read_death_register`. Wrong Wage Record click gives feedback without saving.
+2. Click **Wage Record** during `READ_WAGE_RECORD`, server action `check_wage_record`. Wrong Death Register click does not advance.
+3. Click the **Wage Record again**, as a distinct action during `EXAMINE_SCRAPED_ENTRY`, server action `examine_scraped_entry`. Its existing art has blank ruled lines; the approved text describes the scraped area, but the screen does not claim an actual drawn scratch on the book.
+4. The archive assistant's four-line approved conversation runs on the original `speak_to_archive_assistant` / `continue_dialogue` actions.
+5. The player chooses either `compare_neighbouring_entries` or `compare_shift_book` from the approved two-choice dialogue; there is no newly illustrated shift book. The player then performs `record_finding` to finish.
+6. Approved journal, no wages/inventory/extra skill award, server revision and Stage 5 handoff remain unchanged. Wrong-object clicks do not cause a server action, and the first three phases do **not** expose shortcut dialogue buttons.
+
+The existing death/wage artwork is a reusable visual depiction; worker number and recorded dates remain deliberately unprinted and unassigned, per canon. The scraped change and shift-book cross-check are conveyed through the approved script, not fabricated physical assets.
+
+**Local install:** Unpack `The_Pall_Stage4_Scholarship_Asset_Patch.zip` into `The-Pall/platform` and run `npm run verify:scholarship-art`, `npm run verify:stage-four`, `npm run check:web`, `npm run build -w @the-pall/web`. The owner must have previously installed the two Commerce book WebPs (already tested in the Commerce scene). No database migration or character reset. Desktop/mobile positioning and full gameplay still need local browser verification.
