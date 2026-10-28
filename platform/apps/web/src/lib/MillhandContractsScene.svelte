@@ -167,7 +167,7 @@
   .contracts-job{display:flex;flex-direction:column;min-width:0;
     font-family:var(--pall-font-reading,Georgia,serif)}
   .contracts-scene{position:relative;isolation:isolate;overflow:hidden;
-    height:clamp(690px,76vh,830px);min-width:0;background:#322720}
+    height:clamp(565px,65vh,680px);min-width:0;background:#322720}
   .office-art{position:absolute;inset:0;z-index:0;
     background:url('/locations/contracts/contracts-office.webp') center 55%/cover no-repeat}
   .record-props{position:absolute;z-index:2;left:2.5%;bottom:8%;width:54%;height:29%;
