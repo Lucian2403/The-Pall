@@ -65,3 +65,18 @@ The owner approved the Stage 4 Industry/Hauling transition and supplied `depot_b
 Install: extract the ZIP into `The-Pall/platform`, retaining `apps/web/static/locations/depot/depot-background-cold.webp`; run `npm run verify:depot-art`, then restart the frontend. No database migration or character reset.
 
 This revision supersedes the background filename and artwork noted above. No new assets are required for the delivery list or receiving record.
+
+
+## Commerce office — owner asset decision (2026-10-28)
+
+**Owner decision overrides the proposed prop list above:** For the Stage 4 **Commerce / Contracts** interaction, use **only two illustrated interactive book assets**:
+- `stage4-death-register.png` → `apps/web/static/locations/contracts/death-register.webp`
+- `stage4-wage-record.png` → `apps/web/static/locations/contracts/wage-record.webp`
+
+The owner previously supplied `Commerce_Workshop.png` as the **shared Commerce location background**, now installed as `apps/web/static/locations/contracts/contracts-office.webp`. Each of these three sources was converted to a **pixel-identical lossless WebP** (original resolutions 1448×1086, 972×722 and 1026×731). They are delivered as `The_Pall_Stage4_Commerce_Asset_Patch.zip` for local installation rather than committing binary artwork through the text-only GitHub interface.
+
+**No extra prop art.** No new council work-paper cutout, contract ledger, compensation sheet, charge sheet, seal stamp, inkpad, or generic symbol tiles are present in this Commerce scene. The two books are independently clickable with a 1.8% image-only hover enlargement; their button labels contain names without decorative symbols. The approved work-paper examination, record comparison, **seven-line Contracts Clerk exchange**, seal-check versus written-complaint decision and final disputed-docket submission remain the saved server-authoritative work actions; the books' optional visual inspection does not grant knowledge from another route or advance the server action sequence.
+
+**Important canon distinction:** The supplied art says **Death Register** and **Wage Record**, while the approved Commerce route discusses sealed **compensation** and **contract-charge** records. The UI does not pretend the printed titles have changed and does not rewrite or fabricate the approved sealed-record facts. The books are visual props only; the comparison's authoritative content stays in the previously approved stage script. Confirm this visual/narrative distinction in the owner's browser review before treating the books as final representations of the two sealed entries.
+
+**Local verification:** Extract `The_Pall_Stage4_Commerce_Asset_Patch.zip` relative to `The-Pall/platform`. Run `npm run verify:commerce-art`, `npm run verify:stage-four`, `npm run check:web` and `npm run build -w @the-pall/web`. No migration or new character. The shared Commerce background should be reused when future Commerce locations are implemented, subject to their actual approved context.
