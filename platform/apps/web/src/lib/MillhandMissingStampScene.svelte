@@ -31,6 +31,9 @@
   // Local reading pages only. Inspect actions, dialogue and route saves remain
   // server-owned; navigating between these pages changes no saved progress.
   let evidencePage=$state(0);
+  // Present the route briefing and route choices as separate local beats.
+  // This never rewrites the saved Missing Stamp phase or automatically selects a route.
+  let decisionStep=$state<0|1>(0);
   let journalOpen=$state(false);
   let sceneElement:HTMLDivElement|undefined;
   let journalElement:HTMLElement|undefined;
@@ -44,6 +47,9 @@
     else sceneElement?.scrollIntoView({block:'start',behavior:'smooth'});
   }
   const state=$derived(snapshot.state);
+  $effect(()=>{
+    if(state.phase!=='DECISION')decisionStep=0;
+  });
   const beat=$derived(MISSING_STAMP_CONFRONTATION[state.dialogueIndex]??null);
   const journal=$derived(missingStampJournal(state,snapshot.finding,snapshot.slip,snapshot.plate));
   const branchCopy=$derived(state.branch?MISSING_STAMP_ROUTES[state.branch]:null);
@@ -72,7 +78,9 @@
 
     </div>
 
-    <aside class="dialogue" class:record-view={(state.phase==='INSPECT'||state.phase==='READY_TO_SPEAK') && inspectedView!==null && evidencePage===1 && !talkingOptional}
+    <aside class="dialogue"
+      class:record-view={(state.phase==='INSPECT'||state.phase==='READY_TO_SPEAK') && inspectedView!==null && evidencePage===1 && !talkingOptional}
+      class:route-choice={state.phase==='DECISION' && decisionStep===1 && !talkingOptional}
       aria-label="The Missing Stamp dialogue">
       {#if talkingOptional}
         <NpcConversation origin="Millhand" close={() => {talkingOptional=false;}} />
@@ -158,17 +166,23 @@
             <button type="button" class="leave" disabled={!canAct('skip_confrontation')} onclick={() => {void perform('skip_confrontation');}}>{GUTHER_WORK_SKIP_LINE}</button>
           </div>
         {:else if state.phase==='DECISION'}
-          <p class="story">You put the returned plate and the cancellation slip before Guther. He cannot approve the lot. Decide what you will do next.</p>
-          <p class="instruction">Choose what you will do next.</p>
-          <div class="choices">
-            {#each ['restamp','contracts','records'] as route (route)}
-              {@const copy=MISSING_STAMP_ROUTES[route as keyof typeof MISSING_STAMP_ROUTES]}
-              {@const action=('choose_'+route) as MissingStampAction}
-              <button type="button" disabled={!canAct(action)} onclick={() => {void perform(action);}}>
-                “{copy.choice}” <span class="route">{copy.label}</span>
-              </button>
-            {/each}
-          </div>
+          {#if decisionStep===0}
+            <p class="story">You put the returned plate and the cancellation slip before Guther. He cannot approve the lot. Decide what you will do next.</p>
+            <div class="choices">
+              <button type="button" onclick={() => {decisionStep=1;}}>Continue</button>
+            </div>
+          {:else}
+            <p class="instruction">Choose what you will do next.</p>
+            <div class="choices">
+              {#each ['restamp','contracts','records'] as route (route)}
+                {@const copy=MISSING_STAMP_ROUTES[route as keyof typeof MISSING_STAMP_ROUTES]}
+                {@const action=('choose_'+route) as MissingStampAction}
+                <button type="button" disabled={!canAct(action)} onclick={() => {void perform(action);}}>
+                  “{copy.choice}” <span class="route">{copy.label}</span>
+                </button>
+              {/each}
+            </div>
+          {/if}
         {:else if branchCopy}
           <p class="speaker">Guther</p>
           <p class="speech">“{branchCopy.response}”</p>
@@ -243,14 +257,13 @@
   .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px sans-serif}
   .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label{background:#3c2b19;border-color:#efd092}
   /* The image itself is the prop and hit target. Only the small nameplate is framed. */
-  .evidence{position:relative;z-index:4;grid-column:1/-1;grid-row:2;align-self:end;justify-self:center;
-    width:min(490px,48%);display:flex;align-items:end;justify-content:center;gap:12px;
-    /* Shift both physical objects and their accessible click targets onto the
-       horizontal wood surface. Never move the labels independently. */
-    margin:0 0 clamp(89px,10vh,112px)}
+  /* Anchor the full clickable cutouts to the actual foreground wood instead
+     of a row margin that shifts when the scene becomes shorter. */
+  .evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;
+    display:flex;align-items:end;justify-content:center;gap:12px;margin:0}
   .evidence button{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:3px;
     flex:1;min-width:0;margin:0;padding:0;background:transparent;border:0;color:#f3dfc1;cursor:pointer;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(102px,12vw,158px);
+  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(74px,6vw,100px);
     pointer-events:none;filter:drop-shadow(0 5px 6px #0009);
     transform-origin:center 70%;transition:transform 160ms ease-out}
   .evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}
@@ -263,7 +276,7 @@
   .evidence button:disabled .evidence-label{opacity:.7}
   .dialogue{position:relative;z-index:5;grid-column:2;grid-row:1;align-self:start;
     min-width:0;margin:clamp(20px,2.6vw,36px) 0 0;padding:15px 18px;
-    max-height:calc(100% - 40px);overflow-y:auto;overscroll-behavior:contain;
+    max-height:none;overflow:visible;
     border:2px solid #654022;border-radius:5px;background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .eyebrow{font:600 11px sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
   .story,.speech,.finding{font-size:clamp(14px,1.25vw,17px);line-height:1.5;margin:0 0 13px}
@@ -283,6 +296,11 @@
   /* The printed plate and slip are their own short reading beat. Keep the
      document legible, centred and entirely above the physical tabletop props. */
   .dialogue.record-view{max-height:none;overflow:visible}
+  /* Three equally available route choices fit without nesting a scrollbar or
+     enlarging the workshop. The preceding narration is its own Continue beat. */
+  .dialogue.route-choice .instruction{margin:0 0 8px}
+  .dialogue.route-choice .choices{margin-top:4px;gap:5px}
+  .dialogue.route-choice .route{margin-top:3px}
   .record-illustration{display:flex;justify-content:center;align-items:center;
     margin:0 auto 5px;width:100%;max-width:100%}
   .record-illustration img{display:block;width:auto;max-width:100%;
@@ -318,7 +336,8 @@
     .guther{height:86%;left:-5%;top:2%}
     .bench-foreground{object-position:39% center}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%}
-    .evidence{grid-column:1;grid-row:1;width:min(76%,440px);
+    .evidence{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1;
+      justify-self:center;align-self:end;width:min(76%,440px);
       margin:0 0 clamp(32px,7vw,54px);gap:7px}
     .evidence-art{height:clamp(70px,20vw,120px)}
     .evidence-label{min-height:25px;font:11px/1.2 sans-serif;padding:5px 3px}
