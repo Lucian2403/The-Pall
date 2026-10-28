@@ -72,7 +72,8 @@
 
     </div>
 
-    <aside class="dialogue" aria-label="The Missing Stamp dialogue">
+    <aside class="dialogue" class:record-view={(state.phase==='INSPECT'||state.phase==='READY_TO_SPEAK') && inspectedView!==null && evidencePage===1 && !talkingOptional}
+      aria-label="The Missing Stamp dialogue">
       {#if talkingOptional}
         <NpcConversation origin="Millhand" close={() => {talkingOptional=false;}} />
       {:else}
@@ -187,11 +188,6 @@
           {/if}
           <p class="skill">Route: {branchCopy.label}. The associated Major Skill received +1 on the saved route choice.</p>
         {/if}
-        <div class="journal-trigger">
-          <button type="button" class="journal-toggle" aria-expanded={journalOpen}
-            aria-controls="stage-three-journal"
-            onclick={() => {void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
-        </div>
         {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
         {#if pending}<p role="status" class="hint">Saving…</p>{/if}
       {/if}
@@ -207,7 +203,12 @@
       </button>
     </div>
   </div>
-  <p class="footnote">Council-owned evidence. No wages, ordinary XP or items are awarded during this scene.</p>
+  <div class="scene-footer">
+    <p class="footnote">Council-owned evidence. No wages, ordinary XP or items are awarded during this scene.</p>
+    <button type="button" class="journal-toggle journal-outside" aria-expanded={journalOpen}
+      aria-controls="stage-three-journal"
+      onclick={() => {void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
+  </div>
   {#if journalOpen}
     <section id="stage-three-journal" class="journal-panel" bind:this={journalElement}
       aria-label="The Missing Stamp journal">
@@ -279,14 +280,22 @@
     color:#fff1d7;font:600 12px/1.45 sans-serif;opacity:1;text-shadow:none}
   /* Owner's printed evidence art replaces the beige information cards.
      Preserve aspect ratio and keep the existing three-page dialogue height. */
-  .record-illustration{margin:7px 0 9px;max-width:100%;text-align:center}
-  .record-illustration img{display:block;width:100%;height:auto;
-    max-height:min(34vh,325px);object-fit:contain;filter:drop-shadow(0 3px 5px #291b1533)}
+  /* The printed plate and slip are their own short reading beat. Keep the
+     document legible, centred and entirely above the physical tabletop props. */
+  .dialogue.record-view{max-height:none;overflow:visible}
+  .record-illustration{display:flex;justify-content:center;align-items:center;
+    margin:0 auto 5px;width:100%;max-width:100%}
+  .record-illustration img{display:block;width:auto;max-width:100%;
+    height:auto;max-height:240px;object-fit:contain;
+    filter:drop-shadow(0 2px 4px #291b1533)}
   .record{margin:12px 0;padding:12px;border:1px solid #a88f6d;background:#e5d1a9;font:13px/1.4 sans-serif}
   .record strong{font-size:12px;letter-spacing:.04em}
   .record p{margin:6px 0}
   .hint,.skill{font:12px/1.45 sans-serif;color:#614e39}
-  .journal-trigger{border-top:1px solid #b79d7b;margin-top:15px;padding-top:10px}
+  .scene-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:7px 13px;background:#201c17;border-top:1px solid #594229}
+  .scene-footer .footnote{border:0;padding:0;flex:1;margin:0}
+  .journal-outside{flex:none;white-space:nowrap}
   .journal-toggle{padding:7px 10px;background:#d8c7a7;border:1px solid #81654d;color:#3a281b;
     cursor:pointer;font:12px sans-serif}
   .journal-toggle:hover,.journal-toggle:focus-visible{background:#e7d2ae;border-color:#54351c}
@@ -314,6 +323,9 @@
     .evidence-art{height:clamp(70px,20vw,120px)}
     .evidence-label{min-height:25px;font:11px/1.2 sans-serif;padding:5px 3px}
     .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px;max-height:none;overflow:visible}
+    .record-illustration img{max-height:300px}
+    .scene-footer{flex-wrap:wrap}
+    .scene-footer .footnote{min-width:180px}
     .story,.speech,.finding{font-size:16px}
     .journal-heading h2{font-size:20px}
     .journal-entries{font-size:14px}
