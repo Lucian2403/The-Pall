@@ -9,19 +9,26 @@
  * Stranger Friz (personal only) and CF Industrial Fabrics
  * (non-commercial) are intentionally NOT bundled or referenced.
  */
-/* The supplied NewStandard-Regular.otf fails Chromium's OTS CFF CharStrings
- * validation. Preserve its source file but do not request it in the browser.
- * Use a readable system serif until the artist supplies a validated export. */
+/* New Standard is converted locally from the owner's supplied CFF OTF to
+ * quadratic-outline WOFF2 by scripts/install-owner-fonts.ps1.
+ * Never request the original OTF: Chromium rejects its CFF CharStrings INDEX. */
 @font-face {
-  font-family: 'Pall Bebas Neue';
-  src: url('/ui-kit/fonts/bebas-neue-regular.otf') format('opentype');
+  font-family: 'Pall New Standard';
+  src: url('/ui-kit/fonts/new-standard-regular.woff2') format('woff2');
   font-display: swap;
   font-style: normal;
   font-weight: 400;
 }
 @font-face {
   font-family: 'Pall Bebas Neue';
-  src: url('/ui-kit/fonts/bebas-neue-bold.otf') format('opentype');
+  src: url('/ui-kit/fonts/bebas-neue-regular.ttf') format('truetype'), url('/ui-kit/fonts/bebas-neue-regular.otf') format('opentype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Pall Bebas Neue';
+  src: url('/ui-kit/fonts/bebas-neue-bold.ttf') format('truetype'), url('/ui-kit/fonts/bebas-neue-bold.otf') format('opentype');
   font-display: swap;
   font-style: normal;
   font-weight: 700;
@@ -34,7 +41,7 @@
   font-weight: 400;
 }
 :root {
-  --pall-font-reading: Georgia, 'Times New Roman', serif;
+  --pall-font-reading: 'Pall New Standard', Georgia, 'Times New Roman', serif;
   --pall-font-label: 'Pall Bebas Neue', 'Arial Narrow', Arial, sans-serif;
   --pall-font-decorative: 'Pall Beyond Wonderland', Georgia, serif;
   --pall-ink: #151411;
