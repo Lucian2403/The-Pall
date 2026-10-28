@@ -41,6 +41,7 @@
     "verify:missing-stamp-unauthenticated": "node scripts/verify-missing-stamp-unauthenticated.mjs",
     "verify:dev-rewind": "node scripts/verify-dev-stage-rewind.mjs",
     "verify:stage-four": "node scripts/verify-stage-four.mjs",
+    "verify:depot-art": "node scripts/verify-depot-art.mjs",
     "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs"
   }
 }
