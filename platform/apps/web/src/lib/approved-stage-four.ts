@@ -63,7 +63,7 @@ export const STAGE_FOUR_INSTRUCTIONS:Record<SecondJobPhase,string>={
   SPEAK_ARCHIVE:'Speak to the Archive Assistant about the damaged line.',
   ARCHIVE_DIALOGUE:'Speak with the Archive Assistant.',
   CHOOSE_SOURCE:'Use another record to check the damaged entry.',
-  RECORD_FINDING:'Write down what you found.',
+  RECORD_FINDING:'Write down what you\'ve found.',
   DONE:'The work is complete.'
 };
 
@@ -108,7 +108,7 @@ export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
   read_death_register:'You find the worker number beside the entry for a fire in a locked workshop. The council recorded the worker as dead.',
   check_wage_record:'You find the same worker number in a wage entry made after the recorded death. The related shift records contain that number too.',
   examine_scraped_entry:'Part of a handwritten entry has been scraped from the paper. Some ink remains in the damaged area. The surface has been cut.',
-  compare_neighbouring_entries:'You compare the entries above and below the damaged line. The worker number still appears in the later wage record. You cannot read the writing scraped away.',
+  compare_neighbouring_entries:'You check the lines above and below the damaged bit. The worker\'s number is still there in the later wage book.',
   compare_shift_book:'You check the shift book against the wage entry. The same worker number appears in both, after the recorded death.',
   record_finding:'You note the worker number, recorded death, later wage entries and scraped correction. You put the records back in order. The assistant takes the pages.'
 };
@@ -116,7 +116,7 @@ export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
 export const STAGE_FOUR_FINAL={
   restamp:'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
   contracts:'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You leave the Contracts office, pissed off and empty-handed.',
-  records:'The number continued to be used in wage records after the recorded death. Part of an entry had been scraped. Who changed it and why remain unknown.'
+  records:'They marked the man dead, but his number kept showing up in the wage books long after. Someone\'s scraped part of a line off, too. Who did it? Why? Not a damn clue.'
 } as const;
 
 /** Factual personal journal, limited to the route and actions actually committed. */

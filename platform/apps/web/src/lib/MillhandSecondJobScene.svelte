@@ -67,7 +67,7 @@
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
-        <p class="instruction">Your work here is finished.</p>
+        <p class="instruction">You've done what you came for. Nothing more to find here.</p>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
@@ -81,7 +81,7 @@
         {:else if state.phase==='SPEAK_CONTRACTS'||state.phase==='CHOOSE_CHALLENGE'}
           <p class="context">Dead in one record, working in the other. How the bloody hell does that make sense?</p>
         {:else if state.phase==='SPEAK_ARCHIVE'||state.phase==='CHOOSE_SOURCE'||state.phase==='RECORD_FINDING'}
-          <p class="context">The later wage record contains the worker's number. Part of a handwritten entry has been scraped away.</p>
+          <p class="context">But someone's scraped the writing clean off that line. Can't tell what the hell it said.</p>
         {/if}
       {/if}
       {#if actions.length>0}
