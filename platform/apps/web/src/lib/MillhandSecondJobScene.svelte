@@ -1,5 +1,6 @@
 <script lang="ts">
   import {tick} from 'svelte';
+  import MillhandDepotScene from '$lib/MillhandDepotScene.svelte';
   import type {SecondJobState,SecondJobAction} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
@@ -37,6 +38,9 @@
       : ['Death register','Wage records','Scraped line','Shift book']);
 </script>
 
+{#if state.branch==='restamp'}
+  <MillhandDepotScene {snapshot} {pending} {errorMessage} {perform}/>
+{:else}
 <section class="second-job" aria-label={'Millhand Stage 4 '+route.name}>
   <div class="chapter-scene" class:depot={state.branch==='restamp'}
     class:contracts={state.branch==='contracts'} class:records={state.branch==='records'}>
@@ -110,6 +114,7 @@
     </section>
   {/if}
 </section>
+{/if}
 
 <style>
   .second-job{display:flex;flex-direction:column;flex:1;min-width:0;color:#e6d4bf;font-family:var(--pall-font-reading,Georgia,serif)}
