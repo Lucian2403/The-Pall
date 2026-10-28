@@ -123,6 +123,51 @@
   opacity:.55;
   cursor:default;
 }
+/*
+ * Readability pass: real ink contrast on the parchment frame.
+ * Preserve the supplied font family and italic narration; improve its stroke
+ * weight rather than swapping assets or adding glow / blurred text shadows.
+ */
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.dialogue,.work-card,.work-dialogue) {
+  color:#20140d;
+  font-synthesis:weight;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.dialogue,.work-card,.work-dialogue)
+:is(.dialogue-line,.narration,.story,.speech,.finding,.result,.instruction,.context,.outcome) {
+  color:#21150e;
+  font-weight:600;
+  text-shadow:none;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.dialogue,.work-card,.work-dialogue)
+:is(.small,.hint,.skill) {
+  color:#422c1b;
+  font-weight:600;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.heading,.eyebrow,.speaker) {
+  color:#382416;
+  font-weight:700;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button {
+  color:#21140d;
+  font:600 15px/1.35 var(--pall-font-reading,Georgia,serif);
+  text-shadow:none;
+}
+.frame .chapter-content :is(.workshop,.second-job)
+:is(.responses,.actions,.choices) > button:hover:not(:disabled) {
+  color:#170d08;
+}
+/* The bright discipline tag belongs on its own dark plaque: avoid inheriting
+   the choice button's dark ink over that plaque. */
+.frame .chapter-content .workshop .choices > button .route {
+  color:#fff1d7;
+  font-weight:700;
+}
+
 /* Avoid squeezing a tiny popup if a player uses a narrow phone. The actual
  * dialogue stays in the CRPG scene and never becomes a separate page. */
 @media(max-width:700px){
