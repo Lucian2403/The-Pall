@@ -96,6 +96,32 @@ assert.ok(depotUi.includes('scale(1.018)'),'Depot props must have restrained mic
 assert.ok(stage2Ui.includes('{#if instruction !== result}') &&
   stage2Ui.includes('<p class="story">{result}</p>'),
   'Repeated text must be hidden in the UI without modifying owner-authored Stage2 copy');
+const contractsUi=read('apps/web/src/lib/MillhandContractsScene.svelte');
+assert.ok(ui.includes("import MillhandContractsScene from '$lib/MillhandContractsScene.svelte'") &&
+  ui.includes("<MillhandContractsScene {snapshot} {pending} {errorMessage} {perform}/>"),
+  'Approved Commerce branch must render its own office instead of schematic tiles');
+assert.ok(contractsUi.includes('/locations/contracts/contracts-office.webp') &&
+  contractsUi.includes('/locations/contracts/death-register.webp') &&
+  contractsUi.includes('/locations/contracts/wage-record.webp'),
+  'Commerce scene needs the owner-approved office and the exact two supplied book illustrations');
+assert.ok(contractsUi.includes("onclick={() => inspect('death')}") &&
+  contractsUi.includes("onclick={() => inspect('wage')}"),
+  'Both illustrated books must be clickable without advancing or skipping saved work');
+assert.ok(!contractsUi.includes("perform('read_death_register')") &&
+  !contractsUi.includes("perform('check_wage_record')") &&
+  !contractsUi.includes('class="work-surface"') &&
+  !contractsUi.includes('/workshop/council-work.webp'),
+  'Commerce UI must not borrow Investigation's work actions or introduce extra physical props');
+assert.ok(contractsUi.includes('STAGE_FOUR_DIALOGUE.contracts') &&
+  contractsUi.includes('STAGE_FOUR_FINAL.contracts') &&
+  contractsUi.includes('snapshot.availableActions') &&
+  contractsUi.includes('secondJobJournal(state)'),
+  'The previously approved Contracts Clerk script, both dispute choices and journal must remain');
+assert.ok(contractsUi.includes('scale(1.018)') &&
+  contractsUi.includes('class="scene-footer"'),
+  'Book hover must be subtle, and journal should stay outside the CRPG popup');
+console.log('PASS: Owner Contracts office with only Death Register and Wage Record book props, original Disputed Docket script preserved.');
+
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
 console.log('PASS: Stage4 approved dialogue, three jobs, persistent/owned API, navigation and rewind boundaries.');
