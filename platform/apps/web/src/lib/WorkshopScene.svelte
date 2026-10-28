@@ -152,7 +152,7 @@
 
 <style>
   .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:0 0 auto;min-width:0;width:100%;height:clamp(700px,76vh,810px);min-height:0;grid-template-rows:minmax(0,1fr);background:#271b14;border:0;box-sizing:border-box}
+  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:0 0 auto;min-width:0;width:100%;height:clamp(535px,62vh,640px);min-height:0;grid-template-rows:minmax(0,1fr);background:#271b14;border:0;box-sizing:border-box}
   .illustration {position:absolute;inset:0;overflow:hidden}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
