@@ -413,3 +413,28 @@ Owner feedback: Stage 2's four illustrated props were only clickable through the
 **Bench depth / Guther correction:** The scene already has an approved transparent Guther image and the original workshop environment including the painted workbench. Every Stage 1–3 scene now renders **the same environment again, identically aligned, clipped to its lower tabletop area (70%–100%)**. This is a foreground depth layer above Guther, below interactive table props and below the dialogue. Therefore, Guther is genuinely occluded by the existing painted bench instead of being vertically truncated with a crude character mask. No different Guther portrait, workshop asset redraw, new sprites or database changes are required. The 70% depth threshold is an initial match for the existing approved desktop framing; owner screenshots at varying resolutions remain the visual acceptance test. On mobile, the overlay inherits the same `object-position:39% center` as the base environment.
 
 **QA:** `git pull --ff-only` then `npm run check:web` and `npm run build -w @the-pall/web`, restart frontend and hard-refresh. In Stage 1–2 directly click Number stamps, Metal plates, Council order and Hammer on their **images**, with and without their label visible; confirm the same observations/actions as before. Hover just barely scales the prop and leaves the label fixed. In Stage 3 check the Returned plate and Cancellation slip image hover/click; both inspection orders must work. Check Guther's torso/hands at the painted table line and ensure the table occludes him without making a horizontal cutoff across his apron. Verify desktop and mobile. Browser integration remains to be confirmed on the owner's running game.
+
+
+### Millhand Stage 4 Depot — owner background integration, 2026-10-28
+
+The owner supplied a new receiving-yard background `depot_background.png`. The Industry / Hauling branch now renders a dedicated `apps/web/src/lib/MillhandDepotScene.svelte`, replacing the four large schematic glyph tiles. The real numbered plate and council work paper cutouts are separately clickable with 1.8% hover scaling, and the approved Depot Clerk conversation, route choices, server actions and journal remain intact. The delivery list and receiving record are interactive paper *descriptions/actions*, not invented icons. Contracts and Investigation routes are untouched.
+
+To respect the approved task order, the Industry branch uses the existing workshop environment until the player completes the load check and chooses secured versus smaller loads; it then changes to the supplied depot panorama and updates the scene heading to Municipal depot. The new art is delivered as a **separate ZIP** for the user to install, not as a binary committed to GitHub. The ZIP's contents, extracted relative to `platform`, are:
+`apps/web/static/locations/depot/depot-background.webp` (WebP, 1774×887; faithful conversion of the user's original PNG).
+
+**Local commands, from `The-Pall\platform`:**
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\The_Pall_Stage4_Depot_Asset_Patch.zip" -DestinationPath "." -Force
+npm run verify:depot-art
+npm run verify:stage-four
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+The separate ZIP must be downloaded first from the assistant's attachment; do not attempt to install the original PNG at a different path than the component expects. Restart Vite and hard-refresh afterward. No schema, character, Stage 3 or API edits were needed.
+
+**Stage 2 duplicate text:** A poor-quality stamp observation was shown both as the saved action result and the identical phase instruction. `MillhandWorkScene.svelte` now suppresses the second rendering and its separator when the strings match. **No owner-edited source copy was overwritten.**
+
+**Visual limitations:** The Depot Clerk portrait/transparent cutout is not supplied. If later desired, request it from the owner's art workflow. Until then, dialogue is in the standard CRPG popup without inventing a face or character design. The Contracts and records-room locations still require artwork. Browser and database testing must be confirmed locally; the GitHub edits alone do not validate the runtime.
