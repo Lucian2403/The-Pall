@@ -1,98 +1,113 @@
 <#
-Install the permitted typefaces from the ORIGINAL owner-supplied UI kit ZIP.
-Never redistribute or select the non-commercial CF Industrial Fabrics or
-personal-use Stranger Friz files.
+Install user-supplied web-ready New Standard without requiring Python.
+Optional original UI kit import restores Bebas Neue, Beyond Wonderland, and
+the original font license notices. Restricted-license font families are never
+installed.
 
-New Standard's original CFF OTF is rejected by Chromium. This script converts
-that local original into browser-safe WOFF2 using scripts/convert-owner-new-standard.py.
-The conversion is performed on the owner's device; no font binaries are placed
-in GitHub or shared in chat.
-Usage from platform:
-  powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-fonts.ps1 -KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip"
+From The-Pall\platform, for an already-installed kit:
+  powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-fonts.ps1 `
+    -NewStandardWoff2 "$env:USERPROFILE\Downloads\NewStandard-Regular.woff2"
+
+Or to restore other fonts at the same time:
+  powershell -ExecutionPolicy Bypass -File .\scripts\install-owner-fonts.ps1 `
+    -KitZip "$env:USERPROFILE\Downloads\The-Pall-UI-Kit-v1.zip" `
+    -NewStandardWoff2 "$env:USERPROFILE\Downloads\NewStandard-Regular.woff2"
+
+New Standard MUST have genuine TrueType outlines (WOFF2 flavor 0x00010000).
+A WOFF2 wrapper around the rejected OpenType/CFF source will not repair it.
+The source is supplied by the owner, not distributed in the repository.
 #>
 [CmdletBinding()]
 param(
-  [Parameter(Mandatory=$true)][string]$KitZip
+  [string]$KitZip,
+  [string]$NewStandardWoff2
 )
 $ErrorActionPreference = 'Stop'
-if (-not (Test-Path -LiteralPath $KitZip -PathType Leaf)) {
-  throw "Owner UI kit not found: $KitZip"
+if (-not $KitZip -and -not $NewStandardWoff2) {
+  throw 'Specify -NewStandardWoff2 for the corrected web font, or -KitZip to restore the other owner fonts.'
 }
 
 $platformRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $target = Join-Path $platformRoot 'apps\web\static\ui-kit'
 $fontTarget = Join-Path $target 'fonts'
 $licenseTarget = Join-Path $target 'licenses'
-New-Item -ItemType Directory -Path $fontTarget, $licenseTarget -Force | Out-Null
-$temp = Join-Path ([IO.Path]::GetTempPath()) ('pall-owner-fonts-' + [guid]::NewGuid().ToString('N'))
-New-Item -ItemType Directory -Path $temp -Force | Out-Null
+New-Item -ItemType Directory -Path $fontTarget,$licenseTarget -Force | Out-Null
 
-try {
-  Expand-Archive -LiteralPath $KitZip -DestinationPath $temp -Force
-  $root = Join-Path $temp 'The-Pall-UI-Kit-v1\fonts'
-  if (-not (Test-Path -LiteralPath $root -PathType Container)) {
-    throw 'Expected The-Pall-UI-Kit-v1/fonts inside the supplied ZIP.'
+if ($KitZip) {
+  if (-not (Test-Path -LiteralPath $KitZip -PathType Leaf)) {
+    throw "Original UI ZIP not found: $KitZip"
   }
-  $fontSources = @(
-    @{ Archive='new-standard.zip'; Name='NewStandard-Regular.otf'; Output='new-standard-regular.otf'; License='OFL.txt'; LicenseOutput='NEW-STANDARD-OFL.txt' },
-    @{ Archive='bebas-neue-2014-font.zip'; Name='BebasNeueRegular-gxj83.ttf'; Output='bebas-neue-regular.ttf'; License='misc/OFL-58d7.txt'; LicenseOutput='BEBAS-NEUE-OFL.txt' },
-    @{ Archive='bebas-neue-2014-font.zip'; Name='BebasNeueBold-7B9LE.ttf'; Output='bebas-neue-bold.ttf'; License='misc/OFL-58d7.txt'; LicenseOutput='BEBAS-NEUE-OFL.txt' },
-    @{ Archive='beyond-wonderland.zip'; Name='Beyond Wonderland.ttf'; Output='beyond-wonderland.ttf'; License='readme.txt'; LicenseOutput='BEYOND-WONDERLAND-LICENSE.txt' }
-  )
-  foreach ($font in $fontSources) {
-    $archivePath = Join-Path $root $font.Archive
-    $unpacked = Join-Path $temp ('expanded-' + $font.Archive.Replace('.zip',''))
-    if (-not (Test-Path -LiteralPath $unpacked)) {
-      Expand-Archive -LiteralPath $archivePath -DestinationPath $unpacked -Force
+  $temp = Join-Path ([IO.Path]::GetTempPath()) ('pall-fonts-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $temp -Force | Out-Null
+  try {
+    Expand-Archive -LiteralPath $KitZip -DestinationPath $temp -Force
+    $sourceRoot = Join-Path $temp 'The-Pall-UI-Kit-v1\fonts'
+    if (-not (Test-Path -LiteralPath $sourceRoot -PathType Container)) {
+      throw 'The font ZIP must contain The-Pall-UI-Kit-v1/fonts.'
     }
-    $source = Join-Path $unpacked $font.Name
-    $license = Join-Path $unpacked $font.License
-    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
-      throw "Expected font missing from original archive: $($font.Name)"
-    }
-    if (-not (Test-Path -LiteralPath $license -PathType Leaf)) {
-      throw "Font license missing from original archive: $($font.License)"
-    }
-    Copy-Item -LiteralPath $source -Destination (Join-Path $fontTarget $font.Output) -Force
-    Copy-Item -LiteralPath $license -Destination (Join-Path $licenseTarget $font.LicenseOutput) -Force
-  }
 
-  # Convert malformed Chromium CFF to quadratic TrueType outlines.
-  $python = Get-Command 'py' -ErrorAction SilentlyContinue
-  $arguments = @()
-  if ($python) {
-    $pythonExe = $python.Source
-    $arguments = @('-3')
-  } else {
-    $python = Get-Command 'python' -ErrorAction SilentlyContinue
-    if (-not $python) {
-      throw 'Python 3 is required to repair the supplied New Standard CFF font. Install Python 3 and rerun this script.'
-    }
-    $pythonExe = $python.Source
-  }
+    $licensed = @(
+      @{Archive='new-standard.zip'; Files=@(); Output=''; License='OFL.txt'; Notice='NEW-STANDARD-OFL.txt'},
+      @{Archive='bebas-neue-2014-font.zip'; Files=@('BebasNeueRegular-gxj83.ttf','BebasNeueRegular-X34j2.otf'); License='misc/OFL-58d7.txt'; Notice='BEBAS-NEUE-OFL.txt'},
+      @{Archive='bebas-neue-2014-font.zip'; Files=@('BebasNeueBold-7B9LE.ttf','BebasNeueBold-w1w42.otf'); License='misc/OFL-58d7.txt'; Notice='BEBAS-NEUE-OFL.txt'},
+      @{Archive='beyond-wonderland.zip'; Files=@('Beyond Wonderland.ttf'); Output='beyond-wonderland.ttf'; License='readme.txt'; Notice='BEYOND-WONDERLAND-LICENSE.txt'}
+    )
+    foreach ($entry in $licensed) {
+      $zip = Join-Path $sourceRoot $entry.Archive
+      $dir = Join-Path $temp ('expanded-'+$entry.Archive.Replace('.zip',''))
+      if (-not (Test-Path -LiteralPath $dir -PathType Container)) {
+        Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
+      }
+      $license = Join-Path $dir $entry.License
+      if (-not (Test-Path -LiteralPath $license -PathType Leaf)) {
+        throw "Missing owner font license for: $($entry.Archive)"
+      }
+      Copy-Item -LiteralPath $license -Destination (Join-Path $licenseTarget $entry.Notice) -Force
 
-  # Probe without writing an import traceback to PowerShell's error stream.
-  $hasTools = & $pythonExe @arguments -c "import importlib.util; print(int(all(importlib.util.find_spec(n) is not None for n in ('fontTools','brotli'))))"
-  if ($LASTEXITCODE -ne 0 -or $hasTools -ne '1') {
-    Write-Host 'Installing Python fonttools and brotli for the one-time local New Standard conversion…'
-    & $pythonExe @arguments -m pip install --user fonttools brotli --disable-pip-version-check
-    if ($LASTEXITCODE -ne 0) {
-      throw 'Python dependency setup failed. The original New Standard OTF will not work in Chromium.'
+      if ($entry.Files.Count -eq 0) { continue }
+      $chosen = $null
+      foreach ($candidate in $entry.Files) {
+        if (Test-Path -LiteralPath (Join-Path $dir $candidate) -PathType Leaf) {
+          $chosen = $candidate
+          break
+        }
+      }
+      if (-not $chosen) {
+        throw "No compatible approved font found in $($entry.Archive)"
+      }
+      if ($entry.Output) {
+        $outName = $entry.Output
+      } elseif ($chosen -match 'Bold') {
+        $outName = 'bebas-neue-bold'+[IO.Path]::GetExtension($chosen).ToLowerInvariant()
+      } else {
+        $outName = 'bebas-neue-regular'+[IO.Path]::GetExtension($chosen).ToLowerInvariant()
+      }
+      Copy-Item -LiteralPath (Join-Path $dir $chosen) -Destination (Join-Path $fontTarget $outName) -Force
     }
-  }
-
-  $converter = Join-Path $PSScriptRoot 'convert-owner-new-standard.py'
-  $original = Join-Path $fontTarget 'new-standard-regular.otf'
-  $converted = Join-Path $fontTarget 'new-standard-regular.woff2'
-  & $pythonExe @arguments $converter $original $converted
-  if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $converted -PathType Leaf)) {
-    throw 'The local New Standard WOFF2 conversion did not succeed.'
-  }
-  Write-Host 'Installed owner New Standard (repaired WOFF2), Bebas Neue and Beyond Wonderland.'
-  Write-Host 'Restricted fonts were not installed. Included license texts were preserved.'
-  Write-Host "Font directory: $fontTarget"
-} finally {
-  if (Test-Path -LiteralPath $temp) {
-    Remove-Item -LiteralPath $temp -Recurse -Force
+    Write-Host 'Restored licensed Bebas Neue and Beyond Wonderland, with original notices.'
+  } finally {
+    if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
   }
 }
+
+if ($NewStandardWoff2) {
+  if (-not (Test-Path -LiteralPath $NewStandardWoff2 -PathType Leaf)) {
+    throw "The supplied New Standard WOFF2 file does not exist: $NewStandardWoff2"
+  }
+  $bytes = [IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $NewStandardWoff2).Path)
+  if ($bytes.Length -lt 4096 -or
+      [Text.Encoding]::ASCII.GetString($bytes,0,4) -ne 'wOF2' -or
+      $bytes[4] -ne 0 -or $bytes[5] -ne 1 -or
+      $bytes[6] -ne 0 -or $bytes[7] -ne 0) {
+    throw 'New Standard must be a genuine TrueType-outline WOFF2 (wOF2 header, flavor 0x00010000); a repacked CFF/OTF is insufficient.'
+  }
+  $destination = Join-Path $fontTarget 'new-standard-regular.woff2'
+  Copy-Item -LiteralPath $NewStandardWoff2 -Destination $destination -Force
+  Write-Host "Installed New Standard WOFF2: $destination"
+  if (-not (Test-Path -LiteralPath (Join-Path $licenseTarget 'NEW-STANDARD-OFL.txt'))) {
+    Write-Warning 'Keep the original New Standard OFL license notice from your UI kit with any distributed version.'
+  }
+} elseif (-not (Test-Path -LiteralPath (Join-Path $fontTarget 'new-standard-regular.woff2'))) {
+  Write-Warning 'New Standard is not yet installed. Dialogue safely uses Georgia until you supply a valid TrueType-outline WOFF2.'
+}
+Write-Host 'No Python, pip, or font conversion software required.'
