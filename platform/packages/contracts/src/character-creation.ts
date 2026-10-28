@@ -15,6 +15,7 @@ export type CreateCharacterCommand = Readonly<{
   nameKey: string;
   sex: CharacterSex;
   origin: CharacterOrigin;
+  avatarId: string | null;
 }>;
 
 export function normalizeCharacterName(raw: unknown): {name: string; nameKey: string} {
@@ -30,16 +31,32 @@ export function normalizeCharacterName(raw: unknown): {name: string; nameKey: st
 export function parseCreateCharacterCommand(value: unknown): CreateCharacterCommand {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid_body');
   const v = value as Record<string, unknown>;
-  if (Object.keys(v).sort().join(',') !== 'expectedRevision,name,origin,requestId,sex') throw new Error('invalid_fields');
+  const fields=Object.keys(v).sort().join(',');
+  if(fields!=='avatarId,expectedRevision,name,origin,requestId,sex' &&
+     fields!=='expectedRevision,name,origin,requestId,sex')throw new Error('invalid_fields');
   if (typeof v.requestId !== 'string' || !UUID.test(v.requestId)) throw new Error('invalid_request_id');
   if (!Number.isSafeInteger(v.expectedRevision) || (v.expectedRevision as number) < 0) throw new Error('invalid_revision');
   if (v.sex !== 'Male' && v.sex !== 'Female') throw new Error('invalid_sex');
   if (typeof v.origin !== 'string' || !CHARACTER_ORIGINS.some(o => o === v.origin)) throw new Error('invalid_origin');
+  if (v.avatarId !== undefined && v.avatarId !== null &&
+    (typeof v.avatarId !== 'string' ||
+    !new RegExp('^'+v.sex.toLowerCase()+'-0[1-8]
   return {
     requestId: v.requestId,
     expectedRevision: v.expectedRevision as number,
     ...normalizeCharacterName(v.name),
     sex: v.sex,
     origin: v.origin as CharacterOrigin
+  };
+}
+).test(v.avatarId)))
+    throw new Error('invalid_avatar');
+  return {
+    requestId: v.requestId,
+    expectedRevision: v.expectedRevision as number,
+    ...normalizeCharacterName(v.name),
+    sex: v.sex,
+    origin: v.origin as CharacterOrigin,
+    avatarId: typeof v.avatarId==='string'?v.avatarId:null
   };
 }
