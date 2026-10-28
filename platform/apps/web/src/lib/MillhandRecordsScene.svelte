@@ -193,7 +193,7 @@
   .records-job{display:flex;flex-direction:column;min-width:0;
     font-family:var(--pall-font-reading,Georgia,serif)}
   .records-scene{position:relative;isolation:isolate;overflow:hidden;
-    height:clamp(690px,76vh,830px);min-width:0;background:#242730}
+    height:clamp(565px,65vh,680px);min-width:0;background:#242730}
   .records-art{position:absolute;inset:0;z-index:0;
     background:url('/locations/records/records-room.webp') center 49%/cover no-repeat}
   .record-props{position:absolute;z-index:2;left:2.5%;bottom:8%;
