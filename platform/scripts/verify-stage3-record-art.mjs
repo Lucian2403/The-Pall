@@ -28,8 +28,15 @@ assert.ok(scene.includes('evidencePage===1') &&
   scene.includes('max-height:240px'),
   'Owner record images must appear only in the compact second inspection page');
 assert.ok(scene.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
+  scene.includes('max-height:none;overflow:visible;') &&
+  !scene.includes('overflow-y:auto') &&
   scene.includes('class="scene-footer"'),
-  'The evidence pages must be scrollbar-free, with journal actions outside their popup');
+  'All Stage3 dialogue beats must be scrollbar-free; the journal remains outside the popup');
+assert.ok(scene.includes('.evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;') &&
+  scene.includes('height:clamp(74px,6vw,100px)') &&
+  scene.includes("decisionStep=1;") &&
+  scene.includes('class:route-choice='),
+  'Evidence props must remain on the table and the three-route choice must have a compact separate beat');
 assert.ok(scene.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
   scene.includes('snapshot.plate.workerNumber || snapshot.plate.inspectionDate'),
   'If real numbers or dates are authored, use live data instead of stale printed placeholders');
