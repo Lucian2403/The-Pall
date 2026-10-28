@@ -2,6 +2,7 @@
  * Avoid skinning the onboarding sidebar, header, or footer until the owner
  * supplies their dedicated assets. Canonical story copy is never in CSS.
  */
+html,body{margin:0;min-height:100%;background:#151616}
 :root{--entry-ink:#ebdcc4;--entry-warm:#dfb47a;--entry-line:#785a3a}
 .entry-page{min-height:100vh;box-sizing:border-box;padding:clamp(14px,2.5vw,32px);
   background:#151616;color:var(--entry-ink);font-family:var(--pall-font-reading,Georgia,serif)}
