@@ -202,8 +202,7 @@ export function registerCharacterRoutes(app: FastifyInstance) {
         'player_character_work_receipts','player_character_platework',
         'player_character_create_receipts'
       ]){
-        const field=table==='player_character_create_receipts'?'character_id':'character_id';
-        await client.query('DELETE FROM '+table+' WHERE '+field+'=$1',[request.params.id]);
+        await client.query('DELETE FROM '+table+' WHERE character_id=$1',[request.params.id]);
       }
       const removed=await client.query('DELETE FROM player_characters WHERE id=$1 AND account_id=$2',[request.params.id,session.user.id]);
       if(removed.rowCount!==1)throw Error('character_delete_race');
