@@ -527,3 +527,22 @@ npm run build -w @the-pall/web
 The script converts the original OpenType/CFF file to a TrueType-outline WOFF2 with Node/npm in a Windows temporary directory; **no Python or original ZIP needed**. It leaves the already installed UI logo, frames, buttons, Bebas Neue and Beyond Wonderland unchanged. If the entire UI kit was deleted (not just the ZIP), these other assets must be restored separately—this standalone-font command cannot recover missing artwork or missing Bebas files.
 
 The other uploaded standalone fonts do not replace the New Standard source. CF Industrial Fabrics and Stranger Friz remain excluded because of their supplied personal/non-commercial licenses. Do not share font binaries through GitHub or the conversation. The converted WOFF2 is installed only in the owner's local static asset directory; full browser success awaits local testing. On a conversion error, stop and return the installer output so the converter itself can be corrected.
+
+### Stage 3 compact records and Stage 4 colder depot (2026-10-28)
+
+The owner provided a screenshot showing Stage 3's printed **Returned Reference Plate / Cancellation Slip** evidence making the iron dialogue frame so tall that it overlapped the interactive props and generated an internal scrollbar. The layout now constrains **only those two printed record pages** to a maximum illustration height of 240px (300px when the scene stacks on mobile), centres them and makes the record-specific frame fit its content without a scrollbar. The **Review journal** control has moved to a separate compact strip below the workshop illustration, outside the frame. Other conversation pages keep their independent tall-copy safeguard. Both tabletop objects remain separately clickable; no dialogue, choice, journal entry or reward text changed.
+
+The owner also supplied `depot_background_cold.png` to replace the prior warm depot image. It has been losslessly converted to a pixel-identical WebP with its original 1774×887 composition. The new file is **not** baked into the code repository: download `The_Pall_Stage4_Cold_Depot_Background.zip` from this conversation and unpack from `The-Pall\\platform` to create `apps/web/static/locations/depot/depot-background-cold.webp`. The Stage 4 scene now explicitly references this new file so cached warm assets aren't reused.
+
+Run from `platform` after downloading the attached ZIP:
+
+```powershell
+git pull --ff-only
+Expand-Archive -LiteralPath "$env:USERPROFILE\\Downloads\\The_Pall_Stage4_Cold_Depot_Background.zip" -DestinationPath "." -Force
+npm run verify:depot-art
+npm run verify:stage3-record-art
+npm run check:web
+npm run build -w @the-pall/web
+```
+
+Then restart Vite and refresh. This change does not require re-installing the owner fonts, a database migration, or creating a new character. Stage 3 reading page checks and Stage 4 art checks are updated. Source assertions and image pixel comparison were performed; runtime Svelte compilation and browser layout still require the owner's local verification.
