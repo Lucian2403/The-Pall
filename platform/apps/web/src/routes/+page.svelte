@@ -39,7 +39,7 @@
         <div class="hero-content">
           <!-- <p class="entry-eyebrow">THE GAME</p> -->
           <h1 id="landing-title">Make a living.<br/>Find your own way.</h1>
-          <p class="hero-intro"><em>The Pall</em> is a free-to-play, persistent browser MMORPG set in a harsh, industrial world. Your character, skills, possessions and progress remain between sessions.</p>
+          <p class="hero-intro"><em>The Pall</em> is a free-to-play, without any pay-to-win system, persistent browser MMORPG set in a harsh, industrial low-steampunk world. Your character, skills, possessions and progress remain between sessions.</p>
           <div class="hero-actions">
             {#if signedIn}
               <a class="entry-button primary" href="/characters">Continue playing</a>
