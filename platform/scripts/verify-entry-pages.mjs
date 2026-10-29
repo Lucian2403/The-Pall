@@ -60,7 +60,7 @@ assert.ok(!home.includes('Technical connection test') &&
   'Do not bring back the old technical fixture or rejected marketing copy');
 for(const section of [
   'class="landing-hero"','class="world-section','class="freedom-section',
-  'class="story-section"','class="craft-section','class="economy-section',
+  'class="story-section','class="craft-section','class="economy-section',
   'class="exploration-section','class="principles-section','class="development-section'
 ]){
   assert.ok(home.includes(section),'Revised owner copy must be distributed by subject: '+section);
