@@ -3,7 +3,10 @@ import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const read=(p)=>readFileSync(resolve(root,p),'utf8');
+const home=read('apps/web/src/routes/+page.svelte');
 const intro=read('apps/web/src/routes/introduction/+page.svelte');
+const account=read('apps/web/src/routes/account/+page.svelte');
+const approvedHomeCopy=read('../docs/00-vision/public-homepage-copy.md');
 const roster=read('apps/web/src/routes/characters/+page.svelte');
 const backgrounds=read('apps/web/src/routes/backgrounds/+page.svelte');
 const shell=read('apps/web/src/lib/TutorialShell.svelte');
@@ -16,11 +19,45 @@ assert.ok(intro.includes('APPROVED_WORLD_INTRO.paragraphs') &&
   backgrounds.includes('APPROVED_BACKGROUND_SELECTION.origins') &&
   backgrounds.includes('APPROVED_BACKGROUND_SELECTION.closing'),
   'Approved lore and origin copy must remain verbatim in canonical sources');
-for(const page of [intro,roster,backgrounds]){
+for(const page of [home,intro,account,roster,backgrounds]){
   assert.ok(page.includes('pall-entry-pages.css') &&
     page.includes('/ui-kit/branding/logo-compact.png'),
     'Every entry page must retain the owner logo and shared typography');
 }
+assert.ok(home.includes("class=\"landing-hero\"") &&
+  home.includes('/ui-kit/resources/TheCityVista.png') &&
+  home.includes('/account?mode=register') &&
+  home.includes('/account') && home.includes('/introduction') &&
+  home.includes('signedIn?\'/characters\''),
+  'Public homepage must show approved city artwork, account actions, and a signed-in player path');
+for(const text of [
+  'free-to-play, persistent browser, text-based MMORPG',
+  'Develop your skills without fixed classes, pursue different professions',
+  'The world continues to evolve, and your choices determine how you make your living',
+  'No pay-to-win mechanics. No mandatory PvP. No fixed classes.',
+  'The Pall is currently in active development'
+]){
+  assert.ok(approvedHomeCopy.includes(text) && home.includes(text),
+    'Owner-approved public game description changed or is missing: '+text);
+}
+assert.ok(!home.includes('Technical connection test') &&
+  !home.includes('/api/fixture') &&
+  !home.includes('Donation link'),
+  'Never expose the technical fixture or an invented donation link as the public entry');
+assert.ok(home.includes('github.com/Lucian2403/The-Pall/commits/main/') &&
+  home.includes('LONGER-TERM DESIGN') &&
+  home.includes('IMPLEMENTED FOR TESTING'),
+  'Development history and roadmap must remain grounded in actual progress');
+assert.ok(intro.includes('APPROVED_WORLD_INTRO.paragraphs') &&
+  !intro.includes("status==='login'") &&
+  !intro.includes('Account required') &&
+  intro.includes('/account?mode=register'),
+  'Canonical lore must be publicly accessible without changing its text or bypassing gameplay auth');
+assert.ok(account.includes("requested==='register'") &&
+  account.includes("new URLSearchParams(window.location.search)") &&
+  account.includes("authClient.signUp.email") &&
+  account.includes("authClient.signIn.email"),
+  'Create-account hero button must open the live registration form, not a mock link');
 assert.ok(intro.includes('/characters')&&intro.includes('entry-hero') &&
   roster.includes('entry-hero')&&backgrounds.includes('entry-hero'),
   'All three entry routes should show the city overview and work as real navigation');
@@ -59,4 +96,4 @@ for(const [file,expected] of [
   assert.ok(read('apps/web/src/lib/'+file).includes(expected),
     'Compact onboarding image height missing: '+file);
 }
-console.log('PASS: Intro, roster, backgrounds, owner avatar selection, guarded character deletion and compact scenes.');
+console.log('PASS: Public homepage, approved short description, open lore, working signup path, roster, backgrounds, avatars and compact scenes.');
