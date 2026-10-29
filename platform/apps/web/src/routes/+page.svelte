@@ -22,7 +22,9 @@
 
 <div class="entry-page landing">
   <div class="entry-wrap">
-    <nav class="entry-nav" aria-label="Main navigation">
+    <!-- One city panorama spans both navigation and hero: no dark strip or seam. -->
+    <header class="landing-masthead">
+      <nav class="entry-nav" aria-label="Main navigation">
       <a href="/" class="brand" aria-label="The Pall, home">
         <img src="/ui-kit/branding/logo-compact.png" alt="The Pall"/>
       </a>
@@ -32,11 +34,8 @@
         <a href="#development">Development</a>
         <a href="/account">Sign in</a>
       </div>
-    </nav>
-
-    <main>
+      </nav>
       <section class="landing-hero" id="game" aria-labelledby="landing-title">
-        <div class="hero-art" role="img" aria-label="Panorama of Grand Cylinder City and its enormous central power structure"></div>
         <div class="hero-content">
           <!-- <p class="entry-eyebrow">THE GAME</p> -->
           <h1 id="landing-title">Make a living.<br/>Find your own way.</h1>
@@ -52,7 +51,9 @@
           <p class="hero-status">In active development</p>
         </div>
       </section>
+    </header>
 
+    <main>
       <!-- The same six owner illustrations now fill their whole section.
            Parchment text remains on the alternating left/right side of the art. -->
       <section class="world-section landing-split section-width" aria-labelledby="world-heading">
@@ -172,22 +173,68 @@
 <style>
   .landing{padding-top:13px}
   .landing .entry-wrap{max-width:1440px}
-  .landing .entry-nav{padding:0 clamp(9px,1.1vw,18px) 12px}
+  /* A single owner-supplied vista renders behind the complete masthead, not
+     separately underneath the navigation and the hero. This prevents a seam
+     and keeps the city architecture aligned as the viewport changes. */
+  .landing-masthead{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    border:1px solid #745538;
+    background:#24201b url('/ui-kit/resources/TheCityVista.png') center 31%/cover no-repeat;
+  }
+  .landing-masthead::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      linear-gradient(180deg,#100e0ce8 0%,#100e0c91 13%,transparent 38%),
+      linear-gradient(90deg,#15120fa8 0%,#15120f37 55%,transparent 88%);
+  }
+  .landing .entry-nav{
+    position:relative;
+    z-index:1;
+    padding:10px clamp(13px,2.4vw,34px) 12px;
+    border-bottom:1px solid #d0a16b37;
+    background:transparent;
+  }
   .landing .entry-nav .brand img{
-    width:clamp(138px,11.4vw,174px);
-    max-height:94px;
+    width:clamp(188px,16.5vw,248px);
+    max-height:128px;
     height:auto;
     object-fit:contain;
+    filter:drop-shadow(0 2px 5px #0b0807cc);
   }
-  .landing-hero{position:relative;isolation:isolate;overflow:hidden;
-    display:flex;align-items:flex-end;min-height:clamp(360px,33vw,465px);
-    background:#24201b;border:1px solid #745538}
-  .hero-art{position:absolute;z-index:-2;inset:0;
-    background:url('/ui-kit/resources/TheCityVista.png') center 54%/cover no-repeat}
-  .landing-hero:after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
-    background:linear-gradient(90deg,#15120ff2 0%,#15120fd0 27%,#15120f38 65%,transparent 100%),
-      linear-gradient(0deg,#15120fcb,transparent 55%)}
-  .hero-content{max-width:730px;padding:clamp(23px,3.5vw,48px)}
+  .landing .entry-links a{
+    text-shadow:0 2px 4px #0c0806;
+  }
+  .landing-hero{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:flex-end;
+    min-height:clamp(350px,31vw,455px);
+    background:transparent;
+    border:0;
+  }
+  .landing-hero::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      linear-gradient(90deg,#15120fe9 0%,#15120fbc 27%,#15120f2a 65%,transparent 100%),
+      linear-gradient(0deg,#15120fc9,transparent 60%);
+  }
+  .hero-content{
+    position:relative;
+    z-index:1;
+    max-width:730px;
+    padding:clamp(23px,3.5vw,48px);
+  }
   h1,h2,p{margin-top:0}
   h1{margin:10px 0 18px;font:600 clamp(37px,4vw,60px)/1.12 var(--pall-font-reading,Georgia,serif);
     letter-spacing:-.024em;color:#f7e5cd;text-shadow:0 2px 7px #0009}
@@ -425,9 +472,13 @@
     .landing{padding:9px}
     .landing .entry-nav{flex-wrap:wrap}
     .landing .entry-links{gap:10px 16px}
-    .landing-hero{min-height:440px}
-    .hero-art{background-position:55% 35%}
-    .landing-hero:after{background:linear-gradient(0deg,#15120ffb 0%,#15120fe0 55%,#15120f44 100%)}
+    .landing-masthead{background-position:55% 31%}
+    .landing .entry-nav{padding:8px 13px 10px;gap:10px}
+    .landing .entry-nav .brand img{width:clamp(162px,35vw,205px);max-height:110px}
+    .landing-hero{min-height:430px}
+    .landing-hero::after{
+      background:linear-gradient(0deg,#15120ffb 0%,#15120fe0 55%,#15120f50 100%);
+    }
     .hero-content{padding:21px}
     .landing-split{
       align-items:flex-end;

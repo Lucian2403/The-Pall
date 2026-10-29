@@ -69,6 +69,25 @@ assert.ok(!/github\.com|Lucian2403\/The-Pall|Design documents|Development update
   home.includes('/introduction') &&
   home.includes('In active development'),
   'The private development repository must never be linked or mentioned in the public homepage');
+// Navigation and hero must share exactly one city panorama without a
+// separate hero image or contrasting opaque band between them.
+assert.ok(home.includes('<header class="landing-masthead">') &&
+  home.includes('</header>\n\n    <main>') &&
+  home.includes('.landing-masthead{') &&
+  home.includes("background:#24201b url('/ui-kit/resources/TheCityVista.png') center 31%/cover no-repeat") &&
+  home.includes('.landing-masthead::before{') &&
+  home.includes('.landing .entry-nav{') &&
+  home.includes('background:transparent;') &&
+  home.includes('.landing-hero{') &&
+  home.includes('border:0;') &&
+  !home.includes('class="hero-art"') &&
+  !home.includes('.hero-art{'),
+  'Navigation and hero must use one uninterrupted city background, not two differently cropped images');
+assert.ok(home.includes('.landing-hero::after{') &&
+  home.includes('.hero-content{') &&
+  home.includes('z-index:1;') &&
+  home.includes('.landing .entry-links a{'),
+  'Masthead needs translucent overlays plus readable heading and navigation text');
 // Six illustrated sections alternate between art and copy; images are
 // explicitly mapped to the owner-supplied location/resource illustrations.
 const alternate=[
@@ -106,9 +125,10 @@ for(const asset of [
 assert.ok(home.includes('.world-media{') &&
   home.includes('background-position:center top'),
   'Grand Cylinder City section must crop to the upper skyline and Cylinder peak');
-assert.ok(home.includes('width:clamp(138px,11.4vw,174px)') &&
+assert.ok(home.includes('width:clamp(188px,16.5vw,248px)') &&
+  home.includes('.landing .entry-nav .brand img{width:clamp(162px,35vw,205px)') &&
   !home.includes('A CITY ENDURES'),
-  'Homepage logo must be larger and the old city motto removed');
+  'Top-left logo must be visibly larger on desktop and sized for mobile; keep old motto removed');
 assert.ok(home.includes('.landing-split .landing-copy{width:100%}') &&
   home.includes('.landing-split .landing-media{background-position:center}') &&
   home.includes('background:linear-gradient(0deg,#15110dfb'),
@@ -220,4 +240,4 @@ for(const [file,expected] of [
   assert.ok(read('apps/web/src/lib/'+file).includes(expected),
     'Compact onboarding image height missing: '+file);
 }
-console.log('PASS: Approved homepage copy, six full-bleed background sections, alternating contrast, two full-size logo placements, source privacy and entry checks.');
+console.log('PASS: Continuous city masthead, larger responsive logo, owner copy, six full-bleed section backgrounds, logo placements, source privacy and entry checks.');
