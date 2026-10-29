@@ -46,3 +46,18 @@ The public homepage now reuses the existing **owner-approved transparent nine-sl
 For **readability, only prose paragraphs** in the homepage's narrative panels and hero description change to regular Georgia serif (17–19px on framed copy, about 18–20px in the hero), stronger dark ink on parchment, and 1.6–1.65 line spacing. The original headline sizes, font families and section-heading presentation must **not** change. Button labels retain the existing owner-approved font. The exact owner-authored text, including inline emphasis, remains intact.
 
 Keep the ornamental parchment behind actual reading copy rather than behind artwork, labels or the skyline; the homepage is a public entry page, not a gameplay dialogue. Source assertions check the frame and button sprite paths, headings, font isolation, all approved copy paragraphs, and account navigation. Test local assets with `npm run verify:owner-ui-kit`, and source/UI types with `npm run verify:entry-pages` and `npm run check:web`.
+
+## Owner-approved alternating illustration layout — 2026-10-29
+
+The public homepage alternates real art and copy in six adjoining sections, in narrative order. On desktop: **Grand Cylinder City skyline art / World text**, **Your Path text / The Pall-zone art**, **records-room art / Stories text**, **Crafting text / workshop art**, **crafting-items art / Economy text**, **Exploration text / Grey Marches art**. On mobile the text remains grouped with its heading above each corresponding illustration; no content is dropped.
+
+The homepage branding logo is larger (up to 174px wide) and its neighbouring **“A CITY ENDURES”** motto is removed **from this page**. The city artwork in the World section is framed from the **top** so that the sky and peak of the Grand Cylinder remain visible rather than showing the lower buildings again. Approved reading-parchment and three-state buttons remain intact, as does every paragraph of the owner's approved copy.
+
+Three owner-provided image files are installed locally by unpacking `The_Pall_Homepage_Landscape_Assets_Patch.zip` **from the `platform` directory**:
+- `apps/web/static/locations/homepage/pall-zone.webp` ← `ThePallZone-Background01.png`
+- `apps/web/static/locations/homepage/crafting-items.webp` ← `CraftingItems.png`
+- `apps/web/static/locations/homepage/grey-marches.webp` ← `GreyMarches_background01.png`
+
+Images were converted to web-optimised WebP without repainting, reinterpreting or inventing any game visuals. Existing Workshop, Records and City assets are reused. They are **not committed as binary files** through the source-code connector. `npm run verify:homepage-art` checks all six local illustrations; `npm run verify:entry-pages` checks structure, panel order, assets and literal approved copy.
+
+**Important privacy directive:** The Pall is a **closed-source game**. Never expose the private source-code repository or a public code-hosting/documentation link from any player-visible page. The previous repository links in Development have been removed. The only remaining link there leads to the first-party World Introduction page; curate genuine in-game patch notes and a roadmap later, without linking to the underlying source-code host.
