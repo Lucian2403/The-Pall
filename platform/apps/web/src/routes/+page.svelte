@@ -189,15 +189,16 @@
     inset:0;
     z-index:0;
     pointer-events:none;
+    /* One unbroken dark-to-clear treatment covers both header and hero. */
     background:
-      linear-gradient(180deg,#100e0ce8 0%,#100e0c91 13%,transparent 38%),
-      linear-gradient(90deg,#15120fa8 0%,#15120f37 55%,transparent 88%);
+      linear-gradient(90deg,#15120fec 0%,#15120fc6 27%,#15120f37 67%,transparent 100%),
+      linear-gradient(180deg,#100e0cbd 0%,#100e0c55 25%,transparent 58%);
   }
   .landing .entry-nav{
     position:relative;
     z-index:1;
     padding:10px clamp(13px,2.4vw,34px) 12px;
-    border-bottom:1px solid #d0a16b37;
+    border-bottom:0;
     background:transparent;
   }
   .landing .entry-nav .brand img{
@@ -207,8 +208,42 @@
     object-fit:contain;
     filter:drop-shadow(0 2px 5px #0b0807cc);
   }
+  /* Compact variants of the approved nine-slice button artwork. */
+  .landing .entry-links{
+    justify-content:flex-end;
+    gap:clamp(5px,.7vw,10px);
+  }
   .landing .entry-links a{
-    text-shadow:0 2px 4px #0c0806;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:42px;
+    padding:2px 5px;
+    border:solid transparent;
+    border-width:10px 21px 9px;
+    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+    border-image-slice:50 180 45 180 fill;
+    border-image-width:10px 21px 9px;
+    border-image-repeat:stretch;
+    border-radius:0;
+    background:transparent;
+    color:#25170e;
+    font:600 15px/1.25 var(--pall-font-reading,Georgia,serif);
+    text-decoration:none;
+    text-shadow:none;
+    white-space:nowrap;
+  }
+  .landing .entry-links a:hover{
+    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
+    color:#170d08;
+    text-decoration:none;
+  }
+  .landing .entry-links a:active{
+    border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
+  }
+  .landing .entry-links a:focus-visible{
+    outline:2px solid #f0bf7c;
+    outline-offset:2px;
   }
   .landing-hero{
     position:relative;
@@ -225,9 +260,8 @@
     inset:0;
     z-index:0;
     pointer-events:none;
-    background:
-      linear-gradient(90deg,#15120fe9 0%,#15120fbc 27%,#15120f2a 65%,transparent 100%),
-      linear-gradient(0deg,#15120fc9,transparent 60%);
+    /* Horizontal shading now belongs to the masthead, not only this section. */
+    background:linear-gradient(0deg,#15120fc9,transparent 60%);
   }
   .hero-content{
     position:relative;
@@ -473,7 +507,20 @@
     .landing .entry-nav{flex-wrap:wrap}
     .landing .entry-links{gap:10px 16px}
     .landing-masthead{background-position:55% 31%}
+    .landing-masthead::before{
+      background:
+        linear-gradient(180deg,#15120fdb 0%,#15120f70 38%,transparent 72%),
+        linear-gradient(90deg,#15120fd9,#15120f22 100%);
+    }
     .landing .entry-nav{padding:8px 13px 10px;gap:10px}
+    .landing .entry-links{width:100%;justify-content:flex-start;gap:5px 8px}
+    .landing .entry-links a{
+      min-height:37px;
+      padding:1px 3px;
+      border-width:8px 17px 8px;
+      border-image-width:8px 17px 8px;
+      font-size:14px;
+    }
     .landing .entry-nav .brand img{width:clamp(162px,35vw,205px);max-height:110px}
     .landing-hero{min-height:430px}
     .landing-hero::after{
