@@ -3,57 +3,59 @@
   import '$lib/pall-owner-ui.css';
   import '$lib/pall-entry-pages.css';
   import {APPROVED_WORLD_INTRO} from '$lib/approved-introductions';
-  // Replaying the approved world introduction never changes server progress.
-  let status=$state<'checking'|'ready'|'login'|'unavailable'>('checking');
-  onMount(()=>{void (async()=>{try{
-    const response=await fetch('/api/me',{cache:'no-store'});
-    status=response.status===401?'login':response.ok?'ready':'unavailable';
-  }catch{status='unavailable';}})();});
+
+  // The canonical world introduction is publicly readable. Only choosing
+  // characters requires authentication; replaying lore never mutates progress.
+  let signedIn=$state(false);
+  onMount(()=>{void (async()=>{
+    try{
+      const response=await fetch('/api/me',{cache:'no-store'});
+      signedIn=response.ok;
+    }catch{signedIn=false;}
+  })();});
 </script>
 <svelte:head>
   <title>The Pall — World Introduction</title>
-  <meta name="description" content="The Pall — Grand Cylinder City" />
+  <meta name="description" content="Enter the world of The Pall and Grand Cylinder City." />
 </svelte:head>
 <div class="entry-page">
   <div class="entry-wrap">
     <nav class="entry-nav" aria-label="Page navigation">
-      <a href="/introduction" class="brand">
+      <a href="/" class="brand">
         <img src="/ui-kit/branding/logo-compact.png" alt="The Pall"/>
         <span>A CITY ENDURES</span>
       </a>
-      <div class="entry-links"><a href="/characters">Characters</a><a href="/account">Account</a></div>
+      <div class="entry-links">
+        <a href="/">Home</a>
+        <a href="/characters">Characters</a>
+        <a href="/account">Account</a>
+      </div>
     </nav>
     <header class="entry-hero">
       <div><span class="entry-eyebrow">Grand Cylinder City</span><h1>{APPROVED_WORLD_INTRO.heading}</h1></div>
     </header>
     <main class="entry-content">
-      {#if status==='checking'}
-        <p role="status">Checking your account…</p>
-      {:else if status==='login'}
-        <h2>Account required</h2>
-        <p>Sign in to enter The Pall.</p><a class="entry-button" href="/account">Sign in</a>
-      {:else if status==='unavailable'}
-        <h2>Account service unavailable</h2>
-        <p>Check that the local API and database are running, then refresh.</p>
-        <a class="entry-button" href="/account">Return to account</a>
-      {:else}
-        <span class="entry-eyebrow">The world beyond the walls</span>
-        <div class="lore">
-          {#each APPROVED_WORLD_INTRO.paragraphs as paragraph,i}
-            <p class:ending={i>=APPROVED_WORLD_INTRO.paragraphs.length-2}>
-              {#each paragraph as segment}
-                {#if segment.style==='strong'}<strong>{segment.text}</strong>
-                {:else if segment.style==='em'}<em>{segment.text}</em>
-                {:else}{segment.text}{/if}
-              {/each}
-            </p>
-          {/each}
-        </div>
-        <nav class="continue" aria-label="Continue introduction">
+      <span class="entry-eyebrow">The world beyond the walls</span>
+      <div class="lore">
+        {#each APPROVED_WORLD_INTRO.paragraphs as paragraph,i}
+          <p class:ending={i>=APPROVED_WORLD_INTRO.paragraphs.length-2}>
+            {#each paragraph as segment}
+              {#if segment.style==='strong'}<strong>{segment.text}</strong>
+              {:else if segment.style==='em'}<em>{segment.text}</em>
+              {:else}{segment.text}{/if}
+            {/each}
+          </p>
+        {/each}
+      </div>
+      <nav class="continue" aria-label="Continue introduction">
+        {#if signedIn}
           <a class="entry-button" href="/characters">Continue to character selection</a>
           <a href="/backgrounds">Choose a background</a>
-        </nav>
-      {/if}
+        {:else}
+          <a class="entry-button" href="/account?mode=register">Create account to play</a>
+          <a href="/account">Sign in</a>
+        {/if}
+      </nav>
     </main>
   </div>
 </div>
