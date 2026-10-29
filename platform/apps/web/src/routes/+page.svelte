@@ -60,7 +60,7 @@
           <p class="entry-eyebrow">THE WORLD</p>
           <h2 id="world-heading">Grand Cylinder City</h2>
         </div>
-        <div class="section-prose">
+        <div class="section-prose landing-parchment">
           <p>Nearly a century ago, a catastrophe called <strong>The Plume</strong> poisoned much of the world. Nobody knows what caused it. Now, most survivors live behind the enormous walls of Grand Cylinder City, where factories run day and night and thousands struggle to earn their keep. Beyond the walls lie dangerous, largely uncharted territories. And farther still, <strong>the Pall</strong>, where few dare venture.</p>
           <p class="standout"><strong>You're just another person trying to get by.</strong></p>
         </div>
@@ -71,7 +71,7 @@
           <p class="entry-eyebrow">YOUR PATH</p>
           <h2 id="freedom-heading">No fixed classes.</h2>
         </div>
-        <div class="section-prose">
+        <div class="section-prose landing-parchment">
           <p>Learn a trade, take jobs, build a business, explore or fight your way through trouble. There are no fixed classes. How you develop your skills, earn your coin and spend your days is entirely up to you.</p>
         </div>
       </section>
@@ -81,7 +81,9 @@
         <div class="story-content">
           <p class="entry-eyebrow">STORIES &amp; CHOICES</p>
           <h2 id="stories-heading">But there's more to life here than making money.</h2>
-          <p><strong>Mature, story-driven quests</strong> explore corruption, exploitation, poverty, survival and the darker side of human nature. You'll meet people with their own troubles and motives, face uncomfortable choices and uncover stories that don't always have a clear right or wrong. Sometimes, doing the decent thing comes at a price.</p>
+          <div class="landing-parchment">
+            <p><strong>Mature, story-driven quests</strong> explore corruption, exploitation, poverty, survival and the darker side of human nature. You'll meet people with their own troubles and motives, face uncomfortable choices and uncover stories that don't always have a clear right or wrong. Sometimes, doing the decent thing comes at a price.</p>
+          </div>
         </div>
       </section>
 
@@ -90,7 +92,9 @@
         <div class="craft-content">
           <p class="entry-eyebrow">CRAFTING &amp; PRODUCTION</p>
           <h2 id="crafting-heading">Master a trade.</h2>
-          <p><strong>Crafting is a profession in its own right.</strong> Gather resources, refine materials, manufacture components and assemble equipment. Your skills, tools, workshop, materials and decisions affect the quality of what you produce. There's genuine depth to mastering a trade.</p>
+          <div class="landing-parchment">
+            <p><strong>Crafting is a profession in its own right.</strong> Gather resources, refine materials, manufacture components and assemble equipment. Your skills, tools, workshop, materials and decisions affect the quality of what you produce. There's genuine depth to mastering a trade.</p>
+          </div>
         </div>
       </section>
 
@@ -99,7 +103,7 @@
           <p class="entry-eyebrow">THE ECONOMY</p>
           <h2 id="economy-heading">Every material has a purpose.</h2>
         </div>
-        <div class="section-prose">
+        <div class="section-prose landing-parchment">
           <p>And unlike many MMORPGs, <strong>early-game materials don't become useless at higher levels</strong>. Coal, iron, leather, cloth and basic components remain part of advanced production, maintenance and repairs. Even the best equipment needs ordinary materials and the craftsmen who produce them. A newcomer supplying basic goods can still have a place in the endgame economy.</p>
         </div>
       </section>
@@ -109,7 +113,7 @@
           <p class="entry-eyebrow">EXPLORATION &amp; COMBAT</p>
           <h2 id="exploration-heading">Beyond the city.</h2>
         </div>
-        <div class="section-prose">
+        <div class="section-prose landing-parchment">
           <p>Beyond the city, procedurally generated territories offer new places to explore, resources to uncover and dangers to face. Discover something valuable? Sell the information to other players, or keep it for yourself. Just make sure you're prepared. Equipment, supplies and decisions matter, especially when trouble turns into tactical, turn-based combat.</p>
           <p class="standout">Be a craftsman, merchant, explorer, fighter, or a little of everything. You don't have to chase the same goals as everyone else.</p>
         </div>
@@ -124,7 +128,9 @@
         <div>
           <p class="entry-eyebrow">DEVELOPMENT</p>
           <h2 id="development-heading">The Pall is taking shape.</h2>
-          <p><em>The Pall</em> is in active development, with new locations, quests, professions and gameplay systems being introduced as the world takes shape.</p>
+          <div class="landing-parchment">
+            <p><em>The Pall</em> is in active development, with new locations, quests, professions and gameplay systems being introduced as the world takes shape.</p>
+          </div>
           <div class="development-links">
             <a href="https://github.com/Lucian2403/The-Pall/commits/main/" target="_blank" rel="noopener noreferrer">Development updates</a>
             <a href="https://github.com/Lucian2403/The-Pall/tree/main/docs" target="_blank" rel="noopener noreferrer">Design documents</a>
@@ -164,7 +170,7 @@
   h1{margin:10px 0 18px;font:600 clamp(37px,4vw,60px)/1.12 var(--pall-font-reading,Georgia,serif);
     letter-spacing:-.024em;color:#f7e5cd;text-shadow:0 2px 7px #0009}
   .hero-intro{max-width:680px;margin:0;color:#f0dfc6;
-    font:500 clamp(17px,1.5vw,20px)/1.5 var(--pall-font-reading,Georgia,serif)}
+    font:400 clamp(18px,1.5vw,20px)/1.6 Georgia,'Times New Roman',serif}
   .hero-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:22px}
   .entry-button.primary{background:#705037;border-color:#c39c65;color:#fff0d7}
   .entry-button.primary:hover{background:#866044}
@@ -214,6 +220,79 @@
   .landing-footer a{color:#e1b97b}
   .footer-brand{text-decoration:none;letter-spacing:.14em;
     font:16px var(--pall-font-label,'Arial Narrow',sans-serif)}
+  /*
+   * Owner nine-slice parchment from the CRPG dialogue. Headings remain
+   * outside these panels with their original type and colours.
+   */
+  .landing .landing-parchment{
+    box-sizing:border-box;
+    min-width:0;
+    border-style:solid;
+    border-color:transparent;
+    border-width:27px 31px 25px 31px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:27px 31px 25px 31px;
+    border-image-repeat:stretch;
+    border-radius:0;
+    background:transparent;
+    padding:12px 16px 15px;
+    box-shadow:0 7px 18px #0007;
+    color:#271a12;
+  }
+  /* Body paragraphs alone use the clearer Georgia face. Heading, kicker and
+     button typography remain in the existing owner-approved fonts. */
+  .landing .landing-parchment p{
+    margin:0 0 13px;
+    font:400 clamp(17px,1.38vw,19px)/1.65 Georgia,'Times New Roman',serif;
+    letter-spacing:0;
+    color:#27190f;
+    text-shadow:none;
+  }
+  .landing .landing-parchment p:last-child{margin-bottom:0}
+  .landing .landing-parchment strong{font-weight:700;color:#23150e}
+  .landing .landing-parchment .standout{color:#4b2d1a!important;font-weight:700!important}
+  /* CTA links keep their semantic hrefs but use the exact three-state artwork
+     as gameplay response buttons. */
+  .landing a.entry-button{
+    box-sizing:border-box;
+    min-height:50px;
+    border-style:solid;
+    border-color:transparent;
+    border-width:13px 34px 12px 34px;
+    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+    border-image-slice:50 180 45 180 fill;
+    border-image-width:13px 34px 12px 34px;
+    border-image-repeat:stretch;
+    border-radius:0;
+    background:transparent;
+    color:#25170e;
+    padding:3px 9px;
+    text-align:center;
+    text-shadow:none;
+    font:600 15px/1.35 var(--pall-font-reading,Georgia,serif);
+  }
+  .landing a.entry-button.primary,
+  .landing a.entry-button.secondary{background:transparent;color:#25170e;border-color:transparent}
+  .landing a.entry-button:hover,
+  .landing a.entry-button.primary:hover{
+    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
+    background:transparent;
+    color:#170d08;
+  }
+  .landing a.entry-button:active{
+    border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
+  }
+  .landing a.entry-button:focus-visible{
+    outline:2px solid #f0bf7c;outline-offset:3px;
+  }
+  @media(max-width:700px){
+    .landing .landing-parchment{
+      border-width:23px 25px 22px 25px;
+      border-image-width:23px 25px 22px 25px;
+      padding:10px 9px;
+    }
+  }
   @media(max-width:850px){
     .world-section,.freedom-section,.economy-section,.exploration-section{grid-template-columns:1fr;gap:5px}
     .story-section{grid-template-columns:1fr}
