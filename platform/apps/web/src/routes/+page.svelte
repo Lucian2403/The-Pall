@@ -54,7 +54,8 @@
         </div>
       </section>
 
-      <!-- Alternating art/text rhythm: image/text, text/image, repeated. -->
+      <!-- The same six owner illustrations now fill their whole section.
+           Parchment text remains on the alternating left/right side of the art. -->
       <section class="world-section landing-split section-width" aria-labelledby="world-heading">
         <div class="landing-media world-media" role="img" aria-label="The sky and the upper reaches of Grand Cylinder City, with the Cylinder rising above its rooftops"></div>
         <div class="landing-copy">
@@ -136,6 +137,10 @@
         <h2 id="principles-heading">No pay-to-win. No forced PvP. No fixed classes.</h2>
       </section>
 
+      <div class="landing-logo-break section-width" aria-label="The Pall">
+        <img src="/ui-kit/branding/logo-full.png" alt="The Pall"/>
+      </div>
+
       <section class="development-section section-width" id="development" aria-labelledby="development-heading">
         <div>
           <p class="entry-eyebrow">DEVELOPMENT</p>
@@ -156,7 +161,9 @@
     </main>
 
     <footer class="landing-footer">
-      <a href="/" class="footer-brand">THE PALL</a>
+      <a href="/" class="footer-brand" aria-label="The Pall — home">
+        <img src="/ui-kit/branding/logo-full.png" alt=""/>
+      </a>
       <span>In active development</span>
       <a href="/account">Account</a>
     </footer>
@@ -195,43 +202,90 @@
   .hero-status{margin:16px 0 0;color:#e5cba8;font:14px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.08em;text-transform:uppercase}
   .section-width{max-width:1320px;margin:0 auto}
-  /* Alternate each illustration with its own heading and reading panel.
-     Text and images remain two balanced columns instead of tiny thumbnail cards. */
+  /*
+   * The six original location/resource illustrations fill their entire
+   * sections. Preserve the alternating *text alignment* and the full
+   * art rather than placing it inside bordered thumbnails.
+   */
   .landing-split{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+    position:relative;
+    isolation:isolate;
+    display:flex;
     align-items:center;
-    gap:clamp(24px,3.1vw,48px);
-    padding:clamp(30px,3.7vw,54px) clamp(14px,2.4vw,34px);
-    border-bottom:1px solid #5c4935;
+    min-height:clamp(350px,32vw,490px);
+    padding:clamp(30px,4vw,58px) clamp(22px,5vw,74px);
+    margin:12px auto;
+    overflow:hidden;
+    border:1px solid #705036;
   }
-  .landing-copy{min-width:0}
+  .landing-split .landing-media{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:-2;
+    border:0;
+    box-shadow:none;
+    background-color:#25201b;
+    background-repeat:no-repeat;
+    background-size:cover;
+    background-position:center;
+    pointer-events:none;
+  }
+  /* Darken the text half without burying the artwork behind a flat overlay. */
+  .landing-split::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    background:
+      linear-gradient(0deg,#110e0bae,transparent 65%),
+      linear-gradient(90deg,#15110df5 0%,#15110de9 36%,#15110d70 63%,#15110d06 100%);
+  }
+  .world-section,.story-section,.economy-section{justify-content:flex-end}
+  .world-section::before,.story-section::before,.economy-section::before{
+    background:
+      linear-gradient(0deg,#110e0bae,transparent 65%),
+      linear-gradient(270deg,#15110df5 0%,#15110de9 36%,#15110d70 63%,#15110d06 100%);
+  }
+  .freedom-section,.craft-section,.exploration-section{justify-content:flex-start}
+  .landing-split .landing-copy{
+    position:relative;
+    z-index:1;
+    width:min(56%,730px);
+    min-width:0;
+  }
   .section-heading h2,.landing-copy h2,.development-section h2{
     font:600 clamp(25px,2.5vw,36px)/1.2 var(--pall-font-reading,Georgia,serif);
     color:#f0dbc0;margin:8px 0 18px;
+    text-shadow:0 2px 4px #0d0906d9;
   }
-  .landing-media{
-    display:block;
-    width:100%;
-    min-width:0;
-    height:clamp(300px,26vw,390px);
-    background-color:#25201b;
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    border:1px solid #75583b;
-    box-shadow:0 5px 16px #0006;
-  }
-  /* Only the upper skyline and Cylinder peak: not another full city panorama. */
-  .world-media{
+  /* City view deliberately uses the upper skyline / Cylinder peak. */
+  .landing-split .world-media{
     background-image:url('/ui-kit/resources/TheCityVista.png');
     background-position:center top;
   }
-  .pall-media{background-image:url('/locations/homepage/pall-zone.webp');background-position:center 48%}
-  .story-media{background-image:url('/locations/records/records-room.webp');background-position:center}
-  .craft-media{background-image:url('/workshop/environment.webp');background-position:center 53%}
-  .economy-media{background-image:url('/locations/homepage/crafting-items.webp');background-position:center}
-  .marches-media{background-image:url('/locations/homepage/grey-marches.webp');background-position:center 48%}
+  .landing-split .pall-media{
+    background-image:url('/locations/homepage/pall-zone.webp');
+    background-position:center 48%;
+  }
+  .landing-split .story-media{
+    background-image:url('/locations/records/records-room.webp');
+    background-position:center 42%;
+  }
+  .landing-split .craft-media{
+    background-image:url('/workshop/environment.webp');
+    background-position:center 54%;
+  }
+  .landing-split .economy-media{
+    background-image:url('/locations/homepage/crafting-items.webp');
+    background-position:center 48%;
+  }
+  .landing-split .marches-media{
+    background-image:url('/locations/homepage/grey-marches.webp');
+    background-position:center 50%;
+  }
   .section-prose{max-width:100%}
   .section-prose p,.landing-copy p:not(.entry-eyebrow),.development-section p:not(.entry-eyebrow){
     color:#e1d1bb;font:500 clamp(16px,1.32vw,18px)/1.65 var(--pall-font-reading,Georgia,serif);
@@ -240,8 +294,7 @@
   .section-prose p:last-child,.landing-copy p:last-child{margin-bottom:0}
   .section-prose strong,.landing-copy strong{font-weight:700;color:#f4dbb6}
   .standout{margin-top:20px!important;color:#edcda1!important;font-weight:600!important}
-  .story-section{background:#252019}
-  .economy-section{background:linear-gradient(90deg,#1e1c18,#28231e)}
+  /* The existing parchment text panel stays opaque and readable. */
   .principles-section{border:1px solid #856540;background:#32271d;
     padding:clamp(22px,3vw,34px);margin:22px auto;text-align:center}
   .principles-section h2{margin:11px 0 0;color:#f4d6a8;
@@ -257,8 +310,32 @@
   .landing-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
     padding:19px clamp(14px,2.5vw,34px);font:14px/1.3 var(--pall-font-reading,Georgia,serif);color:#b8a68f}
   .landing-footer a{color:#e1b97b}
-  .footer-brand{text-decoration:none;letter-spacing:.14em;
-    font:16px var(--pall-font-label,'Arial Narrow',sans-serif)}
+  .footer-brand{display:inline-flex;align-items:center;flex:0 0 auto;text-decoration:none}
+  .footer-brand img{
+    display:block;
+    width:clamp(160px,15vw,208px);
+    height:auto;
+    max-height:94px;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 5px #0008);
+  }
+  .landing-logo-break{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:clamp(145px,14vw,195px);
+    padding:18px;
+    margin:0 auto;
+  }
+  .landing-logo-break img{
+    display:block;
+    width:clamp(245px,31vw,395px);
+    max-width:100%;
+    max-height:145px;
+    height:auto;
+    object-fit:contain;
+    filter:drop-shadow(0 3px 9px #0009);
+  }
   /*
    * Owner nine-slice parchment from the CRPG dialogue. Headings remain
    * outside these panels with their original type and colours.
@@ -333,12 +410,17 @@
     }
   }
   @media(max-width:850px){
-    .landing-split{grid-template-columns:1fr;gap:18px}
-    .landing-media{height:clamp(245px,46vw,330px)}
-    /* Text first for reading on narrow screens, without changing the alternating
-       desktop rhythm or separating headings from their parchment paragraphs. */
-    .landing-split .landing-copy{grid-row:1}
-    .landing-split .landing-media{grid-row:2}
+    .landing-split{
+      min-height:350px;
+      padding:28px clamp(15px,4vw,34px);
+    }
+    .landing-split .landing-copy{width:min(84%,690px)}
+    .landing-split::before{
+      background:linear-gradient(90deg,#15110df3 0%,#15110de2 50%,#15110d60 100%);
+    }
+    .world-section::before,.story-section::before,.economy-section::before{
+      background:linear-gradient(270deg,#15110df3 0%,#15110de2 50%,#15110d60 100%);
+    }
   }
   @media(max-width:700px){
     .landing{padding:9px}
@@ -348,6 +430,20 @@
     .hero-art{background-position:55% 35%}
     .landing-hero:after{background:linear-gradient(0deg,#15120ffb 0%,#15120fe0 55%,#15120f44 100%)}
     .hero-content{padding:21px}
+    .landing-split{
+      align-items:flex-end;
+      min-height:400px;
+      padding:26px 13px;
+    }
+    .landing-split .landing-copy{width:100%}
+    .landing-split::before,
+    .world-section::before,.story-section::before,.economy-section::before{
+      background:linear-gradient(0deg,#15110dfb 0%,#15110de9 48%,#15110d26 100%);
+    }
+    .landing-split .landing-media{background-position:center}
+    .landing-split .world-media{background-position:center top}
+    .landing-logo-break{min-height:130px}
+    .landing-footer{justify-content:center;text-align:center}
     .development-section{align-items:flex-start;flex-direction:column}
   }
 </style>
