@@ -34,6 +34,7 @@
     "characters:portraits-migrate": "node --env-file=.env scripts/character-portraits-migrate.mjs",
     "verify:avatar-art": "node scripts/verify-avatar-art.mjs",
     "verify:entry-pages": "node scripts/verify-entry-pages.mjs",
+    "verify:account-art": "node scripts/verify-account-art.mjs",
     "verify:homepage-art": "node scripts/verify-homepage-art.mjs",
     "check:api": "npm run build:packages && npm run check -w @the-pall/api",
     "verify:characters-unauthenticated": "node scripts/verify-characters-unauthenticated.mjs",
