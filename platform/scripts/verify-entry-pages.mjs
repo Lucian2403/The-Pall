@@ -88,6 +88,30 @@ assert.ok(home.includes('.landing-hero::after{') &&
   home.includes('z-index:1;') &&
   home.includes('.landing .entry-links a{'),
   'Masthead needs translucent overlays plus readable heading and navigation text');
+// The same side-to-side shadow must continue through the whole masthead.
+// The individual hero may keep a bottom fade, but no second horizontal
+// gradient that reintroduces the original navigation/hero boundary.
+const mastheadOverlay=home.slice(home.indexOf('  .landing-masthead::before{'),home.indexOf('  .landing .entry-nav{'));
+const heroOverlay=home.slice(home.indexOf('  .landing-hero::after{'),home.indexOf('  .hero-content{'));
+assert.ok(mastheadOverlay.includes('linear-gradient(90deg,#15120fec') &&
+  mastheadOverlay.includes('linear-gradient(180deg,#100e0cbd') &&
+  heroOverlay.includes('background:linear-gradient(0deg,#15120fc9,transparent 60%);') &&
+  !heroOverlay.includes('linear-gradient(90deg') &&
+  home.includes('border-bottom:0;'),
+  'Gradient must cover navigation and hero continuously without a divider');
+// Header links use the approved normal/hover/pressed nine-slice artwork,
+// with compact dimensions and a wrapping layout for narrow devices.
+const navFrameStyles=home.slice(home.indexOf('  .landing .entry-links{'),home.indexOf('  .landing-hero{'));
+for(const state of ['normal','hover','pressed']){
+  assert.ok(navFrameStyles.includes("/ui-kit/buttons/button-"+state+"-trim.png"),
+    'Navigation missing '+state+' button art');
+}
+assert.ok(navFrameStyles.includes('border-image-slice:50 180 45 180 fill;') &&
+  navFrameStyles.includes('white-space:nowrap;') &&
+  navFrameStyles.includes('a:focus-visible{') &&
+  home.includes('.landing .entry-links{width:100%;justify-content:flex-start;gap:5px 8px}') &&
+  home.includes('border-width:8px 17px 8px;'),
+  'Navigation frames must preserve focus and mobile wrapping');
 // Six illustrated sections alternate between art and copy; images are
 // explicitly mapped to the owner-supplied location/resource illustrations.
 const alternate=[
