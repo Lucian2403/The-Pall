@@ -32,7 +32,7 @@ assert.ok(home.includes("class=\"landing-hero\"") &&
   'Public homepage must show approved city artwork, account actions, and a signed-in player path');
 // The owner revised the entire homepage copy. Test the real text after stripping
 // only intentional inline emphasis, rather than allowing older promotional prose.
-const htmlText=home.replace(/<\\/?(?:em|strong)>/g,'').replaceAll('&amp;','&');
+const htmlText=home.replace(/<\/?(?:em|strong)>/g,'').replace(/<br\s*\/?>/g,' ').replaceAll('&amp;','&');
 const canonText=approvedHomeCopy.replaceAll('**','').replaceAll('*','');
 for(const paragraph of [
   'Make a living. Find your own way.',
