@@ -61,3 +61,15 @@ Three owner-provided image files are installed locally by unpacking `The_Pall_Ho
 Images were converted to web-optimised WebP without repainting, reinterpreting or inventing any game visuals. Existing Workshop, Records and City assets are reused. They are **not committed as binary files** through the source-code connector. `npm run verify:homepage-art` checks all six local illustrations; `npm run verify:entry-pages` checks structure, panel order, assets and literal approved copy.
 
 **Important privacy directive:** The Pall is a **closed-source game**. Never expose the private source-code repository or a public code-hosting/documentation link from any player-visible page. The previous repository links in Development have been removed. The only remaining link there leads to the first-party World Introduction page; curate genuine in-game patch notes and a roadmap later, without linking to the underlying source-code host.
+
+## Full-width section backgrounds and logo placement — 2026-10-29 (latest)
+
+The owner reviewed the alternating thumbnail-style sections and changed the visual direction: the **same six owner illustrations now cover their entire respective sections**, with headings and approved parchment-text frames overlaid on the artwork. Preserve the alternating **left/right reading-panel positions**, not separate Image/Text columns. Text stays legible through directional dark gradients; on mobile, a darker lower gradient keeps prose readable without hiding the entire illustration.
+
+The section sequence remains unchanged: World → classless Path → Stories → Crafting → Economy → Grey Marches exploration. The city backdrop must still privilege the **top skyline and Cylinder peak** (`background-position:center top`). Use the existing six files; no revised image archive is required.
+
+The owner's two marked empty areas now show the **approved full-size logo** from `/ui-kit/branding/logo-full.png`: centred in a brand divider between the Free to Play pledge and Development, and as a significantly larger link on the **left side of the footer**. The header's approved compact logo remains. Do not restore the `A CITY ENDURES` text.
+
+Keep paragraph typography, original headings, nine-slice dialogue artwork, real button-state artwork, account actions and every word of approved homepage copy intact. The game remains closed-source: there must be no developer repository links anywhere on public pages. The logo asset is already part of the installed owner UI kit, so no new ZIP or database migration is needed.
+
+Verification after pulling: `npm run verify:owner-ui-kit`, `npm run verify:homepage-art`, `npm run verify:entry-pages`, `npm run check:web`, and `npm run build -w @the-pall/web`. Code-level checks do **not** substitute for browser/layout inspection.
