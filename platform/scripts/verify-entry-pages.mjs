@@ -65,10 +65,53 @@ for(const section of [
 ]){
   assert.ok(home.includes(section),'Revised owner copy must be distributed by subject: '+section);
 }
-assert.ok(home.includes('github.com/Lucian2403/The-Pall/commits/main/') &&
+assert.ok(!/github\.com|Lucian2403\/The-Pall|Design documents|Development updates/.test(home) &&
   home.includes('/introduction') &&
   home.includes('In active development'),
-  'Keep real development updates, public lore and unfinished-status notice');
+  'The private development repository must never be linked or mentioned in the public homepage');
+// Six illustrated sections alternate between art and copy; images are
+// explicitly mapped to the owner-supplied location/resource illustrations.
+const alternate=[
+  {section:'world-section',art:'world-media',first:'image'},
+  {section:'freedom-section',art:'pall-media',first:'text'},
+  {section:'story-section',art:'story-media',first:'image'},
+  {section:'craft-section',art:'craft-media',first:'text'},
+  {section:'economy-section',art:'economy-media',first:'image'},
+  {section:'exploration-section',art:'marches-media',first:'text'}
+];
+const layoutOrder=alternate.map(({section,art,first})=>{
+  const begin=home.indexOf('<section class="'+section+' landing-split');
+  assert.ok(begin!==-1,'Missing alternating landing section: '+section);
+  const end=home.indexOf('</section>',begin);
+  assert.ok(end>begin,'Unclosed landing section: '+section);
+  const snippet=home.slice(begin,end);
+  const imagePosition=snippet.indexOf('class="landing-media '+art+'"');
+  const textPosition=snippet.indexOf('class="landing-copy"');
+  assert.ok(imagePosition!==-1 && textPosition!==-1,
+    'Image and copy must both appear in section '+section);
+  assert.equal(imagePosition<textPosition?'image':'text',first,
+    'Left/right ordering must alternate for '+section);
+  return begin;
+});
+assert.ok(layoutOrder.every((position,i)=>i===0||position>layoutOrder[i-1]),
+  'Alternating sections must remain in the approved narrative order');
+for(const asset of [
+  '/locations/homepage/pall-zone.webp',
+  '/locations/homepage/crafting-items.webp',
+  '/locations/homepage/grey-marches.webp',
+  '/ui-kit/resources/TheCityVista.png',
+  '/locations/records/records-room.webp',
+  '/workshop/environment.webp'
+])assert.ok(home.includes(asset),'Missing appropriate owner art: '+asset);
+assert.ok(home.includes('.world-media{') &&
+  home.includes('background-position:center top'),
+  'Grand Cylinder City section must crop to the upper skyline and Cylinder peak');
+assert.ok(home.includes('width:clamp(138px,11.4vw,174px)') &&
+  !home.includes('A CITY ENDURES'),
+  'Homepage logo must be larger and the old city motto removed');
+assert.ok(home.includes('.landing-split .landing-copy{grid-row:1}') &&
+  home.includes('.landing-split .landing-media{grid-row:2}'),
+  'Mobile should retain heading, paragraph and illustration flow without overlap');
 // Public entry uses the exact same supplied nine-slice sprites as the
 // owner-approved in-scene dialogue. Headings retain their original typeface;
 // only descriptive paragraphs swap to a more legible Georgia reading face.
@@ -152,4 +195,4 @@ for(const [file,expected] of [
   assert.ok(read('apps/web/src/lib/'+file).includes(expected),
     'Compact onboarding image height missing: '+file);
 }
-console.log('PASS: Owner homepage copy, approved seven parchment frames, three-state buttons, readable body typography, original headings, public lore and characters.');
+console.log('PASS: All owner homepage copy, alternating six illustrated sections, skyline crop, private repository links removed, approved parchment/buttons, and existing entry checks.');
