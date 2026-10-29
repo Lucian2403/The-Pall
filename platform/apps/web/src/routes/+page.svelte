@@ -25,7 +25,6 @@
     <nav class="entry-nav" aria-label="Main navigation">
       <a href="/" class="brand" aria-label="The Pall, home">
         <img src="/ui-kit/branding/logo-compact.png" alt="The Pall"/>
-        <span>A CITY ENDURES</span>
       </a>
       <div class="entry-links">
         <a href="#game">The game</a>
@@ -55,30 +54,37 @@
         </div>
       </section>
 
-      <section class="world-section section-width" aria-labelledby="world-heading">
-        <div class="section-heading">
-          <p class="entry-eyebrow">THE WORLD</p>
-          <h2 id="world-heading">Grand Cylinder City</h2>
-        </div>
-        <div class="section-prose landing-parchment">
-          <p>Nearly a century ago, a catastrophe called <strong>The Plume</strong> poisoned much of the world. Nobody knows what caused it. Now, most survivors live behind the enormous walls of Grand Cylinder City, where factories run day and night and thousands struggle to earn their keep. Beyond the walls lie dangerous, largely uncharted territories. And farther still, <strong>the Pall</strong>, where few dare venture.</p>
-          <p class="standout"><strong>You're just another person trying to get by.</strong></p>
-        </div>
-      </section>
-
-      <section class="freedom-section section-width" aria-labelledby="freedom-heading">
-        <div class="section-heading">
-          <p class="entry-eyebrow">YOUR PATH</p>
-          <h2 id="freedom-heading">No fixed classes.</h2>
-        </div>
-        <div class="section-prose landing-parchment">
-          <p>Learn a trade, take jobs, build a business, explore or fight your way through trouble. There are no fixed classes. How you develop your skills, earn your coin and spend your days is entirely up to you.</p>
+      <!-- Alternating art/text rhythm: image/text, text/image, repeated. -->
+      <section class="world-section landing-split section-width" aria-labelledby="world-heading">
+        <div class="landing-media world-media" role="img" aria-label="The sky and the upper reaches of Grand Cylinder City, with the Cylinder rising above its rooftops"></div>
+        <div class="landing-copy">
+          <div class="section-heading">
+            <p class="entry-eyebrow">THE WORLD</p>
+            <h2 id="world-heading">Grand Cylinder City</h2>
+          </div>
+          <div class="section-prose landing-parchment">
+            <p>Nearly a century ago, a catastrophe called <strong>The Plume</strong> poisoned much of the world. Nobody knows what caused it. Now, most survivors live behind the enormous walls of Grand Cylinder City, where factories run day and night and thousands struggle to earn their keep. Beyond the walls lie dangerous, largely uncharted territories. And farther still, <strong>the Pall</strong>, where few dare venture.</p>
+            <p class="standout"><strong>You're just another person trying to get by.</strong></p>
+          </div>
         </div>
       </section>
 
-      <section class="story-section" id="stories" aria-labelledby="stories-heading">
-        <div class="story-image" role="img" aria-label="Council records room, with shelves of documents and heavy industrial furnishings"></div>
-        <div class="story-content">
+      <section class="freedom-section landing-split section-width" aria-labelledby="freedom-heading">
+        <div class="landing-copy">
+          <div class="section-heading">
+            <p class="entry-eyebrow">YOUR PATH</p>
+            <h2 id="freedom-heading">No fixed classes.</h2>
+          </div>
+          <div class="section-prose landing-parchment">
+            <p>Learn a trade, take jobs, build a business, explore or fight your way through trouble. There are no fixed classes. How you develop your skills, earn your coin and spend your days is entirely up to you.</p>
+          </div>
+        </div>
+        <div class="landing-media pall-media" role="img" aria-label="The Pall: an uncharted purple-hazed landscape with a solitary explorer overlooking distant mountains"></div>
+      </section>
+
+      <section class="story-section landing-split section-width" id="stories" aria-labelledby="stories-heading">
+        <div class="landing-media story-media" role="img" aria-label="Council records room, with shelves of documents and heavy industrial furnishings"></div>
+        <div class="landing-copy">
           <p class="entry-eyebrow">STORIES &amp; CHOICES</p>
           <h2 id="stories-heading">But there's more to life here than making money.</h2>
           <div class="landing-parchment">
@@ -87,36 +93,42 @@
         </div>
       </section>
 
-      <section class="craft-section section-width" id="crafting" aria-labelledby="crafting-heading">
-        <div class="craft-image" role="img" aria-label="Guther's smithing workshop and its working forge"></div>
-        <div class="craft-content">
+      <section class="craft-section landing-split section-width" id="crafting" aria-labelledby="crafting-heading">
+        <div class="landing-copy">
           <p class="entry-eyebrow">CRAFTING &amp; PRODUCTION</p>
           <h2 id="crafting-heading">Master a trade.</h2>
           <div class="landing-parchment">
             <p><strong>Crafting is a profession in its own right.</strong> Gather resources, refine materials, manufacture components and assemble equipment. Your skills, tools, workshop, materials and decisions affect the quality of what you produce. There's genuine depth to mastering a trade.</p>
           </div>
         </div>
+        <div class="landing-media craft-media" role="img" aria-label="Guther's smithing workshop with a heated forge and working tools"></div>
       </section>
 
-      <section class="economy-section section-width" aria-labelledby="economy-heading">
-        <div class="section-heading">
-          <p class="entry-eyebrow">THE ECONOMY</p>
-          <h2 id="economy-heading">Every material has a purpose.</h2>
-        </div>
-        <div class="section-prose landing-parchment">
-          <p>And unlike many MMORPGs, <strong>early-game materials don't become useless at higher levels</strong>. Coal, iron, leather, cloth and basic components remain part of advanced production, maintenance and repairs. Even the best equipment needs ordinary materials and the craftsmen who produce them. A newcomer supplying basic goods can still have a place in the endgame economy.</p>
+      <section class="economy-section landing-split section-width" aria-labelledby="economy-heading">
+        <div class="landing-media economy-media" role="img" aria-label="Illustrated crafting resources and components: metal plates, cloth, springs, tools, timber, ores, herbs and respirator"></div>
+        <div class="landing-copy">
+          <div class="section-heading">
+            <p class="entry-eyebrow">THE ECONOMY</p>
+            <h2 id="economy-heading">Every material has a purpose.</h2>
+          </div>
+          <div class="section-prose landing-parchment">
+            <p>And unlike many MMORPGs, <strong>early-game materials don't become useless at higher levels</strong>. Coal, iron, leather, cloth and basic components remain part of advanced production, maintenance and repairs. Even the best equipment needs ordinary materials and the craftsmen who produce them. A newcomer supplying basic goods can still have a place in the endgame economy.</p>
+          </div>
         </div>
       </section>
 
-      <section class="exploration-section section-width" aria-labelledby="exploration-heading">
-        <div class="section-heading">
-          <p class="entry-eyebrow">EXPLORATION &amp; COMBAT</p>
-          <h2 id="exploration-heading">Beyond the city.</h2>
+      <section class="exploration-section landing-split section-width" aria-labelledby="exploration-heading">
+        <div class="landing-copy">
+          <div class="section-heading">
+            <p class="entry-eyebrow">EXPLORATION &amp; COMBAT</p>
+            <h2 id="exploration-heading">Beyond the city.</h2>
+          </div>
+          <div class="section-prose landing-parchment">
+            <p>Beyond the city, procedurally generated territories offer new places to explore, resources to uncover and dangers to face. Discover something valuable? Sell the information to other players, or keep it for yourself. Just make sure you're prepared. Equipment, supplies and decisions matter, especially when trouble turns into tactical, turn-based combat.</p>
+            <p class="standout">Be a craftsman, merchant, explorer, fighter, or a little of everything. You don't have to chase the same goals as everyone else.</p>
+          </div>
         </div>
-        <div class="section-prose landing-parchment">
-          <p>Beyond the city, procedurally generated territories offer new places to explore, resources to uncover and dangers to face. Discover something valuable? Sell the information to other players, or keep it for yourself. Just make sure you're prepared. Equipment, supplies and decisions matter, especially when trouble turns into tactical, turn-based combat.</p>
-          <p class="standout">Be a craftsman, merchant, explorer, fighter, or a little of everything. You don't have to chase the same goals as everyone else.</p>
-        </div>
+        <div class="landing-media marches-media" role="img" aria-label="Grey Marches: a weathered wooden watchtower overlooking a misty, hazardous road and distant industrial skyline"></div>
       </section>
 
       <section class="principles-section section-width" aria-labelledby="principles-heading">
@@ -132,8 +144,6 @@
             <p><em>The Pall</em> is in active development, with new locations, quests, professions and gameplay systems being introduced as the world takes shape.</p>
           </div>
           <div class="development-links">
-            <a href="https://github.com/Lucian2403/The-Pall/commits/main/" target="_blank" rel="noopener noreferrer">Development updates</a>
-            <a href="https://github.com/Lucian2403/The-Pall/tree/main/docs" target="_blank" rel="noopener noreferrer">Design documents</a>
             <a href="/introduction">Read the world introduction</a>
           </div>
         </div>
@@ -157,6 +167,12 @@
   .landing{padding-top:13px}
   .landing .entry-wrap{max-width:1440px}
   .landing .entry-nav{padding:0 clamp(9px,1.1vw,18px) 12px}
+  .landing .entry-nav .brand img{
+    width:clamp(138px,11.4vw,174px);
+    max-height:94px;
+    height:auto;
+    object-fit:contain;
+  }
   .landing-hero{position:relative;isolation:isolate;overflow:hidden;
     display:flex;align-items:flex-end;min-height:clamp(360px,33vw,465px);
     background:#24201b;border:1px solid #745538}
@@ -179,29 +195,52 @@
   .hero-status{margin:16px 0 0;color:#e5cba8;font:14px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.08em;text-transform:uppercase}
   .section-width{max-width:1320px;margin:0 auto}
-  .world-section,.freedom-section,.economy-section,.exploration-section{
-    display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.65fr);
-    gap:clamp(18px,3vw,55px);padding:clamp(29px,4vw,56px) clamp(14px,2.5vw,34px);
-    border-bottom:1px solid #5c4935}
-  .section-heading h2,.story-content h2,.craft-content h2,.development-section h2{
+  /* Alternate each illustration with its own heading and reading panel.
+     Text and images remain two balanced columns instead of tiny thumbnail cards. */
+  .landing-split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+    align-items:center;
+    gap:clamp(24px,3.1vw,48px);
+    padding:clamp(30px,3.7vw,54px) clamp(14px,2.4vw,34px);
+    border-bottom:1px solid #5c4935;
+  }
+  .landing-copy{min-width:0}
+  .section-heading h2,.landing-copy h2,.development-section h2{
     font:600 clamp(25px,2.5vw,36px)/1.2 var(--pall-font-reading,Georgia,serif);
-    color:#f0dbc0;margin:8px 0 18px}
-  .section-prose{max-width:900px}
-  .section-prose p,.story-content p,.craft-content p,.development-section p{
+    color:#f0dbc0;margin:8px 0 18px;
+  }
+  .landing-media{
+    display:block;
+    width:100%;
+    min-width:0;
+    height:clamp(300px,26vw,390px);
+    background-color:#25201b;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    border:1px solid #75583b;
+    box-shadow:0 5px 16px #0006;
+  }
+  /* Only the upper skyline and Cylinder peak: not another full city panorama. */
+  .world-media{
+    background-image:url('/ui-kit/resources/TheCityVista.png');
+    background-position:center top;
+  }
+  .pall-media{background-image:url('/locations/homepage/pall-zone.webp');background-position:center 48%}
+  .story-media{background-image:url('/locations/records/records-room.webp');background-position:center}
+  .craft-media{background-image:url('/workshop/environment.webp');background-position:center 53%}
+  .economy-media{background-image:url('/locations/homepage/crafting-items.webp');background-position:center}
+  .marches-media{background-image:url('/locations/homepage/grey-marches.webp');background-position:center 48%}
+  .section-prose{max-width:100%}
+  .section-prose p,.landing-copy p:not(.entry-eyebrow),.development-section p:not(.entry-eyebrow){
     color:#e1d1bb;font:500 clamp(16px,1.32vw,18px)/1.65 var(--pall-font-reading,Georgia,serif);
-    margin:0 0 13px}
-  .section-prose p:last-child,.story-content p:last-child,.craft-content p:last-child{margin-bottom:0}
-  .section-prose strong,.story-content strong,.craft-content strong{font-weight:700;color:#f4dbb6}
+    margin:0 0 13px;
+  }
+  .section-prose p:last-child,.landing-copy p:last-child{margin-bottom:0}
+  .section-prose strong,.landing-copy strong{font-weight:700;color:#f4dbb6}
   .standout{margin-top:20px!important;color:#edcda1!important;font-weight:600!important}
-  .story-section{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
-    background:#252019;border-bottom:1px solid #705437}
-  .story-image{min-height:340px;background:url('/locations/records/records-room.webp') center/cover no-repeat}
-  .story-content{padding:clamp(28px,4vw,56px);align-self:center}
-  .craft-section{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
-    gap:clamp(22px,4vw,54px);align-items:center;padding:clamp(30px,4vw,58px) clamp(14px,2.5vw,34px);
-    border-bottom:1px solid #5c4935}
-  .craft-image{min-height:305px;background:url('/workshop/environment.webp') center 57%/cover no-repeat;
-    border:1px solid #745538}
+  .story-section{background:#252019}
   .economy-section{background:linear-gradient(90deg,#1e1c18,#28231e)}
   .principles-section{border:1px solid #856540;background:#32271d;
     padding:clamp(22px,3vw,34px);margin:22px auto;text-align:center}
@@ -294,11 +333,12 @@
     }
   }
   @media(max-width:850px){
-    .world-section,.freedom-section,.economy-section,.exploration-section{grid-template-columns:1fr;gap:5px}
-    .story-section{grid-template-columns:1fr}
-    .story-image{min-height:235px}
-    .craft-section{grid-template-columns:1fr}
-    .craft-image{min-height:235px}
+    .landing-split{grid-template-columns:1fr;gap:18px}
+    .landing-media{height:clamp(245px,46vw,330px)}
+    /* Text first for reading on narrow screens, without changing the alternating
+       desktop rhythm or separating headings from their parchment paragraphs. */
+    .landing-split .landing-copy{grid-row:1}
+    .landing-split .landing-media{grid-row:2}
   }
   @media(max-width:700px){
     .landing{padding:9px}
