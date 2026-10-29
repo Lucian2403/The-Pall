@@ -69,6 +69,41 @@ assert.ok(home.includes('github.com/Lucian2403/The-Pall/commits/main/') &&
   home.includes('/introduction') &&
   home.includes('In active development'),
   'Keep real development updates, public lore and unfinished-status notice');
+// Public entry uses the exact same supplied nine-slice sprites as the
+// owner-approved in-scene dialogue. Headings retain their original typeface;
+// only descriptive paragraphs swap to a more legible Georgia reading face.
+const uiKit=read('apps/web/src/lib/pall-owner-ui.css');
+for(const asset of [
+  '/ui-kit/frames/dialogue-frame-trim.png',
+  '/ui-kit/buttons/button-normal-trim.png',
+  '/ui-kit/buttons/button-hover-trim.png',
+  '/ui-kit/buttons/button-pressed-trim.png'
+]){
+  assert.ok(uiKit.includes(asset) && home.includes(asset),
+    'Homepage must reuse an approved owner UI asset: '+asset);
+}
+assert.ok(home.includes('border-image-slice:145 190 125 190 fill') &&
+  home.includes('border-image-slice:50 180 45 180 fill') &&
+  home.includes('border-image-repeat:stretch'),
+  'Public homepage must match the game dialogue and button frame slices');
+assert.ok((home.match(/class="section-prose landing-parchment"/g)||[]).length===4 &&
+  (home.match(/class="landing-parchment"/g)||[]).length===3,
+  'Seven explanatory text areas must be framed, while their headings stay outside');
+assert.ok(home.includes(".landing .landing-parchment p{") &&
+  home.includes("font:400 clamp(17px,1.38vw,19px)/1.65 Georgia") &&
+  home.includes("font:400 clamp(18px,1.5vw,20px)/1.6 Georgia") &&
+  home.includes('color:#27190f') &&
+  home.includes('.landing .landing-parchment strong{'),
+  'Landing body paragraphs should use high-contrast Georgia for readability');
+assert.ok(!home.includes('.landing .landing-parchment h2') &&
+  home.includes('font:600 clamp(37px,4vw,60px)/1.12 var(--pall-font-reading') &&
+  home.includes('font:600 clamp(25px,2.5vw,36px)/1.2 var(--pall-font-reading'),
+  'Homepage heading typography and hierarchy must be unchanged');
+assert.ok(home.includes('.landing a.entry-button:hover') &&
+  home.includes('.landing a.entry-button:active') &&
+  home.includes('.landing a.entry-button:focus-visible') &&
+  home.includes('font:600 15px/1.35 var(--pall-font-reading'),
+  'Button hover/pressed/keyboard states and approved button font must be retained');
 assert.ok(intro.includes('APPROVED_WORLD_INTRO.paragraphs') &&
   !intro.includes("status==='login'") &&
   !intro.includes('Account required') &&
@@ -117,4 +152,4 @@ for(const [file,expected] of [
   assert.ok(read('apps/web/src/lib/'+file).includes(expected),
     'Compact onboarding image height missing: '+file);
 }
-console.log('PASS: Complete revised owner homepage copy across thematic sections, public lore, signup, roster, avatars and compact scenes.');
+console.log('PASS: Owner homepage copy, approved seven parchment frames, three-state buttons, readable body typography, original headings, public lore and characters.');
