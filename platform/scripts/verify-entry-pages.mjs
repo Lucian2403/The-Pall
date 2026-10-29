@@ -30,24 +30,45 @@ assert.ok(home.includes("class=\"landing-hero\"") &&
   home.includes('/account') && home.includes('/introduction') &&
   home.includes('signedIn?\'/characters\''),
   'Public homepage must show approved city artwork, account actions, and a signed-in player path');
-for(const text of [
-  'free-to-play, persistent browser, text-based MMORPG',
-  'Develop your skills without fixed classes, pursue different professions',
-  'The world continues to evolve, and your choices determine how you make your living',
-  'No pay-to-win mechanics. No mandatory PvP. No fixed classes.',
-  'The Pall is currently in active development'
+// The owner revised the entire homepage copy. Test the real text after stripping
+// only intentional inline emphasis, rather than allowing older promotional prose.
+const htmlText=home.replace(/<\\/?(?:em|strong)>/g,'').replaceAll('&amp;','&');
+const canonText=approvedHomeCopy.replaceAll('**','').replaceAll('*','');
+for(const paragraph of [
+  'Make a living. Find your own way.',
+  'The Pall is a free-to-play, persistent browser MMORPG set in a harsh, industrial world. Your character, skills, possessions and progress remain between sessions.',
+  'Nearly a century ago, a catastrophe called The Plume poisoned much of the world. Nobody knows what caused it. Now, most survivors live behind the enormous walls of Grand Cylinder City, where factories run day and night and thousands struggle to earn their keep. Beyond the walls lie dangerous, largely uncharted territories. And farther still, the Pall, where few dare venture.',
+  "You're just another person trying to get by.",
+  'Learn a trade, take jobs, build a business, explore or fight your way through trouble. There are no fixed classes. How you develop your skills, earn your coin and spend your days is entirely up to you.',
+  "But there's more to life here than making money.",
+  "Mature, story-driven quests explore corruption, exploitation, poverty, survival and the darker side of human nature. You'll meet people with their own troubles and motives, face uncomfortable choices and uncover stories that don't always have a clear right or wrong. Sometimes, doing the decent thing comes at a price.",
+  "Crafting is a profession in its own right. Gather resources, refine materials, manufacture components and assemble equipment. Your skills, tools, workshop, materials and decisions affect the quality of what you produce. There's genuine depth to mastering a trade.",
+  "And unlike many MMORPGs, early-game materials don't become useless at higher levels. Coal, iron, leather, cloth and basic components remain part of advanced production, maintenance and repairs. Even the best equipment needs ordinary materials and the craftsmen who produce them. A newcomer supplying basic goods can still have a place in the endgame economy.",
+  "Beyond the city, procedurally generated territories offer new places to explore, resources to uncover and dangers to face. Discover something valuable? Sell the information to other players, or keep it for yourself. Just make sure you're prepared. Equipment, supplies and decisions matter, especially when trouble turns into tactical, turn-based combat.",
+  "Be a craftsman, merchant, explorer, fighter, or a little of everything. You don't have to chase the same goals as everyone else.",
+  'No pay-to-win. No forced PvP. No fixed classes.',
+  'The Pall is in active development, with new locations, quests, professions and gameplay systems being introduced as the world takes shape.'
 ]){
-  assert.ok(approvedHomeCopy.includes(text) && home.includes(text),
-    'Owner-approved public game description changed or is missing: '+text);
+  assert.ok(canonText.includes(paragraph) && htmlText.includes(paragraph),
+    'Revised owner homepage text is missing, altered or replaced: '+paragraph.slice(0,85));
 }
 assert.ok(!home.includes('Technical connection test') &&
   !home.includes('/api/fixture') &&
-  !home.includes('Donation link'),
-  'Never expose the technical fixture or an invented donation link as the public entry');
+  !home.includes('A world shaped by what you do.') &&
+  !home.includes('Built in public, one system at a time.') &&
+  !home.includes('More than a single profession.'),
+  'Do not bring back the old technical fixture or rejected marketing copy');
+for(const section of [
+  'class="landing-hero"','class="world-section','class="freedom-section',
+  'class="story-section"','class="craft-section','class="economy-section',
+  'class="exploration-section','class="principles-section','class="development-section'
+]){
+  assert.ok(home.includes(section),'Revised owner copy must be distributed by subject: '+section);
+}
 assert.ok(home.includes('github.com/Lucian2403/The-Pall/commits/main/') &&
-  home.includes('LONGER-TERM DESIGN') &&
-  home.includes('IMPLEMENTED FOR TESTING'),
-  'Development history and roadmap must remain grounded in actual progress');
+  home.includes('/introduction') &&
+  home.includes('In active development'),
+  'Keep real development updates, public lore and unfinished-status notice');
 assert.ok(intro.includes('APPROVED_WORLD_INTRO.paragraphs') &&
   !intro.includes("status==='login'") &&
   !intro.includes('Account required') &&
@@ -96,4 +117,4 @@ for(const [file,expected] of [
   assert.ok(read('apps/web/src/lib/'+file).includes(expected),
     'Compact onboarding image height missing: '+file);
 }
-console.log('PASS: Public homepage, approved short description, open lore, working signup path, roster, backgrounds, avatars and compact scenes.');
+console.log('PASS: Complete revised owner homepage copy across thematic sections, public lore, signup, roster, avatars and compact scenes.');
