@@ -45,7 +45,10 @@ assert.ok(source.includes('/ui-kit/sidebar-illustration.png'),'Sidebar art must 
 assert.ok(source.includes('character.health')&&source.includes('isMeasured(resource.data)'),'Health bar must use real character values');
 for(const label of ['Stamina','Fatigue','Focus']) assert.ok(source.includes("label:'"+label+"'"),'Missing relevant HUD track '+label);
 assert.ok(source.includes('not tracked yet'),'Unauthored resources must be explicitly unavailable');
-assert.ok(source.includes('min-height:clamp(245px,26vw,335px)'),'Grand Cylinder city vista must be taller than the prior narrow banner');
+assert.ok(source.includes('min-height:clamp(160px,17vw,225px)'),
+  'The Grand Cylinder city vista must use the owner-approved compact desktop height');
+assert.ok(source.includes('.city-banner{min-height:152px;padding:16px'),
+  'The city banner must remain compact on mobile without hiding the vista');
 assert.ok(source.includes("center 12%/cover no-repeat"),'Vista must show the central tower, not only the city walls');
 assert.ok(source.includes('min-height:43px'),'Workshop location strip must remain compact');
 const secondJobUi=readFileSync(resolve(root,'apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte'),'utf8');
