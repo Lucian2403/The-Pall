@@ -30,7 +30,7 @@ assert.equal((markup.match(/<form /g)||[]).length,1,'Keep the existing one-form 
 assert.ok(markup.includes('class="account-masthead"') &&
   markup.includes('class="entry-nav"') &&
   markup.includes('class="entry-hero"') &&
-  markup.includes('class="account-content') &&
+  markup.includes('class="entry-content account-content"') &&
   markup.includes('class="account-panel"') &&
   markup.includes('class="account-aside"'),
   'Preserve navigation, city heading and the original form/aside layout');
