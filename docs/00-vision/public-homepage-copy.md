@@ -38,3 +38,11 @@ Be a craftsman, merchant, explorer, fighter, or a little of everything. You don'
 - The owner wrote “You're are Just another person trying to get by”; only the obvious grammar and accidental capitalisation were corrected to “You're just another person trying to get by.” No other owner-authored meaning or copy has been rewritten.
 - Product information about procedurally generated territories, the player economy, advanced crafting and later content is the **game's intended design**, not a claim these systems are playable in the current browser build. The active-development statement remains conspicuous.
 - Free-to-play/no-pay-to-win/no-forced-PvP are owner-approved commitments. Do not introduce donor mechanics or exclusive purchases without separate approval.
+
+## Approved landing-page visual correction — 2026-10-29
+
+The public homepage now reuses the existing **owner-approved transparent nine-slice dialogue frame** `/ui-kit/frames/dialogue-frame-trim.png` around each main body-text section. The supplied **button-normal-trim.png**, **button-hover-trim.png** and **button-pressed-trim.png** sprites apply to the actual Create Account, Sign In and signed-in character CTA links; links continue to navigate normally, and focus outlines remain visible. No new artwork is invented.
+
+For **readability, only prose paragraphs** in the homepage's narrative panels and hero description change to regular Georgia serif (17–19px on framed copy, about 18–20px in the hero), stronger dark ink on parchment, and 1.6–1.65 line spacing. The original headline sizes, font families and section-heading presentation must **not** change. Button labels retain the existing owner-approved font. The exact owner-authored text, including inline emphasis, remains intact.
+
+Keep the ornamental parchment behind actual reading copy rather than behind artwork, labels or the skyline; the homepage is a public entry page, not a gameplay dialogue. Source assertions check the frame and button sprite paths, headings, font isolation, all approved copy paragraphs, and account navigation. Test local assets with `npm run verify:owner-ui-kit`, and source/UI types with `npm run verify:entry-pages` and `npm run check:web`.
