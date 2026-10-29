@@ -73,3 +73,11 @@ The owner's two marked empty areas now show the **approved full-size logo** from
 Keep paragraph typography, original headings, nine-slice dialogue artwork, real button-state artwork, account actions and every word of approved homepage copy intact. The game remains closed-source: there must be no developer repository links anywhere on public pages. The logo asset is already part of the installed owner UI kit, so no new ZIP or database migration is needed.
 
 Verification after pulling: `npm run verify:owner-ui-kit`, `npm run verify:homepage-art`, `npm run verify:entry-pages`, `npm run check:web`, and `npm run build -w @the-pall/web`. Code-level checks do **not** substitute for browser/layout inspection.
+
+## Unified city masthead and larger header logo — 2026-10-29
+
+The owner approved one final refinement of the first screen: the **main navigation now blends directly into the city hero**, rather than sitting on a separate black band. Wrap the homepage navigation and hero in a single `.landing-masthead` using **one continuous instance** of the existing `/ui-kit/resources/TheCityVista.png`. Do not duplicate it as a hero-specific background image, which can cause misaligned city buildings across the navigation border. Use restrained translucent gradients for navigation contrast and hero prose legibility.
+
+The top-left, owner-approved compact logo becomes larger (responsive `clamp(188px,16.5vw,248px)` on desktop, `clamp(162px,35vw,205px)` on mobile); the old “A CITY ENDURES” text remains absent. The existing full-size logos in the middle-page divider and footer stay unchanged. Navigation links, account behavior, the approved gameplay copy, six background illustration sections, frames and buttons are unaffected. No new image pack or database migration is required.
+
+Verification: `npm run verify:entry-pages` now checks that the header and hero share a single panorama source and that the top-left logo is larger and responsive. Review the actual page at `/` for seamless city architecture between nav and hero, readable links, and no horizontal overflow at narrower widths.
