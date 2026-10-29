@@ -109,9 +109,34 @@ assert.ok(home.includes('.world-media{') &&
 assert.ok(home.includes('width:clamp(138px,11.4vw,174px)') &&
   !home.includes('A CITY ENDURES'),
   'Homepage logo must be larger and the old city motto removed');
-assert.ok(home.includes('.landing-split .landing-copy{grid-row:1}') &&
-  home.includes('.landing-split .landing-media{grid-row:2}'),
-  'Mobile should retain heading, paragraph and illustration flow without overlap');
+assert.ok(home.includes('.landing-split .landing-copy{width:100%}') &&
+  home.includes('.landing-split .landing-media{background-position:center}') &&
+  home.includes('background:linear-gradient(0deg,#15110dfb'),
+  'Mobile sections must preserve the full-bleed image behind a readable bottom-aligned text panel');
+// Art is behind the entire section, not a separately bordered illustration
+// with text in an adjacent column. Text alignment alternates left and right.
+assert.ok(home.includes('.landing-split{') &&
+  home.includes('position:relative;') &&
+  home.includes('isolation:isolate;') &&
+  home.includes('display:flex;') &&
+  home.includes('min-height:clamp(350px,32vw,490px)') &&
+  home.includes('.landing-split .landing-media{') &&
+  home.includes('position:absolute;') &&
+  home.includes('inset:0;') &&
+  home.includes('z-index:-2;') &&
+  home.includes('.landing-split::before{') &&
+  home.includes('.landing-split .landing-copy{'),
+  'Six owner illustrations must be section-wide backgrounds under layered text');
+assert.ok(home.includes('.world-section,.story-section,.economy-section{justify-content:flex-end}') &&
+  home.includes('.freedom-section,.craft-section,.exploration-section{justify-content:flex-start}') &&
+  home.includes('.world-section::before,.story-section::before,.economy-section::before{'),
+  'The layered reading panels must alternate sides with matching contrast gradients');
+assert.ok((home.match(/src="\/ui-kit\/branding\/logo-full\.png"/g)||[]).length===2 &&
+  home.includes('class="landing-logo-break section-width"') &&
+  home.includes('class="footer-brand" aria-label="The Pall — home"') &&
+  home.includes('width:clamp(245px,31vw,395px)') &&
+  home.includes('width:clamp(160px,15vw,208px)'),
+  'The full owner logo must appear in both indicated spaces: centred divider and footer');
 // Public entry uses the exact same supplied nine-slice sprites as the
 // owner-approved in-scene dialogue. Headings retain their original typeface;
 // only descriptive paragraphs swap to a more legible Georgia reading face.
@@ -195,4 +220,4 @@ for(const [file,expected] of [
   assert.ok(read('apps/web/src/lib/'+file).includes(expected),
     'Compact onboarding image height missing: '+file);
 }
-console.log('PASS: All owner homepage copy, alternating six illustrated sections, skyline crop, private repository links removed, approved parchment/buttons, and existing entry checks.');
+console.log('PASS: Approved homepage copy, six full-bleed background sections, alternating contrast, two full-size logo placements, source privacy and entry checks.');
