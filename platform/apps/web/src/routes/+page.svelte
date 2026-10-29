@@ -27,7 +27,6 @@
         <img src="/ui-kit/branding/logo-compact.png" alt="The Pall"/>
       </a>
       <div class="entry-links">
-        <a href="#game">The game</a>
         <a href="#stories">Stories</a>
         <a href="#crafting">Crafting</a>
         <a href="#development">Development</a>
@@ -39,7 +38,7 @@
       <section class="landing-hero" id="game" aria-labelledby="landing-title">
         <div class="hero-art" role="img" aria-label="Panorama of Grand Cylinder City and its enormous central power structure"></div>
         <div class="hero-content">
-          <p class="entry-eyebrow">THE GAME</p>
+          <!-- <p class="entry-eyebrow">THE GAME</p> -->
           <h1 id="landing-title">Make a living.<br/>Find your own way.</h1>
           <p class="hero-intro"><em>The Pall</em> is a free-to-play, persistent browser MMORPG set in a harsh, industrial world. Your character, skills, possessions and progress remain between sessions.</p>
           <div class="hero-actions">
@@ -184,7 +183,7 @@
     display:flex;align-items:flex-end;min-height:clamp(360px,33vw,465px);
     background:#24201b;border:1px solid #745538}
   .hero-art{position:absolute;z-index:-2;inset:0;
-    background:url('/ui-kit/resources/TheCityVista.png') center 34%/cover no-repeat}
+    background:url('/ui-kit/resources/TheCityVista.png') center 54%/cover no-repeat}
   .landing-hero:after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
     background:linear-gradient(90deg,#15120ff2 0%,#15120fd0 27%,#15120f38 65%,transparent 100%),
       linear-gradient(0deg,#15120fcb,transparent 55%)}
