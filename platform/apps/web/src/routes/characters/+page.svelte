@@ -295,7 +295,7 @@
        Dark overlays preserve contrast for the UI and unframed margins. */
     background:
       linear-gradient(180deg,#15130fd4 0%,#17130fc0 48%,#15120fee 100%),
-      url('/locations/characters/grey-marches-roster.webp') center 42%/cover no-repeat,
+      url('/locations/characters/GreyMarches_background01.png') center 42%/cover no-repeat,
       #211d1a;
   }
 
