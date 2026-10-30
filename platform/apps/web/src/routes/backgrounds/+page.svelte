@@ -372,7 +372,6 @@
   .backgrounds-page .intro,
   .backgrounds-page .approved-ending,
   .backgrounds-page .character-preview,
-  .backgrounds-page .origin-text,
   .backgrounds-page .state-notice{
     min-width:0;
     border-style:solid;
@@ -454,18 +453,21 @@
     background-size:cover;
     background-position:center 43%;
   }
-  /* The parchment is the actual text base; do not lay dark ink directly
-     over scenery or silently replace the approved origin descriptions. */
+  /* Plain parchment underneath each scene. Keep the metal frame for the
+     main character preview, not for each of the six descriptions. */
   .backgrounds-page .origin-text{
     display:flex;
     flex:1;
     flex-direction:column;
     gap:10px;
     width:100%;
-    padding:9px 11px 12px;
-    border-width:23px 24px 21px;
-    border-image-width:23px 24px 21px;
+    min-width:0;
+    padding:17px clamp(15px,1.7vw,20px) 20px;
+    border:0;
+    border-radius:0;
+    background:linear-gradient(160deg,#f3e5cf 0%,#ead8b9 65%,#dfc6a2 100%);
     box-shadow:none;
+    color:#352519;
     overflow-wrap:anywhere;
   }
   .backgrounds-page .origin-text strong{
