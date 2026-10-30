@@ -35,13 +35,13 @@
       <header class="entry-hero">
         <div>
           <span class="entry-eyebrow">Grand Cylinder City</span>
-          <h1>{APPROVED_WORLD_INTRO.heading}</h1>
+          <h1>Game lore introduction:</h1>
         </div>
       </header>
     </div>
     <main class="entry-content introduction-content">
       <article class="intro-manuscript" aria-label="World introduction">
-        <span class="entry-eyebrow">The world beyond the walls</span>
+        <span class="entry-eyebrow"></span>
         <div class="lore">
         {#each APPROVED_WORLD_INTRO.paragraphs as paragraph,i}
           <p class:ending={i>=APPROVED_WORLD_INTRO.paragraphs.length-2}>
