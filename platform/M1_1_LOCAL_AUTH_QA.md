@@ -85,6 +85,23 @@ After the lockfile is published, optionally rerun `npm ci` with both node server
 
 **Acceptance:** All A/B and regression checks PASS, the M1.1 dependency lockfile is committed, and an `npm ci` pass on Node 24 follows. This closes **local M1.1**, not public launch security review or future character-ownership authorization.
 
+## Mailpit persistent inbox — 2026-10-30
+
+Mailpit's default SQLite database is temporary and is deleted when the application exits. The local `compose.yaml` now sets `MP_DATABASE=/data/mailpit.db` and mounts the named Docker volume `pall_mailpit_dev` at `/data`. This preserves **newly received** development emails across Mailpit container restarts and recreations. It does **not** recover messages previously lost from the old temporary database. The existing `MP_MAX_MESSAGES=100` limit still prunes older messages when exceeded. SMTP remains bound to `127.0.0.1:1025`; the Mailpit UI remains at `http://127.0.0.1:8025`.
+
+After the change has been merged and pulled, run from `The-Pall\\platform` in PowerShell:
+
+```powershell
+docker compose config
+docker compose up -d --no-deps mailpit
+docker compose ps mailpit
+docker inspect (docker compose ps -q mailpit) --format '{{json .Mounts}}'
+```
+
+The final command should show a named mount targeting `/data`. Compose recreates the Mailpit container when its configuration changes; there is no need to stop or recreate PostgreSQL. If port 8025 or 1025 is in use by a Mailpit instance from a **different** Compose project, check `docker ps` before starting another instance—do not delete any existing containers or volumes blindly.
+
+**Persistence smoke test:** with the API running, request a password reset for an existing test account from `/account`, confirm a new message in Mailpit, then run `docker compose restart mailpit` and refresh `http://127.0.0.1:8025`. To verify container *recreation*, run `docker compose up -d --no-deps --force-recreate mailpit` and refresh again: the same message should remain. Do not use `docker compose down -v`, `docker volume rm`, or a volume-pruning command: these can destroy named volumes, including PostgreSQL data. Never share password reset or email verification links containing tokens.
+
 ## Why no The Pall domain or personal SMTP is needed
 
 Register a test account using your own personal email address, if desired. **Mailpit will intercept the message and display it locally; the message will NOT arrive in that external inbox.** No personal mailbox password, SMTP credential or production domain is needed. Our test sender is the reserved invalid address `no-reply@thepall.invalid` and exists **only inside Mailpit**.
