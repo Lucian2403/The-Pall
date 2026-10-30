@@ -4,7 +4,7 @@
   import {APPROVED_BACKGROUND_SELECTION} from '$lib/approved-introductions';
   import '$lib/pall-owner-ui.css';
   import '$lib/pall-entry-pages.css';
-  import AvatarPicker from '$lib/AvatarPicker.svelte';
+  import PortraitCarousel from '$lib/PortraitCarousel.svelte';
   import {originVisual} from '$lib/origin-visuals';
 
   type OriginFact = {origin: string; socialRole: string; majorSkill: string};
@@ -185,8 +185,8 @@
                   aria-pressed={selectedSex==='Female'}
                   onclick={()=>{selectedSex='Female';selectedAvatarId=null;}}>Female</button>
               </div>
-              <p class="entry-muted">Choose your portrait. All eight portraits in each set are available to every background.</p>
-              <AvatarPicker sex={selectedSex} selectedId={selectedAvatarId}
+              <p class="entry-muted">Choose your portrait with the arrows, or select the one displayed. All eight portraits in each set are available to every background.</p>
+              <PortraitCarousel sex={selectedSex} selectedId={selectedAvatarId}
                 onSelect={(id)=>{selectedAvatarId=id;}}/>
               <div class="starting-facts">
                 <p><strong>{selected.majorSkill} +{catalogue.startingFacts.originMajorSkillBonusLevels}</strong></p>
