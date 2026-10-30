@@ -1,4 +1,5 @@
 import {strict as assert} from 'node:assert';
+import {createHash} from 'node:crypto';
 import {existsSync,readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 
@@ -114,6 +115,11 @@ for(const [origin,asset] of [
   assert.ok(bytes.length>10000 &&
     bytes.toString('ascii',0,4)==='RIFF' &&
     bytes.toString('ascii',8,12)==='WEBP', 'Corrupt origin scene: '+asset);
+  if(origin==='Scrapper'){
+    const checksum=createHash('sha256').update(bytes).digest('hex');
+    assert.equal(checksum,'654c65cde3e8bd87cf6e3a399f84abd15a32746de3d13e1e82485126bb42bc6d',
+      'Scrapper must use the owner-revised Scrapper_background02 image (install the replacement ZIP)');
+  }
 }
 
 // The creation page has one large portrait at a time; pressing the arrows
