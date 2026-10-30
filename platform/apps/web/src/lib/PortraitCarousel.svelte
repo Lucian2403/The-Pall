@@ -1,9 +1,9 @@
 <script lang="ts">
   /**
-   * One-at-a-time background-creation portrait selector.
-   * Only the user's explicit arrow or portrait click selects an avatar;
-   * otherwise the displayed first portrait is a preview, not a saved choice.
-   * The shared AvatarPicker grid used on other pages stays untouched.
+   * Shared one-at-a-time selector for character creation and roster editing.
+   * Arrows navigate and choose a draft portrait. The parent decides whether
+   * to submit a new character or save an existing character's avatar.
+   * The legacy AvatarPicker grid remains available for unrelated screens.
    */
   let {sex,selectedId=null,onSelect}:{
     sex:'Male'|'Female';
