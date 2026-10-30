@@ -89,7 +89,7 @@ After the lockfile is published, optionally rerun `npm ci` with both node server
 
 Mailpit's default SQLite database is temporary and is deleted when the application exits. The local `compose.yaml` now sets `MP_DATABASE=/data/mailpit.db` and mounts the named Docker volume `pall_mailpit_dev` at `/data`. This preserves **newly received** development emails across Mailpit container restarts and recreations. It does **not** recover messages previously lost from the old temporary database. The existing `MP_MAX_MESSAGES=100` limit still prunes older messages when exceeded. SMTP remains bound to `127.0.0.1:1025`; the Mailpit UI remains at `http://127.0.0.1:8025`.
 
-After the change has been merged and pulled, run from `The-Pall\\platform` in PowerShell:
+After the change has been merged and pulled, run from `The-Pall\platform` in PowerShell:
 
 ```powershell
 docker compose config
