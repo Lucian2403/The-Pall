@@ -82,4 +82,15 @@ assert.ok(css.includes('border-image-slice:145 190 125 190 fill') &&
   css.includes('@media(max-width:920px)') &&
   css.includes('@media(max-width:540px)'),
   'Framed selection controls must retain selected/focus states and responsive cards');
+// Decorative metalwork belongs to the major panels and actions, not to every
+// background description. Flat parchment must remain readable and selected state
+// must remain on the entire origin card.
+const panelFrameRule=css.slice(css.indexOf('  .backgrounds-page .intro,'),css.indexOf('  .backgrounds-page .intro{'));
+const descriptionRule=css.slice(css.indexOf('  .backgrounds-page .origin-text{'),css.indexOf('  .backgrounds-page .origin-text strong{'));
+assert.ok(!panelFrameRule.includes('.backgrounds-page .origin-text') &&
+  descriptionRule.includes('border:0;') &&
+  descriptionRule.includes('background:linear-gradient(160deg,#f3e5cf') &&
+  !descriptionRule.includes('border-image') &&
+  css.includes('.backgrounds-page .origin-card.active{'),
+  'Origin descriptions should be frameless parchment with selection indicated on the whole card');
 console.log('PASS: Six approved origins, live creation flow, owner frames, city masthead, Grey Marches background and responsive layout.');
