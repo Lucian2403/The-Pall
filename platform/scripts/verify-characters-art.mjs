@@ -1,11 +1,16 @@
 import {strict as assert} from 'node:assert';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 
 const root=resolve(import.meta.dirname,'..');
 const page=readFileSync(resolve(root,'apps/web/src/routes/characters/+page.svelte'),'utf8');
 const markup=page.slice(0,page.indexOf('<style>'));
 const css=page.slice(page.indexOf('<style>'));
+const greyMarchesAsset=resolve(root,'apps/web/static/locations/characters/GreyMarches_background01.png');
+assert.ok(css.includes("url('/locations/characters/GreyMarches_background01.png')"),
+  'Roster background must use the uploaded Grey Marches illustration');
+assert.ok(existsSync(greyMarchesAsset),
+  'The Grey Marches PNG is not installed: extract The_Pall_Grey_Marches_Roster_Asset.zip into platform/ before verifying and merging');
 
 // This is a visual pass: all existing roster/auth endpoints and safety
 // confirmations must remain implemented, not replaced with mock interactions.

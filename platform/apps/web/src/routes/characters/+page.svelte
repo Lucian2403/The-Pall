@@ -291,7 +291,12 @@
     padding:clamp(16px,3vw,36px);
     border:1px solid #59452f;
     border-top:0;
-    background:radial-gradient(ellipse at 52% 0%,#30271d 0%,#1b1916 75%);
+    /* Grey Marches owner illustration covers only the roster area.
+       Dark overlays preserve contrast for the UI and unframed margins. */
+    background:
+      linear-gradient(180deg,#15130fd4 0%,#17130fc0 48%,#15120fee 100%),
+      url('/locations/characters/GreyMarches_background01.png') center 42%/cover no-repeat,
+      #211d1a;
   }
 
   /* The status strip is a compact parchment plaque; no invented character data. */
