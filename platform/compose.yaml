@@ -18,7 +18,11 @@ services:
     ports:
       - "127.0.0.1:8025:8025"
       - "127.0.0.1:1025:1025"
+    volumes:
+      - pall_mailpit_dev:/data
     environment:
       MP_MAX_MESSAGES: "100"
+      MP_DATABASE: /data/mailpit.db
 volumes:
   pall_pg_dev:
+  pall_mailpit_dev:
