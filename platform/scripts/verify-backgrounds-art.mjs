@@ -5,6 +5,8 @@ import {resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const page=readFileSync(resolve(root,'apps/web/src/routes/backgrounds/+page.svelte'),'utf8');
 const copy=readFileSync(resolve(root,'apps/web/src/lib/approved-introductions.ts'),'utf8');
+const originVisuals=readFileSync(resolve(root,'apps/web/src/lib/origin-visuals.ts'),'utf8');
+const portraits=readFileSync(resolve(root,'apps/web/src/lib/PortraitCarousel.svelte'),'utf8');
 const markup=page.slice(0,page.indexOf('<style>'));
 const css=page.slice(page.indexOf('<style>'));
 
@@ -26,8 +28,9 @@ for(const fragment of [
   'catalogue.startingFacts.starterItemDisplayNames',
   'selectedSex=\'Male\';selectedAvatarId=null',
   'selectedSex=\'Female\';selectedAvatarId=null',
-  '<AvatarPicker',
+  '<PortraitCarousel',
   'onSelect={(id)=>{selectedAvatarId=id;}}',
+  'Choose your portrait with the arrows',
   'onsubmit={(event)=>{event.preventDefault();void createCharacter();}}',
   'disabled={busy||!selectedAvatarId||roster.slots.used>=roster.slots.limit}',
   "pendingRequestId = crypto.randomUUID()",
@@ -93,4 +96,39 @@ assert.ok(!panelFrameRule.includes('.backgrounds-page .origin-text') &&
   !descriptionRule.includes('border-image') &&
   css.includes('.backgrounds-page .origin-card.active{'),
   'Origin descriptions should be frameless parchment with selection indicated on the whole card');
-console.log('PASS: Six approved origins, live creation flow, owner frames, city masthead, Grey Marches background and responsive layout.');
+
+// Four user-supplied scenes are mapped to their named origins. The exact binary
+// assets must be installed for this branch to pass verification.
+for(const [origin,asset] of [
+  ['Bellrunner','bellrunner-depot.webp'],
+  ['Stitcher','stitcher-clinic.webp'],
+  ['Squatter','squatter-outskirts.webp'],
+  ['Scrapper','scrapper-yard.webp']
+]){
+  assert.ok(originVisuals.includes(origin+":{src:'/locations/origins/"+asset+"'") &&
+    originVisuals.includes('hubArt:true'), 'Incorrect origin scene mapping: '+origin);
+  const path=resolve(root,'apps/web/static/locations/origins',asset);
+  assert.ok(existsSync(path),
+    'Missing '+asset+': extract The_Pall_Origin_Backgrounds_Patch.zip into platform/ and commit its four assets before merging');
+  const bytes=readFileSync(path);
+  assert.ok(bytes.length>10000 &&
+    bytes.toString('ascii',0,4)==='RIFF' &&
+    bytes.toString('ascii',8,12)==='WEBP', 'Corrupt origin scene: '+asset);
+}
+
+// The creation page has one large portrait at a time; pressing the arrows
+// updates the same selected avatar ID submitted to the server. Keep selection
+// optional until a direct user choice to preserve the existing form gate.
+assert.ok(!markup.includes('<AvatarPicker') &&
+  markup.includes('<PortraitCarousel sex={selectedSex} selectedId={selectedAvatarId}') &&
+  portraits.includes('aria-label="Previous portrait"') &&
+  portraits.includes('aria-label="Next portrait"') &&
+  portraits.includes('onSelect(choices[next])') &&
+  portraits.includes('aria-pressed={selectedId===current}') &&
+  portraits.includes('onclick={()=>onSelect(current)}') &&
+  portraits.includes('aspect-ratio:4/5') &&
+  portraits.includes("sex.toLowerCase()+'-'") &&
+  !portraits.includes('Portrait {String(i+1)') &&
+  !portraits.includes('<span>Portrait '),
+  'Carousel must show one enlarged unlabelled portrait and allow explicit arrow selection');
+console.log('PASS: Six approved origins, live creation flow, owner frames, named origin art, carousel, city masthead, Grey Marches background and responsive layout.');
