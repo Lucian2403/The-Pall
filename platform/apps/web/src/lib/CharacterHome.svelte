@@ -8,6 +8,9 @@
     id:string; name:string; sex:string; origin:string; avatarId?:string|null;
     attributes:{STR:number;DEX:number;INT:number;RES:number};
     health:{current:number;maximum:number}; coins:number;
+    stamina?:{current:number;maximum:number};
+    fatigue?:{current:number;maximum:number};
+    focus?:{current:number;maximum:number};
     majorSkillBonuses:Record<string,number>;
     starterItemRequirements:{name:string;quantity:number}[];
     startingLocation:string;
@@ -71,6 +74,24 @@
     }catch{/* Local storage unavailable; still toggle this session. */}
   }
 
+  // Match TutorialShell's measurements: untracked resources are not guessed.
+  type Measured={current:number;maximum:number};
+  function isMeasured(value:Measured|undefined):value is Measured{
+    return !!value && Number.isFinite(value.current) &&
+      Number.isFinite(value.maximum) && value.maximum>0 && value.current>=0;
+  }
+  function formatted(value:Measured|undefined){
+    return isMeasured(value)?value.current+' / '+value.maximum:'—';
+  }
+  const resources=$derived([
+    {id:'health',label:'Health',value:formatted(character.health),known:isMeasured(character.health)},
+    {id:'stamina',label:'Stamina',value:formatted(character.stamina),known:isMeasured(character.stamina)},
+    {id:'fatigue',label:'Fatigue',value:formatted(character.fatigue),known:isMeasured(character.fatigue)},
+    {id:'focus',label:'Focus',value:formatted(character.focus),known:isMeasured(character.focus)},
+    {id:'coins',label:'Coins',value:String(character.coins),known:true},
+    {id:'stage',label:'Onboarding',value:character.tutorial.stage+' / 8',known:true}
+  ]);
+
   // Approved, short versions of docs/01-player/character-system.md.
   const attributes=[
     {key:'STR',name:'Strength',description:'Physical potential, carrying, heavy jobs/equipment, melee and heavy-tool training.'},
@@ -93,9 +114,21 @@
             <h2>{character.name}</h2>
             <p>{character.sex} · {character.origin}</p>
             <p>{character.startingLocation}</p>
-            <span class="health-summary">Health {character.health.current} / {character.health.maximum} · {character.coins} coins</span>
           </div>
         </div>
+        <ul class="resource-grid" aria-label="Character condition and progression">
+          {#each resources as resource (resource.id)}
+            <li class:untracked={!resource.known} class="resource-item"
+              title={resource.known?resource.label:'Not tracked yet'}>
+              <img src={'/ui-kit/icons/character-'+resource.id+'.svg'} alt="" aria-hidden="true"
+                width="32" height="32"/>
+              <span class="resource-details">
+                <span class="resource-label">{resource.label}</span>
+                <strong class="resource-value">{resource.value}</strong>
+              </span>
+            </li>
+          {/each}
+        </ul>
       </div>
 
       <aside class="personal-notices" aria-label="Personal notices">
@@ -185,8 +218,9 @@
     box-shadow:0 9px 24px #0006;padding:clamp(17px,2vw,27px);
   }
   .arrival-layout{
-    display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,440px);
-    gap:clamp(20px,3vw,45px);align-items:start;
+    display:grid;
+    grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);
+    gap:clamp(20px,2vw,33px);align-items:start;
   }
   .arrival-heading{min-width:0;padding:14px 0 0;text-shadow:0 2px 7px #000b}
   .arrival-heading h1{
@@ -206,12 +240,33 @@
     margin:0 0 6px;color:#fff0d7;overflow-wrap:anywhere;
   }
   .identity-copy p{margin:3px 0;color:#ead5b9;font-size:15px}
-  .health-summary{display:inline-block;margin-top:8px;color:#f1d2a8;font-weight:600;font-size:14px}
+  .resource-grid{
+    list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;margin:21px 0 0;padding:0;max-width:720px;text-shadow:none;
+  }
+  .resource-item{
+    min-width:0;display:flex;align-items:center;gap:8px;
+    padding:8px 9px;background:#18140ed4;border:1px solid #94704699;
+    box-shadow:0 2px 7px #09070466;
+  }
+  .resource-item img{display:block;width:32px;height:32px;flex:none}
+  .resource-details{display:flex;flex-direction:column;min-width:0;gap:3px}
+  .resource-label{
+    color:#ddbd8c;font:600 13px/1.1 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.035em;
+  }
+  .resource-value{
+    color:#f8e5c8;font:700 15px/1.2 var(--pall-font-reading,Georgia,serif);
+    white-space:nowrap;font-variant-numeric:tabular-nums;
+  }
+  .resource-item.untracked .resource-value{color:#c5b7a2}
+  .resource-item.untracked{border-color:#75634f70}
 
   /* Position the entire notice high in the previously empty area of the
      origin panorama. The first job is part of this very same notice. */
   .personal-notices{
-    min-width:0;padding:16px clamp(6px,1.5vw,21px) 16px 12px;
+    min-width:0;width:100%;box-sizing:border-box;
+    padding:16px clamp(8px,1.5vw,22px) 16px 12px;
     border:0;border-radius:0;background:none;box-shadow:none;
     text-shadow:0 2px 5px #090604,0 0 11px #090604b8;
     color:#fff0d9;
@@ -226,7 +281,11 @@
     margin:0 0 9px;color:#f0d4af;
     font:600 20px/1.2 var(--pall-font-reading,Georgia,serif);
   }
-  .personal-notices p{margin:0 0 11px;font:500 16px/1.5 var(--pall-font-reading,Georgia,serif);color:#f1dec6}
+  .personal-notices p{
+    margin:0 0 11px;max-width:84ch;
+    font:500 clamp(16px,1vw,18px)/1.53 var(--pall-font-reading,Georgia,serif);
+    color:#f1dec6;
+  }
   .personal-notices .notice-signoff{font-weight:700;color:#ffe1b8}
   .notice-work{margin-top:16px;padding-top:14px;border-top:1px solid #d4a36b84}
   .notice-work h3{font-size:18px;color:#f6deb8}
@@ -298,7 +357,7 @@
   .attribute-row{
     display:flex;align-items:center;justify-content:space-between;gap:13px;
     padding:12px 12px 12px 17px;margin-bottom:8px;
-    background:linear-gradient(110deg,#e6d1ae,#d6bb91);
+    background:linear-gradient(110deg,#f1dfc2,#e3c79d);
     border:1px solid #a27c51;color:#382517;
     box-shadow:inset 3px 0 #a47c4d,0 2px 6px #0003;
   }
@@ -308,7 +367,11 @@
     letter-spacing:.11em;
   }
   .attribute-row dt strong{font:700 18px/1.15 var(--pall-font-reading,Georgia,serif);color:#2d1b0e}
-  .attribute-row dt small{font:500 13px/1.4 var(--pall-font-reading,Georgia,serif);color:#5e4630}
+  .attribute-row dt small{
+    font:700 15px/1.5 var(--pall-font-reading,Georgia,serif);
+    font-synthesis:weight;color:#24160d;text-shadow:none;
+    opacity:1;letter-spacing:0;
+  }
   .attribute-row dd{
     margin:0;flex:none;display:grid;place-items:center;
     min-width:47px;min-height:47px;padding:5px;
@@ -318,17 +381,19 @@
     font:700 22px/1.1 var(--pall-font-reading,Georgia,serif);
   }
 
-  @media(max-width:1120px){
-    .arrival-layout{grid-template-columns:minmax(0,1fr) minmax(265px,385px)}
+  @media(max-width:1250px){
+    .arrival-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+    .resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
   @media(max-width:950px){
     .record-columns{grid-template-columns:1fr}
     .attribute-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
     .attribute-row{margin:0}
   }
-  @media(max-width:750px){
+  @media(max-width:900px){
     .arrival-layout{grid-template-columns:1fr}
     .personal-notices{max-width:100%}
+    .resource-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
     .hero-portrait :global(.portrait){width:96px;height:122px}
   }
   @media(max-width:460px){
@@ -341,5 +406,8 @@
     .attribute-list{grid-template-columns:1fr}
     .personal-notices{padding:14px 4px}
     .attribute-row{padding:10px;gap:8px}
+    .resource-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    .resource-item{padding:7px 6px;gap:6px}
+    .resource-item img{width:27px;height:27px}
   }
 </style>
