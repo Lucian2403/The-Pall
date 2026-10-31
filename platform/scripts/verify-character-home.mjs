@@ -44,7 +44,7 @@ for(const field of [
   'avatarId={character.avatarId??null}','character.startingLocation'
 ]) assert.ok(markup.includes(field),'Missing saved character value: '+field);
 for(const field of [
-  'formatted(character.health)','formatted(character.stamina)',
+  'formatted(character.health)','formatted(character.stamina??{current:100,maximum:100})',
   'formatted(character.fatigue)','formatted(character.focus)',
   'String(character.coins)',"character.tutorial.stage+' / 8'"
 ]) assert.ok(markup.includes(field),'Missing saved or explicitly untracked resource: '+field);
@@ -244,12 +244,15 @@ for(const name of ['health','stamina','fatigue','focus','coins','stage']){
 }
 assert.ok(markup.includes("isMeasured(value:Measured|undefined)") &&
   markup.includes('resource.known?resource.label:\'Not tracked yet\'') &&
-  markup.includes("value:formatted(character.stamina)") &&
+  markup.includes("value:formatted(character.stamina??{current:100,maximum:100})") &&
+  markup.includes('provisional:!isMeasured(character.stamina)') &&
+  shell.includes("staminaShown=$derived(isMeasured(character.stamina)") &&
+  shell.includes("{current:100,maximum:100}") &&
   markup.includes("value:formatted(character.focus)") &&
   markup.includes('class:untracked={!resource.known}') &&
   markup.includes('class="resource-grid"') &&
   !markup.includes('character.stamina??0') &&
   !markup.includes('character.focus??0'),
-  'Untracked resources must show a dash, never fictitious measured numbers');
+  'Stamina is an explicitly provisional full bar; other untracked values remain honest dashes');
 console.log('PASS: Wide unframed notice, readable parchment attributes, framed skill dropdowns, six original resource icons with honest API state and existing game contracts.');
 
