@@ -66,8 +66,8 @@ The owner supplied **`SmithingWorkshopAmbience.wav`** as an additional, dedicate
 - Original: stereo 48 kHz PCM32 WAV, **115.00 seconds**, approximately 44.2 MB. The beginning and ending decay toward silence, allowing an unobtrusive repeat.
 - Browser version: **`smithing-workshop-ambience.mp3`**, MP3 112 kbit/s, stereo 48 kHz, **1,610,828 bytes**, generated from that exact owner recording. The source WAV remains untouched. `sha256: aa769bc0aa3a480bdaa56153be231bb735fa949b055c24aa7e25330a55dc38e4`.
 - Loop is **continuous** (`audio.loop=true`) without the 30–75-second rests used by the separate MusicTheme. No artificial smithing sounds are generated. Player-controlled default **Ambience** is 30%, with a dedicated **0–100%** slider; Music remains separately controlled (maximum 50%, as modified by the owner in GitHub), and Effects has its own slider.
-- The sound only plays while the actual **Smithing Workshop backdrop** is visible and after browser gesture authorization. Screens currently claiming it: Millhand arrival portrait, Stage 1 Guther opening, Stage 2 platework, Stage 3 Missing Stamp and the initial workshop preparation phase of Stage 4 depot delivery. Once the scenery changes to the depot, or the player opens a non-workshop page, it pauses and resets. Hidden tabs and master mute silence it.
-- **Binary delivery gate**: The GitHub source connector cannot install the generated audio binary. `ThePall_Smithing_Ambience_Browser_Patch.zip` contains the one expected file under `apps/web/static/audio/the-pall/` relative to `platform/`. Extract that ZIP into the `platform` directory on the feature branch, commit it, then run `npm run verify:workshop-hud-ambience` and `npm run check:web`. Do not merge while the MP3 is missing; the verifier checks its exact SHA-256 and byte count.
+- The sound plays only when `TutorialShell.svelte` receives an explicit `smithingBackdrop=true` from a page actually rendering Smithing Workshop artwork: Millhand character illustration, Stage 1 Guther opening, Stage 2 platework, Stage 3 Missing Stamp and **only** the early workshop-preparation phases of Stage 4 restamp delivery. Depot, council office, records room, other origins and other pages are non-forge backgrounds. Hidden tabs and master mute silence the loop. Consecutive workshop-stage transitions preserve the track's position.
+- **Asset status**: the browser MP3 is already committed at `platform/apps/web/static/audio/the-pall/smithing-workshop-ambience.mp3`; no ZIP or binary replacement is necessary. The verifier checks its SHA-256 and byte count.
 - The original eight SFX files, weighted click playback, short-effect Web Audio buffer cache and music fades are preserved.
 
 The new HUD displays **Stamina 100/100** as an explicit provisional starting value. A live/saved Stamina measurement from future combat integration—including Flint—takes precedence; this change does not invent a combat state, persist stamina, or subtract it from actions.
@@ -98,3 +98,21 @@ npm run check:web
 ```
 
 Then open an actual Smithing Workshop and open **Sound**. The Ambience status should become `Playing` after a pointer/keyboard activation. If it instead reports `File unavailable` or `Playback blocked — click to retry`, that distinguishes a missing URL/codec problem from the browser's activation policy. Confirm the playing state and audible balance on the owner's own browser before merging.
+
+
+## Backdrop-scoped forge ambience and seamless stages — 2026-11-01
+
+**Owner correction:** Workshop ambience must never become generic game music and must not restart at the beginning after the brief Stage 1→2→3 transitions.
+
+**Implementation:** The route that actually displays each scene declares `smithingBackdrop` to the mounted `TutorialShell`. Only that shell can claim ambient ownership. Old independent `onMount(claimSmithingWorkshopAmbience)` hooks in all five workshop-related content components have been removed; otherwise component residue and partial Stage 4 branches could incorrectly leave the forge playing.
+
+- Millhand character home: `true`, because the actual origin image is `/workshop/environment.webp`; all other origin homes: `false`.
+- Stage 1 Guther, Stage 2 platework, Stage 3 Missing Stamp: `true` only for their actual workshop scenes.
+- Stage 4: `true` **only** on the `restamp` branch while phase is `CHECK_LOAD` or `CHOOSE_TRANSPORT`; depot/records/contracts art is `false` and immediately silences and resets forge ambience.
+- Account, roster, marketing and other routes: no workshop background. Navigation away from character scenes explicitly stops the forge via `beforeNavigate`.
+
+A single `HTMLAudioElement` owns the **same playing position** across scene remounts. When the old stage releases its forge claim, the manager allows a short **2.4-second route-transition grace**. If another stage mounts with the same forge artwork in that interval, it cancels the pending stop; the audio keeps playing uninterrupted. If the next stage takes longer to load, playback may pause at the end of the grace period, but its position is preserved rather than rewound. A confirmed non-forge backdrop stops and resets immediately.
+
+This does **not** change MusicTheme's spaced looping, any Effects Web Audio buffers, or the owner's Music/Ambience/Effects sliders and saved volumes.
+
+**Verified in GitHub Actions** using both the executable runtime mock and a real Chromium page with the production Sound UI: the Svelte shell is deliberately unmounted and remounted using a keyed new stage; the recording's `currentTime` does not regress. Switching that same page's visible backdrop to the depot must pause the recorded ambience and reset only at that confirmed departure.
