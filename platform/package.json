@@ -37,6 +37,7 @@
     "verify:account-art": "node scripts/verify-account-art.mjs",
     "verify:introduction-art": "node scripts/verify-introduction-art.mjs",
     "verify:characters-art": "node scripts/verify-characters-art.mjs",
+    "verify:character-home": "node scripts/verify-character-home.mjs",
     "verify:backgrounds-art": "node scripts/verify-backgrounds-art.mjs",
     "verify:homepage-art": "node scripts/verify-homepage-art.mjs",
     "check:api": "npm run build:packages && npm run check -w @the-pall/api",
