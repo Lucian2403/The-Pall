@@ -39,7 +39,7 @@ const activeClips=new Set<HTMLAudioElement>();
 const clamp=(x:number,min:number,max:number)=>Math.min(max,Math.max(min,x));
 function canPlayMusic(){
   return typeof document!=='undefined' && settings.enabled && sceneActive &&
-    unlocked && !document.hidden;
+    settings.musicVolume>0 && unlocked && !document.hidden;
 }
 function clearMusicTimer(){
   if(nextMusicTimer!==null){clearTimeout(nextMusicTimer);nextMusicTimer=null;}
@@ -74,6 +74,7 @@ function startMusic(){
   if(!canPlayMusic()||nextMusicTimer!==null)return;
   const track=ensureMusic();
   if(!track.paused)return;
+  if(track.ended)track.currentTime=0;
   void track.play().then(updateMusicVolume).catch(()=>{
     // Autoplay-denied browsers simply remain quiet until a later gesture.
   });
@@ -122,8 +123,10 @@ export function playSmithingSfx(){
 export function setPallAudioSettings(next:Partial<PallAudioSettings>){
   settings={
     enabled:typeof next.enabled==='boolean'?next.enabled:settings.enabled,
-    musicVolume:Number.isFinite(next.musicVolume)?clamp(next.musicVolume!,0,0.12):settings.musicVolume,
-    sfxVolume:Number.isFinite(next.sfxVolume)?clamp(next.sfxVolume!,0,1):settings.sfxVolume
+    musicVolume:typeof next.musicVolume==='number'&&Number.isFinite(next.musicVolume)
+      ?clamp(next.musicVolume,0,0.12):settings.musicVolume,
+    sfxVolume:typeof next.sfxVolume==='number'&&Number.isFinite(next.sfxVolume)
+      ?clamp(next.sfxVolume,0,1):settings.sfxVolume
   };
   pallAudioSettings.set({...settings});
   if(typeof window==='undefined')return;
@@ -144,6 +147,9 @@ export function setPallAudioScene(active:boolean){
   else stopMusic();
 }
 function clicked(event:MouseEvent){
+  // Prototype soundscape is scoped to in-game routes; no unexpected noises
+  // while browsing the public site or creating an account.
+  if(!sceneActive)return;
   // The first user gesture unlocks audio; nothing plays on page load.
   unlock();
   const target=event.target instanceof Element?event.target:null;
