@@ -103,7 +103,7 @@ assert.ok(audio.includes("document.addEventListener('pointerdown',gesture,true)"
   audio.includes("volume.gain.value=clamp(settings.sfxVolume*gain,0,1)") &&
   audio.split('ambience.load()').length===2 &&
   audio.includes('export const pallAudioPlayback=writable') &&
-  audio.includes('export function previewPallEffect()') &&
+  audio.includes('export async function previewPallEffect()') &&
   settings.includes('{$pallAudioPlayback.music}') &&
   settings.includes('{$pallAudioPlayback.ambience}') &&
   settings.includes('{$pallAudioPlayback.effects}') &&
