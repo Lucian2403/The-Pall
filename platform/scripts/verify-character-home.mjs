@@ -47,9 +47,9 @@ for(const field of [
 
 // Four full names and descriptions from the approved character system.
 const descriptions={
-  STR:['Strength','Physical potential, carrying, heavy jobs, melee and heavy-tool training.'],
+  STR:['Strength','Physical potential, carrying, heavy jobs/equipment, melee and heavy-tool training.'],
   DEX:['Dexterity','Coordination, firearms, movement, locks and delicate technical work.'],
-  INT:['Intellect','Learning, reasoning, research, medicine, engineering and investigation.'],
+  INT:['Intellect','Learning and reasoning, research, medicine, chemistry, engineering and investigation.'],
   RES:['Resolve','Endurance under strain, mental resilience and difficult training.']
 };
 for(const [key,[name,description]] of Object.entries(descriptions)){
