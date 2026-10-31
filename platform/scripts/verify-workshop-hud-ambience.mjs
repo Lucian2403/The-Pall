@@ -62,7 +62,10 @@ assert.ok(audio.includes("smithingAmbienceFile='smithing-workshop-ambience.mp3'"
   audio.includes("if(document.hidden)") &&
   audio.includes('stopAmbience(true)') &&
   audio.includes('startAmbience();') &&
-  mainLayout.includes("setPallAudioScene(/^\\/characters\\/[^/]+(?:\\/|$)/.test(page.url.pathname))"),
+  mainLayout.includes('onMount(connectPallAudio)') &&
+  !mainLayout.includes('setPallAudioScene(') &&
+  hud.includes('onMount(()=>{\\n    setPallAudioScene(true);') &&
+  hud.includes('return ()=>setPallAudioScene(false);'),
   'Ambience must require a visible Smithing Workshop, respect autoplay/tab visibility and stop on navigation');
 assert.ok(audio.includes("ambienceVolume:typeof next.ambienceVolume==='number'") &&
   audio.includes("clamp(next.ambienceVolume,0,1)") &&
