@@ -41,7 +41,7 @@ assert.ok(hud.includes('background:linear-gradient(180deg,#648e60,#315c39 52%,#1
 assert.ok(hud.includes("romanStages=['—','I','II','III','IV','V','VI','VII','VIII']") &&
   hud.includes('{introStage} / VIII') &&
   hud.includes('<PallAudioControls/>') &&
-  hud.includes('class="coin-stat"') &&
+  hud.includes('class="stat coin-stat"') &&
   hud.includes('class="account-link"') &&
   hud.includes('@media(max-width:1270px)') &&
   hud.includes('@media(max-width:760px)'),
