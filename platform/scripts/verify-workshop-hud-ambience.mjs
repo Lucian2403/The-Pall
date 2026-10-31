@@ -15,6 +15,12 @@ const work=read('apps/web/src/lib/MillhandWorkScene.svelte');
 const missing=read('apps/web/src/lib/MillhandMissingStampScene.svelte');
 const depot=read('apps/web/src/lib/MillhandDepotScene.svelte');
 const mainLayout=read('apps/web/src/routes/+layout.svelte');
+const characterPage=read('apps/web/src/routes/characters/[id]/+page.svelte');
+const openingPage=read('apps/web/src/routes/characters/[id]/opening/+page.svelte');
+const workPage=read('apps/web/src/routes/characters/[id]/millhand/work/+page.svelte');
+const missingPage=read('apps/web/src/routes/characters/[id]/millhand/missing-stamp/+page.svelte');
+const depotPage=read('apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte');
+const qaPage=read('apps/web/src/routes/__audio-qa/+page.svelte');
 
 // UI state is provisional until the saved character/Flint combat API supplies
 // the actual value; genuine measured values always override the 100/100
@@ -47,26 +53,34 @@ assert.ok(hud.includes("romanStages=['—','I','II','III','IV','V','VI','VII','V
   hud.includes('@media(max-width:760px)'),
   'Keep original identity, coin, sound, account and Introduction progress in a responsive header');
 
-// The new ambience is looping, with a separate persisted slider, and plays
-// ONLY when a workshop-art component actually claims it.
+// A single explicit shell backdrop contract avoids accidental playback on
+// unrelated character pages. The audio player survives short scene remounts.
 assert.ok(audio.includes("smithingAmbienceFile='smithing-workshop-ambience.mp3'") &&
   audio.includes('ambienceVolume:0.3') &&
   audio.includes('ambience.loop=true') &&
-  audio.includes('ambience.preload=\'auto\'') &&
+  audio.includes("ambience.preload='auto'") &&
   audio.includes('smithingAmbienceOwners=new Set<symbol>()') &&
   audio.includes('export function claimSmithingWorkshopAmbience()') &&
+  audio.includes('export function stopSmithingWorkshopAmbience()') &&
   audio.includes('smithingAmbienceOwners.delete(owner)') &&
   audio.includes('smithingAmbienceOwners.size>0') &&
   audio.includes('sceneActive && unlocked && settings.ambienceVolume>0') &&
-  audio.includes('if(smithingAmbienceOwners.size===0)stopAmbience(true)') &&
-  audio.includes("if(document.hidden)") &&
+  audio.includes('WORKSHOP_TRANSITION_GRACE_MS=2400') &&
+  audio.includes('if(smithingAmbienceOwners.size===0)deferAmbienceDeparture()') &&
+  audio.includes('cancelAmbienceDeparture()') &&
+  audio.includes('deferAmbienceDeparture()') &&
   audio.includes('stopAmbience(true)') &&
   audio.includes('startAmbience();') &&
   mainLayout.includes('onMount(connectPallAudio)') &&
   !mainLayout.includes('setPallAudioScene(') &&
+  mainLayout.includes('beforeNavigate(({to})=>') &&
+  mainLayout.includes('stopSmithingWorkshopAmbience();') &&
   /onMount\(\(\)=>\{\s*setPallAudioScene\(true\);/.test(hud) &&
-  hud.includes('return ()=>setPallAudioScene(false);'),
-  'Ambience must require a visible Smithing Workshop, respect autoplay/tab visibility and stop on navigation');
+  hud.includes('return ()=>setPallAudioScene(false);') &&
+  hud.includes('if(smithingBackdrop)return claimSmithingWorkshopAmbience()') &&
+  hud.includes('stopSmithingWorkshopAmbience();') &&
+  hud.includes('smithingBackdrop = false'),
+  'Forge loop must be explicitly scene-scoped, continue through route handoffs, and stop on non-forge backdrops');
 assert.ok(audio.includes("ambienceVolume:typeof next.ambienceVolume==='number'") &&
   audio.includes("clamp(next.ambienceVolume,0,1)") &&
   audio.includes('window.localStorage.setItem(KEY') &&
@@ -77,14 +91,21 @@ assert.ok(audio.includes("ambienceVolume:typeof next.ambienceVolume==='number'")
   settings.includes('aria-label="Sound effects volume"') &&
   settings.includes('aria-label="Background music volume"'),
   'Master mute and three distinct volume sliders must persist without reducing the owner music maximum');
-for(const scene of [opening,work,missing]){
-  assert.ok(scene.includes("onMount(claimSmithingWorkshopAmbience)") &&
-    scene.includes("import {claimSmithingWorkshopAmbience} from '$lib/pall-audio'"),
-    'One Smithing Workshop scene lacks ambient sound ownership');
+// Scene images no longer register independent owners. The page supplying
+// each illustrated backdrop declares the state directly to TutorialShell.
+for(const scene of [opening,work,missing,depot,home]){
+  assert.ok(!scene.includes('claimSmithingWorkshopAmbience'),
+    'Independent scene owners can leak ambience into other backgrounds');
 }
-assert.ok(home.includes("if(character.origin==='Millhand')return claimSmithingWorkshopAmbience()") &&
-  depot.includes("if(atWorkshop)return claimSmithingWorkshopAmbience();"),
-  'Origin-workshop portrait and the Stage 4 preparation phase must use ambience only while workshop artwork is visible');
+assert.ok(characterPage.includes("smithingBackdrop={character.origin==='Millhand'}") &&
+  openingPage.includes("smithingBackdrop={character.origin==='Millhand'}") &&
+  workPage.includes('smithingBackdrop={true}') &&
+  missingPage.includes('smithingBackdrop={true}') &&
+  depotPage.includes("smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')}") &&
+  qaPage.includes('smithingBackdrop={forgeVisible}') &&
+  depot.includes("class:preparing={atWorkshop}") &&
+  depot.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
+  'Only routes showing actual workshop artwork may request forge ambience');
 assert.ok(!audio.includes("music.loop=true") &&
   audio.includes("music.loop=false") &&
   audio.includes('MUSIC_PAUSE_MIN_MS=30_000') &&
