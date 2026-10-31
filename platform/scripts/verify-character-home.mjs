@@ -145,7 +145,7 @@ assert.ok(css.includes('min-height:60px;max-width:100%') &&
 assert.ok(markup.includes('class="arrival-layout"') &&
   markup.includes('class="personal-notices"') &&
   markup.includes('<h2>Personal notices</h2>') &&
-  markup.includes('class="notice-work"') &&
+  markup.includes('class="notice-work work-order"') &&
   markup.includes('{#if newArrival}') &&
   markup.includes('{#if !newArrival}') &&
   markup.includes('showArrival') &&
@@ -155,8 +155,28 @@ assert.ok(markup.includes('class="arrival-layout"') &&
   markup.includes("'Hide notice':'Show notice'") &&
   markup.includes('aria-expanded={showArrival}'),
   'Welcome notice must be reversible without hiding the workshop action');
-assert.ok(markup.indexOf('class="notice-work"')<markup.indexOf('{:else}\n          <p>No new personal notices.'),
+assert.ok(markup.indexOf('class="notice-work work-order"')<markup.indexOf('{:else}\n          <p>No new personal notices.'),
   'Stage 1 CTA must be nested in the notice');
+
+// The Stage 1 action is a single prominent Work Order in Personal notices.
+// Its dynamic title/description/route are still derived from the saved stage.
+assert.ok(markup.includes('<section class="notice-work work-order" aria-label="Current work order">') &&
+  markup.includes('<span class="work-order-kicker">Current work order</span>') &&
+  markup.includes('<span class="work-order-stage">Stage I</span>') &&
+  markup.includes('<a class="framed-action work-order-action" href={work.href}>{work.label}</a>') &&
+  markup.includes('<h3>{work.title}</h3>') &&
+  markup.includes('<p>{work.description}</p>'),
+  'The first available work must be a real linked, accessible assignment');
+const workStyles=css.slice(css.indexOf('  .notice-work{'),css.indexOf('  .quiet-action{'));
+assert.ok(workStyles.includes('width:100%') &&
+  workStyles.includes("border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')") &&
+  workStyles.includes('border-image-slice:145 190 125 190 fill') &&
+  workStyles.includes('.personal-notices .work-order h3{') &&
+  workStyles.includes('.personal-notices .work-order p{') &&
+  workStyles.includes('width:min(100%,310px)') &&
+  workStyles.includes('min-height:64px') &&
+  css.includes('.work-order-action{width:100%;font-size:16px}'),
+  'Work Order requires one full-width parchment, readable ink, large main action and mobile sizing');
 
 // Remove all owner-struck labels and inventory from this screen.
 for(const removed of [
