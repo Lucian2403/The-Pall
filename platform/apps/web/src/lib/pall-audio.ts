@@ -170,8 +170,9 @@ function updateAmbience(){
 export function claimSmithingWorkshopAmbience(){
   const owner=Symbol('smithing-workshop');
   smithingAmbienceOwners.add(owner);
-  if(typeof window!=='undefined'&&sceneActive&&settings.enabled){
-    // Preload the 115-second loop on scene mount; playback still needs a gesture.
+  if(typeof window!=='undefined'&&settings.enabled){
+    // Preload while this illustration is mounted, even if the root scene
+    // effect has not yet run; playback still requires a user gesture.
     ensureAmbience().load();
   }
   updateAmbience();
