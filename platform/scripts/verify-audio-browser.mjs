@@ -122,6 +122,9 @@ try{
         e.textContent?.trim()===${JSON.stringify(query)}
       );
       if(!el)return null;
+      // Tests must click the real interactive surface even when the scene
+      // button sits below the initial headless Chromium viewport.
+      el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
       const r=el.getBoundingClientRect();
       return {x:r.left+r.width/2,y:r.top+r.height/2,left:r.left,width:r.width,
         value:el.value??null,disabled:el.disabled||false};
