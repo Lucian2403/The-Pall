@@ -17,8 +17,8 @@ export const pallAudioSettings=writable<PallAudioSettings>({...DEFAULT});
 const base='/audio/the-pall/';
 const clickVariants=[
   {file:'UI_ClickMain.wav',weight:75,gain:1},
-  {file:'UI_Click.wav',weight:15,gain:0.38},
-  {file:'UI_Click02.wav',weight:10,gain:0.45}
+  {file:'UI_Click.wav',weight:15,gain:0.24},
+  {file:'UI_Click02.wav',weight:10,gain:0.30}
 ] as const;
 const paperVariants=['UI_PaperJournal.wav','UI_PaperJournal2.wav'] as const;
 const smithVariants=['UI-SmithingAction.wav','UI-SmithingAction02.wav'] as const;
@@ -117,7 +117,7 @@ export function playPaperSfx(){
   const index=Math.floor(Math.random()*paperVariants.length);
   // The revised second paper clip is about 6 dB stronger at peak than
   // the first. Match the owner's new samples without normalizing files.
-  playFile(paperVariants[index],index===0?0.72:0.38);
+  playFile(paperVariants[index],index===0?0.65:0.47);
 }
 /** Use on workshop entry and after server-confirmed smithing actions.
  * Never play a physical-action cue for a failed work request. */
