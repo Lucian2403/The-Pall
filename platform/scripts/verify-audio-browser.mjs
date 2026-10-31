@@ -14,6 +14,13 @@ const chrome=['google-chrome','chromium','chromium-browser'].find(bin=>
   spawnSync('which',[bin],{stdio:'ignore'}).status===0);
 if(!chrome)throw new Error('Chromium or Google Chrome is required for browser audio QA.');
 const profile=mkdtempSync(join(tmpdir(),'pall-audio-qa-'));
+let phase='initializing';
+const watchdog=setTimeout(()=>{
+  console.error('BROWSER QA DEADLINE: '+phase+'; Vite: '+output.slice(-1800));
+  close();
+  process.exit(124);
+},90000);
+watchdog.unref();
 const web=spawn('npm',['run','dev:web'],{cwd:root,stdio:['ignore','pipe','pipe']});
 let output='';
 for(const stream of [web.stdout,web.stderr])stream.on('data',chunk=>{
@@ -56,6 +63,7 @@ try{
     const tabs=await res.json();
     return tabs.find(tab=>tab.type==='page'&&tab.webSocketDebuggerUrl);
   },20000,'Chromium DevTools target');
+  phase='DevTools WebSocket handshake';
   console.log('BROWSER QA: DevTools target available; connecting WebSocket');
   ws=new WebSocket(target.webSocketDebuggerUrl);
   await Promise.race([
@@ -153,14 +161,17 @@ try{
   await cmd('Page.enable');
   await cmd('Runtime.enable');
   await cmd('Page.addScriptToEvaluateOnNewDocument',{source:monitor});
+  phase='navigating to fixture';
   console.log('BROWSER QA: navigating to mounted real HUD fixture');
   await cmd('Page.navigate',{url:site});
   await waitUntil(()=>rect('.audio-trigger'),20000,'mounted game Sound controls');
+  phase='waiting for Svelte hydration';
   console.log('BROWSER QA: SSR Sound button visible; awaiting hydration');
   // DOM markup is server-rendered before client handlers exist. Wait for an
   // explicit Svelte onMount marker rather than guessing a time to click.
   await waitUntil(()=>evalJS(`document.querySelector('[data-pall-audio-control]')?.dataset.hydrated==='true'`),
     25000,'Svelte Sound control hydration');
+  phase='clicking the Sound button';
   console.log('BROWSER QA: Svelte hydrated; clicking Sound');
   await click('.audio-trigger');
   let menuOpen=await waitUntil(async()=>{
@@ -176,6 +187,7 @@ try{
     })`);
     throw new Error('Actual browser click did not open Sound settings: '+JSON.stringify(diagnostics));
   }
+  phase='waiting for media playback';
   console.log('BROWSER QA: menu opened; inspecting real media playback');
   const status=()=>evalJS(`({
     texts:[...document.querySelectorAll('.playback-state')].map(e=>e.textContent.trim()),
@@ -193,11 +205,13 @@ try{
   let result=await status();
   assert.ok(result.media.some(m=>m.file==='smithing-workshop-ambience.mp3'&&!m.paused),
     'Forge recording did not actually play after clicking Sound. '+JSON.stringify(result));
+  phase='dragging Ambience slider';
   await moveRange('[aria-label="Workshop ambience volume"]',.8);
   await waitUntil(async()=>{
     const a=await status();return a.media.some(m=>
       m.file==='smithing-workshop-ambience.mp3'&&m.volume>.65);
   },8000,'Ambience slider updating the real player');
+  phase='dragging Music slider';
   await moveRange('[aria-label="Background music volume"]',.84);
   await click('Play theme');
   await waitUntil(async()=>{
@@ -205,6 +219,7 @@ try{
   },12000,'Music preview playback at adjusted gain');
   await moveRange('[aria-label="Sound effects volume"]',.9);
   const before=(await status()).starts;
+  phase='testing Web Audio click';
   await click('Test click');
   await waitUntil(async()=>(await status()).starts>before,8000,'actual Web Audio SFX start');
   const after=await status();
