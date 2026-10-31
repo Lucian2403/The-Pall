@@ -16,6 +16,19 @@ const MAX_MUSIC_VOLUME=0.5;
 const PREVIOUS_DEFAULT_MUSIC=0.035;
 export const pallAudioSettings=writable<PallAudioSettings>({...DEFAULT});
 
+// Browser playback diagnostics. Source checks alone cannot establish whether
+// a browser actually loaded or played the owner's sound files.
+export type PallAudioPlayback={
+  music:string;
+  ambience:string;
+  effects:string;
+};
+export const pallAudioPlayback=writable<PallAudioPlayback>({
+  music:'Waiting for interaction',
+  ambience:'Workshop only',
+  effects:'Loading'
+});
+
 const base='/audio/the-pall/';
 const clickVariants=[
   {file:'UI_ClickMain.wav',weight:75,gain:1},
@@ -37,6 +50,9 @@ let sceneActive=false;
 let unlocked=false;
 let music:HTMLAudioElement|null=null;
 let ambience:HTMLAudioElement|null=null;
+let musicError=false;
+let ambienceError=false;
+let statusSnapshot='';
 // A workshop scene claims the soundscape for as long as its illustration
 // is visible. Ownership is independent of URL so non-workshop pages stay silent.
 const smithingAmbienceOwners=new Set<symbol>();
@@ -57,6 +73,27 @@ let sfxContext:AudioContext|null=null;
 const sfxBuffers=new Map<string,AudioBuffer>();
 const sfxLoading=new Map<string,Promise<void>>();
 const activeSources=new Set<AudioBufferSourceNode>();
+
+function publishPlayback(){
+  const playing=typeof document!=='undefined'&&!document.hidden&&sceneActive&&settings.enabled;
+  const musicState=!playing||settings.musicVolume===0?'Off'
+    :musicError?'File unavailable'
+    :!unlocked?'Click to start'
+    :nextMusicTimer!==null?'Resting'
+    :music&&!music.paused?'Playing':'Loading';
+  const ambienceState=!playing||settings.ambienceVolume===0?'Off'
+    :smithingAmbienceOwners.size===0?'Workshop only'
+    :ambienceError?'File unavailable'
+    :!unlocked?'Click to start'
+    :ambience&&!ambience.paused?'Playing':'Loading';
+  const effectsState=!playing||settings.sfxVolume===0?'Off'
+    :sfxBuffers.size===sfxFiles.length?'Ready'
+    :'Loading';
+  const snapshot=[musicState,ambienceState,effectsState].join('|');
+  if(snapshot===statusSnapshot)return;
+  statusSnapshot=snapshot;
+  pallAudioPlayback.set({music:musicState,ambience:ambienceState,effects:effectsState});
+}
 
 function ensureSfxContext():AudioContext|null{
   if(typeof window==='undefined')return null;
@@ -83,12 +120,18 @@ function prepareSoundEffects(){
         return response.arrayBuffer();
       })
       .then(bytes=>context.decodeAudioData(bytes))
-      .then(buffer=>{if(sfxContext===context)sfxBuffers.set(filename,buffer);})
+      .then(buffer=>{
+        if(sfxContext===context)sfxBuffers.set(filename,buffer);
+        publishPlayback();
+      })
       .catch(()=>{
         // No sound is preferable to a late effect on a failed network load.
         // A later scene activation or sound re-enable may retry.
       })
-      .finally(()=>{sfxLoading.delete(filename);});
+      .finally(()=>{
+        sfxLoading.delete(filename);
+        publishPlayback();
+      });
     sfxLoading.set(filename,loading);
   }
 }
@@ -123,9 +166,16 @@ function ensureMusic(){
   music.loop=false;
   music.volume=0;
   music.addEventListener('timeupdate',updateMusicVolume);
+  music.addEventListener('playing',publishPlayback);
+  music.addEventListener('pause',publishPlayback);
+  music.addEventListener('error',()=>{
+    musicError=true;
+    publishPlayback();
+  });
   music.addEventListener('ended',()=>{
     if(!canPlayMusic())return;
     // The supplied 7m27s theme plays in full, then rests before replaying.
+    publishPlayback();
     nextMusicTimer=setTimeout(()=>{
       nextMusicTimer=null;
       if(!canPlayMusic()||!music)return;
@@ -146,18 +196,34 @@ function ensureAmbience(){
   ambience.preload='auto';
   ambience.loop=true;
   ambience.volume=0;
+  ambience.addEventListener('playing',publishPlayback);
+  ambience.addEventListener('pause',publishPlayback);
+  ambience.addEventListener('error',()=>{
+    ambienceError=true;
+    publishPlayback();
+  });
+  // One preload per player lifetime. Repeated load() calls on every workshop
+  // mount would reset even a sound already playing.
+  ambience.load();
+  publishPlayback();
   return ambience;
 }
 function startAmbience(){
   if(!canPlayAmbience())return;
   const track=ensureAmbience();
   track.volume=clamp(settings.ambienceVolume,0,1);
-  if(track.paused)void track.play().catch(()=>{/* Audio is optional. */});
+  if(track.paused)void track.play().catch(()=>{
+    // Never silently swallow a missing file or a blocked playback request.
+    // A later user gesture can retry transient autoplay rejection.
+    publishPlayback();
+  });
+  publishPlayback();
 }
 function stopAmbience(reset=false){
   if(!ambience)return;
   ambience.pause();
   if(reset){try{ambience.currentTime=0;}catch{/* Not loaded yet. */}}
+  publishPlayback();
 }
 function updateAmbience(){
   if(canPlayAmbience())startAmbience();
@@ -171,15 +237,16 @@ export function claimSmithingWorkshopAmbience(){
   const owner=Symbol('smithing-workshop');
   smithingAmbienceOwners.add(owner);
   if(typeof window!=='undefined'&&settings.enabled){
-    // Preload while this illustration is mounted, even if the root scene
-    // effect has not yet run; playback still requires a user gesture.
-    ensureAmbience().load();
+    // Fetch once when a workshop is displayed; play only after activation.
+    ensureAmbience();
   }
   updateAmbience();
+  publishPlayback();
   return ()=>{
     smithingAmbienceOwners.delete(owner);
     if(smithingAmbienceOwners.size===0)stopAmbience(true);
     else updateAmbience();
+    publishPlayback();
   };
 }
 function startMusic(){
@@ -187,23 +254,39 @@ function startMusic(){
   const track=ensureMusic();
   if(!track.paused)return;
   if(track.ended)track.currentTime=0;
-  void track.play().then(updateMusicVolume).catch(()=>{
-    // Autoplay-denied browsers simply remain quiet until a later gesture.
+  void track.play().then(()=>{
+    updateMusicVolume();
+    publishPlayback();
+  }).catch(()=>{
+    // Gesture listeners will retry. Actual file errors surface as unavailable.
+    publishPlayback();
   });
+  publishPlayback();
 }
 function stopMusic(){
   clearMusicTimer();
   if(music)music.pause();
+  publishPlayback();
 }
 function unlock(){
-  if(unlocked)return;
-  unlocked=true; // Invoked synchronously from a real click / keyboard activation.
-  // The context may have been created while suspended for decoding. Resume
-  // synchronously from this gesture; no await between click and SFX start.
+  if(!sceneActive)return;
+  unlocked=true;
+  // Pointerdown/keydown are actual browser user activations. Resume and retry
+  // here, before any slider input event or onClick callback runs.
   const context=ensureSfxContext();
   if(context?.state==='suspended')void context.resume().catch(()=>{});
   startMusic();
-  startAmbience();
+  updateAmbience();
+  publishPlayback();
+}
+export function activatePallAudio(){
+  unlock();
+}
+// An effects-volume slider would otherwise produce no audible feedback until
+// a later unrelated button click. Keep the preview explicitly user-initiated.
+export function previewPallEffect(){
+  unlock();
+  playUiClick();
 }
 function playFile(filename:string,gain=1){
   if(typeof window==='undefined'||!settings.enabled||!unlocked||settings.sfxVolume<=0)return;
@@ -281,6 +364,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     updateMusicVolume();
     updateAmbience();
   }
+  publishPlayback();
 }
 export function setPallAudioScene(active:boolean){
   if(sceneActive===active)return;
@@ -294,6 +378,18 @@ export function setPallAudioScene(active:boolean){
     stopAmbience(true);
     stopSoundEffects();
   }
+  publishPlayback();
+}
+// Unlock at the start of a genuine user gesture, including when dragging a
+// range input or using its keyboard arrows. Waiting for the *click* event can
+// leave every slider apparently inert and prevent the workshop loop starting.
+function gesture(event:Event){
+  if(!sceneActive)return;
+  if(event.type==='keydown'){
+    const k=(event as KeyboardEvent).key;
+    if(!['Enter',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'].includes(k))return;
+  }
+  unlock();
 }
 function clicked(event:MouseEvent){
   // Prototype soundscape is scoped to in-game routes; no unexpected noises
@@ -320,6 +416,7 @@ function visible(){
     startMusic();
     updateAmbience();
   }
+  publishPlayback();
 }
 /** Install once in SvelteKit's root layout; persists across client navigation. */
 export function connectPallAudio(){
@@ -337,14 +434,21 @@ export function connectPallAudio(){
     }else pallAudioSettings.set({...settings});
   }catch{pallAudioSettings.set({...settings});}
   prepareSoundEffects();
+  document.addEventListener('pointerdown',gesture,true);
+  document.addEventListener('keydown',gesture,true);
   document.addEventListener('click',clicked,true);
   document.addEventListener('visibilitychange',visible);
+  publishPlayback();
   return ()=>{
+    document.removeEventListener('pointerdown',gesture,true);
+    document.removeEventListener('keydown',gesture,true);
     document.removeEventListener('click',clicked,true);
     document.removeEventListener('visibilitychange',visible);
     stopMusic();
     stopAmbience(true);
     ambience=null;
+    ambienceError=false;
+    musicError=false;
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();
@@ -355,5 +459,7 @@ export function connectPallAudio(){
     music=null;
     unlocked=false;
     connected=false;
+    statusSnapshot='';
+    publishPlayback();
   };
 }
