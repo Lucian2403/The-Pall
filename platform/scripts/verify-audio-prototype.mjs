@@ -102,7 +102,7 @@ const lowLatencyContracts=[
     audio.includes("if(context?.state==='suspended')void context.resume()")],
   ['shortened Click02 pre-roll',
     audio.includes("const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0")],
-  ['preload on in-game scene',audio.includes("if(active){\\n    prepareSoundEffects();")],
+  ['preload on in-game scene',/if\s*\(active\)\s*\{\s*prepareSoundEffects\(\)/.test(audio)],
   ['SFX source cleanup',audio.includes("function stopSoundEffects()") &&
     audio.includes("stopSoundEffects();")],
   ['no per-click HTMLAudio constructor',!audio.includes("new Audio(base+filename)")],
