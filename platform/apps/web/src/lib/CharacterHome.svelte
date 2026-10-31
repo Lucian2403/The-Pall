@@ -249,7 +249,7 @@
   .work-notice h2,.work-notice h3{color:#2b1a10;margin:0 0 10px}
   .work-notice h2{font:600 22px/1.2 var(--pall-font-reading,Georgia,serif)}
   .work-notice h3{font:600 26px/1.2 var(--pall-font-reading,Georgia,serif)}
-  .work-notice p{font:16px/1.55 Georgia,serif;color:#453020;margin:0 0 14px}
+  .work-notice p{font:16px/1.55 var(--pall-font-reading,Georgia,serif);color:#453020;margin:0 0 14px}
   .framed-action{
     display:inline-flex;align-items:center;justify-content:center;
     min-height:51px;max-width:100%;
