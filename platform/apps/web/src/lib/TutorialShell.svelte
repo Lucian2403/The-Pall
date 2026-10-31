@@ -5,7 +5,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
-  import {setPallAudioScene} from '$lib/pall-audio';
+  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience} from '$lib/pall-audio';
 
   type SavedCharacter = {
     id: string;
@@ -23,7 +23,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string} = $props();
+  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean} = $props();
   const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 4
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
     : character.origin === 'Millhand' && character.tutorial.stage === 3
@@ -68,6 +68,13 @@
   onMount(()=>{
     setPallAudioScene(true);
     return ()=>setPallAudioScene(false);
+  });
+  // The actual rendered background decides whether forge ambience belongs
+  // here. This is independent of the character route or workshop-related
+  // text; the backdrop flag changes dynamically when Stage 4 moves to depot.
+  $effect(()=>{
+    if(smithingBackdrop)return claimSmithingWorkshopAmbience();
+    stopSmithingWorkshopAmbience();
   });
 
   onMount(()=>{
