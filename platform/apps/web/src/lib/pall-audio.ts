@@ -36,7 +36,64 @@ let unlocked=false;
 let music:HTMLAudioElement|null=null;
 let nextMusicTimer:ReturnType<typeof setTimeout>|null=null;
 let lastClickAt=0;
-const activeClips=new Set<HTMLAudioElement>();
+
+// Short effects are fully fetched and decoded as soon as an in-game scene
+// becomes active. Creating a new HTMLAudioElement for each click used to
+// incur observable network/decode/startup latency (roughly 300–500 ms).
+// Keep the long theme streamed through HTMLAudioElement; only tiny SFX are
+// predecoded into Web Audio buffers.
+const sfxFiles=[
+  ...clickVariants.map(variant=>variant.file),
+  ...paperVariants,
+  ...smithVariants
+];
+let sfxContext:AudioContext|null=null;
+const sfxBuffers=new Map<string,AudioBuffer>();
+const sfxLoading=new Map<string,Promise<void>>();
+const activeSources=new Set<AudioBufferSourceNode>();
+
+function ensureSfxContext():AudioContext|null{
+  if(typeof window==='undefined')return null;
+  try{
+    sfxContext??=new AudioContext({latencyHint:'interactive'});
+  }catch{
+    // Audio is optional. An unsupported or unavailable device never blocks UI.
+    return null;
+  }
+  return sfxContext;
+}
+
+function prepareSoundEffects(){
+  if(!sceneActive||!settings.enabled||typeof window==='undefined')return;
+  const context=ensureSfxContext();
+  if(!context)return;
+  // The seven WAVs are small. Fetch and decode once, well before the player
+  // interacts, rather than making the first call to play() load a new file.
+  for(const filename of sfxFiles){
+    if(sfxBuffers.has(filename)||sfxLoading.has(filename))continue;
+    const loading=fetch(base+filename,{cache:'force-cache'})
+      .then(response=>{
+        if(!response.ok)throw new Error('sound unavailable: '+filename);
+        return response.arrayBuffer();
+      })
+      .then(bytes=>context.decodeAudioData(bytes))
+      .then(buffer=>{if(sfxContext===context)sfxBuffers.set(filename,buffer);})
+      .catch(()=>{
+        // No sound is preferable to a late effect on a failed network load.
+        // A later scene activation or sound re-enable may retry.
+      })
+      .finally(()=>{sfxLoading.delete(filename);});
+    sfxLoading.set(filename,loading);
+  }
+}
+
+function stopSoundEffects(){
+  for(const source of activeSources){
+    try{source.stop();}catch{/* Source already ended. */}
+    source.disconnect();
+  }
+  activeSources.clear();
+}
 
 const clamp=(x:number,min:number,max:number)=>Math.min(max,Math.max(min,x));
 function canPlayMusic(){
@@ -88,19 +145,40 @@ function stopMusic(){
 function unlock(){
   if(unlocked)return;
   unlocked=true; // Invoked synchronously from a real click / keyboard activation.
+  // The context may have been created while suspended for decoding. Resume
+  // synchronously from this gesture; no await between click and SFX start.
+  const context=ensureSfxContext();
+  if(context?.state==='suspended')void context.resume().catch(()=>{});
   startMusic();
 }
 function playFile(filename:string,gain=1){
   if(typeof window==='undefined'||!settings.enabled||!unlocked||settings.sfxVolume<=0)return;
-  if(activeClips.size>=7)return;
-  const audio=new Audio(base+filename);
-  audio.volume=clamp(settings.sfxVolume*gain,0,1);
-  audio.preload='auto';
-  activeClips.add(audio);
-  const done=()=>activeClips.delete(audio);
-  audio.addEventListener('ended',done,{once:true});
-  audio.addEventListener('error',done,{once:true});
-  void audio.play().catch(done);
+  const context=sfxContext;
+  const buffer=sfxBuffers.get(filename);
+  // Do not emit a sound hundreds of milliseconds late while a file loads.
+  // Subsequent clicks play immediately once the preload completes.
+  if(!context||!buffer||activeSources.size>=7)return;
+  if(context.state==='suspended')void context.resume().catch(()=>{});
+  try{
+    const source=context.createBufferSource();
+    const volume=context.createGain();
+    source.buffer=buffer;
+    volume.gain.value=clamp(settings.sfxVolume*gain,0,1);
+    source.connect(volume);
+    volume.connect(context.destination);
+    activeSources.add(source);
+    source.addEventListener('ended',()=>{
+      activeSources.delete(source);
+      source.disconnect();
+      volume.disconnect();
+    },{once:true});
+    // UI_Click02 has ~80 ms of initial silence. Skip that idle pre-roll
+    // in the playback buffer without altering the owner's original WAV.
+    const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0;
+    source.start(0,offset);
+  }catch{
+    // Browsers without a functional audio output remain fully usable.
+  }
 }
 export function playUiClick(){
   if(typeof performance==='undefined')return;
@@ -139,9 +217,9 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
   try{window.localStorage.setItem(KEY,JSON.stringify(settings));}catch{/* Browsing without storage. */}
   if(!settings.enabled){
     stopMusic();
-    for(const clip of activeClips)clip.pause();
-    activeClips.clear();
+    stopSoundEffects();
   }else{
+    prepareSoundEffects();
     if(canPlayMusic())startMusic();
     updateMusicVolume();
   }
@@ -149,8 +227,13 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
 export function setPallAudioScene(active:boolean){
   if(sceneActive===active)return;
   sceneActive=active;
-  if(active)startMusic();
-  else stopMusic();
+  if(active){
+    prepareSoundEffects();
+    startMusic();
+  }else{
+    stopMusic();
+    stopSoundEffects();
+  }
 }
 function clicked(event:MouseEvent){
   // Prototype soundscape is scoped to in-game routes; no unexpected noises
@@ -188,15 +271,22 @@ export function connectPallAudio(){
       setPallAudioSettings({...parsed,musicVolume});
     }else pallAudioSettings.set({...settings});
   }catch{pallAudioSettings.set({...settings});}
+  prepareSoundEffects();
   document.addEventListener('click',clicked,true);
   document.addEventListener('visibilitychange',visible);
   return ()=>{
     document.removeEventListener('click',clicked,true);
     document.removeEventListener('visibilitychange',visible);
     stopMusic();
-    for(const clip of activeClips)clip.pause();
-    activeClips.clear();
+    stopSoundEffects();
+    sfxBuffers.clear();
+    sfxLoading.clear();
+    if(sfxContext){
+      void sfxContext.close().catch(()=>{});
+      sfxContext=null;
+    }
     music=null;
+    unlocked=false;
     connected=false;
   };
 }
