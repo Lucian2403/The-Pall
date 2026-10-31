@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import type {Snippet} from 'svelte';
 
-  export type WorkshopObjectKey='stamps'|'plates'|'paper'|'hammer';
+  type WorkshopObjectKey='stamps'|'plates'|'paper'|'hammer';
 
   let {itemKey,title,description,onClose,children}:{
     itemKey:WorkshopObjectKey;
