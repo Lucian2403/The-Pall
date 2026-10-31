@@ -138,10 +138,10 @@ try{
   await cmd('Page.addScriptToEvaluateOnNewDocument',{source:monitor});
   await cmd('Page.navigate',{url:site});
   await waitUntil(()=>rect('.audio-trigger'),20000,'mounted game Sound controls');
-  // The HTML appears in SSR before SvelteKit has hydrated. Wait for the
-  // browser's initial JS modules to settle before dispatching the first real
-  // pointer gesture, otherwise an unhydrated button simply ignores it.
-  await delay(3500);
+  // DOM markup is server-rendered before client handlers exist. Wait for an
+  // explicit Svelte onMount marker rather than guessing a time to click.
+  await waitUntil(()=>evalJS(`document.querySelector('[data-pall-audio-control]')?.dataset.hydrated==='true'`),
+    25000,'Svelte Sound control hydration');
   await click('.audio-trigger');
   let menuOpen=await waitUntil(async()=>{
     const open=await evalJS(`document.querySelector('#pall-sound-settings')!==null`);
