@@ -5,6 +5,7 @@
   import type {PlateworkAction, PlateworkState} from '@the-pall/game-core';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import MillhandWorkScene from '$lib/MillhandWorkScene.svelte';
+  import {playSmithingSfx} from '$lib/pall-audio';
 
   type Character = {
     id:string;name:string;origin:string;sex:string;coins:number;
@@ -67,6 +68,10 @@
       });
       const result=await response.json() as WorkSnapshot & {error?:string};
       if(response.ok){
+        // Confirmed hammer work only: no sound for speculative or failed POSTs.
+        if(action==='stamp_number'||action==='straighten'||action==='fix_mark'){
+          playSmithingSfx();
+        }
         work=result;
         if(character)character={...character,tutorial:{stage:result.stage,status:result.tutorialStatus}};
         retryId=null;retrySignature=null;

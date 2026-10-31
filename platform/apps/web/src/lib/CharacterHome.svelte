@@ -143,7 +143,7 @@
             {/if}
             <p class="notice-signoff">You've a living to make.</p>
           {/if}
-          <button class="quiet-action notice-toggle" type="button"
+          <button class="quiet-action notice-toggle" data-pall-sfx="paper" type="button"
             aria-expanded={showArrival} onclick={toggleArrival}>
             {showArrival?'Hide notice':'Show notice'}
           </button>
@@ -156,7 +156,8 @@
               </div>
               <h3>{work.title}</h3>
               <p>{work.description}</p>
-              <a class="framed-action work-order-action" href={work.href}>{work.label}</a>
+              <a class="framed-action work-order-action" href={work.href}
+                data-pall-sfx={character.origin==='Millhand'&&newArrival?'smithing':'click'}>{work.label}</a>
             </section>
           {/if}
         {:else}

@@ -83,6 +83,7 @@
         <button
           class:chosen={selected === key}
           class="prop-marker {key}"
+          data-pall-sfx={key==='paper'?'paper':'click'}
           type="button"
           aria-pressed={selected === key}
           aria-label={'Inspect ' + workshopObjects[key].name}
@@ -123,7 +124,7 @@
           <button type="button" class="skip-to-work" onclick={() => {selected=null;skipToWork();}}>{GUTHER_WORK_SKIP_LINE}</button>
         {/if}
         {#if beat.kind === 'handoff' && takeWorkPaper}
-          <button type="button" disabled={takingWork} onclick={() => {void takeWorkPaper();}}>{takingWork ? 'Saving…' : 'Take the work paper'}</button>
+          <button type="button" data-pall-sfx="paper" disabled={takingWork} onclick={() => {void takeWorkPaper();}}>{takingWork ? 'Saving…' : 'Take the work paper'}</button>
         {/if}
         {#if handoffError}<p role="alert" class="handoff-error">{handoffError}</p>{/if}
         {#if canGoBack}
