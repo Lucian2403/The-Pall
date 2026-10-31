@@ -1,6 +1,5 @@
 <script lang="ts">
-  import {onMount,tick} from 'svelte';
-  import {claimSmithingWorkshopAmbience} from '$lib/pall-audio';
+  import {tick} from 'svelte';
   import type {MissingStampAction,MissingStampState} from '@the-pall/game-core';
   import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
   import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_HANDOFF,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
@@ -27,7 +26,6 @@
     continueToJob:()=>void;
   }=$props();
 
-  onMount(claimSmithingWorkshopAmbience);
 
   let talkingOptional=$state(false);
   let inspectedView=$state<'slip'|'plate'|null>(null);
