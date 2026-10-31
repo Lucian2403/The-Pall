@@ -20,7 +20,7 @@
   onMount(claimSmithingWorkshopAmbience);
 </script>
 
-<TutorialShell {character} sceneLocation="Smithing Workshop">
+<TutorialShell {character} sceneLocation="Smithing Workshop" smithingBackdrop={true}>
   <div class="audio-qa-scene">
     <h1>Audio diagnostics</h1>
     <p>Development fixture. Open Sound settings in the header. Music, Ambience and Effects should respond independently to user clicks and slider changes.</p>
