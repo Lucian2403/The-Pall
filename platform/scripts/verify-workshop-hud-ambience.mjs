@@ -79,7 +79,7 @@ for(const scene of [opening,work,missing]){
     scene.includes("import {claimSmithingWorkshopAmbience} from '$lib/pall-audio'"),
     'One Smithing Workshop scene lacks ambient sound ownership');
 }
-assert.ok(home.includes("onMount(()=>character.origin==='Millhand'?claimSmithingWorkshopAmbience():undefined)") &&
+assert.ok(home.includes("if(character.origin==='Millhand')return claimSmithingWorkshopAmbience()") &&
   depot.includes("if(atWorkshop)return claimSmithingWorkshopAmbience();"),
   'Origin-workshop portrait and the Stage 4 preparation phase must use ambience only while workshop artwork is visible');
 assert.ok(!audio.includes("music.loop=true") &&
