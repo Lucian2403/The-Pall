@@ -82,7 +82,7 @@
 
 <div class="arrival-home">
   <section class="character-arrival" aria-label="Your character"
-    style={'background-image:linear-gradient(90deg,#17130feb 0%,#17130fba 42%,#17130f45 80%),linear-gradient(0deg,#17130fcc,transparent 65%),url("'+artwork.src+'")'}>
+    style={'background-image:linear-gradient(270deg,#120e0bdd 0%,#120e0b77 28%,transparent 55%),linear-gradient(90deg,#17130feb 0%,#17130fba 42%,#17130f45 80%),linear-gradient(0deg,#17130fcc,transparent 65%),url("'+artwork.src+'")'}>
     <div class="arrival-layout">
       <div class="arrival-heading">
         <h1>{newArrival?'Another day within the walls.':'Your life within the walls.'}</h1>
