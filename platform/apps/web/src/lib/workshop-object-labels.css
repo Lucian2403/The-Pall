@@ -1,0 +1,40 @@
+/* Shared item labels for all illustrated workshops.
+ * Keep entire invisible object hitboxes; frame only their visible caption. */
+.workshop .workshop-object-label{
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:min(100%,240px);
+  min-height:38px;
+  margin-inline:auto;
+  border:solid transparent;
+  border-width:10px 15px 9px;
+  border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+  border-image-slice:145 190 125 190 fill;
+  border-image-width:10px 15px 9px;
+  border-image-repeat:stretch;
+  border-radius:0;
+  background:transparent;
+  color:#2e1d11;
+  padding:2px 3px;
+  text-align:center;
+  text-shadow:none;
+  font:700 clamp(12px,1.15vw,15px)/1.15 var(--pall-font-reading,Georgia,serif);
+  transition:filter 120ms ease;
+}
+.workshop :is(.prop-marker,.target):is(:hover,:focus-visible,[aria-pressed="true"]) .workshop-object-label{
+  filter:brightness(1.08);
+}
+@media(max-width:700px){
+  .workshop .workshop-object-label{
+    min-height:34px;
+    border-width:9px 11px 8px;
+    border-image-width:9px 11px 8px;
+    padding:1px 0;
+    font-size:clamp(9px,2.2vw,12px);
+    line-height:1.08;
+    white-space:normal;
+    overflow-wrap:break-word;
+  }
+}
