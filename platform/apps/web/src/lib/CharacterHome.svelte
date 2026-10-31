@@ -26,7 +26,7 @@
     if(newArrival) return {
       title:character.origin==='Millhand'?'The Smithing Workshop':'Your first work',
       description:character.origin==='Millhand'
-        ?"A council plate lot waits on Guther Anvil's bench. The foreman has work for you."
+        ?'Report to Guther Anvil at the bench to begin your first shift.'
         :'Your introduction begins at '+character.startingLocation+'.',
       label:'Enter '+character.startingLocation,
       href:base+'/opening'
@@ -135,7 +135,6 @@
         <h2>Personal notices</h2>
         {#if newArrival}
           {#if showArrival}
-            <h3>Another shift begins.</h3>
             {#if character.origin==='Millhand'}
               <p>The workshops are already awake. Smoke rises between the roofs, and beyond the crowded streets the Grand Cylinder continues its endless work.</p>
               <p>At Guther Anvil's workshop, a new council plate lot awaits.</p>
@@ -311,14 +310,14 @@
   .work-notice p{font:16px/1.55 var(--pall-font-reading,Georgia,serif);color:#453020;margin:0 0 14px}
   .framed-action{
     display:inline-flex;align-items:center;justify-content:center;
-    min-height:51px;max-width:100%;
+    min-height:60px;max-width:100%;
     border-style:solid;border-color:transparent;
-    border-width:13px 28px 12px;border-image-width:13px 28px 12px;
+    border-width:15px 32px 14px;border-image-width:15px 32px 14px;
     border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
     border-image-slice:50 180 45 180 fill;border-image-repeat:stretch;
     background:transparent;color:#29190f;
-    font:600 16px/1.25 var(--pall-font-reading,Georgia,serif);
-    padding:2px 11px;text-align:center;text-decoration:none;text-shadow:none;
+    font:600 17px/1.25 var(--pall-font-reading,Georgia,serif);
+    padding:4px 13px;text-align:center;text-decoration:none;text-shadow:none;
   }
   .framed-action:hover{color:#1d1009;border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .framed-action:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
