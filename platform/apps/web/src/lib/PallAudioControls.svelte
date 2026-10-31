@@ -1,13 +1,16 @@
 <script lang="ts">
+  import {onMount} from 'svelte';
   import {
     pallAudioSettings,pallAudioPlayback,setPallAudioSettings,previewPallEffect,previewPallMusic
   } from '$lib/pall-audio';
   let open=$state(false);
+  let hydrated=$state(false);
+  onMount(()=>{hydrated=true;});
   const MAX_MUSIC_VOLUME=0.5;
   const musicPercent = $derived(Math.round($pallAudioSettings.musicVolume * 1000) / 10);
 </script>
 
-<div class="audio-controls" data-pall-audio-control>
+<div class="audio-controls" data-pall-audio-control data-hydrated={hydrated}>
   <button class="audio-trigger" type="button" aria-haspopup="true"
     aria-expanded={open} aria-controls="pall-sound-settings"
     onclick={()=>{open=!open;}}>
