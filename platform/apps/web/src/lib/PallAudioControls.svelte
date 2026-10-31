@@ -1,6 +1,8 @@
 <script lang="ts">
   import {pallAudioSettings,setPallAudioSettings} from '$lib/pall-audio';
   let open=$state(false);
+  const MAX_MUSIC_VOLUME=0.5;
+  const musicPercent = $derived(Math.round($pallAudioSettings.musicVolume * 1000) / 10);
 </script>
 
 <div class="audio-controls" data-pall-audio-control>
@@ -19,8 +21,8 @@
         Sound enabled
       </label>
       <label>
-        <span>Music <output>{Math.round($pallAudioSettings.musicVolume*1000)/10}%</output></span>
-        <input type="range" min="0" max="0.12" step="0.005"
+        <span>Music <output>{musicPercent}%</output></span>
+        <input type="range" min="0" max={MAX_MUSIC_VOLUME} step="0.005"
           value={$pallAudioSettings.musicVolume}
           aria-label="Background music volume"
           oninput={e=>setPallAudioSettings({musicVolume:Number(e.currentTarget.value)})}/>
