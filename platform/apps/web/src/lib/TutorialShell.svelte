@@ -5,6 +5,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
+  import {setPallAudioScene} from '$lib/pall-audio';
 
   type SavedCharacter = {
     id: string;
@@ -60,6 +61,14 @@
   let rewinding=$state(false);
   let rewindError=$state('');
   let rewindFromStage=$state<number|null>(null);
+
+  // Audio scope belongs to the *actual mounted game shell*, not a guess
+  // about the URL in a separate root layout. All HUD controls are therefore
+  // live for exactly as long as this in-game scene is rendered.
+  onMount(()=>{
+    setPallAudioScene(true);
+    return ()=>setPallAudioScene(false);
+  });
 
   onMount(()=>{
     if(character.origin!=='Millhand')return;
