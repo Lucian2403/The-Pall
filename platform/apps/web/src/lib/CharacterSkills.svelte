@@ -17,12 +17,12 @@
   // A derived introductory *preview*, not a persisted rank. Roman I-IV are
   // now the proposed tiers; no backend specialization ledger exists yet.
   function specializationLabel(major:string,skill:string){
-    return origin==='Millhand'&&major==='Craftsmanship'&&skill==='Smithing'
+    return origin==='Millhand'&&(majorSkillBonuses.Craftsmanship??0)>=3&&major==='Craftsmanship'&&skill==='Smithing'
       ? 'I · starting'
       : '—';
   }
   function specializationTitle(major:string,skill:string){
-    return origin==='Millhand'&&major==='Craftsmanship'&&skill==='Smithing'
+    return origin==='Millhand'&&(majorSkillBonuses.Craftsmanship??0)>=3&&major==='Craftsmanship'&&skill==='Smithing'
       ? 'Starting specialization preview; rank not persisted in the current character API'
       : 'No specialization rank recorded';
   }
@@ -129,7 +129,7 @@
     display:flex;align-items:center;justify-content:space-between;
     gap:10px;flex-wrap:wrap;margin-bottom:15px;
   }
-  .skills-toolbar h3{margin:0;color:#efd6b1;font:600 21px/1.25 var(--pall-font-reading,Georgia,serif)}
+  .skills-toolbar h3{margin:0;color:#efd6b1;font:600 21px/1.25 var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
   .framed-action{
     display:inline-flex;align-items:center;justify-content:center;
     min-height:43px;padding:2px 8px;
@@ -137,7 +137,7 @@
     border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
     border-image-slice:50 180 45 180 fill;border-image-width:10px 22px 9px;
     background:transparent;color:#2e1a0c;
-    font:600 14px/1.3 var(--pall-font-reading,Georgia,serif);cursor:pointer;
+    font:600 14px/1.3 var(--pall-font-reading,var(--pall-font-reading,Georgia,serif));cursor:pointer;
   }
   .framed-action:hover{border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .framed-action:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
@@ -150,8 +150,8 @@
     color:#edd0a7;
   }
   .skill-category summary::-webkit-details-marker{display:none}
-  .skill-name{flex:1;min-width:0;font:600 17px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .level{flex:none;font:600 13px/1.2 Georgia,serif;color:#baa58b;font-variant-numeric:tabular-nums}
+  .skill-name{flex:1;min-width:0;font:600 17px/1.3 var(--pall-font-reading,var(--pall-font-reading,Georgia,serif))}
+  .level{flex:none;font:600 13px/1.2 var(--pall-font-reading,Georgia,serif);color:#baa58b;font-variant-numeric:tabular-nums}
   .level.trained{color:#f2c782}
   .twist{color:#cfac7c;font-size:22px;line-height:1;transition:transform .16s ease}
   details[open] .twist{transform:rotate(180deg)}
@@ -159,10 +159,10 @@
   .subskills li,.window-skill li{
     display:flex;align-items:center;justify-content:space-between;gap:14px;
     border-bottom:1px solid #594735;padding:8px 2px;
-    color:#e1cfb7;font:14px/1.35 Georgia,serif;
+    color:#e1cfb7;font:14px/1.35 var(--pall-font-reading,Georgia,serif);
   }
   .subskills li:last-child,.window-skill li:last-child{border-bottom:0}
-  .tier{flex:none;white-space:nowrap;color:#bfa888;font:12px/1.3 var(--pall-font-reading,Georgia,serif);font-variant-numeric:tabular-nums}
+  .tier{flex:none;white-space:nowrap;color:#bfa888;font:12px/1.3 var(--pall-font-reading,var(--pall-font-reading,Georgia,serif));font-variant-numeric:tabular-nums}
   .tier.starting{color:#f0c88e;font-weight:700}
   .skills-window{
     position:fixed;inset:auto;max-width:calc(100vw - 24px);
@@ -180,28 +180,28 @@
     flex:1;display:flex;align-items:center;gap:10px;min-width:0;
     text-align:left;touch-action:none;cursor:grab;
     padding:13px 18px;border:0;color:#f5e0bf;background:transparent;
-    font:600 20px/1.25 var(--pall-font-reading,Georgia,serif);
+    font:600 20px/1.25 var(--pall-font-reading,var(--pall-font-reading,Georgia,serif));
   }
   .drag-handle:active{cursor:grabbing}
   .grip{color:#d5b286;font-size:21px}
   .window-close{
     width:54px;flex:none;cursor:pointer;background:#4a3020;
     color:#f1d1a4;border:0;border-left:1px solid #a67c4e;
-    font:30px/1 Georgia,serif;
+    font:30px/1 var(--pall-font-reading,Georgia,serif);
   }
   .window-close:hover{background:#734628}
   .window-body{max-height:calc(min(84vh,810px) - 62px);overflow:auto;padding:17px 22px 23px}
   .skill-note{
-    font:14px/1.5 Georgia,serif;color:#d5bb9a;margin:0 0 14px;
+    font:14px/1.5 var(--pall-font-reading,Georgia,serif);color:#d5bb9a;margin:0 0 14px;
     border-left:2px solid #a0794c;padding-left:12px;
   }
   .window-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
   .window-skill{min-width:0;padding:12px;border:1px solid #654d37;background:#352b23}
   .window-skill h3{
     display:flex;align-items:baseline;justify-content:space-between;gap:9px;
-    color:#f1d9b4;margin:0 0 9px;font:600 18px/1.3 var(--pall-font-reading,Georgia,serif);
+    color:#f1d9b4;margin:0 0 9px;font:600 18px/1.3 var(--pall-font-reading,var(--pall-font-reading,Georgia,serif));
   }
-  .window-skill h3 span{color:#d5aa70;font:600 13px/1.2 Georgia,serif}
+  .window-skill h3 span{color:#d5aa70;font:600 13px/1.2 var(--pall-font-reading,Georgia,serif)}
   .window-skill ul{padding:0}
   @media(max-width:700px){
     .skill-accordions,.window-list{grid-template-columns:1fr}
