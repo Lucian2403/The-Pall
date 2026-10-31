@@ -79,7 +79,7 @@
   .workshop-inspection.stamps{left:2%}
   .workshop-inspection.plates{left:25%}
   .workshop-inspection.paper{right:13%}
-  .workshop-inspection.hammer{right:2%}
+  .workshop-inspection.hammer{right:2%;bottom:47%}
   .inspection-heading{display:flex;align-items:start;justify-content:space-between;gap:8px}
   .inspection-heading strong{
     padding-top:3px;
