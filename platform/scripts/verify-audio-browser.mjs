@@ -56,12 +56,22 @@ try{
     const tabs=await res.json();
     return tabs.find(tab=>tab.type==='page'&&tab.webSocketDebuggerUrl);
   },20000,'Chromium DevTools target');
+  console.log('BROWSER QA: DevTools target available; connecting WebSocket');
   ws=new WebSocket(target.webSocketDebuggerUrl);
-  await new Promise((yes,no)=>{
-    ws.addEventListener('open',yes,{once:true});
-    ws.addEventListener('error',no,{once:true});
-  });
+  await Promise.race([
+    new Promise((yes,no)=>{
+      ws.addEventListener('open',yes,{once:true});
+      ws.addEventListener('error',no,{once:true});
+    }),
+    delay(10000).then(()=>{throw new Error('DevTools WebSocket handshake timed out');})
+  ]);
   let nextId=1;const pending=new Map();
+  ws.addEventListener('close',()=>{
+    for(const [id,callback] of pending){
+      callback.reject(new Error('DevTools WebSocket closed while awaiting id '+id));
+    }
+    pending.clear();
+  });
   ws.addEventListener('message',e=>{
     let msg;try{msg=JSON.parse(e.data);}catch{return;}
     if(!msg.id)return;
@@ -73,7 +83,14 @@ try{
   function cmd(method,params={}){
     const id=nextId++;
     return new Promise((resolve,reject)=>{
-      pending.set(id,{resolve,reject});
+      const timeout=setTimeout(()=>{
+        pending.delete(id);
+        reject(new Error('DevTools command timed out: '+method));
+      },12000);
+      pending.set(id,{
+        resolve(value){clearTimeout(timeout);resolve(value);},
+        reject(error){clearTimeout(timeout);reject(error);}
+      });
       ws.send(JSON.stringify({id,method,params}));
     });
   }
@@ -136,12 +153,15 @@ try{
   await cmd('Page.enable');
   await cmd('Runtime.enable');
   await cmd('Page.addScriptToEvaluateOnNewDocument',{source:monitor});
+  console.log('BROWSER QA: navigating to mounted real HUD fixture');
   await cmd('Page.navigate',{url:site});
   await waitUntil(()=>rect('.audio-trigger'),20000,'mounted game Sound controls');
+  console.log('BROWSER QA: SSR Sound button visible; awaiting hydration');
   // DOM markup is server-rendered before client handlers exist. Wait for an
   // explicit Svelte onMount marker rather than guessing a time to click.
   await waitUntil(()=>evalJS(`document.querySelector('[data-pall-audio-control]')?.dataset.hydrated==='true'`),
     25000,'Svelte Sound control hydration');
+  console.log('BROWSER QA: Svelte hydrated; clicking Sound');
   await click('.audio-trigger');
   let menuOpen=await waitUntil(async()=>{
     const open=await evalJS(`document.querySelector('#pall-sound-settings')!==null`);
@@ -156,6 +176,7 @@ try{
     })`);
     throw new Error('Actual browser click did not open Sound settings: '+JSON.stringify(diagnostics));
   }
+  console.log('BROWSER QA: menu opened; inspecting real media playback');
   const status=()=>evalJS(`({
     texts:[...document.querySelectorAll('.playback-state')].map(e=>e.textContent.trim()),
     sliders:[...document.querySelectorAll('input[type=range]')].map(e=>({name:e.ariaLabel,value:e.value})),
