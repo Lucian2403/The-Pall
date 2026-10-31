@@ -75,7 +75,11 @@
           </div>
           <div class="actions">
             {#each contextualActions as action}
-              <button type="button" disabled={pending} onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
+              <button type="button" disabled={pending}
+                data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
+                  ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
+                  ?'paper':'click'}
+                onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
             {/each}
           </div>
         {:else}
