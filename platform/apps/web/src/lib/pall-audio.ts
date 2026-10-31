@@ -7,10 +7,11 @@ import {writable} from 'svelte/store';
 export type PallAudioSettings={
   enabled:boolean;
   musicVolume:number;
+  ambienceVolume:number;
   sfxVolume:number;
 };
 const KEY='the-pall-audio-v1';
-const DEFAULT:PallAudioSettings={enabled:true,musicVolume:0.06,sfxVolume:0.55};
+const DEFAULT:PallAudioSettings={enabled:true,musicVolume:0.06,ambienceVolume:0.3,sfxVolume:0.55};
 const MAX_MUSIC_VOLUME=0.5;
 const PREVIOUS_DEFAULT_MUSIC=0.035;
 export const pallAudioSettings=writable<PallAudioSettings>({...DEFAULT});
@@ -24,6 +25,7 @@ const clickVariants=[
 const paperVariants=['UI_PaperJournal.wav','UI_PaperJournal2.wav'] as const;
 const smithVariants=['UI-SmithingAction.wav','UI-SmithingAction02.wav'] as const;
 const musicFile='music-theme.mp3';
+const smithingAmbienceFile='smithing-workshop-ambience.mp3';
 const FADE_IN=4;
 const FADE_OUT=5;
 const MUSIC_PAUSE_MIN_MS=30_000;
@@ -34,6 +36,10 @@ let connected=false;
 let sceneActive=false;
 let unlocked=false;
 let music:HTMLAudioElement|null=null;
+let ambience:HTMLAudioElement|null=null;
+// A workshop scene claims the soundscape for as long as its illustration
+// is visible. Ownership is independent of URL so non-workshop pages stay silent.
+const smithingAmbienceOwners=new Set<symbol>();
 let nextMusicTimer:ReturnType<typeof setTimeout>|null=null;
 let lastClickAt=0;
 
@@ -129,6 +135,52 @@ function ensureMusic(){
   });
   return music;
 }
+function canPlayAmbience(){
+  return typeof document!=='undefined' && settings.enabled &&
+    sceneActive && unlocked && settings.ambienceVolume>0 &&
+    smithingAmbienceOwners.size>0 && !document.hidden;
+}
+function ensureAmbience(){
+  if(ambience)return ambience;
+  ambience=new Audio(base+smithingAmbienceFile);
+  ambience.preload='auto';
+  ambience.loop=true;
+  ambience.volume=0;
+  return ambience;
+}
+function startAmbience(){
+  if(!canPlayAmbience())return;
+  const track=ensureAmbience();
+  track.volume=clamp(settings.ambienceVolume,0,1);
+  if(track.paused)void track.play().catch(()=>{/* Audio is optional. */});
+}
+function stopAmbience(reset=false){
+  if(!ambience)return;
+  ambience.pause();
+  if(reset){try{ambience.currentTime=0;}catch{/* Not loaded yet. */}}
+}
+function updateAmbience(){
+  if(canPlayAmbience())startAmbience();
+  else stopAmbience();
+}
+/**
+ * Connect ambient sound to the visible smithing backdrop, not to generic
+ * character routes. The disposer handles navigation and conditional scenes.
+ */
+export function claimSmithingWorkshopAmbience(){
+  const owner=Symbol('smithing-workshop');
+  smithingAmbienceOwners.add(owner);
+  if(typeof window!=='undefined'&&sceneActive&&settings.enabled){
+    // Preload the 115-second loop on scene mount; playback still needs a gesture.
+    ensureAmbience().load();
+  }
+  updateAmbience();
+  return ()=>{
+    smithingAmbienceOwners.delete(owner);
+    if(smithingAmbienceOwners.size===0)stopAmbience(true);
+    else updateAmbience();
+  };
+}
 function startMusic(){
   if(!canPlayMusic()||nextMusicTimer!==null)return;
   const track=ensureMusic();
@@ -150,6 +202,7 @@ function unlock(){
   const context=ensureSfxContext();
   if(context?.state==='suspended')void context.resume().catch(()=>{});
   startMusic();
+  startAmbience();
 }
 function playFile(filename:string,gain=1){
   if(typeof window==='undefined'||!settings.enabled||!unlocked||settings.sfxVolume<=0)return;
@@ -209,6 +262,8 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     enabled:typeof next.enabled==='boolean'?next.enabled:settings.enabled,
     musicVolume:typeof next.musicVolume==='number'&&Number.isFinite(next.musicVolume)
       ?clamp(next.musicVolume,0,MAX_MUSIC_VOLUME):settings.musicVolume,
+    ambienceVolume:typeof next.ambienceVolume==='number'&&Number.isFinite(next.ambienceVolume)
+      ?clamp(next.ambienceVolume,0,1):settings.ambienceVolume,
     sfxVolume:typeof next.sfxVolume==='number'&&Number.isFinite(next.sfxVolume)
       ?clamp(next.sfxVolume,0,1):settings.sfxVolume
   };
@@ -217,11 +272,13 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
   try{window.localStorage.setItem(KEY,JSON.stringify(settings));}catch{/* Browsing without storage. */}
   if(!settings.enabled){
     stopMusic();
+    stopAmbience();
     stopSoundEffects();
   }else{
     prepareSoundEffects();
     if(canPlayMusic())startMusic();
     updateMusicVolume();
+    updateAmbience();
   }
 }
 export function setPallAudioScene(active:boolean){
@@ -230,8 +287,10 @@ export function setPallAudioScene(active:boolean){
   if(active){
     prepareSoundEffects();
     startMusic();
+    updateAmbience();
   }else{
     stopMusic();
+    stopAmbience(true);
     stopSoundEffects();
   }
 }
@@ -253,8 +312,13 @@ function clicked(event:MouseEvent){
 }
 function visible(){
   if(typeof document==='undefined')return;
-  if(document.hidden)stopMusic();
-  else startMusic();
+  if(document.hidden){
+    stopMusic();
+    stopAmbience();
+  }else{
+    startMusic();
+    updateAmbience();
+  }
 }
 /** Install once in SvelteKit's root layout; persists across client navigation. */
 export function connectPallAudio(){
@@ -278,6 +342,8 @@ export function connectPallAudio(){
     document.removeEventListener('click',clicked,true);
     document.removeEventListener('visibilitychange',visible);
     stopMusic();
+    stopAmbience(true);
+    ambience=null;
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();
