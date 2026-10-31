@@ -282,6 +282,15 @@ function unlock(){
 export function activatePallAudio(){
   unlock();
 }
+// The original soundtrack intentionally rests between playthroughs. A manual
+// preview lets players check the Music slider without waiting through that rest.
+export function previewPallMusic(){
+  unlock();
+  if(!settings.enabled||!sceneActive||settings.musicVolume<=0)return;
+  clearMusicTimer();
+  startMusic();
+  publishPlayback();
+}
 // An effects-volume slider would otherwise produce no audible feedback until
 // a later unrelated button click. Keep the preview explicitly user-initiated.
 export function previewPallEffect(){
