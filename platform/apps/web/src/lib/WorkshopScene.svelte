@@ -2,6 +2,8 @@
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
   import NpcConversation from '$lib/NpcConversation.svelte';
+  import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import '$lib/workshop-object-labels.css';
 
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
   type PropSpec = {name: string; label: string; image: string; observation: string};
@@ -69,7 +71,7 @@
          The bench appears in FRONT of Guther instead of clipping his legs. -->
     <img class="environment bench-foreground" src="/workshop/environment.webp" alt="" aria-hidden="true" />
     <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil"
-      title="Talk to Guther Anvil" onclick={() => {talkingToGuther=true;}}>
+      title="Talk to Guther Anvil" onclick={() => {selected=null;talkingToGuther=true;}}>
       <span class="npc-label">Talk to Guther</span>
     </button>
 
@@ -83,16 +85,29 @@
         <button
           class:chosen={selected === key}
           class="prop-marker {key}"
+          data-workshop-object
           data-pall-sfx={key==='paper'?'paper':'click'}
           type="button"
           aria-pressed={selected === key}
           aria-label={'Inspect ' + workshopObjects[key].name}
           onclick={() => inspect(key)}
         >
-          <span class="tag">{workshopObjects[key].label}</span>
+          <span class="workshop-object-label">{workshopObjects[key].label}</span>
         </button>
       {/each}
     </div>
+    {#if selected && !talkingToGuther}
+      <WorkshopItemPopover itemKey={selected}
+        title={workshopObjects[selected].name}
+        description={workshopObjects[selected].observation}
+        onClose={() => {selected=null;}}>
+        <small class="inspection-note">
+          {readyForWork
+            ? 'Stage 2 work commands are not enabled in this read-only integration.'
+            : 'This is inspection only. Continue the conversation to receive the work paper.'}
+        </small>
+      </WorkshopItemPopover>
+    {/if}
     </div>
     <div class="dialogue" aria-label="Workshop conversation">
       {#if talkingToGuther}
@@ -135,20 +150,6 @@
     </div>
   </div>
 
-  {#if selected && !talkingToGuther}
-    <div class="inspection" role="status">
-      <div>
-        <strong>{workshopObjects[selected].name}</strong>
-        <p>{workshopObjects[selected].observation}</p>
-        {#if !readyForWork}
-          <small>This is inspection only. Continue the conversation to receive the work paper.</small>
-        {:else}
-          <small>Stage 2 work commands are not enabled in this read-only integration.</small>
-        {/if}
-      </div>
-      <button type="button" onclick={() => {selected = null;}} aria-label="Close inspection">Close</button>
-    </div>
-  {/if}
 </section>
 
 <style>
@@ -193,13 +194,11 @@
   .illustration:has(.prop-marker.plates:is(:hover,:focus-visible)) .prop-art.plates,
   .illustration:has(.prop-marker.paper:is(:hover,:focus-visible)) .prop-art.paper{transform:scale(1.018)}
   .illustration:has(.prop-marker.hammer:is(:hover,:focus-visible)) .prop-art.hammer{transform:rotate(-32deg) scale(1.018)}
-  .tag {display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;min-height:29px;background:#16130fec;border:1px solid #94754b;border-radius:3px;padding:4px 5px;font-size:clamp(10px,1.22vw,14px);line-height:1.15;white-space:nowrap;text-shadow:0 1px 1px #000}
-  .prop-marker:hover .tag,.prop-marker:focus-visible .tag,.prop-marker.chosen .tag{border-color:#f0c77c;background:#332616}
   .prop-marker:focus-visible {outline:2px solid #f2d28f;outline-offset:3px}
-  .inspection {display:flex;align-items:start;justify-content:space-between;gap:16px;margin-top:8px;padding:13px 16px;border:1px solid #6b5136;background:#24211d;color:#f2e4ce;font-size:14px;line-height:1.45}
-  .inspection p {margin:6px 0 4px}
-  .inspection small {color:#bda990}
-  .inspection button {padding:8px 12px;color:#f4dcbb;background:#403126;border:1px solid #816343;cursor:pointer}
+  .inspection-note{
+    display:block;margin:0;color:#64452b;
+    font:500 12px/1.4 var(--pall-font-reading,Georgia,serif);
+  }
   @media(max-width:700px){
     .scene {display:flex;flex-direction:column;flex:0 0 auto;height:auto;min-height:0;}
     .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
@@ -219,7 +218,6 @@
     .prop-marker.plates {left:24%;width:29%;height:32%}
     .prop-marker.paper {left:49%;width:27%;height:33%}
     .prop-marker.hammer {right:0;width:27%;height:39%}
-    .tag {font:10px/1.1 sans-serif;min-height:28px;padding:3px 2px;gap:3px;white-space:normal}
   }
-  @media(max-width:380px){.dialogue{margin:0;padding:12px}.tag{font-size:9px}}
+  @media(max-width:380px){.dialogue{margin:0;padding:12px}}
 </style>
