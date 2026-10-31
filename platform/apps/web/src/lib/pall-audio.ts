@@ -52,6 +52,8 @@ let music:HTMLAudioElement|null=null;
 let ambience:HTMLAudioElement|null=null;
 let musicError=false;
 let ambienceError=false;
+let musicBlocked=false;
+let ambienceBlocked=false;
 let statusSnapshot='';
 // A workshop scene claims the soundscape for as long as its illustration
 // is visible. Ownership is independent of URL so non-workshop pages stay silent.
@@ -80,11 +82,13 @@ function publishPlayback(){
     :musicError?'File unavailable'
     :!unlocked?'Click to start'
     :nextMusicTimer!==null?'Resting'
+    :musicBlocked?'Playback blocked — click to retry'
     :music&&!music.paused?'Playing':'Loading';
   const ambienceState=!playing||settings.ambienceVolume===0?'Off'
     :smithingAmbienceOwners.size===0?'Workshop only'
     :ambienceError?'File unavailable'
     :!unlocked?'Click to start'
+    :ambienceBlocked?'Playback blocked — click to retry'
     :ambience&&!ambience.paused?'Playing':'Loading';
   const effectsState=!playing||settings.sfxVolume===0?'Off'
     :sfxBuffers.size===sfxFiles.length?'Ready'
@@ -212,9 +216,12 @@ function startAmbience(){
   if(!canPlayAmbience())return;
   const track=ensureAmbience();
   track.volume=clamp(settings.ambienceVolume,0,1);
-  if(track.paused)void track.play().catch(()=>{
-    // Never silently swallow a missing file or a blocked playback request.
-    // A later user gesture can retry transient autoplay rejection.
+  if(track.paused)void track.play().then(()=>{
+    ambienceBlocked=false;
+    publishPlayback();
+  }).catch(()=>{
+    // This is different from a missing file: the next real gesture retries.
+    ambienceBlocked=true;
     publishPlayback();
   });
   publishPlayback();
@@ -255,10 +262,12 @@ function startMusic(){
   if(!track.paused)return;
   if(track.ended)track.currentTime=0;
   void track.play().then(()=>{
+    musicBlocked=false;
     updateMusicVolume();
     publishPlayback();
   }).catch(()=>{
-    // Gesture listeners will retry. Actual file errors surface as unavailable.
+    // Gesture listeners retry; a missing file produces a separate error event.
+    musicBlocked=true;
     publishPlayback();
   });
   publishPlayback();
@@ -458,6 +467,8 @@ export function connectPallAudio(){
     ambience=null;
     ambienceError=false;
     musicError=false;
+    musicBlocked=false;
+    ambienceBlocked=false;
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();
