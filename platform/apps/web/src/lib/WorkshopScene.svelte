@@ -1,6 +1,4 @@
 <script lang="ts">
-  import {onMount} from 'svelte';
-  import {claimSmithingWorkshopAmbience} from '$lib/pall-audio';
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
   import NpcConversation from '$lib/NpcConversation.svelte';
@@ -51,7 +49,6 @@
     handoffError?: string;
   } = $props();
 
-  onMount(claimSmithingWorkshopAmbience);
 
   let selected = $state<PropKey | null>(null);
   let talkingToGuther = $state(false);
