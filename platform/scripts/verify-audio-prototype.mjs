@@ -67,7 +67,9 @@ assert.ok(audio.includes("const KEY='the-pall-audio-v1'") &&
   audio.includes("file:'UI_Click02.wav',weight:10,gain:0.30"),
   'Audio must be gesture-gated, in-game scoped, saved and visibility-aware');
 assert.ok(layout.includes('onMount(connectPallAudio)') &&
-  layout.includes('setPallAudioScene(') &&
+  !layout.includes('setPallAudioScene(') &&
+  shell.includes('setPallAudioScene(true)') &&
+  shell.includes('setPallAudioScene(false)') &&
   shell.includes('<PallAudioControls/>') &&
   controls.includes('Background music volume') &&
   controls.includes('Sound effects volume'),
