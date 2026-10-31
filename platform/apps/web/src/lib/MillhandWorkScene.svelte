@@ -2,6 +2,8 @@
   import type {PlateworkState, PlateworkAction} from '@the-pall/game-core';
   import {WORK_ACTION_OBJECT} from '@the-pall/game-core';
   import NpcConversation from '$lib/NpcConversation.svelte';
+  import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import '$lib/workshop-object-labels.css';
   import {PHASE_INSTRUCTION, ACTION_LABEL, resultCopy, observeObject, type ObjectKey} from '$lib/millhand-work-copy';
 
   let {work, available, pending, errorMessage, perform}: {
@@ -39,7 +41,7 @@
       <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil standing by the workbench" />
       <img class="environment bench-foreground" src="/workshop/environment.webp" alt="" aria-hidden="true" />
       <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil" title="Talk to Guther Anvil"
-        onclick={() => {talkingToGuther=true;}}>
+        onclick={() => {selected=null;talkingToGuther=true;}}>
         <span class="npc-label">Talk to Guther</span>
       </button>
       {#each objects as object (object.key)}
@@ -48,13 +50,33 @@
       <div class="targets" aria-label="Workshop objects">
         {#each objects as object (object.key)}
           <button type="button" class="target {object.key}" class:selected={selected===object.key}
+            data-workshop-object
+            data-pall-sfx={object.key==='paper'?'paper':'click'}
             aria-pressed={selected===object.key}
             aria-label={'Inspect ' + object.label}
             onclick={() => {const wasTalking=talkingToGuther; talkingToGuther=false; selected = !wasTalking && selected===object.key ? null : object.key;}}>
-            <span class="label">{object.label}</span>
+            <span class="workshop-object-label">{object.label}</span>
           </button>
         {/each}
       </div>
+      {#if selected && !talkingToGuther}
+        <WorkshopItemPopover itemKey={selected}
+          title={objects.find(object=>object.key===selected)?.label??'Workshop object'}
+          description={observation??''}
+          onClose={() => {selected=null;}}>
+          {#if work.phase!=='COMPLETE' && contextualActions.length>0}
+            <div class="actions">
+              {#each contextualActions as action}
+                <button type="button" disabled={pending}
+                  data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
+                    ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
+                    ?'paper':'click'}
+                  onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
+              {/each}
+            </div>
+          {/if}
+        </WorkshopItemPopover>
+      {/if}
     </div>
 
     <aside class="work-card" aria-label={talkingToGuther ? "Optional conversation with Guther" : "Council platework"}>
@@ -68,23 +90,11 @@
           <div class="rule"></div>
           <p class="instruction">{instruction}</p>
         {/if}
-        {#if selected}
-          <div class="inspection">
-            <strong>{objects.find(o=>o.key===selected)?.label}</strong>
-            <p>{observation}</p>
-          </div>
-          <div class="actions">
-            {#each contextualActions as action}
-              <button type="button" disabled={pending}
-                data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
-                  ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
-                  ?'paper':'click'}
-                onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
-            {/each}
-          </div>
-        {:else}
-          <p class="small">Select an object on the workbench to examine it.</p>
-        {/if}
+        <p class="small">
+          {selected
+            ? 'The selected object and its available actions are shown beside the workbench.'
+            : 'Select an object on the workbench to examine it.'}
+        </p>
       {:else}
         <p class="instruction">Guther takes the finished work paper and lays it on the bench beside the council bundle.</p>
       {/if}
@@ -126,9 +136,6 @@
   .illustration:has(.target.plates:is(:hover,:focus-visible)) .object-art.plates,
   .illustration:has(.target.paper:is(:hover,:focus-visible)) .object-art.paper{transform:scale(1.018)}
   .illustration:has(.target.hammer:is(:hover,:focus-visible)) .object-art.hammer{transform:rotate(-32deg) scale(1.018)}
-  .label{display:flex;justify-content:center;align-items:center;gap:5px;width:100%;min-height:32px;background:#15120feb;
-    border:1px solid #99784b;padding:5px;font-size:clamp(10px,1.16vw,14px);white-space:nowrap}
-  .target:hover .label,.target:focus-visible .label,.target.selected .label{background:#30241a;border-color:#e7c288}
   .target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
   .work-card{position:relative;grid-column:2;z-index:4;align-self:start;width:100%;margin:clamp(24px,3vw,50px) 0 24px;
     min-width:0;max-height:calc(100% - 48px);overflow-y:auto;overscroll-behavior:contain;padding:15px 18px;border:2px solid #654022;border-radius:5px;background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
@@ -136,9 +143,7 @@
   .story{font-size:clamp(13px,1.2vw,17px);line-height:1.5;margin:0 0 12px}
   .rule{border-top:1px solid #b29c7e;margin:12px 0}
   .instruction{font-weight:600;font-size:clamp(13px,1.1vw,16px);line-height:1.4;margin:0 0 10px}
-  .inspection{border-top:1px solid #bba786;padding-top:10px;font-size:14px;line-height:1.45}
-  .inspection p{margin:6px 0}
-  .actions{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+  .actions{display:flex;flex-direction:column;gap:6px;margin-top:3px}
   .actions button{display:block;width:100%;text-align:left;border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
     padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer;min-height:42px}
   .actions button:hover,.actions button:focus-visible{background:#423022;outline:1px solid #c49d65}
@@ -160,7 +165,6 @@
     .object-art.hammer{width:27%;height:30%;right:0;bottom:8%}
     .target{bottom:2%}.target.stamps{left:0;width:25%;height:33%}.target.plates{left:24%;width:29%;height:32%}
     .target.paper{left:49%;width:27%;height:33%}.target.hammer{right:0;width:27%;height:39%}
-    .label{font:10px/1.2 sans-serif;white-space:normal;padding:4px 1px}
     .work-card{width:100%;margin:0;padding:14px;border-radius:0;max-height:none;overflow:visible}
     .story{font-size:16px;line-height:1.5}.instruction{font-size:15px}
   }
