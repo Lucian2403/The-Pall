@@ -74,6 +74,7 @@ const sfxFiles=[
 let sfxContext:AudioContext|null=null;
 const sfxBuffers=new Map<string,AudioBuffer>();
 const sfxLoading=new Map<string,Promise<void>>();
+const sfxFailures=new Set<string>();
 const activeSources=new Set<AudioBufferSourceNode>();
 
 function publishPlayback(){
@@ -91,6 +92,7 @@ function publishPlayback(){
     :ambienceBlocked?'Playback blocked — click to retry'
     :ambience&&!ambience.paused?'Playing':'Loading';
   const effectsState=!playing||settings.sfxVolume===0?'Off'
+    :sfxFailures.size>0?'Sound file unavailable'
     :sfxBuffers.size===sfxFiles.length?'Ready'
     :'Loading';
   const snapshot=[musicState,ambienceState,effectsState].join('|');
@@ -126,11 +128,14 @@ function prepareSoundEffects(){
       .then(bytes=>context.decodeAudioData(bytes))
       .then(buffer=>{
         if(sfxContext===context)sfxBuffers.set(filename,buffer);
+        sfxFailures.delete(filename);
         publishPlayback();
       })
       .catch(()=>{
-        // No sound is preferable to a late effect on a failed network load.
-        // A later scene activation or sound re-enable may retry.
+        // Never play a delayed cue; report a missing or undecodable WAV.
+        // Subsequent scene activation / reenable may attempt a new fetch.
+        sfxFailures.add(filename);
+        publishPlayback();
       })
       .finally(()=>{
         sfxLoading.delete(filename);
@@ -472,6 +477,7 @@ export function connectPallAudio(){
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();
+    sfxFailures.clear();
     if(sfxContext){
       void sfxContext.close().catch(()=>{});
       sfxContext=null;
