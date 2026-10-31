@@ -157,7 +157,18 @@ assert.ok(markup.includes('class="arrival-layout"') &&
   markup.includes("'Hide notice':'Show notice'") &&
   markup.includes('aria-expanded={showArrival}'),
   'Welcome notice must be reversible without hiding the workshop action');
-assert.ok(markup.indexOf('class="notice-work work-order"')<markup.indexOf('{:else}\n          <p>No new personal notices.'),
+// Scope this check to the Personal notices component, not to the first
+// matching raw text offset anywhere in the page. Whitespace and incidental
+// copy changes must not report that a working Stage 1 CTA has vanished.
+const noticeStart=markup.indexOf('<aside class="personal-notices"');
+const noticeEnd=markup.indexOf('</aside>',noticeStart);
+assert.ok(noticeStart>=0 && noticeEnd>noticeStart,'Personal notices region is missing');
+const personalNotice=markup.slice(noticeStart,noticeEnd);
+const firstStage=personalNotice.indexOf('{#if newArrival}');
+const stageOneAction=personalNotice.indexOf('<section class="notice-work work-order"');
+const laterStage=personalNotice.search(/\{:else\}\s*<p>No new personal notices\./);
+assert.ok(firstStage>=0 && stageOneAction>firstStage &&
+  laterStage>stageOneAction && personalNotice.includes('href={work.href}'),
   'Stage 1 CTA must be nested in the notice');
 
 // The Stage 1 action is a single prominent Work Order in Personal notices.
