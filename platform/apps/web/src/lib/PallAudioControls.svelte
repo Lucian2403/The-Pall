@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    pallAudioSettings,pallAudioPlayback,setPallAudioSettings,previewPallEffect
+    pallAudioSettings,pallAudioPlayback,setPallAudioSettings,previewPallEffect,previewPallMusic
   } from '$lib/pall-audio';
   let open=$state(false);
   const MAX_MUSIC_VOLUME=0.5;
@@ -28,8 +28,14 @@
           value={$pallAudioSettings.musicVolume}
           aria-label="Background music volume"
           oninput={e=>setPallAudioSettings({musicVolume:Number(e.currentTarget.value)})}/>
-        <small class="playback-state">{$pallAudioPlayback.music}</small>
       </label>
+      <div class="effects-test-row">
+        <small class="playback-state">{$pallAudioPlayback.music}</small>
+        <button type="button" class="effects-test" onclick={previewPallMusic}
+          disabled={!$pallAudioSettings.enabled||$pallAudioSettings.musicVolume<=0}>
+          Play theme
+        </button>
+      </div>
       <label>
         <span>Ambience <output>{Math.round($pallAudioSettings.ambienceVolume*100)}%</output></span>
         <input type="range" min="0" max="1" step="0.05"
@@ -45,13 +51,13 @@
           aria-label="Sound effects volume"
           oninput={e=>setPallAudioSettings({sfxVolume:Number(e.currentTarget.value)})}/>
       </label>
-        <div class="effects-test-row">
+      <div class="effects-test-row">
           <small class="playback-state">{$pallAudioPlayback.effects}</small>
           <button type="button" class="effects-test" onclick={previewPallEffect}
             disabled={!$pallAudioSettings.enabled||$pallAudioSettings.sfxVolume<=0}>
             Test click
           </button>
-        </div>
+      </div>
       <small class="audio-footnote">Music rests between playthroughs. Workshop ambience is available only while the forge backdrop is visible.</small>
     </div>
   {/if}
