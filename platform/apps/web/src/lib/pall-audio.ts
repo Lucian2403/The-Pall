@@ -113,7 +113,9 @@ export function playUiClick(){
   }
 }
 export function playPaperSfx(){
-  playFile(paperVariants[Math.floor(Math.random()*paperVariants.length)],0.67);
+  const index=Math.floor(Math.random()*paperVariants.length);
+  // The second supplied paper clip measures about 7 dB quieter.
+  playFile(paperVariants[index],index===0?0.48:0.85);
 }
 /** Use only after the server acknowledges a physical smithing action. */
 export function playSmithingSfx(){
