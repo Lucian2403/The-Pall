@@ -75,7 +75,7 @@
   <div class="skill-accordions">
     {#each CHARACTER_SKILLS as group (group.major)}
       <details class="skill-category">
-        <summary data-pall-sfx="paper">
+        <summary data-pall-sfx="click">
           <span class="skill-name">{group.major}</span>
           <span class:trained={(majorSkillBonuses[group.major]??0)>0} class="level" title="Major Skill on the 100-level scale. A value of 1 without a saved grant is the provisional display baseline.">
             {displayMajor(group.major)}

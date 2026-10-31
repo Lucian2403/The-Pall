@@ -10,14 +10,15 @@ export type PallAudioSettings={
   sfxVolume:number;
 };
 const KEY='the-pall-audio-v1';
-const DEFAULT:PallAudioSettings={enabled:true,musicVolume:0.035,sfxVolume:0.55};
+const DEFAULT:PallAudioSettings={enabled:true,musicVolume:0.06,sfxVolume:0.55};
+const PREVIOUS_DEFAULT_MUSIC=0.035;
 export const pallAudioSettings=writable<PallAudioSettings>({...DEFAULT});
 
 const base='/audio/the-pall/';
 const clickVariants=[
   {file:'UI_ClickMain.wav',weight:75,gain:1},
-  {file:'UI_Click.wav',weight:15,gain:0.55},
-  {file:'UI_Click02.wav',weight:10,gain:0.50}
+  {file:'UI_Click.wav',weight:15,gain:0.24},
+  {file:'UI_Click02.wav',weight:10,gain:0.30}
 ] as const;
 const paperVariants=['UI_PaperJournal.wav','UI_PaperJournal2.wav'] as const;
 const smithVariants=['UI-SmithingAction.wav','UI-SmithingAction02.wav'] as const;
@@ -114,10 +115,12 @@ export function playUiClick(){
 }
 export function playPaperSfx(){
   const index=Math.floor(Math.random()*paperVariants.length);
-  // The second supplied paper clip measures about 7 dB quieter.
-  playFile(paperVariants[index],index===0?0.48:0.85);
+  // The revised second paper clip is about 6 dB stronger at peak than
+  // the first. Match the owner's new samples without normalizing files.
+  playFile(paperVariants[index],index===0?0.65:0.47);
 }
-/** Use only after the server acknowledges a physical smithing action. */
+/** Use on workshop entry and after server-confirmed smithing actions.
+ * Never play a physical-action cue for a failed work request. */
 export function playSmithingSfx(){
   const choice=Math.floor(Math.random()*smithVariants.length);
   playFile(smithVariants[choice],choice===0?0.9:0.42);
@@ -161,6 +164,7 @@ function clicked(event:MouseEvent){
   const kind=target?.closest('[data-pall-sfx]')?.getAttribute('data-pall-sfx');
   if(kind==='none')return;
   if(kind==='paper')playPaperSfx();
+  else if(kind==='smithing')playSmithingSfx();
   else playUiClick();
 }
 function visible(){
@@ -176,7 +180,11 @@ export function connectPallAudio(){
     const raw=window.localStorage.getItem(KEY);
     if(raw){
       const parsed=JSON.parse(raw) as Partial<PallAudioSettings>;
-      setPallAudioSettings(parsed);
+      // Existing users at the previous default hear the slightly louder mix,
+      // while every explicitly different volume preference is preserved.
+      const musicVolume=parsed.musicVolume===PREVIOUS_DEFAULT_MUSIC
+        ?DEFAULT.musicVolume:parsed.musicVolume;
+      setPallAudioSettings({...parsed,musicVolume});
     }else pallAudioSettings.set({...settings});
   }catch{pallAudioSettings.set({...settings});}
   document.addEventListener('click',clicked,true);

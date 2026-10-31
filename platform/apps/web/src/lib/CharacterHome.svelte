@@ -156,7 +156,8 @@
               </div>
               <h3>{work.title}</h3>
               <p>{work.description}</p>
-              <a class="framed-action work-order-action" href={work.href}>{work.label}</a>
+              <a class="framed-action work-order-action" href={work.href}
+                data-pall-sfx={character.origin==='Millhand'&&newArrival?'smithing':'click'}>{work.label}</a>
             </section>
           {/if}
         {:else}
