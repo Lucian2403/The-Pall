@@ -143,7 +143,7 @@
             {/if}
             <p class="notice-signoff">You've a living to make.</p>
           {/if}
-          <button class="quiet-action notice-toggle" type="button"
+          <button class="quiet-action notice-toggle" data-pall-sfx="paper" type="button"
             aria-expanded={showArrival} onclick={toggleArrival}>
             {showArrival?'Hide notice':'Show notice'}
           </button>
