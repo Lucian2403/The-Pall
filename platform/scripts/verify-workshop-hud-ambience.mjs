@@ -98,7 +98,7 @@ assert.ok(audio.includes("document.addEventListener('pointerdown',gesture,true)"
   audio.includes("track.volume=clamp(settings.ambienceVolume,0,1)") &&
   audio.includes("music.volume=canPlayMusic()?clamp(settings.musicVolume,0,MAX_MUSIC_VOLUME)*envelope:0") &&
   audio.includes("volume.gain.value=clamp(settings.sfxVolume*gain,0,1)") &&
-  (audio.match(/ambience\\.load\\(\\)/g)??[]).length===1 &&
+  audio.split('ambience.load()').length===2 &&
   audio.includes('export const pallAudioPlayback=writable') &&
   audio.includes('export function previewPallEffect()') &&
   settings.includes('{$pallAudioPlayback.music}') &&
