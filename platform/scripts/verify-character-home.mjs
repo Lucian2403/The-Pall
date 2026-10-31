@@ -1,5 +1,5 @@
 import {strict as assert} from 'node:assert';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 
 const root=resolve(import.meta.dirname,'..');
@@ -41,9 +41,13 @@ assert.ok(markup.includes("character.tutorial.stage===5") &&
 // Real saved character identity and origin illustration, not mock data.
 for(const field of [
   'originVisual(character.origin)','artwork.src','character.name',
-  'avatarId={character.avatarId??null}','character.startingLocation',
-  'character.health.current','character.coins'
+  'avatarId={character.avatarId??null}','character.startingLocation'
 ]) assert.ok(markup.includes(field),'Missing saved character value: '+field);
+for(const field of [
+  'formatted(character.health)','formatted(character.stamina)',
+  'formatted(character.fatigue)','formatted(character.focus)',
+  'String(character.coins)',"character.tutorial.stage+' / 8'"
+]) assert.ok(markup.includes(field),'Missing saved or explicitly untracked resource: '+field);
 
 // Four full names and descriptions from the approved character system.
 const descriptions={
@@ -164,14 +168,53 @@ assert.ok(noticeStyles.includes('border:0') &&
 assert.ok(markup.includes('class="attribute-code"') &&
   markup.includes('class="record-ornament"') &&
   css.includes('.attribute-row dd{') &&
-  css.includes('background:linear-gradient(110deg,#e6d1ae'),
+  css.includes('background:linear-gradient(110deg,#f1dfc2') && 
+  css.includes('font:700 15px/1.5 var(--pall-font-reading,Georgia,serif)') &&
+  css.includes('color:#24160d;text-shadow:none'),
   'Character record must use the approved stat-ledger visual treatment');
 assert.ok(markup.includes('origin={character.origin}') &&
   panelCss.includes('var(--pall-font-reading,Georgia,serif)') &&
   css.includes('var(--pall-font-reading,Georgia,serif)'),
   'Character UI must consume installed New Standard font tokens');
 assert.ok(css.includes('/ui-kit/frames/dialogue-frame-trim.png') &&
-  css.includes('@media(max-width:750px)') &&
+  css.includes('@media(max-width:900px)') &&
   panelCss.includes('.window-top'),
   'Preserve frame art and responsive behavior');
-console.log('PASS: Reversible unframed notice, saved origin, canonical font/attribute ledger, eight Major Skills, 32 subskills, Roman Smithing preview and draggable skills window.');
+// This pass widens the notice and uses the owner's original dialogue-frame art
+// for each expandable Major Skill. The text remains dark on parchment.
+assert.ok(css.includes('grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr)') &&
+  css.includes('width:100%;box-sizing:border-box') &&
+  css.includes('@media(max-width:1250px)') &&
+  css.includes('@media(max-width:900px)'),
+  'Personal Notices should span the unused right-hand origin illustration');
+assert.ok(panelCss.includes('.skill-category{') &&
+  panelCss.includes("border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')") &&
+  panelCss.includes('border-image-slice:145 190 125 190 fill') &&
+  panelCss.includes('.subskills li{border-bottom:1px solid #bca17c;color:#352316}') &&
+  panelCss.includes('.window-skill li{border-bottom:1px solid #594735;color:#e1cfb7}') &&
+  !panelCss.includes('var(--pall-font-reading,var('),
+  'Skill dropdowns need readable nine-slice parchment without corrupting modal styles');
+
+// Each icon is original transparent SVG line art that may be reused elsewhere.
+for(const name of ['health','stamina','fatigue','focus','coins','stage']){
+  const file='apps/web/static/ui-kit/icons/character-'+name+'.svg';
+  assert.ok(existsSync(resolve(root,file)), 'Missing resource icon: '+file);
+  const svg=read(file);
+  assert.ok(svg.includes('viewBox="0 0 48 48"') &&
+    svg.includes('<svg ') && svg.includes('</svg>') &&
+    svg.includes('stroke="#b58b57"'),
+    'Malformed original brass icon: '+name);
+  assert.ok(markup.includes("id:'"+name+"'"),
+    'Missing original health/stamina/fatigue/focus/coins/stage resource: '+name);
+}
+assert.ok(markup.includes("isMeasured(value:Measured|undefined)") &&
+  markup.includes('resource.known?resource.label:\'Not tracked yet\'') &&
+  markup.includes("value:formatted(character.stamina)") &&
+  markup.includes("value:formatted(character.focus)") &&
+  markup.includes('class:untracked={!resource.known}') &&
+  markup.includes('class="resource-grid"') &&
+  !markup.includes('character.stamina??0') &&
+  !markup.includes('character.focus??0'),
+  'Untracked resources must show a dash, never fictitious measured numbers');
+console.log('PASS: Wide unframed notice, readable parchment attributes, framed skill dropdowns, six original resource icons with honest API state and existing game contracts.');
+
