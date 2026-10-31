@@ -71,9 +71,9 @@
 
   // Approved, short versions of docs/01-player/character-system.md.
   const attributes=[
-    {key:'STR',name:'Strength',description:'Physical potential, carrying, heavy jobs, melee and heavy-tool training.'},
+    {key:'STR',name:'Strength',description:'Physical potential, carrying, heavy jobs/equipment, melee and heavy-tool training.'},
     {key:'DEX',name:'Dexterity',description:'Coordination, firearms, movement, locks and delicate technical work.'},
-    {key:'INT',name:'Intellect',description:'Learning, reasoning, research, medicine, engineering and investigation.'},
+    {key:'INT',name:'Intellect',description:'Learning and reasoning, research, medicine, chemistry, engineering and investigation.'},
     {key:'RES',name:'Resolve',description:'Endurance under strain, mental resilience and difficult training.'}
   ] as const;
 </script>
