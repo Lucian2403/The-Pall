@@ -1,13 +1,21 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import type {Snippet} from 'svelte';
-  import {connectPallAudio} from '$lib/pall-audio';
+  import {beforeNavigate} from '$app/navigation';
+  import {connectPallAudio,stopSmithingWorkshopAmbience} from '$lib/pall-audio';
 
   let {children}:{children:Snippet}=$props();
-  // Install one persistent player across SvelteKit client navigation.
-  // TutorialShell owns in-game activity; the root must never guess it from
-  // a URL or override the currently mounted shell's active state.
+
+  // Root owns the persistent browser player, never the active backdrop.
   onMount(connectPallAudio);
+  // Navigating to a page without an in-game backdrop (roster, account,
+  // marketing) is an explicit departure: stop immediately, not after the
+  // short grace period reserved for workshop-to-workshop loading transitions.
+  beforeNavigate(({to})=>{
+    if(!to||!/^\/characters\/[^/]+(?:\/|$)/.test(to.url.pathname)){
+      stopSmithingWorkshopAmbience();
+    }
+  });
 </script>
 
 {@render children()}
