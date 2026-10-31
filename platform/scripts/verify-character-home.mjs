@@ -74,19 +74,26 @@ for(let i=0;i<8;i++){
 }
 assert.equal(subCount,32,'All canonical 32 subskills must be represented');
 
-// 100 is agreed for Major Skills, NOT for specialization tiers. Do not
-// fabricate an unpersisted 1/100 baseline or a 3/100 subskill grant.
+// Major Skills use 0–100; the owner's newly specified subskill tiers are
+// Roman I–IV. Smithing I for Millhand is an origin-derived preview only,
+// not a recorded rank in the current saved character payload.
 assert.ok(canon.includes('Major Skills use a long 0–100 progression') &&
   canon.includes('Specializations use a smaller tier structure') &&
+  canon.includes('Roman numerals **I, II, III, IV**') &&
+  canon.includes('starting specialization preview') &&
   canon.includes('grants **+3 levels** to the chosen background Major Skill'),
   'Canonical progression rule changed: revisit UI treatment before merging');
 assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
   panelMarkup.includes("grant+' / 100'") &&
   panelMarkup.includes("'— / 100'") &&
-  panelMarkup.includes('— / TBD') &&
-  panelMarkup.includes('not a complete progression record') &&
-  !panelMarkup.includes('1 / 100'),
-  'Only server-stored major grants may appear as numbers; tiers remain undetermined');
+  panelMarkup.includes("'I · starting'") &&
+  panelMarkup.includes("origin==='Millhand'") &&
+  panelMarkup.includes("(majorSkillBonuses.Craftsmanship??0)>=3") &&
+  panelMarkup.includes("major==='Craftsmanship'&&skill==='Smithing'") &&
+  panelMarkup.includes('starting preview, not a saved rank') &&
+  !panelMarkup.includes('1 / 100') &&
+  !panelMarkup.includes('— / TBD'),
+  'Roman tier presentation must not invent persisted specialization levels');
 
 // Dropdowns must expand a vertical list, not a concatenated row.
 for(const frag of [
@@ -124,8 +131,11 @@ assert.ok(markup.includes('class="arrival-layout"') &&
   markup.includes('{#if !newArrival}') &&
   markup.includes('showArrival') &&
   markup.includes('localStorage.setItem(arrivalKey') &&
-  markup.includes('onclick={dismissArrival}'),
-  'Welcome and first job must be one prominent, dismissible but nonblocking panel');
+  markup.includes('localStorage.removeItem(arrivalKey)') &&
+  markup.includes('onclick={toggleArrival}') &&
+  markup.includes("'Hide notice':'Show notice'") &&
+  markup.includes('aria-expanded={showArrival}'),
+  'Welcome notice must be reversible without hiding the workshop action');
 assert.ok(markup.indexOf('class="notice-work"')<markup.indexOf('{:else}\n          <p>No new personal notices.'),
   'Stage 1 CTA must be nested in the notice');
 
@@ -145,8 +155,23 @@ for(const state of ['normal','hover','pressed']){
   const sprite='/ui-kit/buttons/button-'+state+'-trim.png';
   assert.ok(css.includes(sprite) && panelCss.includes(sprite),'Lost '+state+' sprite');
 }
+const noticeStyles=css.slice(css.indexOf('  .personal-notices{'),css.indexOf('  .personal-notices h2{'));
+assert.ok(noticeStyles.includes('border:0') &&
+  noticeStyles.includes('background:none') &&
+  noticeStyles.includes('box-shadow:none') &&
+  css.includes('linear-gradient(270deg,#120e0bdd'),
+  'Notice text should appear directly over darkened chosen-origin art, without a panel');
+assert.ok(markup.includes('class="attribute-code"') &&
+  markup.includes('class="record-ornament"') &&
+  css.includes('.attribute-row dd{') &&
+  css.includes('background:linear-gradient(110deg,#e6d1ae'),
+  'Character record must use the approved stat-ledger visual treatment');
+assert.ok(markup.includes('origin={character.origin}') &&
+  panelCss.includes('var(--pall-font-reading,Georgia,serif)') &&
+  css.includes('var(--pall-font-reading,Georgia,serif)'),
+  'Character UI must consume installed New Standard font tokens');
 assert.ok(css.includes('/ui-kit/frames/dialogue-frame-trim.png') &&
   css.includes('@media(max-width:750px)') &&
   panelCss.includes('.window-top'),
   'Preserve frame art and responsive behavior');
-console.log('PASS: First-arrival notice and action, canonical attributes, all eight major skills and 32 specializations, interactive skill window, saved origin and current routes.');
+console.log('PASS: Reversible unframed notice, saved origin, canonical font/attribute ledger, eight Major Skills, 32 subskills, Roman Smithing preview and draggable skills window.');
