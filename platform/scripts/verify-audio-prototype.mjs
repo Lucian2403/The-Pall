@@ -60,9 +60,9 @@ assert.ok(audio.includes("const KEY='the-pall-audio-v1'") &&
   audio.includes('document.hidden') &&
   audio.includes("if(kind==='paper')playPaperSfx()") &&
   audio.includes("if(kind==='smithing')playSmithingSfx()") &&
-  audio.includes("index===0?0.72:0.38") &&
-  audio.includes("file:'UI_Click.wav',weight:15,gain:0.38") &&
-  audio.includes("file:'UI_Click02.wav',weight:10,gain:0.45"),
+  audio.includes("index===0?0.65:0.47") &&
+  audio.includes("file:'UI_Click.wav',weight:15,gain:0.24") &&
+  audio.includes("file:'UI_Click02.wav',weight:10,gain:0.30"),
   'Audio must be gesture-gated, in-game scoped, saved and visibility-aware');
 assert.ok(layout.includes('onMount(connectPallAudio)') &&
   layout.includes('setPallAudioScene(') &&
