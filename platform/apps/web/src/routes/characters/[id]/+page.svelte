@@ -35,7 +35,7 @@
 <svelte:head><title>The Pall — Your Character</title></svelte:head>
 
 {#if status === 'ready' && character}
-  <TutorialShell {character} activePage="character">
+  <TutorialShell {character} activePage="character" smithingBackdrop={character.origin==='Millhand'}>
     <CharacterHome {character}/>
   </TutorialShell>
 {:else}
