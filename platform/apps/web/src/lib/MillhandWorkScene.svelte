@@ -1,6 +1,4 @@
 <script lang="ts">
-  import {onMount} from 'svelte';
-  import {claimSmithingWorkshopAmbience} from '$lib/pall-audio';
   import type {PlateworkState, PlateworkAction} from '@the-pall/game-core';
   import {WORK_ACTION_OBJECT} from '@the-pall/game-core';
   import NpcConversation from '$lib/NpcConversation.svelte';
@@ -22,7 +20,6 @@
     {key:'paper' as const, label:'Council order', image:'/workshop/council-work.webp'},
     {key:'hammer' as const, label:'Hammer', image:'/workshop/hammer.webp'}
   ];
-  onMount(claimSmithingWorkshopAmbience);
 
   let selected = $state<ObjectKey | null>(null);
   let talkingToGuther = $state(false);
