@@ -20,7 +20,7 @@ const panelCss=skillPanel.slice(skillPanel.indexOf('<style>'));
 for(const fragment of [
   "fetch('/api/characters/' + encodeURIComponent(page.params.id), {cache: 'no-store'})",
   'response.status === 401','response.status === 404',
-  '<TutorialShell {character} activePage="character">',
+  '<TutorialShell {character} activePage="character" smithingBackdrop={character.origin===\'Millhand\'}>',
   '<CharacterHome {character}/>',
   'avatarId?: string | null;',
   'href="/characters"','href="/account"'
