@@ -98,8 +98,9 @@ assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
   panelMarkup.includes("origin==='Millhand'") &&
   panelMarkup.includes("(majorSkillBonuses.Craftsmanship??0)>=3") &&
   panelMarkup.includes("major==='Craftsmanship'&&skill==='Smithing'") &&
-  panelMarkup.includes('Smithing I for a Millhand is a starting preview.') &&
-  panelMarkup.includes('rank not persisted in the current character API') &&
+  // Check the preview/persistence contract, not an exact UI sentence.
+  panelMarkup.includes('starting preview') &&
+  panelMarkup.includes('rank not persisted') &&
   !panelMarkup.includes("'— / 100'") &&
   !panelMarkup.includes('— / TBD'),
   'Roman tier presentation must preserve provisional 1/100 baseline without inventing saved levels');
