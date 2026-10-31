@@ -44,6 +44,7 @@
           value={$pallAudioSettings.sfxVolume}
           aria-label="Sound effects volume"
           oninput={e=>setPallAudioSettings({sfxVolume:Number(e.currentTarget.value)})}/>
+      </label>
         <div class="effects-test-row">
           <small class="playback-state">{$pallAudioPlayback.effects}</small>
           <button type="button" class="effects-test" onclick={previewPallEffect}
@@ -51,7 +52,6 @@
             Test click
           </button>
         </div>
-      </label>
       <small class="audio-footnote">Music rests between playthroughs. Workshop ambience is available only while the forge backdrop is visible.</small>
     </div>
   {/if}
