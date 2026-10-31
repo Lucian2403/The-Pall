@@ -138,9 +138,24 @@ try{
   await cmd('Page.addScriptToEvaluateOnNewDocument',{source:monitor});
   await cmd('Page.navigate',{url:site});
   await waitUntil(()=>rect('.audio-trigger'),20000,'mounted game Sound controls');
+  // The HTML appears in SSR before SvelteKit has hydrated. Wait for the
+  // browser's initial JS modules to settle before dispatching the first real
+  // pointer gesture, otherwise an unhydrated button simply ignores it.
+  await delay(3500);
   await click('.audio-trigger');
-  await waitUntil(()=>evalJS(`document.querySelector('#pall-sound-settings')!==null`),
-    10000,'Sound menu');
+  let menuOpen=await waitUntil(async()=>{
+    const open=await evalJS(`document.querySelector('#pall-sound-settings')!==null`);
+    return open?'open':false;
+  },7000,'hydrated Sound menu').catch(()=>null);
+  if(!menuOpen){
+    const diagnostics=await evalJS(`({
+      url:location.href,
+      trigger:document.querySelector('.audio-trigger')?.outerHTML,
+      body:document.body.innerText.slice(0,1600),
+      viteOverlay:document.querySelector('vite-error-overlay')?.shadowRoot?.innerText??null
+    })`);
+    throw new Error('Actual browser click did not open Sound settings: '+JSON.stringify(diagnostics));
+  }
   const status=()=>evalJS(`({
     texts:[...document.querySelectorAll('.playback-state')].map(e=>e.textContent.trim()),
     sliders:[...document.querySelectorAll('input[type=range]')].map(e=>({name:e.ariaLabel,value:e.value})),
