@@ -1,5 +1,7 @@
 <script lang="ts">
-  import {pallAudioSettings,setPallAudioSettings} from '$lib/pall-audio';
+  import {
+    pallAudioSettings,pallAudioPlayback,setPallAudioSettings,previewPallEffect
+  } from '$lib/pall-audio';
   let open=$state(false);
   const MAX_MUSIC_VOLUME=0.5;
   const musicPercent = $derived(Math.round($pallAudioSettings.musicVolume * 1000) / 10);
@@ -26,6 +28,7 @@
           value={$pallAudioSettings.musicVolume}
           aria-label="Background music volume"
           oninput={e=>setPallAudioSettings({musicVolume:Number(e.currentTarget.value)})}/>
+        <small class="playback-state">{$pallAudioPlayback.music}</small>
       </label>
       <label>
         <span>Ambience <output>{Math.round($pallAudioSettings.ambienceVolume*100)}%</output></span>
@@ -33,6 +36,7 @@
           value={$pallAudioSettings.ambienceVolume}
           aria-label="Workshop ambience volume"
           oninput={e=>setPallAudioSettings({ambienceVolume:Number(e.currentTarget.value)})}/>
+        <small class="playback-state">{$pallAudioPlayback.ambience}</small>
       </label>
       <label>
         <span>Effects <output>{Math.round($pallAudioSettings.sfxVolume*100)}%</output></span>
@@ -40,8 +44,15 @@
           value={$pallAudioSettings.sfxVolume}
           aria-label="Sound effects volume"
           oninput={e=>setPallAudioSettings({sfxVolume:Number(e.currentTarget.value)})}/>
+        <div class="effects-test-row">
+          <small class="playback-state">{$pallAudioPlayback.effects}</small>
+          <button type="button" class="effects-test" onclick={previewPallEffect}
+            disabled={!$pallAudioSettings.enabled||$pallAudioSettings.sfxVolume<=0}>
+            Test click
+          </button>
+        </div>
       </label>
-      <small>Music rests between playthroughs; workshop ambience loops only while its scene is visible. Audio starts after a click.</small>
+      <small class="audio-footnote">Music rests between playthroughs. Workshop ambience is available only while the forge backdrop is visible.</small>
     </div>
   {/if}
 </div>
@@ -63,7 +74,17 @@
   .audio-panel .toggle{flex-direction:row;align-items:center;gap:9px}
   .audio-panel input[type="range"]{width:100%;accent-color:#b18a56}
   .audio-panel input[type="checkbox"]{accent-color:#b18a56}
-  .audio-panel small{display:block;line-height:1.45;color:#c2aa89;margin-top:12px}
+  .audio-panel small{display:block;line-height:1.45;color:#c2aa89}
+  .audio-panel .playback-state{margin:0;color:#d4b78f;font-size:12px}
+  .audio-panel .effects-test-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .effects-test{
+    padding:5px 9px;border:1px solid #9b7851;
+    background:#453120;color:#f2dab6;cursor:pointer;
+    font:600 12px/1.2 var(--pall-font-reading,Georgia,serif);
+  }
+  .effects-test:hover:not(:disabled){background:#634629}
+  .effects-test:disabled{opacity:.45;cursor:default}
+  .audio-panel .audio-footnote{margin-top:13px}
   @media(max-width:760px){
     .audio-trigger{padding:7px 8px;font-size:12px}
     .audio-panel{top:calc(100% + 7px)}
