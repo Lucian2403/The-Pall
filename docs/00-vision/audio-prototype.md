@@ -71,3 +71,30 @@ The owner supplied **`SmithingWorkshopAmbience.wav`** as an additional, dedicate
 - The original eight SFX files, weighted click playback, short-effect Web Audio buffer cache and music fades are preserved.
 
 The new HUD displays **Stamina 100/100** as an explicit provisional starting value. A live/saved Stamina measurement from future combat integration—including Flint—takes precedence; this change does not invent a combat state, persist stamina, or subtract it from actions.
+
+
+## Audio slider and workshop playback repair — 2026-10-31
+
+Reported during PR #12 review: Music, Ambience and Effects sliders did not audibly respond, and Smithing ambience appeared absent, while source/asset verification passed. **An asset hash check does not prove browser playback**.
+
+Corrections on the same branch:
+
+- The global player now activates on genuine **pointer-down and keyboard** events, not only on a later `click`. Dragging a volume slider or changing it with arrow keys therefore qualifies as the player's activation and can start the browser sound engines.
+- The ambience player is **created/preloaded once** for its lifetime, avoiding repeated `load()` calls when workshop components mount or remount, which could otherwise reset playback. The loop is still claimed only by a visible Smithing Workshop and stops on leaving the scene, on master mute and on hidden tabs.
+- All three sliders continue to update saved settings, but also affect the **active playback channel**: Music changes `HTMLAudioElement.volume`, Ambience changes its own `HTMLAudioElement.volume`, and Effects affects the gain of the next cached Web Audio clip.
+- The Sound menu displays a playback state beneath each slider: `Playing`, `Resting`, `Workshop only`, `Click to start`, `Loading`, `File unavailable`, or `Playback blocked — click to retry`. An unrecognized ambience URL or browser autoplay failure no longer fails invisibly.
+- **Play theme** overrides a waiting music rest only when explicitly pressed. **Test click** plays the main weighted click using the current Effects gain. Those are testing conveniences, not new gameplay audio.
+- All owner volume choices, the user-edited **50%** Music maximum, the 75/15/10 click weights, 30–75-second music pauses, source file paths and the 115-second workshop loop remain unchanged.
+- A new **executable** `verify:audio-runtime` script runs the actual audio manager code in a deterministic mock browser using the existing TypeScript toolchain. Unlike source grep checks, it asserts that sliders modify playback volumes, pointer gestures unlock sound, ambience only plays in workshops, muting works, and the Effects preview uses the new gain.
+
+Validation from a locally updated `platform` checkout:
+
+```powershell
+npm run verify:character-home
+npm run verify:audio-runtime
+npm run verify:workshop-hud-ambience
+npm run verify:audio-prototype
+npm run check:web
+```
+
+Then open an actual Smithing Workshop and open **Sound**. The Ambience status should become `Playing` after a pointer/keyboard activation. If it instead reports `File unavailable` or `Playback blocked — click to retry`, that distinguishes a missing URL/codec problem from the browser's activation policy. Confirm the playing state and audible balance on the owner's own browser before merging.
