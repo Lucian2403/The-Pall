@@ -54,6 +54,8 @@ jobs:
         run: npm run verify:canonical-copy
       - name: Vite production compilation
         run: npm run build -w @the-pall/web
+      - name: Real Chromium audio controls
+        run: node scripts/verify-audio-browser.mjs
       # The established web project has TypeScript errors in unrelated pages
       # (state shadowing, optional route params, backgrounds formatting).
       # Keep recording them without hiding new production-build failures.
