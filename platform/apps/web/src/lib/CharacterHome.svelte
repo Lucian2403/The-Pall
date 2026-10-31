@@ -168,7 +168,7 @@
         </dl>
       </section>
 
-      <CharacterSkills majorSkillBonuses={character.majorSkillBonuses}/>
+      <CharacterSkills majorSkillBonuses={character.majorSkillBonuses} origin={character.origin}/>
     </div>
   </section>
 </div>
@@ -211,23 +211,24 @@
   /* Position the entire notice high in the previously empty area of the
      origin panorama. The first job is part of this very same notice. */
   .personal-notices{
-    min-width:0;padding:20px clamp(16px,2vw,25px);
-    border:1px solid #a77945;border-top:3px solid #d1a36b;
-    background:linear-gradient(145deg,#29211dec,#1b1815e8);
-    box-shadow:0 8px 29px #000b;
-    text-shadow:none;
+    min-width:0;padding:16px clamp(6px,1.5vw,21px) 16px 12px;
+    border:0;border-radius:0;background:none;box-shadow:none;
+    text-shadow:0 2px 5px #090604,0 0 11px #090604b8;
+    color:#fff0d9;
   }
   .personal-notices h2{
-    margin:0 0 13px;padding-bottom:10px;border-bottom:1px solid #9a754b;
-    color:#f5dab0;font:700 clamp(22px,2vw,27px)/1.15 var(--pall-font-reading,Georgia,serif);
+    margin:0 0 13px;padding-bottom:9px;
+    border-bottom:1px solid #d4a36b9c;
+    color:#ffe3b8;
+    font:700 clamp(25px,2.5vw,34px)/1.13 var(--pall-font-reading,Georgia,serif);
   }
   .personal-notices h3{
     margin:0 0 9px;color:#f0d4af;
     font:600 20px/1.2 var(--pall-font-reading,Georgia,serif);
   }
-  .personal-notices p{margin:0 0 11px;font:15px/1.5 Georgia,serif;color:#e6d1b5}
+  .personal-notices p{margin:0 0 11px;font:500 16px/1.5 var(--pall-font-reading,Georgia,serif);color:#f1dec6}
   .personal-notices .notice-signoff{font-weight:700;color:#ffe1b8}
-  .notice-work{margin-top:15px;padding-top:15px;border-top:1px solid #98734a}
+  .notice-work{margin-top:16px;padding-top:14px;border-top:1px solid #d4a36b84}
   .notice-work h3{font-size:18px;color:#f6deb8}
   .quiet-action{
     appearance:none;background:none;color:#e8bf8a;
@@ -265,29 +266,57 @@
   .framed-action:focus-visible,.quiet-action:focus-visible{outline:3px solid #e4b77d;outline-offset:3px}
 
   .character-record{
-    margin-top:22px;border:1px solid #6f5540;background:#29231e;min-width:0;
-    padding:clamp(15px,2vw,26px);
+    position:relative;margin-top:22px;min-width:0;
+    border:1px solid #785b3b;
+    background:
+      linear-gradient(135deg,#30261d 0%,#292019 58%,#241d18 100%);
+    box-shadow:inset 0 0 0 4px #1b15115e,0 9px 25px #0006;
+    padding:clamp(21px,2.3vw,34px);
   }
+  .character-record::before,.character-record::after{
+    content:'';position:absolute;width:19px;height:19px;
+    border:solid #b48a57;pointer-events:none;
+  }
+  .character-record::before{top:7px;left:7px;border-width:1px 0 0 1px}
+  .character-record::after{bottom:7px;right:7px;border-width:0 1px 1px 0}
   .record-intro{
-    margin-bottom:19px;padding-bottom:13px;border-bottom:1px solid #665039;
+    display:flex;align-items:center;gap:13px;
+    margin-bottom:24px;padding-bottom:14px;
+    border-bottom:1px solid #9d764a;
   }
+  .record-ornament{color:#c5a06a;font-size:19px;line-height:1}
+  .record-rule{height:1px;flex:1;background:linear-gradient(90deg,#9d764a,transparent)}
   .record-intro h2{
     margin:0;color:#f3dbb8;font:600 clamp(24px,2.4vw,31px)/1.2 var(--pall-font-reading,Georgia,serif);
   }
   .record-columns{display:grid;grid-template-columns:minmax(230px,.7fr) minmax(0,1.7fr);gap:clamp(17px,2.3vw,30px)}
-  .attribute-panel{min-width:0}
+  .attribute-panel{min-width:0;padding-right:clamp(0px,1vw,12px)}
   .attribute-panel h3{
     margin:0 0 13px;font:600 21px/1.2 var(--pall-font-reading,Georgia,serif);color:#e9d1aa;
   }
   .attribute-list{margin:0}
   .attribute-row{
-    display:flex;align-items:start;justify-content:space-between;gap:12px;
-    padding:12px 11px;margin-bottom:7px;background:#352c25;border:1px solid #514031;
+    display:flex;align-items:center;justify-content:space-between;gap:13px;
+    padding:12px 12px 12px 17px;margin-bottom:8px;
+    background:linear-gradient(110deg,#e6d1ae,#d6bb91);
+    border:1px solid #a27c51;color:#382517;
+    box-shadow:inset 3px 0 #a47c4d,0 2px 6px #0003;
   }
   .attribute-row dt{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
-  .attribute-row dt strong{font:600 16px/1.25 var(--pall-font-reading,Georgia,serif)}
-  .attribute-row dt small{font:13px/1.45 Georgia,serif;color:#ccb49b}
-  .attribute-row dd{margin:0;color:#f4d7a8;font:600 21px/1.1 var(--pall-font-reading,Georgia,serif)}
+  .attribute-code{
+    color:#795331;font:600 12px/1.1 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.11em;
+  }
+  .attribute-row dt strong{font:700 18px/1.15 var(--pall-font-reading,Georgia,serif);color:#2d1b0e}
+  .attribute-row dt small{font:500 13px/1.4 var(--pall-font-reading,Georgia,serif);color:#5e4630}
+  .attribute-row dd{
+    margin:0;flex:none;display:grid;place-items:center;
+    min-width:47px;min-height:47px;padding:5px;
+    border:2px solid #8a613b;border-radius:50%;
+    background:#3b2a1c;color:#f1d9aa;
+    box-shadow:inset 0 0 0 2px #d8b88330;
+    font:700 22px/1.1 var(--pall-font-reading,Georgia,serif);
+  }
 
   @media(max-width:1120px){
     .arrival-layout{grid-template-columns:minmax(0,1fr) minmax(265px,385px)}
@@ -310,6 +339,7 @@
     .identity-copy h2{font-size:25px}
     .work-notice{border-width:23px 25px 22px;border-image-width:23px 25px 22px;padding:10px 11px 15px}
     .attribute-list{grid-template-columns:1fr}
-    .personal-notices{padding:16px}
+    .personal-notices{padding:14px 4px}
+    .attribute-row{padding:10px;gap:8px}
   }
 </style>
