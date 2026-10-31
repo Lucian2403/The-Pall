@@ -82,6 +82,12 @@ try{
   });
   ws.addEventListener('message',e=>{
     let msg;try{msg=JSON.parse(e.data);}catch{return;}
+    if(msg.method==='Runtime.exceptionThrown'){
+      console.error('BROWSER UNCAUGHT ERROR:',JSON.stringify(msg.params?.exceptionDetails??{}).slice(0,1600));
+    }
+    if(msg.method==='Log.entryAdded'&&msg.params?.entry?.level==='error'){
+      console.error('BROWSER CONSOLE ERROR:',msg.params.entry.text?.slice(0,800));
+    }
     if(!msg.id)return;
     const callback=pending.get(msg.id);if(!callback)return;
     pending.delete(msg.id);
@@ -160,6 +166,7 @@ try{
   })();`;
   await cmd('Page.enable');
   await cmd('Runtime.enable');
+  await cmd('Log.enable');
   await cmd('Page.addScriptToEvaluateOnNewDocument',{source:monitor});
   phase='navigating to fixture';
   console.log('BROWSER QA: navigating to mounted real HUD fixture');
