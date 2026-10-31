@@ -34,7 +34,7 @@
       </div>
     </div>
   </TutorialShell>
-{/key>
+{/key}
 
 <style>
   .audio-qa-scene{
