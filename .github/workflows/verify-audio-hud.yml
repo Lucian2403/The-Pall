@@ -36,6 +36,8 @@ jobs:
           cache: npm
           cache-dependency-path: platform/package-lock.json
       - run: npm ci
+      - name: Build workspace contracts and game-core
+        run: npm run build:packages
       - name: Character home source and structure
         run: npm run verify:character-home
       - name: Owner audio assets and Web Audio contracts
