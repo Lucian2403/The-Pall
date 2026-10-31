@@ -1,7 +1,10 @@
 <script lang="ts">
   import {CHARACTER_SKILLS} from '$lib/character-skills';
 
-  let {majorSkillBonuses}:{majorSkillBonuses:Record<string,number>}=$props();
+  let {majorSkillBonuses,origin}:{
+    majorSkillBonuses:Record<string,number>;
+    origin:string;
+  }=$props();
   let windowElement:HTMLDialogElement|undefined;
   let dialogPosition=$state({x:100,y:70});
   let dragStart:{x:number;y:number;left:number;top:number}|null=null;
@@ -10,6 +13,18 @@
     const grant=majorSkillBonuses[major];
     // The API stores granted Major Skill levels only, not total XP/level.
     return Number.isFinite(grant)&&grant>0?grant+' / 100':'— / 100';
+  }
+  // A derived introductory *preview*, not a persisted rank. Roman I-IV are
+  // now the proposed tiers; no backend specialization ledger exists yet.
+  function specializationLabel(major:string,skill:string){
+    return origin==='Millhand'&&major==='Craftsmanship'&&skill==='Smithing'
+      ? 'I · starting'
+      : '—';
+  }
+  function specializationTitle(major:string,skill:string){
+    return origin==='Millhand'&&major==='Craftsmanship'&&skill==='Smithing'
+      ? 'Starting specialization preview; rank not persisted in the current character API'
+      : 'No specialization rank recorded';
   }
   function openWindow(){
     if(!windowElement||windowElement.open)return;
@@ -67,7 +82,8 @@
         </summary>
         <ul class="subskills">
           {#each group.subskills as skill (skill)}
-            <li><span>{skill}</span><span class="tier" title="Specialization tier is not recorded and its maximum is not yet defined">— / TBD</span></li>
+            <li><span>{skill}</span><span class:starting={specializationLabel(group.major,skill)!=='—'} class="tier"
+              title={specializationTitle(group.major,skill)}>{specializationLabel(group.major,skill)}</span></li>
           {/each}
         </ul>
       </details>
@@ -90,14 +106,15 @@
     <button class="window-close" type="button" aria-label="Close skills window" onclick={()=>windowElement?.close()}>×</button>
   </div>
   <div class="window-body">
-    <p class="skill-note">Major Skills use the agreed 0–100 scale. The saved character currently exposes granted levels, not a complete progression record. Specialization tier caps are not yet finalized.</p>
+    <p class="skill-note">Major Skills: 0–100. Specializations: Roman I–IV (planned). Smithing I on a Millhand is a starting preview, not a saved rank.</p>
     <div class="window-list">
       {#each CHARACTER_SKILLS as group (group.major)}
         <section class="window-skill">
           <h3>{group.major} <span>{displayMajor(group.major)}</span></h3>
           <ul>
             {#each group.subskills as skill (skill)}
-              <li><span>{skill}</span><span class="tier">— / TBD</span></li>
+              <li><span>{skill}</span><span class:starting={specializationLabel(group.major,skill)!=='—'} class="tier"
+                title={specializationTitle(group.major,skill)}>{specializationLabel(group.major,skill)}</span></li>
             {/each}
           </ul>
         </section>
@@ -145,7 +162,8 @@
     color:#e1cfb7;font:14px/1.35 Georgia,serif;
   }
   .subskills li:last-child,.window-skill li:last-child{border-bottom:0}
-  .tier{flex:none;white-space:nowrap;color:#bfa888;font:12px/1.3 Georgia,serif;font-variant-numeric:tabular-nums}
+  .tier{flex:none;white-space:nowrap;color:#bfa888;font:12px/1.3 var(--pall-font-reading,Georgia,serif);font-variant-numeric:tabular-nums}
+  .tier.starting{color:#f0c88e;font-weight:700}
   .skills-window{
     position:fixed;inset:auto;max-width:calc(100vw - 24px);
     width:min(830px,calc(100vw - 24px));max-height:min(84vh,810px);
