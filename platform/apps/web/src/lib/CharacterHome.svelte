@@ -55,18 +55,20 @@
     return null;
   });
 
-  // This is only a local visual dismissal, not a fictional mail or a quest
-  // mutation. Stage 1 arrival never blocks navigation and never reappears
-  // on this browser after the player dismisses it.
+  // Hide / Show is a reversible local display preference, never a deletion.
+  // The notice does not mutate saved quests and the work button stays visible.
   let showArrival=$state(false);
   const arrivalKey=$derived('pall-arrival-dismissed-'+character.id);
   onMount(()=>{
     try{showArrival=newArrival&&localStorage.getItem(arrivalKey)!=='1';}
     catch{showArrival=newArrival;}
   });
-  function dismissArrival(){
-    showArrival=false;
-    try{localStorage.setItem(arrivalKey,'1');}catch{/* Private mode: nonblocking. */}
+  function toggleArrival(){
+    showArrival=!showArrival;
+    try{
+      if(showArrival)localStorage.removeItem(arrivalKey);
+      else localStorage.setItem(arrivalKey,'1');
+    }catch{/* Local storage unavailable; still toggle this session. */}
   }
 
   // Approved, short versions of docs/01-player/character-system.md.
@@ -108,10 +110,12 @@
               <p>The city is already awake. Your first task begins at {character.startingLocation}.</p>
             {/if}
             <p class="notice-signoff">You've a living to make.</p>
-            <button class="quiet-action" type="button" onclick={dismissArrival}>Dismiss welcome</button>
           {/if}
-          <!-- Stage 1 work lives INSIDE the personal notice. Dismissal
-               never hides the only available next action. -->
+          <button class="quiet-action notice-toggle" type="button"
+            aria-expanded={showArrival} onclick={toggleArrival}>
+            {showArrival?'Hide notice':'Show notice'}
+          </button>
+          <!-- Notice visibility never hides the chapter's only next action. -->
           {#if work}
             <div class="notice-work">
               <h3>{work.title}</h3>
@@ -141,7 +145,9 @@
 
   <section class="character-record" aria-labelledby="character-record-title">
     <div class="record-intro">
+      <div class="record-ornament" aria-hidden="true">✦</div>
       <h2 id="character-record-title">Character details</h2>
+      <div class="record-rule" aria-hidden="true"></div>
     </div>
     <div class="record-columns">
       <section class="attribute-panel" aria-label="Core attributes">
@@ -150,10 +156,13 @@
           {#each attributes as attribute (attribute.key)}
             <div class="attribute-row">
               <dt>
+                <span class="attribute-code">{attribute.key}</span>
                 <strong>{attribute.name}</strong>
                 <small>{attribute.description}</small>
               </dt>
-              <dd>{character.attributes[attribute.key]}</dd>
+              <dd aria-label={attribute.name+' '+character.attributes[attribute.key]}>
+                <span>{character.attributes[attribute.key]}</span>
+              </dd>
             </div>
           {/each}
         </dl>
