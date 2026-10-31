@@ -4,6 +4,7 @@
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
+  import PallAudioControls from '$lib/PallAudioControls.svelte';
 
   type SavedCharacter = {
     id: string;
@@ -171,6 +172,7 @@
         {/each}
       </div>
       <div class="top-extras">
+        <PallAudioControls/>
         <div class="stat coin-stat"><span class="stat-symbol" aria-hidden="true">◉</span><span><small>Coins</small><strong>{character.coins}</strong></span></div>
         <div class="stat stage"><span><small>Onboarding</small><strong>{character.tutorial.stage} / 8</strong></span></div>
         <div class="account-link"><a href="/account" aria-label="Account settings">Account</a></div>
@@ -256,7 +258,7 @@
   .resource-track .css-fill{display:block;height:100%;background:#8a94a7;opacity:.85}
   .resource-track.unavailable::after{content:'';position:absolute;left:8px;right:8px;top:7px;
     border-top:1px dashed #6a5b46;opacity:.55}
-  .top-extras{display:flex;align-items:stretch;min-width:0}
+  .top-extras{display:flex;align-items:center;min-width:0;gap:5px}
   .stat{display:flex;align-items:center;gap:6px;padding:8px 10px;border-right:1px solid #3e352b}
   .stat>span:last-child{display:flex;flex-direction:column;gap:3px}
   .stat strong{font-size:14px;white-space:nowrap}
