@@ -1,0 +1,48 @@
+name: Verify HUD and audio behavior
+
+on:
+  pull_request:
+    paths:
+      - 'platform/apps/web/src/lib/pall-audio.ts'
+      - 'platform/apps/web/src/lib/PallAudioControls.svelte'
+      - 'platform/apps/web/src/lib/CharacterHome.svelte'
+      - 'platform/apps/web/src/lib/TutorialShell.svelte'
+      - 'platform/scripts/verify-audio-*.mjs'
+      - 'platform/scripts/verify-character-home.mjs'
+      - 'platform/scripts/verify-workshop-hud-ambience.mjs'
+      - 'platform/apps/web/static/audio/the-pall/**'
+      - 'platform/package.json'
+      - 'platform/package-lock.json'
+      - '.github/workflows/verify-audio-hud.yml'
+  push:
+    branches:
+      - 'ui/hud-smithing-ambience-20261031'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audio-and-hud:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - name: Character home source and structure
+        run: npm run verify:character-home
+      - name: Owner audio assets and Web Audio contracts
+        run: npm run verify:audio-prototype
+      - name: Workshop ambience asset and HUD contract
+        run: npm run verify:workshop-hud-ambience
+      - name: Executable playback/slider test
+        run: npm run verify:audio-runtime
+      - name: Svelte and route types
+        run: npm run check:web
