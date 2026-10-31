@@ -58,6 +58,10 @@ let statusSnapshot='';
 // A workshop scene claims the soundscape for as long as its illustration
 // is visible. Ownership is independent of URL so non-workshop pages stay silent.
 const smithingAmbienceOwners=new Set<symbol>();
+// SvelteKit briefly unmounts the old stage while the next stage loads.
+// Do not replay the 115-second forge recording from its beginning each time.
+const WORKSHOP_TRANSITION_GRACE_MS=2400;
+let ambienceDepartureTimer:ReturnType<typeof setTimeout>|null=null;
 let nextMusicTimer:ReturnType<typeof setTimeout>|null=null;
 let lastClickAt=0;
 
@@ -219,6 +223,22 @@ function ensureAmbience(){
   publishPlayback();
   return ambience;
 }
+function cancelAmbienceDeparture(){
+  if(ambienceDepartureTimer!==null){
+    clearTimeout(ambienceDepartureTimer);
+    ambienceDepartureTimer=null;
+  }
+}
+function deferAmbienceDeparture(){
+  // Keep an existing loop alive through a short Stage 1→2→3 route handoff.
+  // After a longer fetch, merely PAUSE: the next workshop resumes at the
+  // same point rather than restarting from time zero.
+  if(ambienceDepartureTimer!==null||!ambience||ambience.paused)return;
+  ambienceDepartureTimer=setTimeout(()=>{
+    ambienceDepartureTimer=null;
+    if(!sceneActive||smithingAmbienceOwners.size===0)stopAmbience();
+  },WORKSHOP_TRANSITION_GRACE_MS);
+}
 function startAmbience(){
   if(!canPlayAmbience())return;
   const track=ensureAmbience();
@@ -240,8 +260,24 @@ function stopAmbience(reset=false){
   publishPlayback();
 }
 function updateAmbience(){
-  if(canPlayAmbience())startAmbience();
-  else stopAmbience();
+  // Mute, zero volume or a hidden tab stop sound immediately.
+  if(typeof document==='undefined'||document.hidden||!settings.enabled||settings.ambienceVolume<=0){
+    cancelAmbienceDeparture();
+    stopAmbience();
+  }else if(canPlayAmbience()){
+    cancelAmbienceDeparture();
+    startAmbience();
+  }else if(!sceneActive||smithingAmbienceOwners.size===0){
+    // The backdrop may be temporarily absent during a route data fetch.
+    deferAmbienceDeparture();
+  }else{
+    stopAmbience();
+  }
+}
+/** A confirmed non-forge background must stop the loop immediately. */
+export function stopSmithingWorkshopAmbience(){
+  cancelAmbienceDeparture();
+  stopAmbience(true);
 }
 /**
  * Connect ambient sound to the visible smithing backdrop, not to generic
@@ -250,6 +286,7 @@ function updateAmbience(){
 export function claimSmithingWorkshopAmbience(){
   const owner=Symbol('smithing-workshop');
   smithingAmbienceOwners.add(owner);
+  cancelAmbienceDeparture();
   if(typeof window!=='undefined'&&settings.enabled){
     // Fetch once when a workshop is displayed; play only after activation.
     ensureAmbience();
@@ -258,7 +295,8 @@ export function claimSmithingWorkshopAmbience(){
   publishPlayback();
   return ()=>{
     smithingAmbienceOwners.delete(owner);
-    if(smithingAmbienceOwners.size===0)stopAmbience(true);
+    // Stage transitions momentarily have no owner. Never reset here.
+    if(smithingAmbienceOwners.size===0)deferAmbienceDeparture();
     else updateAmbience();
     publishPlayback();
   };
@@ -424,7 +462,9 @@ export function setPallAudioScene(active:boolean){
     updateAmbience();
   }else{
     stopMusic();
-    stopAmbience(true);
+    // The incoming stage may render the same painted forge background.
+    // Preserve the ambient loop until its new shell can declare the scene.
+    deferAmbienceDeparture();
     stopSoundEffects();
   }
   publishPlayback();
@@ -494,6 +534,7 @@ export function connectPallAudio(){
     document.removeEventListener('click',clicked,true);
     document.removeEventListener('visibilitychange',visible);
     stopMusic();
+    cancelAmbienceDeparture();
     stopAmbience(true);
     ambience=null;
     ambienceError=false;
