@@ -60,7 +60,7 @@
     box-sizing:border-box;
     width:min(375px,calc(100% - 20px));
     bottom:40%;
-    max-height:68%;
+    max-height:57%;
     overflow-y:auto;
     overscroll-behavior:contain;
     padding:7px 10px 10px;
