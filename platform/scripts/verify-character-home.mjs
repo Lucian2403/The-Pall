@@ -166,9 +166,24 @@ assert.ok(noticeStart>=0 && noticeEnd>noticeStart,'Personal notices region is mi
 const personalNotice=markup.slice(noticeStart,noticeEnd);
 const firstStage=personalNotice.indexOf('{#if newArrival}');
 const stageOneAction=personalNotice.indexOf('<section class="notice-work work-order"');
-const laterStage=personalNotice.search(/\{:else\}\s*<p>No new personal notices\./);
+let laterStage=-1;
+if(firstStage>=0){
+  // Walk Svelte's nested if/else delimiters and find the else paired with
+  // {#if newArrival}. Do not depend on the wording or indentation of its copy.
+  let depth=0;
+  const branches=personalNotice.slice(firstStage);
+  for(const token of branches.matchAll(/\{#if[^}]*\}|\{:else[^}]*\}|\{\/if\}/g)){
+    if(token[0].startsWith('{#if'))depth++;
+    else if(token[0]==='{/if}')depth--;
+    else if(token[0].startsWith('{:else')&&depth===1){
+      laterStage=firstStage+token.index;
+      break;
+    }
+  }
+}
 assert.ok(firstStage>=0 && stageOneAction>firstStage &&
-  laterStage>stageOneAction && personalNotice.includes('href={work.href}'),
+  laterStage>stageOneAction &&
+  personalNotice.slice(firstStage,laterStage).includes('href={work.href}'),
   'Stage 1 CTA must be nested in the notice');
 
 // The Stage 1 action is a single prominent Work Order in Personal notices.
