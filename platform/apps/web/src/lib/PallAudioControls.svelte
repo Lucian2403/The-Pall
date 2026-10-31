@@ -28,13 +28,20 @@
           oninput={e=>setPallAudioSettings({musicVolume:Number(e.currentTarget.value)})}/>
       </label>
       <label>
+        <span>Ambience <output>{Math.round($pallAudioSettings.ambienceVolume*100)}%</output></span>
+        <input type="range" min="0" max="1" step="0.05"
+          value={$pallAudioSettings.ambienceVolume}
+          aria-label="Workshop ambience volume"
+          oninput={e=>setPallAudioSettings({ambienceVolume:Number(e.currentTarget.value)})}/>
+      </label>
+      <label>
         <span>Effects <output>{Math.round($pallAudioSettings.sfxVolume*100)}%</output></span>
         <input type="range" min="0" max="1" step="0.05"
           value={$pallAudioSettings.sfxVolume}
           aria-label="Sound effects volume"
           oninput={e=>setPallAudioSettings({sfxVolume:Number(e.currentTarget.value)})}/>
       </label>
-      <small>The theme rests between playthroughs. Audio starts after a click.</small>
+      <small>Music rests between playthroughs; workshop ambience loops only while its scene is visible. Audio starts after a click.</small>
     </div>
   {/if}
 </div>
