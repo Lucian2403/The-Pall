@@ -88,6 +88,25 @@ assert.ok(!audio.includes("music.loop=true") &&
   audio.includes('context.createBufferSource()'),
   'Do not change the independent music-rest or low-latency UI SFX contracts');
 
+// These controls must affect real playback, not only update slider
+// labels. In particular, a pointer drag alone must be a playback gesture,
+// and the ambience player must never be reloaded on every scene remount.
+assert.ok(audio.includes("document.addEventListener('pointerdown',gesture,true)") &&
+  audio.includes("document.addEventListener('keydown',gesture,true)") &&
+  audio.includes("document.removeEventListener('pointerdown',gesture,true)") &&
+  audio.includes("document.removeEventListener('keydown',gesture,true)") &&
+  audio.includes("track.volume=clamp(settings.ambienceVolume,0,1)") &&
+  audio.includes("music.volume=canPlayMusic()?clamp(settings.musicVolume,0,MAX_MUSIC_VOLUME)*envelope:0") &&
+  audio.includes("volume.gain.value=clamp(settings.sfxVolume*gain,0,1)") &&
+  (audio.match(/ambience\\.load\\(\\)/g)??[]).length===1 &&
+  audio.includes('export const pallAudioPlayback=writable') &&
+  audio.includes('export function previewPallEffect()') &&
+  settings.includes('{$pallAudioPlayback.music}') &&
+  settings.includes('{$pallAudioPlayback.ambience}') &&
+  settings.includes('{$pallAudioPlayback.effects}') &&
+  settings.includes('onclick={previewPallEffect}'),
+  'Music, Ambience and Effects must use live volume gain, gesture unlock and observable playback state');
+
 // Exact original-owner encoded audio; do not silently substitute a different
 // ambience version or a huge browser-unfriendly WAV file.
 const filename='apps/web/static/audio/the-pall/smithing-workshop-ambience.mp3';
