@@ -56,7 +56,9 @@ for(const [file,weight] of [['UI_ClickMain.wav',75],['UI_Click.wav',15],['UI_Cli
 assert.ok(audio.includes("const KEY='the-pall-audio-v1'") &&
   audio.includes('window.localStorage.setItem(KEY') &&
   audio.includes("if(!sceneActive)return;") &&
-  audio.includes('if(unlocked)return;') &&
+  audio.includes("document.addEventListener('pointerdown',gesture,true)") &&
+  audio.includes("document.addEventListener('keydown',gesture,true)") &&
+  audio.includes('if(!sceneActive)return;') &&
   audio.includes('document.hidden') &&
   audio.includes("if(kind==='paper')playPaperSfx()") &&
   audio.includes("if(kind==='smithing')playSmithingSfx()") &&
