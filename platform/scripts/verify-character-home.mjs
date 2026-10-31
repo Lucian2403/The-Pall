@@ -201,7 +201,8 @@ const noticeStyles=css.slice(css.indexOf('  .personal-notices{'),css.indexOf('  
 assert.ok(noticeStyles.includes('border:0') &&
   noticeStyles.includes('background:none') &&
   noticeStyles.includes('box-shadow:none') &&
-  css.includes('linear-gradient(270deg,#120e0bdd'),
+  // The image-darkening gradient is on the scene's inline style, not CSS.
+  markup.includes('linear-gradient(270deg,#120e0bdd'),
   'Notice text should appear directly over darkened chosen-origin art, without a panel');
 assert.ok(markup.includes('class="attribute-code"') &&
   markup.includes('class="record-ornament"') &&
