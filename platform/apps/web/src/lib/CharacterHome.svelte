@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {claimSmithingWorkshopAmbience} from '$lib/pall-audio';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import {originVisual} from '$lib/origin-visuals';
   import CharacterSkills from '$lib/CharacterSkills.svelte';
@@ -62,6 +63,8 @@
   // The notice does not mutate saved quests and the work button stays visible.
   let showArrival=$state(false);
   const arrivalKey=$derived('pall-arrival-dismissed-'+character.id);
+  onMount(()=>character.origin==='Millhand'?claimSmithingWorkshopAmbience():undefined);
+
   onMount(()=>{
     try{showArrival=newArrival&&localStorage.getItem(arrivalKey)!=='1';}
     catch{showArrival=newArrival;}
