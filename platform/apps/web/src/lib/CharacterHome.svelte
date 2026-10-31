@@ -149,11 +149,15 @@
           </button>
           <!-- Notice visibility never hides the chapter's only next action. -->
           {#if work}
-            <div class="notice-work">
+            <section class="notice-work work-order" aria-label="Current work order">
+              <div class="work-order-head">
+                <span class="work-order-kicker">Current work order</span>
+                <span class="work-order-stage">Stage I</span>
+              </div>
               <h3>{work.title}</h3>
               <p>{work.description}</p>
-              <a class="framed-action" href={work.href}>{work.label}</a>
-            </div>
+              <a class="framed-action work-order-action" href={work.href}>{work.label}</a>
+            </section>
           {/if}
         {:else}
           <p>No new personal notices. Your saved chapter work is available below.</p>
@@ -286,8 +290,70 @@
     color:#f1dec6;
   }
   .personal-notices .notice-signoff{font-weight:700;color:#ffe1b8}
-  .notice-work{margin-top:16px;padding-top:14px;border-top:1px solid #d4a36b84}
-  .notice-work h3{font-size:18px;color:#f6deb8}
+  /* A single parchment work order is the most prominent action on first
+     arrival. Keep it within Personal notices, not in a competing section. */
+  .notice-work{
+    box-sizing:border-box;
+    width:100%;
+    margin-top:16px;
+  }
+  .work-order{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    min-width:0;
+    padding:15px clamp(13px,2vw,23px) 19px;
+    border:solid transparent;
+    border-width:26px 30px 24px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:26px 30px 24px;
+    border-image-repeat:stretch;
+    background:transparent;
+    color:#2a190f;
+    text-shadow:none;
+    box-shadow:0 8px 22px #0008;
+  }
+  .work-order-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    align-self:stretch;
+    gap:12px;
+    border-bottom:1px solid #ac855d;
+    padding-bottom:9px;
+  }
+  .personal-notices .work-order-kicker,
+  .work-order-stage{
+    color:#79502c;
+    font:600 14px/1.15 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.11em;
+    text-transform:uppercase;
+  }
+  .work-order-stage{white-space:nowrap}
+  .personal-notices .work-order h3{
+    margin:2px 0 0;
+    color:#2b190d;
+    font:700 clamp(25px,2.3vw,30px)/1.1 var(--pall-font-reading,Georgia,serif);
+    text-shadow:none;
+  }
+  .personal-notices .work-order p{
+    margin:0 0 4px;
+    max-width:65ch;
+    color:#3f2918;
+    font:500 clamp(16px,1vw,18px)/1.45 var(--pall-font-reading,Georgia,serif);
+    text-shadow:none;
+  }
+  .work-order-action{
+    min-width:min(100%,280px);
+    min-height:64px;
+    margin-top:5px;
+    padding:5px 18px;
+    font-size:18px;
+    text-shadow:none;
+  }
+  .work-order-action:hover{filter:brightness(1.035)}
   .quiet-action{
     appearance:none;background:none;color:#e8bf8a;
     border:0;border-bottom:1px solid #a47749;padding:4px 0;
@@ -404,6 +470,12 @@
     .work-notice{border-width:23px 25px 22px;border-image-width:23px 25px 22px;padding:10px 11px 15px}
     .attribute-list{grid-template-columns:1fr}
     .personal-notices{padding:14px 4px}
+    .work-order{
+      border-width:23px 24px 21px;
+      border-image-width:23px 24px 21px;
+      padding:10px 9px 14px;
+    }
+    .work-order-action{min-width:100%;font-size:16px}
     .attribute-row{padding:10px;gap:8px}
     .resource-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
     .resource-item{padding:7px 6px;gap:6px}
