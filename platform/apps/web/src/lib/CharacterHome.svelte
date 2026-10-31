@@ -346,7 +346,8 @@
     text-shadow:none;
   }
   .work-order-action{
-    min-width:min(100%,280px);
+    box-sizing:border-box;
+    width:min(100%,310px);
     min-height:64px;
     margin-top:5px;
     padding:5px 18px;
@@ -475,7 +476,7 @@
       border-image-width:23px 24px 21px;
       padding:10px 9px 14px;
     }
-    .work-order-action{min-width:100%;font-size:16px}
+    .work-order-action{width:100%;font-size:16px}
     .attribute-row{padding:10px;gap:8px}
     .resource-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
     .resource-item{padding:7px 6px;gap:6px}
