@@ -147,13 +147,30 @@ engine.setPallAudioSettings({enabled:true});
 await flush();
 assert.equal(ambience.paused,false,'Sound enable must resume claimed ambience.');
 
+// The player is a singleton across SvelteKit Stage 1→2→3 remounts. The
+// transient loss of the old backdrop claim must neither pause nor reset it.
+ambience.currentTime=47;
 release();
-assert.equal(ambience.paused,true,'Leaving the workshop must stop ambience.');
-assert.equal(ambience.currentTime,0,'The old workshop loop should be reset.');
+engine.setPallAudioScene(false);
+assert.equal(ambience.paused,false,'Short workshop stage transition must not stop the forge loop.');
+assert.equal(ambience.currentTime,47,'Stage exit must not rewind ambience.');
+const nextForge=engine.claimSmithingWorkshopAmbience();
+engine.setPallAudioScene(true);
+await flush();
+assert.strictEqual(find('smithing-workshop-ambience.mp3'),ambience,
+  'A later workshop stage must use the existing media element.');
+assert.equal(ambience.paused,false,'A subsequent workshop must keep the existing loop playing.');
+assert.equal(ambience.currentTime,47,'Entering Stage 2 must resume at the original playback position.');
+nextForge();
+// The new *non-workshop* backdrop has explicit authority to stop the loop
+// immediately. This must not depend on a route path, timer or chance.
+engine.stopSmithingWorkshopAmbience();
+assert.equal(ambience.paused,true,'Switching to depot/other backdrop must stop ambience immediately.');
+assert.equal(ambience.currentTime,0,'A confirmed departure should reset for a future independent visit.');
 assert.equal(status().ambience,'Workshop only');
 engine.setPallAudioScene(false);
 assert.equal(music.paused,true,'Leaving the game must pause music.');
 detach();
 assert.equal(listeners.get('pointerdown')?.size??0,0,'Release gesture listeners.');
 assert.equal(listeners.get('keydown')?.size??0,0,'Release keyboard listeners.');
-console.log('PASS: Audio runtime responds to all three sliders, gesture unlock, looping workshop-only ambience, master mute, context cleanup, and effects gain.');
+console.log('PASS: audio sliders, workshop-to-workshop continuity at 47s, immediate depot stop, master mute and SFX gain.');
