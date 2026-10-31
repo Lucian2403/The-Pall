@@ -55,7 +55,8 @@ jobs:
       - name: Vite production compilation
         run: npm run build -w @the-pall/web
       - name: Real Chromium audio controls
-        run: node scripts/verify-audio-browser.mjs
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-audio-browser.mjs
       # The established web project has TypeScript errors in unrelated pages
       # (state shadowing, optional route params, backgrounds formatting).
       # Keep recording them without hiding new production-build failures.
