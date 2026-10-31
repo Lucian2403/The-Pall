@@ -11,6 +11,7 @@ export type PallAudioSettings={
 };
 const KEY='the-pall-audio-v1';
 const DEFAULT:PallAudioSettings={enabled:true,musicVolume:0.06,sfxVolume:0.55};
+const MAX_MUSIC_VOLUME=0.5;
 const PREVIOUS_DEFAULT_MUSIC=0.035;
 export const pallAudioSettings=writable<PallAudioSettings>({...DEFAULT});
 
@@ -50,7 +51,7 @@ function updateMusicVolume(){
   const position=Number.isFinite(music.currentTime)?music.currentTime:0;
   const remaining=Number.isFinite(music.duration)?music.duration-position:FADE_OUT;
   const envelope=clamp(Math.min(position/FADE_IN,remaining/FADE_OUT),0,1);
-  music.volume=canPlayMusic()?clamp(settings.musicVolume,0,0.12)*envelope:0;
+  music.volume=canPlayMusic()?clamp(settings.musicVolume,0,MAX_MUSIC_VOLUME)*envelope:0;
 }
 function ensureMusic(){
   if(music)return music;
@@ -129,7 +130,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
   settings={
     enabled:typeof next.enabled==='boolean'?next.enabled:settings.enabled,
     musicVolume:typeof next.musicVolume==='number'&&Number.isFinite(next.musicVolume)
-      ?clamp(next.musicVolume,0,0.12):settings.musicVolume,
+      ?clamp(next.musicVolume,0,MAX_MUSIC_VOLUME):settings.musicVolume,
     sfxVolume:typeof next.sfxVolume==='number'&&Number.isFinite(next.sfxVolume)
       ?clamp(next.sfxVolume,0,1):settings.sfxVolume
   };
