@@ -31,12 +31,21 @@
         ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
         : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
+  // The 100/100 dark-green stamina meter is the owner's starting HUD
+  // baseline until the combat API begins reporting live depletion. Always
+  // prefer saved data when it becomes available (e.g. during Flint's fight).
+  const staminaShown=$derived(isMeasured(character.stamina)
+    ?character.stamina:{current:100,maximum:100});
   const resources=$derived([
-    {id:'health',label:'Health',data:character.health,fill:'hp-fill.png'},
-    {id:'stamina',label:'Stamina',data:character.stamina,fill:'stamina-fill.png'},
-    {id:'fatigue',label:'Fatigue',data:character.fatigue,fill:'fatigue-fill.png'},
-    {id:'focus',label:'Focus',data:character.focus,fill:null}
-  ]);
+    {id:'health',label:'Health',data:character.health},
+    {id:'stamina',label:'Stamina',data:staminaShown}
+  ] as const);
+  const minorResources=$derived([
+    {id:'fatigue',label:'Fatigue',data:character.fatigue},
+    {id:'focus',label:'Focus',data:character.focus}
+  ] as const);
+  const romanStages=['—','I','II','III','IV','V','VI','VII','VIII'];
+  const introStage=$derived(romanStages[character.tutorial.stage]??String(character.tutorial.stage));
   function isMeasured(value:{current:number;maximum:number}|undefined):value is {current:number;maximum:number}{
     return !!value && Number.isFinite(value.current) &&
       Number.isFinite(value.maximum) && value.maximum>0 && value.current>=0;
@@ -147,34 +156,49 @@
         <CharacterAvatar name={character.name} avatarId={character.avatarId} />
         <span class="player-label"><strong>{character.name}</strong><small>{character.origin}</small></span>
       </div>
-      <div class="resource-strip" aria-label="Character resources">
-        {#each resources as resource (resource.id)}
-          <div class="resource-meter">
-            <span class="meter-heading"><span class="meter-label">{resource.label}</span>
-              <strong class="meter-number">{isMeasured(resource.data) ? resource.data.current+' / '+resource.data.maximum : '—'}</strong>
-            </span>
-            {#if isMeasured(resource.data)}
+      <div class="resource-cluster" aria-label="Character condition">
+        <div class="resource-strip" aria-label="Health and stamina">
+          {#each resources as resource (resource.id)}
+            <div class="resource-meter">
+              <span class="meter-heading">
+                <span class="meter-label">{resource.label}</span>
+                <strong class="meter-number">{resource.data.current} / {resource.data.maximum}</strong>
+              </span>
               <span class="resource-track" role="progressbar" aria-label={resource.label}
                 aria-valuemin="0" aria-valuemax={resource.data.maximum}
-                aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}>
-                {#if resource.fill}
-                  <img src={'/ui-kit/resources/'+resource.fill} alt="" aria-hidden="true"
-                    style={'clip-path:inset(0 '+(100-percentage(resource.data))+'% 0 0)'} />
-                {:else}
-                  <span class="css-fill" style={'width:'+percentage(resource.data)+'%'}></span>
-                {/if}
+                aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}
+                title={resource.id==='stamina'&&!isMeasured(character.stamina)
+                  ?'Provisional full stamina; future combat data will replace this value'
+                  :undefined}>
+                <span class="resource-interior">
+                  <span class={'meter-fill '+resource.id}
+                    style={'width:'+percentage(resource.data)+'%'}></span>
+                </span>
               </span>
-            {:else}
-              <span class="resource-track unavailable" role="img"
-                aria-label={resource.label+': not tracked yet'} title="This resource is not yet supplied by the saved-character API"></span>
-            {/if}
-          </div>
-        {/each}
+            </div>
+          {/each}
+        </div>
+        <div class="minor-resources" aria-label="Other condition indicators">
+          {#each minorResources as resource (resource.id)}
+            <span class="minor-resource">
+              <img src={'/ui-kit/icons/character-'+resource.id+'.svg'}
+                width="18" height="18" alt="" aria-hidden="true"/>
+              <span>{resource.label}</span>
+              <strong>{isMeasured(resource.data)
+                ?resource.data.current+' / '+resource.data.maximum:'—'}</strong>
+            </span>
+          {/each}
+        </div>
       </div>
       <div class="top-extras">
+        <div class="stat coin-stat">
+          <img src="/ui-kit/icons/character-coins.svg" alt="" aria-hidden="true" width="25" height="25"/>
+          <span><small>Coins</small><strong>{character.coins}</strong></span>
+        </div>
+        <div class="stat stage">
+          <span><small>Introduction</small><strong>{introStage} / VIII</strong></span>
+        </div>
         <PallAudioControls/>
-        <div class="stat coin-stat"><span class="stat-symbol" aria-hidden="true">◉</span><span><small>Coins</small><strong>{character.coins}</strong></span></div>
-        <div class="stat stage"><span><small>Onboarding</small><strong>{character.tutorial.stage} / 8</strong></span></div>
         <div class="account-link"><a href="/account" aria-label="Account settings">Account</a></div>
       </div>
     </header>
@@ -239,33 +263,88 @@
   .locked-heading{margin:0;padding:0 19px;font:10px/1.5 sans-serif;letter-spacing:.1em;color:#aa8a62}
   .rail-footer{margin-top:auto;min-height:188px;display:flex;flex-direction:column;justify-content:end;gap:3px;padding:25px 20px 17px;color:#d9b98b;font:13px/1.1 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.23em;background:linear-gradient(0deg,#100e0df2,#100e0d4a 58%,#100e0dbb),url('/ui-kit/sidebar-illustration.png') center center/cover no-repeat;background-color:#181611}
   .right{display:flex;flex-direction:column;min-width:0;min-height:100vh;min-height:100dvh;border:0;background:#1c1a18;border-radius:0}
-  .topbar{display:grid;grid-template-columns:minmax(148px,188px) minmax(0,1fr) auto;
-    align-items:stretch;min-height:80px;background:#131311;border-bottom:1px solid #574632}
-  .player{display:flex;align-items:center;gap:9px;padding:9px 12px;border-right:1px solid #3e352b;min-width:0}
-  .player-label{display:flex;flex-direction:column;min-width:0;gap:4px}
-  .player strong{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .player small{font-size:12px;color:#b3a695}
-  .resource-strip{min-width:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
-  .resource-meter{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0;
-    padding:9px clamp(5px,.7vw,12px);border-right:1px solid #3e352b}
-  .meter-heading{display:flex;align-items:baseline;justify-content:space-between;gap:4px;min-width:0}
-  .meter-label{font:14px/1 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.04em;color:#d7bd98}
-  .meter-number{font:12px/1.2 var(--pall-font-reading,Georgia,serif);color:#eee0cb;white-space:nowrap}
-  .resource-track{position:relative;display:block;width:100%;height:17px;border-radius:2px;
-    background:#211b17 url('/ui-kit/resources/bar-empty.png') center/100% 100% no-repeat;
-    overflow:hidden}
-  .resource-track img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none}
-  .resource-track .css-fill{display:block;height:100%;background:#8a94a7;opacity:.85}
-  .resource-track.unavailable::after{content:'';position:absolute;left:8px;right:8px;top:7px;
-    border-top:1px dashed #6a5b46;opacity:.55}
-  .top-extras{display:flex;align-items:center;min-width:0;gap:5px}
-  .stat{display:flex;align-items:center;gap:6px;padding:8px 10px;border-right:1px solid #3e352b}
-  .stat>span:last-child{display:flex;flex-direction:column;gap:3px}
-  .stat strong{font-size:14px;white-space:nowrap}
-  .stat small{font-size:11px;color:#b3a695}
-  .stat-symbol{font-size:19px;color:#ddbc83;flex-shrink:0}
-  .account-link{display:flex;align-items:center;padding:0 10px}
-  .account-link a{color:#e1bd88;font:12px sans-serif}
+  /* Industrial brass-and-charcoal HUD, rather than four equal developer gauges. */
+  .topbar{
+    display:grid;
+    grid-template-columns:minmax(210px,1.05fr) minmax(350px,2.3fr) minmax(320px,1.4fr);
+    align-items:stretch;min-height:88px;min-width:0;
+    background:linear-gradient(180deg,#292119,#201a15 54%,#161311);
+    border-top:1px solid #80623f;
+    border-bottom:2px solid #a07a4e;
+    box-shadow:inset 0 3px #c09d6720,0 4px 10px #0008;
+  }
+  .player{
+    display:flex;align-items:center;gap:13px;min-width:0;
+    padding:12px clamp(12px,1.5vw,23px);
+    border-right:1px solid #88643b70;
+  }
+  .player :global(.portrait){
+    width:53px;height:60px;border:2px solid #a67f4f;
+    box-shadow:0 0 0 2px #150f0b,0 3px 10px #0009;
+  }
+  .player-label{display:flex;flex-direction:column;min-width:0;gap:5px}
+  .player strong{
+    color:#f3e1c2;
+    font:700 clamp(17px,1.13vw,20px)/1.17 var(--pall-font-reading,Georgia,serif);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .player small{font:13px/1.1 var(--pall-font-reading,Georgia,serif);color:#c7a878}
+  .resource-cluster{
+    display:flex;flex-direction:column;justify-content:center;
+    min-width:0;gap:6px;padding:8px clamp(10px,1.3vw,20px);
+    border-right:1px solid #88643b70;
+  }
+  .resource-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(9px,1.2vw,20px)}
+  .resource-meter{display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0}
+  .meter-heading{display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0}
+  .meter-label{
+    color:#d6ae77;font:600 14px/1 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.055em;text-transform:uppercase;
+  }
+  .meter-number{
+    color:#f3dfbb;
+    font:700 12px/1.2 var(--pall-font-reading,Georgia,serif);
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .resource-track{
+    position:relative;display:block;width:100%;height:17px;min-width:0;
+    background:#1b1611 url('/ui-kit/resources/bar-empty.png') center/100% 100% no-repeat;
+    border-radius:2px;overflow:hidden;
+  }
+  /* Bar frame is owner artwork; the fill spans its *entire inner track* at
+     100%, unlike the previously padded hp-fill sprite. */
+  .resource-interior{position:absolute;inset:4px 9px;overflow:hidden;border-radius:30px;background:#0d0c0a}
+  .meter-fill{
+    display:block;height:100%;border-radius:inherit;
+    box-shadow:inset 0 1px 1px #fff5,0 0 4px #0005;
+    transition:width 220ms ease-out;
+  }
+  .meter-fill.health{background:linear-gradient(180deg,#d65b47,#9e2e23 58%,#651b17)}
+  .meter-fill.stamina{background:linear-gradient(180deg,#648e60,#315c39 52%,#183b2b)}
+  .minor-resources{display:flex;align-items:center;gap:clamp(10px,1.4vw,22px);min-width:0}
+  .minor-resource{
+    display:flex;align-items:center;gap:5px;min-width:0;
+    color:#bca585;font:12px/1.1 var(--pall-font-reading,Georgia,serif);
+  }
+  .minor-resource img{display:block;width:18px;height:18px;flex:none;opacity:.85}
+  .minor-resource strong{color:#e7d4b6;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .top-extras{
+    display:flex;align-items:center;justify-content:flex-end;gap:clamp(6px,.65vw,13px);
+    min-width:0;padding:6px clamp(8px,1vw,17px);
+  }
+  .stat{display:flex;align-items:center;gap:6px;flex:none}
+  .stat img{width:25px;height:25px;flex:none}
+  .stat>span:last-child{display:flex;flex-direction:column;gap:5px}
+  .stat strong{color:#f3dcb8;font:700 16px/1.1 var(--pall-font-reading,Georgia,serif);white-space:nowrap}
+  .stat small{
+    font:12px/1 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.04em;color:#c6a67c;
+  }
+  .stat.stage{padding-left:10px;border-left:1px solid #82634170}
+  .stat.stage strong{font-size:14px}
+  .account-link{display:flex;align-items:center;padding-left:10px;border-left:1px solid #82634170}
+  .account-link a{color:#f0c995;font:13px/1.1 var(--pall-font-reading,Georgia,serif)}
+  .account-link a:hover,.account-link a:focus-visible{color:#ffe6be;text-decoration:underline}
   .city-banner{position:relative;min-height:clamp(160px,17vw,225px);border-bottom:1px solid #5f4935;
     background:linear-gradient(90deg,#11110fb8,#14141223 43%,#1715120a 75%),
       url('/ui-kit/resources/TheCityVista.png') center 12%/cover no-repeat;
@@ -289,37 +368,41 @@
   .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
   .onboarding-footer{border-top:1px solid #4d3928;padding:12px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .mobile-nav{display:none}
-  @media(max-width:1100px){
+  @media(max-width:1270px){
     .frame{grid-template-columns:188px minmax(0,1fr)}
     .nav-entry{padding:7px 9px;font-size:15px}
-    .topbar{grid-template-columns:minmax(133px,165px) minmax(0,1fr) auto}
-    .player{padding:7px}
-    .player strong{font-size:15px}
-    .resource-meter{padding:8px 5px}
-    .meter-label{font-size:13px}
-    .meter-number{font-size:11px}
-    .stat{padding:7px}
-    .stat-symbol{display:none}
-    .stat.stage{display:none}
-    .account-link{padding:0 8px}
+    .topbar{grid-template-columns:minmax(0,1fr) auto;min-height:0}
+    .player{grid-column:1;grid-row:1;min-height:70px}
+    .top-extras{grid-column:2;grid-row:1}
+    .resource-cluster{grid-column:1/-1;grid-row:2;border-right:0;border-top:1px solid #59432e}
     .chapter-meta{display:none}
   }
   @media(max-width:900px){
-    .topbar{grid-template-columns:minmax(0,1fr) auto;min-height:0}
-    .player{grid-column:1;grid-row:1;min-height:53px}
-    .top-extras{grid-column:2;grid-row:1}
-    .resource-strip{grid-column:1/-1;grid-row:2;border-top:1px solid #3e352b}
-    .resource-meter{padding:8px 12px}
+    .player{padding:8px 12px}
+    .resource-cluster{padding:9px 12px}
+    .top-extras{gap:8px}
+    .stat.stage{padding-left:7px}
+    .account-link{padding-left:7px}
   }
   @media(max-width:760px){
     .frame{display:block;width:100%;min-height:100vh;min-height:100dvh;margin:0;padding:0}
     .rail{display:none}
     .right{min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding-bottom:calc(65px + env(safe-area-inset-bottom))}
-    .account-link{display:none}
-    .resource-meter{padding:7px 8px}
+    .topbar{grid-template-columns:1fr}
+    .player{grid-column:1;grid-row:1}
+    .resource-cluster{grid-column:1;grid-row:2;padding:10px 12px}
+    .top-extras{
+      grid-column:1;grid-row:3;justify-content:space-between;
+      flex-wrap:wrap;padding:9px 12px;border-top:1px solid #59432e;
+    }
+    .resource-strip{gap:12px}
     .meter-label{font-size:12px}
-    .meter-number{font-size:10px}
-    .resource-track{height:15px}
+    .meter-number{font-size:11px}
+    .resource-track{height:16px}
+    .minor-resources{gap:12px}
+    .minor-resource{font-size:11px}
+    .stat img{width:22px;height:22px}
+    .account-link{display:flex}
     .city-banner{min-height:152px;padding:16px;background-position:center,center 12%}
     .banner-copy strong{font-size:23px}
     .chapter-bar{padding:7px 9px;gap:7px}
