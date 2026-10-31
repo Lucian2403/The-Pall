@@ -1,5 +1,6 @@
 <script lang="ts">
   import {tick} from 'svelte';
+  import {claimSmithingWorkshopAmbience} from '$lib/pall-audio';
   import type {SecondJobAction, SecondJobState} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
@@ -23,6 +24,11 @@
 
   const state=$derived(snapshot.state);
   const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT');
+  // During the depot job the same panel switches between two distinct
+  // painted backgrounds: never carry the forge ambience into the depot.
+  $effect(()=>{
+    if(atWorkshop)return claimSmithingWorkshopAmbience();
+  });
   const speaking=$derived(state.phase==='DEPOT_DIALOGUE');
   const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[state.dialogueIndex]:null);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
