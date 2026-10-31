@@ -98,14 +98,15 @@ assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
   panelMarkup.includes("origin==='Millhand'") &&
   panelMarkup.includes("(majorSkillBonuses.Craftsmanship??0)>=3") &&
   panelMarkup.includes("major==='Craftsmanship'&&skill==='Smithing'") &&
-  panelMarkup.includes('starting preview, not a saved rank') &&
+  panelMarkup.includes('Smithing I for a Millhand is a starting preview.') &&
+  panelMarkup.includes('rank not persisted in the current character API') &&
   !panelMarkup.includes("'— / 100'") &&
   !panelMarkup.includes('— / TBD'),
   'Roman tier presentation must preserve provisional 1/100 baseline without inventing saved levels');
 
 // Dropdowns must expand a vertical list, not a concatenated row.
 for(const frag of [
-  '<details class="skill-category">','<summary>',
+  '<details class="skill-category">','<summary data-pall-sfx="click">',
   '<ul class="subskills">','<li><span>{skill}</span>',
   'CHARACTER_SKILLS as group',
   'View all the skills',
@@ -163,7 +164,8 @@ assert.ok(markup.indexOf('class="notice-work work-order"')<markup.indexOf('{:els
 assert.ok(markup.includes('<section class="notice-work work-order" aria-label="Current work order">') &&
   markup.includes('<span class="work-order-kicker">Current work order</span>') &&
   markup.includes('<span class="work-order-stage">Stage I</span>') &&
-  markup.includes('<a class="framed-action work-order-action" href={work.href}>{work.label}</a>') &&
+  markup.includes('<a class="framed-action work-order-action" href={work.href}') &&
+  markup.includes("data-pall-sfx={character.origin==='Millhand'&&newArrival?'smithing':'click'}>{work.label}</a>") &&
   markup.includes('<h3>{work.title}</h3>') &&
   markup.includes('<p>{work.description}</p>'),
   'The first available work must be a real linked, accessible assignment');
