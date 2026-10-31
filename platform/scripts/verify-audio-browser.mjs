@@ -200,7 +200,8 @@ try{
     texts:[...document.querySelectorAll('.playback-state')].map(e=>e.textContent.trim()),
     sliders:[...document.querySelectorAll('input[type=range]')].map(e=>({name:e.ariaLabel,value:e.value})),
     media:[...window.__pallAudioQA.media].map(([key,el])=>({
-      file:key.split('/').pop(),paused:el.paused,volume:el.volume,readyState:el.readyState,error:el.error?.code??0
+      file:key.split('/').pop(),paused:el.paused,volume:el.volume,currentTime:el.currentTime,
+      readyState:el.readyState,error:el.error?.code??0
     })),
     starts:window.__pallAudioQA.starts,
     attempts:window.__pallAudioQA.attempts
@@ -231,7 +232,30 @@ try{
   await waitUntil(async()=>(await status()).starts>before,8000,'actual Web Audio SFX start');
   const after=await status();
   assert.ok(after.sliders.length===3,'All three volume sliders must be present.');
-  console.log('PASS: Chromium Sound menu, forge looping playback, active Music/Ambience sliders, and real low-latency Test click.',JSON.stringify(after));
+
+  // Force the exact SvelteKit lifecycle seen on entering a new workshop
+  // stage: destroy the old shell and mount a fresh one with the same forge
+  // backdrop. The original audio element must not be reconstructed/rewound.
+  const forge=items=>items.media.find(m=>m.file==='smithing-workshop-ambience.mp3');
+  const positionBefore=forge(after).currentTime;
+  phase='remounting the next smithing stage';
+  await click('Next forge stage');
+  await waitUntil(()=>evalJS(`document.querySelector('.audio-qa-scene h1')?.textContent.includes('Stage 2')`),
+    12000,'Stage 2 artwork');
+  await waitUntil(async()=>!(forge(await status())?.paused),7000,'continuous forge after remount');
+  const subsequent=await status();
+  assert.ok(forge(subsequent).currentTime>=positionBefore-0.2,
+    'The forge loop restarted during a workshop-to-workshop transition: '+
+    JSON.stringify({before:positionBefore,after:forge(subsequent)}));
+  // The same live 115s recording must stop as soon as the painted background
+  // switches to the depot, without relying on a route or grace-period timer.
+  phase='switching backdrop from forge to depot';
+  await click('Switch to depot');
+  await waitUntil(async()=>forge(await status())?.paused===true,8000,'forge stop at depot');
+  const depot=await status();
+  assert.ok(forge(depot).currentTime<0.1,
+    'Forge must reset only on a confirmed non-forge backdrop: '+JSON.stringify(depot));
+  console.log('PASS: real Chromium Sound sliders, 115s forge loop, next-stage continuity, immediate depot silence, and Web Audio click.',JSON.stringify({after,subsequent,depot}));
 }finally{close();}
 // Vite starts subprocesses and Chromium opens a DevTools WebSocket; those
 // handles can linger after the checks pass. The fixture is disposable and
