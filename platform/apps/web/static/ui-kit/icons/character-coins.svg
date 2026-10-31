@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="coins">
+  <!-- Original small brass-and-ink resource emblem for The Pall UI. -->
+  <circle cx="24" cy="24" r="21" fill="#32261d" stroke="#b58b57" stroke-width="2.2"/>
+  <circle cx="24" cy="24" r="17.7" fill="#493524" stroke="#77563a" stroke-width="1.15"/>
+  <path d="M24 3v3.2M24 41.8V45M3 24h3.2M41.8 24H45" stroke="#eed0a2" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="23" cy="32.5" rx="12" ry="4.8" fill="#85522b" stroke="#f2c88d" stroke-width="1.6"/><path d="M11 27.5v5c0 3.5 5.6 6.3 12 6.3s12-2.8 12-6.3v-5" fill="#ba7d38" stroke="#f2c88d" stroke-width="1.6"/><ellipse cx="23" cy="26.5" rx="12" ry="4.8" fill="#dbac60" stroke="#f2d29e" stroke-width="1.6"/><path d="M22.8 19.3v13.5m-3-10.7h5.3c3.4 0 3.4 3.6 0 3.6-5.8 1.8-5.8 5.2 0 2.4 2.6 2.9 6.8 2.2" stroke="#80532b" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+</svg>

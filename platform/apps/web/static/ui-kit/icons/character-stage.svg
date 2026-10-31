@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="stage">
+  <!-- Original small brass-and-ink resource emblem for The Pall UI. -->
+  <circle cx="24" cy="24" r="21" fill="#32261d" stroke="#b58b57" stroke-width="2.2"/>
+  <circle cx="24" cy="24" r="17.7" fill="#493524" stroke="#77563a" stroke-width="1.15"/>
+  <path d="M24 3v3.2M24 41.8V45M3 24h3.2M41.8 24H45" stroke="#eed0a2" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M15 10.8h18v23.6c-4.3-2.4-7.6 1.7-11.6-.2-3.8-1.8-6.9 1.5-10.4-1V14a4 4 0 0 1 4-3.2Z" fill="#c9a679" stroke="#f2d3a4" stroke-width="1.5"/><path d="M15 11v21.8M20.1 17.5h8.8M20.1 22.5h8.8M20.1 27.5h6.3" stroke="#7f5c3b" stroke-width="1.7" stroke-linecap="round"/><path d="M10.7 14.7H16v19.1c-3.4-2.1-5.3-1-5.3-3.3Z" fill="#9b744d" stroke="#d3ae7c" stroke-width="1"/>
+</svg>
