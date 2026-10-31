@@ -78,26 +78,30 @@ for(let i=0;i<8;i++){
 }
 assert.equal(subCount,32,'All canonical 32 subskills must be represented');
 
-// Major Skills use 0–100; the owner's newly specified subskill tiers are
-// Roman I–IV. Smithing I for Millhand is an origin-derived preview only,
-// not a recorded rank in the current saved character payload.
+// Major Skills use 0–100 and show an owner-approved provisional 1/100 UI
+// baseline if no grant was recorded. Roman I–IV specializations, including
+// Smithing I, remain separate from Major Skill progression.
 assert.ok(canon.includes('Major Skills use a long 0–100 progression') &&
   canon.includes('Specializations use a smaller tier structure') &&
+  canon.includes('**1 / 100** instead of a dash') &&
+  canon.includes('not a persisted level or an award of XP') &&
   canon.includes('Roman numerals **I, II, III, IV**') &&
   canon.includes('starting specialization preview') &&
   canon.includes('grants **+3 levels** to the chosen background Major Skill'),
   'Canonical progression rule changed: revisit UI treatment before merging');
 assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
   panelMarkup.includes("grant+' / 100'") &&
-  panelMarkup.includes("'— / 100'") &&
+  panelMarkup.includes("'1 / 100'") &&
+  panelMarkup.includes("The API stores")===false &&
+  panelMarkup.includes('provisional display baseline') &&
   panelMarkup.includes("'I · starting'") &&
   panelMarkup.includes("origin==='Millhand'") &&
   panelMarkup.includes("(majorSkillBonuses.Craftsmanship??0)>=3") &&
   panelMarkup.includes("major==='Craftsmanship'&&skill==='Smithing'") &&
   panelMarkup.includes('starting preview, not a saved rank') &&
-  !panelMarkup.includes('1 / 100') &&
+  !panelMarkup.includes("'— / 100'") &&
   !panelMarkup.includes('— / TBD'),
-  'Roman tier presentation must not invent persisted specialization levels');
+  'Roman tier presentation must preserve provisional 1/100 baseline without inventing saved levels');
 
 // Dropdowns must expand a vertical list, not a concatenated row.
 for(const frag of [
@@ -127,6 +131,17 @@ assert.ok(panelCss.includes('.skills-window::backdrop') &&
   'Skills popup must include backdrop, desktop columns and mobile layout');
 
 // Stage 1 has ONE combined personal notice + work module, high in the hero.
+// The first welcome paragraph must not repeat the task, and there is no second
+// competing heading. The primary game action should be legible and prominent.
+assert.ok(!markup.includes('<h3>Another shift begins.</h3>') &&
+  markup.includes("At Guther Anvil's workshop, a new council plate lot awaits.") &&
+  markup.includes('Report to Guther Anvil at the bench to begin your first shift.') &&
+  !markup.includes('A council plate lot waits on Guther Anvil'),
+  'Opening notice and current-work copy should not repeat the same sentence');
+assert.ok(css.includes('min-height:60px;max-width:100%') &&
+  css.includes('font:600 17px/1.25 var(--pall-font-reading,Georgia,serif)') &&
+  css.includes('border-width:15px 32px 14px;border-image-width:15px 32px 14px;'),
+  'Primary work button must be larger without losing owner frame proportions');
 assert.ok(markup.includes('class="arrival-layout"') &&
   markup.includes('class="personal-notices"') &&
   markup.includes('<h2>Personal notices</h2>') &&
