@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import '$lib/pall-owner-ui.css';
   import '$lib/pall-entry-pages.css';
-  import AvatarPicker from '$lib/AvatarPicker.svelte';
+  import PortraitCarousel from '$lib/PortraitCarousel.svelte';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import {originVisual} from '$lib/origin-visuals';
 
@@ -16,6 +16,7 @@
   let roster=$state<Roster|null>(null);
   let state=$state<'checking'|'ready'|'login'|'unavailable'>('checking');
   let editingId=$state<string|null>(null);
+  let draftAvatarId=$state<string|null>(null);
   let deletingId=$state<string|null>(null);
   let deletionName=$state('');
   let processingId=$state<string|null>(null);
@@ -39,6 +40,7 @@
       });
       if(!res.ok)throw Error('Could not save that portrait.');
       editingId=null;
+      draftAvatarId=null;
       await refresh();
     }catch(e){alertMessage=e instanceof Error?e.message:'Could not save portrait.';}
     finally{processingId=null;}
@@ -115,19 +117,29 @@
                   <div class="card-actions">
                     <a class="entry-button" href={'/characters/'+encodeURIComponent(character.id)}>Select character</a>
                     <button class="small-action" type="button" onclick={()=>{
-                      editingId=editingId===character.id?null:character.id;deletingId=null;alertMessage='';
+                      const opening=editingId!==character.id;
+                      editingId=opening?character.id:null;
+                      draftAvatarId=opening?(character.avatarId??null):null;
+                      deletingId=null;alertMessage='';
                     }}>{editingId===character.id?'Cancel':'Change portrait'}</button>
                     <button class="small-action danger-link" type="button" onclick={()=>{
                       deletingId=deletingId===character.id?null:character.id;editingId=null;
-                      deletionName='';alertMessage='';
+                      draftAvatarId=null;deletionName='';alertMessage='';
                     }}>{deletingId===character.id?'Cancel removal':'Remove'}</button>
                   </div>
                   {#if editingId===character.id}
                     <div class="card-editor">
-                      <p>Choose a {character.sex.toLowerCase()} portrait. The same collection is available to every background.</p>
-                      <AvatarPicker sex={character.sex==='Female'?'Female':'Male'}
-                        selectedId={character.avatarId??null}
-                        onSelect={(id)=>{void changePortrait(character,id);}}/>
+                      <p>Browse {character.sex.toLowerCase()} portraits using the arrows. One portrait at a time.</p>
+                      <PortraitCarousel sex={character.sex==='Female'?'Female':'Male'}
+                        selectedId={draftAvatarId}
+                        onSelect={(id)=>{draftAvatarId=id;}}/>
+                      <div class="entry-action-row portrait-save">
+                        <button type="button" class="entry-button"
+                          disabled={!draftAvatarId||draftAvatarId===character.avatarId||processingId!==null}
+                          onclick={()=>{if(draftAvatarId)void changePortrait(character,draftAvatarId);}}>
+                          {processingId===character.id?'Saving…':'Save portrait'}
+                        </button>
+                      </div>
                       {#if processingId===character.id}<p role="status">Saving portrait…</p>{/if}
                     </div>
                   {/if}
@@ -460,8 +472,10 @@
   }
   .characters-page .card-editor .entry-action-row{gap:6px;flex-wrap:wrap}
   .characters-page .card-editor .entry-action-row .entry-button{flex:1 1 170px}
-  /* Leave AvatarPicker's selection and focus feedback intact; it owns
-     its inner portrait buttons, not the page-wide nine-slice navigation style. */
+  /* PortraitCarousel owns its arrow/portrait presentation; only the
+     explicit Save button commits a roster change to the server. */
+  .characters-page .portrait-save{margin-top:11px}
+  .characters-page .portrait-save .entry-button{width:100%;min-width:0}
 
   @media(max-width:1090px){
     .characters-page .roster{grid-template-columns:repeat(2,minmax(0,1fr))}

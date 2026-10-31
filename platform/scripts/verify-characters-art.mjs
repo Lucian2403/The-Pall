@@ -29,8 +29,11 @@ for(const required of [
   "{#each roster.characters as character (character.id)}",
   "originVisual(character.origin).src",
   "<CharacterAvatar",
-  "<AvatarPicker",
-  'onSelect={(id)=>{void changePortrait(character,id);}}',
+  "<PortraitCarousel",
+  'onSelect={(id)=>{draftAvatarId=id;}}',
+  'if(draftAvatarId)void changePortrait(character,draftAvatarId);',
+  'disabled={!draftAvatarId||draftAvatarId===character.avatarId||processingId!==null}',
+  'draftAvatarId=opening?(character.avatarId??null):null;',
   'disabled={deletionName!==character.name||processingId!==null}',
   'role="alert"',
   'role="status"'
@@ -80,4 +83,8 @@ assert.ok(css.includes('border-image-slice:145 190 125 190 fill') &&
   css.includes('.characters-page .card-editor input:focus-visible') &&
   css.includes('.characters-page .entry-links a:focus-visible'),
   'Character cards must have readable parchment, framed controls and responsive focus rules');
-console.log('PASS: Character roster appearance, city masthead, original portrait/deletion flows, approved frames and mobile columns.');
+assert.ok(!markup.includes('<AvatarPicker') &&
+  markup.includes("import PortraitCarousel from '$lib/PortraitCarousel.svelte'") &&
+  markup.includes("onclick={()=>{if(draftAvatarId)void changePortrait(character,draftAvatarId);}}"),
+  'Changing portraits must use an explicitly confirmed draft, not save on every arrow click');
+console.log('PASS: Character roster appearance, arrow-driven portrait drafts, save and deletion safeguards, city masthead and responsive cards.');
