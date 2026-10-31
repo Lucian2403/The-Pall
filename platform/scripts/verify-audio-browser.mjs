@@ -233,3 +233,7 @@ try{
   assert.ok(after.sliders.length===3,'All three volume sliders must be present.');
   console.log('PASS: Chromium Sound menu, forge looping playback, active Music/Ambience sliders, and real low-latency Test click.',JSON.stringify(after));
 }finally{close();}
+// Vite starts subprocesses and Chromium opens a DevTools WebSocket; those
+// handles can linger after the checks pass. The fixture is disposable and
+// every assertion has completed, so terminate the QA runner explicitly.
+process.exit(0);
