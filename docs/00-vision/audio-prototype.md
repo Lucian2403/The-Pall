@@ -26,6 +26,18 @@ The original eight audio assets have already been committed to PR #10, but the f
 - `UI_Click02` has approximately 80 ms of low-level leading material, so if this rare alternative feels delayed in actual play, trim its onset in a future owner-approved revision rather than raising volume.
 - This review uses waveform/loudness analysis and does **not** claim subjective listening quality. Evaluate tonality and fatigue using real headphones and speakers.
 
+## Low-latency SFX patch (2026-10-31)
+
+**Observed issue:** `new Audio(base+filename)` was constructed for each UI interaction, so every click could incur independent file load, WAV decode and media-element startup delay (reported as 300–500 ms). Those per-click HTMLAudioElements have been removed for *short sound effects*.
+
+The seven short WAVs now use a single `AudioContext({latencyHint:'interactive'})`. Upon entering an in-game route, the browser fetches and `decodeAudioData()` decodes all seven recordings **once**, caching the resulting `AudioBuffer` objects. A click creates only a `BufferSource` and a gain node and invokes `start(0)` synchronously. The first user gesture resumes a suspended context to respect browser autoplay restrictions. Music remains on its separate streaming HTMLAudioElement, with the existing fades and pauses.
+
+**Click02** has about 80 ms of leading silence in the owner's unmodified WAV; its sound is scheduled with a 75 ms buffer start offset (without changing the file). Other SFX keep their original timing. Samples that are still loading are skipped on a cold first click rather than played hundreds of milliseconds late; once preloading finishes, all subsequent clicks are scheduled immediately. The short effects are not retriggered during disabled audio, and playing nodes stop on mute or leaving the in-game route.
+
+The owner separately increased the volume slider's maximum to **50%** (`MAX_MUSIC_VOLUME=0.5`) in GitHub; the patch **retains that change** and preserves saved slider values.
+
+**Decoder compatibility check:** All seven owner's PCM32 stereo WAVs successfully decoded in Chromium 144 (Web Audio, 44.1 kHz device output). This confirms browser support for these test recordings, not end-to-end perceived latency on the owner's machine.
+
 ## Validation
 
 After replacing the four revised files:
