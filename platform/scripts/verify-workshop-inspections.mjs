@@ -72,7 +72,7 @@ for(const phrase of [
 ]){
   assert.ok(panel.includes(phrase),'Workshop inspection popup contract lost: '+phrase);
 }
-for(const position of ['stamps{left:2%}','plates{left:25%}','paper{right:13%}','hammer{right:2%}']){
+for(const position of ['stamps{left:2%}','plates{left:25%}','paper{right:13%}','hammer{right:2%;bottom:47%}']){
   assert.ok(panel.includes(position),'Item popup no longer anchored near '+position);
 }
 assert.ok(labels.includes('.workshop .workshop-object-label{') &&
