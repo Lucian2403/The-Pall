@@ -70,12 +70,12 @@
 <section class="skills-module" aria-label="Major skills and subskills">
   <div class="skills-toolbar">
     <h3>Skills & Specializations</h3>
-    <button class="framed-action view-all" type="button" onclick={openWindow}>View all the skills</button>
+    <button class="framed-action view-all" type="button" data-pall-sfx="paper" onclick={openWindow}>View all the skills</button>
   </div>
   <div class="skill-accordions">
     {#each CHARACTER_SKILLS as group (group.major)}
       <details class="skill-category">
-        <summary>
+        <summary data-pall-sfx="paper">
           <span class="skill-name">{group.major}</span>
           <span class:trained={(majorSkillBonuses[group.major]??0)>0} class="level" title="Major Skill on the 100-level scale. A value of 1 without a saved grant is the provisional display baseline.">
             {displayMajor(group.major)}
@@ -105,7 +105,7 @@
       <span class="grip" aria-hidden="true">⠿</span>
       <span id="all-skills-title">All skills & specializations</span>
     </button>
-    <button class="window-close" type="button" aria-label="Close skills window" onclick={()=>windowElement?.close()}>×</button>
+    <button class="window-close" type="button" data-pall-sfx="paper" aria-label="Close skills window" onclick={()=>windowElement?.close()}>×</button>
   </div>
   <div class="window-body">
     <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline, not a saved level. Specializations: Roman I–IV (planned); Smithing I for a Millhand is a starting preview.</p>
