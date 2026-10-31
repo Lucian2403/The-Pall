@@ -78,23 +78,25 @@ const sfxFailures=new Set<string>();
 const activeSources=new Set<AudioBufferSourceNode>();
 
 function publishPlayback(){
-  const playing=typeof document!=='undefined'&&!document.hidden&&sceneActive&&settings.enabled;
-  const musicState=!playing||settings.musicVolume===0?'Off'
+  const unavailable=typeof document==='undefined'||!sceneActive?'Game audio inactive'
+    :!settings.enabled?'Sound disabled'
+    :document.hidden?'Tab inactive':null;
+  const musicState=unavailable??(settings.musicVolume===0?'Off'
     :musicError?'File unavailable'
     :!unlocked?'Click to start'
     :nextMusicTimer!==null?'Resting'
     :musicBlocked?'Playback blocked — click to retry'
-    :music&&!music.paused?'Playing':'Loading';
-  const ambienceState=!playing||settings.ambienceVolume===0?'Off'
+    :music&&!music.paused?'Playing':'Loading');
+  const ambienceState=unavailable??(settings.ambienceVolume===0?'Off'
     :smithingAmbienceOwners.size===0?'Workshop only'
     :ambienceError?'File unavailable'
     :!unlocked?'Click to start'
     :ambienceBlocked?'Playback blocked — click to retry'
-    :ambience&&!ambience.paused?'Playing':'Loading';
-  const effectsState=!playing||settings.sfxVolume===0?'Off'
+    :ambience&&!ambience.paused?'Playing':'Loading');
+  const effectsState=unavailable??(settings.sfxVolume===0?'Off'
     :sfxFailures.size>0?'Sound file unavailable'
     :sfxBuffers.size===sfxFiles.length?'Ready'
-    :'Loading';
+    :'Loading');
   const snapshot=[musicState,ambienceState,effectsState].join('|');
   if(snapshot===statusSnapshot)return;
   statusSnapshot=snapshot;
@@ -300,16 +302,40 @@ export function activatePallAudio(){
 // preview lets players check the Music slider without waiting through that rest.
 export function previewPallMusic(){
   unlock();
-  if(!settings.enabled||!sceneActive||settings.musicVolume<=0)return;
+  if(!canPlayMusic())return;
   clearMusicTimer();
-  startMusic();
+  const track=ensureMusic();
+  // A manual audition must produce audible output NOW, not sit through the
+  // four-second initial fade or silently do nothing during normal playback.
+  const seek=()=>{
+    try{track.currentTime=Math.min(8,Math.max(0,track.duration-10));}
+    catch{/* The stream is not seekable on this browser yet. */}
+    updateMusicVolume();
+  };
+  if(track.readyState>=1)seek();
+  else track.addEventListener('loadedmetadata',seek,{once:true});
+  void track.play().then(()=>{
+    musicBlocked=false;
+    updateMusicVolume();
+    publishPlayback();
+  }).catch(()=>{
+    musicBlocked=true;
+    publishPlayback();
+  });
   publishPlayback();
 }
 // An effects-volume slider would otherwise produce no audible feedback until
 // a later unrelated button click. Keep the preview explicitly user-initiated.
-export function previewPallEffect(){
+export async function previewPallEffect(){
   unlock();
-  playUiClick();
+  if(!sceneActive||!settings.enabled||settings.sfxVolume<=0)return;
+  const file='UI_ClickMain.wav';
+  // Test click must audition even on a cold page load. Normal in-world
+  // interaction still refuses to fire late while its clip is loading.
+  prepareSoundEffects();
+  if(!sfxBuffers.has(file))await sfxLoading.get(file);
+  if(sfxBuffers.has(file))playFile(file,1);
+  else publishPlayback(); // Diagnostic text identifies a missing/invalid WAV.
 }
 function playFile(filename:string,gain=1){
   if(typeof window==='undefined'||!settings.enabled||!unlocked||settings.sfxVolume<=0)return;
