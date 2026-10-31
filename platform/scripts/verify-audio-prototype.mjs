@@ -79,9 +79,32 @@ assert.ok(skills.includes('<summary data-pall-sfx="click">') &&
 assert.ok(home.includes("data-pall-sfx={character.origin==='Millhand'&&newArrival?'smithing':'click'}") &&
   home.includes('<a class="framed-action work-order-action" href={work.href}'),
   'Entering Millhand Stage 1 Smithing Workshop must play smithing SFX on its link, not a UI click');
+// UI click latency regression: all seven short WAVs are fetched, decoded
+// once, and then scheduled directly from Web Audio. Never create an HTML
+// Audio element on a click; that reintroduces late network/decode latency.
+assert.ok(audio.includes("const sfxBuffers=new Map<string,AudioBuffer>()") &&
+  audio.includes("const sfxLoading=new Map<string,Promise<void>>()") &&
+  audio.includes("const activeSources=new Set<AudioBufferSourceNode>()") &&
+  audio.includes("new AudioContext({latencyHint:'interactive'})") &&
+  audio.includes("fetch(base+filename,{cache:'force-cache'})") &&
+  audio.includes("context.decodeAudioData(bytes)") &&
+  audio.includes("context.createBufferSource()") &&
+  audio.includes("context.createGain()") &&
+  audio.includes("source.start(0,offset)") &&
+  audio.includes("if(!context||!buffer||activeSources.size>=7)return") &&
+  audio.includes("if(context?.state==='suspended')void context.resume()") &&
+  audio.includes("const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0") &&
+  audio.includes("if(active){\n    prepareSoundEffects();") &&
+  audio.includes("function stopSoundEffects()") &&
+  audio.includes("stopSoundEffects();") &&
+  !audio.includes("new Audio(base+filename)") &&
+  !audio.includes("activeClips") &&
+  audio.includes("new Audio(base+musicFile)"),
+  'Web Audio SFX must be predecoded and played without per-click loading');
+
 assert.ok(workRoute.includes('playSmithingSfx();') &&
   workRoute.indexOf('if(response.ok){') < workRoute.indexOf('playSmithingSfx();') &&
   workRoute.includes("if(action==='stamp_number'||action==='straighten'||action==='fix_mark')") &&
   workshop.includes("action==='stamp_number'||action==='straighten'||action==='fix_mark'"),
   'Smithing sounds only after server-confirmed actions, never on failed work');
-console.log('PASS: owner SFXBase02 replacements, louder 6% theme, 75/15/10 clicks, skill dropdown clicks, workshop-entry smithing, settings and autoplay safety.');
+console.log('PASS: owner SFXBase02, 6% music, cached Web Audio SFX, immediate click scheduling, trimmed Click02 onset, original owner volumes, skill/workshop routing.');
