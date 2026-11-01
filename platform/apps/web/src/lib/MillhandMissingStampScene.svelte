@@ -4,6 +4,7 @@
   import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
   import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_HANDOFF,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
   import NpcConversation from '$lib/NpcConversation.svelte';
+  import '$lib/workshop-object-labels.css';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
 
   type Snapshot = {
@@ -210,11 +211,11 @@
     <div class="evidence" aria-label="Council evidence on the bench">
       <button type="button" class:seen={state.plateRead} disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
         onclick={() => {void inspect('plate');}}>
-        <img class="evidence-art" src="/workshop/returned-reference-plate.webp" alt="" aria-hidden="true" /><span class="evidence-label">Returned plate</span>
+        <img class="evidence-art" src="/workshop/returned-reference-plate.webp" alt="" aria-hidden="true" /><span class="workshop-object-label evidence-label">Returned plate</span>
       </button>
       <button type="button" class:seen={state.slipRead} disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
         onclick={() => {void inspect('slip');}}>
-        <img class="evidence-art" src="/workshop/cancellation-slip.webp" alt="" aria-hidden="true" /><span class="evidence-label">Cancellation slip</span>
+        <img class="evidence-art" src="/workshop/cancellation-slip.webp" alt="" aria-hidden="true" /><span class="workshop-object-label evidence-label">Cancellation slip</span>
       </button>
     </div>
   </div>
@@ -260,18 +261,16 @@
   /* The image itself is the prop and hit target. Only the small nameplate is framed. */
   /* Anchor the full clickable cutouts to the actual foreground wood instead
      of a row margin that shifts when the scene becomes shorter. */
-  .evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;
-    display:flex;align-items:end;justify-content:center;gap:12px;margin:0}
+  /* Larger cutouts, same centred pair and tabletop anchor as before. */
+  .evidence{position:absolute;z-index:4;left:24%;bottom:3%;width:52%;
+    display:flex;align-items:end;justify-content:center;gap:clamp(12px,2.2vw,26px);margin:0}
   .evidence button{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:3px;
     flex:1;min-width:0;margin:0;padding:0;background:transparent;border:0;color:#f3dfc1;cursor:pointer;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(74px,6vw,100px);
+  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(132px,13vw,180px);
     pointer-events:none;filter:drop-shadow(0 5px 6px #0009);
     transform-origin:center 70%;transition:transform 160ms ease-out}
   .evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}
-  .evidence-label{display:block;box-sizing:border-box;width:100%;max-width:205px;min-height:29px;padding:5px 6px;
-    background:#16130feb;border:1px solid #92704b;font:clamp(11px,1.06vw,13px)/1.25 var(--pall-font-reading,Georgia,serif);text-align:center}
-  .evidence button:hover .evidence-label,.evidence button:focus-visible .evidence-label,
-  .evidence button.seen .evidence-label{border-color:#e9bd73;background:#312415}
+  .evidence button .evidence-label{width:100%;max-width:240px}
   .evidence button:focus-visible{outline:2px solid #f2d28f;outline-offset:3px}
   .evidence button:disabled{opacity:1;cursor:default}
   .evidence button:disabled .evidence-label{opacity:.7}
@@ -340,8 +339,7 @@
     .evidence{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1;
       justify-self:center;align-self:end;width:min(76%,440px);
       margin:0 0 clamp(32px,7vw,54px);gap:7px}
-    .evidence-art{height:clamp(70px,20vw,120px)}
-    .evidence-label{min-height:25px;font:11px/1.2 sans-serif;padding:5px 3px}
+    .evidence-art{height:clamp(94px,25vw,142px)}
     .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px;max-height:none;overflow:visible}
     .record-illustration img{max-height:300px}
     .scene-footer{flex-wrap:wrap}
