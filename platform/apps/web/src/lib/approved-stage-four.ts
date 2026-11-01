@@ -67,6 +67,18 @@ export const STAGE_FOUR_INSTRUCTIONS:Record<SecondJobPhase,string>={
   DONE:'The work is complete.'
 };
 
+/** Transport identity is saved as SecondJobState.transport, without another flag.
+ * These are qualitative handling differences, not active damage or time modifiers. */
+export const STAGE_FOUR_TRANSPORT_HINTS={
+  secure_plates:'Fewer trips. A heavier load that must be kept steady.',
+  carry_smaller_loads:'More trips. Less weight to manage each time.'
+} as const;
+
+export const STAGE_FOUR_TRANSPORT_VERIFICATION={
+  secured:'You set the bundle on the receiving counter. Before the clerk takes it, you check that the plates have remained properly aligned.',
+  smaller_loads:'You bring the last group to the receiving counter and put it beside the others. You count the plates again to make sure the entire lot has arrived.'
+} as const;
+
 export const STAGE_FOUR_ACTION_LABELS:Record<SecondJobAction,string>={
   check_load:'Check the load',
   secure_plates:'Secure the plates together',
@@ -94,8 +106,8 @@ export const STAGE_FOUR_ACTION_LABELS:Record<SecondJobAction,string>={
 
 export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
   check_load:'You count the plates and compare the load with the work paper. The number matches the delivery entry. You check whether any are loose or damaged.',
-  secure_plates:'You fasten the plates together for transport. A heavy load can shift if you do not keep it steady.',
-  carry_smaller_loads:'You split the plates into smaller bundles and carry them to the depot in several trips. Each load is easier to handle, though moving everything takes longer.',
+  secure_plates:'You fasten the plates together and lift the bundled stack. The weight is awkward, but you can move the lot without making several trips.',
+  carry_smaller_loads:'You divide the plates into smaller groups. Each load is easier to manage, though you must return to the workshop several times.',
   compare_delivery_list:'You check the delivery list. Under goods, some fool\'s written “workers”.',
   record_goods_as_plates:'You enter “plates” in the received-goods record. The clerk confirms that the depot received the metal plates.',
   request_delivery_correction:'You ask the clerk to check the incorrect goods entry before signing. The clerk reviews the papers and acknowledges that the depot received metal plates. The original entry remains unexplained.',
@@ -124,8 +136,9 @@ export function secondJobJournal(s:SecondJobState):readonly string[]{
   const result:string[]=[];
   if(s.branch==='restamp'){
     result.push("I stamped the worker number once more at Guther's bench. I did not touch the council inspector's mark.");
-    if(s.transport==='secured')result.push('Fastened the plates together to carry them to the depot.');
-    if(s.transport==='smaller_loads')result.push('Carried the plates in smaller groups. More trips, but less weight at once.');
+    if(s.revision>0)result.push('I checked the plates and compared the load with the work paper.');
+    if(s.transport==='secured')result.push('I secured the plates together and carried them to the depot as one load.');
+    if(s.transport==='smaller_loads')result.push('I carried the plates in smaller groups. It took more trips, but each load was easier to handle.');
     if(s.phase==='SPEAK_DEPOT'||s.phase==='DEPOT_DIALOGUE'||s.phase==='CHOOSE_RECEIPT'||s.phase==='COMPLETE_DELIVERY'||s.phase==='DONE')
       result.push("Delivered metal plates to the depot. Someone had entered “workers” on the delivery list. Workers! The clerk could see what I'd brought.");
     if(s.receipt==='recorded_plates')result.push('I recorded the received goods as plates.');
