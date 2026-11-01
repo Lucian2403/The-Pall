@@ -163,6 +163,45 @@ assert.ok(recordsUi.includes('scale(1.018)') &&
   'Scholarship book hover must be subtle, with no schematic placeholder tiles');
 console.log('PASS: Scholarship records room and three deliberate inspections retain approved reconciliation route.');
 
+
+/* Transport presentation: different saved choices must remain visible after
+ * travel without a second personality flag or invented numeric damage rolls. */
+const labels=read('apps/web/src/lib/workshop-object-labels.css');
+assert.ok(labels.includes("dialogue-frame-trim.png")&&
+  labels.includes(":is(.workshop,.second-job)")&&
+  labels.includes(".table-prop")&&labels.includes(".record-prop"),
+  'All tabletop cutouts must reuse the workshop nine-slice caption');
+for(const name of [
+  'WorkshopScene.svelte','MillhandWorkScene.svelte',
+  'MillhandMissingStampScene.svelte','MillhandDepotScene.svelte',
+  'MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
+]){
+  const scene=read('apps/web/src/lib/'+name);
+  assert.ok(scene.includes("import '$lib/workshop-object-labels.css'") &&
+    scene.includes('workshop-object-label'),
+    name+' must use the one framed tabletop label component');
+}
+assert.ok(stage3Ui.includes('height:clamp(132px,13vw,180px)') &&
+  stage3Ui.includes('left:24%;bottom:3%;width:52%'),
+  'Stage3 evidence must be enlarged without changing its centred bench arrangement');
+assert.ok(copy.includes('STAGE_FOUR_TRANSPORT_HINTS') &&
+  copy.includes('STAGE_FOUR_TRANSPORT_VERIFICATION') &&
+  copy.includes('You set the bundle on the receiving counter.') &&
+  copy.includes('You bring the last group to the receiving counter') &&
+  copy.includes('I secured the plates together and carried them to the depot as one load.') &&
+  copy.includes('I carried the plates in smaller groups. It took more trips'),
+  'Both transport choices must change the immediate/depot/journal copy');
+assert.ok(depotUi.includes("state.phase==='COMPARE_DELIVERY' && state.transport") &&
+  depotUi.includes('STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]') &&
+  depotUi.includes('STAGE_FOUR_TRANSPORT_HINTS[action]'),
+  'Saved transport must drive depot verification and pre-choice trade-off text');
+assert.ok(core.includes("case 'secure_plates':transport='secured';phase='COMPARE_DELIVERY';") &&
+  core.includes("case 'carry_smaller_loads':transport='smaller_loads';phase='COMPARE_DELIVERY';"),
+  'Both methods must keep the same mandatory delivery-list progression');
+assert.ok(canon.includes('Owner-approved refinement — Transport handling, 2026-11-01'),
+  'Canonical Stage4 transport refinement must be recorded');
+console.log('PASS: Distinct transport narration/journal; shared table labels; no new state machine branch.');
+
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
 const sharedJournalCss=read('apps/web/src/lib/pall-owner-ui.css');
