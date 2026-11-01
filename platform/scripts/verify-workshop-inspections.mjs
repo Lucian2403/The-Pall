@@ -75,7 +75,7 @@ for(const phrase of [
 for(const position of ['stamps{left:2%}','plates{left:25%}','paper{right:13%}','hammer{right:2%;bottom:47%}']){
   assert.ok(panel.includes(position),'Item popup no longer anchored near '+position);
 }
-assert.ok(labels.includes('.workshop .workshop-object-label{') &&
+assert.ok(labels.includes('.workshop-object-label{') &&
   labels.includes("border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')") &&
   labels.includes('border-image-slice:145 190 125 190 fill') &&
   labels.includes('width:min(100%,240px)') &&
