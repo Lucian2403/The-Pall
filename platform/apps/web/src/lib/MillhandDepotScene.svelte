@@ -5,6 +5,7 @@
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
     STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_OUTCOMES,STAGE_FOUR_FINAL,
+    STAGE_FOUR_TRANSPORT_PRESENTATION,
     secondJobJournal
   } from '$lib/approved-stage-four';
 
@@ -27,6 +28,8 @@
   const speaking=$derived(state.phase==='DEPOT_DIALOGUE');
   const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[state.dialogueIndex]:null);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
+  const transportCheck=$derived(state.transport
+    ?STAGE_FOUR_TRANSPORT_PRESENTATION[state.transport].depotCheck:null);
   const instruction=$derived(STAGE_FOUR_INSTRUCTIONS[state.phase]);
   const journal=$derived(secondJobJournal(state));
   let selected=$state<'plates'|'paper'|null>(null);
@@ -53,12 +56,14 @@
          acted on in the CRPG popup; do not fabricate separate paper sprites. -->
     <div class="table-props" aria-label="Physical objects at the workbench or receiving counter">
       <button type="button" class="table-prop plates" class:selected={selected==='plates'}
+        data-workshop-object data-pall-sfx="click"
         aria-pressed={selected==='plates'} aria-label="Inspect the numbered metal plates"
         onclick={() => inspect('plates')}>
         <img src="/workshop/metal-plates.webp" alt="" aria-hidden="true"/>
         <span class="workshop-object-label">Numbered plates</span>
       </button>
       <button type="button" class="table-prop paper" class:selected={selected==='paper'}
+        data-workshop-object data-pall-sfx="paper"
         aria-pressed={selected==='paper'} aria-label="Inspect the council work paper"
         onclick={() => inspect('paper')}>
         <img src="/workshop/council-work.webp" alt="" aria-hidden="true"/>
@@ -79,6 +84,9 @@
       {:else}
         {#if result}
           <p class="result">{result}</p>
+        {/if}
+        {#if state.phase==='COMPARE_DELIVERY' && transportCheck}
+          <p class="transport-check">{transportCheck}</p>
         {/if}
         {#if result!==instruction}
           <p class="instruction">{instruction}</p>
@@ -104,8 +112,16 @@
       {#if snapshot.availableActions.length>0}
         <div class="actions" aria-label="Available delivery actions">
           {#each snapshot.availableActions as action (action)}
-            <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
+            <button type="button" class:handling-choice={state.phase==='CHOOSE_TRANSPORT'}
+              disabled={pending} onclick={() => {selected=null;void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
+              {#if state.phase==='CHOOSE_TRANSPORT'}
+                <span class="transport-tradeoff">
+                  {action==='secure_plates'
+                    ?STAGE_FOUR_TRANSPORT_PRESENTATION.secured.tradeoff
+                    :STAGE_FOUR_TRANSPORT_PRESENTATION.smaller_loads.tradeoff}
+                </span>
+              {/if}
             </button>
           {/each}
         </div>
@@ -171,6 +187,10 @@
   .instruction,.result,.outcome,.context{font:15px/1.45 var(--pall-font-reading,Georgia,serif);margin:0 0 13px}
   .instruction,.outcome{font-weight:600}
   .context{color:#503b2b}
+  .transport-check{
+    margin:8px 0 13px;padding-left:12px;border-left:2px solid #9f805a;
+    color:#49311f;font:15px/1.45 var(--pall-font-reading,Georgia,serif);
+  }
   .inspection{border-top:1px solid #bba07a;padding-top:10px;margin:13px 0;
     font:13px/1.4 sans-serif;color:#59412d}
   .inspection strong{color:#3f2d1f}
@@ -179,6 +199,11 @@
   .actions button{min-height:43px;width:100%;text-align:left;border:1px solid #98734c;
     background:#30251d;color:#f0dfc7;padding:10px 13px;
     font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
+  .actions button.handling-choice{min-height:65px}
+  .transport-tradeoff{
+    display:block;margin-top:5px;color:#d7be99;
+    font:13px/1.35 var(--pall-font-reading,Georgia,serif);
+  }
   .actions button:disabled{opacity:.55;cursor:default}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
