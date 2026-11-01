@@ -27,8 +27,8 @@ for(const [i,stage] of stages.entries()){
     'Stage '+(i+1)+' must not restore an independent dark nameplate');
 }
 for(const style of [
-  '.workshop .workshop-object-label{',
-  '.workshop .workshop-npc-label{',
+  '.workshop-object-label{',
+  '.workshop-npc-label{',
   "border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')",
   'border-image-slice:145 190 125 190 fill',
   'border-image-width:10px 15px 9px',
@@ -66,7 +66,8 @@ assert.ok(stage3.includes("onclick={() => {void inspect('plate');}}") &&
   'Do not alter server-backed inspection and disabled phases');
 assert.ok(stage3.includes('class="evidence"') &&
   stage3.includes('.evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;') &&
-  stage3.includes('height:clamp(74px,6vw,100px)') &&
+  stage3.includes('height:clamp(108px,8vw,140px)') &&
+  stage3.includes('.evidence-art{height:clamp(88px,24vw,138px)}') &&
   stage3.includes('transform:scale(1.018)') &&
   stage3.includes('.evidence{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1;'),
   'Keep the original evidence positions, art sizing, hover behavior and mobile layout');
