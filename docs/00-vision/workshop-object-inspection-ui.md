@@ -15,6 +15,9 @@
 
 - **Stage 1:** Inspection remains entirely read-only. Guther's scripted dialogue, the work-paper handoff and navigation are untouched. The popup still distinguishes looking at an object from actually starting the saved job.
 - **Stage 2:** The same popup shows the item's contextual description **and any permitted work actions**. Its actions still derive from the server-provided `availableActions`, stay disabled during pending operations and invoke the existing server-backed `perform` callback. No new progression, costs, XP or items are invented.
+- **Stage 3 — The Missing Stamp:** The returned reference plate and cancellation slip use the **same nine-slice framed tabletop nameplates** as Stage 1–2. Their artwork and full object hitboxes remain untouched. Unlike the read-only item inspection popup, selecting evidence initiates a multi-beat, server-backed reading sequence in Guther's dialogue area; keep that authored flow intact rather than replacing it with an unrelated popup.
+- **Guther Anvil across Stages 1–3:** The visible nameplate always reads **Guther Anvil** and uses the same `dialogue-frame-trim.png` treatment as the tabletop names, via the reusable `.workshop-npc-label` class. No independent dark badge variations.
+- **Stage 3 journal:** The Review Journal action belongs in the workshop scene but **outside** the dialogue box; the journal entries themselves remain outside the painted scene so opening them never enlarges the CRPG popup. Remove the under-scene disclaimer strip about wages, ordinary XP, or item awards. That statement describes payout constraints, not a player-facing objective or reward.
 - Sound markers retain the approved UI/metal/paper distinction. No hover sound or repeated clicks from interacting with a label.
 
 ## Reusable implementation
