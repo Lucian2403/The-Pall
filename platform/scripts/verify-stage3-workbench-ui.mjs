@@ -34,7 +34,7 @@ for(const style of [
   'border-image-width:10px 15px 9px',
   'color:#2e1d11',
   'font:700 clamp(12px,1.15vw,15px)/1.15',
-  ':is(.prop-marker,.target,.evidence button)',
+  ':is(.prop-marker,.target,.evidence button,.table-prop,.record-prop)',
   '@media(max-width:700px)'
 ]){
   assert.ok(nameplates.includes(style),'Missing matching workshop nameplate styling: '+style);
