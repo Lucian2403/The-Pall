@@ -1,5 +1,6 @@
 <script lang="ts">
   import {tick} from 'svelte';
+  import '$lib/workshop-object-labels.css';
   import type {SecondJobAction,SecondJobState} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
@@ -81,13 +82,13 @@
         aria-pressed={inspected==='death'} aria-label="Inspect the Death Register"
         disabled={pending} onclick={() => inspect('death')}>
         <img src="/locations/contracts/death-register.webp" alt="" aria-hidden="true"/>
-        <span>Death register</span>
+        <span class="workshop-object-label">Death register</span>
       </button>
       <button type="button" class="record-prop wage" class:chosen={inspected==='wage'}
         aria-pressed={inspected==='wage'} aria-label="Inspect the Wage Record"
         disabled={pending} onclick={() => inspect('wage')}>
         <img src="/locations/contracts/wage-record.webp" alt="" aria-hidden="true"/>
-        <span>Wage record</span>
+        <span class="workshop-object-label">Wage record</span>
       </button>
     </div>
 
@@ -183,11 +184,6 @@
     filter:drop-shadow(0 4px 5px #100c08ae);
     transition:transform 150ms ease-out}
   .record-prop:is(:hover,:focus-visible) img{transform:scale(1.018)}
-  .record-prop span{display:block;box-sizing:border-box;width:100%;max-width:240px;
-    min-height:31px;padding:6px 8px;text-align:center;background:#17130de8;
-    border:1px solid #967447;color:#f5e9d5;text-shadow:0 1px #000}
-  .record-prop:is(:hover,:focus-visible) span,.record-prop.chosen span{
-    background:#382819;border-color:#e6b978}
   .record-prop:focus-visible{outline:2px solid #e6bb83;outline-offset:2px}
   .work-dialogue{position:absolute;top:clamp(22px,2.8vw,42px);right:3%;
     z-index:3;width:min(45%,650px);box-sizing:border-box;min-width:0;
