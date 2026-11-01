@@ -4,8 +4,10 @@
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
     STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_OUTCOMES,STAGE_FOUR_FINAL,
+    STAGE_FOUR_TRANSPORT_HINTS,STAGE_FOUR_TRANSPORT_VERIFICATION,
     secondJobJournal
   } from '$lib/approved-stage-four';
+  import '$lib/workshop-object-labels.css';
 
   type Snapshot = {
     stage:number;
@@ -55,13 +57,13 @@
         aria-pressed={selected==='plates'} aria-label="Inspect the numbered metal plates"
         onclick={() => inspect('plates')}>
         <img src="/workshop/metal-plates.webp" alt="" aria-hidden="true"/>
-        <span>Numbered plates</span>
+        <span class="workshop-object-label">Numbered plates</span>
       </button>
       <button type="button" class="table-prop paper" class:selected={selected==='paper'}
         aria-pressed={selected==='paper'} aria-label="Inspect the council work paper"
         onclick={() => inspect('paper')}>
         <img src="/workshop/council-work.webp" alt="" aria-hidden="true"/>
-        <span>Council work paper</span>
+        <span class="workshop-object-label">Council work paper</span>
       </button>
     </div>
 
@@ -78,6 +80,9 @@
       {:else}
         {#if result}
           <p class="result">{result}</p>
+        {/if}
+        {#if state.phase==='COMPARE_DELIVERY' && state.transport}
+          <p class="context transport-verification">{STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]}</p>
         {/if}
         {#if result!==instruction}
           <p class="instruction">{instruction}</p>
@@ -105,6 +110,9 @@
           {#each snapshot.availableActions as action (action)}
             <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
+              {#if action==='secure_plates'||action==='carry_smaller_loads'}
+                <small class="transport-hint">{STAGE_FOUR_TRANSPORT_HINTS[action]}</small>
+              {/if}
             </button>
           {/each}
         </div>
@@ -152,15 +160,11 @@
     cursor:pointer;color:#f8e9d0;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
   .table-prop.plates{width:55%}
   .table-prop.paper{width:40%}
-  .table-prop img{display:block;width:100%;height:calc(100% - 35px);object-fit:contain;
+  .table-prop img{display:block;width:100%;height:calc(100% - 45px);object-fit:contain;
     filter:drop-shadow(0 5px 5px #080501a8);transform:scale(1);
     transform-origin:center 75%;transition:transform 150ms ease-out;pointer-events:none}
   .table-prop:is(:hover,:focus-visible) img{transform:scale(1.018)}
-  .table-prop span{display:block;box-sizing:border-box;width:100%;max-width:220px;min-height:30px;
-    background:#19140feb;border:1px solid #927348;padding:5px 7px;text-align:center;
-    text-shadow:0 1px 2px #000}
-  .table-prop:is(:hover,:focus-visible) span,.table-prop.selected span{
-    border-color:#e8bd77;background:#382819}
+  .table-prop .workshop-object-label{width:100%;max-width:240px}
   .table-prop:focus-visible{outline:2px solid #edd19a;outline-offset:2px}
   .work-dialogue{position:absolute;z-index:3;top:clamp(24px,3vw,45px);right:3%;
     width:min(46%,660px);max-height:calc(100% - 58px);box-sizing:border-box;
@@ -184,6 +188,8 @@
     background:#30251d;color:#f0dfc7;padding:10px 13px;
     font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .actions button:disabled{opacity:.55;cursor:default}
+  .actions .transport-hint{display:block;margin-top:4px;font:12px/1.35 var(--pall-font-reading,Georgia,serif);opacity:.86}
+  .transport-verification{margin-top:0}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
   .journal-trigger{padding-top:11px;margin-top:17px;border-top:1px solid #bca482}
