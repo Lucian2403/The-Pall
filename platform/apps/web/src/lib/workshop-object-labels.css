@@ -23,7 +23,7 @@
   font:700 clamp(12px,1.15vw,15px)/1.15 var(--pall-font-reading,Georgia,serif);
   transition:filter 120ms ease;
 }
-.workshop :is(.prop-marker,.target):is(:hover,:focus-visible,[aria-pressed="true"]) .workshop-object-label{
+.workshop :is(.prop-marker,.target,.evidence button):is(:hover,:focus-visible,[aria-pressed="true"]) .workshop-object-label{
   filter:brightness(1.08);
 }
 /* Guther's label is made from the SAME owner-supplied dialogue frame as
