@@ -4,6 +4,7 @@
   import type {ReadableMissingStampEvidence} from '$lib/approved-stage-three';
   import {MISSING_STAMP_CONFRONTATION,MISSING_STAMP_HANDOFF,MISSING_STAMP_OPENING,CANCELLATION_NARRATION,PLATE_NARRATION,stageThreeFinding,MISSING_STAMP_ROUTES,missingStampJournal} from '$lib/approved-stage-three';
   import NpcConversation from '$lib/NpcConversation.svelte';
+  import '$lib/workshop-object-labels.css';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
 
   type Snapshot = {
@@ -74,7 +75,7 @@
       <img class="environment bench-foreground" src="/workshop/environment.webp" alt="" aria-hidden="true" />
       <button type="button" class="npc-hotspot" disabled={state.phase==='CONFRONT'||state.phase==='DECISION'}
         onclick={() => {talkingOptional=true;inspectedView=null;}} aria-label="Speak to Guther Anvil">
-        <span class="npc-label">Guther Anvil</span>
+        <span class="workshop-npc-label">Guther Anvil</span>
       </button>
 
     </div>
@@ -208,20 +209,25 @@
       {/if}
     </aside>
     <div class="evidence" aria-label="Council evidence on the bench">
-      <button type="button" class:seen={state.plateRead} disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
+      <button type="button" class:seen={state.plateRead} data-workshop-object
+        data-pall-sfx="click" aria-pressed={inspectedView==='plate'}
+        disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
         onclick={() => {void inspect('plate');}}>
-        <img class="evidence-art" src="/workshop/returned-reference-plate.webp" alt="" aria-hidden="true" /><span class="evidence-label">Returned plate</span>
+        <img class="evidence-art" src="/workshop/returned-reference-plate.webp" alt="" aria-hidden="true" />
+        <span class="workshop-object-label">Returned plate</span>
       </button>
-      <button type="button" class:seen={state.slipRead} disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
+      <button type="button" class:seen={state.slipRead} data-workshop-object
+        data-pall-sfx="paper" aria-pressed={inspectedView==='slip'}
+        disabled={state.phase==='CONFRONT'||state.phase==='DECISION'||state.phase==='RESTAMP'}
         onclick={() => {void inspect('slip');}}>
-        <img class="evidence-art" src="/workshop/cancellation-slip.webp" alt="" aria-hidden="true" /><span class="evidence-label">Cancellation slip</span>
+        <img class="evidence-art" src="/workshop/cancellation-slip.webp" alt="" aria-hidden="true" />
+        <span class="workshop-object-label">Cancellation slip</span>
       </button>
     </div>
-  </div>
-  <div class="scene-footer">
-    <p class="footnote">Council-owned evidence. No wages, ordinary XP or items are awarded during this scene.</p>
-    <button type="button" class="journal-toggle journal-outside" aria-expanded={journalOpen}
-      aria-controls="stage-three-journal"
+    <!-- Journal access stays separate from the CRPG dialogue and inspection
+         beats. The lower disclaimer/status band has no gameplay function. -->
+    <button type="button" class="journal-toggle journal-outside" data-pall-sfx="paper"
+      aria-expanded={journalOpen} aria-controls="stage-three-journal"
       onclick={() => {void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
   </div>
   {#if journalOpen}
@@ -255,8 +261,6 @@
   .bench-foreground{z-index:2;clip-path:inset(70% 0 0 0)}
   .npc-hotspot{position:absolute;z-index:4;top:12%;left:12%;width:25%;height:50%;display:flex;align-items:end;justify-content:center;background:none;border:0;padding:0 0 10px;color:#f7dfb6;cursor:pointer}
   .npc-hotspot:disabled{cursor:default;opacity:.7}
-  .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px sans-serif}
-  .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label{background:#3c2b19;border-color:#efd092}
   /* The image itself is the prop and hit target. Only the small nameplate is framed. */
   /* Anchor the full clickable cutouts to the actual foreground wood instead
      of a row margin that shifts when the scene becomes shorter. */
@@ -268,13 +272,10 @@
     pointer-events:none;filter:drop-shadow(0 5px 6px #0009);
     transform-origin:center 70%;transition:transform 160ms ease-out}
   .evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}
-  .evidence-label{display:block;box-sizing:border-box;width:100%;max-width:205px;min-height:29px;padding:5px 6px;
-    background:#16130feb;border:1px solid #92704b;font:clamp(11px,1.06vw,13px)/1.25 var(--pall-font-reading,Georgia,serif);text-align:center}
-  .evidence button:hover .evidence-label,.evidence button:focus-visible .evidence-label,
-  .evidence button.seen .evidence-label{border-color:#e9bd73;background:#312415}
+  .evidence button.seen .workshop-object-label{filter:brightness(1.06)}
   .evidence button:focus-visible{outline:2px solid #f2d28f;outline-offset:3px}
   .evidence button:disabled{opacity:1;cursor:default}
-  .evidence button:disabled .evidence-label{opacity:.7}
+  .evidence button:disabled .workshop-object-label{opacity:.75}
   .dialogue{position:relative;z-index:5;grid-column:2;grid-row:1;align-self:start;
     min-width:0;margin:clamp(20px,2.6vw,36px) 0 0;padding:15px 18px;
     max-height:none;overflow:visible;
@@ -311,13 +312,34 @@
   .record strong{font-size:12px;letter-spacing:.04em}
   .record p{margin:6px 0}
   .hint,.skill{font:12px/1.45 sans-serif;color:#614e39}
-  .scene-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding:7px 13px;background:#201c17;border-top:1px solid #594229}
-  .scene-footer .footnote{border:0;padding:0;flex:1;margin:0}
-  .journal-outside{flex:none;white-space:nowrap}
-  .journal-toggle{padding:7px 10px;background:#d8c7a7;border:1px solid #81654d;color:#3a281b;
-    cursor:pointer;font:600 15px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .journal-toggle:hover,.journal-toggle:focus-visible{background:#e7d2ae;border-color:#54351c}
+  /* Accessible journal action floats over unused far-right scenery. It is
+     outside the dialogue and cannot enlarge the scene or move the evidence. */
+  .journal-outside{
+    position:absolute;z-index:7;top:10px;right:clamp(8px,1vw,18px);
+    max-width:10.5%;min-width:100px;min-height:40px;white-space:normal;
+  }
+  .journal-toggle{
+    box-sizing:border-box;
+    padding:3px 8px;
+    border:solid transparent;
+    border-width:11px 17px 10px;
+    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+    border-image-slice:50 180 45 180 fill;
+    border-image-width:11px 17px 10px;
+    border-image-repeat:stretch;
+    background:transparent;
+    color:#332319;
+    cursor:pointer;
+    font:600 15px/1.3 var(--pall-font-reading,Georgia,serif);
+  }
+  .journal-toggle:hover,.journal-toggle:focus-visible{
+    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
+    color:#24170d;
+  }
+  .journal-toggle:active{
+    border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
+  }
+  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   /* A separate page-flow journal: it cannot stretch the floating dialogue
      or move the tabletop props. The page scrolls; neither panel has a scrollbar. */
   .journal-panel{width:100%;box-sizing:border-box;padding:19px clamp(16px,4vw,46px) 25px;
@@ -328,7 +350,6 @@
   .journal-entries{max-width:930px;margin:0 auto;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
   .journal-entries p{margin:9px 0}
   .error{font:13px/1.4 sans-serif;color:#873523}
-  .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif}
   @media(max-width:700px){
     .scene{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;
       height:auto;min-height:0;flex:0 0 auto}
@@ -341,11 +362,9 @@
       justify-self:center;align-self:end;width:min(76%,440px);
       margin:0 0 clamp(32px,7vw,54px);gap:7px}
     .evidence-art{height:clamp(70px,20vw,120px)}
-    .evidence-label{min-height:25px;font:11px/1.2 sans-serif;padding:5px 3px}
     .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px;max-height:none;overflow:visible}
     .record-illustration img{max-height:300px}
-    .scene-footer{flex-wrap:wrap}
-    .scene-footer .footnote{min-width:180px}
+    .journal-outside{top:8px;right:8px;max-width:none;min-width:104px}
     .story,.speech,.finding{font-size:16px}
     .journal-heading h2{font-size:20px}
     .journal-entries{font-size:14px}
