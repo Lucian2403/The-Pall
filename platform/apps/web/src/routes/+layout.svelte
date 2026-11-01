@@ -1,15 +1,20 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import type {Snippet} from 'svelte';
-  import {page} from '$app/state';
-  import {connectPallAudio,setPallAudioScene} from '$lib/pall-audio';
+  import {beforeNavigate} from '$app/navigation';
+  import {connectPallAudio,stopSmithingWorkshopAmbience} from '$lib/pall-audio';
 
   let {children}:{children:Snippet}=$props();
+
+  // Root owns the persistent browser player, never the active backdrop.
   onMount(connectPallAudio);
-  // First prototype is confined to authenticated in-game character routes.
-  // Public marketing, registration and character creation stay silent.
-  $effect(()=>{
-    setPallAudioScene(/^\/characters\/[^/]+(?:\/|$)/.test(page.url.pathname));
+  // Navigating to a page without an in-game backdrop (roster, account,
+  // marketing) is an explicit departure: stop immediately, not after the
+  // short grace period reserved for workshop-to-workshop loading transitions.
+  beforeNavigate(({to})=>{
+    if(!to||!/^\/characters\/[^/]+(?:\/|$)/.test(to.url.pathname)){
+      stopSmithingWorkshopAmbience();
+    }
   });
 </script>
 

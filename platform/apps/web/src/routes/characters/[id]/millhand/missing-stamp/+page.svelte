@@ -79,7 +79,7 @@
 <svelte:head><title>The Pall — The Missing Stamp</title></svelte:head>
 
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character}>
+  <TutorialShell {character} smithingBackdrop={true}>
     <MillhandMissingStampScene {snapshot} {pending} {errorMessage} {perform} continueToJob={() => {void goto('/characters/'+encodeURIComponent(characterId)+'/millhand/second-job');}}/>
   </TutorialShell>
 {:else}

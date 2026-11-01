@@ -62,6 +62,7 @@
   // The notice does not mutate saved quests and the work button stays visible.
   let showArrival=$state(false);
   const arrivalKey=$derived('pall-arrival-dismissed-'+character.id);
+
   onMount(()=>{
     try{showArrival=newArrival&&localStorage.getItem(arrivalKey)!=='1';}
     catch{showArrival=newArrival;}
@@ -85,7 +86,8 @@
   }
   const resources=$derived([
     {id:'health',label:'Health',value:formatted(character.health),known:isMeasured(character.health)},
-    {id:'stamina',label:'Stamina',value:formatted(character.stamina),known:isMeasured(character.stamina)},
+    {id:'stamina',label:'Stamina',value:formatted(character.stamina??{current:100,maximum:100}),
+      known:true,provisional:!isMeasured(character.stamina)},
     {id:'fatigue',label:'Fatigue',value:formatted(character.fatigue),known:isMeasured(character.fatigue)},
     {id:'focus',label:'Focus',value:formatted(character.focus),known:isMeasured(character.focus)},
     {id:'coins',label:'Coins',value:String(character.coins),known:true},
@@ -119,7 +121,8 @@
         <ul class="resource-grid" aria-label="Character condition and progression">
           {#each resources as resource (resource.id)}
             <li class:untracked={!resource.known} class="resource-item"
-              title={resource.known?resource.label:'Not tracked yet'}>
+              title={resource.provisional?'Starting Stamina display baseline until combat tracking is connected'
+                :resource.known?resource.label:'Not tracked yet'}>
               <img src={'/ui-kit/icons/character-'+resource.id+'.svg'} alt="" aria-hidden="true"
                 width="32" height="32"/>
               <span class="resource-details">

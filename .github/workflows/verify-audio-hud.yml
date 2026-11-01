@@ -1,0 +1,65 @@
+name: Verify HUD and audio behavior
+
+on:
+  pull_request:
+    paths:
+      - 'platform/apps/web/src/lib/pall-audio.ts'
+      - 'platform/apps/web/src/lib/PallAudioControls.svelte'
+      - 'platform/apps/web/src/lib/CharacterHome.svelte'
+      - 'platform/apps/web/src/lib/TutorialShell.svelte'
+      - 'platform/scripts/verify-audio-*.mjs'
+      - 'platform/scripts/verify-character-home.mjs'
+      - 'platform/scripts/verify-workshop-hud-ambience.mjs'
+      - 'platform/apps/web/static/audio/the-pall/**'
+      - 'platform/package.json'
+      - 'platform/package-lock.json'
+      - '.github/workflows/verify-audio-hud.yml'
+  push:
+    branches:
+      - 'ui/hud-smithing-ambience-20261031'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audio-and-hud:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - name: Build workspace contracts and game-core
+        run: npm run build:packages
+      - name: Character home source and structure
+        run: npm run verify:character-home
+      - name: Owner audio assets and Web Audio contracts
+        run: npm run verify:audio-prototype
+      - name: Workshop ambience asset and HUD contract
+        run: npm run verify:workshop-hud-ambience
+      - name: Executable playback/slider test
+        run: npm run verify:audio-runtime
+      # The existing canonical-copy script currently flags Millhand stage
+      # dialogue drift unrelated to this HUD/audio PR. Report the issue but
+      # do not prevent the independent Svelte typecheck from running.
+      - name: Existing canonical dialogue copy (informational)
+        continue-on-error: true
+        run: npm run verify:canonical-copy
+      - name: Vite production compilation
+        run: npm run build -w @the-pall/web
+      - name: Real Chromium audio controls
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-audio-browser.mjs
+      # The established web project has TypeScript errors in unrelated pages
+      # (state shadowing, optional route params, backgrounds formatting).
+      # Keep recording them without hiding new production-build failures.
+      - name: Existing Svelte/type diagnostics (informational)
+        continue-on-error: true
+        run: npm run check -w @the-pall/web

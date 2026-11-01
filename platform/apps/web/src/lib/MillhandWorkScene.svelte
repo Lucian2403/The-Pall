@@ -20,6 +20,7 @@
     {key:'paper' as const, label:'Council order', image:'/workshop/council-work.webp'},
     {key:'hammer' as const, label:'Hammer', image:'/workshop/hammer.webp'}
   ];
+
   let selected = $state<ObjectKey | null>(null);
   let talkingToGuther = $state(false);
   const contextualActions = $derived(selected ? available.filter(a => WORK_ACTION_OBJECT[a] === selected) : []);

@@ -49,6 +49,7 @@
     handoffError?: string;
   } = $props();
 
+
   let selected = $state<PropKey | null>(null);
   let talkingToGuther = $state(false);
   const say = $derived(beat.text.replaceAll('[player name]', characterName));

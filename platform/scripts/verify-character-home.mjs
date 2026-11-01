@@ -20,7 +20,7 @@ const panelCss=skillPanel.slice(skillPanel.indexOf('<style>'));
 for(const fragment of [
   "fetch('/api/characters/' + encodeURIComponent(page.params.id), {cache: 'no-store'})",
   'response.status === 401','response.status === 404',
-  '<TutorialShell {character} activePage="character">',
+  '<TutorialShell {character} activePage="character" smithingBackdrop={character.origin===\'Millhand\'}>',
   '<CharacterHome {character}/>',
   'avatarId?: string | null;',
   'href="/characters"','href="/account"'
@@ -44,7 +44,7 @@ for(const field of [
   'avatarId={character.avatarId??null}','character.startingLocation'
 ]) assert.ok(markup.includes(field),'Missing saved character value: '+field);
 for(const field of [
-  'formatted(character.health)','formatted(character.stamina)',
+  'formatted(character.health)','formatted(character.stamina??{current:100,maximum:100})',
   'formatted(character.fatigue)','formatted(character.focus)',
   'String(character.coins)',"character.tutorial.stage+' / 8'"
 ]) assert.ok(markup.includes(field),'Missing saved or explicitly untracked resource: '+field);
@@ -98,14 +98,16 @@ assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
   panelMarkup.includes("origin==='Millhand'") &&
   panelMarkup.includes("(majorSkillBonuses.Craftsmanship??0)>=3") &&
   panelMarkup.includes("major==='Craftsmanship'&&skill==='Smithing'") &&
-  panelMarkup.includes('starting preview, not a saved rank') &&
+  // Check the preview/persistence contract, not an exact UI sentence.
+  panelMarkup.includes('starting preview') &&
+  panelMarkup.includes('rank not persisted') &&
   !panelMarkup.includes("'— / 100'") &&
   !panelMarkup.includes('— / TBD'),
   'Roman tier presentation must preserve provisional 1/100 baseline without inventing saved levels');
 
 // Dropdowns must expand a vertical list, not a concatenated row.
 for(const frag of [
-  '<details class="skill-category">','<summary>',
+  '<details class="skill-category">','<summary data-pall-sfx="click">',
   '<ul class="subskills">','<li><span>{skill}</span>',
   'CHARACTER_SKILLS as group',
   'View all the skills',
@@ -155,7 +157,33 @@ assert.ok(markup.includes('class="arrival-layout"') &&
   markup.includes("'Hide notice':'Show notice'") &&
   markup.includes('aria-expanded={showArrival}'),
   'Welcome notice must be reversible without hiding the workshop action');
-assert.ok(markup.indexOf('class="notice-work work-order"')<markup.indexOf('{:else}\n          <p>No new personal notices.'),
+// Scope this check to the Personal notices component, not to the first
+// matching raw text offset anywhere in the page. Whitespace and incidental
+// copy changes must not report that a working Stage 1 CTA has vanished.
+const noticeStart=markup.indexOf('<aside class="personal-notices"');
+const noticeEnd=markup.indexOf('</aside>',noticeStart);
+assert.ok(noticeStart>=0 && noticeEnd>noticeStart,'Personal notices region is missing');
+const personalNotice=markup.slice(noticeStart,noticeEnd);
+const firstStage=personalNotice.indexOf('{#if newArrival}');
+const stageOneAction=personalNotice.indexOf('<section class="notice-work work-order"');
+let laterStage=-1;
+if(firstStage>=0){
+  // Walk Svelte's nested if/else delimiters and find the else paired with
+  // {#if newArrival}. Do not depend on the wording or indentation of its copy.
+  let depth=0;
+  const branches=personalNotice.slice(firstStage);
+  for(const token of branches.matchAll(/\{#if[^}]*\}|\{:else[^}]*\}|\{\/if\}/g)){
+    if(token[0].startsWith('{#if'))depth++;
+    else if(token[0]==='{/if}')depth--;
+    else if(token[0].startsWith('{:else')&&depth===1){
+      laterStage=firstStage+token.index;
+      break;
+    }
+  }
+}
+assert.ok(firstStage>=0 && stageOneAction>firstStage &&
+  laterStage>stageOneAction &&
+  personalNotice.slice(firstStage,laterStage).includes('href={work.href}'),
   'Stage 1 CTA must be nested in the notice');
 
 // The Stage 1 action is a single prominent Work Order in Personal notices.
@@ -163,7 +191,8 @@ assert.ok(markup.indexOf('class="notice-work work-order"')<markup.indexOf('{:els
 assert.ok(markup.includes('<section class="notice-work work-order" aria-label="Current work order">') &&
   markup.includes('<span class="work-order-kicker">Current work order</span>') &&
   markup.includes('<span class="work-order-stage">Stage I</span>') &&
-  markup.includes('<a class="framed-action work-order-action" href={work.href}>{work.label}</a>') &&
+  markup.includes('<a class="framed-action work-order-action" href={work.href}') &&
+  markup.includes("data-pall-sfx={character.origin==='Millhand'&&newArrival?'smithing':'click'}>{work.label}</a>") &&
   markup.includes('<h3>{work.title}</h3>') &&
   markup.includes('<p>{work.description}</p>'),
   'The first available work must be a real linked, accessible assignment');
@@ -198,7 +227,8 @@ const noticeStyles=css.slice(css.indexOf('  .personal-notices{'),css.indexOf('  
 assert.ok(noticeStyles.includes('border:0') &&
   noticeStyles.includes('background:none') &&
   noticeStyles.includes('box-shadow:none') &&
-  css.includes('linear-gradient(270deg,#120e0bdd'),
+  // The image-darkening gradient is on the scene's inline style, not CSS.
+  markup.includes('linear-gradient(270deg,#120e0bdd'),
   'Notice text should appear directly over darkened chosen-origin art, without a panel');
 assert.ok(markup.includes('class="attribute-code"') &&
   markup.includes('class="record-ornament"') &&
@@ -244,12 +274,15 @@ for(const name of ['health','stamina','fatigue','focus','coins','stage']){
 }
 assert.ok(markup.includes("isMeasured(value:Measured|undefined)") &&
   markup.includes('resource.known?resource.label:\'Not tracked yet\'') &&
-  markup.includes("value:formatted(character.stamina)") &&
+  markup.includes("value:formatted(character.stamina??{current:100,maximum:100})") &&
+  markup.includes('provisional:!isMeasured(character.stamina)') &&
+  shell.includes("staminaShown=$derived(isMeasured(character.stamina)") &&
+  shell.includes("{current:100,maximum:100}") &&
   markup.includes("value:formatted(character.focus)") &&
   markup.includes('class:untracked={!resource.known}') &&
   markup.includes('class="resource-grid"') &&
   !markup.includes('character.stamina??0') &&
   !markup.includes('character.focus??0'),
-  'Untracked resources must show a dash, never fictitious measured numbers');
+  'Stamina is an explicitly provisional full bar; other untracked values remain honest dashes');
 console.log('PASS: Wide unframed notice, readable parchment attributes, framed skill dropdowns, six original resource icons with honest API state and existing game contracts.');
 

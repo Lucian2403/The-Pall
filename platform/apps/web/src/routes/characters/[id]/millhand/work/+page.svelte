@@ -100,7 +100,7 @@
 <svelte:head><title>The Pall — Marking the Plates</title></svelte:head>
 
 {#if status==='ready' && character && work?.work}
-  <TutorialShell {character}>
+  <TutorialShell {character} smithingBackdrop={true}>
     <MillhandWorkScene work={work.work} available={work.availableActions} 
       pending={committing} {errorMessage} {perform}/>
   </TutorialShell>

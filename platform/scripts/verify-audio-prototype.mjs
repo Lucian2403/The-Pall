@@ -56,7 +56,9 @@ for(const [file,weight] of [['UI_ClickMain.wav',75],['UI_Click.wav',15],['UI_Cli
 assert.ok(audio.includes("const KEY='the-pall-audio-v1'") &&
   audio.includes('window.localStorage.setItem(KEY') &&
   audio.includes("if(!sceneActive)return;") &&
-  audio.includes('if(unlocked)return;') &&
+  audio.includes("document.addEventListener('pointerdown',gesture,true)") &&
+  audio.includes("document.addEventListener('keydown',gesture,true)") &&
+  audio.includes('if(!sceneActive)return;') &&
   audio.includes('document.hidden') &&
   audio.includes("if(kind==='paper')playPaperSfx()") &&
   audio.includes("if(kind==='smithing')playSmithingSfx()") &&
@@ -65,7 +67,9 @@ assert.ok(audio.includes("const KEY='the-pall-audio-v1'") &&
   audio.includes("file:'UI_Click02.wav',weight:10,gain:0.30"),
   'Audio must be gesture-gated, in-game scoped, saved and visibility-aware');
 assert.ok(layout.includes('onMount(connectPallAudio)') &&
-  layout.includes('setPallAudioScene(') &&
+  !layout.includes('setPallAudioScene(') &&
+  shell.includes('setPallAudioScene(true)') &&
+  shell.includes('setPallAudioScene(false)') &&
   shell.includes('<PallAudioControls/>') &&
   controls.includes('Background music volume') &&
   controls.includes('Sound effects volume'),
@@ -82,25 +86,34 @@ assert.ok(home.includes("data-pall-sfx={character.origin==='Millhand'&&newArriva
 // UI click latency regression: all seven short WAVs are fetched, decoded
 // once, and then scheduled directly from Web Audio. Never create an HTML
 // Audio element on a click; that reintroduces late network/decode latency.
-assert.ok(audio.includes("const sfxBuffers=new Map<string,AudioBuffer>()") &&
-  audio.includes("const sfxLoading=new Map<string,Promise<void>>()") &&
-  audio.includes("const activeSources=new Set<AudioBufferSourceNode>()") &&
-  audio.includes("new AudioContext({latencyHint:'interactive'})") &&
-  audio.includes("fetch(base+filename,{cache:'force-cache'})") &&
-  audio.includes("context.decodeAudioData(bytes)") &&
-  audio.includes("context.createBufferSource()") &&
-  audio.includes("context.createGain()") &&
-  audio.includes("source.start(0,offset)") &&
-  audio.includes("if(!context||!buffer||activeSources.size>=7)return") &&
-  audio.includes("if(context?.state==='suspended')void context.resume()") &&
-  audio.includes("const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0") &&
-  audio.includes("if(active){\n    prepareSoundEffects();") &&
-  audio.includes("function stopSoundEffects()") &&
-  audio.includes("stopSoundEffects();") &&
-  !audio.includes("new Audio(base+filename)") &&
-  !audio.includes("activeClips") &&
-  audio.includes("new Audio(base+musicFile)"),
-  'Web Audio SFX must be predecoded and played without per-click loading');
+// Report individual failures, not an opaque 18-condition AssertionError.
+// A local worktree with out-of-date runtime code must identify the exact
+// missing behavior rather than making every failure look identical.
+const lowLatencyContracts=[
+  ['decoded SFX buffers',audio.includes("const sfxBuffers=new Map<string,AudioBuffer>()")],
+  ['in-flight SFX request cache',audio.includes("const sfxLoading=new Map<string,Promise<void>>()")],
+  ['concurrent SFX source limit',audio.includes("const activeSources=new Set<AudioBufferSourceNode>()")],
+  ['interactive AudioContext',audio.includes("new AudioContext({latencyHint:'interactive'})")],
+  ['cached SFX network fetch',audio.includes("fetch(base+filename,{cache:'force-cache'})")],
+  ['decode once',audio.includes("context.decodeAudioData(bytes)")],
+  ['Web Audio buffer sources',audio.includes("context.createBufferSource()")],
+  ['per-source gain',audio.includes("context.createGain()")],
+  ['scheduled playback',audio.includes("source.start(0,offset)")],
+  ['no late playback while buffers load',audio.includes("if(!context||!buffer||activeSources.size>=7)return")],
+  ['resume suspended context in gesture',
+    audio.includes("if(context?.state==='suspended')void context.resume()")],
+  ['shortened Click02 pre-roll',
+    audio.includes("const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0")],
+  ['preload on in-game scene',/if\s*\(active\)\s*\{\s*prepareSoundEffects\(\)/.test(audio)],
+  ['SFX source cleanup',audio.includes("function stopSoundEffects()") &&
+    audio.includes("stopSoundEffects();")],
+  ['no per-click HTMLAudio constructor',!audio.includes("new Audio(base+filename)")],
+  ['no obsolete HTMLAudio clip list',!audio.includes("activeClips")],
+  ['stream long MusicTheme independently',audio.includes("new Audio(base+musicFile)")]
+];
+const missingContracts=lowLatencyContracts.filter(([,passed])=>!passed).map(([name])=>name);
+assert.deepEqual(missingContracts,[],
+  'Audio implementation is out of sync with the verified low-latency runtime; missing: '+missingContracts.join(', '));
 
 assert.ok(workRoute.includes('playSmithingSfx();') &&
   workRoute.indexOf('if(response.ok){') < workRoute.indexOf('playSmithingSfx();') &&

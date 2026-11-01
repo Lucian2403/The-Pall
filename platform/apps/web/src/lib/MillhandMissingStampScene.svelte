@@ -26,6 +26,7 @@
     continueToJob:()=>void;
   }=$props();
 
+
   let talkingOptional=$state(false);
   let inspectedView=$state<'slip'|'plate'|null>(null);
   // Local reading pages only. Inspect actions, dialogue and route saves remain
