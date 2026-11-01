@@ -115,11 +115,14 @@ assert.ok(contractsUi.includes("which==='death' && snapshot.availableActions.inc
 assert.ok(contractsUi.includes("state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'") &&
   contractsUi.includes("{:else if snapshot.availableActions.length>0}"),
   'Remove evidence action buttons from dialogue while retaining later Clerk and dispute actions');
-assert.ok(!contractsUi.includes("perform('read_death_register')") &&
-  !contractsUi.includes("perform('check_wage_record')") &&
-  !contractsUi.includes('class="work-surface"') &&
-  !contractsUi.includes('/workshop/council-work.webp'),
-  'Commerce UI must not borrow Investigation's work actions or introduce extra physical props');
+const commerceForbiddenProps=[
+  "perform('read_death_register')",
+  "perform('check_wage_record')",
+  'class="work-surface"',
+  '/workshop/council-work.webp'
+];
+assert.ok(commerceForbiddenProps.every(fragment=>!contractsUi.includes(fragment)),
+  'Commerce UI must not borrow Investigation work actions or introduce extra physical props');
 assert.ok(contractsUi.includes('STAGE_FOUR_DIALOGUE.contracts') &&
   contractsUi.includes('STAGE_FOUR_FINAL.contracts') &&
   contractsUi.includes('snapshot.availableActions') &&
