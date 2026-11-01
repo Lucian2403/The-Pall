@@ -74,7 +74,7 @@ assert.ok(copy.includes("if(s.transport==='secured')result.push('I secured the p
   'Branch-specific first-person journal lines must retain the server-backed action flow.');
 assert.ok(canon.includes('less handling, risk of misalignment/damage') &&
   script.includes('Both choices complete the move to the municipal depot.') &&
-  script.includes('no numbers, random outcome or guaranteed damage'),
+  script.includes('no numerical modifiers, damage rolls, invented fatigue cost or guaranteed damage'),
   'Risk/duration are an approved future contract, not fabricated mechanics now.');
 assert.ok(!copy.includes('transportSeconds')&&!copy.includes('damageChance') &&
   !depot.includes('Math.random')&&!depot.includes('fatigueCost') &&
