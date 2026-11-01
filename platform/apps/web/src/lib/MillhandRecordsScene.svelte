@@ -6,6 +6,7 @@
     STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_OUTCOMES,STAGE_FOUR_FINAL,
     secondJobJournal
   } from '$lib/approved-stage-four';
+  import '$lib/workshop-object-labels.css';
 
   type Snapshot={
     stage:number;
@@ -105,13 +106,13 @@
         aria-pressed={inspected==='death'} aria-label="Examine the Death Register"
         disabled={pending} onclick={() => inspect('death')}>
         <img src="/locations/contracts/death-register.webp" alt="" aria-hidden="true"/>
-        <span>Death register</span>
+        <span class="workshop-object-label">Death register</span>
       </button>
       <button type="button" class="record-prop wage" class:chosen={inspected==='wage'}
         aria-pressed={inspected==='wage'} aria-label="Examine the Wage Record"
         disabled={pending} onclick={() => inspect('wage')}>
         <img src="/locations/contracts/wage-record.webp" alt="" aria-hidden="true"/>
-        <span>Wage record</span>
+        <span class="workshop-object-label">Wage record</span>
       </button>
     </div>
 
@@ -203,15 +204,11 @@
     border:0;background:transparent;color:#f3e3ca;cursor:pointer;
     font:14px/1.25 var(--pall-font-reading,Georgia,serif)}
   .record-prop.death,.record-prop.wage{width:49%}
-  .record-prop img{display:block;width:100%;height:calc(100% - 34px);
+  .record-prop img{display:block;width:100%;height:calc(100% - 45px);
     object-fit:contain;pointer-events:none;transform-origin:center 76%;
     filter:drop-shadow(0 4px 5px #100c08ae);transition:transform 150ms ease-out}
   .record-prop:is(:hover,:focus-visible):not(:disabled) img{transform:scale(1.018)}
-  .record-prop span{display:block;box-sizing:border-box;width:100%;max-width:240px;
-    min-height:31px;padding:6px 8px;text-align:center;background:#17130de8;
-    border:1px solid #967447;color:#f5e9d5;text-shadow:0 1px #000}
-  .record-prop:is(:hover,:focus-visible) span,.record-prop.chosen span{
-    background:#382819;border-color:#e6b978}
+  .record-prop .workshop-object-label{width:100%;max-width:240px}
   .record-prop:focus-visible{outline:2px solid #e6bb83;outline-offset:2px}
   .record-prop:disabled{cursor:wait}
 
