@@ -55,6 +55,7 @@
     "verify:commerce-art": "node scripts/verify-commerce-art.mjs",
     "verify:scholarship-art": "node scripts/verify-scholarship-art.mjs",
     "verify:stage3-record-art": "node scripts/verify-stage3-record-art.mjs",
+    "verify:stage3-workbench-ui": "node scripts/verify-stage3-workbench-ui.mjs",
     "verify:audio-prototype": "node scripts/verify-audio-prototype.mjs",
     "verify:audio-runtime": "node scripts/verify-audio-runtime.mjs",
     "verify:workshop-hud-ambience": "node scripts/verify-workshop-hud-ambience.mjs",
