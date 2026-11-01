@@ -141,7 +141,7 @@ assert.ok(ui.includes("import MillhandRecordsScene from '$lib/MillhandRecordsSce
 assert.ok(recordsUi.includes('/locations/records/records-room.webp') &&
   recordsUi.includes('/locations/contracts/death-register.webp') &&
   recordsUi.includes('/locations/contracts/wage-record.webp'),
-  'Scholarship must display the owner's records-room background with the existing death/wage books');
+  "Scholarship must display the owner\'s records-room background with the existing death/wage books");
 for(const [phase,which,action] of [
   ['READ_DEATH_REGISTER','death','read_death_register'],
   ['READ_WAGE_RECORD','wage','check_wage_record'],
@@ -172,7 +172,7 @@ const sharedJournalCss=read('apps/web/src/lib/pall-owner-ui.css');
 assert.ok(sharedJournalCss.includes("font:600 16px/1.55 var(--pall-font-reading") &&
   sharedJournalCss.includes("font:600 15px/1.3 var(--pall-font-reading") &&
   sharedJournalCss.includes("color:#24160e"),
-  'Journal body and controls must use the owner's reading face with strong dark-ink contrast');
+  "Journal body and controls must use the owner\'s reading face with strong dark-ink contrast");
 for(const name of [
   'MillhandDepotScene.svelte','MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
 ]){
