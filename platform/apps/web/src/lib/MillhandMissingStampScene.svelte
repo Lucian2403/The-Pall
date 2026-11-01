@@ -268,7 +268,7 @@
     display:flex;align-items:end;justify-content:center;gap:12px;margin:0}
   .evidence button{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:3px;
     flex:1;min-width:0;margin:0;padding:0;background:transparent;border:0;color:#f3dfc1;cursor:pointer;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(74px,6vw,100px);
+  .evidence-art{display:block;object-fit:contain;width:100%;height:clamp(108px,8vw,140px);
     pointer-events:none;filter:drop-shadow(0 5px 6px #0009);
     transform-origin:center 70%;transition:transform 160ms ease-out}
   .evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}
@@ -361,7 +361,7 @@
     .evidence{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1;
       justify-self:center;align-self:end;width:min(76%,440px);
       margin:0 0 clamp(32px,7vw,54px);gap:7px}
-    .evidence-art{height:clamp(70px,20vw,120px)}
+    .evidence-art{height:clamp(88px,24vw,138px)}
     .dialogue{grid-column:1;grid-row:2;margin:0;width:100%;border-radius:0;padding:14px;max-height:none;overflow:visible}
     .record-illustration img{max-height:300px}
     .journal-outside{top:8px;right:8px;max-width:none;min-width:104px}
