@@ -1,0 +1,50 @@
+name: Verify Stage 3 workshop UI
+
+on:
+  pull_request:
+    paths:
+      - 'platform/apps/web/src/lib/WorkshopScene.svelte'
+      - 'platform/apps/web/src/lib/MillhandWorkScene.svelte'
+      - 'platform/apps/web/src/lib/MillhandMissingStampScene.svelte'
+      - 'platform/apps/web/src/lib/workshop-object-labels.css'
+      - 'platform/scripts/verify-stage3-workbench-ui.mjs'
+      - 'platform/scripts/verify-stage3-record-art.mjs'
+      - 'platform/scripts/verify-workshop-inspections.mjs'
+      - 'platform/scripts/verify-approved-intro-copy.mjs'
+      - 'platform/package.json'
+      - '.github/workflows/verify-stage3-workbench.yml'
+  push:
+    branches:
+      - 'ui/stage3-workbench-frames-20261101'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage3-workshop:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - name: Build shared packages
+        run: npm run build:packages
+      - name: Stage 3 frames, Guther and journal
+        run: npm run verify:stage3-workbench-ui
+      - name: Stage 1–2 workshop interaction consistency
+        run: npm run verify:workshop-inspections
+      - name: Original Stage 3 evidence assets
+        run: npm run verify:stage3-record-art
+      - name: Vite production build
+        run: npm run build -w @the-pall/web
+      - name: Existing approved dialogue verification (informational)
+        continue-on-error: true
+        run: npm run verify:canonical-copy
