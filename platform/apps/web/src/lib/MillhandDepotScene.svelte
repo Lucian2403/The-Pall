@@ -24,7 +24,13 @@
   }=$props();
 
   const state=$derived(snapshot.state);
-  const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT');
+  // Purely local presentation beat: a saved transport choice is shown at the
+  // workshop before the player proceeds to the depot. This grants no work
+  // action and cannot change server progress or cause a missing receipt.
+  let travelConfirmed=$state(false);
+  const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'||
+    (state.phase==='COMPARE_DELIVERY'&&!travelConfirmed));
+  $effect(()=>{if(state.phase!=='COMPARE_DELIVERY')travelConfirmed=false;});
   const speaking=$derived(state.phase==='DEPOT_DIALOGUE');
   const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[state.dialogueIndex]:null);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
@@ -78,13 +84,13 @@
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
       {:else}
-        {#if result}
+        {#if result && !(state.phase==='COMPARE_DELIVERY' && travelConfirmed)}
           <p class="result">{result}</p>
         {/if}
-        {#if state.phase==='COMPARE_DELIVERY' && state.transport}
+        {#if state.phase==='COMPARE_DELIVERY' && state.transport && travelConfirmed}
           <p class="context transport-verification">{STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]}</p>
         {/if}
-        {#if result!==instruction}
+        {#if !(state.phase==='COMPARE_DELIVERY' && !travelConfirmed) && result!==instruction}
           <p class="instruction">{instruction}</p>
         {/if}
         {#if state.phase==='SPEAK_DEPOT'||state.phase==='CHOOSE_RECEIPT'}
@@ -97,7 +103,9 @@
           <strong>{selected==='plates'?'Numbered metal plates':'Council work paper'}</strong>
           <p>{selected==='plates'
             ? atWorkshop
-              ? 'The finished plates are together on the bench. Check the load against the paper before moving them.'
+              ? state.phase==='COMPARE_DELIVERY'
+                ? 'You have chosen how to move the load. The plates are ready to go to the depot.'
+                : 'The finished plates are together on the bench. Check the load against the paper before moving them.'
               : 'You have brought numbered metal plates to the municipal depot.'
             : atWorkshop
               ? 'The council work paper accompanies the finished plates.'
@@ -105,7 +113,10 @@
         </div>
       {/if}
 
-      {#if snapshot.availableActions.length>0}
+      {#if state.phase==='COMPARE_DELIVERY' && !travelConfirmed}
+        <div class="actions"><button type="button" disabled={pending}
+          onclick={() => {selected=null;travelConfirmed=true;}}>Continue to the depot</button></div>
+      {:else if snapshot.availableActions.length>0}
         <div class="actions" aria-label="Available delivery actions">
           {#each snapshot.availableActions as action (action)}
             <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
