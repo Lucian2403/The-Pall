@@ -43,7 +43,7 @@
       <img class="environment bench-foreground" src="/workshop/environment.webp" alt="" aria-hidden="true" />
       <button type="button" class="npc-hotspot" aria-label="Talk to Guther Anvil" title="Talk to Guther Anvil"
         onclick={() => {selected=null;talkingToGuther=true;}}>
-        <span class="npc-label">Talk to Guther</span>
+        <span class="workshop-npc-label">Guther Anvil</span>
       </button>
       {#each objects as object (object.key)}
         <img class="object-art {object.key}" src={object.image} alt="" aria-hidden="true"/>
@@ -117,8 +117,6 @@
   .bench-foreground{z-index:2;clip-path:inset(70% 0 0 0)}
   .npc-hotspot{position:absolute;z-index:4;top:12%;left:12%;width:25%;height:56%;display:flex;align-items:flex-end;
     justify-content:center;padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
-  .npc-label{padding:5px 9px;border:1px solid #a4804d;background:#19150edc;font:12px/1.3 sans-serif;text-shadow:0 1px #000}
-  .npc-hotspot:hover .npc-label,.npc-hotspot:focus-visible .npc-label{background:#3c2b19;border-color:#efd092}
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .object-art{position:absolute;z-index:3;max-width:none;object-fit:contain;pointer-events:none;
     filter:drop-shadow(0 4px 4px #0806069c);transform-origin:center 72%;
@@ -159,7 +157,6 @@
     .guther{height:86%;left:-5%;top:2%}
     .bench-foreground{object-position:39% center}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
-    .npc-label{font-size:10px}
     .object-art.stamps{width:26%;height:24%;left:0;bottom:9%}
     .object-art.plates{width:29%;height:23%;left:24%;bottom:9%}
     .object-art.paper{width:27%;height:24%;left:49%;bottom:9%}
