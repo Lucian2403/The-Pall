@@ -191,9 +191,11 @@ assert.ok(copy.includes('STAGE_FOUR_TRANSPORT_HINTS') &&
   copy.includes('I secured the plates together and carried them to the depot as one load.') &&
   copy.includes('I carried the plates in smaller groups. It took more trips'),
   'Both transport choices must change the immediate/depot/journal copy');
-assert.ok(depotUi.includes("state.phase==='COMPARE_DELIVERY' && state.transport") &&
+assert.ok(depotUi.includes("state.phase==='COMPARE_DELIVERY' && state.transport && travelConfirmed") &&
   depotUi.includes('STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]') &&
-  depotUi.includes('STAGE_FOUR_TRANSPORT_HINTS[action]'),
+  depotUi.includes('STAGE_FOUR_TRANSPORT_HINTS[action]') &&
+  depotUi.includes('Continue to the depot') &&
+  depotUi.includes("state.phase==='COMPARE_DELIVERY'&&!travelConfirmed"),
   'Saved transport must drive depot verification and pre-choice trade-off text');
 assert.ok(core.includes("case 'secure_plates':transport='secured';phase='COMPARE_DELIVERY';") &&
   core.includes("case 'carry_smaller_loads':transport='smaller_loads';phase='COMPARE_DELIVERY';"),
