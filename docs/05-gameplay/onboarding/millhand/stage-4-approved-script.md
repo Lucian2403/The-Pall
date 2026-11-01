@@ -46,23 +46,37 @@
 
 **Action:** Check the load.
 
-*You count the plates and compare the load with the work paper. The number of plates matches the delivery entry. You check whether any are loose or damaged.*
+*You finish counting the plates. None appear damaged, but the stack is heavy. You must get the lot to the municipal depot.*
 
 **Instruction:** Decide how to move the plates.
 
 **Choice 1: Secure the plates together.**
 
-*You fasten the plates together for transport. You can move them with less handling, although a heavy load can shift and damage plates if you do not keep them steady.*
+**Visible trade-off:** Fewer trips. A heavier load that must be kept steady.
+
+*You fasten the plates together and lift the bundled stack. The weight is awkward, but you can move the lot without making several trips.*
 
 **Choice 2: Carry the plates in smaller loads.**
 
-*You divide the plates into smaller groups and move them separately. You spend more time handling the load, but there is less weight to manage each time.*
+**Visible trade-off:** More trips. Less weight to manage each time.
 
-Both choices complete the move to the municipal depot. They preserve their distinct handling-time/damage-risk trade-offs when those values are implemented; this script establishes **no numbers, random outcome or guaranteed damage**.
+*You divide the plates into smaller groups. Each load is easier to manage, though you must return to the workshop several times.*
+
+Both choices complete the move to the municipal depot. The saved `transport` choice now changes immediate narration, the depot's condition/completeness check, and first-person journal text. They preserve their distinct handling-time/damage-risk trade-offs **for when those mechanics exist**; this script establishes **no numerical modifiers, damage rolls, invented fatigue cost or guaranteed damage**.
 
 ### Scene A03 — At the municipal depot
 
 *You bring the numbered plates to the receiving counter. A clerk examines the work paper and the delivery list.*
+
+**If secured together — depot condition check:**
+
+*You set the bundle on the receiving counter. Before the clerk takes it, you check that the plates have remained properly aligned.*
+
+**If carried in smaller loads — depot completeness check:**
+
+*You bring the last group to the receiving counter and put it beside the others. You count the plates again to make sure the entire lot has arrived.*
+
+These are different narrated checks of the **already-saved transport choice**, not new server actions, additional skill checks or random outcomes. Both lead to the same mandatory evidence comparison.
 
 **Action:** Compare the delivery list with the plates.
 
