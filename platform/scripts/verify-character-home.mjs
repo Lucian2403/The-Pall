@@ -29,7 +29,7 @@ assert.ok(shell.includes('class="resource-strip"') &&
   shell.includes('class="city-banner"') &&
   shell.includes('lockedSections'),
   'Keep resource meters, city masthead and original onboarding navigation');
-for(const target of ['/opening','/millhand/work','/millhand/missing-stamp','/millhand/second-job']){
+for(const target of ['/opening','/millhand/work','/millhand/missing-stamp','/millhand/second-job','/millhand/wage-claim']){
   assert.ok(markup.includes("href:base+'"+target+"'"),
     'Missing existing stage route '+target);
 }
