@@ -30,7 +30,7 @@ test('Industry: one previously stamped number, inspect load, choose secure trans
   assert.equal(s.receipt,'recorded_plates');
   s=apply(s,'complete_delivery');
   assert.equal(s.phase,'DONE');
-  assert.deepEqual(availableSecondJobActions(s),[]);
+  assert.deepEqual(availableSecondJobActions(s),['leave_location']);
   assert.equal('ordinaryXp' in s,false);
   assert.equal('coins' in s,false);
   assert.throws(()=>advanceSecondJob(s,'complete_delivery'),SecondJobInvalidAction);
@@ -64,7 +64,7 @@ for(const [challenge,choice] of [
     assert.equal(s.challenge,choice);
     s=apply(s,'submit_dispute');
     assert.equal(s.phase,'DONE');
-    assert.deepEqual(availableSecondJobActions(s),[]);
+    assert.deepEqual(availableSecondJobActions(s),['leave_location']);
   });
 }
 for(const [action,comparison] of [
@@ -84,7 +84,7 @@ for(const [action,comparison] of [
     assert.equal(s.source,comparison);
     s=apply(s,'record_finding');
     assert.equal(s.phase,'DONE');
-    assert.deepEqual(availableSecondJobActions(s),[]);
+    assert.deepEqual(availableSecondJobActions(s),['leave_location']);
   });
 }
 test('Saved state survives JSON round-trip and never autoplays through NPC speech',()=>{
@@ -100,4 +100,23 @@ test('Saved state survives JSON round-trip and never autoplays through NPC speec
   const next=apply(saved,'continue_dialogue');
   assert.equal(next.dialogueIndex,1);
   assert.equal(next.revision,saved.revision+1);
+});
+
+test('All three completed jobs preserve their chosen evidence until the explicit exit',()=>{
+  for(const branch of ['restamp','contracts','records']){
+    const saved={...initialSecondJob(branch),phase:'DONE',revision:24,
+      transport:branch==='restamp'?'secured':null,
+      challenge:branch==='contracts'?'seal_check':null,
+      source:branch==='records'?'shift_book':null};
+    assert.deepEqual(availableSecondJobActions(saved),['leave_location']);
+    assert.throws(()=>advanceSecondJob(saved,'continue_dialogue'),SecondJobInvalidAction);
+    const exited=advanceSecondJob(saved,'leave_location');
+    assert.equal(exited.phase,'EXITED');
+    assert.equal(exited.branch,branch);
+    assert.equal(exited.transport,saved.transport);
+    assert.equal(exited.challenge,saved.challenge);
+    assert.equal(exited.source,saved.source);
+    assert.deepEqual(availableSecondJobActions(exited),[]);
+    assert.throws(()=>advanceSecondJob(exited,'leave_location'),SecondJobInvalidAction);
+  }
 });
