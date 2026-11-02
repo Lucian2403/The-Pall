@@ -217,7 +217,7 @@ try{
   assert.ok(result.media.some(m=>m.file==='smithing-workshop-ambience.mp3'&&!m.paused),
     'Forge recording did not actually play after clicking Sound. '+JSON.stringify(result));
   phase='dragging Ambience slider';
-  await moveRange('[aria-label="Workshop ambience volume"]',.8);
+  await moveRange('[aria-label="Environmental ambience volume"]',.8);
   await waitUntil(async()=>{
     const a=await status();return a.media.some(m=>
       m.file==='smithing-workshop-ambience.mp3'&&m.volume>.65);
