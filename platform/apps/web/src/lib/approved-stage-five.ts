@@ -101,7 +101,8 @@ export const WAGE_CLAIM_ACTION_LABELS:Record<WageClaimAction,string>={
   say_going_home:"I'm going home.",
   brace_and_defend:'Brace and defend',
   keep_moving:'Keep moving',
-  use_cart_as_cover:'Use the cart as cover'
+  use_cart_as_cover:'Use the cart as cover',
+  previous_dialogue:'← Previous dialogue'
 };
 export const WAGE_CLAIM_STANCE_OUTCOMES={
   brace:'You plant your feet and raise your arms to protect your head and body.',
