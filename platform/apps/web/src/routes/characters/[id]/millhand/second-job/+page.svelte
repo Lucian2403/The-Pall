@@ -58,6 +58,9 @@
         snapshot=body;
         character={...character,tutorial:{stage:body.stage,status:body.tutorialStatus}};
         retryId=null;retrySignature=null;
+        if(action==='leave_location' && body.state.phase==='EXITED'){
+          await goto('/characters/'+encodeURIComponent(character.id)+'/millhand/wage-claim');
+        }
       }else{
         errorMessage=body.error==='stale_revision'?'Your saved work changed elsewhere. The scene has been reloaded.'
           :body.error==='second_job_schema_missing'?'Stage 4 database tables are missing. Run npm run second-job:migrate and restart the API.'
@@ -74,12 +77,7 @@
 {#if status==='ready' && character && snapshot}
   <TutorialShell {character} smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
     <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform}/>
-    {#if snapshot.state.phase==='DONE'}
-      <div class="follow-up">
-        The job is finished. The Wage Claim with Flint is the next chapter. That scene has not yet been connected.
-        <a href={'/characters/'+character.id}>View character</a>
-      </div>
-    {/if}
+
   </TutorialShell>
 {:else}
   <main class="fallback">
@@ -101,7 +99,5 @@
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
   :global(a){color:#dcb98b}
   .fallback{max-width:750px;margin:6vh auto;padding:30px;background:#24211e;border:1px solid #72583e}
-  .follow-up{padding:14px 18px;background:#30271e;color:#edddc4;font:14px/1.5 sans-serif}
-  .follow-up a{margin-left:12px}
   nav{margin-top:25px}
 </style>
