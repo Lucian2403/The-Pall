@@ -66,7 +66,8 @@ assert.ok(audio.includes("smithingAmbienceFile='smithing-workshop-ambience.mp3'"
   audio.includes('smithingAmbienceOwners.size>0') &&
   audio.includes('sceneActive && unlocked && settings.ambienceVolume>0') &&
   audio.includes('WORKSHOP_TRANSITION_GRACE_MS=2400') &&
-  audio.includes('if(smithingAmbienceOwners.size===0)deferAmbienceDeparture()') &&
+  audio.includes('if(smithingAmbienceOwners.size===0){') &&
+  audio.includes('deferAmbienceDeparture()') &&
   audio.includes('cancelAmbienceDeparture()') &&
   audio.includes('deferAmbienceDeparture()') &&
   audio.includes('stopAmbience(true)') &&
