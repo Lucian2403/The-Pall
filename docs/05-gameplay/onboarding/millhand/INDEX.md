@@ -8,7 +8,7 @@ The origin's [story master](README.md) retains narrative structure and mechanica
 | 2 — Worker plates | [Platework interaction](platework-interaction.md) | [Stage 2 Revision 03](stage-2-approved-script.md) |
 | 3 — Missing Stamp | [Discovery mechanics](missing-stamp-discovery.md) | [Stage 3 Revision 01](stage-3-approved-script.md) |
 | 4 — Three second jobs | [Route mechanics](second-task-branches.md) | [Stage 4 Revision 01](stage-4-approved-script.md) |
-| 5 — Flint confrontation | [Confrontation](flint-confrontation.md) | [Stage 5 Revision 02](stage-5-approved-script.md) |
+| 5 — Flint confrontation | [Confrontation](flint-confrontation.md) | [Stage 5 Revision 03](stage-5-approved-script.md) |
 | 6 — Flint fight | [Encounter](flint-fight.md) | [Stage 6 Revision 02](stage-6-approved-script.md) |
 | 7 — Clinic | [Clinic encounter](clinic-treatment.md) | [Stage 7 Revision 01](stage-7-approved-script.md) |
 | 8 — Shared rented home | [Single universal Stage 8](../shared-home-rent-ending.md) | [Stage 8 Revision 01](stage-8-approved-script.md), with the universal notice and speech unchanged |
