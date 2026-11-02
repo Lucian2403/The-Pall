@@ -164,7 +164,7 @@ export function secondJobJournal(s: SecondJobState): readonly string[] {
       result.push('One entry treats the man as dead for compensation. In the other they still charge for him as if he were alive. Both have council seals. How can they accept both?');
     if (s.challenge === 'seal_check') result.push('I asked the clerk to check both seals. Both entries had been accepted. Still no explanation.');
     if (s.challenge === 'written_complaint') result.push('I marked what was wrong on the work paper. The clerk recorded my complaint.');
-    if (s.phase === 'DONE') result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
+    if (s.phase === 'DONE' || s.phase === 'EXITED') result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
   }
   if (s.branch === 'records') {
     if (!['READ_DEATH_REGISTER', 'READ_WAGE_RECORD'].includes(s.phase))
@@ -175,7 +175,7 @@ export function secondJobJournal(s: SecondJobState): readonly string[] {
       result.push("Someone scraped writing from an entry. The archive assistant didn't know who had done it. I wasn't going to damage the page any further.");
     if (s.source === 'neighbouring_entries') result.push('I compared the entries around the damaged one. The number is still there in the later wage record.');
     if (s.source === 'shift_book') result.push('I checked the shift book against the wage record. Both have that number after the recorded death.');
-    if (s.phase === 'DONE') result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
+    if (s.phase === 'DONE' || s.phase === 'EXITED') result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
   }
   return result;
 }
