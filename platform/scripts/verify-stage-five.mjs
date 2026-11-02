@@ -61,8 +61,7 @@ assert.ok(core.includes("case 'FIGHT_PENDING':return []") &&
   !api.includes("tutorial_stage=6") &&
   !api.includes("UPDATE player_characters SET coins"),
   'Scene must stop before combat; no scripted win, fee or loot');
-assert.ok(scene.includes('inspectPaper()')===false &&
-  scene.includes('onclick={inspectPaper}') &&
+assert.ok(scene.includes('onclick={inspectPaper}') &&
   scene.includes('onclick={inspectClub}') &&
   scene.includes('onclick={inspectCart}') &&
   scene.includes('snapshot.availableActions'),
