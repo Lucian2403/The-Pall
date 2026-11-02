@@ -8,6 +8,7 @@
     secondJobJournal
   } from '$lib/approved-stage-four';
   import '$lib/workshop-object-labels.css';
+  import StageFourNextStep from '$lib/StageFourNextStep.svelte';
 
   type Snapshot = {
     stage:number;
@@ -80,6 +81,7 @@
       {/if}
       {#if state.phase==='DONE'}
         <p class="outcome">{STAGE_FOUR_FINAL.restamp}</p>
+        <StageFourNextStep/>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
