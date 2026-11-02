@@ -17,9 +17,17 @@ const dev=read('apps/api/src/millhand-stage-rewind-routes.ts');
 const packageJSON=JSON.parse(read('package.json'));
 
 for(const phrase of [
-  'You did the plate work for Anvil?',
-  "They've stopped that lot. The contractor wants money for the delay.",
-  "I wasn't sent to pay you.",
+  "Flint steps into your way and shoves a folded paper towards you.",
+  "You worked on Anvil's plates?",
+  "Yeah. What of it?",
+  "Lot's been stopped. Boss wants his money. Says you're paying.",
+  "Paying for what? I ain't even got my wages!",
+  "Don't care. I came to collect.",
+  "You snatch the paper and unfold it. There's the plate lot number.",
+  "And that worker number again. The same one the council had marked as cancelled.",
+  "You read further. They've put a charge against your name for the delay.",
+  "But your wages? Not a word about those.",
+  "Bloody hell. They haven't paid you a penny, and now they want money from you.",
   'Who gave you the right to take money from me? The council?',
   "Don't know. They don't tell men like us.",
   "And you still want me to pay?",
@@ -33,6 +41,13 @@ for(const phrase of [
   assert.ok(canon.includes(phrase),'Missing canonical Stage 5 speech: '+phrase);
   assert.ok(copy.includes(phrase),'Stage 5 player-facing copy drifts from canon: '+phrase);
 }
+assert.ok(!copy.includes('You did the plate work for Anvil?') &&
+  !copy.includes("I wasn't sent to pay you.") &&
+  !scene.includes('Flint holds out the folded paper.'),
+  'Outdated Stage 5 opening or duplicate paper narration must not return');
+assert.ok(scene.includes("white-space:pre-line") &&
+  scene.includes("beat.speaker==='Player'?'You':'Flint'"),
+  'Demand narration keeps all three owner-authored paragraphs and Flint nameplate');
 for(const branch of ['restamp','contracts','records']){
   assert.match(copy,new RegExp(branch+':\\['),'Missing branch-only evidence: '+branch);
 }
