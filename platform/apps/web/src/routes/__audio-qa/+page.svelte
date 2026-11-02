@@ -22,7 +22,7 @@
 
 {#key stage}
   <TutorialShell {character} sceneLocation={councilRoom==='contracts'?'Council Contracts office':councilRoom==='records'?'Council records room':forgeVisible?'Smithing Workshop':'Municipal depot'} smithingBackdrop={forgeVisible && councilRoom===null} councilBackdrop={councilRoom!==null}>
-    <div class="audio-qa-scene" class:depot={!forgeVisible && councilRoom===null} class:council={councilRoom!==null}>
+    <div class="audio-qa-scene" class:depot={!forgeVisible && councilRoom===null} class:council={councilRoom!==null} class:records={councilRoom==='records'}>
       <h1>Audio diagnostics · Stage {stage}</h1>
       <p>Development fixture. Open Sound settings in the header. Music, Ambience and Effects should respond independently to user clicks and slider changes.</p>
       <div class="qa-actions">
@@ -51,6 +51,9 @@
   }
   .audio-qa-scene.council{
     background:linear-gradient(105deg,#15120f99,#24160988),url('/locations/contracts/contracts-office.webp') center/cover;
+  }
+  .audio-qa-scene.records{
+    background:linear-gradient(105deg,#15120f99,#24160988),url('/locations/records/records-room.webp') center/cover;
   }
   .qa-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
   .qa-actions button{background:#3c2c20;border:1px solid #a77f4d;color:#efdeba;padding:10px 13px;cursor:pointer}
