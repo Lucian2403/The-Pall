@@ -5,7 +5,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
-  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience} from '$lib/pall-audio';
+  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience} from '$lib/pall-audio';
 
   type SavedCharacter = {
     id: string;
@@ -23,7 +23,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean} = $props();
+  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean} = $props();
   const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 4
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
     : character.origin === 'Millhand' && character.tutorial.stage === 3
@@ -75,6 +75,12 @@
   $effect(()=>{
     if(smithingBackdrop)return claimSmithingWorkshopAmbience();
     stopSmithingWorkshopAmbience();
+  });
+  // Both council interiors use one soundscape. Claim it from the actual
+  // painted route, not a generic character stage; keep it outside the popup.
+  $effect(()=>{
+    if(councilBackdrop)return claimCouncilOfficeAmbience();
+    stopCouncilOfficeAmbience();
   });
 
   onMount(()=>{

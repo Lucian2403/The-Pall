@@ -116,3 +116,16 @@ A single `HTMLAudioElement` owns the **same playing position** across scene remo
 This does **not** change MusicTheme's spaced looping, any Effects Web Audio buffers, or the owner's Music/Ambience/Effects sliders and saved volumes.
 
 **Verified in GitHub Actions** using both the executable runtime mock and a real Chromium page with the production Sound UI: the Svelte shell is deliberately unmounted and remounted using a keyed new stage; the recording's `currentTime` does not regress. Switching that same page's visible backdrop to the depot must pause the recorded ambience and reset only at that confirmed departure.
+
+## Council interiors ambience — Contracts and Scholarship, 2026-11-02
+
+The owner provided `Contracts_Ambience.wav` to play in **both** Millhand Stage 4 Council Contracts and Scholarship records-room backgrounds. This is one shared indoor recording, not two layers and not the background-music theme.
+
+- Original: 110.76 seconds, 48 kHz, 32-bit PCM stereo WAV. The first/last sample values meet cleanly for a continuous loop.
+- Browser asset: `platform/apps/web/static/audio/the-pall/contracts-scholarship-ambience.mp3`, 128 kb/s stereo MP3 (1,772,972 bytes), SHA-256 `14c45b7fe9f054023d57d304488b113845898fe55166a3adcd504d3761d16437`.
+- **Binary asset installation:** this MP3 must be committed at the path above. It is supplied in the accompanying `ThePall_Contracts_Scholarship_Ambience_Asset.zip` with the original folder structure. Connector-based GitHub text edits cannot upload the local binary file, so source changes alone do not provide audible playback.
+- Both illustrated council scenes call the shared `claimCouncilOfficeAmbience()` via `TutorialShell.councilBackdrop`. No independent scene component owns a second player. The player is reused between short shell remounts.
+- The loop preloads once, starts only after real browser interaction, observes master mute and the **same** persisted Ambience slider as smithing, and pauses in background tabs. The Music and Effects channels are unchanged.
+- A confirmed transition out of council interiors stops/resets it immediately. Brief route reloads have the same 2,400 ms continuation grace as the forge. Council sound must not overlap forge, depot or other unrelated places.
+- The actual backdrop/route controls playback; a dialogue popup or journal never controls the room sound. The `/__audio-qa` fixture can switch among forge, depot, Contracts and Scholarship for manual browser checking.
+- Do not invent ambient effects, audio fades, per-route volume multipliers, extra files or gameplay consequences.

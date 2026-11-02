@@ -167,10 +167,55 @@ nextForge();
 engine.stopSmithingWorkshopAmbience();
 assert.equal(ambience.paused,true,'Switching to depot/other backdrop must stop ambience immediately.');
 assert.equal(ambience.currentTime,0,'A confirmed departure should reset for a future independent visit.');
-assert.equal(status().ambience,'Workshop only');
+assert.equal(status().ambience,'Workshop or council office only');
+
+const releaseCouncil=engine.claimCouncilOfficeAmbience();
+const council=find('contracts-scholarship-ambience.mp3');
+assert.ok(council,'Council ambience must use the uploaded owner recording.');
+assert.equal(council.loadCount,1,'Council recording preloads exactly once.');
+assert.equal(council.loop,true,'Council recording loops, like the workshop.');
+await flush();
+assert.equal(council.paused,false,'An already-unlocked browser starts council ambience.');
+assert.equal(ambience.paused,true,'Forge ambience must not overlap the council.');
+assert.equal(status().ambience,'Playing');
+assert.ok(Math.abs(council.volume-.4)<.0001,'Office respects saved ambience slider.');
+
+engine.setPallAudioSettings({ambienceVolume:.65});
+await flush();
+assert.ok(Math.abs(council.volume-.65)<.0001,'Council slider controls the live player.');
+engine.setPallAudioSettings({enabled:false});
+assert.equal(council.paused,true,'Master mute also stops office ambience.');
+engine.setPallAudioSettings({enabled:true});
+await flush();
+assert.equal(council.paused,false,'Master unmute resumes the current office.');
+
+document.hidden=true;
+document.dispatch('visibilitychange');
+assert.equal(council.paused,true,'Hidden tab pauses indoor sound.');
+document.hidden=false;
+document.dispatch('visibilitychange');
+await flush();
+assert.equal(council.paused,false,'Visible tab resumes indoor sound.');
+
+council.currentTime=38;
+releaseCouncil();
+engine.setPallAudioScene(false);
+assert.equal(council.paused,false,'Brief Contracts→Scholarship handoff keeps the loop.');
+const releaseScholarship=engine.claimCouncilOfficeAmbience();
+engine.setPallAudioScene(true);
+await flush();
+assert.strictEqual(find('contracts-scholarship-ambience.mp3'),council,
+  'Both council rooms reuse the exact same player.');
+assert.equal(council.currentTime,38,'Scholarship should not restart the recording.');
+releaseScholarship();
+engine.stopCouncilOfficeAmbience();
+assert.equal(council.paused,true,'A confirmed depot/background change stops office ambience.');
+assert.equal(council.currentTime,0,'A confirmed departure resets office playback.');
+assert.equal(status().ambience,'Workshop or council office only');
+
 engine.setPallAudioScene(false);
 assert.equal(music.paused,true,'Leaving the game must pause music.');
 detach();
 assert.equal(listeners.get('pointerdown')?.size??0,0,'Release gesture listeners.');
 assert.equal(listeners.get('keydown')?.size??0,0,'Release keyboard listeners.');
-console.log('PASS: audio sliders, workshop-to-workshop continuity at 47s, immediate depot stop, master mute and SFX gain.');
+console.log('PASS: forge and council ambience continuity, mute, tab visibility, sliders and no overlapping loops.');

@@ -25,7 +25,7 @@ export type PallAudioPlayback={
 };
 export const pallAudioPlayback=writable<PallAudioPlayback>({
   music:'Waiting for interaction',
-  ambience:'Workshop only',
+  ambience:'Workshop or council office only',
   effects:'Loading'
 });
 
@@ -39,6 +39,8 @@ const paperVariants=['UI_PaperJournal.wav','UI_PaperJournal2.wav'] as const;
 const smithVariants=['UI-SmithingAction.wav','UI-SmithingAction02.wav'] as const;
 const musicFile='music-theme.mp3';
 const smithingAmbienceFile='smithing-workshop-ambience.mp3';
+// Same owner-provided indoor ambience for the Contracts and Scholarship rooms.
+const councilOfficeAmbienceFile='contracts-scholarship-ambience.mp3';
 const FADE_IN=4;
 const FADE_OUT=5;
 const MUSIC_PAUSE_MIN_MS=30_000;
@@ -50,18 +52,24 @@ let sceneActive=false;
 let unlocked=false;
 let music:HTMLAudioElement|null=null;
 let ambience:HTMLAudioElement|null=null;
+let councilAmbience:HTMLAudioElement|null=null;
 let musicError=false;
 let ambienceError=false;
+let councilAmbienceError=false;
 let musicBlocked=false;
 let ambienceBlocked=false;
+let councilAmbienceBlocked=false;
 let statusSnapshot='';
 // A workshop scene claims the soundscape for as long as its illustration
 // is visible. Ownership is independent of URL so non-workshop pages stay silent.
 const smithingAmbienceOwners=new Set<symbol>();
+const councilAmbienceOwners=new Set<symbol>();
+let activeAmbienceScene:'forge'|'council'|null=null;
 // SvelteKit briefly unmounts the old stage while the next stage loads.
 // Do not replay the 115-second forge recording from its beginning each time.
 const WORKSHOP_TRANSITION_GRACE_MS=2400;
 let ambienceDepartureTimer:ReturnType<typeof setTimeout>|null=null;
+let councilDepartureTimer:ReturnType<typeof setTimeout>|null=null;
 let nextMusicTimer:ReturnType<typeof setTimeout>|null=null;
 let lastClickAt=0;
 
@@ -91,12 +99,16 @@ function publishPlayback(){
     :nextMusicTimer!==null?'Resting'
     :musicBlocked?'Playback blocked — click to retry'
     :music&&!music.paused?'Playing':'Loading');
+  const activeTrack=activeAmbienceScene==='forge'?ambience
+    :activeAmbienceScene==='council'?councilAmbience:null;
+  const activeError=activeAmbienceScene==='forge'?ambienceError:councilAmbienceError;
+  const activeBlocked=activeAmbienceScene==='forge'?ambienceBlocked:councilAmbienceBlocked;
   const ambienceState=unavailable??(settings.ambienceVolume===0?'Off'
-    :smithingAmbienceOwners.size===0?'Workshop only'
-    :ambienceError?'File unavailable'
+    :activeAmbienceScene===null?'Workshop or council office only'
+    :activeError?'File unavailable'
     :!unlocked?'Click to start'
-    :ambienceBlocked?'Playback blocked — click to retry'
-    :ambience&&!ambience.paused?'Playing':'Loading');
+    :activeBlocked?'Playback blocked — click to retry'
+    :activeTrack&&!activeTrack.paused?'Playing':'Loading');
   const effectsState=unavailable??(settings.sfxVolume===0?'Off'
     :sfxFailures.size>0?'Sound file unavailable'
     :sfxBuffers.size===sfxFiles.length?'Ready'
@@ -203,7 +215,7 @@ function ensureMusic(){
 function canPlayAmbience(){
   return typeof document!=='undefined' && settings.enabled &&
     sceneActive && unlocked && settings.ambienceVolume>0 &&
-    smithingAmbienceOwners.size>0 && !document.hidden;
+    smithingAmbienceOwners.size>0 && activeAmbienceScene==='forge' && !document.hidden;
 }
 function ensureAmbience(){
   if(ambience)return ambience;
@@ -274,8 +286,99 @@ function updateAmbience(){
     stopAmbience();
   }
 }
+
+/** Same streaming, user-gesture and pause/resume contract as the forge loop.
+ * Separate media elements keep their positions while the HUD is remounted. */
+function canPlayCouncilAmbience(){
+  return typeof document!=='undefined' && settings.enabled &&
+    sceneActive && unlocked && settings.ambienceVolume>0 &&
+    councilAmbienceOwners.size>0 && activeAmbienceScene==='council' && !document.hidden;
+}
+function ensureCouncilAmbience(){
+  if(councilAmbience)return councilAmbience;
+  councilAmbience=new Audio(base+councilOfficeAmbienceFile);
+  councilAmbience.preload='auto';
+  councilAmbience.loop=true;
+  councilAmbience.volume=0;
+  councilAmbience.addEventListener('playing',publishPlayback);
+  councilAmbience.addEventListener('pause',publishPlayback);
+  councilAmbience.addEventListener('error',()=>{councilAmbienceError=true;publishPlayback();});
+  councilAmbience.load();
+  publishPlayback();
+  return councilAmbience;
+}
+function cancelCouncilDeparture(){
+  if(councilDepartureTimer!==null){clearTimeout(councilDepartureTimer);councilDepartureTimer=null;}
+}
+function stopCouncilAmbience(reset=false){
+  if(!councilAmbience)return;
+  councilAmbience.pause();
+  if(reset){try{councilAmbience.currentTime=0;}catch{/* Not loaded yet. */}}
+  publishPlayback();
+}
+function deferCouncilDeparture(){
+  if(councilDepartureTimer!==null||!councilAmbience||councilAmbience.paused)return;
+  councilDepartureTimer=setTimeout(()=>{
+    councilDepartureTimer=null;
+    if(!sceneActive||councilAmbienceOwners.size===0)stopCouncilAmbience();
+  },WORKSHOP_TRANSITION_GRACE_MS);
+}
+function startCouncilAmbience(){
+  if(!canPlayCouncilAmbience())return;
+  const track=ensureCouncilAmbience();
+  track.volume=clamp(settings.ambienceVolume,0,1);
+  if(track.paused)void track.play().then(()=>{
+    councilAmbienceBlocked=false;
+    publishPlayback();
+  }).catch(()=>{
+    councilAmbienceBlocked=true;
+    publishPlayback();
+  });
+  publishPlayback();
+}
+function updateCouncilAmbience(){
+  if(typeof document==='undefined'||document.hidden||!settings.enabled||settings.ambienceVolume<=0){
+    cancelCouncilDeparture();
+    stopCouncilAmbience();
+  }else if(canPlayCouncilAmbience()){
+    cancelCouncilDeparture();
+    startCouncilAmbience();
+  }else if(!sceneActive||councilAmbienceOwners.size===0){
+    deferCouncilDeparture();
+  }else{
+    stopCouncilAmbience();
+  }
+}
+/** A confirmed non-council backdrop stops the indoor room immediately. */
+export function stopCouncilOfficeAmbience(){
+  if(activeAmbienceScene==='council')activeAmbienceScene=null;
+  cancelCouncilDeparture();
+  stopCouncilAmbience(true);
+}
+/** Contracts and Scholarship share one persistent loop, never two copies. */
+export function claimCouncilOfficeAmbience(){
+  const owner=Symbol('council-office');
+  councilAmbienceOwners.add(owner);
+  activeAmbienceScene='council';
+  cancelAmbienceDeparture();
+  stopAmbience(true);
+  cancelCouncilDeparture();
+  if(typeof window!=='undefined'&&settings.enabled)ensureCouncilAmbience();
+  updateCouncilAmbience();
+  publishPlayback();
+  return ()=>{
+    councilAmbienceOwners.delete(owner);
+    if(councilAmbienceOwners.size===0){
+      if(activeAmbienceScene==='council')activeAmbienceScene=null;
+      deferCouncilDeparture();
+    }else updateCouncilAmbience();
+    publishPlayback();
+  };
+}
+
 /** A confirmed non-forge background must stop the loop immediately. */
 export function stopSmithingWorkshopAmbience(){
+  if(activeAmbienceScene==='forge')activeAmbienceScene=null;
   cancelAmbienceDeparture();
   stopAmbience(true);
 }
@@ -286,6 +389,9 @@ export function stopSmithingWorkshopAmbience(){
 export function claimSmithingWorkshopAmbience(){
   const owner=Symbol('smithing-workshop');
   smithingAmbienceOwners.add(owner);
+  activeAmbienceScene='forge';
+  cancelCouncilDeparture();
+  stopCouncilAmbience(true);
   cancelAmbienceDeparture();
   if(typeof window!=='undefined'&&settings.enabled){
     // Fetch once when a workshop is displayed; play only after activation.
@@ -296,7 +402,10 @@ export function claimSmithingWorkshopAmbience(){
   return ()=>{
     smithingAmbienceOwners.delete(owner);
     // Stage transitions momentarily have no owner. Never reset here.
-    if(smithingAmbienceOwners.size===0)deferAmbienceDeparture();
+    if(smithingAmbienceOwners.size===0){
+      if(activeAmbienceScene==='forge')activeAmbienceScene=null;
+      deferAmbienceDeparture();
+    }
     else updateAmbience();
     publishPlayback();
   };
@@ -331,6 +440,7 @@ function unlock(){
   if(context?.state==='suspended')void context.resume().catch(()=>{});
   startMusic();
   updateAmbience();
+  updateCouncilAmbience();
   publishPlayback();
 }
 export function activatePallAudio(){
@@ -444,12 +554,14 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
   if(!settings.enabled){
     stopMusic();
     stopAmbience();
+    stopCouncilAmbience();
     stopSoundEffects();
   }else{
     prepareSoundEffects();
     if(canPlayMusic())startMusic();
     updateMusicVolume();
     updateAmbience();
+    updateCouncilAmbience();
   }
   publishPlayback();
 }
@@ -460,11 +572,13 @@ export function setPallAudioScene(active:boolean){
     prepareSoundEffects();
     startMusic();
     updateAmbience();
+    updateCouncilAmbience();
   }else{
     stopMusic();
     // The incoming stage may render the same painted forge background.
     // Preserve the ambient loop until its new shell can declare the scene.
     deferAmbienceDeparture();
+    deferCouncilDeparture();
     stopSoundEffects();
   }
   publishPlayback();
@@ -501,9 +615,11 @@ function visible(){
   if(document.hidden){
     stopMusic();
     stopAmbience();
+    stopCouncilAmbience();
   }else{
     startMusic();
     updateAmbience();
+    updateCouncilAmbience();
   }
   publishPlayback();
 }
@@ -535,12 +651,20 @@ export function connectPallAudio(){
     document.removeEventListener('visibilitychange',visible);
     stopMusic();
     cancelAmbienceDeparture();
+    cancelCouncilDeparture();
     stopAmbience(true);
+    stopCouncilAmbience(true);
     ambience=null;
+    councilAmbience=null;
+    activeAmbienceScene=null;
+    smithingAmbienceOwners.clear();
+    councilAmbienceOwners.clear();
     ambienceError=false;
+    councilAmbienceError=false;
     musicError=false;
     musicBlocked=false;
     ambienceBlocked=false;
+    councilAmbienceBlocked=false;
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();

@@ -10,6 +10,7 @@ on:
       - 'platform/scripts/verify-audio-*.mjs'
       - 'platform/scripts/verify-character-home.mjs'
       - 'platform/scripts/verify-workshop-hud-ambience.mjs'
+      - 'platform/scripts/verify-council-ambience-asset.mjs'
       - 'platform/apps/web/static/audio/the-pall/**'
       - 'platform/package.json'
       - 'platform/package-lock.json'
@@ -54,6 +55,8 @@ jobs:
         run: npm run verify:canonical-copy
       - name: Vite production compilation
         run: npm run build -w @the-pall/web
+      - name: Verify exact owner Council room audio asset
+        run: npm run verify:council-ambience-asset
       - name: Real Chromium audio controls
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-audio-browser.mjs

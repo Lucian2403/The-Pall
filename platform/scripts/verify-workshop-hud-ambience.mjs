@@ -66,7 +66,8 @@ assert.ok(audio.includes("smithingAmbienceFile='smithing-workshop-ambience.mp3'"
   audio.includes('smithingAmbienceOwners.size>0') &&
   audio.includes('sceneActive && unlocked && settings.ambienceVolume>0') &&
   audio.includes('WORKSHOP_TRANSITION_GRACE_MS=2400') &&
-  audio.includes('if(smithingAmbienceOwners.size===0)deferAmbienceDeparture()') &&
+  audio.includes('if(smithingAmbienceOwners.size===0){') &&
+  audio.includes('deferAmbienceDeparture()') &&
   audio.includes('cancelAmbienceDeparture()') &&
   audio.includes('deferAmbienceDeparture()') &&
   audio.includes('stopAmbience(true)') &&
@@ -87,7 +88,7 @@ assert.ok(audio.includes("ambienceVolume:typeof next.ambienceVolume==='number'")
   audio.includes('window.localStorage.getItem(KEY') &&
   audio.includes('MAX_MUSIC_VOLUME=0.5') &&
   settings.includes('const MAX_MUSIC_VOLUME=0.5') &&
-  settings.includes('Workshop ambience volume') &&
+  settings.includes('Environmental ambience volume') &&
   settings.includes('aria-label="Sound effects volume"') &&
   settings.includes('aria-label="Background music volume"'),
   'Master mute and three distinct volume sliders must persist without reducing the owner music maximum');
@@ -102,10 +103,28 @@ assert.ok(characterPage.includes("smithingBackdrop={character.origin==='Millhand
   workPage.includes('smithingBackdrop={true}') &&
   missingPage.includes('smithingBackdrop={true}') &&
   depotPage.includes("smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')}") &&
-  qaPage.includes('smithingBackdrop={forgeVisible}') &&
+  qaPage.includes('smithingBackdrop={forgeVisible && councilRoom===null}') &&
+  qaPage.includes('councilBackdrop={councilRoom!==null}') &&
   depot.includes("class:preparing={atWorkshop}") &&
   depot.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
   'Only routes showing actual workshop artwork may request forge ambience');
+assert.ok(audio.includes("councilOfficeAmbienceFile='contracts-scholarship-ambience.mp3'") &&
+  audio.includes('export function claimCouncilOfficeAmbience()') &&
+  audio.includes('export function stopCouncilOfficeAmbience()') &&
+  audio.includes('councilAmbience.loop=true') &&
+  audio.includes("activeAmbienceScene='council'") &&
+  audio.includes('councilAmbienceOwners=new Set<symbol>()') &&
+  audio.includes('cancelCouncilDeparture()') &&
+  audio.includes('deferCouncilDeparture()') &&
+  audio.includes('councilAmbience.load()') &&
+  audio.includes('updateCouncilAmbience()') &&
+  hud.includes('councilBackdrop = false') &&
+  hud.includes('if(councilBackdrop)return claimCouncilOfficeAmbience()') &&
+  hud.includes('stopCouncilOfficeAmbience()') &&
+  depotPage.includes("councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'}") &&
+  mainLayout.includes('stopCouncilOfficeAmbience();') &&
+  settings.includes('Contracts office and records room'),
+  'Contracts and Scholarship must share one backdrop-scoped indoor loop without altering the forge or music');
 assert.ok(!audio.includes("music.loop=true") &&
   audio.includes("music.loop=false") &&
   audio.includes('MUSIC_PAUSE_MIN_MS=30_000') &&
