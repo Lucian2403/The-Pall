@@ -74,12 +74,6 @@
 {#if status==='ready' && character && snapshot}
   <TutorialShell {character} smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
     <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform}/>
-    {#if snapshot.state.phase==='DONE'}
-      <div class="follow-up">
-        Your second job is complete. Continue towards home and face Flint's Wage Claim.
-        <a href={'/characters/'+character.id+'/millhand/wage-claim'}>Continue to The Wage Claim</a>
-      </div>
-    {/if}
   </TutorialShell>
 {:else}
   <main class="fallback">
@@ -101,7 +95,5 @@
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
   :global(a){color:#dcb98b}
   .fallback{max-width:750px;margin:6vh auto;padding:30px;background:#24211e;border:1px solid #72583e}
-  .follow-up{padding:14px 18px;background:#30271e;color:#edddc4;font:14px/1.5 sans-serif}
-  .follow-up a{margin-left:12px}
   nav{margin-top:25px}
 </style>
