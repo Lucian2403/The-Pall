@@ -50,10 +50,16 @@
       href:base+'/millhand/second-job'
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===5) return {
-      title:'Your Finished Work',
-      description:'The second job is complete. Review the work already recorded.',
-      label:'Review the finished second job',
-      href:base+'/millhand/second-job'
+      title:'The Wage Claim',
+      description:'Flint has stopped you on the way home. His demand concerns your completed council work.',
+      label:'Continue the confrontation',
+      href:base+'/millhand/wage-claim'
+    };
+    if(character.origin==='Millhand'&&character.tutorial.stage===6) return {
+      title:'The Fight with Flint',
+      description:'Your confrontation and opening stance are saved. The approved Stage 6 combat has not been connected yet.',
+      label:'Review the saved confrontation',
+      href:base+'/millhand/wage-claim'
     };
     return null;
   });
