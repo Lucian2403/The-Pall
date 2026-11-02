@@ -258,7 +258,37 @@ try{
   const depot=await status();
   assert.ok(forge(depot).currentTime<0.1,
     'Forge must reset only on a confirmed non-forge backdrop: '+JSON.stringify(depot));
-  console.log('PASS: real Chromium Sound sliders, 115s forge loop, next-stage continuity, immediate depot silence, and Web Audio click.',JSON.stringify({after,subsequent,depot}));
+
+  phase='entering Contracts office';
+  await click('Switch to Contracts');
+  const council=items=>items.media.find(m=>m.file==='contracts-scholarship-ambience.mp3');
+  await waitUntil(async()=>{
+    const a=await status();
+    return council(a)&&!council(a).paused&&a.texts.includes('Playing');
+  },12000,'Contracts indoor ambience');
+  let contracts=await status();
+  assert.ok(forge(contracts).paused,'Forge ambience must stay silent in Contracts.');
+  assert.ok(council(contracts).volume>.65,'Council audio uses the same ambience slider.');
+
+  phase='switching from Contracts to Scholarship';
+  const councilBefore=council(contracts).currentTime;
+  await click('Switch to Scholarship');
+  await waitUntil(()=>evalJS(`document.querySelector('.audio-qa-scene.records')!==null`),
+    7000,'Scholarship record-room background');
+  await waitUntil(async()=>!council(await status())?.paused,7000,'continuous council loop');
+  let scholarship=await status();
+  assert.ok(council(scholarship).currentTime>=councilBefore-.2,
+    'Scholarship must reuse the Contracts loop without restarting the MP3.');
+
+  phase='leaving the council to return to forge';
+  await click('Return to forge');
+  await waitUntil(async()=>council(await status())?.paused===true,8000,'council stop');
+  const returned=await status();
+  assert.ok(council(returned).currentTime<.1,
+    'A confirmed new background must reset the Council recording.');
+  await waitUntil(async()=>forge(await status())?.paused===false,8000,'forge resumed');
+
+  console.log('PASS: real Chromium ambience loops in forge, Contracts and Scholarship; slider, transitions, master mute and Web Audio click.',JSON.stringify({after,subsequent,depot,contracts,scholarship,returned}));
 }finally{close();}
 // Vite starts subprocesses and Chromium opens a DevTools WebSocket; those
 // handles can linger after the checks pass. The fixture is disposable and
