@@ -78,7 +78,7 @@
 
 <svelte:head><title>The Pall — Millhand second job</title></svelte:head>
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character} smithingBackdrop={preparingAtWorkshop} depotBackdrop={showingDepot} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
+  <TutorialShell {character} smithingBackdrop={preparingAtWorkshop} depotBackdrop={showingDepot} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(preparingAtWorkshop?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
     <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform} {travelConfirmed} confirmTravel={()=>{travelConfirmed=true;}}/>
   </TutorialShell>
 {:else}
