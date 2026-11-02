@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import type {Snippet} from 'svelte';
   import {beforeNavigate} from '$app/navigation';
-  import {connectPallAudio,stopSmithingWorkshopAmbience,stopCouncilOfficeAmbience,stopNightAlleyAmbience} from '$lib/pall-audio';
+  import {connectPallAudio,stopSmithingWorkshopAmbience,stopCouncilOfficeAmbience,stopNightAlleyAmbience,stopDepotAmbience} from '$lib/pall-audio';
 
   let {children}:{children:Snippet}=$props();
 
@@ -16,6 +16,7 @@
       stopSmithingWorkshopAmbience();
       stopCouncilOfficeAmbience();
       stopNightAlleyAmbience();
+      stopDepotAmbience();
     }
   });
 </script>

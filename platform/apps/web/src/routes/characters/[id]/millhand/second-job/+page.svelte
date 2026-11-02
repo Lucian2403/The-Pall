@@ -18,6 +18,12 @@
   let snapshot=$state<Snapshot|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'stage-three'|'schema'|'unavailable'>('loading');
   let pending=$state(false);
+  // COMPARE_DELIVERY is saved before the player actually leaves the workshop.
+  let travelConfirmed=$state(false);
+  const preparingAtWorkshop=$derived(snapshot?.state.branch==='restamp' &&
+    (snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'||
+      (snapshot.state.phase==='COMPARE_DELIVERY'&&!travelConfirmed)));
+  const showingDepot=$derived(snapshot?.state.branch==='restamp'&&!preparingAtWorkshop);
   let errorMessage=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
@@ -72,8 +78,8 @@
 
 <svelte:head><title>The Pall — Millhand second job</title></svelte:head>
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character} smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
-    <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform}/>
+  <TutorialShell {character} smithingBackdrop={preparingAtWorkshop} depotBackdrop={showingDepot} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
+    <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform} {travelConfirmed} confirmTravel={()=>{travelConfirmed=true;}}/>
   </TutorialShell>
 {:else}
   <main class="fallback">

@@ -5,7 +5,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
-  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience} from '$lib/pall-audio';
+  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience,claimDepotAmbience,stopDepotAmbience} from '$lib/pall-audio';
 
   type SavedCharacter = {
     id: string;
@@ -23,7 +23,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, alleyBackdrop = false, backToStageFive, backStageBusy = false, backStageError = ''}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; alleyBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean; backStageError?: string} = $props();
+  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, alleyBackdrop = false, depotBackdrop = false, backToStageFive, backStageBusy = false, backStageError = ''}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; alleyBackdrop?: boolean; depotBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean; backStageError?: string} = $props();
   const chapter = $derived(character.origin === 'Millhand' && (character.tutorial.stage === 5 || character.tutorial.stage === 6)
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/wage-claim'
     : character.origin === 'Millhand' && character.tutorial.stage === 4
@@ -88,6 +88,12 @@
   $effect(()=>{
     if(alleyBackdrop)return claimNightAlleyAmbience();
     stopNightAlleyAmbience();
+  });
+
+  // Depot playback follows the visible backdrop, not merely Stage 4 status.
+  $effect(()=>{
+    if(depotBackdrop)return claimDepotAmbience();
+    stopDepotAmbience();
   });
 
   // Refresh the local-only replay button when undoing the Stage 6 stance

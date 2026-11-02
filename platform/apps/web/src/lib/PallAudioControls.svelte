@@ -61,7 +61,7 @@
             Test click
           </button>
       </div>
-      <small class="audio-footnote">Music rests between playthroughs. Environmental ambience plays in the Smithing Workshop, Council offices and Flint's dark alley.</small>
+      <small class="audio-footnote">Music rests between playthroughs. Environmental ambience plays in the Smithing Workshop, Municipal Depot, Council offices and Flint's dark alley.</small>
     </div>
   {/if}
 </div>

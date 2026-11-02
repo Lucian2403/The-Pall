@@ -22,7 +22,7 @@
 </script>
 
 {#key stage}
-  <TutorialShell {character} sceneLocation={alleyVisible?'Industrial service passage':councilRoom==='contracts'?'Council Contracts office':councilRoom==='records'?'Council records room':forgeVisible?'Smithing Workshop':'Municipal depot'} smithingBackdrop={forgeVisible && councilRoom===null && !alleyVisible} councilBackdrop={councilRoom!==null && !alleyVisible} alleyBackdrop={alleyVisible}>
+  <TutorialShell {character} sceneLocation={alleyVisible?'Industrial service passage':councilRoom==='contracts'?'Council Contracts office':councilRoom==='records'?'Council records room':forgeVisible?'Smithing Workshop':'Municipal depot'} smithingBackdrop={forgeVisible && councilRoom===null && !alleyVisible} councilBackdrop={councilRoom!==null && !alleyVisible} alleyBackdrop={alleyVisible} depotBackdrop={!forgeVisible && councilRoom===null && !alleyVisible}>
     <div class="audio-qa-scene" class:depot={!forgeVisible && councilRoom===null} class:council={councilRoom!==null} class:records={councilRoom==='records'} class:alley={alleyVisible}>
       <h1>Audio diagnostics · Stage {stage}</h1>
       <p>Development fixture. Open Sound settings in the header. Music, Ambience and Effects should respond independently to user clicks and slider changes.</p>

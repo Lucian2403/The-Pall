@@ -13,9 +13,10 @@
   type Snapshot={stage:number;tutorialStatus:string;state:SecondJobState;
     availableActions:SecondJobAction[];
     tutorialPayout:{coins:number;ordinaryXp:number;items:number}};
-  let {snapshot,pending,errorMessage,perform}:{
+  let {snapshot,pending,errorMessage,perform,travelConfirmed,confirmTravel}:{
     snapshot:Snapshot;pending:boolean;errorMessage:string;
-    perform:(action:SecondJobAction)=>Promise<void>
+    perform:(action:SecondJobAction)=>Promise<void>;
+    travelConfirmed:boolean;confirmTravel:()=>void
   }=$props();
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
@@ -40,7 +41,7 @@
 </script>
 
 {#if state.branch==='restamp'}
-  <MillhandDepotScene {snapshot} {pending} {errorMessage} {perform}/>
+  <MillhandDepotScene {snapshot} {pending} {errorMessage} {perform} {travelConfirmed} {confirmTravel}/>
 {:else if state.branch==='contracts'}
   <MillhandContractsScene {snapshot} {pending} {errorMessage} {perform}/>
 {:else if state.branch==='records'}
