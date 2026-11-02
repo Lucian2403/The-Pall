@@ -102,7 +102,8 @@ assert.ok(characterPage.includes("smithingBackdrop={character.origin==='Millhand
   workPage.includes('smithingBackdrop={true}') &&
   missingPage.includes('smithingBackdrop={true}') &&
   depotPage.includes("smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')}") &&
-  qaPage.includes('smithingBackdrop={forgeVisible}') &&
+  qaPage.includes('smithingBackdrop={forgeVisible && councilRoom===null}') &&
+  qaPage.includes('councilBackdrop={councilRoom!==null}') &&
   depot.includes("class:preparing={atWorkshop}") &&
   depot.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
   'Only routes showing actual workshop artwork may request forge ambience');
