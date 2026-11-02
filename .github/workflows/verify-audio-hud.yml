@@ -10,6 +10,7 @@ on:
       - 'platform/scripts/verify-audio-*.mjs'
       - 'platform/scripts/verify-character-home.mjs'
       - 'platform/scripts/verify-workshop-hud-ambience.mjs'
+      - 'platform/scripts/verify-council-ambience-asset.mjs'
       - 'platform/apps/web/static/audio/the-pall/**'
       - 'platform/package.json'
       - 'platform/package-lock.json'
@@ -44,6 +45,8 @@ jobs:
         run: npm run verify:audio-prototype
       - name: Workshop ambience asset and HUD contract
         run: npm run verify:workshop-hud-ambience
+      - name: Verify exact owner Council room audio asset
+        run: npm run verify:council-ambience-asset
       - name: Executable playback/slider test
         run: npm run verify:audio-runtime
       # The existing canonical-copy script currently flags Millhand stage
