@@ -43,6 +43,10 @@
       const body=await c.json() as {character:Character};
       character=body.character;
       snapshot=await j.json() as Snapshot;
+      if(snapshot.state.phase==='EXITED'&&snapshot.stage>=5){
+        await goto('/characters/'+encodeURIComponent(id)+'/millhand/wage-claim',{replaceState:true});
+        return;
+      }
       status='ready';
     }catch{status='unavailable';}
   }
