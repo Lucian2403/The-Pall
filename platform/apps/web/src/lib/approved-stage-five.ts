@@ -1,4 +1,4 @@
-/** Approved Millhand Stage 5 R02 (owner-revised opening and demand inspection). No fabricated debt amount or combat results.
+/** Approved Millhand Stage 5 R03 (owner-revised Read the demand exchange and common dialogue). No fabricated debt amount or combat results.
  * docs/05-gameplay/onboarding/millhand/stage-5-approved-script.md
  */
 import type {WageClaimState,WageClaimPhase,WageClaimAction} from '@the-pall/game-core';
@@ -20,12 +20,13 @@ export const WAGE_CLAIM_DIALOGUE:{
     {speaker:'Flint',text:"Don't care. I came to collect."}
   ],
   COMMON_EXCHANGE:[
-    {speaker:'Player',text:'That worker number was cancelled. The man died in the fire.'},
-    {speaker:'Flint',text:"I didn't put it on there."},
-    {speaker:'Player',text:'Who did?'},
-    {speaker:'Flint',text:"Don't know. They don't tell men like us."},
-    {speaker:'Player',text:'And you still want me to pay?'},
-    {speaker:'Flint',text:'Yes.'}
+    {speaker:'Player',text:"But that number's been cancelled. The man's dead. Died in the fire."},
+    {speaker:'Flint',text:"Well, I didn't put it there."},
+    {speaker:'Player',text:'Who did, then?'},
+    {speaker:'Flint',text:"How should I know? They don't tell us that stuff."},
+    {speaker:'Player',text:"So you know it's wrong, and you still want me to pay?"},
+    {speaker:'Narration',text:'Flint scratches his chin, then looks back at you.'},
+    {speaker:'Flint',text:'Yeah.'}
   ],
   CORNERED_EXCHANGE:[
     {speaker:'Player',text:"I'm going home."},
@@ -41,8 +42,8 @@ export const WAGE_CLAIM_DIALOGUE:{
 const APPROACH={
   read:[
     {speaker:'Narration',text:"You snatch the paper and unfold it. There's the plate lot number. And that worker number again. The same one the council had marked as cancelled.\n\nYou read further. They've put a charge against your name for the delay. But your wages? Not a word about those.\n\nBloody hell. They haven't paid you a penny, and now they want money from you."},
-    {speaker:'Player',text:'Why have they put the charge on me?'},
-    {speaker:'Flint',text:"They've got you down for the work. The contractor sent me to collect it."}
+    {speaker:'Player',text:"Why's this on me?"},
+    {speaker:'Flint',text:"You did the job, didn't you? Boss wants his money."}
   ],
   challenge:[
     {speaker:'Player',text:'Who gave you the right to take money from me? The council?'},
