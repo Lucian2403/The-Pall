@@ -3,6 +3,7 @@
   import MillhandDepotScene from '$lib/MillhandDepotScene.svelte';
   import MillhandContractsScene from '$lib/MillhandContractsScene.svelte';
   import MillhandRecordsScene from '$lib/MillhandRecordsScene.svelte';
+  import StageFourNextStep from '$lib/StageFourNextStep.svelte';
   import type {SecondJobState,SecondJobAction} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
@@ -70,7 +71,7 @@
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
-        <p class="instruction">You've done what you came for. Nothing more to find here.</p>
+        <StageFourNextStep/>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
