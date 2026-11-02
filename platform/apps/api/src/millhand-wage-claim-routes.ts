@@ -37,8 +37,10 @@ function snapshot(ch:CharacterRow,state:WageClaimState){
     state,availableActions:availableWageClaimActions(state),
     tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
 }
-function finishedBranch(job:PriorJob|undefined):MissingStampBranch|null{
-  if(!job||job.state.phase!=='DONE')return null;
+function finishedBranch(job:PriorJob|undefined,stage:number):MissingStampBranch|null{
+  // Older saved characters reached Stage 5 or 6 when the job became DONE.
+  // New characters must explicitly leave their workplace (EXITED).
+  if(!job||!(job.state.phase==='EXITED'||(stage>=5&&job.state.phase==='DONE')))return null;
   const b=job.state.branch;
   return b==='restamp'||b==='contracts'||b==='records'?b:null;
 }
@@ -59,7 +61,7 @@ export function registerMillhandWageClaimRoutes(app:FastifyInstance){
     try{
       const previous=await db.query<PriorJob>(
         'SELECT state FROM player_character_second_job WHERE character_id=$1',[req.params.id]);
-      const branch=finishedBranch(previous.rows[0]);
+      const branch=finishedBranch(previous.rows[0],c.rows[0].tutorial_stage);
       if(!branch)return reply.code(409).send({error:'second_job_not_complete'});
       const saved=await db.query<{state:WageClaimState}>(
         'SELECT state FROM player_character_wage_claim WHERE character_id=$1',[req.params.id]);
@@ -123,7 +125,7 @@ export function registerMillhandWageClaimRoutes(app:FastifyInstance){
       }
       const previous=await client.query<PriorJob>(
         'SELECT state FROM player_character_second_job WHERE character_id=$1',[req.params.id]);
-      const branch=finishedBranch(previous.rows[0]);
+      const branch=finishedBranch(previous.rows[0],c.rows[0].tutorial_stage);
       if(!branch){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'second_job_not_complete'});

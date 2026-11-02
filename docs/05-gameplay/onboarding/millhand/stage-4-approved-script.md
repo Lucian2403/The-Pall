@@ -346,3 +346,37 @@ After the plates match the work paper, the two choices are presented with their 
 **Deferred mechanics:** Real duration differences, fatigue costs, damage probabilities and correction procedures remain unspecified. No numerical mechanics, random damage, combat Stamina loss, additional skill awards, wages, XP, reputation penalties or new inventory assets are authorised by this refinement.
 
 **Tabletop UI rule:** Stages 1–3 and all Stage 4 illustrated tabletop objects (including depot plates/paper and council books) reuse the same framed caption asset, typeface and hover/focus/selection treatment. Stage 3 returned plate and cancellation slip appear enlarged while retaining their shared central bench composition and full-object click areas.
+
+
+---
+
+## Owner-approved Stage 4 → Stage 5 exit handoff — 2026-11-02
+
+This clarification supersedes the former automatic transition from a completed
+Stage 4 job to the announced Wage Claim. It leaves the three job scripts,
+route-specific evidence, and the approved Stage 5 conversation intact.
+
+A task's completion and leaving its location are **different saved actions**.
+After the Depot Intake Run, Disputed Docket, or Ledger Reconciliation reaches
+its completed state, the player remains in the current workplace. The interaction
+shows only a neutral completion line and one appropriate action: **Leave the
+depot**, **Leave the Contracts office**, or **Leave the records room**.
+
+The exit action, not the work completion, advances a new character's saved stage
+from 4 to 5. Only after exiting does the player encounter Flint in the
+industrial service passage. Before the exit, the interface must not disclose
+Flint's appearance, a Wage Claim, or the pending fight. Personal Journal review,
+repeated inspections and reloads do not trigger an exit.
+
+**Existing saves:** An older character may have a Stage 4 state of `DONE`
+while the character is already at Stage 5 or 6. That is valid previously
+completed progress. Show the matching location-exit navigation action without
+writing a second completion, downgrading the stage, resetting the Journal, or
+charging/rewarding the character. On Stage 6, the existing saved confrontation
+and its Back/Previous Dialogue controls remain authoritative. A newer save
+that records `EXITED` must be resumable without a repeat exit.
+
+The final Contracts copy formerly placed the character outside before the
+player had chosen to leave; the completion copy instead leaves the character
+at the counter. This is an interaction-flow refinement, not approval of final
+UI/UX, additional dialogue, map art, or combat rules.

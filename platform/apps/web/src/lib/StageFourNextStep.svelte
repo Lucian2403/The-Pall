@@ -1,15 +1,38 @@
 <script lang="ts">
   import {page} from '$app/state';
+  import type {SecondJobAction,SecondJobState} from '@the-pall/game-core';
 
-  // Display only when a Stage 4 branch has reached the persisted DONE phase.
-  // Navigation itself does not change the saved state or grant anything.
+  let {snapshot,pending,perform}:{
+    snapshot:{stage:number;state:SecondJobState;availableActions:SecondJobAction[]};
+    pending:boolean;
+    perform:(action:SecondJobAction)=>Promise<void>;
+  }=$props();
+
+  // The exact same exit surface is used by Industry, Commerce, and Scholarship.
+  // No future character, confrontation, or combat title appears before exiting.
   const href=$derived('/characters/'+encodeURIComponent(page.params.id)+'/millhand/wage-claim');
+  const label=$derived(snapshot.state.branch==='restamp'?'Leave the depot'
+    :snapshot.state.branch==='contracts'?'Leave the Contracts office':'Leave the records room');
+  const exitAvailable=$derived(snapshot.stage===4&&
+    snapshot.state.phase==='DONE'&&snapshot.availableActions.includes('leave_location'));
+  // Backwards compatibility: legacy saved characters were advanced at job
+  // completion. They must not be forced to replay, re-save, or reset Stage 4.
+  const alreadyAdvanced=$derived(snapshot.stage>=5&&
+    (snapshot.state.phase==='DONE'||snapshot.state.phase==='EXITED'));
 </script>
 
-<nav class="stage-next-step" aria-label="Next chapter">
-  <p class="stage-next-step-label">NEXT STEP</p>
-  <p class="stage-next-step-context">Your second job is complete. Continue towards home and face Flint's Wage Claim.</p>
-  <a class="stage-next-step-link" {href}>Continue to The Wage Claim</a>
+<nav class="stage-next-step" aria-label="Leave current location">
+  <p class="stage-next-step-context">
+    {snapshot.state.phase==='EXITED'?'You have already left this location.':'Your work here is finished.'}
+  </p>
+  {#if exitAvailable}
+    <button class="stage-next-step-link" type="button" disabled={pending}
+      onclick={()=>{void perform('leave_location');}}>
+      {label}
+    </button>
+  {:else if alreadyAdvanced}
+    <a class="stage-next-step-link" {href}>{label}</a>
+  {/if}
 </nav>
 
 <style>
@@ -18,12 +41,6 @@
     padding-top:12px;
     border-top:1px solid #bca482;
     color:#332316;
-  }
-  .stage-next-step-label{
-    margin:0 0 7px;
-    font:700 13px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.09em;
-    color:#60402a;
   }
   .stage-next-step-context{
     margin:0 0 10px;
@@ -40,6 +57,7 @@
     text-align:center;
     color:#2d2016;
     text-decoration:none;
+    cursor:pointer;
     font:700 16px/1.3 var(--pall-font-reading,Georgia,serif);
     background:transparent;
     border:solid transparent;
@@ -49,7 +67,7 @@
     border-image-width:10px 17px 9px;
     border-image-repeat:stretch;
   }
-  .stage-next-step-link:hover{
+  .stage-next-step-link:hover:not(:disabled){
     border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
     color:#28190f;
   }
@@ -58,7 +76,8 @@
     outline:2px solid #76512f;
     outline-offset:3px;
   }
-  .stage-next-step-link:active{
+  .stage-next-step-link:active:not(:disabled){
     border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
   }
+  .stage-next-step-link:disabled{cursor:wait;opacity:.65}
 </style>

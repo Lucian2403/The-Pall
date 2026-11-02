@@ -29,7 +29,7 @@
   const journal=$derived(secondJobJournal(state));
   const actions=$derived(snapshot.availableActions);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
-  const committed=$derived(state.phase==='DONE');
+  const committed=$derived((state.phase==='DONE'||state.phase==='EXITED'));
   async function toggleJournal(){
     journalOpen=!journalOpen;
     await tick();
@@ -72,7 +72,7 @@
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
-        <StageFourNextStep/>
+        <StageFourNextStep {snapshot} {pending} {perform}/>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>

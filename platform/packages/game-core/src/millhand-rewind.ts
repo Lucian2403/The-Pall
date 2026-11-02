@@ -51,9 +51,9 @@ export function planMillhandRewind(
     throw new MillhandRewindInvalid('unsafe_stage_three_state');
   if(stage===2 && (branch!==null || missingStampPhase!==null))
     throw new MillhandRewindInvalid('unsafe_stage_three_state');
-  if(stage===5 && secondJobPhase!=='DONE')
+  if(stage===5 && secondJobPhase!=='DONE' && secondJobPhase!=='EXITED')
     throw new MillhandRewindInvalid('unsafe_second_job_state');
-  if(stage===4 && secondJobPhase==='DONE')
+  if(stage===4 && secondJobPhase==='EXITED')
     throw new MillhandRewindInvalid('unsafe_second_job_state');
   if(stage<=3 && secondJobPhase!==null)
     throw new MillhandRewindInvalid('unsafe_second_job_state');

@@ -43,6 +43,10 @@
       const body=await c.json() as {character:Character};
       character=body.character;
       snapshot=await j.json() as Snapshot;
+      if(snapshot.state.phase==='EXITED'&&snapshot.stage>=5){
+        await goto('/characters/'+encodeURIComponent(id)+'/millhand/wage-claim',{replaceState:true});
+        return;
+      }
       status='ready';
     }catch{status='unavailable';}
   }
@@ -64,6 +68,9 @@
         snapshot=body;
         character={...character,tutorial:{stage:body.stage,status:body.tutorialStatus}};
         retryId=null;retrySignature=null;
+        if(action==='leave_location'&&body.state.phase==='EXITED'){
+          await goto('/characters/'+encodeURIComponent(character.id)+'/millhand/wage-claim');
+        }
       }else{
         errorMessage=body.error==='stale_revision'?'Your saved work changed elsewhere. The scene has been reloaded.'
           :body.error==='second_job_schema_missing'?'Stage 4 database tables are missing. Run npm run second-job:migrate and restart the API.'
