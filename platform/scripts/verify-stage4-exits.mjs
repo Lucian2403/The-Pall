@@ -34,7 +34,13 @@ for(const [branch,sceneName,label] of [
   assert.ok(scene.includes('StageFourNextStep {snapshot} {pending} {perform}'),
     'Missing shared exit component in '+sceneName);
   assert.ok(next.includes(label),'Missing route-specific exit label for '+branch);
+  assert.ok(scene.includes("availableActions.filter(action=>action!=='leave_location')") &&
+    scene.includes('workActions as action'),
+    'The normal action list must not render a second generic leave button: '+branch);
 }
+const fallback=read('apps/web/src/lib/MillhandSecondJobScene.svelte');
+assert.ok(fallback.includes("availableActions.filter(action=>action!=='leave_location')"),
+  'Generic fallback must also render only the contextual exit');
 assert.ok(next.includes("snapshot.stage>=5") &&
   next.includes("snapshot.state.phase==='DONE'||snapshot.state.phase==='EXITED'") &&
   next.includes("void perform('leave_location')") &&
