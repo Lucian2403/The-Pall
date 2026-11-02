@@ -33,6 +33,8 @@
   } = $props();
 
   const state = $derived(snapshot.state);
+  // Leave is rendered by the shared location exit, not in the work-action list.
+  const workActions = $derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
   const beat = $derived(
     state.phase === "ARCHIVE_DIALOGUE"
       ? STAGE_FOUR_DIALOGUE.records[state.dialogueIndex]
@@ -217,9 +219,9 @@
         <p class="prop-hint">
           Select the relevant book on the counter to examine it.
         </p>
-      {:else if snapshot.availableActions.length > 0}
+      {:else if workActions.length > 0}
         <div class="actions" aria-label="Available investigation actions">
-          {#each snapshot.availableActions as action (action)}
+          {#each workActions as action (action)}
             <button
               type="button"
               disabled={pending}
