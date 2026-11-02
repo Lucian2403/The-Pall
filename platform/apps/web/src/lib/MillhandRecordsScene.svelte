@@ -180,9 +180,9 @@
         <p class="context">{STAGE_FOUR_ROUTES.records.entry}</p>
       {/if}
 
-      {#if state.phase === "DONE"}
+      {#if (state.phase === "DONE" || state.phase === "EXITED")}
         <p class="outcome">{STAGE_FOUR_FINAL.records}</p>
-        <StageFourNextStep />
+        <StageFourNextStep {snapshot} {pending} {perform} />
       {:else if state.phase === "ARCHIVE_DIALOGUE" && beat}
         <p class="speaker">
           {beat.speaker === "Player" ? "You" : beat.speaker}
