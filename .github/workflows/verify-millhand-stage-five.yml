@@ -1,0 +1,54 @@
+name: Verify Millhand Stage 5
+on:
+  pull_request:
+    paths:
+      - 'platform/packages/game-core/src/millhand-wage-claim.ts'
+      - 'platform/packages/game-core/src/index.ts'
+      - 'platform/packages/game-core/test/millhand-wage-claim.test.mjs'
+      - 'platform/apps/api/src/millhand-wage-claim-routes.ts'
+      - 'platform/apps/api/src/index.ts'
+      - 'platform/apps/api/src/millhand-stage-rewind-routes.ts'
+      - 'platform/apps/web/src/lib/MillhandWageClaimScene.svelte'
+      - 'platform/apps/web/src/lib/approved-stage-five.ts'
+      - 'platform/apps/web/src/routes/characters/**'
+      - 'platform/apps/web/src/lib/TutorialShell.svelte'
+      - 'platform/apps/web/src/lib/CharacterHome.svelte'
+      - 'platform/apps/web/static/locations/alley/**'
+      - 'platform/apps/web/static/characters/flint/**'
+      - 'platform/db/migrations/0006_millhand_wage_claim.sql'
+      - 'platform/scripts/*wage-claim*'
+      - 'platform/scripts/verify-stage-five*.mjs'
+      - 'platform/package.json'
+      - '.github/workflows/verify-millhand-stage-five.yml'
+  push:
+    branches:
+      - 'gameplay/millhand-stage5-flint-20261102'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stage-five:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - name: Build game-core and workspace contracts
+        run: npm run build:packages
+      - name: All route/evidence/stance combinations
+        run: node --test packages/game-core/test/millhand-wage-claim.test.mjs
+      - name: Stage 5 canonical script, route wiring and safety contract
+        run: npm run verify:stage-five
+      - name: Fastify typecheck
+        run: npm run check -w @the-pall/api
+      - name: Production SvelteKit build
+        run: npm run build -w @the-pall/web
+      - name: Require owner's exact Stage 5 artwork
+        run: npm run verify:stage-five-assets

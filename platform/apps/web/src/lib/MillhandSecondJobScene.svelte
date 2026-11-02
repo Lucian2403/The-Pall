@@ -3,6 +3,7 @@
   import MillhandDepotScene from '$lib/MillhandDepotScene.svelte';
   import MillhandContractsScene from '$lib/MillhandContractsScene.svelte';
   import MillhandRecordsScene from '$lib/MillhandRecordsScene.svelte';
+  import StageFourNextStep from '$lib/StageFourNextStep.svelte';
   import type {SecondJobState,SecondJobAction} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
@@ -12,9 +13,10 @@
   type Snapshot={stage:number;tutorialStatus:string;state:SecondJobState;
     availableActions:SecondJobAction[];
     tutorialPayout:{coins:number;ordinaryXp:number;items:number}};
-  let {snapshot,pending,errorMessage,perform}:{
+  let {snapshot,pending,errorMessage,perform,travelConfirmed,confirmTravel}:{
     snapshot:Snapshot;pending:boolean;errorMessage:string;
-    perform:(action:SecondJobAction)=>Promise<void>
+    perform:(action:SecondJobAction)=>Promise<void>;
+    travelConfirmed:boolean;confirmTravel:()=>void
   }=$props();
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
@@ -39,7 +41,7 @@
 </script>
 
 {#if state.branch==='restamp'}
-  <MillhandDepotScene {snapshot} {pending} {errorMessage} {perform}/>
+  <MillhandDepotScene {snapshot} {pending} {errorMessage} {perform} {travelConfirmed} {confirmTravel}/>
 {:else if state.branch==='contracts'}
   <MillhandContractsScene {snapshot} {pending} {errorMessage} {perform}/>
 {:else if state.branch==='records'}
@@ -70,7 +72,7 @@
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
-        <p class="instruction">You've done what you came for. Nothing more to find here.</p>
+        <StageFourNextStep/>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>

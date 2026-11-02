@@ -5,7 +5,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
-  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience} from '$lib/pall-audio';
+  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience,claimDepotAmbience,stopDepotAmbience} from '$lib/pall-audio';
 
   type SavedCharacter = {
     id: string;
@@ -23,8 +23,10 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean} = $props();
-  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 4
+  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, alleyBackdrop = false, depotBackdrop = false, backToStageFive, backStageBusy = false, backStageError = ''}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; alleyBackdrop?: boolean; depotBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean; backStageError?: string} = $props();
+  const chapter = $derived(character.origin === 'Millhand' && (character.tutorial.stage === 5 || character.tutorial.stage === 6)
+    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/wage-claim'
+    : character.origin === 'Millhand' && character.tutorial.stage === 4
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
     : character.origin === 'Millhand' && character.tutorial.stage === 3
       ? '/characters/' + encodeURIComponent(character.id) + '/millhand/missing-stamp'
@@ -82,18 +84,38 @@
     if(councilBackdrop)return claimCouncilOfficeAmbience();
     stopCouncilOfficeAmbience();
   });
+  // Explicit illustrated alley only, including the pre-combat Stage 6 boundary.
+  $effect(()=>{
+    if(alleyBackdrop)return claimNightAlleyAmbience();
+    stopNightAlleyAmbience();
+  });
 
-  onMount(()=>{
+  // Depot playback follows the visible backdrop, not merely Stage 4 status.
+  $effect(()=>{
+    if(depotBackdrop)return claimDepotAmbience();
+    stopDepotAmbience();
+  });
+
+  // Refresh the local-only replay button when undoing the Stage 6 stance
+  // returns this same mounted shell to Stage 5. Do not show stale stage labels.
+  $effect(()=>{
     if(character.origin!=='Millhand')return;
+    const characterId=character.id;
+    const currentStage=character.tutorial.stage;
+    let stale=false;
+    canRewind=false;
+    rewindFromStage=null;
     void (async()=>{
       try{
-        const response=await fetch('/api/characters/'+encodeURIComponent(character.id)+'/dev/rewind-stage',{cache:'no-store'});
-        if(!response.ok)return;
+        const response=await fetch('/api/characters/'+encodeURIComponent(characterId)+'/dev/rewind-stage',{cache:'no-store'});
+        if(!response.ok||stale)return;
         const data=await response.json() as {enabled:boolean;canRewind:boolean;stage:number};
+        if(stale||data.stage!==currentStage)return;
         canRewind=data.enabled&&data.canRewind;
         rewindFromStage=data.stage;
       }catch{/* Developer-only capability unavailable; hide control. */}
     })();
+    return ()=>{stale=true;};
   });
 
   async function rewindOneStage(){
@@ -239,6 +261,16 @@
         <span>{sceneLocation ?? character.startingLocation}</span>
       </div>
       <div class="chapter-meta">Stage {character.tutorial.stage} · {character.origin}</div>
+      {#if character.origin==='Millhand' && character.tutorial.stage===6 && backToStageFive}
+        <button type="button" class="rewind-button" disabled={backStageBusy}
+          title="Return to the saved Stage 5 stance selection before combat begins"
+          onclick={()=>{void backToStageFive();}}>
+          {backStageBusy?'Returning…':'← Back to Stage 5'}
+        </button>
+      {/if}
+      {#if character.origin==='Millhand' && character.tutorial.stage===6 && backToStageFive && backStageError}
+        <span class="back-stage-error" role="alert">{backStageError}</span>
+      {/if}
       {#if canRewind && rewindFromStage!==null}
         <button type="button" class="rewind-button" disabled={rewinding}
           title="Developer testing only: reset the current stage to replay the previous one"
@@ -283,6 +315,7 @@
   .lock{margin-left:auto;font-size:13px}
   .nav-rule{border-top:1px solid #403429;margin:8px 17px 12px}
   .locked-heading{margin:0;padding:0 19px;font:10px/1.5 sans-serif;letter-spacing:.1em;color:#aa8a62}
+  .back-stage-error{max-width:360px;padding:6px 8px;border:1px solid #a36b3d;color:#f5ce91;background:#4e241d;font:12px/1.4 sans-serif}
   .rail-footer{margin-top:auto;min-height:188px;display:flex;flex-direction:column;justify-content:end;gap:3px;padding:25px 20px 17px;color:#d9b98b;font:13px/1.1 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.23em;background:linear-gradient(0deg,#100e0df2,#100e0d4a 58%,#100e0dbb),url('/ui-kit/sidebar-illustration.png') center center/cover no-repeat;background-color:#181611}
   .right{display:flex;flex-direction:column;min-width:0;min-height:100vh;min-height:100dvh;border:0;background:#1c1a18;border-radius:0}
   /* Industrial brass-and-charcoal HUD, rather than four equal developer gauges. */

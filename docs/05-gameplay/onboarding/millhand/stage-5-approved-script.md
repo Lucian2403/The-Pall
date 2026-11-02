@@ -1,6 +1,6 @@
-# Millhand — Stage 5: The Wage Claim / Cornered — Editorial Revision 01
+# Millhand — Stage 5: The Wage Claim / Cornered — Editorial Revision 03
 
-**STATUS: APPROVED EDITORIAL CANON — STAGE 5 REVISION 01, WITH PERSONAL JOURNAL UPDATE (2026-10-23).** The project owner approved this version including the revised first-person Journal. **Not yet installed in the playable build.** This proposal reopens spoken dialogue, narration, interface instructions, wrong-object observations and journal copy, **not** the approved Stage 5 structure or combat rules. Historical mechanics and approved causal constraints: [The Wage Claim and Cornered](flint-confrontation.md). Follows approved [Stage 4 editorial Revision 01](stage-4-approved-script.md) and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
+**STATUS: OWNER-APPROVED STAGE 5 REVISION 03 (2026-11-02).** The owner revised the two spoken lines following **Read the demand** and the common exchange following either approach. Flint's brief chin-scratch is its own narration beat before his final reply. All other dialogue, interactions, personal Journal, state transition rules and combat boundaries remain unchanged. Stage 5 is implemented in PR #15, not yet merged into `main`. Historical mechanics and causal constraints: [The Wage Claim and Cornered](flint-confrontation.md). Follows [Stage 4 editorial Revision 01](stage-4-approved-script.md) and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
 
 ## Specific weaknesses in the prior copy
 - The original bill confrontation made Flint sound like a clerk reporting a case; **he is a paid collector, not a council officer**. Have him identify the workshop worker and demand money plainly.
@@ -14,31 +14,33 @@
 
 **Location:** Existing industrial service passage, on the way home. No invented street name or neighborhood.
 
-*You enter the narrow passage on your way home. A man steps into your path. He has a short club at his side and a folded paper in one hand.*
+*Flint steps into your way and shoves a folded paper towards you.*
 
-**FLINT:** “You did the plate work for Anvil?”
+**FLINT:** “You worked on Anvil's plates?”
 
-**PLAYER:** “Yes.”
+**PLAYER:** “Yeah. What of it?”
 
-**FLINT:** “They've stopped that lot. The contractor wants money for the delay. They've got you down for the job.”
+**FLINT:** “Lot's been stopped. Boss wants his money. Says you're paying.”
 
-**PLAYER:** “I haven't been paid for that work.”
+**PLAYER:** “Paying for what? I ain't even got my wages!”
 
-**FLINT:** “I wasn't sent to pay you.”
-
-*Flint holds out the folded paper.*
+**FLINT:** “Don't care. I came to collect.”
 
 **CURRENT INSTRUCTION:** Check the demand or ask who sent Flint.
 
 **PLAYER CHOICE 1 — Read the demand.**
 
-*You read the contractor's paper. You find the disputed plate lot reference and the same cancelled worker number you found in the council's records. The contractor has entered a processing charge against you as the worker assigned to the lot. There is no record of wages being paid to you.*
+*You snatch the paper and unfold it. There's the plate lot number. And that worker number again. The same one the council had marked as cancelled.*
+
+*You read further. They've put a charge against your name for the delay. But your wages? Not a word about those.*
+
+*Bloody hell. They haven't paid you a penny, and now they want money from you.*
 
 **Authoring constraint:** The contractor charge has no established numerical amount; do not invent one.
 
-**PLAYER:** “Why have they put the charge on me?”
+**PLAYER:** “Why's this on me?”
 
-**FLINT:** “They've got you down for the work. The contractor sent me to collect it.”
+**FLINT:** “You did the job, didn't you? Boss wants his money.”
 
 **PLAYER CHOICE 2 — Ask who sent him.**
 
@@ -52,17 +54,19 @@ Both choices expose the contractor's role and the same essential evidence; neith
 
 ### Common exchange after either choice
 
-**PLAYER:** “That worker number was cancelled. The man died in the fire.”
+**PLAYER:** “But that number's been cancelled. The man's dead. Died in the fire.”
 
-**FLINT:** “I didn't put it on there.”
+**FLINT:** “Well, I didn't put it there.”
 
-**PLAYER:** “Who did?”
+**PLAYER:** “Who did, then?”
 
-**FLINT:** “Don't know. They don't tell men like us.”
+**FLINT:** “How should I know? They don't tell us that stuff.”
 
-**PLAYER:** “And you still want me to pay?”
+**PLAYER:** “So you know it's wrong, and you still want me to pay?”
 
-**FLINT:** “Yes.”
+*Flint scratches his chin, then looks back at you.*
+
+**FLINT:** “Yeah.”
 
 **PLAYER ACTION:** Tell Flint what you found in your second job. Only the spoken response from your actual Stage 4 route is available. It does not appear or advance automatically.
 
@@ -139,10 +143,12 @@ All scene observations are in **second person**, literal and restricted to facts
 | Inspect the folded bill before Flint has offered it | “Flint still has the folded paper in his hand. He has not handed it to you.” |
 | Examine the bill again after the initial choice | Show the actual bill fields again without reissuing a charge or advancing the exchange |
 | Try to discuss the depot if the player followed Contracts/Records | The depot-specific speech option does not exist; never provide a generic wrong-route message that spoils other branches |
-| Select the club during the Wage Claim | “Flint has a short club at his side. You cannot take it from him by examining it.” |
+| Inspect Flint during the Wage Claim | “Flint is a broad, thickset man in a battered brimmed hat and an eyepatch. Leather braces cross his worn, rolled-sleeve shirt. His trousers are patched, his boots heavy, and he grips a metal-banded wooden club.” The interaction also retains the club observation: “Flint has a short club at his side. You cannot take it from him by examining it.” |
 | Inspect the cart before choosing a stance | “A work cart stands against one side of the passage. Flint is blocking the way ahead.” |
 | Try to leave during the required conversation | “Flint is still blocking the passage. Finish speaking to him before you try to get past.” |
 | Select an inventory or journal page | Browsing remains immediate and free. Returning does not advance the conversation or change the fight |
+
+**Asset inspection presentation (2026-11-02):** Clicking Flint opens a **Flint** observation first, followed by a clearly distinguished **His club** note. Flint, the work cart and the contractor's demand all use the same larger, high-contrast text block inside the existing parchment dialogue window. Examining Flint remains read-only; it does not advance the confrontation or affect combat. The underlying approved dialogue and movement choices are unchanged.
 
 No red highlight identifies the right response. Each required utterance remains visible until the user advances or selects the next explicit speech option. The 1.2-second presentation delay belongs to actions with committed outcomes, never autoplay.
 

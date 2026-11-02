@@ -8,6 +8,7 @@
     secondJobJournal
   } from '$lib/approved-stage-four';
   import '$lib/workshop-object-labels.css';
+  import StageFourNextStep from '$lib/StageFourNextStep.svelte';
 
   type Snapshot = {
     stage:number;
@@ -16,21 +17,20 @@
     availableActions:SecondJobAction[];
     tutorialPayout:{coins:number;ordinaryXp:number;items:number};
   };
-  let {snapshot,pending,errorMessage,perform}:{
+  let {snapshot,pending,errorMessage,perform,travelConfirmed,confirmTravel}:{
     snapshot:Snapshot;
     pending:boolean;
     errorMessage:string;
     perform:(action:SecondJobAction)=>Promise<void>;
+    travelConfirmed:boolean;confirmTravel:()=>void;
   }=$props();
 
   const state=$derived(snapshot.state);
   // Purely local presentation beat: a saved transport choice is shown at the
   // workshop before the player proceeds to the depot. This grants no work
   // action and cannot change server progress or cause a missing receipt.
-  let travelConfirmed=$state(false);
   const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'||
     (state.phase==='COMPARE_DELIVERY'&&!travelConfirmed));
-  $effect(()=>{if(state.phase!=='COMPARE_DELIVERY')travelConfirmed=false;});
   const speaking=$derived(state.phase==='DEPOT_DIALOGUE');
   const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[state.dialogueIndex]:null);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
@@ -80,6 +80,7 @@
       {/if}
       {#if state.phase==='DONE'}
         <p class="outcome">{STAGE_FOUR_FINAL.restamp}</p>
+        <StageFourNextStep/>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
@@ -115,7 +116,7 @@
 
       {#if state.phase==='COMPARE_DELIVERY' && !travelConfirmed}
         <div class="actions"><button type="button" disabled={pending}
-          onclick={() => {selected=null;travelConfirmed=true;}}>Continue to the depot</button></div>
+          onclick={() => {selected=null;confirmTravel();}}>Continue to the depot</button></div>
       {:else if snapshot.availableActions.length>0}
         <div class="actions" aria-label="Available delivery actions">
           {#each snapshot.availableActions as action (action)}

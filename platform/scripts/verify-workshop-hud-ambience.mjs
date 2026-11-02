@@ -102,9 +102,13 @@ assert.ok(characterPage.includes("smithingBackdrop={character.origin==='Millhand
   openingPage.includes("smithingBackdrop={character.origin==='Millhand'}") &&
   workPage.includes('smithingBackdrop={true}') &&
   missingPage.includes('smithingBackdrop={true}') &&
-  depotPage.includes("smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')}") &&
-  qaPage.includes('smithingBackdrop={forgeVisible && councilRoom===null}') &&
-  qaPage.includes('councilBackdrop={councilRoom!==null}') &&
+  depotPage.includes('smithingBackdrop={preparingAtWorkshop}') &&
+  depotPage.includes("snapshot.state.phase==='COMPARE_DELIVERY'&&!travelConfirmed") &&
+  depotPage.includes('depotBackdrop={showingDepot}') &&
+  qaPage.includes('smithingBackdrop={forgeVisible && councilRoom===null && !alleyVisible}') &&
+  qaPage.includes('councilBackdrop={councilRoom!==null && !alleyVisible}') &&
+  qaPage.includes('alleyBackdrop={alleyVisible}') &&
+  qaPage.includes('depotBackdrop={!forgeVisible && councilRoom===null && !alleyVisible}') &&
   depot.includes("class:preparing={atWorkshop}") &&
   depot.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
   'Only routes showing actual workshop artwork may request forge ambience');
@@ -123,8 +127,41 @@ assert.ok(audio.includes("councilOfficeAmbienceFile='contracts-scholarship-ambie
   hud.includes('stopCouncilOfficeAmbience()') &&
   depotPage.includes("councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'}") &&
   mainLayout.includes('stopCouncilOfficeAmbience();') &&
-  settings.includes('Contracts office and records room'),
+  settings.includes("Flint's dark alley"),
   'Contracts and Scholarship must share one backdrop-scoped indoor loop without altering the forge or music');
+const alleyPage=read('apps/web/src/routes/characters/[id]/millhand/wage-claim/+page.svelte');
+const alleyScene=read('apps/web/src/lib/MillhandWageClaimScene.svelte');
+assert.ok(audio.includes("nightAlleyAmbienceFile='night-alley-ambience.mp3'") &&
+  audio.includes("activeAmbienceScene='alley'") &&
+  audio.includes('alleyAmbienceOwners=new Set<symbol>()') &&
+  audio.includes('export function claimNightAlleyAmbience()') &&
+  audio.includes('export function stopNightAlleyAmbience()') &&
+  audio.includes('alleyAmbience.loop=true') &&
+  audio.includes('alleyAmbience.load()') &&
+  audio.includes('cancelAlleyDeparture()') &&
+  audio.includes('deferAlleyDeparture()') &&
+  audio.includes('updateAlleyAmbience()') &&
+  hud.includes('alleyBackdrop = false') &&
+  hud.includes('if(alleyBackdrop)return claimNightAlleyAmbience()') &&
+  hud.includes('stopNightAlleyAmbience()') &&
+  alleyPage.includes('alleyBackdrop={true}') &&
+  alleyScene.includes("url('/locations/alley/alley-background.webp')") &&
+  !depotPage.includes('alleyBackdrop={true}') &&
+  mainLayout.includes('stopNightAlleyAmbience();') &&
+  qaPage.includes('alleyBackdrop={alleyVisible}'),
+  'Night Alley must play only in the painted Stage 5/6 passage and stop in other locations');
+assert.ok(audio.includes("depotAmbienceFile='depot-ambience.mp3'") &&
+  audio.includes("activeAmbienceScene='depot'") &&
+  audio.includes('depotAmbienceOwners=new Set<symbol>()') &&
+  audio.includes('export function claimDepotAmbience()') &&
+  audio.includes('export function stopDepotAmbience()') &&
+  audio.includes('depotAmbience.loop=true') &&
+  hud.includes('if(depotBackdrop)return claimDepotAmbience()') &&
+  hud.includes('stopDepotAmbience()') &&
+  depot.includes('confirmTravel()') &&
+  !depot.includes('let travelConfirmed=$state(false)') &&
+  mainLayout.includes('stopDepotAmbience();'),
+  'Depot ambience must follow the painted backdrop, including local travel confirmation');
 assert.ok(!audio.includes("music.loop=true") &&
   audio.includes("music.loop=false") &&
   audio.includes('MUSIC_PAUSE_MIN_MS=30_000') &&

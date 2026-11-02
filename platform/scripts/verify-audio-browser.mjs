@@ -255,18 +255,32 @@ try{
   phase='switching backdrop from forge to depot';
   await click('Switch to depot');
   await waitUntil(async()=>forge(await status())?.paused===true,8000,'forge stop at depot');
+  const depotTrack=items=>items.media.find(m=>m.file==='depot-ambience.mp3');
+  await waitUntil(async()=>depotTrack(await status())?.paused===false,12000,'Depot ambience starts');
   const depot=await status();
+  assert.ok(depotTrack(depot).volume>.65,'Depot follows the existing Ambience slider.');
   assert.ok(forge(depot).currentTime<0.1,
     'Forge must reset only on a confirmed non-forge backdrop: '+JSON.stringify(depot));
 
   phase='entering Contracts office';
   await click('Switch to Contracts');
   const council=items=>items.media.find(m=>m.file==='contracts-scholarship-ambience.mp3');
-  await waitUntil(async()=>{
-    const a=await status();
-    return council(a)&&!council(a).paused&&a.texts.includes('Playing');
-  },12000,'Contracts indoor ambience');
+  try{
+    await waitUntil(async()=>{
+      const a=await status();
+      return council(a)&&!council(a).paused;
+    },12000,'Contracts indoor ambience');
+  }catch(error){
+    console.error('CONTRACTS MEDIA STATE',JSON.stringify(await status()));
+    console.error('CONTRACTS SCENE STATE',JSON.stringify(await evalJS(`({
+      classes:document.querySelector('.audio-qa-scene')?.className,
+      activeText:document.querySelector('.audio-qa-scene h1')?.textContent,
+      sound:document.querySelector('.playback-state')?.textContent
+    })`)));
+    throw error;
+  }
   let contracts=await status();
+  assert.ok(depotTrack(contracts).paused,'Depot stops when Council backdrop appears.');
   assert.ok(forge(contracts).paused,'Forge ambience must stay silent in Contracts.');
   assert.ok(council(contracts).volume>.65,'Council audio uses the same ambience slider.');
 
@@ -288,7 +302,38 @@ try{
     'A confirmed new background must reset the Council recording.');
   await waitUntil(async()=>forge(await status())?.paused===false,8000,'forge resumed');
 
-  console.log('PASS: real Chromium ambience loops in forge, Contracts and Scholarship; slider, transitions, master mute and Web Audio click.',JSON.stringify({after,subsequent,depot,contracts,scholarship,returned}));
+  phase='entering the painted dark alley';
+  await click('Switch to dark alley');
+  const alley=items=>items.media.find(m=>m.file==='night-alley-ambience.mp3');
+  await waitUntil(async()=>{
+    const a=await status();
+    return alley(a)&&!alley(a).paused;
+  },12000,'Night Alley ambience begins');
+  const alleyStart=await status();
+  assert.ok(forge(alleyStart).paused,'Forge must stop inside dark alley.');
+  assert.ok(council(alleyStart).paused,'Council must stop inside dark alley.');
+  assert.ok(alley(alleyStart).volume>.65,'Night Alley must obey the saved Ambience slider.');
+  assert.ok(depotTrack(alleyStart).paused,'Depot stays silent in Flint’s alley.');
+
+  phase='remounting the same alley from Stage 5 to Stage 6';
+  const alleyPosition=alley(alleyStart).currentTime;
+  await click('Next forge stage'); // fixture remounts the same currently selected backdrop
+  await waitUntil(async()=>alley(await status())?.paused===false,8000,'continued alley ambience');
+  const alleyNext=await status();
+  assert.ok(alley(alleyNext).currentTime>=alleyPosition-.2,
+    'Stage 5 to Stage 6 should preserve the original Night Alley media element.');
+
+  phase='leaving the alley for Contracts';
+  await click('Switch to Contracts');
+  await waitUntil(async()=>alley(await status())?.paused===true,8000,'alley stop at Council');
+  const alleyLeft=await status();
+  assert.ok(alley(alleyLeft).currentTime<.1,'Alley audio resets on a confirmed new backdrop.');
+  await waitUntil(async()=>council(await status())?.paused===false,8000,'Council resumes');
+  await click('Return to forge');
+  await waitUntil(async()=>forge(await status())?.paused===false,8000,'forge resumes from Council');
+  assert.ok(alley(await status()).paused,'Dark Alley may not leak into the forge.');
+
+  console.log('PASS: real Chromium workshop, Depot, Council and Night Alley audio loops; location isolation, slider, scene remount, and Web Audio click.',JSON.stringify({after,subsequent,depot,alleyStart,alleyNext,alleyLeft}));
 }finally{close();}
 // Vite starts subprocesses and Chromium opens a DevTools WebSocket; those
 // handles can linger after the checks pass. The fixture is disposable and

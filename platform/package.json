@@ -47,6 +47,9 @@
     "platework:migrate": "node --env-file=.env scripts/platework-migrate.mjs",
     "missing-stamp:migrate": "node --env-file=.env scripts/missing-stamp-migrate.mjs",
     "second-job:migrate": "node --env-file=.env scripts/second-job-migrate.mjs",
+    "wage-claim:migrate": "node --env-file=.env scripts/wage-claim-migrate.mjs",
+    "verify:stage-five": "node scripts/verify-stage-five.mjs",
+    "verify:stage-five-assets": "node scripts/verify-stage-five-assets.mjs",
     "verify:millhand-work-unauthenticated": "node scripts/verify-millhand-work-unauthenticated.mjs",
     "verify:missing-stamp-unauthenticated": "node scripts/verify-missing-stamp-unauthenticated.mjs",
     "verify:dev-rewind": "node scripts/verify-dev-stage-rewind.mjs",
@@ -61,6 +64,8 @@
     "verify:audio-runtime": "node scripts/verify-audio-runtime.mjs",
     "verify:workshop-hud-ambience": "node scripts/verify-workshop-hud-ambience.mjs",
     "verify:council-ambience-asset": "node scripts/verify-council-ambience-asset.mjs",
+    "verify:night-alley-ambience-asset": "node scripts/verify-night-alley-ambience-asset.mjs",
+    "verify:depot-ambience-asset": "node scripts/verify-depot-ambience-asset.mjs",
     "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs"
   }
 }

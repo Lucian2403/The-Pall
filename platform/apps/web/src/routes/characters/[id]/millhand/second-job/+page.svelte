@@ -18,6 +18,12 @@
   let snapshot=$state<Snapshot|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'stage-three'|'schema'|'unavailable'>('loading');
   let pending=$state(false);
+  // COMPARE_DELIVERY is saved before the player actually leaves the workshop.
+  let travelConfirmed=$state(false);
+  const preparingAtWorkshop=$derived(snapshot?.state.branch==='restamp' &&
+    (snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'||
+      (snapshot.state.phase==='COMPARE_DELIVERY'&&!travelConfirmed)));
+  const showingDepot=$derived(snapshot?.state.branch==='restamp'&&!preparingAtWorkshop);
   let errorMessage=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
@@ -72,14 +78,8 @@
 
 <svelte:head><title>The Pall — Millhand second job</title></svelte:head>
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character} smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT'?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
-    <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform}/>
-    {#if snapshot.state.phase==='DONE'}
-      <div class="follow-up">
-        The job is finished. The Wage Claim with Flint is the next chapter. That scene has not yet been connected.
-        <a href={'/characters/'+character.id}>View character</a>
-      </div>
-    {/if}
+  <TutorialShell {character} smithingBackdrop={preparingAtWorkshop} depotBackdrop={showingDepot} councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'} sceneLocation={snapshot.state.branch==='restamp'?(preparingAtWorkshop?'Smithing workshop':'Municipal depot'):snapshot.state.branch==='contracts'?'Council Contracts office':'Council records room'}>
+    <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform} {travelConfirmed} confirmTravel={()=>{travelConfirmed=true;}}/>
   </TutorialShell>
 {:else}
   <main class="fallback">
@@ -101,7 +101,5 @@
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
   :global(a){color:#dcb98b}
   .fallback{max-width:750px;margin:6vh auto;padding:30px;background:#24211e;border:1px solid #72583e}
-  .follow-up{padding:14px 18px;background:#30271e;color:#edddc4;font:14px/1.5 sans-serif}
-  .follow-up a{margin-left:12px}
   nav{margin-top:25px}
 </style>
