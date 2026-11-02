@@ -3,6 +3,12 @@ on:
   pull_request:
     paths:
       - 'platform/apps/web/src/lib/**'
+      - 'platform/apps/web/src/routes/**'
+      - 'platform/apps/api/src/**'
+      - 'platform/packages/game-core/src/**'
+      - 'platform/packages/game-core/test/**'
+      - 'platform/scripts/verify-stage4-exits.mjs'
+      - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/scripts/verify-stage3-workbench-ui.mjs'
       - 'platform/scripts/verify-stage4-transport-ui.mjs'
       - 'platform/package.json'
@@ -30,5 +36,8 @@ jobs:
       - run: npm run build:packages
       - run: npm run verify:stage3-workbench-ui
       - run: npm run verify:stage4-transport-ui
-      - run: node --test packages/game-core/test/millhand-second-job.test.mjs
+      - run: node --test packages/game-core/test/millhand-second-job.test.mjs packages/game-core/test/millhand-rewind.test.mjs packages/game-core/test/millhand-wage-claim.test.mjs
+      - run: npm run verify:stage4-exits
+      - run: npm run verify:stage-five
+      - run: npm run check:api
       - run: npm run build -w @the-pall/web
