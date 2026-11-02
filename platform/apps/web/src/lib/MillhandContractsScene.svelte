@@ -8,6 +8,7 @@
     STAGE_FOUR_ACTION_LABELS,
     STAGE_FOUR_OUTCOMES,
     STAGE_FOUR_FINAL,
+    STAGE_FOUR_EXIT_LABELS,
     secondJobJournal,
   } from "$lib/approved-stage-four";
   import "$lib/workshop-object-labels.css";
@@ -195,7 +196,7 @@
                 void perform(action);
               }}
             >
-              {STAGE_FOUR_ACTION_LABELS[action]}
+              {action==='leave_location'?STAGE_FOUR_EXIT_LABELS[state.branch]:STAGE_FOUR_ACTION_LABELS[action]}
             </button>
           {/each}
         </div>
