@@ -85,17 +85,26 @@
     stopCouncilOfficeAmbience();
   });
 
-  onMount(()=>{
+  // Refresh the local-only replay button when undoing the Stage 6 stance
+  // returns this same mounted shell to Stage 5. Do not show stale stage labels.
+  $effect(()=>{
     if(character.origin!=='Millhand')return;
+    const characterId=character.id;
+    const currentStage=character.tutorial.stage;
+    let stale=false;
+    canRewind=false;
+    rewindFromStage=null;
     void (async()=>{
       try{
-        const response=await fetch('/api/characters/'+encodeURIComponent(character.id)+'/dev/rewind-stage',{cache:'no-store'});
-        if(!response.ok)return;
+        const response=await fetch('/api/characters/'+encodeURIComponent(characterId)+'/dev/rewind-stage',{cache:'no-store'});
+        if(!response.ok||stale)return;
         const data=await response.json() as {enabled:boolean;canRewind:boolean;stage:number};
+        if(stale||data.stage!==currentStage)return;
         canRewind=data.enabled&&data.canRewind;
         rewindFromStage=data.stage;
       }catch{/* Developer-only capability unavailable; hide control. */}
     })();
+    return ()=>{stale=true;};
   });
 
   async function rewindOneStage(){
