@@ -100,6 +100,21 @@ assert.match(scene,/flintImageMissing/);
 assert.match(scene,/onerror=/);
 assert.doesNotMatch(scene,/class="object club"/);
 assert.match(scene,/Inspect Flint and his club/);
+assert.match(copy,/WAGE_CLAIM_FLINT_INSPECTION/);
+assert.match(copy,/battered brimmed hat and an eyepatch/);
+assert.match(copy,/Leather braces cross his worn, rolled-sleeve shirt/);
+assert.match(scene,/inspection-title/);
+assert.match(scene,/inspection-text/);
+assert.match(scene,/inspection-weapon/);
+assert.match(scene,/WAGE_CLAIM_FLINT_INSPECTION/);
+assert.match(scene,/inspected==='club'\?'Flint':'Work cart'/);
+assert.match(scene,/font:600 16px\/1\.55/);
+assert.match(scene,/color:#342316/);
+assert.match(scene,/aria-live="polite" aria-label="Object inspection"/);
+assert.match(canon,/Asset inspection presentation/);
+assert.ok(copy.includes("Flint has a short club at his side."),
+  'Flint physical description must not replace the existing club observation');
+
 assert.match(core,/previousWageClaim/);
 assert.match(core,/revision:s\.revision\+1/);
 assert.match(api,/returningFromBoundary/);
