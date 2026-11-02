@@ -13,6 +13,8 @@ The origin's [story master](README.md) retains narrative structure and mechanica
 | 7 — Clinic | [Clinic encounter](clinic-treatment.md) | [Stage 7 Revision 01](stage-7-approved-script.md) |
 | 8 — Shared rented home | [Single universal Stage 8](../shared-home-rent-ending.md) | [Stage 8 Revision 01](stage-8-approved-script.md), with the universal notice and speech unchanged |
 
+**Stages 5–8 integration:** [Production kickoff and handoff plan](stages-5-8-integration-kickoff.md) records the remaining production sequence, shared art requirements, state/persistence contracts and combat reuse gate. It does not replace the approved scripts or indicate that the scenes are currently playable.
+
 [Approved personal Journal wording for Stages 1–4](stages-1-4-approved-journal.md) supplies the personal first-person voice; use conditional branch text only when the corresponding game state occurred.
 
 **Optional Guther conversation:** [Approved owner-written Guther workshop dialogue (2026-10-27)](guther-optional-conversation.md) is separate from the Stage 1 opening and Stage 3 Missing Stamp exchanges. The shared small NPC popup handles its player-selected follow-ups; all work state remains unchanged.
