@@ -114,7 +114,10 @@ export function registerMillhandWageClaimRoutes(app:FastifyInstance){
           return reply.code(409).send({error:'idempotency_key_reuse'});
         return receipt.rows[0].result;
       }
-      if(c.rows[0].tutorial_stage!==5){
+      // Completed Stage 5 may return to the stance selection before Stage 6
+      // combat begins. Normal progression cannot be edited from Stage 6.
+      const returningFromBoundary=c.rows[0].tutorial_stage===6&&cmd.action==='previous_dialogue';
+      if(c.rows[0].tutorial_stage!==5&&!returningFromBoundary){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'wrong_wage_claim_phase'});
       }
@@ -134,6 +137,10 @@ export function registerMillhandWageClaimRoutes(app:FastifyInstance){
       if(current.branch!==branch){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'branch_mismatch'});
+      }
+      if(returningFromBoundary&&current.phase!=='DONE'){
+        await client.query('ROLLBACK');transaction=false;
+        return reply.code(409).send({error:'stage_six_not_reversible'});
       }
       if(current.revision!==cmd.expectedRevision){
         await client.query('ROLLBACK');transaction=false;
