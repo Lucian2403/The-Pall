@@ -29,8 +29,15 @@ for(const phrase of [
   "But your wages? Not a word about those.",
   "Bloody hell. They haven't paid you a penny, and now they want money from you.",
   'Who gave you the right to take money from me? The council?',
-  "Don't know. They don't tell men like us.",
-  "And you still want me to pay?",
+  "Why's this on me?",
+  "You did the job, didn't you? Boss wants his money.",
+  "But that number's been cancelled. The man's dead. Died in the fire.",
+  "Well, I didn't put it there.",
+  "Who did, then?",
+  "How should I know? They don't tell us that stuff.",
+  "So you know it's wrong, and you still want me to pay?",
+  "Flint scratches his chin, then looks back at you.",
+  "Yeah.",
   "I've got the receipt.",
   "Nobody told me.",
   "Then go and tell them. I don't keep the books.",
@@ -55,6 +62,13 @@ assert.match(core,/initialWageClaim/);
 assert.match(core,/availableWageClaimActions/);
 assert.match(core,/advanceWageClaim/);
 assert.match(core,/WAGE_CLAIM_DIALOGUE_COUNTS/);
+assert.match(core,/COMMON_EXCHANGE:7/);
+assert.match(copy,/speaker:'Narration',text:'Flint scratches his chin, then looks back at you\.'/);
+assert.ok(!copy.includes('Why have they put the charge on me?') &&
+  !copy.includes("Don't know. They don't tell men like us.") &&
+  !copy.includes('And you still want me to pay?'),
+  'Owner R03 replaces the earlier question, reply and common dialogue');
+
 assert.match(core,/phase='DONE'/);
 assert.match(api,/session\?\.user\.emailVerified/);
 assert.match(api,/account_id=\$2 FOR UPDATE/);
