@@ -4,6 +4,17 @@
 import type {WageClaimState,WageClaimPhase,WageClaimAction} from '@the-pall/game-core';
 type Beat={speaker:'Flint'|'Player'|'Narration';text:string};
 
+/** A quiet, saved arrival beat before Flint's artwork or label is shown.
+ * Only the location changes with the player's completed Stage 4 branch. */
+export const WAGE_CLAIM_WALK_HOME:Record<WageClaimState['branch'],string>={
+  restamp:
+    'You leave the municipal depot and start towards home. The work is done, though you still haven\'t seen a coin for it. The industrial passage is quiet beneath the gas lamps. A man stands farther along near a work cart. As you draw closer, you recognize him. Flint.',
+  contracts:
+    'You leave the Contracts office and head for home. Your complaint has been recorded; the wages are another matter. The industrial passage is quiet beneath the gas lamps. A man stands farther along near a work cart. As you draw closer, you recognize him. Flint.',
+  records:
+    'You leave the records room and make for home, still thinking about the altered entry. The industrial passage is quiet beneath the gas lamps. A man stands farther along near a work cart. As you draw closer, you recognize him. Flint.'
+};
+
 export const WAGE_CLAIM_OPENING=
   'Flint steps into your way and shoves a folded paper towards you.';
 
@@ -83,6 +94,7 @@ export function wageClaimBeat(s:WageClaimState):Beat|null {
   return beats[s.dialogueIndex]??null;
 }
 export const WAGE_CLAIM_INSTRUCTIONS:Record<WageClaimPhase,string>={
+  APPROACHING:'Continue towards home.',
   OPENING:'Speak with Flint.',
   CHOOSE_APPROACH:'Check the demand or ask who sent Flint.',
   APPROACH_EXCHANGE:'Speak with Flint.',
@@ -122,7 +134,7 @@ export const WAGE_CLAIM_CART_INSPECTION=
   'A work cart stands against one side of the passage. Flint is blocking the way ahead.';
 
 const STAGES:WageClaimPhase[]=[
-  'OPENING','CHOOSE_APPROACH','APPROACH_EXCHANGE','COMMON_EXCHANGE',
+  'APPROACHING','OPENING','CHOOSE_APPROACH','APPROACH_EXCHANGE','COMMON_EXCHANGE',
   'CHOOSE_EVIDENCE','EVIDENCE_EXCHANGE','LEAVING','CORNERED_EXCHANGE','CHOOSE_STANCE','DONE'
 ];
 export function wageClaimJournal(s:WageClaimState):string[]{
