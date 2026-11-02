@@ -11,6 +11,7 @@ const api=read('apps/api/src/millhand-second-job-routes.ts');
 const route=read('apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte');
 const ui=read('apps/web/src/lib/MillhandSecondJobScene.svelte');
 const stage3Ui=read('apps/web/src/lib/MillhandMissingStampScene.svelte');
+const wageClaimPage=read('apps/web/src/routes/characters/[id]/millhand/wage-claim/+page.svelte');
 const stage3Route=read('apps/web/src/routes/characters/[id]/millhand/missing-stamp/+page.svelte');
 const shell=read('apps/web/src/lib/TutorialShell.svelte');
 const dev=read('apps/api/src/millhand-stage-rewind-routes.ts');
@@ -57,16 +58,27 @@ assert.ok(api.includes("char.rows[0].tutorial_stage!==4"),
   'Stage4 actions must be restricted to Stage4');
 assert.ok(api.includes('AND account_id=$2 FOR UPDATE'), 'Account-owned server row lock needed');
 assert.ok(api.includes('player_character_second_job_receipts'),'Stage4 needs idempotent receipts');
-assert.ok(api.includes("nextCharacter.tutorial_stage=5"), 'Stage4 must lead to Stage5 only on completion');
+assert.ok(api.includes("if(next.phase==='EXITED')") &&
+  api.includes("nextCharacter.tutorial_stage=5") &&
+  core.includes("case 'DONE':return ['leave_location']") &&
+  core.includes("case 'leave_location':phase='EXITED';"),
+  'Only the deliberate location exit may trigger Stage5');
 assert.ok(!api.includes('MISSING_STAMP_ROUTE_SKILL'), 'Do not grant a second major skill award');
 assert.ok(!api.includes('major_skill_bonuses=$2'), 'No skill mutation from Stage4');
 
-assert.ok(route.includes('/millhand/second-job'), 'Stage4 saved work route missing');
+assert.ok(route.includes('/millhand/wage-claim') &&
+  route.includes("action==='leave_location'") &&
+  !route.includes("The Wage Claim with Flint is the next chapter"),
+  'Stage4 must hide Flint until the explicit location exit');
+assert.ok(wageClaimPage.includes('MillhandWageClaimScene'),
+  'Stage5 destination must be a real playable confrontation route');
 assert.ok(ui.includes('secondJobJournal')&&ui.includes("STAGE_FOUR_DIALOGUE"),
   'Stage4 route-specific copy and journal missing');
 assert.ok(stage3Ui.includes('continueToJob'), 'Guther must offer chosen next job after finishing Stage3');
 assert.ok(stage3Route.includes("/millhand/second-job"), 'Stage3 seamless route navigation missing');
-assert.ok(shell.includes("character.tutorial.stage >= 4"), 'Shared navigation must select Stage4');
+assert.ok(shell.includes("character.tutorial.stage === 4") &&
+  shell.includes("character.tutorial.stage >= 5"),
+  'Shared navigation must distinguish Stage4 work from Stage5 encounter');
 assert.ok(planner.includes('removeSecondJob:stage>=4'),'Developer rewind must discard later Stage4 work safely');
 assert.ok(dev.includes('player_character_second_job_receipts'),'Developer rewind must clear Stage4 receipts');
 
