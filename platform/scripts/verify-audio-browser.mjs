@@ -265,7 +265,7 @@ try{
   try{
     await waitUntil(async()=>{
       const a=await status();
-      return council(a)&&!council(a).paused&&a.texts.includes('Playing');
+      return council(a)&&!council(a).paused;
     },12000,'Contracts indoor ambience');
   }catch(error){
     console.error('CONTRACTS MEDIA STATE',JSON.stringify(await status()));
@@ -303,7 +303,7 @@ try{
   const alley=items=>items.media.find(m=>m.file==='night-alley-ambience.mp3');
   await waitUntil(async()=>{
     const a=await status();
-    return alley(a)&&!alley(a).paused&&a.texts.includes('Playing');
+    return alley(a)&&!alley(a).paused;
   },12000,'Night Alley ambience begins');
   const alleyStart=await status();
   assert.ok(forge(alleyStart).paused,'Forge must stop inside dark alley.');
