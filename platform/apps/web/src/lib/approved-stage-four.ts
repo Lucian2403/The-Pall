@@ -141,7 +141,7 @@ export const STAGE_FOUR_EXIT_LABELS = {
 
 export const STAGE_FOUR_FINAL = {
   restamp: 'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
-  contracts: 'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You're still at the counter, empty-handed.',
+  contracts: 'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You are still at the counter, empty-handed.',
   records: 'They marked the man dead, but his number kept showing up in the wage books long after. Someone\'s scraped part of a line off, too. Who did it? Why? Not a damn clue.'
 } as const;
 
