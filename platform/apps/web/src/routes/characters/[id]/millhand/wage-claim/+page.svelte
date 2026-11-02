@@ -102,7 +102,7 @@
 
 <svelte:head><title>The Pall — The Wage Claim</title></svelte:head>
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character} sceneLocation="Industrial service passage" backStageBusy={pending} {backStageError} backToStageFive={()=>perform('previous_dialogue')}>
+  <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true} backStageBusy={pending} {backStageError} backToStageFive={()=>perform('previous_dialogue')}>
     <MillhandWageClaimScene {snapshot} {pending} {errorMessage} {perform}/>
   </TutorialShell>
 {:else}
