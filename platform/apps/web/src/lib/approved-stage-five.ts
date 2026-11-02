@@ -113,6 +113,9 @@ export const WAGE_CLAIM_STANCE_OUTCOMES={
 
 export const WAGE_CLAIM_DEMAND_INSPECTION=
   "The contractor's paper names the disputed plate lot and the cancelled worker number. A processing charge is assigned to you. No wages have been recorded as paid to you. The amount of the charge is not given.";
+/** Visual-only description derived from the owner-provided standing Flint cutout. */
+export const WAGE_CLAIM_FLINT_INSPECTION=
+  'Flint is a broad, thickset man in a battered brimmed hat and an eyepatch. Leather braces cross his worn, rolled-sleeve shirt. His trousers are patched, his boots heavy, and he grips a metal-banded wooden club.';
 export const WAGE_CLAIM_CLUB_INSPECTION=
   'Flint has a short club at his side. You cannot take it from him by examining it.';
 export const WAGE_CLAIM_CART_INSPECTION=
