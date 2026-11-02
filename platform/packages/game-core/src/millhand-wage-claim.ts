@@ -13,7 +13,8 @@ export type WageClaimPhase =
 export type WageClaimAction =
   | 'continue_dialogue' | 'read_demand' | 'challenge_authority'
   | 'share_route_evidence' | 'say_going_home'
-  | 'brace_and_defend' | 'keep_moving' | 'use_cart_as_cover';
+  | 'brace_and_defend' | 'keep_moving' | 'use_cart_as_cover'
+  | 'previous_dialogue';
 
 export type WageClaimApproach='read'|'challenge';
 export type WageClaimStance='brace'|'moving'|'cart';
@@ -29,7 +30,8 @@ export type WageClaimState=Readonly<{
 
 export const WAGE_CLAIM_ACTIONS:readonly WageClaimAction[]=[
   'continue_dialogue','read_demand','challenge_authority','share_route_evidence',
-  'say_going_home','brace_and_defend','keep_moving','use_cart_as_cover'
+  'say_going_home','brace_and_defend','keep_moving','use_cart_as_cover',
+  'previous_dialogue'
 ];
 export const WAGE_CLAIM_DIALOGUE_COUNTS={
   OPENING:5,
@@ -45,20 +47,56 @@ export function initialWageClaim(branch:MissingStampBranch):WageClaimState {
   return {revision:0,branch,phase:'OPENING',dialogueIndex:0,
     approach:null,stance:null,lastAction:null};
 }
+/** Previous moves one *saved* beat backward. Once combat is connected,
+ * the API must reject it after a Stage 6 encounter has started. */
 export function availableWageClaimActions(s:WageClaimState):readonly WageClaimAction[]{
+  const back:WageClaimAction[]=
+    s.phase==='OPENING' && s.dialogueIndex===0?[]:['previous_dialogue'];
   switch(s.phase){
     case 'OPENING':
     case 'APPROACH_EXCHANGE':
     case 'COMMON_EXCHANGE':
     case 'EVIDENCE_EXCHANGE':
     case 'CORNERED_EXCHANGE':
-      return ['continue_dialogue'];
-    case 'CHOOSE_APPROACH':return ['read_demand','challenge_authority'];
-    case 'CHOOSE_EVIDENCE':return ['share_route_evidence'];
-    case 'LEAVING':return ['say_going_home'];
-    case 'CHOOSE_STANCE':return ['brace_and_defend','keep_moving','use_cart_as_cover'];
-    case 'DONE':return [];
+      return ['continue_dialogue',...back];
+    case 'CHOOSE_APPROACH':return ['read_demand','challenge_authority',...back];
+    case 'CHOOSE_EVIDENCE':return ['share_route_evidence',...back];
+    case 'LEAVING':return ['say_going_home',...back];
+    case 'CHOOSE_STANCE':return ['brace_and_defend','keep_moving','use_cart_as_cover',...back];
+    case 'DONE':return back;
   }
+}
+/** Reverse the last dialog beat or choice without rewinding Stage 4,
+ * decrementing XP, or depending on ephemeral client-side history.
+ * Revision remains strictly monotone, even while navigating backwards. */
+export function previousWageClaim(s:WageClaimState):WageClaimState{
+  if(!availableWageClaimActions(s).includes('previous_dialogue'))
+    throw new WageClaimInvalidAction('previous_dialogue_not_available');
+  let {phase,dialogueIndex,approach,stance}=s;
+  if(phase==='DONE'){
+    phase='CHOOSE_STANCE';dialogueIndex=0;stance=null;
+  }else if(phase==='CHOOSE_APPROACH'){
+    phase='OPENING';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.OPENING-1;
+  }else if(phase==='CHOOSE_EVIDENCE'){
+    phase='COMMON_EXCHANGE';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.COMMON_EXCHANGE-1;
+  }else if(phase==='LEAVING'){
+    phase='EVIDENCE_EXCHANGE';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.EVIDENCE_EXCHANGE-1;
+  }else if(phase==='CHOOSE_STANCE'){
+    phase='CORNERED_EXCHANGE';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.CORNERED_EXCHANGE-1;
+  }else if(phase==='APPROACH_EXCHANGE'&&dialogueIndex===0){
+    phase='CHOOSE_APPROACH';approach=null;
+  }else if(phase==='COMMON_EXCHANGE'&&dialogueIndex===0){
+    phase='APPROACH_EXCHANGE';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.APPROACH_EXCHANGE-1;
+  }else if(phase==='EVIDENCE_EXCHANGE'&&dialogueIndex===0){
+    phase='CHOOSE_EVIDENCE';
+  }else if(phase==='CORNERED_EXCHANGE'&&dialogueIndex===0){
+    phase='LEAVING';
+  }else if(dialogueIndex>0){
+    dialogueIndex--;
+  }else{
+    throw new WageClaimInvalidAction('invalid_previous_dialogue');
+  }
+  return {...s,revision:s.revision+1,phase,dialogueIndex,approach,stance,lastAction:'previous_dialogue'};
 }
 export class WageClaimInvalidAction extends Error{
   constructor(message='wrong_wage_claim_phase'){super(message);}
@@ -67,6 +105,7 @@ export function advanceWageClaim(s:WageClaimState,action:WageClaimAction):WageCl
   if(!Number.isSafeInteger(s.revision)||s.revision<0||s.revision>=Number.MAX_SAFE_INTEGER
     ||!availableWageClaimActions(s).includes(action))
     throw new WageClaimInvalidAction();
+  if(action==='previous_dialogue')return previousWageClaim(s);
   let {phase,dialogueIndex,approach,stance}=s;
   if(action==='continue_dialogue'){
     if(!(phase in WAGE_CLAIM_DIALOGUE_COUNTS))throw new WageClaimInvalidAction();
