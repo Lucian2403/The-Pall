@@ -86,14 +86,11 @@
       {#if state.phase==='OPENING'}
         <p class="context">{WAGE_CLAIM_OPENING}</p>
       {/if}
-      {#if state.phase==='CHOOSE_APPROACH'}
-        <p class="context">Flint holds out the folded paper.</p>
-      {/if}
       {#if beat}
         {#if beat.speaker==='Narration'}
           <p class="context current-beat">{beat.text}</p>
         {:else}
-          <p class="speaker">{beat.speaker==='Player'?'You':"Flint — Contractor's Collector"}</p>
+          <p class="speaker">{beat.speaker==='Player'?'You':'Flint'}</p>
           <p class="speech">“{beat.text}”</p>
         {/if}
       {:else if state.phase==='CHOOSE_STANCE'}
@@ -191,7 +188,7 @@
   .context,.instruction{font:15px/1.45 var(--pall-font-reading,Georgia,serif);margin:0 0 11px}
   .instruction{font-weight:700}
   .context{color:#463020}
-  .current-beat{font-weight:600}
+  .current-beat{font-weight:600;white-space:pre-line}
   .inspection{padding:8px 0;margin:8px 0;border-top:1px solid #ae9272;
     font:13px/1.4 var(--pall-font-reading,Georgia,serif);color:#4e3221}
   .inspection p{margin:5px 0 0}
