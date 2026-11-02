@@ -25,7 +25,7 @@ export type PallAudioPlayback={
 };
 export const pallAudioPlayback=writable<PallAudioPlayback>({
   music:'Waiting for interaction',
-  ambience:'Workshop or council office only',
+  ambience:'Only in an illustrated environment',
   effects:'Loading'
 });
 
@@ -41,6 +41,7 @@ const musicFile='music-theme.mp3';
 const smithingAmbienceFile='smithing-workshop-ambience.mp3';
 // Same owner-provided indoor ambience for the Contracts and Scholarship rooms.
 const councilOfficeAmbienceFile='contracts-scholarship-ambience.mp3';
+const nightAlleyAmbienceFile='night-alley-ambience.mp3';
 const FADE_IN=4;
 const FADE_OUT=5;
 const MUSIC_PAUSE_MIN_MS=30_000;
@@ -53,23 +54,28 @@ let unlocked=false;
 let music:HTMLAudioElement|null=null;
 let ambience:HTMLAudioElement|null=null;
 let councilAmbience:HTMLAudioElement|null=null;
+let alleyAmbience:HTMLAudioElement|null=null;
 let musicError=false;
 let ambienceError=false;
 let councilAmbienceError=false;
+let alleyAmbienceError=false;
 let musicBlocked=false;
 let ambienceBlocked=false;
 let councilAmbienceBlocked=false;
+let alleyAmbienceBlocked=false;
 let statusSnapshot='';
 // A workshop scene claims the soundscape for as long as its illustration
 // is visible. Ownership is independent of URL so non-workshop pages stay silent.
 const smithingAmbienceOwners=new Set<symbol>();
 const councilAmbienceOwners=new Set<symbol>();
-let activeAmbienceScene:'forge'|'council'|null=null;
+const alleyAmbienceOwners=new Set<symbol>();
+let activeAmbienceScene:'forge'|'council'|'alley'|null=null;
 // SvelteKit briefly unmounts the old stage while the next stage loads.
 // Do not replay the 115-second forge recording from its beginning each time.
 const WORKSHOP_TRANSITION_GRACE_MS=2400;
 let ambienceDepartureTimer:ReturnType<typeof setTimeout>|null=null;
 let councilDepartureTimer:ReturnType<typeof setTimeout>|null=null;
+let alleyDepartureTimer:ReturnType<typeof setTimeout>|null=null;
 let nextMusicTimer:ReturnType<typeof setTimeout>|null=null;
 let lastClickAt=0;
 
@@ -100,11 +106,14 @@ function publishPlayback(){
     :musicBlocked?'Playback blocked — click to retry'
     :music&&!music.paused?'Playing':'Loading');
   const activeTrack=activeAmbienceScene==='forge'?ambience
-    :activeAmbienceScene==='council'?councilAmbience:null;
-  const activeError=activeAmbienceScene==='forge'?ambienceError:councilAmbienceError;
-  const activeBlocked=activeAmbienceScene==='forge'?ambienceBlocked:councilAmbienceBlocked;
+    :activeAmbienceScene==='council'?councilAmbience
+    :activeAmbienceScene==='alley'?alleyAmbience:null;
+  const activeError=activeAmbienceScene==='forge'?ambienceError
+    :activeAmbienceScene==='council'?councilAmbienceError:alleyAmbienceError;
+  const activeBlocked=activeAmbienceScene==='forge'?ambienceBlocked
+    :activeAmbienceScene==='council'?councilAmbienceBlocked:alleyAmbienceBlocked;
   const ambienceState=unavailable??(settings.ambienceVolume===0?'Off'
-    :activeAmbienceScene===null?'Workshop or council office only'
+    :activeAmbienceScene===null?'Only in an illustrated environment'
     :activeError?'File unavailable'
     :!unlocked?'Click to start'
     :activeBlocked?'Playback blocked — click to retry'
@@ -360,6 +369,8 @@ export function claimCouncilOfficeAmbience(){
   const owner=Symbol('council-office');
   councilAmbienceOwners.add(owner);
   activeAmbienceScene='council';
+  cancelAlleyDeparture();
+  stopAlleyTrack(true);
   cancelAmbienceDeparture();
   stopAmbience(true);
   cancelCouncilDeparture();
@@ -372,6 +383,98 @@ export function claimCouncilOfficeAmbience(){
       if(activeAmbienceScene==='council')activeAmbienceScene=null;
       deferCouncilDeparture();
     }else updateCouncilAmbience();
+    publishPlayback();
+  };
+}
+
+/** The industrial alley is a distinct ambient location. It is audible only
+ * while its painted backdrop is mounted; Stages 5 and 6 share one stream. */
+function canPlayAlleyAmbience(){
+  return typeof document!=='undefined' && settings.enabled &&
+    sceneActive && unlocked && settings.ambienceVolume>0 &&
+    alleyAmbienceOwners.size>0 && activeAmbienceScene==='alley' && !document.hidden;
+}
+function ensureAlleyAmbience(){
+  if(alleyAmbience)return alleyAmbience;
+  alleyAmbience=new Audio(base+nightAlleyAmbienceFile);
+  alleyAmbience.preload='auto';
+  alleyAmbience.loop=true;
+  alleyAmbience.volume=0;
+  alleyAmbience.addEventListener('playing',publishPlayback);
+  alleyAmbience.addEventListener('pause',publishPlayback);
+  alleyAmbience.addEventListener('error',()=>{alleyAmbienceError=true;publishPlayback();});
+  // Preload once; remounts must not restart the owner recording.
+  alleyAmbience.load();
+  publishPlayback();
+  return alleyAmbience;
+}
+function cancelAlleyDeparture(){
+  if(alleyDepartureTimer!==null){clearTimeout(alleyDepartureTimer);alleyDepartureTimer=null;}
+}
+function stopAlleyTrack(reset=false){
+  if(!alleyAmbience)return;
+  alleyAmbience.pause();
+  if(reset){try{alleyAmbience.currentTime=0;}catch{/* Not loaded yet. */}}
+  publishPlayback();
+}
+function deferAlleyDeparture(){
+  if(alleyDepartureTimer!==null||!alleyAmbience||alleyAmbience.paused)return;
+  alleyDepartureTimer=setTimeout(()=>{
+    alleyDepartureTimer=null;
+    if(!sceneActive||alleyAmbienceOwners.size===0)stopAlleyTrack();
+  },WORKSHOP_TRANSITION_GRACE_MS);
+}
+function startAlleyAmbience(){
+  if(!canPlayAlleyAmbience())return;
+  const track=ensureAlleyAmbience();
+  track.volume=clamp(settings.ambienceVolume,0,1);
+  if(track.paused)void track.play().then(()=>{
+    alleyAmbienceBlocked=false;
+    publishPlayback();
+  }).catch(()=>{
+    alleyAmbienceBlocked=true;
+    publishPlayback();
+  });
+  publishPlayback();
+}
+function updateAlleyAmbience(){
+  if(typeof document==='undefined'||document.hidden||!settings.enabled||settings.ambienceVolume<=0){
+    cancelAlleyDeparture();
+    stopAlleyTrack();
+  }else if(canPlayAlleyAmbience()){
+    cancelAlleyDeparture();
+    startAlleyAmbience();
+  }else if(!sceneActive||alleyAmbienceOwners.size===0){
+    deferAlleyDeparture();
+  }else{
+    stopAlleyTrack();
+  }
+}
+/** Only an explicit non-alley backdrop stops and resets the alley recording. */
+export function stopNightAlleyAmbience(){
+  if(activeAmbienceScene==='alley')activeAmbienceScene=null;
+  cancelAlleyDeparture();
+  stopAlleyTrack(true);
+}
+/** Claim only from the actual Flint alley scene, never from a generic character URL. */
+export function claimNightAlleyAmbience(){
+  const owner=Symbol('night-alley');
+  alleyAmbienceOwners.add(owner);
+  activeAmbienceScene='alley';
+  cancelAmbienceDeparture();
+  cancelCouncilDeparture();
+  stopAmbience(true);
+  stopCouncilAmbience(true);
+  cancelAlleyDeparture();
+  if(typeof window!=='undefined'&&settings.enabled)ensureAlleyAmbience();
+  updateAlleyAmbience();
+  publishPlayback();
+  return ()=>{
+    alleyAmbienceOwners.delete(owner);
+    if(alleyAmbienceOwners.size===0){
+      if(activeAmbienceScene==='alley')activeAmbienceScene=null;
+      deferAlleyDeparture();
+    }else updateAlleyAmbience();
     publishPlayback();
   };
 }
@@ -390,6 +493,8 @@ export function claimSmithingWorkshopAmbience(){
   const owner=Symbol('smithing-workshop');
   smithingAmbienceOwners.add(owner);
   activeAmbienceScene='forge';
+  cancelAlleyDeparture();
+  stopAlleyTrack(true);
   cancelCouncilDeparture();
   stopCouncilAmbience(true);
   cancelAmbienceDeparture();
@@ -441,6 +546,7 @@ function unlock(){
   startMusic();
   updateAmbience();
   updateCouncilAmbience();
+  updateAlleyAmbience();
   publishPlayback();
 }
 export function activatePallAudio(){
@@ -555,6 +661,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     stopMusic();
     stopAmbience();
     stopCouncilAmbience();
+    stopAlleyTrack();
     stopSoundEffects();
   }else{
     prepareSoundEffects();
@@ -562,6 +669,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     updateMusicVolume();
     updateAmbience();
     updateCouncilAmbience();
+    updateAlleyAmbience();
   }
   publishPlayback();
 }
@@ -573,12 +681,14 @@ export function setPallAudioScene(active:boolean){
     startMusic();
     updateAmbience();
     updateCouncilAmbience();
+    updateAlleyAmbience();
   }else{
     stopMusic();
     // The incoming stage may render the same painted forge background.
     // Preserve the ambient loop until its new shell can declare the scene.
     deferAmbienceDeparture();
     deferCouncilDeparture();
+    deferAlleyDeparture();
     stopSoundEffects();
   }
   publishPlayback();
@@ -616,10 +726,12 @@ function visible(){
     stopMusic();
     stopAmbience();
     stopCouncilAmbience();
+    stopAlleyTrack();
   }else{
     startMusic();
     updateAmbience();
     updateCouncilAmbience();
+    updateAlleyAmbience();
   }
   publishPlayback();
 }
@@ -652,19 +764,25 @@ export function connectPallAudio(){
     stopMusic();
     cancelAmbienceDeparture();
     cancelCouncilDeparture();
+    cancelAlleyDeparture();
     stopAmbience(true);
     stopCouncilAmbience(true);
+    stopAlleyTrack(true);
     ambience=null;
     councilAmbience=null;
+    alleyAmbience=null;
     activeAmbienceScene=null;
     smithingAmbienceOwners.clear();
     councilAmbienceOwners.clear();
+    alleyAmbienceOwners.clear();
     ambienceError=false;
     councilAmbienceError=false;
+    alleyAmbienceError=false;
     musicError=false;
     musicBlocked=false;
     ambienceBlocked=false;
     councilAmbienceBlocked=false;
+    alleyAmbienceBlocked=false;
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();
