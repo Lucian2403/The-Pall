@@ -112,21 +112,22 @@ export function advanceWageClaim(s:WageClaimState,action:WageClaimAction):WageCl
   let {phase,dialogueIndex,approach,stance}=s;
   if(action==='continue_dialogue'){
     if(phase==='APPROACHING'){
-      // The walk home is one saved narrative beat; it does not reveal Flint's art.
+      if(dialogueIndex!==0)throw new WageClaimInvalidAction('invalid_dialogue_index');
+      // Reveal Flint only after this server-authoritative Continue action.
       phase='OPENING';dialogueIndex=0;
     }else{
-    if(!(phase in WAGE_CLAIM_DIALOGUE_COUNTS))throw new WageClaimInvalidAction();
-    const count=WAGE_CLAIM_DIALOGUE_COUNTS[phase as keyof typeof WAGE_CLAIM_DIALOGUE_COUNTS];
-    if(!Number.isSafeInteger(dialogueIndex)||dialogueIndex<0||dialogueIndex>=count)
-      throw new WageClaimInvalidAction('invalid_dialogue_index');
-    if(dialogueIndex<count-1)dialogueIndex++;
-    else{
-      dialogueIndex=0;
-      phase=phase==='OPENING'?'CHOOSE_APPROACH'
-        :phase==='APPROACH_EXCHANGE'?'COMMON_EXCHANGE'
-        :phase==='COMMON_EXCHANGE'?'CHOOSE_EVIDENCE'
-        :phase==='EVIDENCE_EXCHANGE'?'LEAVING':'CHOOSE_STANCE';
-    }
+      if(!(phase in WAGE_CLAIM_DIALOGUE_COUNTS))throw new WageClaimInvalidAction();
+      const count=WAGE_CLAIM_DIALOGUE_COUNTS[phase as keyof typeof WAGE_CLAIM_DIALOGUE_COUNTS];
+      if(!Number.isSafeInteger(dialogueIndex)||dialogueIndex<0||dialogueIndex>=count)
+        throw new WageClaimInvalidAction('invalid_dialogue_index');
+      if(dialogueIndex<count-1)dialogueIndex++;
+      else{
+        dialogueIndex=0;
+        phase=phase==='OPENING'?'CHOOSE_APPROACH'
+          :phase==='APPROACH_EXCHANGE'?'COMMON_EXCHANGE'
+          :phase==='COMMON_EXCHANGE'?'CHOOSE_EVIDENCE'
+          :phase==='EVIDENCE_EXCHANGE'?'LEAVING':'CHOOSE_STANCE';
+      }
     }
   }else{
     switch(action){
