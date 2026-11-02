@@ -288,7 +288,37 @@ try{
     'A confirmed new background must reset the Council recording.');
   await waitUntil(async()=>forge(await status())?.paused===false,8000,'forge resumed');
 
-  console.log('PASS: real Chromium ambience loops in forge, Contracts and Scholarship; slider, transitions, master mute and Web Audio click.',JSON.stringify({after,subsequent,depot,contracts,scholarship,returned}));
+  phase='entering the painted dark alley';
+  await click('Switch to dark alley');
+  const alley=items=>items.media.find(m=>m.file==='night-alley-ambience.mp3');
+  await waitUntil(async()=>{
+    const a=await status();
+    return alley(a)&&!alley(a).paused&&a.texts.includes('Playing');
+  },12000,'Night Alley ambience begins');
+  const alleyStart=await status();
+  assert.ok(forge(alleyStart).paused,'Forge must stop inside dark alley.');
+  assert.ok(council(alleyStart).paused,'Council must stop inside dark alley.');
+  assert.ok(alley(alleyStart).volume>.65,'Night Alley must obey the saved Ambience slider.');
+
+  phase='remounting the same alley from Stage 5 to Stage 6';
+  const alleyPosition=alley(alleyStart).currentTime;
+  await click('Next forge stage'); // fixture remounts the same currently selected backdrop
+  await waitUntil(async()=>alley(await status())?.paused===false,8000,'continued alley ambience');
+  const alleyNext=await status();
+  assert.ok(alley(alleyNext).currentTime>=alleyPosition-.2,
+    'Stage 5 to Stage 6 should preserve the original Night Alley media element.');
+
+  phase='leaving the alley for Contracts';
+  await click('Switch to Contracts');
+  await waitUntil(async()=>alley(await status())?.paused===true,8000,'alley stop at Council');
+  const alleyLeft=await status();
+  assert.ok(alley(alleyLeft).currentTime<.1,'Alley audio resets on a confirmed new backdrop.');
+  await waitUntil(async()=>council(await status())?.paused===false,8000,'Council resumes');
+  await click('Return to forge');
+  await waitUntil(async()=>forge(await status())?.paused===false,8000,'forge resumes from Council');
+  assert.ok(alley(await status()).paused,'Dark Alley may not leak into the forge.');
+
+  console.log('PASS: real Chromium workshop, Council and Night Alley audio loops; location isolation, slider, scene remount, and Web Audio click.',JSON.stringify({after,subsequent,depot,alleyStart,alleyNext,alleyLeft}));
 }finally{close();}
 // Vite starts subprocesses and Chromium opens a DevTools WebSocket; those
 // handles can linger after the checks pass. The fixture is disposable and
