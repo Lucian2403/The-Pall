@@ -143,10 +143,12 @@ All scene observations are in **second person**, literal and restricted to facts
 | Inspect the folded bill before Flint has offered it | “Flint still has the folded paper in his hand. He has not handed it to you.” |
 | Examine the bill again after the initial choice | Show the actual bill fields again without reissuing a charge or advancing the exchange |
 | Try to discuss the depot if the player followed Contracts/Records | The depot-specific speech option does not exist; never provide a generic wrong-route message that spoils other branches |
-| Select the club during the Wage Claim | “Flint has a short club at his side. You cannot take it from him by examining it.” |
+| Inspect Flint during the Wage Claim | “Flint is a broad, thickset man in a battered brimmed hat and an eyepatch. Leather braces cross his worn, rolled-sleeve shirt. His trousers are patched, his boots heavy, and he grips a metal-banded wooden club.” The interaction also retains the club observation: “Flint has a short club at his side. You cannot take it from him by examining it.” |
 | Inspect the cart before choosing a stance | “A work cart stands against one side of the passage. Flint is blocking the way ahead.” |
 | Try to leave during the required conversation | “Flint is still blocking the passage. Finish speaking to him before you try to get past.” |
 | Select an inventory or journal page | Browsing remains immediate and free. Returning does not advance the conversation or change the fight |
+
+**Asset inspection presentation (2026-11-02):** Clicking Flint opens a **Flint** observation first, followed by a clearly distinguished **His club** note. Flint, the work cart and the contractor's demand all use the same larger, high-contrast text block inside the existing parchment dialogue window. Examining Flint remains read-only; it does not advance the confrontation or affect combat. The underlying approved dialogue and movement choices are unchanged.
 
 No red highlight identifies the right response. Each required utterance remains visible until the user advances or selects the next explicit speech option. The 1.2-second presentation delay belongs to actions with committed outcomes, never autoplay.
 
