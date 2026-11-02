@@ -23,7 +23,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean} = $props();
+  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, backToStageFive, backStageBusy = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean} = $props();
   const chapter = $derived(character.origin === 'Millhand' && (character.tutorial.stage === 5 || character.tutorial.stage === 6)
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/wage-claim'
     : character.origin === 'Millhand' && character.tutorial.stage === 4
@@ -241,6 +241,13 @@
         <span>{sceneLocation ?? character.startingLocation}</span>
       </div>
       <div class="chapter-meta">Stage {character.tutorial.stage} · {character.origin}</div>
+      {#if character.origin==='Millhand' && character.tutorial.stage===6 && backToStageFive}
+        <button type="button" class="rewind-button" disabled={backStageBusy}
+          title="Return to the saved Stage 5 stance selection before combat begins"
+          onclick={()=>{void backToStageFive();}}>
+          {backStageBusy?'Returning…':'← Back to Stage 5'}
+        </button>
+      {/if}
       {#if canRewind && rewindFromStage!==null}
         <button type="button" class="rewind-button" disabled={rewinding}
           title="Developer testing only: reset the current stage to replay the previous one"
