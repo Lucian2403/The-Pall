@@ -65,7 +65,25 @@ assert.match(route,/expectedRevision:revision/);
 assert.match(route,/sceneLocation="Industrial service passage"/);
 assert.match(shell,/millhand\/wage-claim/);
 assert.match(home,/Continue the confrontation/);
-assert.match(last,/Continue to The Wage Claim/);
+const nextStep=read('apps/web/src/lib/StageFourNextStep.svelte');
+assert.match(nextStep,/NEXT STEP/);
+assert.match(nextStep,/Continue to The Wage Claim/);
+assert.match(nextStep,/millhand\/wage-claim/);
+assert.match(nextStep,/button-normal-trim\.png/);
+for(const name of [
+  'MillhandDepotScene.svelte',
+  'MillhandContractsScene.svelte',
+  'MillhandRecordsScene.svelte',
+  'MillhandSecondJobScene.svelte'
+]){
+  const scene=read('apps/web/src/lib/'+name);
+  assert.match(scene,/StageFourNextStep/,
+    'All Stage 4 outcomes must show the next-chapter action inside their dialogue: '+name);
+  assert.match(scene,/class="work-dialogue"/);
+  assert.match(scene,/STAGE_FOUR_FINAL/);
+}
+assert.doesNotMatch(last,/class="follow-up"|Continue to The Wage Claim/,
+  'No duplicate Stage 5 link is allowed in the bottom status strip');
 assert.match(dev,/DELETE FROM player_character_wage_claim_receipts/);
 assert.match(dev,/DELETE FROM player_character_wage_claim WHERE/);
 assert.ok(packageJSON.scripts['wage-claim:migrate']);
