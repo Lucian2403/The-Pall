@@ -26,8 +26,6 @@
 
 **FLINT:** “Don't care. I came to collect.”
 
-*The paper is in front of you.*
-
 **CURRENT INSTRUCTION:** Check the demand or ask who sent Flint.
 
 **PLAYER CHOICE 1 — Read the demand.**
