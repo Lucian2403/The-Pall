@@ -25,7 +25,7 @@ for(const branch of ['restamp','contracts','records']){
         assert.equal(s.approach,approach==='read_demand'?'read':'challenge');
         s=beats(s,3);
         assert.equal(s.phase,'COMMON_EXCHANGE');
-        s=beats(s,6);
+        s=beats(s,7);
         assert.equal(s.phase,'CHOOSE_EVIDENCE');
         assert.deepEqual(availableWageClaimActions(s),['share_route_evidence','previous_dialogue']);
         s=apply(s,'share_route_evidence');
@@ -75,7 +75,7 @@ test('Previous dialogue walks backwards across every phase with saved state inta
  s=beats(s,5);
  s=apply(s,'read_demand');
  s=beats(s,3);
- s=beats(s,6);
+ s=beats(s,7);
  s=apply(s,'share_route_evidence');
  s=beats(s,3);
  s=apply(s,'say_going_home');
@@ -91,7 +91,7 @@ test('Previous dialogue walks backwards across every phase with saved state inta
   ['LEAVING',0],
   ['EVIDENCE_EXCHANGE',2],['EVIDENCE_EXCHANGE',1],['EVIDENCE_EXCHANGE',0],
   ['CHOOSE_EVIDENCE',0],
-  ['COMMON_EXCHANGE',5],['COMMON_EXCHANGE',4],['COMMON_EXCHANGE',3],
+  ['COMMON_EXCHANGE',6],['COMMON_EXCHANGE',5],['COMMON_EXCHANGE',4],['COMMON_EXCHANGE',3],
   ['COMMON_EXCHANGE',2],['COMMON_EXCHANGE',1],['COMMON_EXCHANGE',0],
   ['APPROACH_EXCHANGE',2],['APPROACH_EXCHANGE',1],['APPROACH_EXCHANGE',0],
   ['CHOOSE_APPROACH',0],
@@ -115,7 +115,7 @@ test('Previous dialogue walks backwards across every phase with saved state inta
 test('Stage 6 pre-combat boundary returns to Stage 5 stance selection',()=>{
  let s=initialWageClaim('restamp');
  s=beats(s,5);s=apply(s,'challenge_authority');s=beats(s,3);
- s=beats(s,6);s=apply(s,'share_route_evidence');s=beats(s,3);
+ s=beats(s,7);s=apply(s,'share_route_evidence');s=beats(s,3);
  s=apply(s,'say_going_home');s=beats(s,8);
  s=apply(s,'brace_and_defend');
  const saved=JSON.parse(JSON.stringify(s));
@@ -143,7 +143,7 @@ for(const branch of ['restamp','contracts','records']){
      'The choice must not auto-advance');
    s=apply(s,originalApproach);
    s=beats(s,3);
-   s=beats(s,6);
+   s=beats(s,7);
    assert.equal(s.phase,'CHOOSE_EVIDENCE');
    s=apply(s,'share_route_evidence');
    s=apply(s,'previous_dialogue');
@@ -170,3 +170,23 @@ for(const branch of ['restamp','contracts','records']){
   });
  }
 }
+
+test('Owner R03: Flint gesture is its own saved beat and Previous stops on it',()=>{
+ let s=initialWageClaim('records');
+ const forward=(action)=>{s=advanceWageClaim(s,action);};
+ for(let i=0;i<5;i++)forward('continue_dialogue');
+ forward('read_demand');
+ for(let i=0;i<3;i++)forward('continue_dialogue');
+ assert.equal(s.phase,'COMMON_EXCHANGE');
+ for(let i=0;i<5;i++)forward('continue_dialogue');
+ assert.equal(s.dialogueIndex,5,'Gesture precedes final Flint reply');
+ forward('continue_dialogue');
+ assert.equal(s.dialogueIndex,6,'Last reply remains its own beat');
+ forward('previous_dialogue');
+ assert.equal(s.dialogueIndex,5,'Previous returns to Flint chin scratch');
+ forward('continue_dialogue');
+ assert.equal(s.dialogueIndex,6);
+ forward('continue_dialogue');
+ assert.equal(s.phase,'CHOOSE_EVIDENCE','Only seventh common beat transitions to evidence choice');
+ assert.deepEqual(availableWageClaimActions(s),['share_route_evidence','previous_dialogue']);
+});
