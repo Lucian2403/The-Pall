@@ -31,7 +31,7 @@ function parseCommand(value:unknown):Command {
 }
 function snapshot(ch:CharacterRow,state:SecondJobState){
   return {stage:ch.tutorial_stage,tutorialStatus:ch.tutorial_status,
-    state,availableActions:availableSecondJobActions(state),
+    state,availableActions:ch.tutorial_stage===4?availableSecondJobActions(state):[], 
     tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
 }
 function branchFromSavedStage3(value:{branch:MissingStampBranch|null;phase:string}|undefined){
@@ -71,7 +71,7 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
     }
     if(!job.rowCount&&ch.rows[0].tutorial_stage!==4)return reply.code(409).send({error:'missing_second_job_state'});
     const state=job.rows[0]?.state??initialSecondJob(branch);
-    if(state.branch!==branch || (ch.rows[0].tutorial_stage>4&&state.phase!=='DONE'))
+    if(state.branch!==branch || (ch.rows[0].tutorial_stage>4&&state.phase!=='DONE'&&state.phase!=='EXITED'))
       return reply.code(409).send({error:'invalid_second_job_state'});
     return snapshot(ch.rows[0],state);
   });
@@ -149,7 +149,7 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
         return reply.code(409).send({error:'wrong_second_job_phase'});
       }
       const nextCharacter:CharacterRow={...char.rows[0]};
-      if(next.phase==='DONE'){
+      if(next.phase==='EXITED'){
         nextCharacter.tutorial_stage=5;
         nextCharacter.tutorial_status='NOT_STARTED';
       }else{
