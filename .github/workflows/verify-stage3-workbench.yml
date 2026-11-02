@@ -40,4 +40,5 @@ jobs:
       - run: node --test packages/game-core/test/millhand-second-job.test.mjs packages/game-core/test/millhand-wage-claim.test.mjs
       - run: npm run verify:stage-four
       - run: npm run verify:stage-five
+      - run: npm run check:api
       - run: npm run build -w @the-pall/web
