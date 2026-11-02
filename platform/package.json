@@ -52,6 +52,7 @@
     "verify:missing-stamp-unauthenticated": "node scripts/verify-missing-stamp-unauthenticated.mjs",
     "verify:dev-rewind": "node scripts/verify-dev-stage-rewind.mjs",
     "verify:stage-four": "node scripts/verify-stage-four.mjs",
+    "verify:stage-five": "node scripts/verify-stage-five.mjs",
     "verify:depot-art": "node scripts/verify-depot-art.mjs",
     "verify:commerce-art": "node scripts/verify-commerce-art.mjs",
     "verify:scholarship-art": "node scripts/verify-scholarship-art.mjs",
