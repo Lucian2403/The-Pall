@@ -22,7 +22,11 @@
   const beat=$derived(wageClaimBeat(state));
   const journal=$derived(wageClaimJournal(state));
   const offered=$derived(state.phase!=='OPENING');
-  const canGoBack=$derived(snapshot.availableActions.includes('previous_dialogue'));
+  // Compute Back availability from saved position. This stays visible even
+  // during a stale local API build that omits the previous_dialogue action,
+  // so the user receives a clear server error instead of a dead button.
+  const canGoBack=$derived(state.phase!=='OPENING'||state.dialogueIndex>0);
+  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'].includes(state.phase));
   const forwardActions=$derived(snapshot.availableActions.filter(a=>a!=='previous_dialogue'));
   let flintImageMissing=$state(false);
   const cornered=$derived(
@@ -116,6 +120,9 @@
         </div>
       {/if}
       {#if forwardActions.length}
+        {#if atChoice}
+          <p class="decision-prompt">Choose your response</p>
+        {/if}
         <div class="actions" aria-label="Available confrontation actions">
           {#each forwardActions as action (action)}
             <button type="button" disabled={pending} onclick={()=>choose(action)}
@@ -129,7 +136,7 @@
         <div class="back-nav">
           <button type="button" class="back-button" disabled={pending}
             data-pall-sfx="click" onclick={()=>choose('previous_dialogue')}>
-            {state.phase==='DONE'?'← Back to Stage 5':'← Previous dialogue'}
+            ← Previous dialogue
           </button>
         </div>
       {/if}
@@ -209,6 +216,7 @@
   .inspection{padding:8px 0;margin:8px 0;border-top:1px solid #ae9272;
     font:13px/1.4 var(--pall-font-reading,Georgia,serif);color:#4e3221}
   .inspection p{margin:5px 0 0}
+  .decision-prompt{margin:10px 0 7px;font:700 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#614126}
   .actions{display:flex;flex-direction:column;gap:7px;margin:10px 0}
   .actions button{appearance:none;min-height:43px;text-align:left;padding:8px 13px;
     border:solid transparent;border-width:9px 17px 9px;
