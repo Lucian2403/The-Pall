@@ -48,12 +48,13 @@
   async function perform(action:WageClaimAction){
     const revision=snapshot?.state.revision;
     if(pending||revision===undefined||!character||!snapshot)return;
-    // A Stage 6 character can have an older API still reporting no
-    // previous_dialogue action. Do not silently discard the Back click:
-    // send it to the API so a mismatched backend reports an actionable error.
-    const stageSixBack=action==='previous_dialogue' &&
-      snapshot.stage===6 && snapshot.state.phase==='DONE';
-    if(!stageSixBack&&!snapshot.availableActions.includes(action))return;
+    // Previous Dialogue belongs to the saved Stage 5 position, not to a
+    // possibly stale availableActions list from a previously started API.
+    // Always send an eligible Back request; old API versions must return
+    // an explanatory error rather than making the button appear broken.
+    const previousAllowed=action==='previous_dialogue' &&
+      (snapshot.state.phase!=='OPENING'||snapshot.state.dialogueIndex>0);
+    if(!previousAllowed&&!snapshot.availableActions.includes(action))return;
     pending=true;errorMessage='';backStageError='';
     const signature=JSON.stringify([action,revision]);
     if(retrySignature!==signature||!retryId){retryId=crypto.randomUUID();retrySignature=signature;}
@@ -76,14 +77,18 @@
           :body.error==='wrong_wage_claim_phase'
           ?'That action is not available in this part of the conversation.'
           :'Could not save the conversation: '+(body.error??response.status);
-        if(action==='previous_dialogue'&&snapshot.stage===6){
+        if(action==='previous_dialogue'){
           const restartNeeded=['invalid_action','wrong_wage_claim_phase',
             'stage_six_not_reversible'].includes(body.error??'');
-          backStageError=restartNeeded
-            ?'The API does not support returning from Stage 6 yet. Pull PR #15, rebuild game-core and restart the API server.'
-            :'Back to Stage 5 failed: '+(body.error??response.status)+'. Check the API response.';
-          // Keep the error next to the button even when the server rejects
-          // the request. Do not reset the completed Stage 4 route.
+          const backMessage=restartNeeded
+            ?'Previous Dialogue requires the updated Stage 5 API. Rebuild game-core and restart the API server.'
+            :'Previous Dialogue failed: '+(body.error??response.status)+'. Check the API response.';
+          errorMessage=backMessage;
+          if(snapshot.stage===6)backStageError=backMessage;
+          if(response.status===409&&body.error==='stale_revision'){
+            retryId=null;retrySignature=null;
+            await refresh();
+          }
         }else if(response.status===409){
           retryId=null;retrySignature=null;await refresh();
         }
