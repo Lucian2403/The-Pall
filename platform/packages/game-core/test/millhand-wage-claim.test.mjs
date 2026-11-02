@@ -127,3 +127,46 @@ test('Stage 6 pre-combat boundary returns to Stage 5 stance selection',()=>{
  assert.equal(changed.phase,'DONE');
  assert.equal(changed.stance,'cart');
 });
+
+
+for(const branch of ['restamp','contracts','records']){
+ for(const originalApproach of ['read_demand','challenge_authority']){
+  test('Previous dialogue stops at every selected choice for '+branch+' / '+originalApproach,()=>{
+   let s=beats(initialWageClaim(branch),5);
+   assert.equal(s.phase,'CHOOSE_APPROACH');
+   s=apply(s,originalApproach);
+   assert.equal(s.phase,'APPROACH_EXCHANGE');
+   s=apply(s,'previous_dialogue');
+   assert.equal(s.phase,'CHOOSE_APPROACH','Previously selected demand choice must reappear');
+   assert.equal(s.approach,null);
+   assert.ok(!availableWageClaimActions(s).includes('continue_dialogue'),
+     'The choice must not auto-advance');
+   s=apply(s,originalApproach);
+   s=beats(s,3);
+   s=beats(s,6);
+   assert.equal(s.phase,'CHOOSE_EVIDENCE');
+   s=apply(s,'share_route_evidence');
+   s=apply(s,'previous_dialogue');
+   assert.equal(s.phase,'CHOOSE_EVIDENCE','Return to evidence choice');
+   assert.deepEqual(availableWageClaimActions(s),['share_route_evidence','previous_dialogue']);
+   s=apply(s,'share_route_evidence');
+   s=beats(s,3);
+   assert.equal(s.phase,'LEAVING');
+   s=apply(s,'say_going_home');
+   s=apply(s,'previous_dialogue');
+   assert.equal(s.phase,'LEAVING','Return to the decision to leave');
+   assert.ok(availableWageClaimActions(s).includes('say_going_home'));
+   assert.ok(!availableWageClaimActions(s).includes('continue_dialogue'));
+   s=apply(s,'say_going_home');
+   s=beats(s,8);
+   assert.equal(s.phase,'CHOOSE_STANCE');
+   s=apply(s,'brace_and_defend');
+   const rewind=apply(s,'previous_dialogue');
+   assert.equal(rewind.phase,'CHOOSE_STANCE','Stage 6 return must stop at stance choice');
+   assert.equal(rewind.stance,null);
+   assert.ok(!availableWageClaimActions(rewind).includes('continue_dialogue'));
+   assert.equal(rewind.branch,branch,'The saved Stage 4 route must not change');
+   assert.equal(apply(rewind,'keep_moving').stance,'moving');
+  });
+ }
+}
