@@ -13,7 +13,7 @@ export type SecondJobPhase =
   | 'CHOOSE_CHALLENGE' | 'SUBMIT_DISPUTE'
   | 'READ_DEATH_REGISTER' | 'READ_WAGE_RECORD' | 'EXAMINE_SCRAPED_ENTRY'
   | 'SPEAK_ARCHIVE' | 'ARCHIVE_DIALOGUE' | 'CHOOSE_SOURCE' | 'RECORD_FINDING'
-  | 'DONE';
+  | 'DONE' | 'EXITED';
 
 export type SecondJobAction =
   | 'check_load' | 'secure_plates' | 'carry_smaller_loads'
@@ -24,7 +24,7 @@ export type SecondJobAction =
   | 'read_death_register' | 'check_wage_record' | 'examine_scraped_entry'
   | 'speak_to_archive_assistant' | 'compare_neighbouring_entries'
   | 'compare_shift_book' | 'record_finding'
-  | 'continue_dialogue';
+  | 'continue_dialogue' | 'leave_location';
 
 export type SecondJobChoice =
   | 'secured' | 'smaller_loads'
@@ -52,7 +52,7 @@ export const SECOND_JOB_ACTIONS:readonly SecondJobAction[]=[
   'submit_dispute','read_death_register','check_wage_record',
   'examine_scraped_entry','speak_to_archive_assistant',
   'compare_neighbouring_entries','compare_shift_book','record_finding',
-  'continue_dialogue'
+  'continue_dialogue','leave_location'
 ];
 const DIALOGUE_BEATS={restamp:5,contracts:7,records:4} as const;
 
@@ -85,7 +85,8 @@ export function availableSecondJobActions(s:SecondJobState):readonly SecondJobAc
     case 'ARCHIVE_DIALOGUE':return ['continue_dialogue'];
     case 'CHOOSE_SOURCE':return ['compare_neighbouring_entries','compare_shift_book'];
     case 'RECORD_FINDING':return ['record_finding'];
-    case 'DONE':return [];
+    case 'DONE':return ['leave_location'];
+    case 'EXITED':return [];
   }
 }
 
@@ -118,6 +119,7 @@ export function advanceSecondJob(s:SecondJobState,action:SecondJobAction):Second
     case 'compare_neighbouring_entries':source='neighbouring_entries';phase='RECORD_FINDING';break;
     case 'compare_shift_book':source='shift_book';phase='RECORD_FINDING';break;
     case 'record_finding':phase='DONE';break;
+    case 'leave_location':phase='EXITED';break;
     case 'continue_dialogue':{
       const count=DIALOGUE_BEATS[s.branch];
       if(dialogueIndex<count-1)dialogueIndex++;
