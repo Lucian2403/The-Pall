@@ -102,10 +102,13 @@ assert.ok(characterPage.includes("smithingBackdrop={character.origin==='Millhand
   openingPage.includes("smithingBackdrop={character.origin==='Millhand'}") &&
   workPage.includes('smithingBackdrop={true}') &&
   missingPage.includes('smithingBackdrop={true}') &&
-  depotPage.includes("smithingBackdrop={snapshot.state.branch==='restamp'&&(snapshot.state.phase==='CHECK_LOAD'||snapshot.state.phase==='CHOOSE_TRANSPORT')}") &&
+  depotPage.includes('smithingBackdrop={preparingAtWorkshop}') &&
+  depotPage.includes("snapshot.state.phase==='COMPARE_DELIVERY'&&!travelConfirmed") &&
+  depotPage.includes('depotBackdrop={showingDepot}') &&
   qaPage.includes('smithingBackdrop={forgeVisible && councilRoom===null && !alleyVisible}') &&
   qaPage.includes('councilBackdrop={councilRoom!==null && !alleyVisible}') &&
   qaPage.includes('alleyBackdrop={alleyVisible}') &&
+  qaPage.includes('depotBackdrop={!forgeVisible && councilRoom===null && !alleyVisible}') &&
   depot.includes("class:preparing={atWorkshop}") &&
   depot.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
   'Only routes showing actual workshop artwork may request forge ambience');
@@ -147,6 +150,18 @@ assert.ok(audio.includes("nightAlleyAmbienceFile='night-alley-ambience.mp3'") &&
   mainLayout.includes('stopNightAlleyAmbience();') &&
   qaPage.includes('alleyBackdrop={alleyVisible}'),
   'Night Alley must play only in the painted Stage 5/6 passage and stop in other locations');
+assert.ok(audio.includes("depotAmbienceFile='depot-ambience.mp3'") &&
+  audio.includes("activeAmbienceScene='depot'") &&
+  audio.includes('depotAmbienceOwners=new Set<symbol>()') &&
+  audio.includes('export function claimDepotAmbience()') &&
+  audio.includes('export function stopDepotAmbience()') &&
+  audio.includes('depotAmbience.loop=true') &&
+  hud.includes('if(depotBackdrop)return claimDepotAmbience()') &&
+  hud.includes('stopDepotAmbience()') &&
+  depot.includes('confirmTravel()') &&
+  !depot.includes('let travelConfirmed=$state(false)') &&
+  mainLayout.includes('stopDepotAmbience();'),
+  'Depot ambience must follow the painted backdrop, including local travel confirmation');
 assert.ok(!audio.includes("music.loop=true") &&
   audio.includes("music.loop=false") &&
   audio.includes('MUSIC_PAUSE_MIN_MS=30_000') &&
