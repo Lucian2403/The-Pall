@@ -17,23 +17,25 @@
   };
   let forgeVisible=$state(true);
   let councilRoom=$state<'contracts'|'records'|null>(null);
+  let alleyVisible=$state(false);
   let stage=$state(1);
 </script>
 
 {#key stage}
-  <TutorialShell {character} sceneLocation={councilRoom==='contracts'?'Council Contracts office':councilRoom==='records'?'Council records room':forgeVisible?'Smithing Workshop':'Municipal depot'} smithingBackdrop={forgeVisible && councilRoom===null} councilBackdrop={councilRoom!==null}>
-    <div class="audio-qa-scene" class:depot={!forgeVisible && councilRoom===null} class:council={councilRoom!==null} class:records={councilRoom==='records'}>
+  <TutorialShell {character} sceneLocation={alleyVisible?'Industrial service passage':councilRoom==='contracts'?'Council Contracts office':councilRoom==='records'?'Council records room':forgeVisible?'Smithing Workshop':'Municipal depot'} smithingBackdrop={forgeVisible && councilRoom===null && !alleyVisible} councilBackdrop={councilRoom!==null && !alleyVisible} alleyBackdrop={alleyVisible}>
+    <div class="audio-qa-scene" class:depot={!forgeVisible && councilRoom===null} class:council={councilRoom!==null} class:records={councilRoom==='records'} class:alley={alleyVisible}>
       <h1>Audio diagnostics · Stage {stage}</h1>
       <p>Development fixture. Open Sound settings in the header. Music, Ambience and Effects should respond independently to user clicks and slider changes.</p>
       <div class="qa-actions">
         <button type="button" onclick={()=>{stage++;}}>Next forge stage</button>
         {#if forgeVisible}
-          <button type="button" onclick={()=>{forgeVisible=false;councilRoom=null;}}>Switch to depot</button>
+          <button type="button" onclick={()=>{forgeVisible=false;councilRoom=null;alleyVisible=false;}}>Switch to depot</button>
         {:else}
-          <button type="button" onclick={()=>{forgeVisible=true;councilRoom=null;}}>Return to forge</button>
+          <button type="button" onclick={()=>{forgeVisible=true;councilRoom=null;alleyVisible=false;}}>Return to forge</button>
         {/if}
-        <button type="button" onclick={()=>{forgeVisible=false;councilRoom='contracts';}}>Switch to Contracts</button>
-        <button type="button" onclick={()=>{forgeVisible=false;councilRoom='records';}}>Switch to Scholarship</button>
+        <button type="button" onclick={()=>{forgeVisible=false;councilRoom='contracts';alleyVisible=false;}}>Switch to Contracts</button>
+        <button type="button" onclick={()=>{forgeVisible=false;councilRoom='records';alleyVisible=false;}}>Switch to Scholarship</button>
+        <button type="button" onclick={()=>{forgeVisible=false;councilRoom=null;alleyVisible=true;}}>Switch to dark alley</button>
       </div>
     </div>
   </TutorialShell>
@@ -54,6 +56,9 @@
   }
   .audio-qa-scene.records{
     background:linear-gradient(105deg,#15120f99,#24160988),url('/locations/records/records-room.webp') center/cover;
+  }
+  .audio-qa-scene.alley{
+    background:linear-gradient(105deg,#15120f99,#24160988),url('/locations/alley/alley-background.webp') center/cover;
   }
   .qa-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
   .qa-actions button{background:#3c2c20;border:1px solid #a77f4d;color:#efdeba;padding:10px 13px;cursor:pointer}
