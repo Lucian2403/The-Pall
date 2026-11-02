@@ -84,3 +84,14 @@ test('Unknown or unfinished Stage4 data blocks unsafe Stage5 rewinds',()=>{
   assert.throws(()=>plan(5,'contracts','SELECTED','COMPLETE',{Craftsmanship:3,Commerce:1},'COMPARE_RECORDS'),/unsafe_second_job_state/);
   assert.throws(()=>plan(3,null,'INSPECT','COMPLETE',base,'CHECK_LOAD'),/unsafe_second_job_state/);
 });
+
+test('Stage 4 DONE remains replayable; Stage 5 legacy DONE and new EXITED are both valid predecessors',()=>{
+  const bonuses={Craftsmanship:3,Commerce:1};
+  const stay=plan(4,'contracts','SELECTED','COMPLETE',bonuses,'DONE');
+  assert.equal(stay.toStage,3);
+  for(const phase of ['DONE','EXITED']){
+    const rewind=plan(5,'contracts','SELECTED','COMPLETE',bonuses,phase);
+    assert.equal(rewind.toStage,4);
+    assert.deepEqual(rewind.nextBonuses,bonuses);
+  }
+});
