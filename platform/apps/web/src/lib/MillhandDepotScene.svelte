@@ -78,9 +78,9 @@
       {#if state.revision===0}
         <p class="context">{STAGE_FOUR_ROUTES.restamp.entry}</p>
       {/if}
-      {#if state.phase==='DONE'}
+      {#if (state.phase==='DONE'||state.phase==='EXITED')}
         <p class="outcome">{STAGE_FOUR_FINAL.restamp}</p>
-        <StageFourNextStep/>
+        <StageFourNextStep {snapshot} {pending} {perform}/>
       {:else if speaking && beat}
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
