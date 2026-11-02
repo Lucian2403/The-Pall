@@ -30,11 +30,10 @@ assert.ok(scene.includes('evidencePage===1') &&
 assert.ok(scene.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
   scene.includes('max-height:none;overflow:visible;') &&
   !scene.includes('overflow-y:auto') &&
-  scene.includes('class="journal-toggle journal-outside"') &&
-  !scene.includes('class="scene-footer"'),
+  scene.includes('class="scene-footer"'),
   'All Stage3 dialogue beats must be scrollbar-free; the journal remains outside the popup');
 assert.ok(scene.includes('.evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;') &&
-  scene.includes('height:clamp(108px,8vw,140px)') &&
+  scene.includes('height:clamp(74px,6vw,100px)') &&
   scene.includes("decisionStep=1;") &&
   scene.includes('class:route-choice='),
   'Evidence props must remain on the table and the three-route choice must have a compact separate beat');

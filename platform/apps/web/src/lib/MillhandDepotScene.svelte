@@ -1,13 +1,13 @@
 <script lang="ts">
   import {tick} from 'svelte';
-  import '$lib/workshop-object-labels.css';
   import type {SecondJobAction, SecondJobState} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
     STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_OUTCOMES,STAGE_FOUR_FINAL,
-    STAGE_FOUR_TRANSPORT_PRESENTATION,
+    STAGE_FOUR_TRANSPORT_HINTS,STAGE_FOUR_TRANSPORT_VERIFICATION,
     secondJobJournal
   } from '$lib/approved-stage-four';
+  import '$lib/workshop-object-labels.css';
 
   type Snapshot = {
     stage:number;
@@ -24,12 +24,16 @@
   }=$props();
 
   const state=$derived(snapshot.state);
-  const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT');
+  // Purely local presentation beat: a saved transport choice is shown at the
+  // workshop before the player proceeds to the depot. This grants no work
+  // action and cannot change server progress or cause a missing receipt.
+  let travelConfirmed=$state(false);
+  const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'||
+    (state.phase==='COMPARE_DELIVERY'&&!travelConfirmed));
+  $effect(()=>{if(state.phase!=='COMPARE_DELIVERY')travelConfirmed=false;});
   const speaking=$derived(state.phase==='DEPOT_DIALOGUE');
   const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[state.dialogueIndex]:null);
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
-  const transportCheck=$derived(state.transport
-    ?STAGE_FOUR_TRANSPORT_PRESENTATION[state.transport].depotCheck:null);
   const instruction=$derived(STAGE_FOUR_INSTRUCTIONS[state.phase]);
   const journal=$derived(secondJobJournal(state));
   let selected=$state<'plates'|'paper'|null>(null);
@@ -56,14 +60,12 @@
          acted on in the CRPG popup; do not fabricate separate paper sprites. -->
     <div class="table-props" aria-label="Physical objects at the workbench or receiving counter">
       <button type="button" class="table-prop plates" class:selected={selected==='plates'}
-        data-workshop-object data-pall-sfx="click"
         aria-pressed={selected==='plates'} aria-label="Inspect the numbered metal plates"
         onclick={() => inspect('plates')}>
         <img src="/workshop/metal-plates.webp" alt="" aria-hidden="true"/>
         <span class="workshop-object-label">Numbered plates</span>
       </button>
       <button type="button" class="table-prop paper" class:selected={selected==='paper'}
-        data-workshop-object data-pall-sfx="paper"
         aria-pressed={selected==='paper'} aria-label="Inspect the council work paper"
         onclick={() => inspect('paper')}>
         <img src="/workshop/council-work.webp" alt="" aria-hidden="true"/>
@@ -82,13 +84,13 @@
         <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
         <p class="speech">“{beat.text}”</p>
       {:else}
-        {#if result}
+        {#if result && !(state.phase==='COMPARE_DELIVERY' && travelConfirmed)}
           <p class="result">{result}</p>
         {/if}
-        {#if state.phase==='COMPARE_DELIVERY' && transportCheck}
-          <p class="transport-check">{transportCheck}</p>
+        {#if state.phase==='COMPARE_DELIVERY' && state.transport && travelConfirmed}
+          <p class="context transport-verification">{STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]}</p>
         {/if}
-        {#if result!==instruction}
+        {#if !(state.phase==='COMPARE_DELIVERY' && !travelConfirmed) && result!==instruction}
           <p class="instruction">{instruction}</p>
         {/if}
         {#if state.phase==='SPEAK_DEPOT'||state.phase==='CHOOSE_RECEIPT'}
@@ -101,7 +103,9 @@
           <strong>{selected==='plates'?'Numbered metal plates':'Council work paper'}</strong>
           <p>{selected==='plates'
             ? atWorkshop
-              ? 'The finished plates are together on the bench. Check the load against the paper before moving them.'
+              ? state.phase==='COMPARE_DELIVERY'
+                ? 'You have chosen how to move the load. The plates are ready to go to the depot.'
+                : 'The finished plates are together on the bench. Check the load against the paper before moving them.'
               : 'You have brought numbered metal plates to the municipal depot.'
             : atWorkshop
               ? 'The council work paper accompanies the finished plates.'
@@ -109,18 +113,16 @@
         </div>
       {/if}
 
-      {#if snapshot.availableActions.length>0}
+      {#if state.phase==='COMPARE_DELIVERY' && !travelConfirmed}
+        <div class="actions"><button type="button" disabled={pending}
+          onclick={() => {selected=null;travelConfirmed=true;}}>Continue to the depot</button></div>
+      {:else if snapshot.availableActions.length>0}
         <div class="actions" aria-label="Available delivery actions">
           {#each snapshot.availableActions as action (action)}
-            <button type="button" class:handling-choice={state.phase==='CHOOSE_TRANSPORT'}
-              disabled={pending} onclick={() => {selected=null;void perform(action);}}>
+            <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
-              {#if state.phase==='CHOOSE_TRANSPORT'}
-                <span class="transport-tradeoff">
-                  {action==='secure_plates'
-                    ?STAGE_FOUR_TRANSPORT_PRESENTATION.secured.tradeoff
-                    :STAGE_FOUR_TRANSPORT_PRESENTATION.smaller_loads.tradeoff}
-                </span>
+              {#if action==='secure_plates'||action==='carry_smaller_loads'}
+                <small class="transport-hint">{STAGE_FOUR_TRANSPORT_HINTS[action]}</small>
               {/if}
             </button>
           {/each}
@@ -169,10 +171,11 @@
     cursor:pointer;color:#f8e9d0;font:13px/1.3 var(--pall-font-reading,Georgia,serif)}
   .table-prop.plates{width:55%}
   .table-prop.paper{width:40%}
-  .table-prop img{display:block;width:100%;height:calc(100% - 35px);object-fit:contain;
+  .table-prop img{display:block;width:100%;height:calc(100% - 45px);object-fit:contain;
     filter:drop-shadow(0 5px 5px #080501a8);transform:scale(1);
     transform-origin:center 75%;transition:transform 150ms ease-out;pointer-events:none}
   .table-prop:is(:hover,:focus-visible) img{transform:scale(1.018)}
+  .table-prop .workshop-object-label{width:100%;max-width:240px}
   .table-prop:focus-visible{outline:2px solid #edd19a;outline-offset:2px}
   .work-dialogue{position:absolute;z-index:3;top:clamp(24px,3vw,45px);right:3%;
     width:min(46%,660px);max-height:calc(100% - 58px);box-sizing:border-box;
@@ -187,10 +190,6 @@
   .instruction,.result,.outcome,.context{font:15px/1.45 var(--pall-font-reading,Georgia,serif);margin:0 0 13px}
   .instruction,.outcome{font-weight:600}
   .context{color:#503b2b}
-  .transport-check{
-    margin:8px 0 13px;padding-left:12px;border-left:2px solid #9f805a;
-    color:#49311f;font:15px/1.45 var(--pall-font-reading,Georgia,serif);
-  }
   .inspection{border-top:1px solid #bba07a;padding-top:10px;margin:13px 0;
     font:13px/1.4 sans-serif;color:#59412d}
   .inspection strong{color:#3f2d1f}
@@ -199,12 +198,9 @@
   .actions button{min-height:43px;width:100%;text-align:left;border:1px solid #98734c;
     background:#30251d;color:#f0dfc7;padding:10px 13px;
     font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .actions button.handling-choice{min-height:65px}
-  .transport-tradeoff{
-    display:block;margin-top:5px;color:#d7be99;
-    font:13px/1.35 var(--pall-font-reading,Georgia,serif);
-  }
   .actions button:disabled{opacity:.55;cursor:default}
+  .actions .transport-hint{display:block;margin-top:4px;font:12px/1.35 var(--pall-font-reading,Georgia,serif);opacity:.86}
+  .transport-verification{margin-top:0}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
   .journal-trigger{padding-top:11px;margin-top:17px;border-top:1px solid #bca482}

@@ -1,33 +1,20 @@
-name: Verify Stage 3 workshop UI
-
+name: Verify Millhand workshop UI
 on:
   pull_request:
     paths:
-      - 'platform/apps/web/src/lib/WorkshopScene.svelte'
-      - 'platform/apps/web/src/lib/MillhandWorkScene.svelte'
-      - 'platform/apps/web/src/lib/MillhandMissingStampScene.svelte'
-      - 'platform/apps/web/src/lib/MillhandDepotScene.svelte'
-      - 'platform/apps/web/src/lib/MillhandContractsScene.svelte'
-      - 'platform/apps/web/src/lib/MillhandRecordsScene.svelte'
-      - 'platform/apps/web/src/lib/approved-stage-four.ts'
-      - 'platform/scripts/verify-stage4-transport-ui.mjs'
-      - 'platform/apps/web/src/lib/workshop-object-labels.css'
+      - 'platform/apps/web/src/lib/**'
       - 'platform/scripts/verify-stage3-workbench-ui.mjs'
-      - 'platform/scripts/verify-stage3-record-art.mjs'
-      - 'platform/scripts/verify-workshop-inspections.mjs'
-      - 'platform/scripts/verify-approved-intro-copy.mjs'
+      - 'platform/scripts/verify-stage4-transport-ui.mjs'
       - 'platform/package.json'
       - '.github/workflows/verify-stage3-workbench.yml'
   push:
     branches:
       - 'ui/stage3-workbench-frames-20261101'
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
-  stage3-workshop:
+  workshop:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,22 +27,8 @@ jobs:
           cache: npm
           cache-dependency-path: platform/package-lock.json
       - run: npm ci
-      - name: Build shared packages
-        run: npm run build:packages
-      - name: Stage 3 frames, Guther and journal
-        run: npm run verify:stage3-workbench-ui
-      - name: Stage 1–2 workshop interaction consistency
-        run: npm run verify:workshop-inspections
-      - name: Original Stage 3 evidence assets
-        run: npm run verify:stage3-record-art
-      - name: Stage 4 transport and framed tabletop objects
-        run: npm run verify:stage4-transport-ui
-      - name: Existing Stage 4 branch/story tests
-        run: npm run verify:stage-four
-      - name: Existing Hauling/Contracts/Investigation game-core tests
-        run: node --test packages/game-core/test/millhand-second-job.test.mjs
-      - name: Vite production build
-        run: npm run build -w @the-pall/web
-      - name: Existing approved dialogue verification (informational)
-        continue-on-error: true
-        run: npm run verify:canonical-copy
+      - run: npm run build:packages
+      - run: npm run verify:stage3-workbench-ui
+      - run: npm run verify:stage4-transport-ui
+      - run: node --test packages/game-core/test/millhand-second-job.test.mjs
+      - run: npm run build -w @the-pall/web

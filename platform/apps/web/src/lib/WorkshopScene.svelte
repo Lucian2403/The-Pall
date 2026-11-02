@@ -205,6 +205,7 @@
     .guther {height:86%;left:-5%;top:2%}
     .bench-foreground{object-position:39% center}
     .npc-hotspot {left:0;top:7%;width:41%;height:49%;padding-bottom:0}
+    .npc-label {font-size:10px}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}

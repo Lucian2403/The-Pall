@@ -4,167 +4,170 @@
  * A01 corrective worker-number stamp was already committed in Stage 3.
  * Exact worker number and calendar dates are deliberately never fabricated.
  */
-import type {MissingStampBranch,SecondJobAction,SecondJobPhase,SecondJobState} from '@the-pall/game-core';
+import type { MissingStampBranch, SecondJobAction, SecondJobPhase, SecondJobState } from '@the-pall/game-core';
 
-export const STAGE_FOUR_ROUTES={
-  restamp:{name:'Depot Intake Run',family:'Industry / Hauling',location:'Municipal depot',
-    entry:'Guther leaves the council work paper beside the plates. You make one more worker-number mark, leaving the council inspector\'s mark alone. The finished plates are together with the work paper.',
-    task:'Carry the numbered plates to the municipal depot and have the delivery recorded.'},
-  contracts:{name:'Disputed Docket',family:'Commerce / Contracts',location:'Council Contracts office',
-    entry:"You enter the council's Contracts office with the disputed work paper. A clerk is working at the counter.",
-    task:'Examine the work paper, compare the official entries and record a challenge.'},
-  records:{name:'Ledger Reconciliation',family:'Scholarship / Investigation',location:'Council records room',
-    entry:"You enter the council's records room and ask for the records connected with the worker number. An archive assistant brings out the death register. The pages show wear along the edges from repeated handling.",
-    task:'Compare the death and later wage records, examine the damaged entry and record your findings.'}
+export const STAGE_FOUR_ROUTES = {
+  restamp: {
+    name: 'Depot Intake Run', family: 'Industry / Hauling', location: 'Municipal depot',
+    entry: 'Guther reaches across the table, pulls the council work paper closer, and sets it beside the plates. You stamp your worker number one last time, careful not to touch the inspector\'s mark. That\'s it. The plates are done, and the paperwork\'s ready.',
+    task: 'Check the plates against the work paper. Make sure nothing\'s missing.'
+  },
+  contracts: {
+    name: 'Disputed Docket', family: 'Commerce / Contracts', location: 'Council Contracts office',
+    entry: "You enter the council's Contracts office with the disputed work paper. A clerk is working at the counter.",
+    task: 'Examine the work paper, compare the official entries and record a challenge.'
+  },
+  records: {
+    name: 'Ledger Reconciliation', family: 'Scholarship / Investigation', location: 'Council records room',
+    entry: "You enter the council's records room and ask for the records connected with the worker number. An archive assistant brings out the death register. The pages show wear along the edges from repeated handling.",
+    task: 'Compare the death and later wage records, examine the damaged entry and record your findings.'
+  }
 } as const;
 
-export const STAGE_FOUR_DIALOGUE={
-  restamp:[
-    {speaker:'Depot Clerk',text:'Put the plates there. I need your mark for the delivery.'},
-    {speaker:'Player',text:"They've written ‘workers’ here. I've brought plates."},
-    {speaker:'Depot Clerk',text:'Aye. I can see that.'},
-    {speaker:'Player',text:'Are you going to record it like that?'},
-    {speaker:'Depot Clerk',text:"No. I'll record what you've brought. But I can't change the council's other papers."}
+export const STAGE_FOUR_DIALOGUE = {
+  restamp: [
+    { speaker: 'Depot Clerk', text: 'Put the plates there. I need your mark for the delivery.' },
+    { speaker: 'Player', text: "They've written ‘workers’ here. I've brought plates." },
+    { speaker: 'Depot Clerk', text: 'Aye. I can see that.' },
+    { speaker: 'Player', text: 'Are you going to record it like that?' },
+    { speaker: 'Depot Clerk', text: "No. I'll record what you've brought. But I can't change the council's other papers." }
   ],
-  contracts:[
-    {speaker:'Contracts Clerk',text:'Which entry have you come about?'},
-    {speaker:'Player',text:"Both. Here they've recorded the man as dead. In this one they're still charging for him."},
-    {speaker:'Contracts Clerk',text:'Both entries were accepted. Both have council seals.'},
-    {speaker:'Player',text:'Who checked them?'},
-    {speaker:'Contracts Clerk',text:"I can look up how they were entered. I can't change them myself."},
-    {speaker:'Player',text:'Then I want the difference recorded.'},
-    {speaker:'Contracts Clerk',text:"You can ask for the seals to be checked, or put your complaint on the work paper. Either way, I can't approve the lot here."}
+  contracts: [
+    { speaker: 'Contracts Clerk', text: 'Which entry have you come about?' },
+    { speaker: 'Player', text: "Both. Here they've recorded the man as dead. In this one they're still charging for him." },
+    { speaker: 'Contracts Clerk', text: 'Both entries were accepted. Both have council seals.' },
+    { speaker: 'Player', text: 'Who checked them?' },
+    { speaker: 'Contracts Clerk', text: "I can look up how they were entered. I can't change them myself." },
+    { speaker: 'Player', text: 'Then I want the difference recorded.' },
+    { speaker: 'Contracts Clerk', text: "You can ask for the seals to be checked, or put your complaint on the work paper. Either way, I can't approve the lot here." }
   ],
-  records:[
-    {speaker:'Player',text:'Someone scraped the ink off this line.'},
-    {speaker:'Archive Assistant',text:"Don't rub it. The paper's thin there."},
-    {speaker:'Player',text:'Do you know who changed it?'},
-    {speaker:'Archive Assistant',text:"No. I don't know."}
+  records: [
+    { speaker: 'Player', text: 'Someone scraped the ink off this line.' },
+    { speaker: 'Archive Assistant', text: "Don't rub it. The paper's thin there." },
+    { speaker: 'Player', text: 'Do you know who changed it?' },
+    { speaker: 'Archive Assistant', text: "No. I don't know." }
   ]
 } as const;
 
-export const STAGE_FOUR_INSTRUCTIONS:Record<SecondJobPhase,string>={
-  CHECK_LOAD:'Check the plates and compare the load with the work paper.',
-  CHOOSE_TRANSPORT:'Decide how to move the plates.',
-  COMPARE_DELIVERY:'Compare the delivery list with the plates.',
-  SPEAK_DEPOT:'Speak to the Depot Clerk about the delivery.',
-  DEPOT_DIALOGUE:'Speak with the Depot Clerk.',
-  CHOOSE_RECEIPT:'Decide how to record the delivery.',
-  COMPLETE_DELIVERY:'Complete the delivery.',
-  EXAMINE_PAPER:'Read the council work paper and find the worker number and seals.',
-  COMPARE_RECORDS:'Compare the two official records.',
-  SPEAK_CONTRACTS:'Ask the clerk how both records got accepted.',
-  CONTRACTS_DIALOGUE:'Speak with the Contracts Clerk.',
-  CHOOSE_CHALLENGE:'Decide how to challenge the two entries.',
-  SUBMIT_DISPUTE:'Submit the disputed work paper.',
-  READ_DEATH_REGISTER:'Find the worker number in the death register.',
-  READ_WAGE_RECORD:'Compare the death entry with the later wage records.',
-  EXAMINE_SCRAPED_ENTRY:'Examine the altered entry.',
-  SPEAK_ARCHIVE:'Speak to the Archive Assistant about the damaged line.',
-  ARCHIVE_DIALOGUE:'Speak with the Archive Assistant.',
-  CHOOSE_SOURCE:'Use another record to check the damaged entry.',
-  RECORD_FINDING:'Write down what you\'ve found.',
-  DONE:'The work is complete.'
+export const STAGE_FOUR_INSTRUCTIONS: Record<SecondJobPhase, string> = {
+  CHECK_LOAD: 'Check the plates and compare the load with the work paper.',
+  CHOOSE_TRANSPORT: 'Now, how are you going to carry them?',
+  COMPARE_DELIVERY: 'Compare the delivery list with the plates.',
+  SPEAK_DEPOT: 'Speak to the Depot Clerk about the delivery.',
+  DEPOT_DIALOGUE: 'Speak with the Depot Clerk.',
+  CHOOSE_RECEIPT: 'Decide how to record the delivery.',
+  COMPLETE_DELIVERY: 'Complete the delivery.',
+  EXAMINE_PAPER: 'Read the council work paper and find the worker number and seals.',
+  COMPARE_RECORDS: 'Compare the two official records.',
+  SPEAK_CONTRACTS: 'Ask the clerk how both records got accepted.',
+  CONTRACTS_DIALOGUE: 'Speak with the Contracts Clerk.',
+  CHOOSE_CHALLENGE: 'Decide how to challenge the two entries.',
+  SUBMIT_DISPUTE: 'Hand over the disputed work paper.',
+  READ_DEATH_REGISTER: 'Find the worker number in the death register.',
+  READ_WAGE_RECORD: 'Compare the death entry with the later wage records.',
+  EXAMINE_SCRAPED_ENTRY: 'Examine the altered entry.',
+  SPEAK_ARCHIVE: 'Speak to the Archive Assistant about the damaged line.',
+  ARCHIVE_DIALOGUE: 'Speak with the Archive Assistant.',
+  CHOOSE_SOURCE: 'Use another record to check the damaged entry.',
+  RECORD_FINDING: 'Write down what you\'ve found.',
+  DONE: 'The work is complete.'
 };
 
-export const STAGE_FOUR_ACTION_LABELS:Record<SecondJobAction,string>={
-  check_load:'Check the load',
-  secure_plates:'Secure the plates together',
-  carry_smaller_loads:'Carry the plates in smaller loads',
-  compare_delivery_list:'Compare the delivery list',
-  speak_to_depot_clerk:'Speak to the Depot Clerk',
-  record_goods_as_plates:'Record the goods as plates',
-  request_delivery_correction:'Ask for the delivery list to be corrected before signing',
-  complete_delivery:'Complete the delivery',
-  examine_work_paper:'Examine the work paper',
-  compare_official_records:'Compare the two official records',
-  speak_to_contracts_clerk:'Speak to the Contracts Clerk',
-  request_seal_check:'Ask the clerk to check both seals',
-  mark_conflicting_entries:'Mark the two conflicting entries on the work paper',
-  submit_dispute:'Submit the disputed work paper',
-  read_death_register:'Read the death register',
-  check_wage_record:'Check the wage record',
-  examine_scraped_entry:'Examine the scraped entry',
-  speak_to_archive_assistant:'Speak to the Archive Assistant',
-  compare_neighbouring_entries:'Compare the entries above and below it',
-  compare_shift_book:'Compare the shift book with the wage record',
-  record_finding:'Record the difference',
-  continue_dialogue:'Continue'
+/** Transport identity is saved as SecondJobState.transport, without another flag.
+ * These are qualitative handling differences, not active damage or time modifiers. */
+export const STAGE_FOUR_TRANSPORT_HINTS = {
+  secure_plates: 'Fewer trips. A heavier load that must be kept steady.',
+  carry_smaller_loads: 'More trips. Less weight to manage each time.'
+} as const;
+
+export const STAGE_FOUR_TRANSPORT_VERIFICATION = {
+  secured: 'You set the bundle on the receiving counter. Before the clerk takes it, you check that the plates have remained properly aligned.',
+  smaller_loads: 'You carry the last stack to the receiving counter and lower it onto the worn wooden top with a heavy clank. You straighten your back, give your arms a quick shake, then count through the stacks again. Better make sure you\'ve brought the whole lot.'
+} as const;
+
+export const STAGE_FOUR_ACTION_LABELS: Record<SecondJobAction, string> = {
+  check_load: 'Check the load',
+  secure_plates: 'Secure the plates together',
+  carry_smaller_loads: 'Carry the plates in smaller loads',
+  compare_delivery_list: 'Compare the delivery list',
+  speak_to_depot_clerk: 'Speak to the Depot Clerk',
+  record_goods_as_plates: 'Record the goods as plates',
+  request_delivery_correction: 'Ask for the delivery list to be corrected before signing',
+  complete_delivery: 'Complete the delivery',
+  examine_work_paper: 'Examine the work paper',
+  compare_official_records: 'Compare the two official records',
+  speak_to_contracts_clerk: 'Speak to the Contracts Clerk',
+  request_seal_check: 'Ask the clerk to check both seals',
+  mark_conflicting_entries: 'Mark the two conflicting entries on the work paper',
+  submit_dispute: 'Submit the disputed work paper',
+  read_death_register: 'Read the death register',
+  check_wage_record: 'Check the wage record',
+  examine_scraped_entry: 'Examine the scraped entry',
+  speak_to_archive_assistant: 'Speak to the Archive Assistant',
+  compare_neighbouring_entries: 'Compare the entries above and below it',
+  compare_shift_book: 'Compare the shift book with the wage record',
+  record_finding: 'Record the difference',
+  continue_dialogue: 'Continue'
 };
 
-/**
- * The existing saved transport value controls both the choice's visible
- * trade-off and the depot's physical verification. No fabricated time cost,
- * random damage or additional inventory state before Hauling mechanics exist.
- */
-export const STAGE_FOUR_TRANSPORT_PRESENTATION={
-  secured:{
-    tradeoff:'Fewer trips. A heavier load that must be kept steady.',
-    depotCheck:'You set the bundle on the receiving counter. Before the clerk takes it, you check that the plates have remained properly aligned.'
-  },
-  smaller_loads:{
-    tradeoff:'More trips. Less weight to manage each time.',
-    depotCheck:'You bring the last group to the receiving counter and put it beside the others. You count the plates again to make sure the entire lot has arrived.'
-  }
-} as const satisfies Record<NonNullable<SecondJobState['transport']>,{tradeoff:string;depotCheck:string}>;
-
-export const STAGE_FOUR_OUTCOMES:Partial<Record<SecondJobAction,string>>={
-  check_load:'You finish counting the plates. None appear damaged, but the stack is heavy. You must get the lot to the municipal depot.',
-  secure_plates:'You fasten the plates together and lift the bundled stack. The weight is awkward, but you can move the lot without making several trips.',
-  carry_smaller_loads:'You divide the plates into smaller groups. Each load is easier to manage, though you must return to the workshop several times.',
-  compare_delivery_list:'You check the delivery list. Under goods, some fool\'s written “workers”.',
-  record_goods_as_plates:'You enter “plates” in the received-goods record. The clerk confirms that the depot received the metal plates.',
-  request_delivery_correction:'You ask the clerk to check the incorrect goods entry before signing. The clerk reviews the papers and acknowledges that the depot received metal plates. The original entry remains unexplained.',
-  complete_delivery:'The depot staff take the plates. The receipt records metal plates, not workers. You have not received any wages.',
-  examine_work_paper:'You find the worker number, the council seal and the office responsible for the contract. The clerk brings out the related records.',
-  compare_official_records:'You put the two records side by side. Same worker number on both. One says the man\'s dead, for compensation. The other still has him down as working, with contract charges against his name. And both have council seals.',
-  request_seal_check:'The clerk checks how the two records were entered. Both entries appear in the council records with their seals. The clerk cannot explain the difference.',
-  mark_conflicting_entries:'You mark the two entries and the difference between them. The clerk records your complaint but changes neither entry.',
-  submit_dispute:'The clerk records that the complaint has been received. Both entries remain unchanged. The council has not approved the plate lot, and you are not paid.',
-  read_death_register:'You find the worker number beside the entry for a fire in a locked workshop. The council recorded the worker as dead.',
-  check_wage_record:'You find the same worker number in a wage entry made after the recorded death. The related shift records contain that number too.',
-  examine_scraped_entry:'Part of a handwritten entry has been scraped from the paper. Some ink remains in the damaged area. The surface has been cut.',
-  compare_neighbouring_entries:'You check the lines above and below the damaged bit. The worker\'s number is still there in the later wage book.',
-  compare_shift_book:'You check the shift book against the wage entry. The same worker number appears in both, after the recorded death.',
-  record_finding:'You note the worker number, recorded death, later wage entries and scraped correction. You put the records back in order. The assistant takes the pages.'
+export const STAGE_FOUR_OUTCOMES: Partial<Record<SecondJobAction, string>> = {
+  check_load: 'You count the plates, then check the number on the work paper. All there. You give the stack a quick look to see if anything\'s loose or damaged.',
+  secure_plates: 'You tie the plates together, bend your knees, and get both arms under the bundle. With a grunt, you heave it off the table and pull it against your chest. Bloody heavy. You shift your grip a little until the weight settles. Still, better than making two trips.',
+  carry_smaller_loads: 'You split the plates into smaller stacks, bend down, and slide both hands under the first one. With a grunt, you lift it up and rest it against your chest. Much easier to carry. It\'ll mean a few trips back to the workshop, but at least you won\'t break your back hauling the whole lot at once.',
+  compare_delivery_list: 'You check the delivery list. Under goods, some fool\'s written “workers”.',
+  record_goods_as_plates: 'You enter “plates” in the received-goods record. The clerk confirms that the depot received the metal plates.',
+  request_delivery_correction: 'You ask the clerk to check the incorrect goods entry before signing. The clerk reviews the papers and acknowledges that the depot received metal plates. The original entry remains unexplained.',
+  complete_delivery: 'The depot staff take the plates. The receipt records metal plates, not workers. You have not received any wages.',
+  examine_work_paper: 'You find the worker number, the council seal and the office responsible for the contract. The clerk brings out the related records.',
+  compare_official_records: 'You put both papers on the desk, side by side. Same worker number. One says the man\'s dead and is owed compensation. The other says he\'s still working and owes money on his contract. You check the seals. Both are from the council. How\'s that possible?',
+  request_seal_check: 'The clerk checks how the two records were entered. Both entries appear in the council records with their seals. The clerk cannot explain the difference.',
+  mark_conflicting_entries: 'You point out the two entries and mark where they don\'t match. The clerk writes down your complaint but leaves both records as they are.',
+  submit_dispute: 'The clerk records that the complaint has been received. Both entries remain unchanged. The council has not approved the plate lot, and you are not paid.',
+  read_death_register: 'You find the worker number beside the entry for a fire in a locked workshop. The council recorded the worker as dead.',
+  check_wage_record: 'You find the same worker number in a wage entry made after the recorded death. The related shift records contain that number too.',
+  examine_scraped_entry: 'Part of a handwritten entry has been scraped from the paper. Some ink remains in the damaged area. The surface has been cut.',
+  compare_neighbouring_entries: 'You check the lines above and below the damaged bit. The worker\'s number is still there in the later wage book.',
+  compare_shift_book: 'You check the shift book against the wage entry. The same worker number appears in both, after the recorded death.',
+  record_finding: 'You note the worker number, recorded death, later wage entries and scraped correction. You put the records back in order. The assistant takes the pages.'
 };
 
-export const STAGE_FOUR_FINAL={
-  restamp:'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
-  contracts:'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You leave the Contracts office, pissed off and empty-handed.',
-  records:'They marked the man dead, but his number kept showing up in the wage books long after. Someone\'s scraped part of a line off, too. Who did it? Why? Not a damn clue.'
+export const STAGE_FOUR_FINAL = {
+  restamp: 'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
+  contracts: 'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You leave the Contracts office, pissed off and empty-handed.',
+  records: 'They marked the man dead, but his number kept showing up in the wage books long after. Someone\'s scraped part of a line off, too. Who did it? Why? Not a damn clue.'
 } as const;
 
 /** Factual personal journal, limited to the route and actions actually committed. */
-export function secondJobJournal(s:SecondJobState):readonly string[]{
-  const result:string[]=[];
-  if(s.branch==='restamp'){
+export function secondJobJournal(s: SecondJobState): readonly string[] {
+  const result: string[] = [];
+  if (s.branch === 'restamp') {
     result.push("I stamped the worker number once more at Guther's bench. I did not touch the council inspector's mark.");
-    if(s.transport==='secured')result.push('I secured the plates together and carried them to the depot as one load.');
-    if(s.transport==='smaller_loads')result.push('I carried the plates in smaller groups. It took more trips, but each load was easier to handle.');
-    if(s.phase==='SPEAK_DEPOT'||s.phase==='DEPOT_DIALOGUE'||s.phase==='CHOOSE_RECEIPT'||s.phase==='COMPLETE_DELIVERY'||s.phase==='DONE')
+    if (s.revision > 0) result.push('I checked the plates and compared the load with the work paper.');
+    if (s.transport === 'secured') result.push('I secured the plates together and carried them to the depot as one load.');
+    if (s.transport === 'smaller_loads') result.push('I carried the plates in smaller groups. It took more trips, but each load was easier to handle.');
+    if (s.phase === 'SPEAK_DEPOT' || s.phase === 'DEPOT_DIALOGUE' || s.phase === 'CHOOSE_RECEIPT' || s.phase === 'COMPLETE_DELIVERY' || s.phase === 'DONE')
       result.push("Delivered metal plates to the depot. Someone had entered “workers” on the delivery list. Workers! The clerk could see what I'd brought.");
-    if(s.receipt==='recorded_plates')result.push('I recorded the received goods as plates.');
-    if(s.receipt==='requested_correction')result.push('I asked the depot clerk to check the incorrect entry before I signed.');
-    if(s.phase==='DONE')result.push("The depot recorded the goods as plates in the end. I've got a receipt, but I still don't know why that other entry was wrong. No pay for this job, either.");
+    if (s.receipt === 'recorded_plates') result.push('I recorded the received goods as plates.');
+    if (s.receipt === 'requested_correction') result.push('I asked the depot clerk to check the incorrect entry before I signed.');
+    if (s.phase === 'DONE') result.push("The depot recorded the goods as plates in the end. I've got a receipt, but I still don't know why that other entry was wrong. No pay for this job, either.");
   }
-  if(s.branch==='contracts'){
-    if(!['EXAMINE_PAPER','COMPARE_RECORDS'].includes(s.phase))
+  if (s.branch === 'contracts') {
+    if (!['EXAMINE_PAPER', 'COMPARE_RECORDS'].includes(s.phase))
       result.push('One entry treats the man as dead for compensation. In the other they still charge for him as if he were alive. Both have council seals. How can they accept both?');
-    if(s.challenge==='seal_check')result.push('I asked the clerk to check both seals. Both entries had been accepted. Still no explanation.');
-    if(s.challenge==='written_complaint')result.push('I marked what was wrong on the work paper. The clerk recorded my complaint.');
-    if(s.phase==='DONE')result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
+    if (s.challenge === 'seal_check') result.push('I asked the clerk to check both seals. Both entries had been accepted. Still no explanation.');
+    if (s.challenge === 'written_complaint') result.push('I marked what was wrong on the work paper. The clerk recorded my complaint.');
+    if (s.phase === 'DONE') result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
   }
-  if(s.branch==='records'){
-    if(!['READ_DEATH_REGISTER','READ_WAGE_RECORD'].includes(s.phase))
+  if (s.branch === 'records') {
+    if (!['READ_DEATH_REGISTER', 'READ_WAGE_RECORD'].includes(s.phase))
       result.push('Found the worker in the death register. Then I found the same number in later wage records. They were still using it after he died.');
-    if(s.phase==='SPEAK_ARCHIVE'||s.phase==='ARCHIVE_DIALOGUE')
+    if (s.phase === 'SPEAK_ARCHIVE' || s.phase === 'ARCHIVE_DIALOGUE')
       result.push('Someone had scraped part of an entry from the page. I could not tell what was written there.');
-    if(['CHOOSE_SOURCE','RECORD_FINDING','DONE'].includes(s.phase))
+    if (['CHOOSE_SOURCE', 'RECORD_FINDING', 'DONE'].includes(s.phase))
       result.push("Someone scraped writing from an entry. The archive assistant didn't know who had done it. I wasn't going to damage the page any further.");
-    if(s.source==='neighbouring_entries')result.push('I compared the entries around the damaged one. The number is still there in the later wage record.');
-    if(s.source==='shift_book')result.push('I checked the shift book against the wage record. Both have that number after the recorded death.');
-    if(s.phase==='DONE')result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
+    if (s.source === 'neighbouring_entries') result.push('I compared the entries around the damaged one. The number is still there in the later wage record.');
+    if (s.source === 'shift_book') result.push('I checked the shift book against the wage record. Both have that number after the recorded death.');
+    if (s.phase === 'DONE') result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
   }
   return result;
 }

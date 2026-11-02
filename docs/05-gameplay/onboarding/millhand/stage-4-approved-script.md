@@ -46,37 +46,23 @@
 
 **Action:** Check the load.
 
-*You finish counting the plates. None appear damaged, but the stack is heavy. You must get the lot to the municipal depot.*
+*You count the plates and compare the load with the work paper. The number of plates matches the delivery entry. You check whether any are loose or damaged.*
 
 **Instruction:** Decide how to move the plates.
 
 **Choice 1: Secure the plates together.**
 
-**Visible trade-off:** Fewer trips. A heavier load that must be kept steady.
-
-*You fasten the plates together and lift the bundled stack. The weight is awkward, but you can move the lot without making several trips.*
+*You fasten the plates together for transport. You can move them with less handling, although a heavy load can shift and damage plates if you do not keep them steady.*
 
 **Choice 2: Carry the plates in smaller loads.**
 
-**Visible trade-off:** More trips. Less weight to manage each time.
+*You divide the plates into smaller groups and move them separately. You spend more time handling the load, but there is less weight to manage each time.*
 
-*You divide the plates into smaller groups. Each load is easier to manage, though you must return to the workshop several times.*
-
-Both choices complete the move to the municipal depot. The saved `transport` choice now changes immediate narration, the depot's condition/completeness check, and first-person journal text. They preserve their distinct handling-time/damage-risk trade-offs **for when those mechanics exist**; this script establishes **no numerical modifiers, damage rolls, invented fatigue cost or guaranteed damage**.
+Both choices complete the move to the municipal depot. They preserve their distinct handling-time/damage-risk trade-offs when those values are implemented; this script establishes **no numbers, random outcome or guaranteed damage**.
 
 ### Scene A03 — At the municipal depot
 
 *You bring the numbered plates to the receiving counter. A clerk examines the work paper and the delivery list.*
-
-**If secured together — depot condition check:**
-
-*You set the bundle on the receiving counter. Before the clerk takes it, you check that the plates have remained properly aligned.*
-
-**If carried in smaller loads — depot completeness check:**
-
-*You bring the last group to the receiving counter and put it beside the others. You count the plates again to make sure the entire lot has arrived.*
-
-These are different narrated checks of the **already-saved transport choice**, not new server actions, additional skill checks or random outcomes. Both lead to the same mandatory evidence comparison.
 
 **Action:** Compare the delivery list with the plates.
 
@@ -319,3 +305,44 @@ All three branches end only **after** their substantive job is completed. The us
 | Records | Scholarship +1 | Same number in death/wage records; scraped correction | Findings recorded |
 
 **No new IDs, calendar dates, item ownership, wages, standard XP, loot, criminal/reputation flags or mystery resolution.** The project owner approved Revision 01 on 2026-10-22. The playable Stage 4 retains older dialogue and must receive these approved words during the next integration pass.
+
+
+---
+
+## Owner-approved refinement — Transport handling, 2026-11-01
+
+This section supersedes **only** the Route A transport presentation and follow-up copy in Scene A02/A03. The approved clerk dialogue, route decisions, documentary discovery and Stage 5 handoff are unchanged.
+
+After the plates match the work paper, the two choices are presented with their practical trade-offs:
+
+| Choice | Player-facing explanation | Transport identity |
+| --- | --- | --- |
+| **Secure the plates together** | Fewer trips. A heavier load that must be kept steady. | Shorter handling; higher concentrated shift/damage risk, when later systems exist. |
+| **Carry the plates in smaller loads** | More trips. Less weight to manage each time. | Longer handling; lower concentrated damage risk, when later systems exist. |
+
+**Secured together — immediate result:**
+
+*You fasten the plates together and lift the bundled stack. The weight is awkward, but you can move the lot without making several trips.*
+
+**Secured together — at the depot, before examining the delivery list:**
+
+*You set the bundle on the receiving counter. Before the clerk takes it, you check that the plates have remained properly aligned.*
+
+**Smaller loads — immediate result:**
+
+*You divide the plates into smaller groups. Each load is easier to manage, though you must return to the workshop several times.*
+
+**Smaller loads — at the depot, before examining the delivery list:**
+
+*You bring the last group to the receiving counter and put it beside the others. You count the plates again to make sure the entire lot has arrived.*
+
+**Journal once the method is committed:**
+
+- Secured: *I secured the plates together and carried them to the depot as one load.*
+- Smaller loads: *I carried the plates in smaller groups. It took more trips, but each load was easier to handle.*
+
+**State and integration:** The existing saved `transport = 'secured' | 'smaller_loads'` selects the immediate outcome, depot arrival/verification and journal. Both choices reach the existing `COMPARE_DELIVERY` state and lead to the same mandatory evidence. No extra personality flag or server migration. Neither choice can softlock the tutorial.
+
+**Deferred mechanics:** Real duration differences, fatigue costs, damage probabilities and correction procedures remain unspecified. No numerical mechanics, random damage, combat Stamina loss, additional skill awards, wages, XP, reputation penalties or new inventory assets are authorised by this refinement.
+
+**Tabletop UI rule:** Stages 1–3 and all Stage 4 illustrated tabletop objects (including depot plates/paper and council books) reuse the same framed caption asset, typeface and hover/focus/selection treatment. Stage 3 returned plate and cancellation slip appear enlarged while retaining their shared central bench composition and full-object click areas.

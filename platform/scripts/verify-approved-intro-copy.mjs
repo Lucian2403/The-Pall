@@ -179,7 +179,7 @@ console.log('PASS: Guther approved optional dialogue and universal Millhand skip
 // The owner's transparent evidence cutouts are real items, not square UI cards.
 const stage3SceneSource = readFileSync(resolve(root,'apps/web/src/lib/MillhandMissingStampScene.svelte'),'utf8');
 const stage3DialogueEnd = stage3SceneSource.indexOf('</aside>');
-const stage3SceneEnd = stage3SceneSource.indexOf('  </div>\n  {#if journalOpen}',stage3DialogueEnd);
+const stage3SceneEnd = stage3SceneSource.indexOf('  </div>\n  <div class="scene-footer">',stage3DialogueEnd);
 const journalPanelStart = stage3SceneSource.indexOf('<section id="stage-three-journal"');
 assert.ok(stage3DialogueEnd>=0 && stage3SceneEnd>stage3DialogueEnd,'Missing Stamp scene shape changed');
 assert.ok(stage3SceneSource.indexOf('<div class="evidence"')>stage3DialogueEnd,
@@ -213,12 +213,9 @@ assert.ok(stage3SceneSource.includes('class:route-choice=') &&
   'Stage3 route selection must have separate briefing/choice beats without any nested dialogue scrollbar');
 assert.ok(stage3SceneSource.includes('class:record-view=') &&
   stage3SceneSource.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
-  stage3SceneSource.includes('class="journal-toggle journal-outside"') &&
-  !stage3SceneSource.includes('class="scene-footer"') &&
-  stage3SceneSource.indexOf('class="journal-toggle journal-outside"')>stage3DialogueEnd &&
-  stage3SceneSource.indexOf('class="journal-toggle journal-outside"')<stage3SceneEnd &&
-  !stage3SceneSource.includes('Council-owned evidence.'),
-  'Evidence reading must keep journal access outside the popup without an obsolete lower disclaimer strip');
+  stage3SceneSource.includes('class="scene-footer"') &&
+  !stage3SceneSource.includes('class="journal-trigger"'),
+  'Evidence reading should not introduce a scroll bar or add a journal action inside the popup');
 assert.ok(stage3SceneSource.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
   stage3SceneSource.includes('snapshot.plate.workerNumber || snapshot.plate.inspectionDate'),
   'When real worker IDs or dates exist, render live values rather than conflicting baked-in image text');

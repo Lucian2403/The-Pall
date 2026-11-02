@@ -115,14 +115,11 @@ assert.ok(contractsUi.includes("which==='death' && snapshot.availableActions.inc
 assert.ok(contractsUi.includes("state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'") &&
   contractsUi.includes("{:else if snapshot.availableActions.length>0}"),
   'Remove evidence action buttons from dialogue while retaining later Clerk and dispute actions');
-const commerceForbiddenProps=[
-  "perform('read_death_register')",
-  "perform('check_wage_record')",
-  'class="work-surface"',
-  '/workshop/council-work.webp'
-];
-assert.ok(commerceForbiddenProps.every(fragment=>!contractsUi.includes(fragment)),
-  'Commerce UI must not borrow Investigation work actions or introduce extra physical props');
+assert.ok(!contractsUi.includes("perform('read_death_register')") &&
+  !contractsUi.includes("perform('check_wage_record')") &&
+  !contractsUi.includes('class="work-surface"') &&
+  !contractsUi.includes('/workshop/council-work.webp'),
+  'Commerce UI must not borrow Investigation's work actions or introduce extra physical props');
 assert.ok(contractsUi.includes('STAGE_FOUR_DIALOGUE.contracts') &&
   contractsUi.includes('STAGE_FOUR_FINAL.contracts') &&
   contractsUi.includes('snapshot.availableActions') &&
@@ -141,7 +138,7 @@ assert.ok(ui.includes("import MillhandRecordsScene from '$lib/MillhandRecordsSce
 assert.ok(recordsUi.includes('/locations/records/records-room.webp') &&
   recordsUi.includes('/locations/contracts/death-register.webp') &&
   recordsUi.includes('/locations/contracts/wage-record.webp'),
-  "Scholarship must display the owner\'s records-room background with the existing death/wage books");
+  'Scholarship must display the owner's records-room background with the existing death/wage books');
 for(const [phase,which,action] of [
   ['READ_DEATH_REGISTER','death','read_death_register'],
   ['READ_WAGE_RECORD','wage','check_wage_record'],
@@ -166,13 +163,54 @@ assert.ok(recordsUi.includes('scale(1.018)') &&
   'Scholarship book hover must be subtle, with no schematic placeholder tiles');
 console.log('PASS: Scholarship records room and three deliberate inspections retain approved reconciliation route.');
 
+
+/* Transport presentation: different saved choices must remain visible after
+ * travel without a second personality flag or invented numeric damage rolls. */
+const labels=read('apps/web/src/lib/workshop-object-labels.css');
+assert.ok(labels.includes("dialogue-frame-trim.png")&&
+  labels.includes(":is(.workshop,.second-job)")&&
+  labels.includes(".table-prop")&&labels.includes(".record-prop"),
+  'All tabletop cutouts must reuse the workshop nine-slice caption');
+for(const name of [
+  'WorkshopScene.svelte','MillhandWorkScene.svelte',
+  'MillhandMissingStampScene.svelte','MillhandDepotScene.svelte',
+  'MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
+]){
+  const scene=read('apps/web/src/lib/'+name);
+  assert.ok(scene.includes("import '$lib/workshop-object-labels.css'") &&
+    scene.includes('workshop-object-label'),
+    name+' must use the one framed tabletop label component');
+}
+assert.ok(stage3Ui.includes('height:clamp(132px,13vw,180px)') &&
+  stage3Ui.includes('left:24%;bottom:3%;width:52%'),
+  'Stage3 evidence must be enlarged without changing its centred bench arrangement');
+assert.ok(copy.includes('STAGE_FOUR_TRANSPORT_HINTS') &&
+  copy.includes('STAGE_FOUR_TRANSPORT_VERIFICATION') &&
+  copy.includes('You set the bundle on the receiving counter.') &&
+  copy.includes('You bring the last group to the receiving counter') &&
+  copy.includes('I secured the plates together and carried them to the depot as one load.') &&
+  copy.includes('I carried the plates in smaller groups. It took more trips'),
+  'Both transport choices must change the immediate/depot/journal copy');
+assert.ok(depotUi.includes("state.phase==='COMPARE_DELIVERY' && state.transport && travelConfirmed") &&
+  depotUi.includes('STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]') &&
+  depotUi.includes('STAGE_FOUR_TRANSPORT_HINTS[action]') &&
+  depotUi.includes('Continue to the depot') &&
+  depotUi.includes("state.phase==='COMPARE_DELIVERY'&&!travelConfirmed"),
+  'Saved transport must drive depot verification and pre-choice trade-off text');
+assert.ok(core.includes("case 'secure_plates':transport='secured';phase='COMPARE_DELIVERY';") &&
+  core.includes("case 'carry_smaller_loads':transport='smaller_loads';phase='COMPARE_DELIVERY';"),
+  'Both methods must keep the same mandatory delivery-list progression');
+assert.ok(canon.includes('Owner-approved refinement — Transport handling, 2026-11-01'),
+  'Canonical Stage4 transport refinement must be recorded');
+console.log('PASS: Distinct transport narration/journal; shared table labels; no new state machine branch.');
+
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
 const sharedJournalCss=read('apps/web/src/lib/pall-owner-ui.css');
 assert.ok(sharedJournalCss.includes("font:600 16px/1.55 var(--pall-font-reading") &&
   sharedJournalCss.includes("font:600 15px/1.3 var(--pall-font-reading") &&
   sharedJournalCss.includes("color:#24160e"),
-  "Journal body and controls must use the owner\'s reading face with strong dark-ink contrast");
+  'Journal body and controls must use the owner's reading face with strong dark-ink contrast');
 for(const name of [
   'MillhandDepotScene.svelte','MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
 ]){
