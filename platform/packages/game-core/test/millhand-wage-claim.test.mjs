@@ -27,7 +27,7 @@ for(const branch of ['restamp','contracts','records']){
         assert.equal(s.phase,'COMMON_EXCHANGE');
         s=beats(s,6);
         assert.equal(s.phase,'CHOOSE_EVIDENCE');
-        assert.deepEqual(availableWageClaimActions(s),['share_route_evidence']);
+        assert.deepEqual(availableWageClaimActions(s),['share_route_evidence','previous_dialogue']);
         s=apply(s,'share_route_evidence');
         s=beats(s,3);
         assert.equal(s.phase,'LEAVING');
@@ -35,13 +35,13 @@ for(const branch of ['restamp','contracts','records']){
         s=beats(s,8);
         assert.equal(s.phase,'CHOOSE_STANCE');
         assert.deepEqual(availableWageClaimActions(s),
-          ['brace_and_defend','keep_moving','use_cart_as_cover']);
+          ['brace_and_defend','keep_moving','use_cart_as_cover','previous_dialogue']);
         s=apply(s,stance);
         assert.equal(s.phase,'DONE');
         assert.equal(s.stance,stance==='brace_and_defend'?'brace'
           :stance==='keep_moving'?'moving':'cart');
         assert.equal(s.branch,branch);
-        assert.deepEqual(availableWageClaimActions(s),[]);
+        assert.deepEqual(availableWageClaimActions(s),['previous_dialogue']);
         assert.equal('coins' in s,false);
         assert.equal('xp' in s,false);
         assert.equal('health' in s,false);
@@ -57,7 +57,7 @@ test('Each spoken beat advances only on a committed action and survives reload',
  s=apply(s,'continue_dialogue');
  assert.equal(s.dialogueIndex,1);
  const saved=JSON.parse(JSON.stringify(s));
- assert.deepEqual(availableWageClaimActions(saved),['continue_dialogue']);
+ assert.deepEqual(availableWageClaimActions(saved),['continue_dialogue','previous_dialogue']);
  assert.equal(saved.dialogueIndex,1);
  assert.equal(apply(saved,'continue_dialogue').dialogueIndex,2);
  assert.throws(()=>advanceWageClaim({...s,dialogueIndex:99},'continue_dialogue'),
@@ -67,4 +67,63 @@ test('Each spoken beat advances only on a committed action and survives reload',
 });
 test('Invalid or unapproved branch cannot create a Stage 5 state',()=>{
  assert.throws(()=>initialWageClaim('depot'),WageClaimInvalidAction);
+});
+
+test('Previous dialogue walks backwards across every phase with saved state intact',()=>{
+ let s=initialWageClaim('contracts');
+ assert.equal(availableWageClaimActions(s).includes('previous_dialogue'),false);
+ s=beats(s,5);
+ s=apply(s,'read_demand');
+ s=beats(s,3);
+ s=beats(s,6);
+ s=apply(s,'share_route_evidence');
+ s=beats(s,3);
+ s=apply(s,'say_going_home');
+ s=beats(s,8);
+ s=apply(s,'use_cart_as_cover');
+ const revision=s.revision;
+ const phases=[
+  ['CHOOSE_STANCE',0,'cart'], // the saved cart stance is cleared
+  ['CORNERED_EXCHANGE',7],['CORNERED_EXCHANGE',6],
+  ['CORNERED_EXCHANGE',5],['CORNERED_EXCHANGE',4],
+  ['CORNERED_EXCHANGE',3],['CORNERED_EXCHANGE',2],
+  ['CORNERED_EXCHANGE',1],['CORNERED_EXCHANGE',0],
+  ['LEAVING',0],
+  ['EVIDENCE_EXCHANGE',2],['EVIDENCE_EXCHANGE',1],['EVIDENCE_EXCHANGE',0],
+  ['CHOOSE_EVIDENCE',0],
+  ['COMMON_EXCHANGE',5],['COMMON_EXCHANGE',4],['COMMON_EXCHANGE',3],
+  ['COMMON_EXCHANGE',2],['COMMON_EXCHANGE',1],['COMMON_EXCHANGE',0],
+  ['APPROACH_EXCHANGE',2],['APPROACH_EXCHANGE',1],['APPROACH_EXCHANGE',0],
+  ['CHOOSE_APPROACH',0],
+  ['OPENING',4],['OPENING',3],['OPENING',2],['OPENING',1],['OPENING',0]
+ ];
+ for(const [phase,index] of phases){
+   s=apply(s,'previous_dialogue');
+   assert.equal(s.phase,phase);
+   assert.equal(s.dialogueIndex,index);
+   assert.equal(s.stance,null);
+   assert.equal(s.branch,'contracts');
+ }
+ assert.equal(s.approach,null);
+ assert.equal(s.revision,revision+phases.length);
+ assert.equal(availableWageClaimActions(s).includes('previous_dialogue'),false);
+ assert.throws(()=>advanceWageClaim(s,'previous_dialogue'),WageClaimInvalidAction);
+ const repeated=apply(s,'continue_dialogue');
+ assert.equal(repeated.dialogueIndex,1);
+ assert.equal(apply(repeated,'previous_dialogue').dialogueIndex,0);
+});
+test('Stage 6 pre-combat boundary returns to Stage 5 stance selection',()=>{
+ let s=initialWageClaim('restamp');
+ s=beats(s,5);s=apply(s,'challenge_authority');s=beats(s,3);
+ s=beats(s,6);s=apply(s,'share_route_evidence');s=beats(s,3);
+ s=apply(s,'say_going_home');s=beats(s,8);
+ s=apply(s,'brace_and_defend');
+ const saved=JSON.parse(JSON.stringify(s));
+ const rewound=apply(saved,'previous_dialogue');
+ assert.equal(rewound.phase,'CHOOSE_STANCE');
+ assert.equal(rewound.stance,null);
+ assert.equal(rewound.revision,s.revision+1);
+ const changed=apply(rewound,'use_cart_as_cover');
+ assert.equal(changed.phase,'DONE');
+ assert.equal(changed.stance,'cart');
 });
