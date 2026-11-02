@@ -1,6 +1,6 @@
-# Millhand — Stage 5: The Wage Claim / Cornered — Editorial Revision 02
+# Millhand — Stage 5: The Wage Claim / Cornered — Editorial Revision 03
 
-**STATUS: OWNER-APPROVED STAGE 5 REVISION 02 (2026-11-02).** This replaces only the opening exchange, initial scene narration, and the Read the demand narration of Revision 01, using the owner's exact wording. The remaining dialogues, interactions, personal Journal, Stage 5 state machine and combat contract remain unchanged. Stage 5 is implemented in PR #15 but not merged into the playable main branch. Historical mechanics and approved causal constraints: [The Wage Claim and Cornered](flint-confrontation.md). Follows approved [Stage 4 editorial Revision 01](stage-4-approved-script.md) and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
+**STATUS: OWNER-APPROVED STAGE 5 REVISION 03 (2026-11-02).** The owner revised the two spoken lines following **Read the demand** and the common exchange following either approach. Flint's brief chin-scratch is its own narration beat before his final reply. All other dialogue, interactions, personal Journal, state transition rules and combat boundaries remain unchanged. Stage 5 is implemented in PR #15, not yet merged into `main`. Historical mechanics and causal constraints: [The Wage Claim and Cornered](flint-confrontation.md). Follows [Stage 4 editorial Revision 01](stage-4-approved-script.md) and the [game-wide writing standard](../../interactions/dialogue-style-guide.md).
 
 ## Specific weaknesses in the prior copy
 - The original bill confrontation made Flint sound like a clerk reporting a case; **he is a paid collector, not a council officer**. Have him identify the workshop worker and demand money plainly.
@@ -38,9 +38,9 @@
 
 **Authoring constraint:** The contractor charge has no established numerical amount; do not invent one.
 
-**PLAYER:** “Why have they put the charge on me?”
+**PLAYER:** “Why's this on me?”
 
-**FLINT:** “They've got you down for the work. The contractor sent me to collect it.”
+**FLINT:** “You did the job, didn't you? Boss wants his money.”
 
 **PLAYER CHOICE 2 — Ask who sent him.**
 
@@ -54,17 +54,19 @@ Both choices expose the contractor's role and the same essential evidence; neith
 
 ### Common exchange after either choice
 
-**PLAYER:** “That worker number was cancelled. The man died in the fire.”
+**PLAYER:** “But that number's been cancelled. The man's dead. Died in the fire.”
 
-**FLINT:** “I didn't put it on there.”
+**FLINT:** “Well, I didn't put it there.”
 
-**PLAYER:** “Who did?”
+**PLAYER:** “Who did, then?”
 
-**FLINT:** “Don't know. They don't tell men like us.”
+**FLINT:** “How should I know? They don't tell us that stuff.”
 
-**PLAYER:** “And you still want me to pay?”
+**PLAYER:** “So you know it's wrong, and you still want me to pay?”
 
-**FLINT:** “Yes.”
+*Flint scratches his chin, then looks back at you.*
+
+**FLINT:** “Yeah.”
 
 **PLAYER ACTION:** Tell Flint what you found in your second job. Only the spoken response from your actual Stage 4 route is available. It does not appear or advance automatically.
 
