@@ -262,10 +262,20 @@ try{
   phase='entering Contracts office';
   await click('Switch to Contracts');
   const council=items=>items.media.find(m=>m.file==='contracts-scholarship-ambience.mp3');
-  await waitUntil(async()=>{
-    const a=await status();
-    return council(a)&&!council(a).paused&&a.texts.includes('Playing');
-  },12000,'Contracts indoor ambience');
+  try{
+    await waitUntil(async()=>{
+      const a=await status();
+      return council(a)&&!council(a).paused&&a.texts.includes('Playing');
+    },12000,'Contracts indoor ambience');
+  }catch(error){
+    console.error('CONTRACTS MEDIA STATE',JSON.stringify(await status()));
+    console.error('CONTRACTS SCENE STATE',JSON.stringify(await evalJS(`({
+      classes:document.querySelector('.audio-qa-scene')?.className,
+      activeText:document.querySelector('.audio-qa-scene h1')?.textContent,
+      sound:document.querySelector('.playback-state')?.textContent
+    })`)));
+    throw error;
+  }
   let contracts=await status();
   assert.ok(forge(contracts).paused,'Forge ambience must stay silent in Contracts.');
   assert.ok(council(contracts).volume>.65,'Council audio uses the same ambience slider.');
