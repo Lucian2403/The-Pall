@@ -71,7 +71,7 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
     }
     if(!job.rowCount&&ch.rows[0].tutorial_stage!==4)return reply.code(409).send({error:'missing_second_job_state'});
     const state=job.rows[0]?.state??initialSecondJob(branch);
-    if(state.branch!==branch || (ch.rows[0].tutorial_stage>4&&state.phase!=='DONE'))
+    if(state.branch!==branch || (ch.rows[0].tutorial_stage>4&&state.phase!=='DONE'&&state.phase!=='EXITED'))
       return reply.code(409).send({error:'invalid_second_job_state'});
     return snapshot(ch.rows[0],state);
   });
@@ -149,7 +149,7 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
         return reply.code(409).send({error:'wrong_second_job_phase'});
       }
       const nextCharacter:CharacterRow={...char.rows[0]};
-      if(next.phase==='DONE'){
+      if(next.phase==='EXITED'){
         nextCharacter.tutorial_stage=5;
         nextCharacter.tutorial_status='NOT_STARTED';
       }else{
