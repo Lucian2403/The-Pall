@@ -23,7 +23,7 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, backToStageFive, backStageBusy = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean} = $props();
+  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, backToStageFive, backStageBusy = false, backStageError = ''}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean; backStageError?: string} = $props();
   const chapter = $derived(character.origin === 'Millhand' && (character.tutorial.stage === 5 || character.tutorial.stage === 6)
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/wage-claim'
     : character.origin === 'Millhand' && character.tutorial.stage === 4
@@ -257,6 +257,9 @@
           {backStageBusy?'Returning…':'← Back to Stage 5'}
         </button>
       {/if}
+      {#if character.origin==='Millhand' && character.tutorial.stage===6 && backToStageFive && backStageError}
+        <span class="back-stage-error" role="alert">{backStageError}</span>
+      {/if}
       {#if canRewind && rewindFromStage!==null}
         <button type="button" class="rewind-button" disabled={rewinding}
           title="Developer testing only: reset the current stage to replay the previous one"
@@ -301,6 +304,7 @@
   .lock{margin-left:auto;font-size:13px}
   .nav-rule{border-top:1px solid #403429;margin:8px 17px 12px}
   .locked-heading{margin:0;padding:0 19px;font:10px/1.5 sans-serif;letter-spacing:.1em;color:#aa8a62}
+  .back-stage-error{max-width:360px;padding:6px 8px;border:1px solid #a36b3d;color:#f5ce91;background:#4e241d;font:12px/1.4 sans-serif}
   .rail-footer{margin-top:auto;min-height:188px;display:flex;flex-direction:column;justify-content:end;gap:3px;padding:25px 20px 17px;color:#d9b98b;font:13px/1.1 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.23em;background:linear-gradient(0deg,#100e0df2,#100e0d4a 58%,#100e0dbb),url('/ui-kit/sidebar-illustration.png') center center/cover no-repeat;background-color:#181611}
   .right{display:flex;flex-direction:column;min-width:0;min-height:100vh;min-height:100dvh;border:0;background:#1c1a18;border-radius:0}
   /* Industrial brass-and-charcoal HUD, rather than four equal developer gauges. */
