@@ -70,7 +70,8 @@ export const STAGE_FOUR_INSTRUCTIONS: Record<SecondJobPhase, string> = {
   ARCHIVE_DIALOGUE: 'Speak with the Archive Assistant.',
   CHOOSE_SOURCE: 'Use another record to check the damaged entry.',
   RECORD_FINDING: 'Write down what you\'ve found.',
-  DONE: 'The work is complete.'
+  DONE: 'The work is complete.',
+  EXITED: 'You have left the workplace.'
 };
 
 /** Transport identity is saved as SecondJobState.transport, without another flag.
@@ -107,7 +108,8 @@ export const STAGE_FOUR_ACTION_LABELS: Record<SecondJobAction, string> = {
   compare_neighbouring_entries: 'Compare the entries above and below it',
   compare_shift_book: 'Compare the shift book with the wage record',
   record_finding: 'Record the difference',
-  continue_dialogue: 'Continue'
+  continue_dialogue: 'Continue',
+  leave_location: 'Leave the workplace'
 };
 
 export const STAGE_FOUR_OUTCOMES: Partial<Record<SecondJobAction, string>> = {
@@ -133,7 +135,7 @@ export const STAGE_FOUR_OUTCOMES: Partial<Record<SecondJobAction, string>> = {
 
 export const STAGE_FOUR_FINAL = {
   restamp: 'The clerk writes “metal plates” in the receiving book and calls over the depot hands. They haul the lot away. The old list still says “workers”. He leaves it as it is. Doesn\'t say a damn thing about why. \n Well, that\'s the job done. All that hauling, and not a bloody coin to show for it.',
-  contracts: 'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You leave the Contracts office, pissed off and empty-handed.',
+  contracts: 'The clerk writes down your complaint and shuts the book. That\'s it. Both records stay as they were. Nonsense. The council still won\'t approve the plates. And your pay? Not a damn coin. All that work for nothing. You are still at the counter, empty-handed.',
   records: 'They marked the man dead, but his number kept showing up in the wage books long after. Someone\'s scraped part of a line off, too. Who did it? Why? Not a damn clue.'
 } as const;
 
@@ -149,25 +151,25 @@ export function secondJobJournal(s: SecondJobState): readonly string[] {
       result.push("Delivered metal plates to the depot. Someone had entered “workers” on the delivery list. Workers! The clerk could see what I'd brought.");
     if (s.receipt === 'recorded_plates') result.push('I recorded the received goods as plates.');
     if (s.receipt === 'requested_correction') result.push('I asked the depot clerk to check the incorrect entry before I signed.');
-    if (s.phase === 'DONE') result.push("The depot recorded the goods as plates in the end. I've got a receipt, but I still don't know why that other entry was wrong. No pay for this job, either.");
+    if ((s.phase === 'DONE' || s.phase === 'EXITED')) result.push("The depot recorded the goods as plates in the end. I've got a receipt, but I still don't know why that other entry was wrong. No pay for this job, either.");
   }
   if (s.branch === 'contracts') {
     if (!['EXAMINE_PAPER', 'COMPARE_RECORDS'].includes(s.phase))
       result.push('One entry treats the man as dead for compensation. In the other they still charge for him as if he were alive. Both have council seals. How can they accept both?');
     if (s.challenge === 'seal_check') result.push('I asked the clerk to check both seals. Both entries had been accepted. Still no explanation.');
     if (s.challenge === 'written_complaint') result.push('I marked what was wrong on the work paper. The clerk recorded my complaint.');
-    if (s.phase === 'DONE') result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
+    if ((s.phase === 'DONE' || s.phase === 'EXITED')) result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
   }
   if (s.branch === 'records') {
     if (!['READ_DEATH_REGISTER', 'READ_WAGE_RECORD'].includes(s.phase))
       result.push('Found the worker in the death register. Then I found the same number in later wage records. They were still using it after he died.');
     if (s.phase === 'SPEAK_ARCHIVE' || s.phase === 'ARCHIVE_DIALOGUE')
       result.push('Someone had scraped part of an entry from the page. I could not tell what was written there.');
-    if (['CHOOSE_SOURCE', 'RECORD_FINDING', 'DONE'].includes(s.phase))
+    if (['CHOOSE_SOURCE', 'RECORD_FINDING', 'DONE','EXITED'].includes(s.phase))
       result.push("Someone scraped writing from an entry. The archive assistant didn't know who had done it. I wasn't going to damage the page any further.");
     if (s.source === 'neighbouring_entries') result.push('I compared the entries around the damaged one. The number is still there in the later wage record.');
     if (s.source === 'shift_book') result.push('I checked the shift book against the wage record. Both have that number after the recorded death.');
-    if (s.phase === 'DONE') result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
+    if ((s.phase === 'DONE' || s.phase === 'EXITED')) result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
   }
   return result;
 }
