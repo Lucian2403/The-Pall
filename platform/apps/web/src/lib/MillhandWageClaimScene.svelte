@@ -22,6 +22,9 @@
   const beat=$derived(wageClaimBeat(state));
   const journal=$derived(wageClaimJournal(state));
   const offered=$derived(state.phase!=='OPENING');
+  const canGoBack=$derived(snapshot.availableActions.includes('previous_dialogue'));
+  const forwardActions=$derived(snapshot.availableActions.filter(a=>a!=='previous_dialogue'));
+  let flintImageMissing=$state(false);
   const cornered=$derived(
     state.phase==='CORNERED_EXCHANGE'||state.phase==='CHOOSE_STANCE'||state.phase==='DONE');
   let inspected=$state<'bill'|'club'|'cart'|null>(null);
@@ -58,15 +61,17 @@
   <div class="alley-scene">
     <div class="alley-art" role="img"
       aria-label="A narrow industrial service passage in Grand Cylinder City, lit by gas lamps, with a wooden work cart to one side"></div>
-    <div class="flint-figure">
-      <img src="/characters/flint/flint-standing.webp" alt="Flint, the contractor's collector, holding a short club"
-        class="flint-image"/>
+    <!-- Flint and his club are one physical inspection target, not two detached labels. -->
+    <button type="button" class="flint-figure" data-pall-sfx="click"
+      aria-label="Inspect Flint and his club" aria-pressed={inspected==='club'}
+      onclick={()=>inspect('club')}>
+      {#if !flintImageMissing}
+        <img src="/characters/flint/flint-standing.webp" alt=""
+          class="flint-image" onerror={()=>{flintImageMissing=true;}}/>
+      {:else}
+        <span class="flint-missing" role="status">Flint artwork unavailable. Install flint-standing.webp in the game's character assets.</span>
+      {/if}
       <span class="workshop-object-label flint-label">Flint</span>
-    </div>
-
-    <button type="button" class="object club" data-pall-sfx="click" aria-label="Inspect Flint's club"
-      aria-pressed={inspected==='club'} onclick={()=>inspect('club')}>
-      <span class="workshop-object-label">Short club</span>
     </button>
     <button type="button" class="object cart" data-pall-sfx="click" aria-label="Inspect the work cart"
       aria-pressed={inspected==='cart'} onclick={()=>inspect('cart')}>
@@ -110,14 +115,22 @@
           <p>{inspectionNote}</p>
         </div>
       {/if}
-      {#if snapshot.availableActions.length}
+      {#if forwardActions.length}
         <div class="actions" aria-label="Available confrontation actions">
-          {#each snapshot.availableActions as action (action)}
+          {#each forwardActions as action (action)}
             <button type="button" disabled={pending} onclick={()=>choose(action)}
               data-pall-sfx={action==='read_demand'?'paper':'click'}>
               {WAGE_CLAIM_ACTION_LABELS[action]}
             </button>
           {/each}
+        </div>
+      {/if}
+      {#if canGoBack}
+        <div class="back-nav">
+          <button type="button" class="back-button" disabled={pending}
+            data-pall-sfx="click" onclick={()=>choose('previous_dialogue')}>
+            {state.phase==='DONE'?'← Back to Stage 5':'← Previous dialogue'}
+          </button>
         </div>
       {/if}
       {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -158,15 +171,19 @@
     background:linear-gradient(90deg,#17100c12 0%,transparent 40%,#0a0b1240 85%);pointer-events:none}
   .flint-figure{position:absolute;z-index:2;left:5%;bottom:2.3%;
     width:38%;height:88%;display:flex;flex-direction:column;align-items:center;
-    justify-content:flex-end;pointer-events:none}
+    justify-content:flex-end;appearance:none;background:transparent;border:0;padding:0;
+    cursor:pointer;color:#332113}
   .flint-image{height:calc(100% - 38px);width:100%;object-fit:contain;object-position:bottom center;
     filter:drop-shadow(0 9px 13px #0008)}
   .flint-label{width:min(180px,62%)}
+  .flint-figure:focus-visible{outline:3px solid #f3d69c;outline-offset:3px}
+  .flint-missing{display:block;max-width:70%;padding:12px;background:#1b1917c9;
+    color:#eedbb9;border:1px solid #956e41;font:13px/1.45 sans-serif;
+    text-align:center;pointer-events:none}
   .object{position:absolute;z-index:3;appearance:none;border:0;background:transparent;
     padding:0;cursor:pointer;color:#332113}
   .object:focus-visible{outline:3px solid #f3d69c;outline-offset:3px}
   .object .workshop-object-label{min-width:105px;max-width:220px}
-  .club{left:1%;bottom:3%;width:17%}
   .cart{left:60%;bottom:9%;width:18%}
   .bill{left:40%;bottom:3%;width:19%;display:flex;flex-direction:column;align-items:center;gap:4px}
   .folded-paper{width:60px;height:48px;display:block;transform:rotate(-12deg);
@@ -202,6 +219,12 @@
   .actions button:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .actions button:focus-visible{outline:2px solid #885f2c;outline-offset:2px}
   .actions button:disabled{opacity:.6;cursor:default}
+  .back-nav{margin:10px 0 0}
+  .back-button{appearance:none;border:1px solid #977956;background:#e6d3b1;color:#382619;
+    padding:7px 12px;min-height:36px;cursor:pointer;
+    font:600 14px/1.3 var(--pall-font-reading,Georgia,serif)}
+  .back-button:is(:hover,:focus-visible){background:#f3dfc0;border-color:#6a4a31}
+  .back-button:disabled{opacity:.55;cursor:default}
   .journal-trigger{border-top:1px solid #bfa889;margin-top:12px;padding-top:10px}
   .journal-button{background:#e5d1ae;border:1px solid #906c49;padding:6px 10px;
     font:600 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#352414;cursor:pointer}
@@ -222,7 +245,6 @@
     .flint-figure{top:0;bottom:auto;left:0;width:44%;height:38%}
     .flint-image{height:calc(100% - 30px)}
     .object{top:39%;bottom:auto}
-    .club{left:1%;width:20%}
     .cart{left:72%;width:25%}
     .bill{left:31%;width:38%;top:33%}
     .work-dialogue{position:relative;top:auto;right:auto;max-height:none;
