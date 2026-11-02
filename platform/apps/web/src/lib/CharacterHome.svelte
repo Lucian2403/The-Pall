@@ -50,10 +50,10 @@
       href:base+'/millhand/second-job'
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===5) return {
-      title:'Your Finished Work',
-      description:'The second job is complete. Review the work already recorded.',
-      label:'Review the finished second job',
-      href:base+'/millhand/second-job'
+      title:'On your way home',
+      description:'You have left the workplace. Continue through the city.',
+      label:'Continue walking',
+      href:base+'/millhand/wage-claim'
     };
     return null;
   });
