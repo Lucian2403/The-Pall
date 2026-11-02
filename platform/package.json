@@ -64,6 +64,7 @@
     "verify:audio-runtime": "node scripts/verify-audio-runtime.mjs",
     "verify:workshop-hud-ambience": "node scripts/verify-workshop-hud-ambience.mjs",
     "verify:council-ambience-asset": "node scripts/verify-council-ambience-asset.mjs",
+    "verify:night-alley-ambience-asset": "node scripts/verify-night-alley-ambience-asset.mjs",
     "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs"
   }
 }
