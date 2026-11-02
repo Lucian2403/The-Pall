@@ -100,6 +100,10 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
 
       // Wipe only the stage replayed (and any dependent future stage). Receipt
       // clearing prevents old successful requests from replaying stale results.
+      if(plan.fromStage===5){
+        await client.query('DELETE FROM player_character_wage_claim_receipts WHERE character_id=$1',[req.params.id]);
+        await client.query('DELETE FROM player_character_wage_claim WHERE character_id=$1',[req.params.id]);
+      }
       if(plan.removeSecondJob){
         await client.query('DELETE FROM player_character_second_job_receipts WHERE character_id=$1',[req.params.id]);
         await client.query('DELETE FROM player_character_second_job WHERE character_id=$1',[req.params.id]);
