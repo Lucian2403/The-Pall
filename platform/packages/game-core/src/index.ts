@@ -20,3 +20,6 @@ export type {MillhandRewindPlan,MillhandRewindStage,MillhandRewindTarget} from '
 
 export {SECOND_JOB_ACTIONS,initialSecondJob,availableSecondJobActions,advanceSecondJob,SecondJobInvalidAction} from './millhand-second-job.js';
 export type {SecondJobState,SecondJobPhase,SecondJobAction,SecondJobChoice} from './millhand-second-job.js';
+
+export {WAGE_CLAIM_ACTIONS,initialWageClaim,availableWageClaimActions,advanceWageClaim,WageClaimInvalidAction} from './millhand-wage-claim.js';
+export type {WageClaimState,WageClaimPhase,WageClaimAction,WageClaimStance} from './millhand-wage-claim.js';
