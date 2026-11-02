@@ -31,7 +31,7 @@ function parseCommand(value:unknown):Command {
 }
 function snapshot(ch:CharacterRow,state:SecondJobState){
   return {stage:ch.tutorial_stage,tutorialStatus:ch.tutorial_status,
-    state,availableActions:availableSecondJobActions(state),
+    state,availableActions:ch.tutorial_stage===4?availableSecondJobActions(state):[],
     tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
 }
 function branchFromSavedStage3(value:{branch:MissingStampBranch|null;phase:string}|undefined){
