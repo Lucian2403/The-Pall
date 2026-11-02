@@ -43,7 +43,7 @@
         <span>Ambience <output>{Math.round($pallAudioSettings.ambienceVolume*100)}%</output></span>
         <input type="range" min="0" max="1" step="0.05"
           value={$pallAudioSettings.ambienceVolume}
-          aria-label="Workshop ambience volume"
+          aria-label="Environmental ambience volume"
           oninput={e=>setPallAudioSettings({ambienceVolume:Number(e.currentTarget.value)})}/>
         <small class="playback-state">{$pallAudioPlayback.ambience}</small>
       </label>
@@ -61,7 +61,7 @@
             Test click
           </button>
       </div>
-      <small class="audio-footnote">Music rests between playthroughs. Workshop ambience is available only while the forge backdrop is visible.</small>
+      <small class="audio-footnote">Music rests between playthroughs. Environmental ambience plays in the Smithing Workshop, Contracts office and records room.</small>
     </div>
   {/if}
 </div>
