@@ -178,7 +178,7 @@
   .folded-paper::after{content:'';display:block;width:66%;height:30%;
     margin:13px auto 0;border-top:2px solid #91795c;border-bottom:2px solid #91795c;opacity:.65}
   .work-dialogue{position:absolute;z-index:5;top:3.5%;right:2.4%;box-sizing:border-box;
-    width:min(46%,650px);max-height:calc(100% - 6%);overflow:auto;
+    width:min(46%,650px);max-height:none;overflow:visible;
     background:#ead8b8;color:#2b1c11;
     border:solid transparent;border-width:21px 25px 20px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
