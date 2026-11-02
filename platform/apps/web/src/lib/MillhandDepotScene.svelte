@@ -26,6 +26,8 @@
   }=$props();
 
   const state=$derived(snapshot.state);
+  // The location-specific exit belongs only to StageFourNextStep.
+  const workActions=$derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
   // Purely local presentation beat: a saved transport choice is shown at the
   // workshop before the player proceeds to the depot. This grants no work
   // action and cannot change server progress or cause a missing receipt.
@@ -117,9 +119,9 @@
       {#if state.phase==='COMPARE_DELIVERY' && !travelConfirmed}
         <div class="actions"><button type="button" disabled={pending}
           onclick={() => {selected=null;confirmTravel();}}>Continue to the depot</button></div>
-      {:else if snapshot.availableActions.length>0}
+      {:else if workActions.length>0}
         <div class="actions" aria-label="Available delivery actions">
-          {#each snapshot.availableActions as action (action)}
+          {#each workActions as action (action)}
             <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
               {#if action==='secure_plates'||action==='carry_smaller_loads'}
