@@ -24,8 +24,10 @@
   };
 
   let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean} = $props();
-  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 4
-    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
+  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 5
+    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/wage-claim'
+    : character.origin === 'Millhand' && character.tutorial.stage === 4
+      ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
     : character.origin === 'Millhand' && character.tutorial.stage === 3
       ? '/characters/' + encodeURIComponent(character.id) + '/millhand/missing-stamp'
       : character.origin === 'Millhand' && character.tutorial.stage === 2
