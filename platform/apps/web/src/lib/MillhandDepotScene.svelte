@@ -5,6 +5,7 @@
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
     STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_OUTCOMES,STAGE_FOUR_FINAL,
     STAGE_FOUR_TRANSPORT_HINTS,STAGE_FOUR_TRANSPORT_VERIFICATION,
+    STAGE_FOUR_EXIT_LABELS,
     secondJobJournal
   } from '$lib/approved-stage-four';
   import '$lib/workshop-object-labels.css';
@@ -120,7 +121,7 @@
         <div class="actions" aria-label="Available delivery actions">
           {#each snapshot.availableActions as action (action)}
             <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
-              {STAGE_FOUR_ACTION_LABELS[action]}
+              {action==='leave_location'?STAGE_FOUR_EXIT_LABELS[state.branch]:STAGE_FOUR_ACTION_LABELS[action]}
               {#if action==='secure_plates'||action==='carry_smaller_loads'}
                 <small class="transport-hint">{STAGE_FOUR_TRANSPORT_HINTS[action]}</small>
               {/if}
