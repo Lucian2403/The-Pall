@@ -129,8 +129,12 @@ assert.match(route,/sceneLocation="Industrial service passage"/);
 assert.match(shell,/millhand\/wage-claim/);
 assert.match(home,/Continue the confrontation/);
 const nextStep=read('apps/web/src/lib/StageFourNextStep.svelte');
-assert.match(nextStep,/NEXT STEP/);
-assert.match(nextStep,/Continue to The Wage Claim/);
+assert.doesNotMatch(nextStep,/NEXT STEP|Continue to The Wage Claim|face Flint/i);
+for(const label of ['Leave the depot','Leave the Contracts office','Leave the records room']){
+  assert.ok(nextStep.includes(label),'Missing spoiler-free location exit: '+label);
+}
+assert.match(nextStep,/leave_location/);
+assert.match(nextStep,/alreadyAdvanced/);
 assert.match(nextStep,/millhand\/wage-claim/);
 assert.match(nextStep,/button-normal-trim\.png/);
 for(const name of [
