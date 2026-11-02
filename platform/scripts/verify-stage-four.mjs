@@ -131,7 +131,7 @@ assert.ok(!contractsUi.includes("perform('read_death_register')") &&
   !contractsUi.includes("perform('check_wage_record')") &&
   !contractsUi.includes('class="work-surface"') &&
   !contractsUi.includes('/workshop/council-work.webp'),
-  'Commerce UI must not borrow Investigation's work actions or introduce extra physical props');
+  "Commerce UI must not borrow Investigation\'s work actions or introduce extra physical props");
 assert.ok(contractsUi.includes('STAGE_FOUR_DIALOGUE.contracts') &&
   contractsUi.includes('STAGE_FOUR_FINAL.contracts') &&
   contractsUi.includes('snapshot.availableActions') &&
