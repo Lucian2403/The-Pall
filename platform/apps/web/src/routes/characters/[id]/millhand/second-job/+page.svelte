@@ -76,8 +76,8 @@
     <MillhandSecondJobScene {snapshot} {pending} {errorMessage} {perform}/>
     {#if snapshot.state.phase==='DONE'}
       <div class="follow-up">
-        The job is finished. The Wage Claim with Flint is the next chapter. That scene has not yet been connected.
-        <a href={'/characters/'+character.id}>View character</a>
+        Your second job is complete. Continue towards home and face Flint's Wage Claim.
+        <a href={'/characters/'+character.id+'/millhand/wage-claim'}>Continue to The Wage Claim</a>
       </div>
     {/if}
   </TutorialShell>
