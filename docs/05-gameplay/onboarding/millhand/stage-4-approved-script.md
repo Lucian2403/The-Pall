@@ -346,3 +346,29 @@ After the plates match the work paper, the two choices are presented with their 
 **Deferred mechanics:** Real duration differences, fatigue costs, damage probabilities and correction procedures remain unspecified. No numerical mechanics, random damage, combat Stamina loss, additional skill awards, wages, XP, reputation penalties or new inventory assets are authorised by this refinement.
 
 **Tabletop UI rule:** Stages 1–3 and all Stage 4 illustrated tabletop objects (including depot plates/paper and council books) reuse the same framed caption asset, typeface and hover/focus/selection treatment. Stage 3 returned plate and cancellation slip appear enlarged while retaining their shared central bench composition and full-object click areas.
+
+---
+
+## Owner-approved Stage 4 → Stage 5 handoff refinement — 2026-11-02
+
+This later instruction supersedes any implementation that advertises Flint or advances
+to Stage 5 the moment the second job is complete. It does not change the three
+completed tasks, their approved evidence, or NPC dialogue.
+
+- All three routes finish their work in the current location. The completion
+  display must not disclose Flint, the Wage Claim, a fight, or the next-stage title.
+- After the work has been recorded, the player explicitly chooses to **leave
+  the depot**, **leave the Contracts office**, or **leave the records room**.
+- Until that action is saved, the player remains in Stage 4. On the action,
+  the game saves the exit and transitions into the industrial service passage.
+- Flint's sudden appearance is revealed **only after** the player exits. The
+  actual confrontation remains the approved Stage 5 script and uses only
+  evidence from the player's chosen Stage 4 branch.
+- Returning to a completed Journal or inspecting an ordinary item cannot
+  trigger the exit. Replay protection and persistence apply to the exit just as
+  they apply to other server-authoritative interactions.
+
+The approved final Contracts-office copy that previously said the player had
+already left is superseded solely at that point: departure is now a separate
+player action. This is a narrative-flow and interaction correction, **not**
+approval of final scene art or UI geometry.
