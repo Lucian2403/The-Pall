@@ -4,7 +4,7 @@
   import {
     WAGE_CLAIM_OPENING,WAGE_CLAIM_INSTRUCTIONS,WAGE_CLAIM_ACTION_LABELS,
     WAGE_CLAIM_STANCE_OUTCOMES,WAGE_CLAIM_DEMAND_INSPECTION,
-    WAGE_CLAIM_CLUB_INSPECTION,WAGE_CLAIM_CART_INSPECTION,
+    WAGE_CLAIM_FLINT_INSPECTION,WAGE_CLAIM_CLUB_INSPECTION,WAGE_CLAIM_CART_INSPECTION,
     wageClaimBeat,wageClaimJournal
   } from '$lib/approved-stage-five';
   import '$lib/workshop-object-labels.css';
@@ -114,10 +114,15 @@
       {/if}
 
       {#if inspectionNote}
-        <div class="inspection" aria-live="polite">
-          <strong>{inspected==='bill'?"Contractor's demand":inspected==='club'?'Short club':'Work cart'}</strong>
-          <p>{inspectionNote}</p>
-        </div>
+        <section class="inspection" aria-live="polite" aria-label="Object inspection">
+          <h3 class="inspection-title">{inspected==='bill'?"Contractor's demand":inspected==='club'?'Flint':'Work cart'}</h3>
+          {#if inspected==='club'}
+            <p class="inspection-text">{WAGE_CLAIM_FLINT_INSPECTION}</p>
+            <p class="inspection-weapon"><strong>His club:</strong> {inspectionNote}</p>
+          {:else}
+            <p class="inspection-text">{inspectionNote}</p>
+          {/if}
+        </section>
       {/if}
       {#if forwardActions.length}
         {#if atChoice}
@@ -213,9 +218,29 @@
   .instruction{font-weight:700}
   .context{color:#463020}
   .current-beat{font-weight:600;white-space:pre-line}
-  .inspection{padding:8px 0;margin:8px 0;border-top:1px solid #ae9272;
-    font:13px/1.4 var(--pall-font-reading,Georgia,serif);color:#4e3221}
-  .inspection p{margin:5px 0 0}
+  /* Inspected objects use the same readable presentation: Flint, cart and paper.
+     This is only descriptive UI, never a dialogue or quest-state transition. */
+  .inspection{
+    box-sizing:border-box;
+    margin:12px 0 14px;
+    padding:12px 14px;
+    background:#f4e5cd;
+    border:1px solid #b99a70;
+    color:#2b2016;
+    overflow-wrap:break-word;
+  }
+  .inspection-title{
+    margin:0 0 8px;
+    font:700 17px/1.3 var(--pall-font-reading,Georgia,serif);
+    color:#2d1d12;
+  }
+  .inspection-text,.inspection-weapon{
+    margin:0;
+    font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
+    color:#342316;
+  }
+  .inspection-weapon{margin-top:10px;padding-top:9px;border-top:1px solid #b99a70}
+  .inspection-weapon strong{font-weight:700;color:#26190f}
   .decision-prompt{margin:10px 0 7px;font:700 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#614126}
   .actions{display:flex;flex-direction:column;gap:7px;margin:10px 0}
   .actions button{appearance:none;min-height:43px;text-align:left;padding:8px 13px;
@@ -258,6 +283,9 @@
     .work-dialogue{position:relative;top:auto;right:auto;max-height:none;
       overflow:visible;width:100%;padding:9px 10px 11px;border-width:15px 17px}
     .speech{font-size:16px}
+    .inspection{padding:11px 12px}
+    .inspection-title{font-size:16px}
+    .inspection-text,.inspection-weapon{font-size:15px;line-height:1.5}
   }
   @media(prefers-reduced-motion:reduce){.object,.actions button{transition:none}}
 </style>
