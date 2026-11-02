@@ -129,3 +129,16 @@ The owner provided `Contracts_Ambience.wav` to play in **both** Millhand Stage 4
 - A confirmed transition out of council interiors stops/resets it immediately. Brief route reloads have the same 2,400 ms continuation grace as the forge. Council sound must not overlap forge, depot or other unrelated places.
 - The actual backdrop/route controls playback; a dialogue popup or journal never controls the room sound. The `/__audio-qa` fixture can switch among forge, depot, Contracts and Scholarship for manual browser checking.
 - Do not invent ambient effects, audio fades, per-route volume multipliers, extra files or gameplay consequences.
+
+
+## Night Alley ambience — Millhand Stage 5/6, 2026-11-02
+
+**Owner recording:** `NightAlley_Ambience.wav`, 157.92 s, 48 kHz stereo, PCM 32-bit, supplied for the **dark industrial service passage only**. The browser version is the exact audio transcoded to `platform/apps/web/static/audio/the-pall/night-alley-ambience.mp3` (48 kHz stereo MP3, 96 kb/s, 1,895,769 bytes; SHA-256 `7b1d1f07962cdb1d1adedb5ad0f73ab3ae4ce1ff9d0817f1f60b3b0fec8485f0`).
+
+- The Stage 5 and pre-combat Stage 6 alley scene explicitly sets `TutorialShell.alleyBackdrop=true`. Merely being a Millhand or in Stage 6 does not activate the loop; the painted alley has to be mounted.
+- One persistent player loops the recording and observes the already-saved **Ambience** slider, master sound mute, user-gesture audio unlock and hidden-tab pause. Brief Stage 5→6 shell remounts keep playback position, like the workshop.
+- Leaving the alley for the forge, Council Contracts, Scholarship, depot, home, character roster or any unrelated scene stops the alley ambience. Forge and Council loops are mutually exclusive with the alley recording; no second loop is layered over it.
+- This recording is environmental sound, not UI/SFX or background music. Music and sound effects retain their own controls and existing rules.
+- The development `/__audio-qa` fixture exercises switching into the alley, remounting it and departing. `npm run verify:night-alley-ambience-asset` verifies the exact committed file.
+
+No invented echo, positional sound or procedural effects are introduced.
