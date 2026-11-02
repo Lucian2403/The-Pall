@@ -21,6 +21,7 @@
   let status=$state<'loading'|'ready'|'login'|'missing'|'stage-four'|'schema'|'unavailable'>('loading');
   let pending=$state(false);
   let errorMessage=$state('');
+  let backStageError=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
   const id=$derived(page.params.id);
@@ -46,8 +47,14 @@
 
   async function perform(action:WageClaimAction){
     const revision=snapshot?.state.revision;
-    if(pending||revision===undefined||!snapshot?.availableActions.includes(action)||!character)return;
-    pending=true;errorMessage='';
+    if(pending||revision===undefined||!character||!snapshot)return;
+    // A Stage 6 character can have an older API still reporting no
+    // previous_dialogue action. Do not silently discard the Back click:
+    // send it to the API so a mismatched backend reports an actionable error.
+    const stageSixBack=action==='previous_dialogue' &&
+      snapshot.stage===6 && snapshot.state.phase==='DONE';
+    if(!stageSixBack&&!snapshot.availableActions.includes(action))return;
+    pending=true;errorMessage='';backStageError='';
     const signature=JSON.stringify([action,revision]);
     if(retrySignature!==signature||!retryId){retryId=crypto.randomUUID();retrySignature=signature;}
     try{
@@ -60,6 +67,7 @@
         snapshot=body;
         character={...character,tutorial:{stage:body.stage,status:body.tutorialStatus}};
         retryId=null;retrySignature=null;
+        backStageError='';
       }else{
         errorMessage=body.error==='stale_revision'
           ?'Your saved conversation changed elsewhere. The scene has been reloaded.'
@@ -68,17 +76,28 @@
           :body.error==='wrong_wage_claim_phase'
           ?'That action is not available in this part of the conversation.'
           :'Could not save the conversation: '+(body.error??response.status);
-        if(response.status===409){retryId=null;retrySignature=null;await refresh();}
+        if(action==='previous_dialogue'&&snapshot.stage===6){
+          const restartNeeded=['invalid_action','wrong_wage_claim_phase',
+            'stage_six_not_reversible'].includes(body.error??'');
+          backStageError=restartNeeded
+            ?'The API does not support returning from Stage 6 yet. Pull PR #15, rebuild game-core and restart the API server.'
+            :'Back to Stage 5 failed: '+(body.error??response.status)+'. Check the API response.';
+          // Keep the error next to the button even when the server rejects
+          // the request. Do not reset the completed Stage 4 route.
+        }else if(response.status===409){
+          retryId=null;retrySignature=null;await refresh();
+        }
       }
     }catch{
       errorMessage='The server could not be reached. Retry; the same saved request will not repeat the action.';
+      if(action==='previous_dialogue')backStageError='Back to Stage 5 requires the API server to be running. Restart it and retry.';
     }finally{pending=false;}
   }
 </script>
 
 <svelte:head><title>The Pall — The Wage Claim</title></svelte:head>
 {#if status==='ready' && character && snapshot}
-  <TutorialShell {character} sceneLocation="Industrial service passage" backStageBusy={pending} backToStageFive={()=>perform('previous_dialogue')}>
+  <TutorialShell {character} sceneLocation="Industrial service passage" backStageBusy={pending} {backStageError} backToStageFive={()=>perform('previous_dialogue')}>
     <MillhandWageClaimScene {snapshot} {pending} {errorMessage} {perform}/>
   </TutorialShell>
 {:else}
