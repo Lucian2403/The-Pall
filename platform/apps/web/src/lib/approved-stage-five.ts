@@ -1,11 +1,11 @@
-/** Approved Millhand Stage 5 R01. No fabricated debt amount or combat results.
+/** Approved Millhand Stage 5 R02 (owner-revised opening and demand inspection). No fabricated debt amount or combat results.
  * docs/05-gameplay/onboarding/millhand/stage-5-approved-script.md
  */
 import type {WageClaimState,WageClaimPhase,WageClaimAction} from '@the-pall/game-core';
 type Beat={speaker:'Flint'|'Player'|'Narration';text:string};
 
 export const WAGE_CLAIM_OPENING=
-  'You enter the narrow passage on your way home. A man steps into your path. He has a short club at his side and a folded paper in one hand.';
+  'Flint steps into your way and shoves a folded paper towards you.';
 
 export const WAGE_CLAIM_DIALOGUE:{
   OPENING:readonly Beat[];
@@ -13,11 +13,11 @@ export const WAGE_CLAIM_DIALOGUE:{
   CORNERED_EXCHANGE:readonly Beat[];
 }={
   OPENING:[
-    {speaker:'Flint',text:'You did the plate work for Anvil?'},
-    {speaker:'Player',text:'Yes.'},
-    {speaker:'Flint',text:"They've stopped that lot. The contractor wants money for the delay. They've got you down for the job."},
-    {speaker:'Player',text:"I haven't been paid for that work."},
-    {speaker:'Flint',text:"I wasn't sent to pay you."}
+    {speaker:'Flint',text:"You worked on Anvil's plates?"},
+    {speaker:'Player',text:'Yeah. What of it?'},
+    {speaker:'Flint',text:"Lot's been stopped. Boss wants his money. Says you're paying."},
+    {speaker:'Player',text:"Paying for what? I ain't even got my wages!"},
+    {speaker:'Flint',text:"Don't care. I came to collect."}
   ],
   COMMON_EXCHANGE:[
     {speaker:'Player',text:'That worker number was cancelled. The man died in the fire.'},
@@ -40,7 +40,7 @@ export const WAGE_CLAIM_DIALOGUE:{
 };
 const APPROACH={
   read:[
-    {speaker:'Narration',text:"You read the contractor's paper. You find the disputed plate lot reference and the same cancelled worker number you found in the council's records. The contractor has entered a processing charge against you as the worker assigned to the lot. There is no record of wages being paid to you."},
+    {speaker:'Narration',text:"You snatch the paper and unfold it. There's the plate lot number. And that worker number again. The same one the council had marked as cancelled.\n\nYou read further. They've put a charge against your name for the delay. But your wages? Not a word about those.\n\nBloody hell. They haven't paid you a penny, and now they want money from you."},
     {speaker:'Player',text:'Why have they put the charge on me?'},
     {speaker:'Flint',text:"They've got you down for the work. The contractor sent me to collect it."}
   ],
