@@ -192,3 +192,39 @@ No outcome is entered here until Stage 6 resolves; no invented damage, hidden th
 - Stage 6 combat, clinic treatment and home/rent follow, while the deeper record fraud remains unresolved.
 - The currently playable Millhand v0.4.1 is **not** updated by this draft.
 
+
+---
+
+## Owner-approved presentation refinement — Walking home before Flint appears (2026-11-02)
+
+The player leaves their completed Stage 4 workplace using **one** contextual
+exit control. There is no second generic "Leave the workplace" button.
+
+The next screen initially paints only the existing industrial-passage backdrop.
+Flint's standing cutout, nameplate and interactive inspection target are
+**not rendered yet**. There are no clickable cart or contractor-paper labels
+during the prologue. The parchment dialogue has the neutral heading
+**ON THE WAY HOME · STAGE 5**, narrates the player's walk home, and ends
+with recognizing Flint near the work cart. A single **Continue** action moves
+to the existing approved Stage 5 R03 opening without skipping or rewriting
+any Flint dialogue:
+
+- **Depot:** "You leave the municipal depot and start towards home. The work is done, though you still haven't seen a coin for it."
+- **Contracts:** "You leave the Contracts office and head for home. Your complaint has been recorded; the wages are another matter."
+- **Records:** "You leave the records room and make for home, still thinking about the altered entry."
+
+For all three routes, the introduction then continues:
+
+> The industrial passage is quiet beneath the gas lamps. A man stands farther
+> along near a work cart. As you draw closer, you recognize him. Flint.
+
+This is an actual saved **APPROACHING** dialogue phase. The server's next
+`continue_dialogue` action switches to the existing **OPENING** phase at
+beat zero, where Flint's cutout and nameplate appear with the originally
+approved text "Flint steps into your way and shoves a folded paper towards
+you." Backward dialogue from that opening can revisit the prologue.
+
+Characters already saved in OPENING, later Stage 5 phases, or Stage 6
+remain valid; they do not have their saved dialogue position reset or their
+completed work replayed. The extra beat is presentation and persistence,
+not a combat, XP, money or item action.

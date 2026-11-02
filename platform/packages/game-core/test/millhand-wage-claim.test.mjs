@@ -9,13 +9,22 @@ const apply=(s,action)=>{
   return advanceWageClaim(s,action);
 };
 const beats=(s,n)=>{for(let i=0;i<n;i++)s=apply(s,'continue_dialogue');return s;};
+const start=branch=>{
+  const intro=initialWageClaim(branch);
+  assert.equal(intro.phase,'APPROACHING');
+  assert.deepEqual(availableWageClaimActions(intro),['continue_dialogue']);
+  const opening=apply(intro,'continue_dialogue');
+  assert.equal(opening.phase,'OPENING');
+  assert.equal(opening.dialogueIndex,0);
+  return opening;
+};
 
 for(const branch of ['restamp','contracts','records']){
   for(const approach of ['read_demand','challenge_authority']){
     for(const stance of ['brace_and_defend','keep_moving','use_cart_as_cover']){
       test('Stage 5 '+branch+' / '+approach+' / '+stance+' reaches real fight boundary',()=>{
-        let s=initialWageClaim(branch);
-        assert.equal(s.revision,0);
+        let s=start(branch);
+        assert.equal(s.revision,1);
         assert.equal(s.phase,'OPENING');
         assert.equal(s.dialogueIndex,0);
         assert.throws(()=>advanceWageClaim(s,'brace_and_defend'),WageClaimInvalidAction);
@@ -53,7 +62,7 @@ for(const branch of ['restamp','contracts','records']){
   }
 }
 test('Each spoken beat advances only on a committed action and survives reload',()=>{
- let s=initialWageClaim('records');
+ let s=start('records');
  s=apply(s,'continue_dialogue');
  assert.equal(s.dialogueIndex,1);
  const saved=JSON.parse(JSON.stringify(s));
@@ -70,8 +79,8 @@ test('Invalid or unapproved branch cannot create a Stage 5 state',()=>{
 });
 
 test('Previous dialogue walks backwards across every phase with saved state intact',()=>{
- let s=initialWageClaim('contracts');
- assert.equal(availableWageClaimActions(s).includes('previous_dialogue'),false);
+ let s=start('contracts');
+ assert.equal(availableWageClaimActions(s).includes('previous_dialogue'),true);
  s=beats(s,5);
  s=apply(s,'read_demand');
  s=beats(s,3);
@@ -95,7 +104,8 @@ test('Previous dialogue walks backwards across every phase with saved state inta
   ['COMMON_EXCHANGE',2],['COMMON_EXCHANGE',1],['COMMON_EXCHANGE',0],
   ['APPROACH_EXCHANGE',2],['APPROACH_EXCHANGE',1],['APPROACH_EXCHANGE',0],
   ['CHOOSE_APPROACH',0],
-  ['OPENING',4],['OPENING',3],['OPENING',2],['OPENING',1],['OPENING',0]
+  ['OPENING',4],['OPENING',3],['OPENING',2],['OPENING',1],['OPENING',0],
+  ['APPROACHING',0]
  ];
  for(const [phase,index] of phases){
    s=apply(s,'previous_dialogue');
@@ -109,11 +119,15 @@ test('Previous dialogue walks backwards across every phase with saved state inta
  assert.equal(availableWageClaimActions(s).includes('previous_dialogue'),false);
  assert.throws(()=>advanceWageClaim(s,'previous_dialogue'),WageClaimInvalidAction);
  const repeated=apply(s,'continue_dialogue');
- assert.equal(repeated.dialogueIndex,1);
- assert.equal(apply(repeated,'previous_dialogue').dialogueIndex,0);
+ assert.equal(repeated.phase,'OPENING');
+ assert.equal(repeated.dialogueIndex,0);
+ const advanced=apply(repeated,'continue_dialogue');
+ assert.equal(advanced.dialogueIndex,1);
+ assert.equal(apply(advanced,'previous_dialogue').dialogueIndex,0);
+ assert.equal(apply(repeated,'previous_dialogue').phase,'APPROACHING');
 });
 test('Stage 6 pre-combat boundary returns to Stage 5 stance selection',()=>{
- let s=initialWageClaim('restamp');
+ let s=start('restamp');
  s=beats(s,5);s=apply(s,'challenge_authority');s=beats(s,3);
  s=beats(s,7);s=apply(s,'share_route_evidence');s=beats(s,3);
  s=apply(s,'say_going_home');s=beats(s,8);
@@ -132,7 +146,7 @@ test('Stage 6 pre-combat boundary returns to Stage 5 stance selection',()=>{
 for(const branch of ['restamp','contracts','records']){
  for(const originalApproach of ['read_demand','challenge_authority']){
   test('Previous dialogue stops at every selected choice for '+branch+' / '+originalApproach,()=>{
-   let s=beats(initialWageClaim(branch),5);
+   let s=beats(start(branch),5);
    assert.equal(s.phase,'CHOOSE_APPROACH');
    s=apply(s,originalApproach);
    assert.equal(s.phase,'APPROACH_EXCHANGE');
@@ -172,7 +186,7 @@ for(const branch of ['restamp','contracts','records']){
 }
 
 test('Owner R03: Flint gesture is its own saved beat and Previous stops on it',()=>{
- let s=initialWageClaim('records');
+ let s=start('records');
  const forward=(action)=>{s=advanceWageClaim(s,action);};
  for(let i=0;i<5;i++)forward('continue_dialogue');
  forward('read_demand');
@@ -189,4 +203,39 @@ test('Owner R03: Flint gesture is its own saved beat and Previous stops on it',(
  forward('continue_dialogue');
  assert.equal(s.phase,'CHOOSE_EVIDENCE','Only seventh common beat transitions to evidence choice');
  assert.deepEqual(availableWageClaimActions(s),['share_route_evidence','previous_dialogue']);
+});
+
+test('Walk-home prologue is the first saved action and has no back or premature encounter',()=>{
+  for(const branch of ['restamp','contracts','records']){
+    const initial=initialWageClaim(branch);
+    assert.equal(initial.phase,'APPROACHING');
+    assert.equal(initial.revision,0);
+    assert.equal(initial.dialogueIndex,0);
+    assert.equal(initial.branch,branch);
+    assert.deepEqual(availableWageClaimActions(initial),['continue_dialogue']);
+    assert.throws(()=>advanceWageClaim(initial,'previous_dialogue'),WageClaimInvalidAction);
+    assert.throws(()=>advanceWageClaim(initial,'read_demand'),WageClaimInvalidAction);
+    assert.throws(()=>advanceWageClaim({...initial,dialogueIndex:2},'continue_dialogue'),WageClaimInvalidAction);
+    const persisted=JSON.parse(JSON.stringify(initial));
+    const revealed=apply(persisted,'continue_dialogue');
+    assert.equal(revealed.phase,'OPENING');
+    assert.equal(revealed.revision,1);
+    assert.equal(revealed.dialogueIndex,0);
+    assert.equal(revealed.branch,branch);
+    const returned=apply(revealed,'previous_dialogue');
+    assert.equal(returned.phase,'APPROACHING');
+    assert.equal(returned.revision,2);
+    assert.deepEqual(availableWageClaimActions(returned),['continue_dialogue']);
+    assert.equal('coins' in revealed,false);
+    assert.equal('xp' in revealed,false);
+    assert.equal('health' in revealed,false);
+  }
+});
+
+test('Existing saved Stage 5 OPENING phase remains valid without prologue reset',()=>{
+  const saved={...initialWageClaim('contracts'),phase:'OPENING',revision:17,dialogueIndex:2};
+  const next=apply(saved,'continue_dialogue');
+  assert.equal(next.phase,'OPENING');
+  assert.equal(next.dialogueIndex,3);
+  assert.equal(next.revision,18);
 });

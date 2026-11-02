@@ -6,7 +6,7 @@
 import type {MissingStampBranch} from './millhand-missing-stamp.js';
 
 export type WageClaimPhase =
-  | 'OPENING' | 'CHOOSE_APPROACH' | 'APPROACH_EXCHANGE'
+  | 'APPROACHING' | 'OPENING' | 'CHOOSE_APPROACH' | 'APPROACH_EXCHANGE'
   | 'COMMON_EXCHANGE' | 'CHOOSE_EVIDENCE' | 'EVIDENCE_EXCHANGE'
   | 'LEAVING' | 'CORNERED_EXCHANGE' | 'CHOOSE_STANCE' | 'DONE';
 
@@ -44,15 +44,16 @@ export const WAGE_CLAIM_DIALOGUE_COUNTS={
 export function initialWageClaim(branch:MissingStampBranch):WageClaimState {
   if(branch!=='restamp'&&branch!=='contracts'&&branch!=='records')
     throw new WageClaimInvalidAction('invalid_wage_claim_branch');
-  return {revision:0,branch,phase:'OPENING',dialogueIndex:0,
+  return {revision:0,branch,phase:'APPROACHING',dialogueIndex:0,
     approach:null,stance:null,lastAction:null};
 }
 /** Previous moves one *saved* beat backward. Once combat is connected,
  * the API must reject it after a Stage 6 encounter has started. */
 export function availableWageClaimActions(s:WageClaimState):readonly WageClaimAction[]{
   const back:WageClaimAction[]=
-    s.phase==='OPENING' && s.dialogueIndex===0?[]:['previous_dialogue'];
+    s.phase==='APPROACHING'?[]:['previous_dialogue'];
   switch(s.phase){
+    case 'APPROACHING':
     case 'OPENING':
     case 'APPROACH_EXCHANGE':
     case 'COMMON_EXCHANGE':
@@ -73,7 +74,9 @@ export function previousWageClaim(s:WageClaimState):WageClaimState{
   if(!availableWageClaimActions(s).includes('previous_dialogue'))
     throw new WageClaimInvalidAction('previous_dialogue_not_available');
   let {phase,dialogueIndex,approach,stance}=s;
-  if(phase==='DONE'){
+  if(phase==='OPENING'&&dialogueIndex===0){
+    phase='APPROACHING';
+  }else if(phase==='DONE'){
     phase='CHOOSE_STANCE';dialogueIndex=0;stance=null;
   }else if(phase==='CHOOSE_APPROACH'){
     phase='OPENING';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.OPENING-1;
@@ -108,17 +111,23 @@ export function advanceWageClaim(s:WageClaimState,action:WageClaimAction):WageCl
   if(action==='previous_dialogue')return previousWageClaim(s);
   let {phase,dialogueIndex,approach,stance}=s;
   if(action==='continue_dialogue'){
-    if(!(phase in WAGE_CLAIM_DIALOGUE_COUNTS))throw new WageClaimInvalidAction();
-    const count=WAGE_CLAIM_DIALOGUE_COUNTS[phase as keyof typeof WAGE_CLAIM_DIALOGUE_COUNTS];
-    if(!Number.isSafeInteger(dialogueIndex)||dialogueIndex<0||dialogueIndex>=count)
-      throw new WageClaimInvalidAction('invalid_dialogue_index');
-    if(dialogueIndex<count-1)dialogueIndex++;
-    else{
-      dialogueIndex=0;
-      phase=phase==='OPENING'?'CHOOSE_APPROACH'
-        :phase==='APPROACH_EXCHANGE'?'COMMON_EXCHANGE'
-        :phase==='COMMON_EXCHANGE'?'CHOOSE_EVIDENCE'
-        :phase==='EVIDENCE_EXCHANGE'?'LEAVING':'CHOOSE_STANCE';
+    if(phase==='APPROACHING'){
+      if(dialogueIndex!==0)throw new WageClaimInvalidAction('invalid_dialogue_index');
+      // Reveal Flint only after this server-authoritative Continue action.
+      phase='OPENING';dialogueIndex=0;
+    }else{
+      if(!(phase in WAGE_CLAIM_DIALOGUE_COUNTS))throw new WageClaimInvalidAction();
+      const count=WAGE_CLAIM_DIALOGUE_COUNTS[phase as keyof typeof WAGE_CLAIM_DIALOGUE_COUNTS];
+      if(!Number.isSafeInteger(dialogueIndex)||dialogueIndex<0||dialogueIndex>=count)
+        throw new WageClaimInvalidAction('invalid_dialogue_index');
+      if(dialogueIndex<count-1)dialogueIndex++;
+      else{
+        dialogueIndex=0;
+        phase=phase==='OPENING'?'CHOOSE_APPROACH'
+          :phase==='APPROACH_EXCHANGE'?'COMMON_EXCHANGE'
+          :phase==='COMMON_EXCHANGE'?'CHOOSE_EVIDENCE'
+          :phase==='EVIDENCE_EXCHANGE'?'LEAVING':'CHOOSE_STANCE';
+      }
     }
   }else{
     switch(action){

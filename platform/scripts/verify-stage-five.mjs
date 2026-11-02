@@ -58,6 +58,24 @@ assert.ok(scene.includes("white-space:pre-line") &&
 for(const branch of ['restamp','contracts','records']){
   assert.match(copy,new RegExp(branch+':\\['),'Missing branch-only evidence: '+branch);
 }
+assert.ok(core.includes("phase:'APPROACHING'") &&
+  core.includes("case 'APPROACHING':") &&
+  core.includes("phase='OPENING';dialogueIndex=0") &&
+  core.includes("phase='APPROACHING'"),
+  'The saved walk-home prologue must be reversible and precede the approved opening');
+assert.ok(copy.includes('WAGE_CLAIM_WALK_HOME') &&
+  copy.includes('You leave the municipal depot and start towards home.') &&
+  copy.includes('You leave the Contracts office and head for home.') &&
+  copy.includes('You leave the records room and make for home') &&
+  copy.includes('As you draw closer, you recognize him. Flint.') &&
+  canon.includes('Owner-approved presentation refinement — Walking home before Flint appears'),
+  'All three introduction routes must respect the approved neutral arrival');
+assert.ok(scene.includes("{#if !approaching}") &&
+  scene.includes("WAGE_CLAIM_WALK_HOME[state.branch]") &&
+  scene.includes("{approaching?'ON THE WAY HOME'") &&
+  scene.includes('const canGoBack=$derived(state.phase!==\'APPROACHING\')') &&
+  scene.includes("aria-label={approaching?'Journey home narration'"),
+  'The intro must suppress Flint and his inspection label until Continue');
 assert.match(core,/initialWageClaim/);
 assert.match(core,/availableWageClaimActions/);
 assert.match(core,/advanceWageClaim/);

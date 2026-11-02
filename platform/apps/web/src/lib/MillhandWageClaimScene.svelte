@@ -2,7 +2,7 @@
   import {tick} from 'svelte';
   import type {WageClaimState,WageClaimAction} from '@the-pall/game-core';
   import {
-    WAGE_CLAIM_OPENING,WAGE_CLAIM_INSTRUCTIONS,WAGE_CLAIM_ACTION_LABELS,
+    WAGE_CLAIM_WALK_HOME,WAGE_CLAIM_OPENING,WAGE_CLAIM_INSTRUCTIONS,WAGE_CLAIM_ACTION_LABELS,
     WAGE_CLAIM_STANCE_OUTCOMES,WAGE_CLAIM_DEMAND_INSPECTION,
     WAGE_CLAIM_FLINT_INSPECTION,WAGE_CLAIM_CLUB_INSPECTION,WAGE_CLAIM_CART_INSPECTION,
     wageClaimBeat,wageClaimJournal
@@ -19,13 +19,14 @@
     perform:(action:WageClaimAction)=>Promise<void>;
   }=$props();
   const state=$derived(snapshot.state);
+  const approaching=$derived(state.phase==='APPROACHING');
   const beat=$derived(wageClaimBeat(state));
   const journal=$derived(wageClaimJournal(state));
-  const offered=$derived(state.phase!=='OPENING');
+  const offered=$derived(!approaching&&state.phase!=='OPENING');
   // Compute Back availability from saved position. This stays visible even
   // during a stale local API build that omits the previous_dialogue action,
   // so the user receives a clear server error instead of a dead button.
-  const canGoBack=$derived(state.phase!=='OPENING'||state.dialogueIndex>0);
+  const canGoBack=$derived(state.phase!=='APPROACHING');
   const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'].includes(state.phase));
   const forwardActions=$derived(snapshot.availableActions.filter(a=>a!=='previous_dialogue'));
   let flintImageMissing=$state(false);
@@ -61,11 +62,12 @@
   }
 </script>
 
-<section class="second-job wage-claim" aria-label="Millhand Stage 5 The Wage Claim and Cornered">
+<section class="second-job wage-claim" aria-label={approaching?'On the way home, Stage 5':'Millhand Stage 5 The Wage Claim and Cornered'}>
   <div class="alley-scene">
     <div class="alley-art" role="img"
       aria-label="A narrow industrial service passage in Grand Cylinder City, lit by gas lamps, with a wooden work cart to one side"></div>
-    <!-- Flint and his club are one physical inspection target, not two detached labels. -->
+    {#if !approaching}
+      <!-- Show Flint and his club only after the saved Continue action. -->
     <button type="button" class="flint-figure" data-pall-sfx="click"
       aria-label="Inspect Flint and his club" aria-pressed={inspected==='club'}
       onclick={()=>inspect('club')}>
@@ -81,6 +83,7 @@
       aria-pressed={inspected==='cart'} onclick={()=>inspect('cart')}>
       <span class="workshop-object-label">Work cart</span>
     </button>
+    {/if}
     {#if offered}
       <button type="button" class="object bill" data-pall-sfx="paper"
         aria-label="Examine the contractor's folded demand"
@@ -90,8 +93,8 @@
       </button>
     {/if}
 
-    <aside class="work-dialogue" aria-label="Flint dialogue and confrontation">
-      <p class="eyebrow">{cornered?'CORNERED':'THE WAGE CLAIM'} · STAGE 5</p>
+    <aside class="work-dialogue" aria-label={approaching?'Journey home narration':'Flint dialogue and confrontation'}>
+      <p class="eyebrow">{approaching?'ON THE WAY HOME':cornered?'CORNERED':'THE WAGE CLAIM'} · STAGE 5</p>
       {#if state.phase==='OPENING'}
         <p class="context">{WAGE_CLAIM_OPENING}</p>
       {/if}
@@ -102,6 +105,8 @@
           <p class="speaker">{beat.speaker==='Player'?'You':'Flint'}</p>
           <p class="speech">“{beat.text}”</p>
         {/if}
+      {:else if approaching}
+        <p class="context current-beat">{WAGE_CLAIM_WALK_HOME[state.branch]}</p>
       {:else if state.phase==='CHOOSE_STANCE'}
         <p class="context">You have to choose how to meet him. Flint is close enough to strike if you try to push past.</p>
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
@@ -157,9 +162,9 @@
 
   {#if journalOpen}
     <section id="wage-claim-journal" class="journal" bind:this={journalElement}
-      aria-label="The Wage Claim personal journal">
+      aria-label={approaching?'Personal journal':'The Wage Claim personal journal'}>
       <header class="journal-head">
-        <div><small>PERSONAL JOURNAL</small><h2>The Wage Claim</h2></div>
+        <div><small>PERSONAL JOURNAL</small><h2>{approaching?'On the way home':'The Wage Claim'}</h2></div>
         <button type="button" class="journal-button" data-pall-sfx="paper"
           onclick={()=>{void toggleJournal();}}>Close journal</button>
       </header>

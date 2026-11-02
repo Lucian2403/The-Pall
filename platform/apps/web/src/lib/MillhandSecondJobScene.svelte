@@ -27,7 +27,7 @@
     state.phase==='CONTRACTS_DIALOGUE'||state.phase==='ARCHIVE_DIALOGUE');
   const beat=$derived(speaking?dialogue[state.dialogueIndex]:null);
   const journal=$derived(secondJobJournal(state));
-  const actions=$derived(snapshot.availableActions);
+  const actions=$derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
   const committed=$derived((state.phase==='DONE'||state.phase==='EXITED'));
   async function toggleJournal(){

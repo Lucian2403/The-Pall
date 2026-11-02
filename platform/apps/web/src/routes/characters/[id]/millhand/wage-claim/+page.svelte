@@ -53,7 +53,7 @@
     // Always send an eligible Back request; old API versions must return
     // an explanatory error rather than making the button appear broken.
     const previousAllowed=action==='previous_dialogue' &&
-      (snapshot.state.phase!=='OPENING'||snapshot.state.dialogueIndex>0);
+      snapshot.state.phase!=='APPROACHING';
     if(!previousAllowed&&!snapshot.availableActions.includes(action))return;
     pending=true;errorMessage='';backStageError='';
     const signature=JSON.stringify([action,revision]);
