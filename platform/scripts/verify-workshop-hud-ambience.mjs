@@ -123,8 +123,29 @@ assert.ok(audio.includes("councilOfficeAmbienceFile='contracts-scholarship-ambie
   hud.includes('stopCouncilOfficeAmbience()') &&
   depotPage.includes("councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'}") &&
   mainLayout.includes('stopCouncilOfficeAmbience();') &&
-  settings.includes('Contracts office and records room'),
+  settings.includes("Flint's dark alley"),
   'Contracts and Scholarship must share one backdrop-scoped indoor loop without altering the forge or music');
+const alleyPage=read('apps/web/src/routes/characters/[id]/millhand/wage-claim/+page.svelte');
+const alleyScene=read('apps/web/src/lib/MillhandWageClaimScene.svelte');
+assert.ok(audio.includes("nightAlleyAmbienceFile='night-alley-ambience.mp3'") &&
+  audio.includes("activeAmbienceScene='alley'") &&
+  audio.includes('alleyAmbienceOwners=new Set<symbol>()') &&
+  audio.includes('export function claimNightAlleyAmbience()') &&
+  audio.includes('export function stopNightAlleyAmbience()') &&
+  audio.includes('alleyAmbience.loop=true') &&
+  audio.includes('alleyAmbience.load()') &&
+  audio.includes('cancelAlleyDeparture()') &&
+  audio.includes('deferAlleyDeparture()') &&
+  audio.includes('updateAlleyAmbience()') &&
+  hud.includes('alleyBackdrop = false') &&
+  hud.includes('if(alleyBackdrop)return claimNightAlleyAmbience()') &&
+  hud.includes('stopNightAlleyAmbience()') &&
+  alleyPage.includes('alleyBackdrop={true}') &&
+  alleyScene.includes("url('/locations/alley/alley-background.webp')") &&
+  !depotPage.includes('alleyBackdrop={true}') &&
+  mainLayout.includes('stopNightAlleyAmbience();') &&
+  qaPage.includes('alleyBackdrop={alleyVisible}'),
+  'Night Alley must play only in the painted Stage 5/6 passage and stop in other locations');
 assert.ok(!audio.includes("music.loop=true") &&
   audio.includes("music.loop=false") &&
   audio.includes('MUSIC_PAUSE_MIN_MS=30_000') &&
