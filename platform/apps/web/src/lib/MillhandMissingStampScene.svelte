@@ -135,7 +135,7 @@
         }}
         aria-label="Speak to Guther Anvil"
       >
-        <span class="npc-label">Guther Anvil</span>
+        <span class="workshop-npc-label">Guther Anvil</span>
       </button>
     </div>
 
@@ -386,6 +386,8 @@
       <button
         type="button"
         class:seen={state.plateRead}
+        data-workshop-object data-pall-sfx="click"
+        aria-pressed={inspectedView === "plate"}
         disabled={state.phase === "CONFRONT" ||
           state.phase === "DECISION" ||
           state.phase === "RESTAMP"}
@@ -405,6 +407,8 @@
       <button
         type="button"
         class:seen={state.slipRead}
+        data-workshop-object data-pall-sfx="paper"
+        aria-pressed={inspectedView === "slip"}
         disabled={state.phase === "CONFRONT" ||
           state.phase === "DECISION" ||
           state.phase === "RESTAMP"}
@@ -422,21 +426,11 @@
         >
       </button>
     </div>
-  </div>
-  <div class="scene-footer">
-    <p class="footnote">
-      Council-owned evidence. No wages, ordinary XP or items are awarded during
-      this scene.
-    </p>
-    <button
-      type="button"
-      class="journal-toggle journal-outside"
-      aria-expanded={journalOpen}
-      aria-controls="stage-three-journal"
-      onclick={() => {
-        void toggleJournal();
-      }}>{journalOpen ? "Close journal" : "Review journal"}</button
-    >
+    <button type="button" class="journal-toggle journal-outside" data-pall-sfx="paper"
+      aria-expanded={journalOpen} aria-controls="stage-three-journal"
+      onclick={() => {void toggleJournal();}}>
+      {journalOpen ? "Close journal" : "Review journal"}
+    </button>
   </div>
   {#if journalOpen}
     <section
@@ -540,17 +534,6 @@
   .npc-hotspot:disabled {
     cursor: default;
     opacity: 0.7;
-  }
-  .npc-label {
-    padding: 5px 9px;
-    border: 1px solid #a4804d;
-    background: #19150edc;
-    font: 12px sans-serif;
-  }
-  .npc-hotspot:hover .npc-label,
-  .npc-hotspot:focus-visible .npc-label {
-    background: #3c2b19;
-    border-color: #efd092;
   }
   /* The image itself is the prop and hit target. Only the small nameplate is framed. */
   /* Anchor the full clickable cutouts to the actual foreground wood instead
@@ -757,38 +740,24 @@
     font: 12px/1.45 sans-serif;
     color: #614e39;
   }
-  .scene-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 7px 13px;
-    background: #201c17;
-    border-top: 1px solid #594229;
-  }
-  .scene-footer .footnote {
-    border: 0;
-    padding: 0;
-    flex: 1;
-    margin: 0;
-  }
   .journal-outside {
-    flex: none;
-    white-space: nowrap;
+    position:absolute;z-index:7;top:10px;right:clamp(8px,1vw,18px);
+    max-width:10.5%;min-width:100px;min-height:40px;white-space:normal;
   }
   .journal-toggle {
-    padding: 7px 10px;
-    background: #d8c7a7;
-    border: 1px solid #81654d;
-    color: #3a281b;
-    cursor: pointer;
-    font: 600 15px/1.3 var(--pall-font-reading, Georgia, serif);
+    box-sizing:border-box;min-height:40px;padding:3px 8px;
+    border:solid transparent;border-width:10px 17px 9px;
+    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+    border-image-slice:50 180 45 180 fill;border-image-width:10px 17px 9px;
+    border-image-repeat:stretch;border-radius:0;background:transparent;
+    color:#2e1d11;cursor:pointer;
+    font:600 15px/1.3 var(--pall-font-reading,Georgia,serif);
   }
-  .journal-toggle:hover,
-  .journal-toggle:focus-visible {
-    background: #e7d2ae;
-    border-color: #54351c;
+  .journal-toggle:hover,.journal-toggle:focus-visible {
+    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');color:#24170d;
   }
+  .journal-toggle:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
+  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   /* A separate page-flow journal: it cannot stretch the floating dialogue
      or move the tabletop props. The page scrolls; neither panel has a scrollbar. */
   .journal-panel {
@@ -830,13 +799,6 @@
   .error {
     font: 13px/1.4 sans-serif;
     color: #873523;
-  }
-  .footnote {
-    padding: 9px 14px;
-    background: #201c17;
-    border-top: 1px solid #594229;
-    color: #cbb8a0;
-    font: 12px/1.5 sans-serif;
   }
   @media (max-width: 700px) {
     .scene {
@@ -900,12 +862,7 @@
     .record-illustration img {
       max-height: 300px;
     }
-    .scene-footer {
-      flex-wrap: wrap;
-    }
-    .scene-footer .footnote {
-      min-width: 180px;
-    }
+    .journal-outside{top:8px;right:8px;max-width:none;min-width:104px}
     .story,
     .speech,
     .finding {

@@ -1,7 +1,8 @@
 /* One owner-provided nine-slice caption for all interactive tabletop cutouts.
  * Stages 1-3, depot, Contracts and records reuse the same style.
  * Entire object hitboxes remain separate from the framed visible labels. */
-:is(.workshop,.second-job) .workshop-object-label{
+:is(.workshop,.second-job) .workshop-object-label,
+.workshop .workshop-npc-label{
   box-sizing:border-box;
   display:flex;
   align-items:center;
@@ -27,8 +28,11 @@
 :is(.workshop,.second-job) :is(.prop-marker,.target,.evidence button,.table-prop,.record-prop):is(:hover,:focus-visible,[aria-pressed="true"],.seen,.chosen,.selected) .workshop-object-label{
   filter:brightness(1.08);
 }
+.workshop .workshop-npc-label{width:min(100%,200px)}
+.workshop .npc-hotspot:is(:hover,:focus-visible):not(:disabled) .workshop-npc-label{filter:brightness(1.08)}
 @media(max-width:700px){
-  :is(.workshop,.second-job) .workshop-object-label{
+  :is(.workshop,.second-job) .workshop-object-label,
+  .workshop .workshop-npc-label{
     min-height:34px;
     border-width:9px 11px 8px;
     border-image-width:9px 11px 8px;
