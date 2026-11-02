@@ -3,8 +3,15 @@ on:
   pull_request:
     paths:
       - 'platform/apps/web/src/lib/**'
+      - 'platform/apps/web/src/routes/**'
+      - 'platform/apps/api/src/**'
+      - 'platform/packages/game-core/src/**'
+      - 'platform/packages/game-core/test/**'
+      - 'platform/db/migrations/0006_millhand_wage_claim.sql'
       - 'platform/scripts/verify-stage3-workbench-ui.mjs'
       - 'platform/scripts/verify-stage4-transport-ui.mjs'
+      - 'platform/scripts/verify-stage-four.mjs'
+      - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/package.json'
       - '.github/workflows/verify-stage3-workbench.yml'
   push:
@@ -30,5 +37,7 @@ jobs:
       - run: npm run build:packages
       - run: npm run verify:stage3-workbench-ui
       - run: npm run verify:stage4-transport-ui
-      - run: node --test packages/game-core/test/millhand-second-job.test.mjs
+      - run: node --test packages/game-core/test/millhand-second-job.test.mjs packages/game-core/test/millhand-wage-claim.test.mjs
+      - run: npm run verify:stage-four
+      - run: npm run verify:stage-five
       - run: npm run build -w @the-pall/web
