@@ -154,9 +154,9 @@
       {#if state.revision === 0}
         <p class="context">{STAGE_FOUR_ROUTES.contracts.entry}</p>
       {/if}
-      {#if state.phase === "DONE"}
+      {#if (state.phase === "DONE" || state.phase === "EXITED")}
         <p class="outcome">{STAGE_FOUR_FINAL.contracts}</p>
-        <StageFourNextStep />
+        <StageFourNextStep {snapshot} {pending} {perform} />
       {:else if speaking && beat}
         <p class="speaker">
           {beat.speaker === "Player" ? "You" : beat.speaker}
