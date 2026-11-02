@@ -147,7 +147,7 @@ export function secondJobJournal(s: SecondJobState): readonly string[] {
     if (s.revision > 0) result.push('I checked the plates and compared the load with the work paper.');
     if (s.transport === 'secured') result.push('I secured the plates together and carried them to the depot as one load.');
     if (s.transport === 'smaller_loads') result.push('I carried the plates in smaller groups. It took more trips, but each load was easier to handle.');
-    if (s.phase === 'SPEAK_DEPOT' || s.phase === 'DEPOT_DIALOGUE' || s.phase === 'CHOOSE_RECEIPT' || s.phase === 'COMPLETE_DELIVERY' || s.phase === 'DONE')
+    if (s.phase === 'SPEAK_DEPOT' || s.phase === 'DEPOT_DIALOGUE' || s.phase === 'CHOOSE_RECEIPT' || s.phase === 'COMPLETE_DELIVERY' || s.phase === 'DONE' || s.phase === 'EXITED')
       result.push("Delivered metal plates to the depot. Someone had entered “workers” on the delivery list. Workers! The clerk could see what I'd brought.");
     if (s.receipt === 'recorded_plates') result.push('I recorded the received goods as plates.');
     if (s.receipt === 'requested_correction') result.push('I asked the depot clerk to check the incorrect entry before I signed.');
