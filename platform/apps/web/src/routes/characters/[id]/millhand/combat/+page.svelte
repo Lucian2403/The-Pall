@@ -4,12 +4,13 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import MillhandCombatScene from '$lib/MillhandCombatScene.svelte';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
+  import type {CombatSnapshot} from '$lib/millhand-combat-model';
 
   type Character={id:string;name:string;origin:string;sex:string;
     avatarId?:string|null;coins:number;health:{current:number;maximum:number};
     startingLocation:string;tutorial:{stage:number;status:string}};
-  type Snapshot={needsStart?:boolean;revision:number;status:'active'|'finished';
-    legalActions:string[];[key:string]:unknown};
+  type Snapshot=CombatSnapshot;
+  type PendingStart={needsStart:true;stage:number};
   let character=$state<Character|null>(null);
   let battle=$state<Snapshot|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'prerequisite'|'schema'|'unavailable'>('loading');
@@ -41,9 +42,9 @@
       if(fight.status===503){status='schema';return;}
       if(!person.ok||!fight.ok){status='unavailable';return;}
       character=(await person.json() as {character:Character}).character;
-      const state=await fight.json() as Snapshot;
-      if(state.needsStart)await initialize();
-      else battle=state;
+      const state=await fight.json() as Snapshot|PendingStart;
+      if('needsStart' in state && state.needsStart)await initialize();
+      else battle=state as Snapshot;
       status='ready';
     }catch(error){
       status='unavailable';
