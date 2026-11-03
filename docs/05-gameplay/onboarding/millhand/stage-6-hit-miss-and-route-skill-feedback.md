@@ -48,3 +48,28 @@ It does not run any SQL UPDATE, award extra XP or grant an additional skill.
 The existing character page fetch already retrieves the saved
 `majorSkillBonuses` on mount with `cache:'no-store'`; old characters
 receive this display correction without any migration or replay.
+
+## Follow-up: floating text on consecutive rounds (2026-11-04)
+
+The first implementation reconstructed the latest turn by comparing two
+`events` arrays. Those arrays are the Battle Chronicle's rolling
+120-event window. A failed overlap match meant valid later damage/miss
+events were discarded, explaining missing floating feedback after the
+first display.
+
+The combat engine already places the exact just-resolved events in
+`state.events` before advancing `revision` and `round`. The public
+Stage 6 snapshot now includes `turnEvents:state.events` **in addition
+to** the unchanged chronological `events` list. Neither engine output
+nor chronological record is modified.
+
+The browser processes `turnEvents` exclusively after a successful
+turn response where `next.revision === previous.revision + 1`, checking
+that each event belongs to the resolved round. It uses the same
+authoritative per-turn events for combat SFX. Loading a saved fight does
+not trigger a floating animation. Identical revisions, rejected turns,
+and stale history do not replay feedback.
+
+The Stage 6 verifier simulates twenty consecutive turns with alternating
+damage/miss targets while rotating the entire historical Chronicle,
+checking that every eligible turn receives a fresh animation key.

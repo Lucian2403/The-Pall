@@ -8,26 +8,19 @@ export type CombatFloatingFeedback={
   label:string;
 };
 
-/** Returns only events appended in a successful turn, even if the Chronicle
- * is rolling over its server-side history limit. Unknown history is ignored
- * rather than risking replay of old impacts on refresh or stale requests. */
+/** Only a newly committed turn may produce floating text.
+ *
+ * The authoritative engine clears state.events before each resolution and
+ * fills it with that turn's events. combatView forwards those verbatim in
+ * turnEvents. Unlike the rolling 120-line Chronicle, this always identifies
+ * the turn correctly and does not depend on historical array overlaps.
+ */
 export function newSavedCombatEvents(
-  previous:Pick<CombatSnapshot,'events'|'revision'>,
-  next:Pick<CombatSnapshot,'events'|'revision'>
+  previous:Pick<CombatSnapshot,'revision'|'round'>,
+  next:Pick<CombatSnapshot,'revision'|'turnEvents'>
 ):CombatEventView[] {
   if(next.revision!==previous.revision+1)return [];
-  const before=previous.events;
-  const after=next.events;
-  if(before.length===0)return after;
-  const maxOverlap=Math.min(before.length,after.length);
-  for(let length=maxOverlap;length>0;length--){
-    const start=before.length-length;
-    const matches=before.slice(start).every((event,index)=>
-      JSON.stringify(event)===JSON.stringify(after[index])
-    );
-    if(matches)return after.slice(length);
-  }
-  return [];
+  return next.turnEvents.filter(event=>event.round===previous.round);
 }
 
 /** Hit damage is the actual damage from the server event, not a calculation

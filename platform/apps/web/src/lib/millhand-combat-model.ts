@@ -15,7 +15,8 @@ export type CombatEventView={
 export type CombatSnapshot={
   status:'active'|'finished';outcome:string|null;stance:'brace'|'moving'|'cart';
   round:number;revision:number;distance:string;enemyIntent:string|null;intentType:string|null;
-  player:CombatActorView;enemy:CombatActorView;legalActions:string[];events:CombatEventView[];
+  player:CombatActorView;enemy:CombatActorView;legalActions:string[];
+  events:CombatEventView[];turnEvents:CombatEventView[];
   rules:{
     strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
     recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
