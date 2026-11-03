@@ -90,7 +90,7 @@ assert.ok(canon.includes('Major Skills use a long 0–100 progression') &&
   canon.includes('grants **+3 levels** to the chosen background Major Skill'),
   'Canonical progression rule changed: revisit UI treatment before merging');
 assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
-  panelMarkup.includes("grant+' / 100'") &&
+  panelMarkup.includes("majorSkillDisplayLevel(origin,major,majorSkillBonuses)+' / 100'") &&
   panelMarkup.includes("'1 / 100'") &&
   panelMarkup.includes("The API stores")===false &&
   panelMarkup.includes('provisional display baseline') &&
@@ -286,5 +286,31 @@ assert.ok(markup.includes("isMeasured(value:Measured|undefined)") &&
   !markup.includes('character.stamina??0') &&
   !markup.includes('character.focus??0'),
   'Outside combat Stamina remains provisional when untracked; combat may supply the measured value');
+
+// Existing Stage 3 saves already persist a once-only +1 majorSkillBonuses
+// entry for the selected second-job route. With the approved provisional
+// 1/100 UI baseline, the grant must display as 2/100 without altering SQL.
+const {majorSkillDisplayLevel}=await import('../apps/web/src/lib/major-skill-display.ts');
+const starting={Craftsmanship:3};
+assert.equal(majorSkillDisplayLevel('Millhand','Craftsmanship',starting),3);
+assert.equal(majorSkillDisplayLevel('Millhand','Industry',starting),1);
+assert.equal(majorSkillDisplayLevel('Millhand','Commerce',starting),1);
+assert.equal(majorSkillDisplayLevel('Millhand','Scholarship',starting),1);
+for(const major of ['Industry','Commerce','Scholarship']){
+  const granted={...starting,[major]:1};
+  assert.equal(majorSkillDisplayLevel('Millhand',major,granted),2,
+    'The already-persisted second-job grant must visibly raise '+major);
+  assert.equal(majorSkillDisplayLevel('Millhand','Craftsmanship',granted),3,
+    'The original Craftsmanship +3 must not become +4');
+  assert.equal(majorSkillDisplayLevel('Millhand','Arms',granted),1);
+  assert.equal(majorSkillDisplayLevel('Bellrunner',major,granted),1,
+    'Never infer additional levels for other origins');
+}
+assert.ok(panelMarkup.includes('import {majorSkillDisplayLevel}') &&
+  panelMarkup.includes("secondJobRouteAward(major:string)") &&
+  panelMarkup.includes('title={majorSkillTitle(group.major)}') &&
+  panelMarkup.includes('A Millhand\'s chosen second-job route adds +1'),
+  'The major skill list and full skills window must explain the route +1');
+
 console.log('PASS: Wide unframed notice, readable parchment attributes, framed skill dropdowns, six original resource icons with honest API state and existing game contracts.');
 
