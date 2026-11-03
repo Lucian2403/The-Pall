@@ -1,12 +1,12 @@
 import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
+import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
 import {createHash, randomUUID} from 'node:crypto';
 import {APPROVED_STARTING_FACTS, ORIGIN_CATALOGUE} from '@the-pall/game-core';
 import {INITIAL_CHARACTER_SLOT_LIMIT, parseCreateCharacterCommand} from '@the-pall/contracts';
 import {auth} from './auth.js';
 
-const pool = new pg.Pool({connectionString: process.env.DATABASE_URL});
 const CHARACTER_UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const STARTING_LOCATIONS: Record<string, string> = {
   Millhand: 'Smithing workshop',
@@ -42,11 +42,21 @@ function serialize(row: CharacterRow) {
   };
 }
 
-export function registerCharacterRoutes(app: FastifyInstance) {
-  app.addHook('onClose', async () => {await pool.end();});
+type SessionAccount={user:{id:string;emailVerified:boolean}}|null;
+type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
+
+/** An in-process test can supply an isolated database and verified identity
+ * resolver. Production always uses Better Auth and its own PostgreSQL pool. */
+export function registerCharacterRoutes(app:FastifyInstance,options:{
+  pool?:pg.Pool;resolveSession?:SessionResolver;
+}={}) {
+  const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
+    auth.api.getSession({headers:fromNodeHeaders(headers)}));
+  app.addHook('onClose',async()=>{if(!options.pool)await pool.end();});
 
   app.get('/api/characters', async (request, reply) => {
-    const session = await auth.api.getSession({headers: fromNodeHeaders(request.headers)});
+    const session = await resolveSession(request.headers);
     if (!session?.user.emailVerified) return reply.code(401).send({error: 'unauthorized'});
     const client = await pool.connect();
     try {
@@ -68,7 +78,7 @@ export function registerCharacterRoutes(app: FastifyInstance) {
   });
 
   app.get<{Params: {id: string}}>('/api/characters/:id', async (request, reply) => {
-    const session = await auth.api.getSession({headers: fromNodeHeaders(request.headers)});
+    const session = await resolveSession(request.headers);
     if (!session?.user.emailVerified) return reply.code(401).send({error: 'unauthorized'});
     if (!CHARACTER_UUID.test(request.params.id)) return reply.code(404).send({error: 'not_found'});
     const result = await pool.query(`SELECT ${columns} FROM player_characters WHERE id=$1 AND account_id=$2`, [request.params.id, session.user.id]);
@@ -77,7 +87,7 @@ export function registerCharacterRoutes(app: FastifyInstance) {
   });
 
   app.post('/api/characters', async (request, reply) => {
-    const session = await auth.api.getSession({headers: fromNodeHeaders(request.headers)});
+    const session = await resolveSession(request.headers);
     if (!session?.user.emailVerified) return reply.code(401).send({error: 'unauthorized'});
 
     // Reject cross-origin browser writes; local Vite proxy shares AUTH_BASE_URL.
@@ -165,7 +175,7 @@ export function registerCharacterRoutes(app: FastifyInstance) {
   // Every destructive action is account-owned and serialized against the same
   // account roster revision as creation. No foreign key cascade is assumed.
   app.delete<{Params:{id:string}}>('/api/characters/:id',async(request,reply)=>{
-    const session=await auth.api.getSession({headers:fromNodeHeaders(request.headers)});
+    const session=await resolveSession(request.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!CHARACTER_UUID.test(request.params.id))return reply.code(404).send({error:'not_found'});
     const origin=request.headers.origin;
@@ -197,6 +207,8 @@ export function registerCharacterRoutes(app: FastifyInstance) {
       // Child rows have ON DELETE RESTRICT. Explicitly clear only this owned
       // character's receipts and chapter states, then its creation receipts.
       for(const table of [
+        'player_character_flint_combat_receipts','player_character_flint_combat',
+        'player_character_wage_claim_receipts','player_character_wage_claim',
         'player_character_second_job_receipts','player_character_second_job',
         'player_character_missing_stamp_receipts','player_character_missing_stamp',
         'player_character_work_receipts','player_character_platework',
@@ -217,7 +229,7 @@ export function registerCharacterRoutes(app: FastifyInstance) {
   });
 
   app.patch<{Params:{id:string}}>('/api/characters/:id/avatar',async(request,reply)=>{
-    const session=await auth.api.getSession({headers:fromNodeHeaders(request.headers)});
+    const session=await resolveSession(request.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!CHARACTER_UUID.test(request.params.id))return reply.code(404).send({error:'not_found'});
     const origin=request.headers.origin;
