@@ -228,4 +228,47 @@ assert.ok(scene.includes('class="aftermath"') &&
   journalReference.includes('.journal-head'),
   'Finished combat must show the established parchment Personal Journal');
 
+
+// Floating text is strictly cosmetic: derive it from new, saved server
+// damage/miss events. No optimistic rolls, no replay of the loaded Chronicle.
+const {newSavedCombatEvents,floatingFeedbackForSavedTurn}=
+  await import('../apps/web/src/lib/millhand-combat-feedback.ts');
+const intent={round:4,kind:'intent',text:'Flint prepares his club'};
+const hit={round:4,kind:'damage',actor:'player',target:'enemy',damage:11,text:'Flint loses 11 Health'};
+const miss={round:4,kind:'miss',actor:'enemy',damage:0,text:'Flint misses'};
+const zero={round:4,kind:'damage',actor:'enemy',target:'player',damage:0,text:'Guard blocks'};
+const before={revision:4,events:[intent],status:'active'};
+const after={revision:5,events:[intent,hit,miss,zero],status:'active'};
+const feedback=floatingFeedbackForSavedTurn(before,after);
+assert.deepEqual(feedback.map(entry=>({target:entry.target,label:entry.label,kind:entry.kind})),[
+  {target:'enemy',label:'−11',kind:'hit'},
+  {target:'player',label:'Miss',kind:'miss'}
+]);
+assert.deepEqual(newSavedCombatEvents(before,after),[hit,miss,zero]);
+assert.deepEqual(floatingFeedbackForSavedTurn(after,after),[],'Same revision must not replay');
+assert.deepEqual(floatingFeedbackForSavedTurn(before,{...after,revision:7}),[],
+  'Skipped/reloaded revisions must not replay unknown events');
+assert.deepEqual(floatingFeedbackForSavedTurn(before,{...after,events:[hit,miss]}),[],
+  'Without historical overlap, no speculative event is displayed');
+assert.deepEqual(floatingFeedbackForSavedTurn(before,{
+  revision:5,events:[intent,{...miss,actor:'player'}],status:'active'
+}).map(entry=>({target:entry.target,kind:entry.kind,label:entry.label})),
+  [{target:'enemy',kind:'miss',label:'Miss'}],
+  'A player miss must float over Flint');
+assert.deepEqual(floatingFeedbackForSavedTurn(before,{
+  revision:5,events:[intent,{...hit,actor:'enemy',target:'player',damage:14}],status:'active'
+}).map(entry=>({target:entry.target,kind:entry.kind,label:entry.label})),
+  [{target:'player',kind:'hit',label:'−14'}],
+  'An enemy hit must float over the player');
+assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous,result):[]') &&
+  page.includes('feedback=[];') &&
+  page.includes('<MillhandCombatScene snapshot={battle} {feedback}') &&
+  scene.includes("feedback.filter(item => item.target === 'enemy')") &&
+  scene.includes("feedback.filter(item => item.target === 'player')") &&
+  scene.includes('class:impact={event.kind === \'damage\'}') &&
+  scene.includes('class:evaded={event.kind === \'miss\'}') &&
+  scene.includes('animation:combat-feedback-float 1100ms') &&
+  scene.includes('@media(prefers-reduced-motion:reduce)'),
+  'Saved-event floating feedback must be targeted, short-lived and accessible');
+
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
