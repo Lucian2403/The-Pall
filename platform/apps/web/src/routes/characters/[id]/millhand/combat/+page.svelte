@@ -5,6 +5,7 @@
   import MillhandCombatScene from '$lib/MillhandCombatScene.svelte';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatSnapshot} from '$lib/millhand-combat-model';
+  import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import {claimCombatSfx} from '$lib/pall-audio';
   import {soundSavedCombatTurn} from '$lib/millhand-combat-sound';
 
@@ -100,7 +101,8 @@
 
 <svelte:head><title>The Pall — The Passage, Flint</title></svelte:head>
 {#if status==='ready' && character && battle}
-  <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}>
+  <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
+    combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
     <MillhandCombatScene snapshot={battle} {pending} {errorMessage} {perform}/>
   </TutorialShell>
 {:else}

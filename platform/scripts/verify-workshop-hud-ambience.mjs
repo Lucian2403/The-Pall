@@ -25,8 +25,10 @@ const qaPage=read('apps/web/src/routes/__audio-qa/+page.svelte');
 // UI state is provisional until the saved character/Flint combat API supplies
 // the actual value; genuine measured values always override the 100/100
 // starting display, and Health is never fabricated or arbitrarily clipped.
-assert.ok(hud.includes("staminaShown=$derived(isMeasured(character.stamina)") &&
+assert.ok(hud.includes("staminaShown=$derived(isMeasured(combatStamina)") &&
+  hud.includes(":isMeasured(character.stamina)") &&
   hud.includes("?character.stamina:{current:100,maximum:100}") &&
+  hud.includes("combatStamina?:{current:number;maximum:number}") &&
   hud.includes("data:staminaShown") &&
   hud.includes("data:character.health") &&
   hud.includes("style={'width:'+percentage(resource.data)+'%'}") &&
