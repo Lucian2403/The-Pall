@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import type {WageClaimState,WageClaimAction} from '@the-pall/game-core';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -67,6 +68,9 @@
       if(response.ok){
         snapshot=body;
         character={...character,tutorial:{stage:body.stage,status:body.tutorialStatus}};
+        if(body.stage===6&&body.state.phase==='DONE'){
+          await goto('/characters/'+encodeURIComponent(character.id)+'/millhand/combat');
+        }
         retryId=null;retrySignature=null;
         backStageError='';
       }else{

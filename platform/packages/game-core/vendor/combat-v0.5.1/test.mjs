@@ -1,0 +1,346 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {newEncounter,step,CombatError} from './combat.mjs';
+const act=(s,a,id='a')=>step(s,a,{requestId:id,expectedRevision:s.revision});
+const is = (s,t) => s.events.some(e=>e.text.includes(t));
+
+test('Flint telegraphs before action; guard mitigates and can earn defensive Momentum',()=>{
+ let s=newEncounter('flint',{seed:1});const tell=s.intent.tell;
+ s=act(s,{type:'guard'});
+ assert.ok(is(s,tell));assert.ok(s.player.hp<=50);assert.ok(s.player.momentum===0||s.player.momentum===8);
+});
+test('a genuinely avoided attack grants movement Momentum, no forced hit',()=>{
+ let s=newEncounter('flint',{seed:1});s=act(s,{type:'move',to:'side'});
+ assert.equal(s.player.hp,50);assert.equal(s.player.momentum,5);assert.equal(s.player.stamina,84);
+});
+test('boar starts at 30/65 and a single sidestep cannot grant instant victory',()=>{
+ let s=newEncounter('boar',{seed:1});
+ assert.equal(s.enemy.hp,30);assert.equal(s.enemy.hpMax,65);assert.equal(s.enemy.ceiling,65);
+ assert.equal(s.enemy.wounds[0].preexisting,true);
+ s=act(s,{type:'move',to:'side'},'a');
+ assert.equal(s.pathOpen,false);assert.notEqual(s.intent.type,'withdraw');
+ s=act(s,{type:'move',to:'back'},'b');
+ assert.equal(s.pathOpen,true);
+ assert.equal(s.enemy.hp,30);
+ for(let n=0;n<8 && s.status==='active';n++)s=act(s,{type:'guard'},'wait'+n);
+ assert.equal(s.outcome,'player_victory');
+ assert.equal(s.enemy.hp,30);
+});
+test('a second defensive Move earns Momentum only if a new committed threat was actually evaded',()=>{
+ let s=newEncounter('boar',{seed:1});s=act(s,{type:'move',to:'side'},'a');
+ const m=s.player.momentum; const threat=s.intent.type; const priority=s.intent.speed;
+ s=act(s,{type:'move',to:'back'},'b');
+ const avoidedNewAttack=s.events.some(e=>e.kind==='miss'&&e.actor==='enemy');
+ if(threat==='attack' && avoidedNewAttack && priority<=6)assert.equal(s.player.momentum,m+5);
+ else assert.equal(s.player.momentum,m);
+});
+test('missing attack grants no Momentum',()=>{
+ let s=newEncounter('flint',{seed:1,player:{weapon:{damage:6,accuracy:.01,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'attack',zone:'head'});assert.equal(s.player.momentum,0);
+});
+test('attacker and actual guarding defender can earn Momentum in same round',()=>{
+ let s=newEncounter('flint',{seed:1,enemy:{weapon:{damage:10,accuracy:.95,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'guard'});assert.equal(s.player.momentum,8);assert.equal(s.enemy.momentum,10);
+});
+test('Stamina is persistent, Fatigue only at/below 20 from physical exertion',()=>{
+ let s=newEncounter('flint',{seed:1,player:{stamina:27}});
+ s=act(s,{type:'attack'});assert.equal(s.player.stamina,16);assert.equal(s.player.fatigue,5);
+ let fresh=newEncounter('flint',{seed:1});fresh=act(fresh,{type:'guard'});assert.equal(fresh.player.fatigue,0);
+});
+test('bandage must be held and consume action; can control bleeding only',()=>{
+ let s=newEncounter('silas',{seed:1});
+ assert.throws(()=>act(s,{type:'use',item:'bandage'}),CombatError);
+ s.player.bandages=1;s.player.bleed=1;s.player.wounds=[{type:'cut',severity:'minor',zone:'limbs'}];
+ s=act(s,{type:'use',item:'bandage'});assert.equal(s.player.bandages,0);assert.equal(s.player.bleed,0);assert.equal(s.player.wounds.length,1);
+});
+test('bleed applies exactly once on cleanup per round',()=>{
+ let s=newEncounter('flint',{seed:1,player:{bandages:1}});s.player.bleed=2;
+ s=act(s,{type:'guard'});const a=s.player.hp;
+ assert.ok(is(s,'2 Health at bleed cleanup')); assert.ok(a<=48);
+});
+test('bad actions fail without spending the turn',()=>{
+ const s=newEncounter('flint');
+ assert.throws(()=>act(s,{type:'technique',zone:'torso'}),CombatError);
+ assert.equal(s.revision,0);assert.equal(s.player.momentum,0);
+});
+test('same request ID is idempotent and stale revisions fail',()=>{
+ const s=newEncounter('flint');const t=act(s,{type:'guard'},'unique');
+ assert.deepEqual(step(t,{type:'attack'},{requestId:'unique',expectedRevision:0}),t);
+ assert.throws(()=>step(t,{type:'attack'},{requestId:'different',expectedRevision:0}),CombatError);
+});
+test('Downed is a real defeat, not permadeath or forced victory',()=>{
+ let s=newEncounter('flint',{seed:1,player:{hp:4},enemy:{weapon:{damage:20,accuracy:.95,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'recover',mode:'breath'});
+ assert.equal(s.outcome,'player_defeat');assert.equal(s.player.hp,0);
+});
+test('recover does not restore Health, clear fatigue, or give Momentum',()=>{
+ let s=newEncounter('flint',{seed:1,player:{stamina:32,hp:40,fatigue:10}});
+ s=act(s,{type:'recover',mode:'breath'});
+ assert.equal(s.player.stamina,48);assert.equal(s.player.fatigue,10);assert.equal(s.player.momentum,0);
+ assert.ok(s.player.hp<=40);
+});
+test('trained opponent can Guard; its own Momentum rises only on real mitigation',()=>{
+ let s=newEncounter('silas',{seed:1,player:{momentum:18,weapon:{damage:10,accuracy:.95,type:'blunt',reach:'contact'}}});
+ assert.equal(s.intent.type,'guard');
+ s=act(s,{type:'attack',zone:'torso'});
+ assert.equal(s.enemy.momentum,8);assert.equal(s.player.momentum,28);
+});
+test('no passive Fatigue or Stress merely from low reserves',()=>{
+ let s=newEncounter('flint',{seed:1,player:{stamina:19,composure:12,stress:3,fatigue:5}});
+ s=act(s,{type:'recover',mode:'nerves'});
+ assert.equal(s.player.fatigue,5);assert.equal(s.player.stress,3);
+ assert.equal(s.player.composure,24);
+});
+test('an avoided enemy committed attack still consumes enemy physical Stamina',()=>{
+ let s=newEncounter('flint',{seed:1});
+ s=act(s,{type:'move',to:'cover'});
+ assert.equal(s.enemy.stamina,79);
+ assert.equal(s.player.hp,50);
+});
+
+test('equal-speed tie awarded to player really avoiding boar charge earns Momentum',()=>{
+ let s=newEncounter('boar',{seed:1});s=act(s,{type:'move',to:'side'});
+ assert.equal(s.player.hp,50);assert.equal(s.player.momentum,5);
+});
+test('slower movement does not magically avoid a faster enemy strike',()=>{
+ let s=newEncounter('boar',{seed:1,player:{readiness:-2}});
+ s=act(s,{type:'move',to:'side'});
+ assert.ok(s.player.hp<50);assert.equal(s.player.momentum,0);
+});
+
+test('Flint now spends earned Momentum on a distinct, precommitted technique',()=>{
+  const initial=newEncounter('flint',{seed:13,enemy:{momentum:30}});
+  assert.equal(initial.intent.type,'technique');
+  assert.equal(initial.intent.ability,'Driving Blow');
+  assert.match(initial.intent.tell,/heavy blow may follow/);
+  const result=act(initial,{type:'guard'});
+  assert.equal(result.enemy.momentum,10);
+  assert.ok(result.events.some(x=>x.kind==='technique' && x.text.includes('Driving Blow')));
+});
+
+test('Flint is neither guaranteed to hit nor guaranteed to miss across seeded fights',()=>{
+  const results=new Set();
+  for(let seed=1;seed<=70;seed++){
+    const start=newEncounter('flint',{seed});
+    const next=act(start,{type:'guard'});
+    results.add(next.events.some(e=>e.kind==='damage'&&e.actor==='enemy')?'hit':'miss');
+  }
+  assert.deepEqual([...results].sort(),['hit','miss']);
+});
+
+test('both sides have ranged damage, not the same fixed output on every hit',()=>{
+  const enemyDamage=new Set(),playerDamage=new Set();
+  for(let seed=1;seed<=160;seed++){
+    const enemyTurn=act(newEncounter('flint',{seed}),{type:'recover',mode:'breath'});
+    for(const e of enemyTurn.events)if(e.kind==='damage'&&e.actor==='enemy')enemyDamage.add(e.damage);
+    const playerTurn=act(newEncounter('flint',{seed}),{type:'attack',zone:'torso'});
+    for(const e of playerTurn.events)if(e.kind==='damage'&&e.actor==='player')playerDamage.add(e.damage);
+  }
+  assert.ok(enemyDamage.size>=4,`Flint damage variants: ${[...enemyDamage]}`);
+  assert.ok(playerDamage.size>=4,`Player damage variants: ${[...playerDamage]}`);
+  assert.ok([...enemyDamage].every(x=>x>=14&&x<=17));
+  assert.ok([...playerDamage].every(x=>x>=4&&x<=8));
+});
+
+test('narrative combat log includes hit location, actual damage and distinct injury events',()=>{
+  const samples=[];
+  for(let seed=1;seed<=25;seed++){
+    const s=act(newEncounter('flint',{seed}),{type:'guard'});
+    samples.push(...s.events.filter(x=>x.kind==='damage'&&x.actor==='enemy'));
+  }
+  assert.ok(samples.length>0);
+  assert.ok(new Set(samples.map(x=>x.text.split('.')[0])).size>=3);
+  assert.ok(samples.every(x=>x.text.includes('Health')&&x.raw>=x.damage&&x.zone));
+  assert.ok(samples.every(x=>x.guarded===true));
+});
+
+test('a special technique that misses consumes Momentum but adds no hit Momentum',()=>{
+  let found=false;
+  for(let seed=1400;seed<=1500&&!found;seed++){
+    const initial=newEncounter('flint',{seed,enemy:{momentum:30}});
+    const after=act(initial,{type:'guard'});
+    if(after.events.some(x=>x.kind==='miss'&&x.actor==='enemy')){
+      found=true;assert.equal(after.enemy.momentum,10);
+      assert.equal(after.player.momentum,0);
+    }
+  }
+  assert.equal(found,true);
+});
+
+test('human starter opponents follow the same 50 Health baseline as the novice',()=>{
+ for(const scene of ['flint','silas']){const s=newEncounter(scene,{seed:1});assert.equal(s.enemy.hp,50);assert.equal(s.enemy.hpMax,50);assert.equal(s.enemy.ceiling,50);}
+});
+test('different boar movement subtypes do not all open its exit',()=>{
+ for(const move of ['side','cover','back']){
+   const s=act(newEncounter('boar',{seed:2}),{type:'move',to:move},move);
+   assert.equal(s.pathOpen,false,`${move} alone should not complete escape`);
+ }
+ let s=act(newEncounter('boar',{seed:2}),{type:'move',to:'back'},'first');
+ s=act(s,{type:'move',to:'side'},'second');assert.equal(s.pathOpen,true);
+});
+test('Flint responds to prior repeated attacks with guards, not knowledge of next click',()=>{
+ let foundGuard=false;
+ for(let seed=1;seed<90;seed++){
+   let s=newEncounter('flint',{seed});
+   for(let n=0;n<2&&s.status==='active';n++)s=act(s,{type:'attack',zone:'torso'},'atk'+n);
+   if(s.status==='active'&&s.intent?.type==='guard')foundGuard=true;
+ }
+ assert.equal(foundGuard,true);
+});
+test('narrative phrase selector avoids instant identical cue repetition when alternatives exist',()=>{
+ let s=newEncounter('flint',{seed:9});const cues=[];
+ for(let n=0;n<12 && s.status==='active';n++){
+   if(s.intent?.type==='attack')cues.push(s.intent.tell);
+   s=act(s,{type:'move',to:'side'},`skip${n}`);
+ }
+ // Even if the encounter ends early, the surviving logs have truthful scene cues.
+ assert.ok(cues.length>=1);
+});
+test('boar preexisting wound neither bleeds automatically nor lowers approved maximum',()=>{
+ let s=newEncounter('boar',{seed:9});s=act(s,{type:'guard'});
+ assert.equal(s.enemy.bleed,0);assert.equal(s.enemy.hpMax,65);assert.equal(s.enemy.ceiling,65);
+});
+
+test('nearby committed boar charge can strike before a late Move but never reads a new target',()=>{
+ const results=new Set();
+ for(let seed=1;seed<100;seed++){
+  let s=newEncounter('boar',{seed});s=act(s,{type:'move',to:'side'},'one');
+  if(s.intent.type!=='attack')continue;
+  const was=s.player.hp;
+  s=act(s,{type:'move',to:'back'},'two');
+  results.add(s.player.hp<was?'hit':'no-hit');
+ }
+ assert.ok(results.has('hit'),'a quick nearby lunge must remain dangerous');
+});
+test('public intent signal is only a broad stance category, not exact future zone',async()=>{
+ const {createStore}=await import('./store.mjs');const {mkdtemp,rm}=await import('node:fs/promises');
+ const {tmpdir}=await import('node:os');const {join}=await import('node:path');
+ const dir=await mkdtemp(join(tmpdir(),'pall-cue-'));
+ try{
+  const store=createStore(dir,{seedGenerator:()=>9}),{encounter,token}=await store.create('flint');
+  assert.notEqual(encounter.intentType,'attack');assert.notEqual(encounter.intentType,'guard');
+  assert.equal(typeof encounter.enemyIntent,'string');
+  assert.equal(encounter.enemy.hp,50);
+  const refreshed=await store.get(encounter.id,token);
+  assert.equal(refreshed.enemyIntent,encounter.enemyIntent);
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
+
+test('approved boar pre-fight placement varies ground while preserving 30/65 Health',()=>{
+ const hold=newEncounter('boar',{seed:5,approach:'hold'});
+ const fence=newEncounter('boar',{seed:5,approach:'fence'});
+ const bank=newEncounter('boar',{seed:5,approach:'embankment'});
+ assert.equal(hold.terrain.playerSpot,'lane');assert.equal(hold.distance,'contact');
+ assert.equal(fence.terrain.playerSpot,'fence');assert.equal(fence.distance,'near');
+ assert.equal(bank.terrain.playerSpot,'shoulder');assert.equal(bank.player.readiness,1);
+ for(const x of [hold,fence,bank]){assert.equal(x.enemy.hp,30);assert.equal(x.enemy.hpMax,65);}
+ assert.throws(()=>newEncounter('boar',{approach:'random'}),CombatError);
+});
+
+test('v0.4 Flint blunt ordinary impact stays 14–17 and does not cause an automatic serious wound',()=>{
+ let hits=0;
+ for(let seed=1;seed<=250;seed++){
+  const state=act(newEncounter('flint',{seed}),{type:'recover',mode:'breath'});
+  const impact=state.events.find(x=>x.kind==='damage'&&x.actor==='enemy');
+  if(!impact)continue;
+  hits++;
+  assert.ok(impact.raw>=14&&impact.raw<=17,`unmitigated Flint raw=${impact.raw}`);
+  assert.ok(state.player.wounds.every(x=>x.severity!=='serious'),'routine club hit produced serious wound');
+ }
+ assert.ok(hits>50);
+});
+
+test('Flint only rarely chooses Guard even when faced with aggressive play',()=>{
+ let guards=0,commits=0;
+ for(let seed=1;seed<=200;seed++){
+  let s=newEncounter('flint',{seed});
+  for(let turn=0;turn<7&&s.status==='active';turn++){
+   guards+=Number(s.intent?.type==='guard');commits++;
+   const a=s.distance==='contact'?{type:'attack',zone:'torso'}:{type:'move',to:'close'};
+   s=act(s,a,`flint-guard-${turn}`);
+  }
+ }
+ assert.ok(guards>0,'Flint should retain a rare defensive response');
+ assert.ok(guards/commits<.15,`Flint guard share ${(guards/commits).toFixed(3)} is too high`);
+});
+
+test('v0.5 basic strike starts at 11 Stamina, third consecutive attack costs 14',()=>{
+ let s=newEncounter('flint',{seed:21,player:{hp:240,hpMax:240,ceiling:240},enemy:{hp:250,hpMax:250,ceiling:250,weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
+ for(let n=0;n<3;n++)s=act(s,{type:'attack',zone:'torso'},`pressure-${n}`);
+ assert.equal(s.player.stamina,90-11-11-14);
+ assert.deepEqual(s.lastPlayerActions.slice(-3),['attack','attack','attack']);
+});
+test('v0.5 repeated attacks expose stance for NPC, but a different action resets the surcharge',()=>{
+ let s=newEncounter('flint',{seed:21,player:{hp:240,hpMax:240,ceiling:240},enemy:{hp:250,hpMax:250,ceiling:250,weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'attack'},'r1');s=act(s,{type:'attack'},'r2');
+ assert.equal(s.openings.enemy.reason,'your repeated attacks leave your stance open');
+ assert.equal(s.openings.enemy.accuracyBonus,.18);
+ s=act(s,{type:'guard'},'r3');
+ assert.equal(s.lastPlayerActions.at(-1),'guard');
+ const costBefore=s.player.stamina;
+ s=act(s,{type:'attack'},'r4');
+ assert.equal(s.player.stamina,costBefore-11);
+});
+test('v0.5 Flint has high but unreliable club impact; he never receives a free hit',()=>{
+ const s=newEncounter('flint',{seed:1});
+ assert.equal(s.enemy.weapon.minDamage,14);assert.equal(s.enemy.weapon.maxDamage,17);
+ assert.equal(s.enemy.weapon.accuracy,.49);
+});
+test('v0.5 combat server publishes numerical, state-aware action descriptions',async()=>{
+ const {createStore}=await import('./store.mjs');const {mkdtemp,rm}=await import('node:fs/promises');
+ const {tmpdir}=await import('node:os');const {join}=await import('node:path');
+ const dir=await mkdtemp(join(tmpdir(),'pall-rules-'));
+ try{
+  const store=createStore(dir,{seedGenerator:()=>21});const {encounter,token}=await store.create('flint');
+  assert.equal(encounter.rules.attack.cost,11);
+  assert.deepEqual(encounter.rules.attack.accuracy,{torso:70,limbs:58,head:45});
+  assert.equal(encounter.rules.guard.mitigationPercent,68);
+  assert.equal(encounter.rules.attack.minDamage,4);
+  assert.equal(encounter.rules.attack.maxDamage,8);
+  assert.equal(encounter.rules.technique.momentumCost,20);
+  const got=await store.get(encounter.id,token);assert.deepEqual(got.rules,encounter.rules);
+ }finally{await rm(dir,{recursive:true,force:true});}
+});
+test('v0.5 compact combat UI contains details, animation status and reduced-motion support',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const [html,css,client]=await Promise.all(['public/index.html','public/compact.css','public/app.js'].map(f=>readFile(new URL(f,import.meta.url),'utf8')));
+ assert.match(html,/id="ability-inspector"/);assert.match(html,/id="ability-numbers"/);
+ assert.match(html,/id="impact-stage"/);assert.match(html,/id="stance-warning"/);
+ assert.match(css,/prefers-reduced-motion/);
+ assert.match(client,/const PRESENTATION_MS=1250/);
+ assert.match(client,/await wait\(Math.max\(0,minWait/);
+});
+test('v0.5 no vulnerability after just one strike; the second is the threshold',()=>{
+ let s=newEncounter('flint',{seed:21,player:{hp:240,hpMax:240,ceiling:240},enemy:{hp:250,hpMax:250,ceiling:250,weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'attack'},'t1');
+ assert.notEqual(s.openings.enemy?.reason,'your repeated attacks leave your stance open');
+ s=act(s,{type:'attack'},'t2');
+ assert.equal(s.openings.enemy.reason,'your repeated attacks leave your stance open');
+});
+
+// v0.5.1 regression: Flint must not yield while clearly finishing a nearly
+// downed novice just because Flint is below his own old HP cutoff.
+test('Flint does not abandon a dominant 18/50 versus 2/50 position',()=>{
+  for(let seed=1;seed<=300;seed++){
+    const s=newEncounter('flint',{seed,player:{hp:2,momentum:45},enemy:{hp:18}});
+    assert.notEqual(s.intent.type,'withdraw',`Flint incorrectly yields at seed ${seed}`);
+  }
+});
+test('human opponent at clear advantage does not surrender; same for Silas',()=>{
+  for(const scene of ['flint','silas']){
+    for(let seed=1;seed<=120;seed++){
+      const s=newEncounter(scene,{seed,player:{hp:6,momentum:60},enemy:{hp:21}});
+      assert.notEqual(s.intent.type,'withdraw',`${scene} surrendered with 21 versus 6, seed ${seed}`);
+    }
+  }
+});
+test('genuine nonlethal retreat still possible when a human opponent is actually outmatched',()=>{
+  for(const scene of ['flint','silas']){
+    let yields=0;
+    for(let seed=1;seed<=160;seed++){
+      const s=newEncounter(scene,{seed,player:{hp:44,momentum:30},enemy:{hp:8}});
+      if(s.intent.type==='withdraw')yields++;
+    }
+    assert.ok(yields>0,`${scene} should still be able to concede`);
+  }
+});

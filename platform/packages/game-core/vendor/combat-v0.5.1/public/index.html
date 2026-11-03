@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171d1d">
+  <title>The Pall · The Fighting Ground</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/compact.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+<div class="site-shell">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="The Pall home"><span class="brand-seal" aria-hidden="true">P</span><span>THE PALL<small>COMBAT TEST · 0.5</small></span></a>
+    <div class="topbar-right"><span class="local-status"><i></i> LOCAL TEST BUILD</span><button id="fresh" type="button" class="text-button">Change encounter ↗</button></div>
+  </header>
+  <main>
+    <section id="selection" class="selection-section">
+      <div class="selection-head"><p class="overline">01 / CHOOSE YOUR OPPONENT</p><h1>Three fights. Three kinds of trouble.</h1><p>Each confrontation uses the same rules. The opponent's motives, actions and surroundings change the decisions you make.</p></div>
+      <div class="encounter-grid">
+        <button data-scene="flint" class="encounter-card" type="button"><span class="card-num">01 — MILLHAND</span><span class="card-illustration" aria-hidden="true">⚒</span><strong>Flint</strong><span>Close quarters. A club, a cart, and a man who thinks he can collect by force.</span><b>Enter the passage <span aria-hidden="true">→</span></b></button>
+        <button data-scene="boar" class="encounter-card" type="button"><span class="card-num">02 — SQUATTER</span><span class="card-illustration" aria-hidden="true">⌁</span><strong>Injured boar</strong><span>One frightened animal. A broken fence. Survival means making space.</span><b>Enter the path <span aria-hidden="true">→</span></b></button>
+        <button data-scene="silas" class="encounter-card" type="button"><span class="card-num">03 — INKBOUND</span><span class="card-illustration" aria-hidden="true">⚑</span><strong>Silas Pumpard</strong><span>A coal hook and a locked box. Silas wants you driven away from his post.</span><b>Enter the yard <span aria-hidden="true">→</span></b></button>
+      </div>
+      <div class="starting-position">
+        <label for="boar-approach">BOAR ENCOUNTER · PRIOR POSITION</label>
+        <select id="boar-approach">
+          <option value="hold">Hold ground on the narrow path (difficult exit)</option>
+          <option value="fence">Move behind the broken fence (shelter, limited escape)</option>
+          <option value="embankment">Move to the firm stone embankment (better footing)</option>
+        </select>
+        <p>These reproduce approved pre-fight position choices as local test fixtures; they change the opening ground.</p>
+      </div>
+      <p class="footnote">A provisional combat test. Starting stats, damage and AI weights are not final. Encounters save locally to this server.</p>
+    </section>
+
+    <section id="arena" class="arena hidden" aria-label="Current combat encounter">
+      <div class="fight-heading"><div><p id="round-label" class="overline">ROUND 01 · COMBAT IN PROGRESS</p><h1 id="scenario-title">The Service Passage</h1><p id="scene-description" class="scene-description"></p></div><div class="position-pill">POSITION <strong id="scene-distance">CONTACT</strong></div></div>
+
+      <section class="battleground" aria-label="Combatant conditions">
+        <div class="combatant combatant-player">
+          <p class="overline">YOU · UNARMED</p><div class="fighter-heading"><h2>Millhand</h2></div><div id="player-stats"></div>
+        </div>
+        <div class="versus" aria-hidden="true">vs</div>
+        <div class="combatant combatant-foe">
+          <p class="overline">OPPONENT · IN MOTION</p><div class="fighter-heading"><h2 id="enemy-name">Flint</h2></div><div id="enemy-stats"></div>
+        </div>
+      </section>
+
+      <section id="intent-panel" class="intent-panel" aria-label="Committed enemy action">
+        <div class="intent-symbol" aria-hidden="true">!</div><p id="intent-text" aria-live="polite"></p><div id="intent-type" class="intent-type">WATCHFUL</div>
+      </section>
+
+      <p id="terrain-status" class="terrain-status hidden" aria-live="polite"></p>
+      <p id="stance-warning" class="stance-warning hidden" aria-live="polite">You have left your stance open by striking repeatedly. Guard or reposition to regain control.</p>
+      <div class="game-columns">
+        <section class="command-panel" aria-label="Choose your next action">
+          <div class="panel-head compact-head"><h2>Actions</h2><span class="muted" id="action-phase">AWAITING DECISION</span></div>
+          <div id="action-grid" class="action-grid" role="group" aria-label="Combat actions">
+            <button data-choice="attack" type="button"><span class="action-glyph">↗</span><b>Strike</b></button>
+            <button data-choice="guard" type="button"><span class="action-glyph">◇</span><b>Guard</b></button>
+            <button data-choice="move" type="button"><span class="action-glyph">⇢</span><b>Move</b></button>
+            <button data-choice="technique" type="button"><span class="action-glyph">✦</span><b>Technique</b></button>
+            <button data-choice="recover" type="button"><span class="action-glyph">◌</span><b>Recover</b></button>
+            <button data-choice="withdraw" type="button"><span class="action-glyph">↙</span><b>Withdraw</b></button>
+            <button data-choice="use" type="button" class="situational"><span class="action-glyph">+</span><b>Bandage</b></button>
+          </div>
+          <div id="action-details" class="action-details">
+            <p class="detail-kicker">STRIKE · AIM</p><div id="action-settings"></div>
+            <details id="ability-inspector" class="ability-inspector"><summary><span id="ability-title">Strike · Novice</span><strong id="ability-numbers">70% torso · 4–8 damage</strong><span class="detail-more">Details ▾</span></summary><p id="action-description" class="action-description"></p></details>
+          </div>
+          <div class="command-footer"><div class="cost-copy" role="status"><strong id="cost-display">−8 Stamina</strong></div><button id="commit" class="commit-button" type="button">Commit strike <span aria-hidden="true">→</span></button></div>
+          <div id="message" class="message" role="status" aria-live="polite"></div>
+          <div id="impact-stage" class="impact-stage hidden" role="status" aria-live="polite"><span class="impact-spinner" aria-hidden="true"></span><span id="impact-text">Committing action…</span></div>
+        </section>
+        <section class="chronicle-panel" aria-label="Combat history">
+          <div class="panel-head compact-head"><h2>Chronicle</h2><div class="chronicle-tools"><label class="mechanics-switch"><input type="checkbox" id="show-mechanics"> Numbers</label><button id="chronicle-toggle" type="button" class="small-link" aria-expanded="false" aria-controls="log">Expand</button></div></div>
+          <div id="log" class="event-log" aria-live="polite"></div>
+        </section>
+      </div>
+      <div id="result-box" class="result-box hidden" role="status"></div>
+    </section>
+  </main>
+  <footer class="footer"><span>THE PALL · FIELD TEST</span><span>LOCAL PROTOTYPE · NO MMO ACCOUNT, LOOT OR COINS</span></footer>
+</div>
+</body>
+</html>
