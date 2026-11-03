@@ -24,9 +24,9 @@
   };
 
   let {
-    character,children,activePage='scene',sceneLocation,smithingBackdrop=false,
-    councilBackdrop=false,alleyBackdrop=false,depotBackdrop=false,
-    combatStamina,backToStageFive,backStageBusy=false,backStageError=''
+    character,children,activePage = 'scene',sceneLocation,smithingBackdrop = false,
+    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
+    combatStamina,backToStageFive,backStageBusy = false,backStageError = ''
   }:{
     character:SavedCharacter;
     children:Snippet;
