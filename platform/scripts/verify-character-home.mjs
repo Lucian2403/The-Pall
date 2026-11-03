@@ -276,13 +276,15 @@ assert.ok(markup.includes("isMeasured(value:Measured|undefined)") &&
   markup.includes('resource.known?resource.label:\'Not tracked yet\'') &&
   markup.includes("value:formatted(character.stamina??{current:100,maximum:100})") &&
   markup.includes('provisional:!isMeasured(character.stamina)') &&
-  shell.includes("staminaShown=$derived(isMeasured(character.stamina)") &&
+  shell.includes("staminaShown=$derived(isMeasured(combatStamina)") &&
+  shell.includes(":isMeasured(character.stamina)") &&
+  shell.includes("combatStamina?:{current:number;maximum:number}") &&
   shell.includes("{current:100,maximum:100}") &&
   markup.includes("value:formatted(character.focus)") &&
   markup.includes('class:untracked={!resource.known}') &&
   markup.includes('class="resource-grid"') &&
   !markup.includes('character.stamina??0') &&
   !markup.includes('character.focus??0'),
-  'Stamina is an explicitly provisional full bar; other untracked values remain honest dashes');
+  'Outside combat Stamina remains provisional when untracked; combat may supply the measured value');
 console.log('PASS: Wide unframed notice, readable parchment attributes, framed skill dropdowns, six original resource icons with honest API state and existing game contracts.');
 
