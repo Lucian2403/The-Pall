@@ -28,9 +28,13 @@
     :snapshot.enemy.hp<=0
       ?'Flint is on the ground and cannot stop you. You move past him and leave the passage.'
       :'Flint steps aside. You wait until there is room to pass, then leave.');
+  const toughVictory=$derived(snapshot.player.hp<=snapshot.player.hpMax/2 ||
+    snapshot.player.wounds.some(wound=>wound.severity==='serious'));
   const journal=$derived(snapshot.outcome==='player_defeat'
     ?"Flint beat me. Damn it. I thought I could get past him, but I couldn't. Other workers came when they heard the fight, and he left without taking my money. One of them helped me get to medical care. Still not a coin from the council for those plates. A fine day I've had."
-    :"I beat Flint and got past him. That club could've done some damage, but I managed to keep him off me. He didn't get a coin out of me. The council still owes us for the plates, of course.");
+    :toughVictory
+      ?"I beat Flint and got past him. That was tough. For a moment I didn't think I'd manage it, not with that club of his. Everybody knows how hard he is to beat. Well, he didn't get a coin out of me. And after all that, the council still hasn't paid us for those plates."
+      :"I beat Flint and got past him. That club could've done some damage, but I managed to keep him off me. He didn't get a coin out of me. The council still owes us for the plates, of course.");
   function commit(){
     let action:CombatAction;
     switch(visibleSelection){
@@ -62,7 +66,7 @@
       {:else}
         <p class="telegraph-title">Flint's observable intention</p>
         <p class:heavy={snapshot.intentType==='heavy threat'} class="intent">{snapshot.enemyIntent}</p>
-        <p class="position">Distance: {snapshot.distance}. Current position: {snapshot.stance==='cart'?'work cart':snapshot.stance==='moving'?'moving along passage':'braced'}.</p>
+        <p class="position">Distance: {snapshot.distance}. Opening stance: {snapshot.stance==='cart'?'work cart':snapshot.stance==='moving'?'moving along passage':'braced'}.</p>
       {/if}
     </aside>
   </div>
@@ -144,7 +148,9 @@
     </section>
     {#if ended}
       <section class="aftermath" aria-label="Personal journal after the fight">
-        <h3>Personal Journal</h3><p>{journal}</p>
+        <h3>Personal Journal</h3>
+        <p>Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.</p>
+        <p>{journal}</p>
       </section>
     {/if}
   </div>
