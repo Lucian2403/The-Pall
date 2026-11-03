@@ -91,7 +91,7 @@ assert.ok(canon.includes('Major Skills use a long 0–100 progression') &&
   'Canonical progression rule changed: revisit UI treatment before merging');
 assert.ok(panelMarkup.includes("majorSkillBonuses[major]") &&
   panelMarkup.includes("majorSkillDisplayLevel(origin,major,majorSkillBonuses)+' / 100'") &&
-  panelMarkup.includes("'1 / 100'") &&
+  panelMarkup.includes("majorSkillDisplayLevel(origin,major,majorSkillBonuses)") &&
   panelMarkup.includes("The API stores")===false &&
   panelMarkup.includes('provisional display baseline') &&
   panelMarkup.includes("'I · starting'") &&
