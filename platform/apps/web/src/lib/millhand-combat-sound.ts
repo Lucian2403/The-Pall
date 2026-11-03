@@ -15,9 +15,9 @@ export function soundSavedCombatTurn(
 ): void {
   if (next.revision <= previous.revision) return;
 
-  // The engine increments round after resolution. Its saved events retain the
-  // round that was resolved, so only this action's new events are considered.
-  const events = next.events.filter(event => event.round === previous.round);
+  // Combat view exposes the original engine's just-resolved events. Chronicle
+  // history is capped and must not be compared or replayed for sound.
+  const events = next.turnEvents.filter(event => event.round === previous.round);
   if (action.type === 'guard' && events.some(e => e.kind === 'guard' && e.actor === 'player')) {
     playCombatSfx('guard');
   }
