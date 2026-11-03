@@ -59,7 +59,7 @@
       title:'The Fight with Flint',
       description:'Your stance and the fight with Flint are saved. Resume the encounter or review its result.',
       label:'Continue the fight with Flint',
-      href:base+'/millhand/wage-claim'
+      href:base+'/millhand/combat'
     };
     return null;
   });
