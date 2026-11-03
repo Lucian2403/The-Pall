@@ -7,13 +7,13 @@ import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
 import pg from 'pg';
 import {auth} from './auth.js';
-import {INITIAL_PLATEWORK,planMillhandRewind,MillhandRewindInvalid} from '@the-pall/game-core';
-import type {MissingStampBranch} from '@the-pall/game-core';
+import {INITIAL_PLATEWORK,planMillhandRewind,MillhandRewindInvalid,previousWageClaim,WageClaimInvalidAction} from '@the-pall/game-core';
+import type {MissingStampBranch,WageClaimState} from '@the-pall/game-core';
 
 const db = new pg.Pool({connectionString:process.env.DATABASE_URL});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params={id:string};
-type CharacterState={origin:string;tutorial_stage:number;tutorial_status:string;major_skill_bonuses:Record<string,number>};
+type CharacterState={origin:string;tutorial_stage:number;tutorial_status:string;major_skill_bonuses:Record<string,number>;current_health:number;max_health:number};
 
 export function registerMillhandStageRewindRoutes(app:FastifyInstance){
   app.addHook('onClose',async()=>{await db.end();});
@@ -26,13 +26,13 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
     const result=await db.query<CharacterState>(
-      'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses FROM player_characters WHERE id=$1 AND account_id=$2',
+      'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2',
       [req.params.id,session.user.id]
     );
     if(!result.rowCount||result.rows[0].origin!=='Millhand')
       return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
-    return {enabled:true,canRewind:stage>=2&&stage<=5,stage,targetStage:stage>1&&stage<=5?stage-1:null};
+    return {enabled:true,canRewind:stage>=2&&stage<=6,stage,targetStage:stage>1&&stage<=6?stage-1:null};
   });
 
   app.post<{Params:Params}>('/api/characters/:id/dev/rewind-stage',async(req,reply)=>{
@@ -49,7 +49,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
         Object.keys(body).sort().join(',')!=='expectedStage')
       return reply.code(400).send({error:'invalid_body'});
     const expectedStage=(body as {expectedStage:unknown}).expectedStage;
-    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>5)
+    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>6)
       return reply.code(400).send({error:'invalid_stage'});
 
     const client=await db.connect();
@@ -59,7 +59,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
       // Serialise against BOTH Stage 2 and Stage 3 gameplay commands by
       // locking the same owner-scoped character row first.
       const c=await client.query<CharacterState>(
-        'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
+        'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
         [req.params.id,session.user.id]
       );
       if(!c.rowCount||c.rows[0].origin!=='Millhand'){
@@ -70,6 +70,91 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'stale_stage',stage:c.rows[0].tutorial_stage});
       }
+
+      if(expectedStage===6){
+        // Local testing only: restore the exact Health recorded when this
+        // fight began. Never infer it from max Health or manufacture healing.
+        // The same owned character-row lock serializes this with combat turns.
+        const claim=await client.query<{state:WageClaimState}>(
+          'SELECT state FROM player_character_wage_claim WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        if(claim.rows[0]?.state.phase!=='DONE'||!claim.rows[0].state.stance){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_wage_claim_state'});
+        }
+        const combat=await client.query<{
+          state:{player:{hp:number}};stance:string
+        }>(
+          'SELECT state,stance FROM player_character_flint_combat WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        let restoredHealth=c.rows[0].current_health;
+        if(combat.rowCount){
+          const saved=combat.rows[0];
+          if(saved.stance!==claim.rows[0].state.stance||
+              saved.state.player.hp!==c.rows[0].current_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_health_state'});
+          }
+          // Original start receipt: response revision 0. A final-round
+          // snapshot would be an unsafe surrogate for pre-fight Health.
+          const start=await client.query<{response:{
+            revision:number;stance:string;player:{hp:number}
+          }}>(
+            "SELECT response FROM player_character_flint_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+            [req.params.id]
+          );
+          const first=start.rows[0]?.response;
+          if(first?.revision!==0||first.stance!==saved.stance||
+             !Number.isSafeInteger(first.player?.hp)||
+             first.player.hp<=0||first.player.hp>c.rows[0].max_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_initial_health'});
+          }
+          restoredHealth=first.player.hp;
+        }
+        let prior:WageClaimState;
+        try{
+          prior=previousWageClaim(claim.rows[0].state);
+        }catch(error){
+          if(!(error instanceof WageClaimInvalidAction))throw error;
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_wage_claim_state'});
+        }
+        if(prior.phase!=='CHOOSE_STANCE'||prior.stance!==null){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_wage_claim_state'});
+        }
+        // Receipts must be cleared BEFORE their saved encounters. Replaying
+        // a previous request may never reapply old damage after a rewind.
+        await client.query(
+          'DELETE FROM player_character_flint_combat_receipts WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_flint_combat WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_wage_claim_receipts WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'UPDATE player_character_wage_claim SET state=$2::jsonb,revision=$3,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,JSON.stringify(prior),prior.revision]
+        );
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS',current_health=$2 WHERE id=$1",
+          [req.params.id,restoredHealth]
+        );
+        await client.query('COMMIT');transaction=false;
+        return {
+          stage:5,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/millhand/wage-claim'
+        };
+      }
+
       const plate=await client.query<{state:{phase:string}}>(
         'SELECT state FROM player_character_platework WHERE character_id=$1',[req.params.id]
       );
@@ -137,7 +222,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
     } catch(e) {
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
       if((e as {code?:string})?.code==='42P01')
-        return reply.code(503).send({error:'second_job_schema_missing',setup:'npm run second-job:migrate'});
+        return reply.code(503).send({error:expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
+          setup:expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'});
       throw e;
     } finally {client.release();}
   });

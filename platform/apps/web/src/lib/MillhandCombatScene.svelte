@@ -70,12 +70,11 @@
     <div class="stage-scenery">
       <div class="flint" role="img" aria-label="Flint holding his club">
         <img src="/characters/flint/flint-standing.webp" alt="" />
-        <span>FLINT · CONTRACTOR'S COLLECTOR</span>
+        <span class="scene-label flint-label">FLINT · CONTRACTOR'S COLLECTOR</span>
       </div>
-      <span class="cart-marker">WORK CART</span>
+      <span class="cart-marker scene-label">WORK CART</span>
 
       <aside class="parchment" aria-label="Current encounter situation">
-        <p class="kicker">THE PASSAGE · STAGE 6</p>
         <div class="encounter-line">
           <h2>{ended?'The fight ends':'Round '+String(snapshot.round).padStart(2,'0')}</h2>
           {#if !ended}<span class="distance">{snapshot.distance} range</span>{/if}
@@ -413,4 +412,95 @@
     .resources div+div{border-left:0}
   }
   @media(prefers-reduced-motion:reduce){.hp-fill,.action-tile{transition:none}}
+
+  /* Owner's trimmed nine-slice replaces the untrimmed frame and opaque
+     parchment backing. Text stays within the inner paper, not under metal. */
+  .parchment{
+    top:25px;right:2%;width:min(37%,525px);max-width:525px;
+    background:transparent;border-style:solid;border-color:transparent;
+    border-width:21px 25px 20px;padding:12px 15px 13px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:21px 25px 20px;
+    border-image-repeat:stretch;
+    filter:drop-shadow(0 6px 10px #0008)
+  }
+  .parchment h2{font-size:clamp(19px,1.5vw,25px);line-height:1.2}
+  .parchment p{margin-bottom:7px;line-height:1.4}
+  .encounter-line{align-items:center;margin:0 0 10px}
+  .flint .scene-label,.cart-marker.scene-label{
+    box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+    min-height:31px;padding:2px 8px;background:transparent;color:#2e1d11;
+    border:solid transparent;border-width:8px 12px 7px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:8px 12px 7px;
+    border-image-repeat:stretch;
+    font:700 11px/1.15 var(--pall-font-reading,Georgia,serif);
+    letter-spacing:.02em;text-align:center
+  }
+  .flint .scene-label{width:min(100%,250px)}
+  .alley{min-height:clamp(505px,36vw,625px)}
+  /* Smaller framed action tiles. Icons remain the primary labels, while
+     costs and options are still server-derived and keyboard accessible. */
+  .action-zone{left:auto;right:2.2%;bottom:22px;width:min(69%,1090px);gap:7px}
+  .actions-row{grid-template-columns:minmax(0,1fr) minmax(145px,19%);gap:10px}
+  .choices{gap:5px}
+  .action-tile{
+    min-height:69px;padding:2px 3px 3px;background:transparent;color:#2e1d11;
+    border-style:solid;border-color:transparent;border-width:10px 12px 9px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:10px 12px 9px;
+    border-image-repeat:stretch
+  }
+  .action-tile img{width:clamp(27px,2.5vw,38px);height:clamp(27px,2.5vw,38px);
+    filter:brightness(.63) sepia(.25)}
+  .action-tile .action-name{font-size:clamp(10px,.8vw,12px);color:#312116;opacity:.78}
+  .action-tile.chosen{filter:brightness(1.08) drop-shadow(0 0 4px #dca25b);transform:translateY(-1px)}
+  .action-tile.chosen .action-name{color:#2d190c;opacity:1}
+  .confirm-holder{padding-left:10px}
+  .commit{
+    min-height:61px;padding:2px 5px;background:transparent;
+    border-style:solid;border-color:transparent;border-width:10px 12px 9px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:10px 12px 9px;
+    border-image-repeat:stretch;
+    font-size:clamp(11px,.93vw,14px)
+  }
+  .commit img{width:clamp(24px,2.1vw,33px);height:clamp(24px,2.1vw,33px)}
+  .action-details{
+    width:min(100%,640px);min-height:42px;gap:5px 12px;padding:2px 10px;
+    background:transparent;color:#352417;border-style:solid;border-color:transparent;
+    border-width:10px 14px 9px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:10px 14px 9px;
+    border-image-repeat:stretch
+  }
+  .chosen-heading{font-size:13px;padding-right:9px;border-right-color:#917153}
+  .chosen-heading img{width:23px;height:23px;filter:brightness(.65) sepia(.2)}
+  .detail-field label,.detail-text{font-size:12px;color:#4b311c}
+  .detail-note{font-size:11px;color:#795438}
+  .detail-field select{max-width:145px;min-height:26px;background:#f3e2bf;
+    color:#2d1b0f;padding:2px 4px;font-size:12px}
+  @media(max-width:1250px){
+    .action-zone{width:73%;right:1.7%}
+    .action-tile{min-height:63px;padding:2px}
+  }
+  @media(max-width:920px){
+    .action-zone{width:100%;right:auto;left:auto;bottom:auto}
+    .parchment{top:12px;right:2%;width:55%;max-width:none}
+    .alley{min-height:0}
+  }
+  @media(max-width:640px){
+    .parchment{top:8px;right:3%;width:94%;padding:8px 10px;border-width:15px 18px 14px;
+      border-image-width:15px 18px 14px}
+    .action-zone{width:100%;padding:10px 9px 14px}
+    .action-tile{min-height:59px;border-width:7px 8px 7px;border-image-width:7px 8px 7px}
+    .action-tile img{width:29px;height:29px}
+    .commit{min-height:48px}
+  }
+
 </style>

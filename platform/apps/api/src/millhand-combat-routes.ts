@@ -213,7 +213,7 @@ export function registerMillhandCombatRoutes(app:FastifyInstance){
         // No automatic wound type, recovery, coins, XP or tutorial clinic fee.
         await client.query(
           'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
-          [req.params.id,state.player.hp,state.status==='finished'?'COMPLETE':'IN_PROGRESS']);
+          [req.params.id,state.player.hp,state.status==='finished'?'COMPLETED':'IN_PROGRESS']);
       }
       const response=snapshot(record);
       await client.query(
