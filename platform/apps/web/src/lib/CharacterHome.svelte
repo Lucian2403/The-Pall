@@ -57,8 +57,8 @@
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===6) return {
       title:'The Fight with Flint',
-      description:'Your confrontation and opening stance are saved. The approved Stage 6 combat has not been connected yet.',
-      label:'Review the saved confrontation',
+      description:'Your stance and the fight with Flint are saved. Resume the encounter or review its result.',
+      label:'Continue the fight with Flint',
       href:base+'/millhand/wage-claim'
     };
     return null;
