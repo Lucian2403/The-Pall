@@ -172,6 +172,29 @@ test('Three saved stances give distinct first-round tactical states',async()=>{
   assert.equal(results[0].body!.round,2);
 });
 
+test('Closing distance does not collapse Moving and Cart into identical first turns',async()=>{
+  const moving=await character(owner,'moving');
+  const cart=await character(owner,'cart');
+  const m=await start(moving);
+  const c=await start(cart);
+  const [moved,covered]=await Promise.all([
+    turn(moving,m,{type:'move',to:'close'}),
+    turn(cart,c,{type:'move',to:'close'})
+  ]);
+  assert.equal(moved.status,200);
+  assert.equal(covered.status,200);
+  assert.ok(moved.body!.turnEvents.some((event:any)=>
+    event.actor==='enemy'&&(event.kind==='damage'||event.kind==='miss')),
+    'Flint must resolve the committed swing if a moving player closes');
+  assert.ok(covered.body!.turnEvents.some((event:any)=>
+    event.actor==='enemy'&&event.kind==='move'),
+    'Flint must navigate the cart instead of swinging through it');
+  assert.equal(covered.body!.player.hp,50,
+    'Crossing the cart does not secretly damage the player');
+  assert.notDeepEqual(moved.body!.turnEvents,covered.body!.turnEvents,
+    'First-turn events must remain mechanically distinct');
+});
+
 test('Unauthorized users cannot view or advance another account fight',async()=>{
   const c=await character();
   assert.equal((await request('GET',c.path,null)).status,401);
