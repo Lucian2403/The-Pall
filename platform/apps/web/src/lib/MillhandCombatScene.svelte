@@ -25,7 +25,7 @@
 
   const visibleSelection=$derived(snapshot.legalActions.includes(selected)
     ?selected:(canAttack?'attack':'guard'));
-  const recentEvents=$derived(logOpen?snapshot.events:snapshot.events.slice(-6));
+  const recentEvents=$derived(logOpen?snapshot.events:snapshot.events.slice(-3));
   const currentActionName=$derived(
     {attack:'Strike',guard:'Guard',move:'Reposition',recover:'Recover',technique:'Press Advantage'}[visibleSelection]
   );
@@ -64,30 +64,116 @@
   }
 </script>
 
+
 <section class="battle" aria-label="Stage 6, the fight with Flint">
   <div class="alley">
-    <div class="flint" role="img" aria-label="Flint holding his club">
-      <img src="/characters/flint/flint-standing.webp" alt="" />
-      <span>FLINT · CONTRACTOR'S COLLECTOR</span>
-    </div>
-    <span class="cart-marker">WORK CART</span>
-    <aside class="parchment" aria-label="Current encounter situation">
-      <p class="kicker">THE PASSAGE · STAGE 6</p>
-      <div class="encounter-line">
-        <h2>{ended?'The fight ends':`Round ${String(snapshot.round).padStart(2,'0')}`}</h2>
-        {#if !ended}<span class="distance">{snapshot.distance} range</span>{/if}
+    <div class="stage-scenery">
+      <div class="flint" role="img" aria-label="Flint holding his club">
+        <img src="/characters/flint/flint-standing.webp" alt="" />
+        <span>FLINT · CONTRACTOR'S COLLECTOR</span>
       </div>
-      {#if snapshot.round===1 && !ended}<p class="stance">{stanceText}</p>{/if}
-      {#if ended}
-        <p class="outcome">{snapshot.outcome==='player_defeat'?'Flint defeated you. Other workers intervened.':'You defeated Flint.'}</p>
-        <p>{resultText}</p>
-        <p class="after">Your condition is saved. Stage 7 is not yet connected; no treatment has been simulated.</p>
-      {:else}
-        <p class="telegraph-title">FLINT'S OBSERVABLE INTENTION</p>
-        <p class:heavy={snapshot.intentType==='heavy threat'} class="intent">{snapshot.enemyIntent}</p>
-        <p class="position">Opening stance: {snapshot.stance==='cart'?'work cart':snapshot.stance==='moving'?'moving along passage':'braced'}.</p>
-      {/if}
-    </aside>
+      <span class="cart-marker">WORK CART</span>
+
+      <aside class="parchment" aria-label="Current encounter situation">
+        <p class="kicker">THE PASSAGE · STAGE 6</p>
+        <div class="encounter-line">
+          <h2>{ended?'The fight ends':'Round '+String(snapshot.round).padStart(2,'0')}</h2>
+          {#if !ended}<span class="distance">{snapshot.distance} range</span>{/if}
+        </div>
+        {#if snapshot.round===1 && !ended}<p class="stance">{stanceText}</p>{/if}
+        {#if ended}
+          <p class="outcome">{snapshot.outcome==='player_defeat'?'Flint defeated you. Other workers intervened.':'You defeated Flint.'}</p>
+          <p>{resultText}</p>
+          <p class="after">Your condition is saved. Stage 7 is not yet connected; no treatment has been simulated.</p>
+        {:else}
+          <p class="telegraph-title">FLINT'S OBSERVABLE INTENTION</p>
+          <p class:heavy={snapshot.intentType==='heavy threat'} class="intent">{snapshot.enemyIntent}</p>
+          <p class="position">Opening stance: {snapshot.stance==='cart'?'work cart':snapshot.stance==='moving'?'moving along passage':'braced'}.</p>
+        {/if}
+      </aside>
+    </div>
+
+    {#if !ended}
+      <section class="action-zone" aria-label="Combat decisions">
+        <div class="actions-row">
+          <div class="choices" role="group" aria-label="Choose a combat action">
+            {#each [
+              {id:'attack',label:'Strike',asset:'strike.webp',enabled:canAttack},
+              {id:'guard',label:'Guard',asset:'guard.webp',enabled:true},
+              {id:'move',label:'Reposition',asset:'reposition.webp',enabled:canMove},
+              {id:'recover',label:'Recover',asset:'recover.webp',enabled:canRecover},
+              {id:'technique',label:'Press Advantage',asset:'press-advantage.webp',enabled:canTechnique}
+            ] as choice (choice.id)}
+              <button class="action-tile" class:chosen={visibleSelection===choice.id}
+                type="button" disabled={pending||!choice.enabled}
+                aria-pressed={visibleSelection===choice.id}
+                aria-label={`Select ${choice.label} action`}
+                title={choice.enabled?choice.label:choice.label+' unavailable'}
+                onclick={()=>selected=choice.id as typeof selected}>
+                <img src={iconBase+choice.asset} alt="" width="58" height="58" decoding="async" />
+                <span class="action-name">{choice.label}</span>
+              </button>
+            {/each}
+          </div>
+
+          <div class="confirm-holder">
+            <button class="commit" type="button" disabled={pending} onclick={commit}
+              aria-label={`Confirm ${currentActionName} action`}>
+              <img src={iconBase+'confirm-action.webp'} alt="" width="41" height="41" />
+              <span>{pending?'Resolving…':'Confirm action'}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-details" aria-label="Selected combat action details">
+          <div class="chosen-heading">
+            <img src={iconBase+(
+              visibleSelection==='attack'?'strike.webp':
+              visibleSelection==='guard'?'guard.webp':
+              visibleSelection==='move'?'reposition.webp':
+              visibleSelection==='recover'?'recover.webp':'press-advantage.webp'
+            )} width="32" height="32" alt="" />
+            <strong>{currentActionName}</strong>
+          </div>
+          {#if visibleSelection==='attack'||visibleSelection==='technique'}
+            <div class="detail-field">
+              <label for="battle-zone">Target</label>
+              <select id="battle-zone" bind:value={zone} disabled={pending}>
+                <option value="torso">Torso</option>
+                <option value="limbs">Limbs</option>
+                <option value="head">Head</option>
+              </select>
+            </div>
+            <span class="detail-text">Accuracy: {snapshot.rules.accuracy[zone]}%</span>
+            <span class="detail-text">Stamina: {visibleSelection==='attack'?snapshot.rules.strikeCost:12}{visibleSelection==='technique'?' · Momentum: '+snapshot.rules.techniqueMomentum:''}</span>
+            {#if visibleSelection==='attack'}<span class="detail-note">Repeated strikes cost more.</span>{/if}
+          {:else if visibleSelection==='move'}
+            <div class="detail-field">
+              <label for="battle-move">Position</label>
+              <select id="battle-move" bind:value={destination} disabled={pending}>
+                {#if snapshot.distance!=='contact'}<option value="close">Close distance</option>{/if}
+                <option value="side">Move sideways</option>
+                <option value="back">Fall back</option>
+                <option value="cover">Use cover</option>
+              </select>
+            </div>
+            <span class="detail-text">Stamina: {snapshot.rules.moveCost}</span>
+          {:else if visibleSelection==='recover'}
+            <div class="detail-field">
+              <label for="battle-recovery">Restore</label>
+              <select id="battle-recovery" bind:value={reserve} disabled={pending}>
+                <option value="breath">Stamina +{snapshot.rules.recoverStamina}</option>
+                <option value="nerves">Composure +{snapshot.rules.recoverComposure}</option>
+              </select>
+            </div>
+          {:else}
+            <span class="detail-text">Stamina: {snapshot.rules.guardCost}</span>
+            <span class="detail-note">A protected impact can create an opening.</span>
+          {/if}
+        </div>
+        {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
+      </section>
+    {/if}
   </div>
 
   <div class="combat-console">
@@ -98,118 +184,57 @@
             <h3>{fighter.title}</h3>
             <strong class="hp-value">{fighter.value.hp} <span>/ {fighter.value.hpMax} HP</span></strong>
           </div>
-          <div class="hp-track" role="progressbar" aria-label={`${fighter.title} health`}
+          <div class="hp-track" role="progressbar" aria-label={fighter.title+' health'}
             aria-valuemin="0" aria-valuemax={fighter.value.hpMax} aria-valuenow={fighter.value.hp}>
             <span class="hp-fill" class:critical={fighter.value.hp<=fighter.value.hpMax/4}
               style:width={healthWidth(fighter.value.hp,fighter.value.hpMax)}></span>
           </div>
-          {#if fighter.value.ceiling<fighter.value.hpMax}
-            <p class="ceiling">Health ceiling: {fighter.value.ceiling}</p>
-          {/if}
           <dl class="resources">
             <div><dt>Stamina</dt><dd>{fighter.value.stamina}</dd></div>
             <div><dt>Fatigue</dt><dd>{fighter.value.fatigue}</dd></div>
             <div><dt>Momentum</dt><dd>{fighter.value.momentum}</dd></div>
-            <div><dt>Composure</dt><dd>{fighter.value.composure}</dd></div>
-            <div><dt>Wounds</dt><dd>{fighter.value.wounds.length}{fighter.value.bleed?` · bleeding ${fighter.value.bleed}`:''}</dd></div>
           </dl>
+          <details class="secondary-stats">
+            <summary>More condition details</summary>
+            <dl>
+              <div><dt>Composure</dt><dd>{fighter.value.composure}</dd></div>
+              <div><dt>Wounds</dt><dd>{fighter.value.wounds.length}</dd></div>
+              {#if fighter.value.bleed>0}<div><dt>Bleeding</dt><dd>{fighter.value.bleed}</dd></div>{/if}
+              {#if fighter.value.ceiling<fighter.value.hpMax}
+                <div><dt>Health ceiling</dt><dd>{fighter.value.ceiling}</dd></div>
+              {/if}
+            </dl>
+          </details>
         </div>
       {/each}
     </section>
 
-    <div class="decision-row" class:result-row={ended}>
-      {#if !ended}
-        <section class="tactics" aria-label="Choose a combat action">
-          <div class="section-title">
-            <h3>Your next move</h3>
-            <span>Choose one action</span>
-          </div>
-          <div class="choices" role="group" aria-label="Combat action choices">
-            {#each [
-              {id:'attack',label:'Strike',asset:'strike.webp',enabled:canAttack},
-              {id:'guard',label:'Guard',asset:'guard.webp',enabled:true},
-              {id:'move',label:'Reposition',asset:'reposition.webp',enabled:canMove},
-              {id:'recover',label:'Recover',asset:'recover.webp',enabled:canRecover},
-              {id:'technique',label:'Press Advantage',asset:'press-advantage.webp',enabled:canTechnique}
-            ] as choice (choice.id)}
-              <button class="action-tile" type="button" disabled={pending||!choice.enabled}
-                class:chosen={visibleSelection===choice.id}
-                aria-pressed={visibleSelection===choice.id}
-                aria-label={`Select ${choice.label} action`}
-                title={choice.enabled?choice.label:`${choice.label} unavailable`}
-                onclick={()=>selected=choice.id as typeof selected}>
-                <img src={iconBase+choice.asset} alt="" width="72" height="72" decoding="async" />
-                <span class="action-name">{choice.label}</span>
-              </button>
+    <section class="chronicle" aria-label="Battle Chronicle">
+      <div class="chronicle-heading">
+        <h3>Battle Chronicle</h3>
+        <button type="button" onclick={()=>logOpen=!logOpen}
+          aria-expanded={logOpen} aria-controls="combat-chronicle-list">
+          {logOpen?'Latest only':'Full history'}
+        </button>
+      </div>
+      <div id="combat-chronicle-list" class="log-window" role="log" aria-live="off" aria-relevant="additions">
+        {#if snapshot.events.length===0}
+          <p class="no-events">Flint approaches. The first turn has not been committed.</p>
+        {:else}
+          <ol>
+            {#each recentEvents as event,i (i)}
+              <li class:latest={i===recentEvents.length-1}>
+                <span class="round">{String(event.round).padStart(2,'0')}</span>
+                <span>{event.text}</span>
+              </li>
             {/each}
-          </div>
-          <div class="action-details">
-            <div class="chosen-heading">{currentActionName}</div>
-            {#if visibleSelection==='attack'||visibleSelection==='technique'}
-              <label for="battle-zone">Aim</label>
-              <select id="battle-zone" bind:value={zone} disabled={pending}>
-                <option value="torso">Torso · {snapshot.rules.accuracy.torso}% trial accuracy</option>
-                <option value="limbs">Limbs · {snapshot.rules.accuracy.limbs}% trial accuracy</option>
-                <option value="head">Head · {snapshot.rules.accuracy.head}% trial accuracy</option>
-              </select>
-              <p class="cost">{visibleSelection==='attack'
-                ?`Costs ${snapshot.rules.strikeCost} Stamina. Repeated strikes cost more.`
-                :`Costs 12 Stamina and ${snapshot.rules.techniqueMomentum} Momentum.`}</p>
-            {:else if visibleSelection==='move'}
-              <label for="battle-move">Position</label>
-              <select id="battle-move" bind:value={destination} disabled={pending}>
-                {#if snapshot.distance!=='contact'}<option value="close">Close distance</option>{/if}
-                <option value="side">Move sideways</option>
-                <option value="back">Fall back</option>
-                <option value="cover">Move behind cover</option>
-              </select>
-              <p class="cost">Costs {snapshot.rules.moveCost} Stamina.</p>
-            {:else if visibleSelection==='recover'}
-              <label for="battle-recovery">Recover</label>
-              <select id="battle-recovery" bind:value={reserve} disabled={pending}>
-                <option value="breath">Stamina +{snapshot.rules.recoverStamina}</option>
-                <option value="nerves">Composure +{snapshot.rules.recoverComposure}</option>
-              </select>
-            {:else}
-              <p class="cost">Guard costs {snapshot.rules.guardCost} Stamina; a protected impact can create an opening.</p>
-            {/if}
-            <button class="commit" type="button" disabled={pending} onclick={commit}
-              aria-label={`Confirm ${currentActionName} action`}>
-              <img src={iconBase+'confirm-action.webp'} alt="" width="48" height="48" />
-              <span>{pending?'Resolving exchange…':'Confirm action'}</span>
-            </button>
-          </div>
-          {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
-        </section>
-      {/if}
-
-      <section class="chronicle" aria-label="Battle Chronicle">
-        <div class="section-title chronicle-heading">
-          <h3>Battle Chronicle</h3>
-          <button type="button" onclick={()=>logOpen=!logOpen}
-            aria-expanded={logOpen} aria-controls="combat-chronicle-list">
-            {logOpen?'Latest only':'Full history'}
-          </button>
-        </div>
-        <div id="combat-chronicle-list" class="log-window" role="log" aria-live="off" aria-relevant="additions">
-          {#if snapshot.events.length===0}
-            <p class="no-events">Flint approaches. The first turn has not been committed.</p>
-          {:else}
-            <ol>
-              {#each recentEvents as event,i (i)}
-                <li class:latest={i===recentEvents.length-1}>
-                  <span class="round">{String(event.round).padStart(2,'0')}</span>
-                  <span>{event.text}</span>
-                </li>
-              {/each}
-            </ol>
-          {/if}
-        </div>
-        {#if !logOpen && snapshot.events.length>6}
-          <p class="history-hint">Showing the latest 6 entries of {snapshot.events.length}.</p>
+          </ol>
         {/if}
-      </section>
-    </div>
+      </div>
+      {#if !logOpen && snapshot.events.length>3}
+        <p class="history-hint">Latest 3 of {snapshot.events.length} entries.</p>
+      {/if}
+    </section>
 
     {#if ended}
       <section class="aftermath" aria-label="Personal journal after the fight">
@@ -222,100 +247,170 @@
 </section>
 
 <style>
-  .battle{min-width:0;background:#1d1a17;color:#ebd6b3;font-family:var(--pall-font-reading,Georgia,serif)}
-  .alley{position:relative;min-height:clamp(270px,30vw,410px);overflow:hidden;background:#1b222b url('/locations/alley/alley-background.webp') center/cover no-repeat}
-  .alley::after{content:'';position:absolute;inset:auto 0 0;height:65px;background:linear-gradient(transparent,#1d1a17a8);pointer-events:none}
-  .flint{position:absolute;left:3%;bottom:0;width:34%;height:95%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:1}
-  .flint img{max-height:calc(100% - 24px);max-width:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 7px 10px #000b)}
-  .flint span,.cart-marker{font:700 10px/1.3 Arial,sans-serif;letter-spacing:.07em;color:#392616;background:#ead6b4;border:1px solid #88633e;padding:4px 8px}
-  .cart-marker{position:absolute;bottom:12%;left:61%;z-index:1}
-  .parchment{position:relative;z-index:2;box-sizing:border-box;min-height:0;max-width:630px;width:49%;margin:15px 2% 15px auto;padding:11px 14px;background:#ead8b8;color:#2b1c11;border:solid transparent;border-width:20px 25px;border-image:url('/ui-kit/frames/dialogue-frame.png') 60 fill stretch;box-shadow:0 8px 23px #0008}
-  .parchment p{margin:0 0 7px;line-height:1.4}.parchment h2{font:700 clamp(20px,2vw,26px) Georgia,serif;margin:0}
-  .encounter-line{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-  .distance{font:700 11px/1.4 Arial,sans-serif;letter-spacing:.06em;color:#634529;text-transform:uppercase}
-  .kicker,.telegraph-title{font:700 11px/1.4 Arial,sans-serif;letter-spacing:.075em}.kicker{color:#624428}
-  .parchment .stance{font-style:italic;font-size:13px}.parchment .intent{font-size:clamp(14px,1.15vw,16px);line-height:1.48}
-  .heavy{color:#8b2a1f;font-weight:700}.outcome{font-weight:700}.after{border-top:1px solid #bba37e;padding-top:9px;font-size:13px}
-  .position{font-size:12px;color:#604531}
-  .combat-console{display:grid;gap:10px;padding:10px;min-width:0}
-  .duel-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
-  .fighter{min-width:0;background:#29231f;border:1px solid #66513d;padding:10px 13px}
-  .fighter.opponent{border-color:#79533c}
-  .fighter-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-  .fighter h3{font:700 18px/1.25 Georgia,serif;margin:0;color:#f3dfb9}
-  .hp-value{font:700 19px/1.25 Georgia,serif;font-variant-numeric:tabular-nums;color:#ecd1a1}
-  .hp-value span{font-size:12px;font-weight:400;color:#b7a084}
-  .hp-track{height:9px;overflow:hidden;margin:8px 0;background:#110f0e;border:1px solid #745638;border-radius:2px}
-  .hp-fill{display:block;height:100%;background:linear-gradient(90deg,#b7955c,#dcc18f);transition:width .2s ease}
-  .hp-fill.critical{background:#a34d39}
-  .ceiling{font:12px/1.4 Arial,sans-serif;color:#c7ab89;margin:4px 0 0}
-  .resources{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px 10px;margin:9px 0 0}
-  .resources div{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0;padding:4px 0;border-top:1px solid #483b2f}
-  .resources dt{font:11px/1.3 Arial,sans-serif;color:#bda381}
-  .resources dd{margin:0;font:700 13px/1.3 Georgia,serif;font-variant-numeric:tabular-nums;text-align:right;color:#efd7b0}
-  .decision-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(310px,.85fr);gap:10px;align-items:stretch;min-width:0}
-  .decision-row.result-row{grid-template-columns:1fr}
-  .tactics,.chronicle,.aftermath{min-width:0;background:#29231f;border:1px solid #68513c;padding:11px 13px}
-  .section-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
-  .section-title h3,.aftermath h3{margin:0;font:700 18px/1.2 Georgia,serif;color:#efd7ad}
-  .section-title>span{font:12px/1.4 Arial,sans-serif;color:#bca485}
-  .choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
-  .action-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:0;min-height:106px;padding:6px 3px 7px;border:1px solid #77634f;background:#322920;color:#d5be9c;cursor:pointer;transition:background .15s,border-color .15s}
-  .action-tile img{width:clamp(50px,4.5vw,68px);height:clamp(50px,4.5vw,68px);object-fit:contain;opacity:.95;pointer-events:none}
-  .action-tile .action-name{font:600 11px/1.2 Arial,sans-serif;letter-spacing:.025em;text-align:center;opacity:.76;white-space:normal}
-  .action-tile.chosen{background:#493723;border-color:#e3bc7b;box-shadow:inset 0 0 0 1px #e3bc7b}
-  .action-tile.chosen .action-name{opacity:1;color:#f7e4c2}
-  .action-tile:hover:not(:disabled){background:#453625;border-color:#d0a66c}
-  .action-tile:disabled,.commit:disabled{opacity:.35;cursor:not-allowed}
-  .action-details{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 13px;align-items:center;margin-top:8px;padding:8px 10px;background:#211c18;border:1px solid #504132;min-height:66px}
-  .chosen-heading{font:700 14px/1.2 Georgia,serif;color:#f0d6aa}
-  .action-details label{font:12px/1.3 Arial,sans-serif;color:#cfb694}
-  .action-details select{grid-column:1;width:100%;min-width:0;min-height:34px;padding:5px;background:#e4cda8;color:#302013;border:1px solid #95704e;font:13px Georgia,serif}
-  .cost{grid-column:1;margin:0;font:12px/1.45 Georgia,serif;color:#d4ba96}
-  .commit{grid-column:2;grid-row:1/span 3;display:flex;align-items:center;justify-content:center;gap:7px;min-width:146px;min-height:61px;padding:7px 11px;background:#d8bc8b;color:#2d1c10;border:1px solid #a98553;font:700 12px/1.25 Arial,sans-serif;cursor:pointer}
-  .commit img{width:37px;height:37px;object-fit:contain;filter:brightness(.68) sepia(.14)}
-  .commit:hover:not(:disabled){background:#efce95;border-color:#efce95}
-  .commit span{max-width:95px;text-align:center}
-  .error{margin:8px 1px 0;color:#ffb4a7;font:13px/1.4 Arial,sans-serif}
-  .chronicle{display:flex;flex-direction:column}
-  .chronicle-heading button{background:transparent;border:1px solid #7e664c;color:#dac29f;min-height:30px;padding:5px 9px;font:12px Arial,sans-serif;cursor:pointer}
-  .chronicle-heading button:hover{border-color:#d4aa72}
-  .log-window{min-height:155px;max-height:237px;overflow-y:auto;scrollbar-color:#927452 #302820;scrollbar-width:thin}
-  .log-window ol{list-style:none;margin:0;padding:0}
-  .log-window li{display:flex;gap:9px;padding:6px 2px;border-bottom:1px solid #4c3e32;font:12px/1.45 Georgia,serif;color:#cbb392}
-  .log-window li.latest{color:#f2d8ae;background:#382c21;font-weight:700}
-  .round{flex:none;font:700 10px/1.5 Arial,sans-serif;color:#bda27f}
+  .battle{min-width:0;background:#1b1815;color:#eed8b5;font-family:var(--pall-font-reading,Georgia,serif)}
+  .alley{position:relative;min-height:clamp(570px,41vw,690px);isolation:isolate;overflow:hidden;
+    background:#1b222b url('/locations/alley/alley-background.webp') center/cover no-repeat}
+  .alley::after{content:'';position:absolute;inset:auto 0 0;height:235px;
+    background:linear-gradient(transparent,#161410aa 65%,#181512f0);pointer-events:none;z-index:1}
+  .stage-scenery{position:absolute;inset:0;pointer-events:none}
+  .flint{position:absolute;left:3%;bottom:7%;width:29%;height:84%;display:flex;flex-direction:column;
+    align-items:center;justify-content:flex-end;z-index:1}
+  .flint img{max-height:calc(100% - 28px);max-width:100%;object-fit:contain;object-position:center bottom;
+    filter:drop-shadow(0 7px 11px #000b)}
+  .flint span,.cart-marker{font:700 10px/1.3 Arial,sans-serif;letter-spacing:.065em;color:#392616;
+    background:#ead6b4;border:1px solid #88633e;padding:5px 9px;text-align:center}
+  .cart-marker{position:absolute;top:58%;left:63%;z-index:1}
+  .parchment{position:absolute;top:36px;right:2.1%;box-sizing:border-box;z-index:3;
+    width:min(35%,570px);min-height:0;padding:13px 17px;color:#2b1c11;background:#ead8b8;
+    border:solid transparent;border-width:19px 23px;
+    border-image:url('/ui-kit/frames/dialogue-frame.png') 60 fill stretch;
+    filter:drop-shadow(0 7px 15px #0008)}
+  .parchment h2{font:700 clamp(20px,1.7vw,27px)/1.16 Georgia,serif;margin:0;text-transform:uppercase}
+  .parchment p{margin:0 0 8px;line-height:1.44}
+  .encounter-line{display:flex;align-items:baseline;justify-content:space-between;gap:15px;margin:3px 0 13px}
+  .distance{font:700 11px/1.4 Arial,sans-serif;letter-spacing:.045em;color:#5c3d26;text-transform:uppercase;white-space:nowrap}
+  .kicker,.telegraph-title{font:700 11px/1.3 Arial,sans-serif;letter-spacing:.065em;color:#563b26}
+  .parchment .kicker{margin:0}
+  .parchment .intent{font:16px/1.4 Georgia,serif}
+  .parchment .stance{font-style:italic;font-size:14px}
+  .parchment .position{font-size:12px;color:#604531}
+  .parchment .outcome{font-weight:700}
+  .parchment .after{border-top:1px solid #baa17f;padding-top:8px;font-size:12px}
+  .heavy{color:#8b2a1f;font-weight:700}
+
+  /* Buttons belong to the battlefield, never to a second panel below it. */
+  .action-zone{position:absolute;left:29%;right:2.6%;bottom:18px;z-index:4;display:grid;gap:11px;min-width:0}
+  .actions-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,21%);align-items:center;gap:14px;min-width:0}
+  .choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;min-width:0}
+  .action-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+    min-width:0;min-height:92px;padding:9px 5px 10px;color:#ecd0a2;background:#241c17c7;
+    border:solid transparent;border-width:11px 13px;
+    border-image:url('/ui-kit/buttons/button-normal-trim.png') 50 180 45 180 fill / 11px 13px 11px 13px stretch;
+    cursor:pointer;transition:filter .15s ease,transform .15s ease}
+  .action-tile img{width:clamp(36px,3.3vw,56px);height:clamp(36px,3.3vw,56px);object-fit:contain;pointer-events:none}
+  .action-tile .action-name{font:600 clamp(11px,.92vw,14px)/1.2 var(--pall-font-reading,Georgia,serif);
+    opacity:.76;white-space:normal;text-align:center;color:#f0d7b3}
+  .action-tile.chosen{filter:brightness(1.25) drop-shadow(0 0 6px #e0a957);transform:translateY(-2px)}
+  .action-tile.chosen .action-name{opacity:1;color:#fff1d5}
+  .action-tile:hover:not(:disabled){filter:brightness(1.17)}
+  .action-tile:disabled,.commit:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.55)}
+  .confirm-holder{border-left:1px solid #9f805e;padding-left:15px;min-width:0}
+  .commit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:76px;
+    color:#2b1b0f;background:#e9cf9f;cursor:pointer;
+    border:solid transparent;border-width:11px 15px;
+    border-image:url('/ui-kit/buttons/button-normal-trim.png') 50 180 45 180 fill / 11px 15px 11px 15px stretch;
+    font:700 clamp(12px,1.05vw,17px)/1.2 Georgia,serif}
+  .commit img{width:clamp(28px,2.7vw,43px);height:clamp(28px,2.7vw,43px);object-fit:contain;filter:brightness(.62) sepia(.2)}
+  .commit:hover:not(:disabled){filter:brightness(1.12)}
+  .action-details{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px 18px;
+    box-sizing:border-box;min-height:48px;width:min(100%,760px);margin:0 auto;
+    border:solid transparent;border-width:8px 14px;padding:3px 12px;
+    border-image:url('/ui-kit/buttons/button-normal-trim.png') 50 180 45 180 fill / 8px 14px 8px 14px stretch;
+    background:#211b17b5;color:#ead0a9}
+  .chosen-heading{display:flex;align-items:center;gap:9px;padding-right:15px;border-right:1px solid #876742;
+    font:700 16px/1.25 Georgia,serif}
+  .chosen-heading img{width:31px;height:31px;object-fit:contain}
+  .detail-field{display:flex;align-items:center;gap:8px}
+  .detail-field label{font:13px/1.3 Georgia,serif;color:#d5b88c}
+  .detail-field select{max-width:175px;min-height:32px;background:#e7cfaa;color:#291a0e;
+    border:1px solid #9d7750;padding:3px 4px;font:13px Georgia,serif}
+  .detail-text{font:13px/1.3 Georgia,serif;color:#eed7b3}
+  .detail-text+.detail-text{border-left:1px solid #876742;padding-left:15px}
+  .detail-note{font:12px/1.3 Georgia,serif;color:#c4a17a}
+  .error{margin:0;padding:8px 12px;background:#29140fef;border:1px solid #b45d4a;color:#ffc6ae;
+    font:13px/1.45 Arial,sans-serif;text-align:center}
+  .action-tile:focus-visible,.commit:focus-visible,.chronicle button:focus-visible,
+  .detail-field select:focus-visible,.secondary-stats summary:focus-visible{outline:2px solid #ffda9d;outline-offset:3px}
+
+  /* Three synchronized tiles directly below the alley. */
+  .combat-console{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1.15fr);
+    align-items:stretch;gap:14px;padding:16px;min-width:0}
+  .duel-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;min-width:0}
+  .fighter,.chronicle,.aftermath{min-width:0;box-sizing:border-box;background:#29221e;
+    border:1px solid #8b6847;padding:16px 17px}
+  .fighter.opponent{border-color:#92674a}
+  .fighter-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .fighter h3,.chronicle h3,.aftermath h3{margin:0;font:700 clamp(17px,1.35vw,24px)/1.2 Georgia,serif;color:#f4dfb8}
+  .hp-value{white-space:nowrap;color:#e8bd7e;font:700 clamp(18px,1.6vw,26px)/1.2 Georgia,serif;font-variant-numeric:tabular-nums}
+  .hp-value span{font:400 13px/1.2 Georgia,serif;color:#e4c69a}
+  .hp-track{height:13px;border:1px solid #967049;overflow:hidden;background:#0d0c0b;
+    border-radius:2px;margin:11px 0 10px}
+  .hp-fill{display:block;height:100%;background:linear-gradient(90deg,#b89558,#f4d397);transition:width .2s ease}
+  .hp-fill.critical,.opponent .hp-fill{background:linear-gradient(90deg,#783326,#bd4a2e)}
+  .resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:6px}
+  .resources div{min-width:0;display:flex;align-items:baseline;justify-content:center;gap:8px}
+  .resources div+div{border-left:1px solid #866447}
+  .resources dt{color:#d3b182;font:13px/1.25 Georgia,serif}
+  .resources dd{margin:0;color:#eed2a5;font:700 16px/1.25 Georgia,serif;font-variant-numeric:tabular-nums}
+  .secondary-stats{margin-top:11px;border-top:1px solid #4f3e31;padding-top:6px}
+  .secondary-stats summary{cursor:pointer;color:#b99b78;font:11px/1.4 Arial,sans-serif}
+  .secondary-stats dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0 0}
+  .secondary-stats dl div{display:flex;justify-content:space-between;gap:6px;font:12px/1.3 Arial,sans-serif}
+  .secondary-stats dt{color:#c1a582}.secondary-stats dd{margin:0;color:#f0d7ac;font-variant-numeric:tabular-nums}
+  .chronicle-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .chronicle-heading button{padding:7px 12px;background:#271f19;color:#eed4ae;border:1px solid #927453;
+    cursor:pointer;font:13px/1.2 Georgia,serif;white-space:nowrap}
+  .chronicle-heading button:hover{background:#403124}
+  .log-window{min-height:104px;max-height:220px;overflow:auto;scrollbar-color:#947651 #30281f;scrollbar-width:thin}
+  .log-window ol{margin:0;padding:0;list-style:none}
+  .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
+    font:13px/1.35 Georgia,serif;color:#ecd1a8}
+  .log-window li.latest{background:#39291f;color:#ffdfb1;font-weight:700}
+  .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
+  .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font-size:13px;line-height:1.5}
-  .history-hint{margin:auto 0 0;padding-top:8px;font:11px Arial,sans-serif;color:#ac9274}
-  .aftermath p{margin:8px 0;line-height:1.55}
-  .action-tile:focus-visible,.commit:focus-visible,.chronicle button:focus-visible,.action-details select:focus-visible{outline:2px solid #f2c987;outline-offset:2px}
-  @media(max-width:1100px){
-    .decision-row{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr)}
+  .aftermath{grid-column:1/-1}.aftermath p{margin:10px 0;line-height:1.55}
+
+  @media(max-width:1250px){
+    .alley{min-height:575px}
+    .action-zone{left:24%;right:2%}
+    .choices{gap:4px}
+    .action-tile{min-height:80px;padding:5px 2px}
+    .action-details{gap:6px 11px}
+    .detail-note{display:none}
+    .combat-console{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
+    .resources{grid-template-columns:1fr;gap:5px}
+    .resources div{justify-content:space-between}
+    .resources div+div{border-left:0}
+  }
+  @media(max-width:920px){
+    .alley{min-height:0}
+    .stage-scenery{position:relative;min-height:350px}
+    .flint{width:43%;height:89%;bottom:0;left:1%}
+    .parchment{width:54%;right:2%;top:15px}
+    .cart-marker{top:68%}
+    .action-zone{position:relative;left:auto;right:auto;bottom:auto;padding:12px 13px 17px;
+      background:#211b17ef}
+    .actions-row{grid-template-columns:minmax(0,1fr) 160px}
+    .action-tile{min-height:88px}
+    .combat-console{grid-template-columns:1fr}
     .resources{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .action-tile{min-height:91px}
+    .resources div{justify-content:center}
+    .resources div+div{border-left:1px solid #866447}
   }
-  @media(max-width:850px){
-    .alley{min-height:0;display:flex;flex-direction:column}
-    .flint{position:relative;height:280px;width:100%}
-    .flint img{max-height:250px}
-    .cart-marker{bottom:auto;top:210px;left:auto;right:12px}
-    .parchment{width:100%;max-width:none;margin:0}
-    .decision-row{grid-template-columns:1fr}
-    .log-window{max-height:200px}
+  @media(max-width:640px){
+    .stage-scenery{min-height:360px}
+    .flint{width:51%;height:71%;bottom:0}
+    .parchment{width:94%;top:8px;right:3%;padding:8px 10px;border-width:14px 18px}
+    .parchment .intent{font-size:14px}
+    .cart-marker{display:none}
+    .actions-row{grid-template-columns:1fr}
+    .choices{gap:5px}
+    .action-tile{min-height:79px;border-width:7px 8px;padding:5px 2px;
+      border-image-width:7px 8px 7px 8px}
+    .action-tile img{width:37px;height:37px}
+    .action-tile .action-name{font-size:10px}
+    .confirm-holder{padding:8px 0 0;border-left:0;border-top:1px solid #816748}
+    .commit{min-height:53px}
+    .action-details{width:100%;justify-content:flex-start}
+    .duel-board{grid-template-columns:1fr;gap:8px}
+    .resources{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .combat-console{padding:9px;gap:9px}
   }
-  @media(max-width:520px){
-    .combat-console{padding:7px;gap:7px}
-    .duel-board{gap:7px}
-    .fighter{padding:9px}
-    .fighter h3{font-size:15px}.hp-value{font-size:15px}
-    .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media(max-width:370px){
     .choices{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .action-tile{min-height:90px}
-    .action-tile img{width:55px;height:55px}
-    .action-details{grid-template-columns:minmax(0,1fr)}
-    .commit{grid-column:1;grid-row:auto;min-height:51px;width:100%}
-    .commit img{width:30px;height:30px}
-    .commit span{max-width:none}
+    .resources{grid-template-columns:1fr}
+    .resources div+div{border-left:0}
   }
   @media(prefers-reduced-motion:reduce){.hp-fill,.action-tile{transition:none}}
 </style>
