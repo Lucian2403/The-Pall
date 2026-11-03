@@ -44,7 +44,7 @@ registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
-  account:string|undefined=owner,body?:unknown
+  account:string|null=owner,body?:unknown
 ){
   const response=await app.inject({
     method,url:path,
@@ -174,7 +174,7 @@ test('Three saved stances give distinct first-round tactical states',async()=>{
 
 test('Unauthorized users cannot view or advance another account fight',async()=>{
   const c=await character();
-  assert.equal((await request('GET',c.path,undefined)).status,401);
+  assert.equal((await request('GET',c.path,null)).status,401);
   assert.equal((await request('GET',c.path,stranger)).status,404);
   assert.equal((await request('POST',c.path,stranger,{
     kind:'start',requestId:randomUUID()
