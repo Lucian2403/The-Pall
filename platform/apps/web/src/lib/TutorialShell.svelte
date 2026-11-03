@@ -24,7 +24,9 @@
   };
 
   let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, alleyBackdrop = false, depotBackdrop = false, backToStageFive, backStageBusy = false, backStageError = ''}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; alleyBackdrop?: boolean; depotBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean; backStageError?: string} = $props();
-  const chapter = $derived(character.origin === 'Millhand' && (character.tutorial.stage === 5 || character.tutorial.stage === 6)
+  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage === 6
+    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/combat'
+    : character.origin === 'Millhand' && character.tutorial.stage === 5
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/wage-claim'
     : character.origin === 'Millhand' && character.tutorial.stage === 4
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/second-job'
