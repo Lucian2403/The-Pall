@@ -44,7 +44,7 @@ assert.ok(opening.includes("state.intent={") &&
   'The three opening stances must produce real existing-engine tactical differences');
 assert.ok(characterRoutes.includes("'player_character_flint_combat_receipts','player_character_flint_combat'") &&
   characterRoutes.includes("'player_character_wage_claim_receipts','player_character_wage_claim'") &&
-  characterRoutes.includes('DELETE FROM '+String.raw`' +table+ '`),
+  characterRoutes.includes("'DELETE FROM '+table+' WHERE character_id=$1'"),
   'Account-owned deletion must remove Stage 5 and 6 child rows and receipts');
 assert.ok(pgTest.includes("registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5})") &&
   pgTest.includes('Two concurrent browser tabs') &&
