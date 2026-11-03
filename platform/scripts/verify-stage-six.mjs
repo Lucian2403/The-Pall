@@ -76,8 +76,25 @@ assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
   scene.includes('opacity:.76')&&
-  scene.includes('snapshot.events.slice(-6)')&&
+  scene.includes('snapshot.events.slice(-3)')&&
   scene.includes('class="duel-board"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
+
+
+// The screenshot's visual hierarchy is implemented in one scene: action
+// choices and details over the alley, followed by a three-column status row.
+// Lower priority stats remain available inside expandable fighter details.
+assert.ok(scene.includes('class="action-zone"') &&
+  scene.includes('class="actions-row"') &&
+  scene.includes('class="confirm-holder"') &&
+  scene.includes('class="action-details"') &&
+  scene.includes('class="duel-board"') &&
+  scene.includes('class="chronicle"') &&
+  scene.includes('class="secondary-stats"') &&
+  scene.includes('class="resources"') &&
+  scene.includes('grid-template-columns:minmax(0,1.9fr) minmax(0,1.15fr)') &&
+  scene.includes('@media(max-width:640px)') &&
+  !scene.includes('class="decision-row"'),
+  'Combat layout must present one battlefield action bar, compact fighter comparison and adjacent Chronicle');
 
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');

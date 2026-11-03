@@ -45,3 +45,27 @@ cost, AI choice, damage, save data, or monetary reward is changed.**
 This pass does not resolve any independent `Internal Server Error`
 returned by the combat API. Such failures require the server error
 trace and must not be disguised by UI changes.
+
+
+## Stage 6 battlefield layout refinement — 2026-11-03
+
+Owner reference: widescreen combat screenshot with the alley as the dominant
+visual, Flint on the left, the round/telegraph parchment in the upper right,
+and all five supplied action icons laid out horizontally along the lower
+edge of the scene. The sixth confirmation icon sits at the right end of the
+same bar. A slim summary beneath the bar shows the chosen action's actual
+server-provided costs and configurable target/position/recovery mode.
+
+Directly below the alley, the status area follows a 3-column rhythm:
+**You**, **Flint**, and **Battle Chronicle**. Health bars and
+Stamina/Fatigue/Momentum lead. Composure, wounds, bleeding and Health ceiling
+remain accessible through expanded condition details. The Chronicle defaults
+to the latest three saved entries; its full history is retained unchanged.
+
+On compact viewports, the action bar moves below the environment rather than
+covering Flint or the telegraph, the confirmation control becomes a full-width
+row, and the stat cards stack. The controls remain keyboard-operable with
+text labels and visible focus; this is still an interim UI/UX refinement.
+
+No combat state, battle math, costs, AI, database schema or encounter scripting
+changes in this layout-only pass.
