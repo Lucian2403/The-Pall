@@ -26,7 +26,12 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     revision:state.revision,round:state.round,distance:state.distance,
     enemyIntent:state.intent?.tell??null,intentType:state.intent?.signal??null,
     player:visibleActor(state.player),enemy:visibleActor(state.enemy),
-    legalActions,events:history.slice(-120),
+    legalActions,
+    // Historical Chronicle is capped for the UI. The engine separately
+    // retains the exact events of its most recently resolved turn.
+    // Never reconstruct one turn's feedback by diffing a rolling history.
+    events:history.slice(-120),
+    turnEvents:state.events,
     rules:{
       strikeCost:testAttackCost(state,'player'),guardCost:TEST_CONFIG.guardCost,
       moveCost:TEST_CONFIG.moveCost,recoverStamina:TEST_CONFIG.recoverGain,
