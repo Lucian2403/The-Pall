@@ -5,6 +5,8 @@
   import MillhandCombatScene from '$lib/MillhandCombatScene.svelte';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatSnapshot} from '$lib/millhand-combat-model';
+  import {claimCombatSfx} from '$lib/pall-audio';
+  import {soundSavedCombatTurn} from '$lib/millhand-combat-sound';
 
   type Character={id:string;name:string;origin:string;sex:string;
     avatarId?:string|null;coins:number;health:{current:number;maximum:number};
@@ -51,9 +53,14 @@
       errorMessage=error instanceof Error?error.message:'The encounter could not be loaded.';
     }
   }
-  onMount(()=>{void refresh();});
+  onMount(()=>{
+    const releaseCombatSfx=claimCombatSfx();
+    void refresh();
+    return releaseCombatSfx;
+  });
 
   async function perform(action:CombatAction){
+    const previous=battle;
     const revision=battle?.revision;
     if(pending||revision===undefined||!battle||battle.status!=='active')return;
     if(!battle.legalActions.includes(action.type))return;
@@ -68,11 +75,12 @@
           expectedRevision:revision,action})});
       const result=await response.json() as Snapshot&{error?:string;detail?:string};
       if(response.ok){
+        if(previous)soundSavedCombatTurn(previous,result,action,character?.sex);
         battle=result;retryId=null;retrySignature=null;
         if(character){
           const p=result.player as {hp:number};
           character={...character,health:{...character.health,current:p.hp},
-            tutorial:{...character.tutorial,status:result.status==='finished'?'COMPLETE':'IN_PROGRESS'}};
+            tutorial:{...character.tutorial,status:result.status==='finished'?'COMPLETED':'IN_PROGRESS'}};
         }
       }else{
         if(response.status===409){
