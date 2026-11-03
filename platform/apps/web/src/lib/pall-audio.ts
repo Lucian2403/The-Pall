@@ -95,6 +95,19 @@ const sfxFiles=[
   ...paperVariants,
   ...smithVariants
 ];
+
+// Optional Stage 6 cues are predecoded only while a combat scene is mounted.
+// They use the same device, mute switch and SFX volume as workshop sounds.
+const combatHits=['combat/hit-01.mp3','combat/hit-02.mp3',
+  'combat/hit-03.mp3','combat/hit-04.mp3'] as const;
+const combatGrunts=['combat/male-grunt-01.mp3','combat/male-grunt-02.mp3',
+  'combat/male-grunt-03.mp3','combat/male-grunt-04.mp3'] as const;
+const combatSfxFiles=[...combatHits,...combatGrunts,
+  'combat/male-low-stamina.mp3','combat/reposition.mp3',
+  'combat/fight-finished.mp3','combat/guard.mp3'] as const;
+const combatSfxOwners=new Set<symbol>();
+export type CombatSfxCue='hit'|'maleGrunt'|'maleLowStamina'|
+  'reposition'|'guard'|'fightFinished';
 let sfxContext:AudioContext|null=null;
 const sfxBuffers=new Map<string,AudioBuffer>();
 const sfxLoading=new Map<string,Promise<void>>();
@@ -129,7 +142,7 @@ function publishPlayback(){
     :activeTrack&&!activeTrack.paused?'Playing':'Loading');
   const effectsState=unavailable??(settings.sfxVolume===0?'Off'
     :sfxFailures.size>0?'Sound file unavailable'
-    :sfxBuffers.size===sfxFiles.length?'Ready'
+    :sfxFiles.every(filename=>sfxBuffers.has(filename))?'Ready'
     :'Loading');
   const snapshot=[musicState,ambienceState,effectsState].join('|');
   if(snapshot===statusSnapshot)return;
@@ -148,13 +161,13 @@ function ensureSfxContext():AudioContext|null{
   return sfxContext;
 }
 
-function prepareSoundEffects(){
+function prepareSoundEffects(files:readonly string[]=sfxFiles){
   if(!sceneActive||!settings.enabled||typeof window==='undefined')return;
   const context=ensureSfxContext();
   if(!context)return;
   // The seven WAVs are small. Fetch and decode once, well before the player
   // interacts, rather than making the first call to play() load a new file.
-  for(const filename of sfxFiles){
+  for(const filename of files){
     if(sfxBuffers.has(filename)||sfxLoading.has(filename))continue;
     const loading=fetch(base+filename,{cache:'force-cache'})
       .then(response=>{
@@ -735,6 +748,36 @@ export function playSmithingSfx(){
   const choice=Math.floor(Math.random()*smithVariants.length);
   playFile(smithVariants[choice],choice===0?0.9:0.42);
 }
+
+/** Call from the mounted combat route. A scene claim prevents other chapter
+ * views from downloading or accidentally playing Flint's combat effects. */
+export function claimCombatSfx():()=>void {
+  const owner=Symbol('combat-sfx');
+  combatSfxOwners.add(owner);
+  prepareSoundEffects(combatSfxFiles);
+  return ()=>{combatSfxOwners.delete(owner);};
+}
+
+/** Browser-only cue; the caller must have a successful server turn result.
+ * Playback is always subject to the existing global mute and volume. */
+export function playCombatSfx(cue:CombatSfxCue):void {
+  if(combatSfxOwners.size===0||!sceneActive||
+     typeof document==='undefined'||document.hidden)return;
+  switch(cue){
+    case 'hit':
+      playFile(combatHits[Math.floor(Math.random()*combatHits.length)],0.75);break;
+    case 'maleGrunt':
+      playFile(combatGrunts[Math.floor(Math.random()*combatGrunts.length)],0.58);break;
+    case 'maleLowStamina':
+      playFile('combat/male-low-stamina.mp3',0.56);break;
+    case 'reposition':
+      playFile('combat/reposition.mp3',0.65);break;
+    case 'guard':
+      playFile('combat/guard.mp3',0.70);break;
+    case 'fightFinished':
+      playFile('combat/fight-finished.mp3',0.84);break;
+  }
+}
 export function setPallAudioSettings(next:Partial<PallAudioSettings>){
   settings={
     enabled:typeof next.enabled==='boolean'?next.enabled:settings.enabled,
@@ -757,6 +800,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     stopSoundEffects();
   }else{
     prepareSoundEffects();
+    if(combatSfxOwners.size>0)prepareSoundEffects(combatSfxFiles);
     if(canPlayMusic())startMusic();
     updateMusicVolume();
     updateAmbience();
@@ -771,6 +815,7 @@ export function setPallAudioScene(active:boolean){
   sceneActive=active;
   if(active){
     prepareSoundEffects();
+    if(combatSfxOwners.size>0)prepareSoundEffects(combatSfxFiles);
     startMusic();
     updateAmbience();
     updateCouncilAmbience();
