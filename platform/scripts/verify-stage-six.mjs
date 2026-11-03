@@ -18,6 +18,9 @@ const home=read('apps/web/src/lib/CharacterHome.svelte');
 const shell=read('apps/web/src/lib/TutorialShell.svelte');
 const mig=read('db/migrations/0007_millhand_flint_combat.sql');
 const boot=read('apps/api/src/index.ts');
+const charactersSql=read('db/migrations/0002_characters.sql');
+const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
+const sceneShell=read('apps/web/src/lib/TutorialShell.svelte');
 assert.ok(boot.includes('registerMillhandCombatRoutes(api)'));
 assert.ok(api.includes('newEncounter(\'flint\'') &&
   api.includes('state=step(record.state,command.action') &&
@@ -96,5 +99,39 @@ assert.ok(scene.includes('class="action-zone"') &&
   scene.includes('@media(max-width:640px)') &&
   !scene.includes('class="decision-row"'),
   'Combat layout must present one battlefield action bar, compact fighter comparison and adjacent Chronicle');
+
+
+// PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
+// That mismatch formerly rolled back the final Flint turn with HTTP 500.
+assert.ok(charactersSql.includes("'NOT_STARTED','IN_PROGRESS','COMPLETED'") &&
+  api.includes("state.status==='finished'?'COMPLETED':'IN_PROGRESS'") &&
+  !api.includes("state.status==='finished'?'COMPLETE':'IN_PROGRESS'"),
+  'A completed Flint encounter must commit under the actual database status constraint');
+
+// Developer-only Stage 6 → 5 rewind: exact starting Health is recovered
+// from the revision-zero start receipt, not guessed from maximum Health.
+assert.ok(rewind.includes("process.env.NODE_ENV==='production'||!loopback") &&
+  rewind.includes('stage>=2&&stage<=6') &&
+  rewind.includes('expectedStage===6') &&
+  rewind.includes('previousWageClaim(claim.rows[0].state)') &&
+  rewind.includes("response->>'revision'='0'") &&
+  rewind.includes('unsafe_combat_initial_health') &&
+  rewind.includes('unsafe_combat_health_state') &&
+  rewind.includes('DELETE FROM player_character_flint_combat_receipts') &&
+  rewind.includes('DELETE FROM player_character_flint_combat') &&
+  rewind.includes('tutorial_stage=5') &&
+  sceneShell.includes("fromStage===6") &&
+  sceneShell.includes('Back to Stage '),
+  'A safe loopback-only Stage 6 rewind must preserve earlier progress and restore Health');
+
+// Match the approved Stage 5 nine-slice frame, not the older oversized
+// untrimmed dialogue-frame.png with an opaque secondary parchment surface.
+assert.ok(scene.includes("dialogue-frame-trim.png") &&
+  scene.includes('class="cart-marker scene-label"') &&
+  scene.includes('class="scene-label flint-label"') &&
+  scene.includes('border-image-slice:145 190 125 190 fill') &&
+  scene.includes('.action-tile{min-height:') &&
+  !scene.includes('        <p class="kicker">THE PASSAGE · STAGE 6</p>'),
+  'The combat parchment, compact action tiles and NPC labels must use the trimmed frame');
 
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
