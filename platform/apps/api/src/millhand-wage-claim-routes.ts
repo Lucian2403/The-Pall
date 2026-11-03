@@ -140,6 +140,17 @@ export function registerMillhandWageClaimRoutes(app:FastifyInstance){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'branch_mismatch'});
       }
+      if(returningFromBoundary){
+        // An encounter freezes the saved stance. Both APIs lock the character
+        // row first; no concurrent start can race this check.
+        const combat=await client.query(
+          'SELECT character_id FROM player_character_flint_combat WHERE character_id=$1',
+          [req.params.id]);
+        if(combat.rowCount){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'combat_already_started'});
+        }
+      }
       if(returningFromBoundary&&current.phase!=='DONE'){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'stage_six_not_reversible'});
