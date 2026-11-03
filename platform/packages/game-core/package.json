@@ -3,6 +3,19 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "scripts": { "build": "tsc -p tsconfig.json", "test": "node --test test/*.test.mjs" }
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./combat-v0.5.1": {
+      "types": "./vendor/combat-v0.5.1/combat.d.mts",
+      "default": "./vendor/combat-v0.5.1/combat.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test test/*.test.mjs",
+    "test:combat-v0.5.1": "node --test vendor/combat-v0.5.1/test.mjs"
+  }
 }
