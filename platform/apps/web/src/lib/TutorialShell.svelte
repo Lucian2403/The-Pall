@@ -123,7 +123,10 @@
   async function rewindOneStage(){
     if(!canRewind||rewinding||rewindFromStage===null)return;
     const fromStage=rewindFromStage;
-    if(!window.confirm('TESTING ONLY: Replay Stage '+(fromStage-1)+'? This resets the stage you are returning to and clears any later-stage progress, including a Stage 3 route skill award if earned. Your character will be kept.'))return;
+    const warning=fromStage===6
+      ?'TESTING ONLY: Return to Stage 5 stance selection? This discards Flint combat turns and Chronicle, restores the Health saved at the start of the fight, and keeps the character, rewards and earlier jobs.'
+      :'TESTING ONLY: Replay Stage '+(fromStage-1)+'? This resets the stage you are returning to and clears any later-stage progress, including a Stage 3 route skill award if earned. Your character will be kept.';
+    if(!window.confirm(warning))return;
     rewinding=true;
     rewindError='';
     try{
@@ -137,6 +140,12 @@
           rewindError='This character moved to another stage. Reload this page before testing again.';
         }else if(response.status===503 && data.error==='second_job_schema_missing'){
           rewindError='Stage 4 database setup is missing. Run npm run second-job:migrate from platform, then restart the API.';
+        }else if(response.status===503 && data.error==='combat_schema_missing'){
+          rewindError='Stage 6 database setup is missing. Run npm run combat:migrate from platform, then restart the API.';
+        }else if(response.status===409 && data.error==='unsafe_combat_initial_health'){
+          rewindError='Cannot restore the original combat Health: the starting save receipt is missing. No progress was changed.';
+        }else if(response.status===409 && data.error==='unsafe_combat_health_state'){
+          rewindError='Character Health differs from the saved fight. Rewind was blocked to protect the character.';
         }else{
           rewindError='Could not rewind: '+(data.error??response.status);
         }
