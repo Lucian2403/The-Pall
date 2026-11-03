@@ -51,4 +51,33 @@ assert.ok(!api.includes('UPDATE player_characters SET coins') &&
   !api.includes('ordinary_xp') &&
   !api.includes('arms_xp'),
   'Combat must not introduce payouts, healing or an unfinished clinic transition');
+
+// Stage 6 display refinement: the six supplied actions are files, never
+// reimplementations of the authoritative engine's turn handling.
+const assets={
+  'strike.webp':'attack',
+  'guard.webp':'guard',
+  'reposition.webp':'move',
+  'recover.webp':'recover',
+  'press-advantage.webp':'technique'
+};
+for(const [asset,action] of Object.entries(assets)){
+  const file=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions',asset));
+  assert.equal(file.toString('ascii',0,4),'RIFF',asset+' must be a WebP image');
+  assert.equal(file.toString('ascii',8,12),'WEBP',asset+' must be a WebP image');
+  assert.ok(file.length>1000&&file.length<30000,asset+' must be an optimized standalone asset');
+  assert.ok(scene.includes("id:'"+action+"'")&&scene.includes("asset:'"+asset+"'"),
+    'The '+action+' button must display the supplied '+asset);
+}
+const confirm=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/confirm-action.webp'));
+assert.equal(confirm.toString('ascii',8,12),'WEBP','Confirm action icon missing');
+assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
+  scene.includes('aria-pressed={visibleSelection===choice.id}')&&
+  scene.includes('aria-label={`Select ${choice.label} action`}')&&
+  scene.includes('class="action-name"')&&
+  scene.includes('opacity:.76')&&
+  scene.includes('snapshot.events.slice(-6)')&&
+  scene.includes('class="duel-board"'),
+  'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
+
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
