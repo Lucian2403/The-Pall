@@ -186,4 +186,46 @@ assert.ok(page.includes('claimCombatSfx()') &&
   scene.includes('data-pall-sfx="none"'),
   'Audio must follow successful turns, not pending actions or old Chronicle history');
 
+
+// Stage 6 reads the actual combat snapshot's Stamina in the shared header.
+// Earlier stages retain their existing saved-resource or provisional behavior.
+const combatModel=read('apps/web/src/lib/millhand-combat-model.ts');
+const journalReference=read('apps/web/src/lib/MillhandWageClaimScene.svelte');
+assert.ok(page.includes('combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}') &&
+  page.includes("import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model'") &&
+  combatModel.includes('export const COMBAT_RESOURCE_SCALE=100') &&
+  shell.includes('combatStamina?:{current:number;maximum:number}') &&
+  shell.includes('const staminaShown=$derived(isMeasured(combatStamina)') &&
+  shell.indexOf('?combatStamina') < shell.indexOf(':isMeasured(character.stamina)') &&
+  shell.includes("!isMeasured(combatStamina)&&!isMeasured(character.stamina)"),
+  'The header must prefer the current saved Stage 6 Stamina over provisional 100/100');
+
+// Both fighter panels use one resource template with real numbers and small
+// visual meters. Fatigue is not capped in the v0.5.1 state, so only bar fill
+// is clamped; the true numeric amount remains visible.
+assert.ok(scene.includes("displayedResources=[") &&
+  scene.includes("{key:'stamina',label:'Stamina'}") &&
+  scene.includes("{key:'fatigue',label:'Fatigue'}") &&
+  scene.includes("{key:'momentum',label:'Momentum'}") &&
+  scene.includes('style:width={resourceWidth(actor[resource.key])}') &&
+  scene.includes('<dd>{actor[resource.key]}</dd>') &&
+  scene.includes('Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100)') &&
+  scene.includes('class={\'mini-fill \'+resource.key}') &&
+  scene.includes("{@render combatant(snapshot.enemy, 'Flint', true)}") &&
+  scene.includes("{@render combatant(snapshot.player, 'You', false)}"),
+  'Both combatants must display all three real resource values and compact bars');
+
+// The post-fight Journal uses the same parchment, reading width, title
+// hierarchy and paper/ink contrast already established in Stage 5.
+assert.ok(scene.includes('class="aftermath"') &&
+  scene.includes('<small>PERSONAL JOURNAL</small>') &&
+  scene.includes('<h2>The Fight with Flint</h2>') &&
+  scene.includes('class="journal-entries"') &&
+  scene.includes('.aftermath{grid-column:1/-1;background:#e6d5b5;color:#24160e;') &&
+  scene.includes('max-width:960px') &&
+  scene.includes('.journal-entries p{margin:0 0 10px;font:600 16px/1.55') &&
+  journalReference.includes('.journal{background:#e6d5b5;color:#25180d;') &&
+  journalReference.includes('.journal-head'),
+  'Finished combat must show the established parchment Personal Journal');
+
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
