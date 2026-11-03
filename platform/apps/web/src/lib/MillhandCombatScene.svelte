@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
-  import type {CombatActorView, CombatSnapshot} from '$lib/millhand-combat-model';
+  import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
+  import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
 
   let {snapshot, pending, errorMessage, perform}: {
     snapshot: CombatSnapshot;
@@ -46,6 +47,11 @@
       : "I beat Flint and got past him. That club could've done some damage, but I managed to keep him off me. He didn't get a coin out of me. The council still owes us for the plates, of course.");
 
   const iconBase = '/ui-kit/combat-actions/';
+  const displayedResources=[
+    {key:'stamina',label:'Stamina'},
+    {key:'fatigue',label:'Fatigue'},
+    {key:'momentum',label:'Momentum'}
+  ] as const;
   const actionChoices = [
     {id:'attack',label:'Strike',asset:'strike.webp'},
     {id:'guard',label:'Guard',asset:'guard.webp'},
@@ -60,6 +66,13 @@
   }
   function healthWidth(current: number, maximum: number): string {
     return `${Math.max(0, Math.min(100, Math.round(current / Math.max(1, maximum) * 100)))}%`;
+  }
+
+  // Visual fill is capped, but the numeric value is never truncated:
+  // combat v0.5.1 can accumulate Fatigue beyond the 100-point reference scale.
+  function resourceWidth(value:number):string{
+    const scaled=Number.isFinite(value)?value:0;
+    return `${Math.max(0,Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100))}%`;
   }
   function commit(): void {
     let action: CombatAction;
@@ -85,10 +98,19 @@
       <span class="hp-fill" class:critical={actor.hp <= actor.hpMax/4}
         style:width={healthWidth(actor.hp, actor.hpMax)}></span>
     </div>
-    <dl class="resources">
-      <div><dt>Stamina</dt><dd>{actor.stamina}</dd></div>
-      <div><dt>Fatigue</dt><dd>{actor.fatigue}</dd></div>
-      <div><dt>Momentum</dt><dd>{actor.momentum}</dd></div>
+    <dl class="resources" aria-label={title+' combat resources'}>
+      {#each displayedResources as resource (resource.key)}
+        <div class="resource">
+          <div class="resource-top">
+            <dt>{resource.label}</dt>
+            <dd>{actor[resource.key]}</dd>
+          </div>
+          <span class="mini-track" aria-hidden="true">
+            <span class={'mini-fill '+resource.key}
+              style:width={resourceWidth(actor[resource.key])}></span>
+          </span>
+        </div>
+      {/each}
     </dl>
     <details class="secondary-stats">
       <summary>More condition details</summary>
@@ -249,10 +271,17 @@
     </section>
 
     {#if ended}
-      <section class="aftermath" aria-label="Personal journal after the fight">
-        <h3>Personal Journal</h3>
-        <p>Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.</p>
-        <p>{journal}</p>
+      <section class="aftermath" aria-label="The Fight with Flint personal journal">
+        <header class="journal-head">
+          <div>
+            <small>PERSONAL JOURNAL</small>
+            <h2>The Fight with Flint</h2>
+          </div>
+        </header>
+        <div class="journal-entries">
+          <p>Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.</p>
+          <p>{journal}</p>
+        </div>
       </section>
     {/if}
   </div>
@@ -350,7 +379,7 @@
     outline:2px solid #ffda9d;outline-offset:3px}
 
   /* Each fighter has a single reusable status template; their positions differ. */
-  .fighter,.chronicle,.aftermath{min-width:0;box-sizing:border-box;background:#29221eea;
+  .fighter,.chronicle{min-width:0;box-sizing:border-box;background:#29221eea;
     border:1px solid #8b6847;padding:15px 16px}
   .fighter.opponent{border-color:#92674a}
   .fighter-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -362,11 +391,19 @@
     border-radius:2px;margin:10px 0}
   .hp-fill{display:block;height:100%;background:linear-gradient(90deg,#b89558,#f4d397);transition:width .2s ease}
   .hp-fill.critical,.opponent .hp-fill{background:linear-gradient(90deg,#783326,#bd4a2e)}
-  .resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:6px}
-  .resources div{display:flex;align-items:baseline;justify-content:center;gap:6px;min-width:0}
-  .resources div+div{border-left:1px solid #866447}
-  .resources dt{color:#d3b182;font:12px/1.25 Georgia,serif}
-  .resources dd{margin:0;color:#eed2a5;font:700 15px/1.25 Georgia,serif;font-variant-numeric:tabular-nums}
+  .resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:8px}
+  .resource{min-width:0}
+  .resource+.resource{border-left:1px solid #866447;padding-left:8px}
+  .resource-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;min-width:0}
+  .resource-top dt{color:#d3b182;font:12px/1.25 Georgia,serif}
+  .resource-top dd{margin:0;color:#eed2a5;font:700 15px/1.25 Georgia,serif;
+    font-variant-numeric:tabular-nums}
+  .mini-track{display:block;height:7px;margin-top:6px;background:#0d0c0b;
+    border:1px solid #967049;border-radius:3px;overflow:hidden}
+  .mini-fill{display:block;height:100%;transition:width .2s ease}
+  .mini-fill.stamina{background:linear-gradient(90deg,#326343,#71a67c)}
+  .mini-fill.fatigue{background:linear-gradient(90deg,#8e542b,#d59a52)}
+  .mini-fill.momentum{background:linear-gradient(90deg,#8b733d,#e6cb7c)}
   .secondary-stats{margin-top:11px;border-top:1px solid #4f3e31;padding-top:6px}
   .secondary-stats summary{cursor:pointer;color:#b99b78;font:11px/1.4 Arial,sans-serif}
   .secondary-stats dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0 0}
@@ -391,15 +428,26 @@
   .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font-size:13px;line-height:1.5}
-  .aftermath{grid-column:1/-1}.aftermath p{margin:10px 0;line-height:1.55}
+  /* Match the parchment, reading width and typography of the Stage 4–5 Journal. */
+  .aftermath{grid-column:1/-1;background:#e6d5b5;color:#24160e;
+    padding:23px clamp(16px,3vw,45px);border-top:2px solid #94704a;
+    scroll-margin-top:14px}
+  .journal-head{max-width:960px;margin:0 auto 15px}
+  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.09em;color:#47301d}
+  .journal-head h2{margin:4px 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
+    color:#25170f}
+  .journal-entries{max-width:960px;margin:0 auto}
+  .journal-entries p{margin:0 0 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
+    color:#24160e}
 
   @media(max-width:1220px){
     .enemy-status{left:29%;width:27%;min-width:230px}
     .action-zone{right:1.7%;width:72%}
     .choices{gap:4px}
     .resources{grid-template-columns:1fr}
-    .resources div{justify-content:space-between}
-    .resources div+div{border-left:0}
+    .resource{padding-left:0}
+    .resource+.resource{border-left:0;padding-left:0}
   }
   @media(max-width:920px){
     .alley{min-height:0}
@@ -413,8 +461,7 @@
     .actions-row{grid-template-columns:minmax(0,1fr) 160px}
     .combat-console{grid-template-columns:1fr}
     .resources{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .resources div{justify-content:center}
-    .resources div+div{border-left:1px solid #866447}
+    .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   }
   @media(max-width:640px){
     .stage-scenery{min-height:360px}
@@ -437,7 +484,7 @@
   @media(max-width:370px){
     .choices{grid-template-columns:repeat(3,minmax(0,1fr))}
     .resources{grid-template-columns:1fr}
-    .resources div+div{border-left:0}
+    .resource+.resource{border-left:0;padding-left:0}
   }
-  @media(prefers-reduced-motion:reduce){.hp-fill,.action-tile{transition:none}}
+  @media(prefers-reduced-motion:reduce){.hp-fill,.mini-fill,.action-tile{transition:none}}
 </style>
