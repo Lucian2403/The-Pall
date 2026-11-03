@@ -761,7 +761,8 @@ export function claimCombatSfx():()=>void {
 /** Browser-only cue; the caller must have a successful server turn result.
  * Playback is always subject to the existing global mute and volume. */
 export function playCombatSfx(cue:CombatSfxCue):void {
-  if(combatSfxOwners.size===0)return;
+  if(combatSfxOwners.size===0||!sceneActive||
+     typeof document==='undefined'||document.hidden)return;
   switch(cue){
     case 'hit':
       playFile(combatHits[Math.floor(Math.random()*combatHits.length)],0.75);break;
