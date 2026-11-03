@@ -1,16 +1,7 @@
 <script lang="ts">
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
 
-  type Actor={name:string;hp:number;hpMax:number;ceiling:number;stamina:number;
-    composure:number;fatigue:number;stress:number;momentum:number;bleed:number;
-    wounds:Array<{type:string;zone?:string;severity:string}>};
-  type Event={round:number;text:string;kind:string};
-  type CombatSnapshot={status:'active'|'finished';outcome:string|null;stance:'brace'|'moving'|'cart';
-    round:number;revision:number;distance:string;enemyIntent:string|null;intentType:string|null;
-    player:Actor;enemy:Actor;legalActions:string[];events:Event[];
-    rules:{strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
-      recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
-      accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:number;prototype:boolean}};
+  import type {CombatSnapshot} from '$lib/millhand-combat-model';
   let {snapshot,pending,errorMessage,perform}: {
     snapshot:CombatSnapshot;pending:boolean;errorMessage:string;
     perform:(action:CombatAction)=>Promise<void>
