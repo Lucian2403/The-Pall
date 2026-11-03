@@ -22,3 +22,9 @@ export type CombatSnapshot={
     accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:number;prototype:boolean
   };
 };
+
+/** The v0.5.1 combat recovery action caps Stamina at 100.
+ * This also provides a consistent visual reference for the three resource bars.
+ * Fatigue can exceed this scale; its numeric value is never clamped.
+ */
+export const COMBAT_RESOURCE_SCALE=100;
