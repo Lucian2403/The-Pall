@@ -40,7 +40,7 @@ assert.ok(home.includes('/millhand/combat')&&shell.includes('/millhand/combat'))
 assert.ok(scene.includes('snapshot.enemyIntent') &&
   scene.includes('snapshot.events') &&
   scene.includes('snapshot.rules') &&
-  scene.includes('snapshot.player.wounds')===false &&
+  scene.includes('snapshot.player.wounds.some') &&
   scene.includes('snapshot.outcome') &&
   scene.includes('Stage 7 is not yet connected'),
   'UI must use real combat state and avoid fake clinic');
