@@ -2,9 +2,11 @@
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
+  import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
 
-  let {snapshot, pending, errorMessage, perform}: {
+  let {snapshot, feedback, pending, errorMessage, perform}: {
     snapshot: CombatSnapshot;
+    feedback: CombatFloatingFeedback[];
     pending: boolean;
     errorMessage: string;
     perform: (action: CombatAction) => Promise<void>;
@@ -135,6 +137,9 @@
           ? '/characters/flint/flint-defeated.webp'
           : '/characters/flint/flint-standing.webp'} alt="" />
         <span class="scene-label flint-label">FLINT · CONTRACTOR'S COLLECTOR</span>
+        {#each feedback.filter(item => item.target === 'enemy') as cue (cue.id)}
+          <span class="combat-float" class:missed={cue.kind === 'miss'} aria-hidden="true">{cue.label}</span>
+        {/each}
       </div>
       <span class="cart-marker scene-label">WORK CART</span>
 
@@ -253,7 +258,8 @@
         {:else}
           <ol>
             {#each recentEvents as event, i (i)}
-              <li class:latest={i === recentEvents.length - 1}>
+              <li class:latest={i === recentEvents.length - 1}
+                class:impact={event.kind === 'damage'} class:evaded={event.kind === 'miss'}>
                 <span class="round">{String(event.round).padStart(2, '0')}</span>
                 <span>{event.text}</span>
               </li>
@@ -268,6 +274,9 @@
 
     <section class="player-status" aria-label="Player combat condition">
       {@render combatant(snapshot.player, 'You', false)}
+      {#each feedback.filter(item => item.target === 'player') as cue (cue.id)}
+        <span class="combat-float" class:missed={cue.kind === 'miss'} aria-hidden="true">{cue.label}</span>
+      {/each}
     </section>
 
     {#if ended}
@@ -413,7 +422,7 @@
   /* Battle Chronicle sits left of the player's status, below the alley. */
   .combat-console{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
     align-items:stretch;gap:14px;padding:14px 16px;min-width:0}
-  .player-status{min-width:0}
+  .player-status{min-width:0;position:relative}
   .player-status .fighter{height:100%}
   .chronicle-heading{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin-bottom:10px}
@@ -425,9 +434,34 @@
   .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
     font:13px/1.35 Georgia,serif;color:#ecd1a8}
   .log-window li.latest{background:#39291f;color:#ffdfb1;font-weight:700}
+  .log-window li.impact{border-left:3px solid #ce5d4c;padding-left:7px;color:#ffd4c8;
+    background:#552a2580}
+  .log-window li.evaded{border-left:3px solid #d7b97b;padding-left:7px;
+    color:#f4e1bf;background:#493c2b72}
   .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font-size:13px;line-height:1.5}
+  /* Transient hit/miss overlays are anchored to the target, never to a guessed
+     attack roll. Actual damage comes from the committed combat Chronicle. */
+  .combat-float{position:absolute;z-index:6;top:29%;left:52%;
+    pointer-events:none;user-select:none;white-space:nowrap;
+    color:#ff786a;font:900 clamp(22px,2.6vw,44px)/1.1 Georgia,serif;
+    font-variant-numeric:tabular-nums;letter-spacing:.03em;
+    -webkit-text-stroke:1px #47160c;
+    text-shadow:0 2px 3px #160705,0 0 12px #e72e2b8c;
+    animation:combat-feedback-float 1100ms ease-out both}
+  .combat-float.missed{color:#f1e4ca;font-size:clamp(18px,2vw,33px);
+    -webkit-text-stroke:1px #422e1c;text-shadow:0 2px 5px #120d07}
+  .player-status .combat-float{top:-28px;left:50%}
+  @keyframes combat-feedback-float{
+    0%{opacity:0;transform:translate(-50%,18px) scale(.75)}
+    18%{opacity:1;transform:translate(-50%,0) scale(1.14)}
+    67%{opacity:1;transform:translate(-50%,-20px) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-49px) scale(.98)}
+  }
+  @keyframes combat-feedback-reduced{
+    0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}
+  }
   /* Match the parchment, reading width and typography of the Stage 4–5 Journal. */
   .aftermath{grid-column:1/-1;background:#e6d5b5;color:#24160e;
     padding:23px clamp(16px,3vw,45px);border-top:2px solid #94704a;
@@ -486,5 +520,8 @@
     .resources{grid-template-columns:1fr}
     .resource+.resource{border-left:0;padding-left:0}
   }
-  @media(prefers-reduced-motion:reduce){.hp-fill,.mini-fill,.action-tile{transition:none}}
+  @media(prefers-reduced-motion:reduce){
+    .hp-fill,.mini-fill,.action-tile{transition:none}
+    .combat-float{animation:combat-feedback-reduced 1100ms linear both}
+  }
 </style>
