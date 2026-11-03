@@ -74,13 +74,13 @@ for(const [asset,action] of Object.entries(assets)){
 }
 const confirm=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/confirm-action.webp'));
 assert.equal(confirm.toString('ascii',8,12),'WEBP','Confirm action icon missing');
-assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
-  scene.includes('aria-pressed={visibleSelection===choice.id}')&&
+assert.ok(scene.includes("iconBase + 'confirm-action.webp'")&&
+  scene.includes('aria-pressed={visibleSelection === choice.id}')&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
   scene.includes('opacity:.76')&&
   scene.includes('snapshot.events.slice(-3)')&&
-  scene.includes('class="duel-board"'),
+  scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
 
 
@@ -91,11 +91,11 @@ assert.ok(scene.includes('class="action-zone"') &&
   scene.includes('class="actions-row"') &&
   scene.includes('class="confirm-holder"') &&
   scene.includes('class="action-details"') &&
-  scene.includes('class="duel-board"') &&
+  scene.includes('class="enemy-status"') && scene.includes('class="player-status"') &&
   scene.includes('class="chronicle"') &&
   scene.includes('class="secondary-stats"') &&
   scene.includes('class="resources"') &&
-  scene.includes('grid-template-columns:minmax(0,1.9fr) minmax(0,1.15fr)') &&
+  scene.includes('grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)') &&
   scene.includes('@media(max-width:640px)') &&
   !scene.includes('class="decision-row"'),
   'Combat layout must present one battlefield action bar, compact fighter comparison and adjacent Chronicle');
@@ -130,8 +130,60 @@ assert.ok(scene.includes("dialogue-frame-trim.png") &&
   scene.includes('class="cart-marker scene-label"') &&
   scene.includes('class="scene-label flint-label"') &&
   scene.includes('border-image-slice:145 190 125 190 fill') &&
-  scene.includes('.action-tile{min-height:') &&
+  scene.includes('min-height:69px') &&
   !scene.includes('        <p class="kicker">THE PASSAGE · STAGE 6</p>'),
   'The combat parchment, compact action tiles and NPC labels must use the trimmed frame');
+
+
+// Owner HUD: Flint beside his stats; Chronicle on the left, player on the right.
+const enemyPosition=scene.indexOf('<section class="enemy-status"');
+const actionPosition=scene.indexOf('<section class="action-zone"');
+const chroniclePosition=scene.indexOf('<section class="chronicle"');
+const playerPosition=scene.indexOf('<section class="player-status"');
+assert.ok(enemyPosition>0 && enemyPosition<actionPosition &&
+  actionPosition<chroniclePosition && chroniclePosition<playerPosition &&
+  scene.includes("{@render combatant(snapshot.enemy, 'Flint', true)}") &&
+  scene.includes("{@render combatant(snapshot.player, 'You', false)}") &&
+  scene.includes('.enemy-status{position:absolute') &&
+  scene.includes('.combat-console{display:grid') &&
+  scene.includes('@media(max-width:920px)') &&
+  scene.includes('.enemy-status{position:relative'),
+  'Flint condition near him, Chronicle left of player; narrow screens remain usable');
+assert.ok(scene.includes('/characters/flint/flint-defeated.webp') &&
+  scene.includes("snapshot.outcome === 'player_victory'") &&
+  scene.includes('/characters/flint/flint-standing.webp'),
+  'Flint defeated art must replace the standing cutout after a saved victory');
+
+// Twelve owner cues. Verify the binary files, shared mixer and server truth.
+const audio=read('apps/web/src/lib/pall-audio.ts');
+const soundMap=read('apps/web/src/lib/millhand-combat-sound.ts');
+const soundNames=[
+  'guard.mp3','reposition.mp3','fight-finished.mp3','male-low-stamina.mp3',
+  ...[1,2,3,4].map(n=>'hit-0'+n+'.mp3'),
+  ...[1,2,3,4].map(n=>'male-grunt-0'+n+'.mp3')
+];
+for(const name of soundNames){
+  const buffer=readFileSync(resolve(root,'apps/web/static/audio/the-pall/combat',name));
+  assert.equal(buffer.toString('ascii',0,3),'ID3',name+' must be a valid MP3');
+  assert.ok(buffer.length>3000 && buffer.length<35000,name+' must be a compact sound');
+  assert.ok(audio.includes('combat/'+name),'Audio source missing '+name);
+}
+assert.ok(audio.includes('claimCombatSfx') &&
+  audio.includes('playCombatSfx') &&
+  audio.includes('combatSfxOwners') &&
+  audio.includes('settings.sfxVolume') &&
+  audio.includes('prepareSoundEffects(combatSfxFiles)') &&
+  audio.includes('sfxFiles.every(filename=>sfxBuffers.has(filename))'),
+  'Combat cues must share player SFX settings and preload only in combat');
+assert.ok(page.includes('claimCombatSfx()') &&
+  page.includes('soundSavedCombatTurn(previous,result,action,character?.sex)') &&
+  soundMap.includes('event.round === previous.round') &&
+  soundMap.includes("e.kind === 'damage'") &&
+  soundMap.includes("e.kind === 'guard'") &&
+  soundMap.includes("e.kind === 'move'") &&
+  soundMap.includes("next.status === 'finished'") &&
+  soundMap.includes("playerSex === 'Male'") &&
+  scene.includes('data-pall-sfx="none"'),
+  'Audio must follow successful turns, not pending actions or old Chronicle history');
 
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
