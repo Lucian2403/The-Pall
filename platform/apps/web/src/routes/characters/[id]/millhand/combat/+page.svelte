@@ -8,6 +8,8 @@
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import {claimCombatSfx} from '$lib/pall-audio';
   import {soundSavedCombatTurn} from '$lib/millhand-combat-sound';
+  import {floatingFeedbackForSavedTurn} from '$lib/millhand-combat-feedback';
+  import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
 
   type Character={id:string;name:string;origin:string;sex:string;
     avatarId?:string|null;coins:number;health:{current:number;maximum:number};
@@ -16,6 +18,8 @@
   type PendingStart={needsStart:true;stage:number};
   let character=$state<Character|null>(null);
   let battle=$state<Snapshot|null>(null);
+  // Transient presentation only. No floating text is restored on reload.
+  let feedback=$state<CombatFloatingFeedback[]>([]);
   let status=$state<'loading'|'ready'|'login'|'missing'|'prerequisite'|'schema'|'unavailable'>('loading');
   let pending=$state(false);
   let errorMessage=$state('');
@@ -33,6 +37,7 @@
     battle=await response.json() as Snapshot;
   }
   async function refresh(){
+    feedback=[];
     status='loading';
     try{
       const [person,fight]=await Promise.all([
@@ -76,6 +81,8 @@
           expectedRevision:revision,action})});
       const result=await response.json() as Snapshot&{error?:string;detail?:string};
       if(response.ok){
+        // React only to committed new damage/miss events, never stale history.
+        feedback=previous?floatingFeedbackForSavedTurn(previous,result):[];
         if(previous)soundSavedCombatTurn(previous,result,action,character?.sex);
         battle=result;retryId=null;retrySignature=null;
         if(character){
@@ -103,7 +110,7 @@
 {#if status==='ready' && character && battle}
   <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
     combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
-    <MillhandCombatScene snapshot={battle} {pending} {errorMessage} {perform}/>
+    <MillhandCombatScene snapshot={battle} {feedback} {pending} {errorMessage} {perform}/>
   </TutorialShell>
 {:else}
   <main class="fallback">

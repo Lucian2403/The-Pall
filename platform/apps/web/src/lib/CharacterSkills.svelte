@@ -1,5 +1,6 @@
 <script lang="ts">
   import {CHARACTER_SKILLS} from '$lib/character-skills';
+  import {majorSkillDisplayLevel} from '$lib/major-skill-display';
 
   let {majorSkillBonuses,origin}:{
     majorSkillBonuses:Record<string,number>;
@@ -10,11 +11,19 @@
   let dragStart:{x:number;y:number;left:number;top:number}|null=null;
 
   function displayMajor(major:string){
-    const grant=majorSkillBonuses[major];
-    // Only positive Major Skill grants are stored today. For majors without a
-    // recorded grant, show the owner's 1/100 starting display baseline.
-    // This baseline is presentation-only until the complete skill ledger exists.
-    return Number.isFinite(grant)&&grant>0?grant+' / 100':'1 / 100';
+    // Saved route grants must become visible above the provisional 1/100
+    // baseline; Craftsmanship's existing +3 remains 3/100.
+    return majorSkillDisplayLevel(origin,major,majorSkillBonuses)+' / 100';
+  }
+  function secondJobRouteAward(major:string):boolean{
+    return origin==='Millhand' &&
+      (major==='Industry'||major==='Commerce'||major==='Scholarship') &&
+      Number.isSafeInteger(majorSkillBonuses[major]) && majorSkillBonuses[major]>0;
+  }
+  function majorSkillTitle(major:string):string{
+    return secondJobRouteAward(major)
+      ?'Your second-job route granted +1 to '+major+'. The 1/100 baseline is still provisional.'
+      :'Major Skill on the 100-level scale. Without a saved grant, 1/100 is a provisional display baseline.';
   }
   // A derived introductory *preview*, not a persisted rank. Roman I-IV are
   // now the proposed tiers; no backend specialization ledger exists yet.
@@ -77,7 +86,7 @@
       <details class="skill-category">
         <summary data-pall-sfx="click">
           <span class="skill-name">{group.major}</span>
-          <span class:trained={(majorSkillBonuses[group.major]??0)>0} class="level" title="Major Skill on the 100-level scale. A value of 1 without a saved grant is the provisional display baseline.">
+          <span class:trained={(majorSkillBonuses[group.major]??0)>0} class="level" title={majorSkillTitle(group.major)}>
             {displayMajor(group.major)}
           </span>
           <span class="twist" aria-hidden="true">⌄</span>
@@ -108,7 +117,7 @@
     <button class="window-close" type="button" data-pall-sfx="paper" aria-label="Close skills window" onclick={()=>windowElement?.close()}>×</button>
   </div>
   <div class="window-body">
-    <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline, not a saved level. Specializations: Roman I–IV (planned); Smithing I for a Millhand is a starting preview.</p>
+    <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline. A Millhand's chosen second-job route adds +1 to Industry, Commerce or Scholarship; that saved grant displays as 2 / 100. Specializations: Roman I–IV (planned); Smithing I is a starting preview.</p>
     <div class="window-list">
       {#each CHARACTER_SKILLS as group (group.major)}
         <section class="window-skill">
