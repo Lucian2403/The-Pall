@@ -229,37 +229,77 @@ assert.ok(scene.includes('class="aftermath"') &&
   'Finished combat must show the established parchment Personal Journal');
 
 
-// Floating text is strictly cosmetic: derive it from new, saved server
-// damage/miss events. No optimistic rolls, no replay of the loaded Chronicle.
+// The combat engine resets state.events at every step. Use the fresh,
+// authoritative turnEvents rather than comparing a growing Chronicle.
+// Repeated successful turns must each display their own result.
+assert.ok(view.includes('turnEvents:state.events') &&
+  combatModel.includes('turnEvents:CombatEventView[]') &&
+  soundMap.includes('next.turnEvents.filter(event => event.round === previous.round)'),
+  'The server must expose per-turn events to both floating text and combat SFX');
 const {newSavedCombatEvents,floatingFeedbackForSavedTurn}=
   await import('../apps/web/src/lib/millhand-combat-feedback.ts');
 const intent={round:4,kind:'intent',text:'Flint prepares his club'};
 const hit={round:4,kind:'damage',actor:'player',target:'enemy',damage:11,text:'Flint loses 11 Health'};
 const miss={round:4,kind:'miss',actor:'enemy',damage:0,text:'Flint misses'};
 const zero={round:4,kind:'damage',actor:'enemy',target:'player',damage:0,text:'Guard blocks'};
-const before={revision:4,events:[intent],status:'active'};
-const after={revision:5,events:[intent,hit,miss,zero],status:'active'};
-const feedback=floatingFeedbackForSavedTurn(before,after);
-assert.deepEqual(feedback.map(entry=>({target:entry.target,label:entry.label,kind:entry.kind})),[
+const before={revision:4,round:4,events:[intent],turnEvents:[],status:'active'};
+const after={revision:5,round:5,events:[intent,hit,miss,zero],
+  turnEvents:[intent,hit,miss,zero],status:'active'};
+const summarize=items=>items.map(({target,label,kind})=>({target,label,kind}));
+assert.deepEqual(summarize(floatingFeedbackForSavedTurn(before,after)),[
   {target:'enemy',label:'−11',kind:'hit'},
   {target:'player',label:'Miss',kind:'miss'}
 ]);
-assert.deepEqual(newSavedCombatEvents(before,after),[hit,miss,zero]);
-assert.deepEqual(floatingFeedbackForSavedTurn(after,after),[],'Same revision must not replay');
+assert.deepEqual(newSavedCombatEvents(before,after),[intent,hit,miss,zero]);
+assert.deepEqual(floatingFeedbackForSavedTurn(after,after),[],
+  'Same revision must not replay');
 assert.deepEqual(floatingFeedbackForSavedTurn(before,{...after,revision:7}),[],
-  'Skipped/reloaded revisions must not replay unknown events');
-assert.deepEqual(floatingFeedbackForSavedTurn(before,{...after,events:[hit,miss]}),[],
-  'Without historical overlap, no speculative event is displayed');
-assert.deepEqual(floatingFeedbackForSavedTurn(before,{
-  revision:5,events:[intent,{...miss,actor:'player'}],status:'active'
-}).map(entry=>({target:entry.target,kind:entry.kind,label:entry.label})),
-  [{target:'enemy',kind:'miss',label:'Miss'}],
+  'Skipped revisions must not replay unknown events');
+assert.deepEqual(summarize(floatingFeedbackForSavedTurn(before,{
+  ...after,turnEvents:[{...miss,actor:'player'}]
+})),[{target:'enemy',kind:'miss',label:'Miss'}],
   'A player miss must float over Flint');
-assert.deepEqual(floatingFeedbackForSavedTurn(before,{
-  revision:5,events:[intent,{...hit,actor:'enemy',target:'player',damage:14}],status:'active'
-}).map(entry=>({target:entry.target,kind:entry.kind,label:entry.label})),
-  [{target:'player',kind:'hit',label:'−14'}],
+assert.deepEqual(summarize(floatingFeedbackForSavedTurn(before,{
+  ...after,turnEvents:[{...hit,actor:'enemy',target:'player',damage:14}]
+})),[{target:'player',kind:'hit',label:'−14'}],
   'An enemy hit must float over the player');
+assert.deepEqual(floatingFeedbackForSavedTurn(before,{
+  ...after,turnEvents:[zero]
+}),[],'Blocked zero-damage attacks must not show fictitious damage');
+
+// Regression: this failed after the first feedback when array comparison
+// drifted. Each consecutive round must work even when the visible Chronicle
+// has rolled its 120-event limit.
+let previous=after;
+for(let round=5;round<25;round++){
+  const target=round%2===0?'enemy':'player';
+  const newEvent=round%3===0
+    ?{round,kind:'miss',actor:target==='enemy'?'player':'enemy',damage:0,
+        text:'The strike misses'}
+    :{round,kind:'damage',actor:target==='enemy'?'player':'enemy',target,
+        damage:round,text:'The blow lands'};
+  const next={
+    ...previous,
+    revision:previous.revision+1,
+    round:round+1,
+    // Simulate compacted/rotating history to ensure it is never used as
+    // the source for this turn's floating feedback.
+    events:Array.from({length:120},(_,i)=>({
+      round:i,kind:'intent',text:'Old Chronicle entry '+i
+    })),
+    turnEvents:[{round,kind:'intent',text:'Flint shifts'},newEvent]
+  };
+  const output=floatingFeedbackForSavedTurn(previous,next);
+  assert.equal(output.length,1,'Missing floating feedback on round '+round);
+  assert.equal(output[0].target,target,'Wrong target on round '+round);
+  assert.equal(output[0].label,newEvent.kind==='miss'?'Miss':'−'+round);
+  assert.ok(output[0].id.startsWith(String(next.revision)+':'),
+    'Every successful turn must have a new DOM animation key');
+  previous=next;
+}
+assert.deepEqual(floatingFeedbackForSavedTurn(before,{
+  ...after,turnEvents:[],events:[hit,miss,zero]
+}),[],'Old Chronicle entries must not animate without a new turn event');
 assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous,result):[]') &&
   page.includes('feedback=[];') &&
   page.includes('<MillhandCombatScene snapshot={battle} {feedback}') &&
@@ -269,6 +309,6 @@ assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous
   scene.includes('class:evaded={event.kind === \'miss\'}') &&
   scene.includes('animation:combat-feedback-float 1100ms') &&
   scene.includes('@media(prefers-reduced-motion:reduce)'),
-  'Saved-event floating feedback must be targeted, short-lived and accessible');
+  'The short-lived floating feedback must restart every turn without replaying old events');
 
 console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
