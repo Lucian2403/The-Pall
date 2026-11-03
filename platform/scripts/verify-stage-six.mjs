@@ -9,6 +9,9 @@ const engineHash=createHash('sha256').update(engine).digest('hex');
 assert.equal(engineHash,'4d7b2c958611c8b564113a9c8825b7346461516e02d237b09fce331ba3e5ef89',
   'The approved v0.5.1 engine must remain byte-for-byte unchanged');
 const api=read('apps/api/src/millhand-combat-routes.ts');
+const opening=read('apps/api/src/millhand-combat-opening.ts');
+const characterRoutes=read('apps/api/src/character-routes.ts');
+const pgTest=read('scripts/verify-stage6-postgres.integration.test.ts');
 const view=read('apps/api/src/millhand-combat-view.ts');
 const scene=read('apps/web/src/lib/MillhandCombatScene.svelte');
 const page=read('apps/web/src/routes/characters/[id]/millhand/combat/+page.svelte');
@@ -22,7 +25,8 @@ const charactersSql=read('db/migrations/0002_characters.sql');
 const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
 const sceneShell=read('apps/web/src/lib/TutorialShell.svelte');
 assert.ok(boot.includes('registerMillhandCombatRoutes(api)'));
-assert.ok(api.includes('newEncounter(\'flint\'') &&
+assert.ok(opening.includes("newEncounter('flint'") &&
+  api.includes('initializeFlintCombat(req.params.id,ch,stance,seed())') &&
   api.includes('state=step(record.state,command.action') &&
   api.includes('FOR UPDATE') &&
   api.includes('account_id=$2') &&
@@ -31,7 +35,23 @@ assert.ok(api.includes('newEncounter(\'flint\'') &&
   api.includes('current_health=$2') &&
   api.includes('unexpected_encounter_outcome'),
   'Server must own both combat and character Health');
-for(const stance of ['brace','moving','cart'])assert.ok(api.includes("stance==='"+stance+"'"));
+for(const stance of ['brace','moving','cart'])assert.ok(opening.includes("stance==='"+stance+"'"));
+assert.ok(opening.includes("state.intent={") &&
+  opening.includes("type:'move',to:'close',speed:5") &&
+  opening.includes("state.distance='near'") &&
+  opening.includes("state.distance='far'") &&
+  opening.includes('state.player.readiness+=2'),
+  'The three opening stances must produce real existing-engine tactical differences');
+assert.ok(characterRoutes.includes("'player_character_flint_combat_receipts','player_character_flint_combat'") &&
+  characterRoutes.includes("'player_character_wage_claim_receipts','player_character_wage_claim'") &&
+  characterRoutes.includes("'DELETE FROM '+table+' WHERE character_id=$1'"),
+  'Account-owned deletion must remove Stage 5 and 6 child rows and receipts');
+assert.ok(pgTest.includes("registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5})") &&
+  pgTest.includes('Two concurrent browser tabs') &&
+  pgTest.includes('A victory saves its actual Health') &&
+  pgTest.includes('A defeat at zero Health') &&
+  pgTest.includes('Account-owned deletion removes Stage 5/6 records'),
+  'PostgreSQL adapter integration coverage must include races, both outcomes and deletion');
 assert.ok(claim.includes('combat_already_started'),'Stance cannot be rewound after combat begins');
 assert.ok(page.includes("kind:'start'") &&
   page.includes("kind:'turn'") &&

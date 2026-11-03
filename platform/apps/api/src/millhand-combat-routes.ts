@@ -7,15 +7,16 @@
  */
 import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
+import type {IncomingHttpHeaders} from 'node:http';
 import {createHash,randomBytes} from 'node:crypto';
 import pg from 'pg';
 import {auth} from './auth.js';
-import {newEncounter,step,CombatError} from '@the-pall/game-core/combat-v0.5.1';
+import {step,CombatError} from '@the-pall/game-core/combat-v0.5.1';
+import {initializeFlintCombat} from './millhand-combat-opening.js';
 import type {CombatAction,CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
 import {combatView} from './millhand-combat-view.js';
 import type {StageSixStance} from './millhand-combat-view.js';
 
-const db=new pg.Pool({connectionString:process.env.DATABASE_URL});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params={id:string};
 type Character={origin:string;tutorial_stage:number;tutorial_status:string;
@@ -69,34 +70,33 @@ function readyStance(claim:Claim|undefined):StageSixStance|null{
   const stance=claim.state.stance;
   return stance==='brace'||stance==='moving'||stance==='cart'?stance:null;
 }
-function initialize(characterId:string,character:Character,stance:StageSixStance):CombatState{
-  if(!Number.isInteger(character.current_health)||character.current_health<=0||
-    !Number.isInteger(character.max_health)||character.max_health<=0)
-    throw new Error('invalid_initial_health');
-  const encounter=newEncounter('flint',{
-    id:'flint-'+characterId,
-    seed:randomBytes(4).readUInt32BE(0),
-    player:{hp:character.current_health,hpMax:character.max_health,ceiling:character.max_health}
-  });
-  // These are the three actual placements from the owner's v0.6.1 playtest.
-  // No fabricated cover mitigation or new initiative formula is added.
-  if(stance==='brace')encounter.player.readiness+=2;
-  if(stance==='moving'){encounter.distance='near';encounter.side=true;}
-  if(stance==='cart'){encounter.distance='far';encounter.side=true;}
-  return encounter;
-}
-
 function snapshot(record:CombatRecord){
   return combatView(record.state,record.history,record.stance);
 }
 function databaseSetupError(error:unknown){return (error as {code?:string})?.code==='42P01';}
 
-export function registerMillhandCombatRoutes(app:FastifyInstance){
-  app.addHook('onClose',async()=>{await db.end();});
+type SessionAccount={user:{id:string;emailVerified:boolean}}|null;
+type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
+
+/**
+ * Production uses the real Better Auth session, a private PostgreSQL pool,
+ * and cryptographic seeds. Dependencies can be supplied only by the in-process
+ * PostgreSQL integration harness; no HTTP header can enable this substitution.
+ */
+export function registerMillhandCombatRoutes(app:FastifyInstance,options:{
+  pool?:pg.Pool;
+  resolveSession?:SessionResolver;
+  seed?:()=>number;
+}={}){
+  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
+    auth.api.getSession({headers:fromNodeHeaders(headers)}));
+  const seed=options.seed??(()=>randomBytes(4).readUInt32BE(0));
+  app.addHook('onClose',async()=>{if(!options.pool)await db.end();});
 
   app.get<{Params:Params}>('/api/characters/:id/millhand/combat',async(req,reply)=>{
     reply.header('Cache-Control','no-store');
-    const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+    const session=await resolveSession(req.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
     const c=await db.query<Character>(
@@ -124,7 +124,7 @@ export function registerMillhandCombatRoutes(app:FastifyInstance){
 
   app.post<{Params:Params}>('/api/characters/:id/millhand/combat',async(req,reply)=>{
     reply.header('Cache-Control','no-store');
-    const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+    const session=await resolveSession(req.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
     if(req.headers.origin&&req.headers.origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
@@ -173,7 +173,7 @@ export function registerMillhandCombatRoutes(app:FastifyInstance){
       if(command.kind==='start'){
         if(saved.rowCount)record=saved.rows[0];
         else{
-          const state=initialize(req.params.id,ch,stance);
+          const state=initializeFlintCombat(req.params.id,ch,stance,seed());
           record={state,history:[],stance};
           await client.query(
             'INSERT INTO player_character_flint_combat(character_id,revision,stance,state,history) VALUES($1,0,$2,$3::jsonb,$4::jsonb)',
