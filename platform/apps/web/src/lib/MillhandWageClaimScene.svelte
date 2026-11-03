@@ -1,5 +1,6 @@
 <script lang="ts">
   import {tick} from 'svelte';
+  import {page} from '$app/state';
   import type {WageClaimState,WageClaimAction} from '@the-pall/game-core';
   import {
     WAGE_CLAIM_WALK_HOME,WAGE_CLAIM_OPENING,WAGE_CLAIM_INSTRUCTIONS,WAGE_CLAIM_ACTION_LABELS,
@@ -112,8 +113,10 @@
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
       {:else if state.phase==='DONE' && state.stance}
         <p class="context">{WAGE_CLAIM_STANCE_OUTCOMES[state.stance]}</p>
-        <p class="instruction">Your choice is saved. Stage 6 will use this position when the real Flint encounter is connected.</p>
-        <p class="context boundary">Stage 6 combat is not yet integrated. No attack or damage has been simulated.</p>
+        <p class="instruction">Your position is saved. The encounter begins in Stage 6.</p>
+        {#if snapshot.stage===6}
+          <a class="combat-link" href={'/characters/'+encodeURIComponent(page.params.id)+'/millhand/combat'}>Enter the fight</a>
+        {/if}
       {:else}
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
       {/if}
@@ -293,4 +296,6 @@
     .inspection-text,.inspection-weapon{font-size:15px;line-height:1.5}
   }
   @media(prefers-reduced-motion:reduce){.object,.actions button{transition:none}}
+  .combat-link{display:block;margin:12px 0;padding:10px 12px;text-align:center;background:#35271d;color:#f4e3c3;border:1px solid #90714e;text-decoration:none;font-weight:700}
+  .combat-link:focus-visible{outline:2px solid #75562d;outline-offset:3px}
 </style>
