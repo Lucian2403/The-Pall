@@ -1,0 +1,230 @@
+/**
+ * Millhand Stage 6 — Flint. This is the authenticated PostgreSQL adapter for
+ * the exact v0.5.1 engine, NOT a new combat implementation.
+ *
+ * Lock order: owned character -> Stage 5 prerequisite -> combat row -> receipt.
+ * Every resolved round and character Health update commit atomically.
+ */
+import type {FastifyInstance} from 'fastify';
+import {fromNodeHeaders} from 'better-auth/node';
+import {createHash,randomBytes} from 'node:crypto';
+import pg from 'pg';
+import {auth} from './auth.js';
+import {newEncounter,step,CombatError} from '@the-pall/game-core/combat-v0.5.1';
+import type {CombatAction,CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
+import {combatView} from './millhand-combat-view.js';
+import type {StageSixStance} from './millhand-combat-view.js';
+
+const db=new pg.Pool({connectionString:process.env.DATABASE_URL});
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+type Params={id:string};
+type Character={origin:string;tutorial_stage:number;tutorial_status:string;
+  current_health:number;max_health:number};
+type Claim={state:{phase:string;stance:StageSixStance|null}};
+type CombatRecord={state:CombatState;history:CombatEvent[];stance:StageSixStance};
+type Command={kind:'start';requestId:string}|{
+  kind:'turn';requestId:string;expectedRevision:number;action:CombatAction
+};
+const allowedMove=['side','close','cover','back'];
+const allowedZone=['head','torso','limbs'];
+
+function parseCommand(value:unknown):Command{
+  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('invalid_body');
+  const v=value as Record<string,unknown>;
+  if(typeof v.requestId!=='string'||!UUID.test(v.requestId))throw Error('invalid_request_id');
+  if(v.kind==='start'){
+    if(Object.keys(v).sort().join(',')!=='kind,requestId')throw Error('invalid_fields');
+    return {kind:'start',requestId:v.requestId};
+  }
+  if(v.kind!=='turn'||Object.keys(v).sort().join(',')!=='action,expectedRevision,kind,requestId')
+    throw Error('invalid_fields');
+  if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)
+    throw Error('invalid_revision');
+  if(!v.action||typeof v.action!=='object'||Array.isArray(v.action))throw Error('invalid_action');
+  const a=v.action as Record<string,unknown>;
+  const keys=Object.keys(a).sort().join(',');
+  let action:CombatAction;
+  switch(a.type){
+    case 'attack':case 'technique':
+      if(keys!=='type,zone'||!allowedZone.includes(a.zone as string))throw Error('invalid_action');
+      action={type:a.type,zone:a.zone as 'head'|'torso'|'limbs'};break;
+    case 'move':
+      if(keys!=='to,type'||!allowedMove.includes(a.to as string))throw Error('invalid_action');
+      action={type:'move',to:a.to as 'side'|'close'|'cover'|'back'};break;
+    case 'recover':
+      if(keys!=='mode,type'||(a.mode!=='breath'&&a.mode!=='nerves'))throw Error('invalid_action');
+      action={type:'recover',mode:a.mode};break;
+    case 'guard':
+      if(keys!=='type')throw Error('invalid_action');
+      action={type:'guard'};break;
+    default:
+      // No client override for speed, AI intent, damage, consumables or escape.
+      throw Error('invalid_action');
+  }
+  return {kind:'turn',requestId:v.requestId,expectedRevision:v.expectedRevision as number,action};
+}
+
+function readyStance(claim:Claim|undefined):StageSixStance|null{
+  if(claim?.state.phase!=='DONE')return null;
+  const stance=claim.state.stance;
+  return stance==='brace'||stance==='moving'||stance==='cart'?stance:null;
+}
+function initialize(characterId:string,character:Character,stance:StageSixStance):CombatState{
+  if(!Number.isInteger(character.current_health)||character.current_health<=0||
+    !Number.isInteger(character.max_health)||character.max_health<=0)
+    throw new Error('invalid_initial_health');
+  const encounter=newEncounter('flint',{
+    id:'flint-'+characterId,
+    seed:randomBytes(4).readUInt32BE(0),
+    player:{hp:character.current_health,hpMax:character.max_health,ceiling:character.max_health}
+  });
+  // These are the three actual placements from the owner's v0.6.1 playtest.
+  // No fabricated cover mitigation or new initiative formula is added.
+  if(stance==='brace')encounter.player.readiness+=2;
+  if(stance==='moving'){encounter.distance='near';encounter.side=true;}
+  if(stance==='cart'){encounter.distance='far';encounter.side=true;}
+  return encounter;
+}
+
+function snapshot(record:CombatRecord){
+  return combatView(record.state,record.history,record.stance);
+}
+function databaseSetupError(error:unknown){return (error as {code?:string})?.code==='42P01';}
+
+export function registerMillhandCombatRoutes(app:FastifyInstance){
+  app.addHook('onClose',async()=>{await db.end();});
+
+  app.get<{Params:Params}>('/api/characters/:id/millhand/combat',async(req,reply)=>{
+    reply.header('Cache-Control','no-store');
+    const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+    const c=await db.query<Character>(
+      'SELECT origin,tutorial_stage,tutorial_status,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2',
+      [req.params.id,session.user.id]);
+    if(!c.rowCount||c.rows[0].origin!=='Millhand')return reply.code(404).send({error:'not_found'});
+    if(c.rows[0].tutorial_stage<6)return reply.code(409).send({error:'stage_six_not_ready'});
+    try{
+      const claim=await db.query<Claim>('SELECT state FROM player_character_wage_claim WHERE character_id=$1',[req.params.id]);
+      const stance=readyStance(claim.rows[0]);
+      if(!stance)return reply.code(409).send({error:'stance_not_recorded'});
+      const saved=await db.query<CombatRecord>(
+        'SELECT state,history,stance FROM player_character_flint_combat WHERE character_id=$1',[req.params.id]);
+      if(!saved.rowCount){
+        if(c.rows[0].tutorial_stage!==6)return reply.code(409).send({error:'combat_not_found'});
+        return {needsStart:true,stage:6};
+      }
+      if(saved.rows[0].stance!==stance)return reply.code(409).send({error:'combat_stance_mismatch'});
+      return snapshot(saved.rows[0]);
+    }catch(error){
+      if(databaseSetupError(error))return reply.code(503).send({error:'combat_schema_missing',setup:'npm run combat:migrate'});
+      throw error;
+    }
+  });
+
+  app.post<{Params:Params}>('/api/characters/:id/millhand/combat',async(req,reply)=>{
+    reply.header('Cache-Control','no-store');
+    const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+    if(req.headers.origin&&req.headers.origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
+      return reply.code(403).send({error:'invalid_origin'});
+    if(!req.headers['content-type']?.toLowerCase().startsWith('application/json'))
+      return reply.code(415).send({error:'json_required'});
+    let command:Command;
+    try{command=parseCommand(req.body);}catch(error){
+      return reply.code(400).send({error:error instanceof Error?error.message:'invalid_action'});
+    }
+    const hash=createHash('sha256').update(JSON.stringify(command)).digest('hex');
+    const client=await db.connect();let inTransaction=false;
+    try{
+      await client.query('BEGIN');inTransaction=true;
+      const characters=await client.query<Character>(
+        'SELECT origin,tutorial_stage,tutorial_status,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
+        [req.params.id,session.user.id]);
+      if(!characters.rowCount||characters.rows[0].origin!=='Millhand'){
+        await client.query('ROLLBACK');inTransaction=false;
+        return reply.code(404).send({error:'not_found'});
+      }
+      const receipt=await client.query<{request_hash:string;response:unknown}>(
+        'SELECT request_hash,response FROM player_character_flint_combat_receipts WHERE character_id=$1 AND request_id=$2',
+        [req.params.id,command.requestId]);
+      if(receipt.rowCount){
+        await client.query('COMMIT');inTransaction=false;
+        return receipt.rows[0].request_hash===hash?receipt.rows[0].response
+          :reply.code(409).send({error:'idempotency_key_reuse'});
+      }
+      const ch=characters.rows[0];
+      if(ch.tutorial_stage!==6){
+        await client.query('ROLLBACK');inTransaction=false;
+        return reply.code(409).send({error:'stage_six_not_ready'});
+      }
+      const claims=await client.query<Claim>(
+        'SELECT state FROM player_character_wage_claim WHERE character_id=$1',[req.params.id]);
+      const stance=readyStance(claims.rows[0]);
+      if(!stance){
+        await client.query('ROLLBACK');inTransaction=false;
+        return reply.code(409).send({error:'stance_not_recorded'});
+      }
+      const saved=await client.query<CombatRecord>(
+        'SELECT state,history,stance FROM player_character_flint_combat WHERE character_id=$1 FOR UPDATE',
+        [req.params.id]);
+      let record:CombatRecord;
+      if(command.kind==='start'){
+        if(saved.rowCount)record=saved.rows[0];
+        else{
+          const state=initialize(req.params.id,ch,stance);
+          record={state,history:[],stance};
+          await client.query(
+            'INSERT INTO player_character_flint_combat(character_id,revision,stance,state,history) VALUES($1,0,$2,$3::jsonb,$4::jsonb)',
+            [req.params.id,stance,JSON.stringify(state),'[]']);
+          await client.query(
+            "UPDATE player_characters SET tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
+        }
+      }else{
+        if(!saved.rowCount){
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(409).send({error:'combat_not_initialized'});
+        }
+        record=saved.rows[0];
+        if(record.stance!==stance){
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(409).send({error:'combat_stance_mismatch'});
+        }
+        if(record.state.revision!==command.expectedRevision){
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(409).send({error:'stale_revision',currentRevision:record.state.revision});
+        }
+        let state:CombatState;
+        try{
+          state=step(record.state,command.action,{
+            expectedRevision:command.expectedRevision,requestId:command.requestId});
+        }catch(error){
+          if(!(error instanceof CombatError))throw error;
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(422).send({error:'invalid_combat_action',detail:error.message});
+        }
+        if(state.status==='finished'&&state.outcome!=='player_victory'&&state.outcome!=='player_defeat')
+          throw new Error('unexpected_encounter_outcome');
+        record={state,stance,history:[...record.history,...state.events]};
+        await client.query(
+          'UPDATE player_character_flint_combat SET revision=$2,state=$3::jsonb,history=$4::jsonb,outcome=$5,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,state.revision,JSON.stringify(state),JSON.stringify(record.history),state.outcome]);
+        // No automatic wound type, recovery, coins, XP or tutorial clinic fee.
+        await client.query(
+          'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
+          [req.params.id,state.player.hp,state.status==='finished'?'COMPLETE':'IN_PROGRESS']);
+      }
+      const response=snapshot(record);
+      await client.query(
+        'INSERT INTO player_character_flint_combat_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
+        [req.params.id,command.requestId,hash,JSON.stringify(response)]);
+      await client.query('COMMIT');inTransaction=false;
+      return response;
+    }catch(error){
+      if(inTransaction){try{await client.query('ROLLBACK');}catch{/* preserve original */}}
+      if(databaseSetupError(error))return reply.code(503).send({error:'combat_schema_missing',setup:'npm run combat:migrate'});
+      throw error;
+    }finally{client.release();}
+  });
+}
