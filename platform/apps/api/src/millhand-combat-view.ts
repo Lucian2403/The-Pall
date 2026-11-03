@@ -16,7 +16,8 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     ? [...(contact?['attack']:[]),'guard','move','recover',
         ...(contact&&state.player.momentum>=20?['technique']:[])]
     : [];
-  const opening=state.openings.player?.expires>=state.round?state.openings.player:null;
+  const opportunity=state.openings.player;
+  const opening=opportunity&&opportunity.expires>=state.round?opportunity:null;
   const accuracy=(zone:'head'|'torso'|'limbs')=>Math.round(100*Math.min(.95,Math.max(.05,
     state.player.weapon.accuracy+TEST_CONFIG.aim[zone]+(opening?.accuracyBonus??0)
   )));
