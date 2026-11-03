@@ -23,7 +23,25 @@
     tutorial: {stage: number; status: string};
   };
 
-  let {character, children, activePage = 'scene', sceneLocation, smithingBackdrop = false, councilBackdrop = false, alleyBackdrop = false, depotBackdrop = false, backToStageFive, backStageBusy = false, backStageError = ''}: {character: SavedCharacter; children: Snippet; activePage?: 'scene' | 'character'; sceneLocation?: string; smithingBackdrop?: boolean; councilBackdrop?: boolean; alleyBackdrop?: boolean; depotBackdrop?: boolean; backToStageFive?: ()=>Promise<void>; backStageBusy?: boolean; backStageError?: string} = $props();
+  let {
+    character,children,activePage='scene',sceneLocation,smithingBackdrop=false,
+    councilBackdrop=false,alleyBackdrop=false,depotBackdrop=false,
+    combatStamina,backToStageFive,backStageBusy=false,backStageError=''
+  }:{
+    character:SavedCharacter;
+    children:Snippet;
+    activePage?:'scene'|'character';
+    sceneLocation?:string;
+    smithingBackdrop?:boolean;
+    councilBackdrop?:boolean;
+    alleyBackdrop?:boolean;
+    depotBackdrop?:boolean;
+    /** Only the active combat page supplies live, server-confirmed Stamina. */
+    combatStamina?:{current:number;maximum:number};
+    backToStageFive?:()=>Promise<void>;
+    backStageBusy?:boolean;
+    backStageError?:string;
+  }=$props();
   const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage === 6
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/combat'
     : character.origin === 'Millhand' && character.tutorial.stage === 5
@@ -36,11 +54,12 @@
         ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
         : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
-  // The 100/100 dark-green stamina meter is the owner's starting HUD
-  // baseline until the combat API begins reporting live depletion. Always
-  // prefer saved data when it becomes available (e.g. during Flint's fight).
-  const staminaShown=$derived(isMeasured(character.stamina)
-    ?character.stamina:{current:100,maximum:100});
+  // Prefer the currently rendered combat snapshot over the character sheet.
+  // Outside combat, retain the existing saved-resource/provisional HUD behavior.
+  const staminaShown=$derived(isMeasured(combatStamina)
+    ?combatStamina
+    :isMeasured(character.stamina)
+      ?character.stamina:{current:100,maximum:100});
   const resources=$derived([
     {id:'health',label:'Health',data:character.health},
     {id:'stamina',label:'Stamina',data:staminaShown}
@@ -222,7 +241,7 @@
               <span class="resource-track" role="progressbar" aria-label={resource.label}
                 aria-valuemin="0" aria-valuemax={resource.data.maximum}
                 aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}
-                title={resource.id==='stamina'&&!isMeasured(character.stamina)
+                title={resource.id==='stamina'&&!isMeasured(combatStamina)&&!isMeasured(character.stamina)
                   ?'Provisional full stamina; future combat data will replace this value'
                   :undefined}>
                 <span class="resource-interior">
