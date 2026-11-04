@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
   import MillhandDepotScene from '$lib/MillhandDepotScene.svelte';
   import MillhandContractsScene from '$lib/MillhandContractsScene.svelte';
@@ -19,6 +21,13 @@
     travelConfirmed:boolean;confirmTravel:()=>void
   }=$props();
   let journalOpen=$state(false);
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    // Real branches register their own physical scene journal.
+    if(state.branch==='restamp'||state.branch==='contracts'||state.branch==='records')return;
+    registerSceneJournal?.({id:'second-job-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement:HTMLElement|undefined;
   const state=$derived(snapshot.state);
   const route=$derived(STAGE_FOUR_ROUTES[state.branch]);
@@ -100,10 +109,6 @@
       {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
-      <div class="journal-trigger">
-        <button type="button" class="journal-button" aria-expanded={journalOpen} aria-controls="second-job-journal"
-          onclick={() => {void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
-      </div>
     </aside>
   </div>
   <div class="notice">Council and workshop property stays at its workplace. No wages, ordinary XP or personal inventory items are awarded for this task.</div>

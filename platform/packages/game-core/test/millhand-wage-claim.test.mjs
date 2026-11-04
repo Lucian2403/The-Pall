@@ -41,7 +41,7 @@ for(const branch of ['restamp','contracts','records']){
         s=beats(s,3);
         assert.equal(s.phase,'LEAVING');
         s=apply(s,'say_going_home');
-        s=beats(s,8);
+        s=beats(s,7);
         assert.equal(s.phase,'CHOOSE_STANCE');
         assert.deepEqual(availableWageClaimActions(s),
           ['brace_and_defend','keep_moving','use_cart_as_cover','previous_dialogue']);
@@ -61,6 +61,21 @@ for(const branch of ['restamp','contracts','records']){
     }
   }
 }
+test('Going-home line is a scripted Continue, not a second stored response beat',()=>{
+  let s=beats(start('restamp'),5);
+  s=apply(s,'read_demand');s=beats(s,3);s=beats(s,7);
+  s=apply(s,'share_route_evidence');s=beats(s,3);
+  assert.equal(s.phase,'LEAVING');
+  s=apply(s,'say_going_home');
+  assert.equal(s.phase,'CORNERED_EXCHANGE');
+  assert.equal(s.dialogueIndex,1,'Index zero was already spoken in LEAVING');
+  const previous=apply(s,'previous_dialogue');
+  assert.equal(previous.phase,'LEAVING');
+  assert.equal(previous.dialogueIndex,0,'Going back must reset the previous step cursor');
+  s=beats(s,7);
+  assert.equal(s.phase,'CHOOSE_STANCE');
+});
+
 test('Each spoken beat advances only on a committed action and survives reload',()=>{
  let s=start('records');
  s=apply(s,'continue_dialogue');
@@ -88,7 +103,7 @@ test('Previous dialogue walks backwards across every phase with saved state inta
  s=apply(s,'share_route_evidence');
  s=beats(s,3);
  s=apply(s,'say_going_home');
- s=beats(s,8);
+ s=beats(s,7);
  s=apply(s,'use_cart_as_cover');
  const revision=s.revision;
  const phases=[
@@ -96,7 +111,7 @@ test('Previous dialogue walks backwards across every phase with saved state inta
   ['CORNERED_EXCHANGE',7],['CORNERED_EXCHANGE',6],
   ['CORNERED_EXCHANGE',5],['CORNERED_EXCHANGE',4],
   ['CORNERED_EXCHANGE',3],['CORNERED_EXCHANGE',2],
-  ['CORNERED_EXCHANGE',1],['CORNERED_EXCHANGE',0],
+  ['CORNERED_EXCHANGE',1],
   ['LEAVING',0],
   ['EVIDENCE_EXCHANGE',2],['EVIDENCE_EXCHANGE',1],['EVIDENCE_EXCHANGE',0],
   ['CHOOSE_EVIDENCE',0],
@@ -130,7 +145,7 @@ test('Stage 6 pre-combat boundary returns to Stage 5 stance selection',()=>{
  let s=start('restamp');
  s=beats(s,5);s=apply(s,'challenge_authority');s=beats(s,3);
  s=beats(s,7);s=apply(s,'share_route_evidence');s=beats(s,3);
- s=apply(s,'say_going_home');s=beats(s,8);
+ s=apply(s,'say_going_home');s=beats(s,7);
  s=apply(s,'brace_and_defend');
  const saved=JSON.parse(JSON.stringify(s));
  const rewound=apply(saved,'previous_dialogue');
@@ -172,7 +187,7 @@ for(const branch of ['restamp','contracts','records']){
    assert.ok(availableWageClaimActions(s).includes('say_going_home'));
    assert.ok(!availableWageClaimActions(s).includes('continue_dialogue'));
    s=apply(s,'say_going_home');
-   s=beats(s,8);
+   s=beats(s,7);
    assert.equal(s.phase,'CHOOSE_STANCE');
    s=apply(s,'brace_and_defend');
    const rewind=apply(s,'previous_dialogue');

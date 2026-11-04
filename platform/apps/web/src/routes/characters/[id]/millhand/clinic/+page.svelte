@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {onMount,tick} from 'svelte';
+  import {onMount,tick,getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {
@@ -70,6 +71,13 @@
     pricedDialogueIndex+=1;
   }
   let journalOpen=$state(false);
+  // The only visible journal toggle lives in TutorialShell; the journal's
+  // actual entries stay below the illustrated clinic.
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement:HTMLElement|undefined;
   const assessment=$derived(clinic
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
@@ -244,11 +252,7 @@
 
 
 
-          <button type="button" class="pall-framed-button journal-toggle"
-            data-pall-sfx="paper" aria-expanded={journalOpen} aria-controls="clinic-journal"
-            onclick={()=>{void toggleJournal();}}>
-            {journalOpen?'Close journal':'Review journal'}
-          </button>
+
         </aside>
       </div>
 
@@ -368,7 +372,6 @@
   .medical-record summary:focus-visible{outline:2px solid #745230;outline-offset:3px}
   .medical-record p{margin:8px 0}
   .medical-record ul{margin:8px 0;padding-left:23px}
-  .journal-toggle{margin:12px 0 0;min-width:170px;min-height:44px}
   /* Match the full-width personal journals used in Stages 5 and 6. */
   .journal{background:#e6d5b5;color:#24160e;
     padding:23px clamp(16px,3vw,45px);border-top:2px solid #94704a;
