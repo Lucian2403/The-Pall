@@ -165,7 +165,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     'The clinician must narrate saved facts and keep the existing action sequence');
   const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
   const shell=source('apps/web/src/lib/TutorialShell.svelte');
-  assert.ok(rewind.includes('if(expectedStage===7)') &&
+  assert.ok(rewind.includes('if(expectedStage===7||expectedStage===8)') &&
     rewind.includes('unsafe_clinic_health_state') &&
     rewind.includes('DELETE FROM player_character_clinic_receipts') &&
     rewind.includes('DELETE FROM player_character_clinic WHERE character_id') &&
