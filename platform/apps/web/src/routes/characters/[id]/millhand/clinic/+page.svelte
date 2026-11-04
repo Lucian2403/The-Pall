@@ -223,7 +223,7 @@
             <p class="completion">You leave the clinic and head toward your rented home.</p>
             <p>Stage 8 — Return Home is the next chapter. Its playable scene is not yet connected.</p>
           {:else if next}
-            <button class="advance" type="button" disabled={pending}
+            <button class="pall-framed-button advance" type="button" disabled={pending}
               onclick={()=>{if(next)void perform(next);}}>
               {pending?'Saving…':label}
             </button>
@@ -255,7 +255,7 @@
       <p>Run <code>npm run clinic:migrate</code> from the platform folder.</p>
     {:else}
       <h1>Clinic service unavailable</h1><p role="alert">{errorMessage}</p>
-      <button type="button" onclick={refresh}>Retry</button>
+      <button class="pall-framed-button" type="button" onclick={refresh}>Retry</button>
     {/if}
   </main>
 {/if}
@@ -295,11 +295,7 @@
   .discharge h3{margin:0 0 8px}
   .discharge p{margin:5px 0;font-size:14px}
   .discharge .small{font-size:12px;color:#d1c8af}
-  .advance{display:inline-block;min-width:210px;margin-top:12px;padding:13px 22px;
-    background:#735236;border:1px solid #d4ad78;color:#fff0d4;font:700 15px Georgia,serif;
-    cursor:pointer}
-  .advance:hover:not(:disabled){background:#8f6945}
-  .advance:disabled{opacity:.5;cursor:wait}
+  .advance{margin-top:12px}
   .error{color:#ffd1bc}
   .journal{margin-top:2px;background:#e6d5b5;color:#24160e;padding:23px clamp(16px,3vw,45px)}
   .reading{max-width:960px;margin:auto}
