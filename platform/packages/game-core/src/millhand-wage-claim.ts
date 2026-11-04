@@ -93,7 +93,8 @@ export function previousWageClaim(s:WageClaimState):WageClaimState{
   }else if(phase==='EVIDENCE_EXCHANGE'&&dialogueIndex===0){
     phase='CHOOSE_EVIDENCE';
   }else if(phase==='CORNERED_EXCHANGE'&&dialogueIndex<=1){
-    phase='LEAVING';
+    // This was a single LEAVING step, irrespective of old/new saved beat.
+    phase='LEAVING';dialogueIndex=0;
   }else if(dialogueIndex>0){
     dialogueIndex--;
   }else{
