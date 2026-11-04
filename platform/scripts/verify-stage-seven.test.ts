@@ -152,7 +152,9 @@ test('Priced clinic conversation advances one owner-approved beat at a time befo
     price.includes('{pricedBeat.text}') &&
     price.includes('<p class="speaker">{pricedBeat.speaker}</p>') &&
     price.includes('{#if pricedAtEnd}') &&
-    price.includes('class="price"'),
+    price.includes('class="charge-slip"') &&
+    price.includes('Clinic charge') && price.includes('{clinic.fee}') &&
+    price.includes('{clinic.coins}'),
     'Render one current beat, with price details only after the final line');
   assert.ok(web.includes("clinic.phase==='PRICED' && !pricedAtEnd") &&
     web.includes('onclick={advancePricedDialogue}>Continue</button>') &&
@@ -163,6 +165,36 @@ test('Priced clinic conversation advances one owner-approved beat at a time befo
   assert.ok(web.includes('class="narration stage-direction"') &&
     web.includes('.stage-direction{font-style:italic}'),
     'Stage directions keep the established reading face and use italics');
+});
+
+test('Clinic record is separate from scene dialogue; payment and ambience are confirmed-only',()=>{
+  const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+  const shell=source('apps/web/src/lib/TutorialShell.svelte');
+  const audio=source('apps/web/src/lib/pall-audio.ts');
+  const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
+  const dialogue=web.slice(web.indexOf('<aside class="clinic-dialogue"'),web.indexOf('</aside>'));
+  const record=web.indexOf('<section class="medical-record-wrapper"');
+  const journal=web.indexOf('{#if journalOpen}');
+  assert.ok(record>web.indexOf('</aside>') && record<web.indexOf('id="clinic-journal"'),
+    'Optional numerical record belongs below the scene but before the journal');
+  assert.ok(!dialogue.includes('medical-record') && !dialogue.includes('Health after the fight:'),
+    'Do not repeat the clinician\'s condition inside the speech frame');
+  assert.ok(web.includes('<details class="medical-record">') &&
+    !web.includes('<details class="medical-record" open'),
+    'Examination record stays collapsed by default');
+  assert.ok(web.includes('clinicBackdrop={true}') &&
+    shell.includes('if(clinicBackdrop)return claimMedicalClinicAmbience()') &&
+    audio.includes('claimMedicalClinicAmbience') &&
+    audio.includes('medical-clinic-ambience.mp3'),
+    'The medical soundscape must only follow the actual illustrated clinic');
+  assert.ok(web.includes("action==='pay'&&result.paid===true&&result.coins<clinic.coins") &&
+    web.includes('if(paidNow)playCoinTransactionSfx()') &&
+    shell.includes("data.coinDelta>0)playCoinTransactionSfx()") &&
+    rewind.includes('coinDelta:wasPaid?10:0'),
+    'Coin cues follow actual accepted debits/refunds, not button clicks or stale requests');
+  assert.ok(audio.includes('ui-coins1.wav') && audio.includes('ui-coins2.wav') &&
+    audio.includes('playCoinTransactionSfx') && audio.includes('0.12'),
+    'Both owner coin samples are used in one combined transaction cue');
 });
 
 test('Web and API wire the clinic without altering original combat rules',()=>{
