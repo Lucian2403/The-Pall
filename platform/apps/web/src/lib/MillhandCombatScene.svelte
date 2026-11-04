@@ -4,8 +4,9 @@
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
 
-  let {snapshot, feedback, pending, errorMessage, perform}: {
+  let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
     snapshot: CombatSnapshot;
+    characterId: string;
     feedback: CombatFloatingFeedback[];
     pending: boolean;
     errorMessage: string;
@@ -153,7 +154,8 @@
           <p class="outcome">{snapshot.outcome === 'player_defeat'
             ? 'Flint defeated you. Other workers intervened.' : 'You defeated Flint.'}</p>
           <p>{resultText}</p>
-          <p class="after">Your condition is saved. Stage 7 is not yet connected; no treatment has been simulated.</p>
+          <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
+          <a class="clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
         {:else}
           <p class="telegraph-title">FLINT'S OBSERVABLE INTENTION</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -441,6 +443,8 @@
   .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font-size:13px;line-height:1.5}
+  .clinic-link{display:inline-block;padding:9px 14px;margin-top:9px;background:#765332;border:1px solid #cfad77;color:#ffe6bb;font-weight:700;text-decoration:none}
+  .clinic-link:hover{background:#926e47}
   /* Transient hit/miss overlays are anchored to the target, never to a guessed
      attack roll. Actual damage comes from the committed combat Chronicle. */
   .combat-float{position:absolute;z-index:6;top:29%;left:52%;
