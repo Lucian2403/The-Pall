@@ -80,7 +80,9 @@ export function observeObject(object: ObjectKey, state: PlateworkState): string 
 // docs/05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md.
 // Saved phase, handling and correction decide which entries are factual.
 export function stageTwoJournal(s:PlateworkState):readonly string[]{
-  const entries:string[]=[];
+  const entries:string[]=[
+    "Guther's put me on the council's worker plates. Got to check the numbers and set the stamps first. I can manage that."
+  ];
   const afterStamps=['HANDLE_BENT_PLATE','STAMP','INSPECT','CORRECT',
     'REVIEW','RETURN_PAPER','COMPLETE'].includes(s.phase);
   if(afterStamps){
