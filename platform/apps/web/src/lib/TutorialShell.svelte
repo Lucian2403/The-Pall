@@ -5,7 +5,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
-  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience,claimDepotAmbience,stopDepotAmbience} from '$lib/pall-audio';
+  import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience,claimDepotAmbience,stopDepotAmbience,claimMedicalClinicAmbience,stopMedicalClinicAmbience,playCoinTransactionSfx} from '$lib/pall-audio';
 
   type SavedCharacter = {
     id: string;
@@ -25,7 +25,7 @@
 
   let {
     character,children,activePage = 'scene',sceneLocation,smithingBackdrop = false,
-    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
+    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = ''
   }:{
     character:SavedCharacter;
@@ -36,6 +36,7 @@
     councilBackdrop?:boolean;
     alleyBackdrop?:boolean;
     depotBackdrop?:boolean;
+    clinicBackdrop?:boolean;
     /** Only the active combat page supplies live, server-confirmed Stamina. */
     combatStamina?:{current:number;maximum:number};
     /** The clinic remains the Stage 7 scene when its saved exit unlocks Stage 8. */
@@ -122,6 +123,12 @@
     stopDepotAmbience();
   });
 
+  // The medical soundscape belongs only to the mounted illustrated clinic.
+  $effect(()=>{
+    if(clinicBackdrop)return claimMedicalClinicAmbience();
+    stopMedicalClinicAmbience();
+  });
+
   // Refresh the local-only replay button when returning to earlier stages
   // returns this same mounted shell to Stage 5. Do not show stale stage labels.
   $effect(()=>{
@@ -185,7 +192,8 @@
         }
         return;
       }
-      const data=await response.json() as {stage:number;route:string};
+      const data=await response.json() as {stage:number;route:string;coinDelta?:number};
+      if(typeof data.coinDelta==='number'&&data.coinDelta>0)playCoinTransactionSfx();
       canRewind=false;
       await goto(data.route,{replaceState:true,invalidateAll:true});
     }catch{
