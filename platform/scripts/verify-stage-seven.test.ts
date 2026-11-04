@@ -122,6 +122,11 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(clinicArt.length>40000&&clinicArt.length<400000,
     'Use optimized, real owner-supplied illustrated clinic artwork');
   assert.ok(web.includes("url('/locations/clinic/clinic-workshop-cold.webp')") &&
+    web.includes('class="clinic-scene"') &&
+    web.includes('min-height:clamp(340px,38vw,540px)') &&
+    web.indexOf('class="clinic-scene"') < web.indexOf('class="clinic-layout"') &&
+    web.includes('background:#1d1b1a') &&
+    !web.includes('min-height:clamp(720px,62vw,960px);background-color:#17191d;') &&
     web.includes('class="clinic-layout"') &&
     web.includes('class="condition"') &&
     web.includes('class="exchange"') &&

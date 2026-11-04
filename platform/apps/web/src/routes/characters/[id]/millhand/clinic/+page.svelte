@@ -135,14 +135,18 @@
   <TutorialShell {character} sceneLocation="City clinic"
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}>
     <div class="clinic">
-      <header class="clinic-heading">
-        <small>MILLHAND · STAGE VII</small>
-        <h1>The Clinic</h1>
-        <p>{clinic.outcome==='player_defeat'
-          ?'Another worker helps you reach the clinic after Flint defeats you.'
-          :'You leave the passage and reach the clinic after Flint withdraws.'}</p>
-        <p>There is a place to sit. A clinician is available to examine you.</p>
-      </header>
+      <!-- Unobstructed owner-supplied clinic illustration, before the existing
+           condition / examination columns and the Personal Journal. -->
+      <section class="clinic-scene" aria-label="City clinic interior">
+        <header class="clinic-heading">
+          <small>MILLHAND · STAGE VII</small>
+          <h1>The Clinic</h1>
+          <p>{clinic.outcome==='player_defeat'
+            ?'Another worker helps you reach the clinic after Flint defeats you.'
+            :'You leave the passage and reach the clinic after Flint withdraws.'}</p>
+          <p>There is a place to sit. A clinician is available to examine you.</p>
+        </header>
+      </section>
       <div class="clinic-layout">
         <section class="condition" aria-label="Recorded condition">
           <h2>Your condition</h2>
@@ -267,15 +271,23 @@
 
 <style>
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
-  /* Owner-supplied clinic interior is the actual Stage 7 backdrop.
-     Keep the existing heading, two-column diagnosis/dialogue layout and
-     parchment Journal; use translucent surfaces for readable text. */
+  /* Give the supplied clinic artwork a dedicated visible stage. Previously
+     it sat behind nearly opaque full-width panels and was effectively hidden.
+     The condition, dialogue, fee and Journal keep their existing order. */
   .clinic{display:flex;flex-direction:column;gap:14px;padding:16px 19px 24px;
-    min-height:clamp(720px,62vw,960px);background-color:#17191d;
-    background-image:linear-gradient(180deg,#1111163b 0%,#16161754 48%,#171414b8 100%),
+    min-height:620px;background:#1d1b1a}
+  .clinic-scene{position:relative;box-sizing:border-box;width:100%;
+    min-height:clamp(340px,38vw,540px);
+    display:flex;align-items:flex-start;
+    border:1px solid #725a3b;
+    background-color:#30303a;
+    background-image:linear-gradient(90deg,#120e0d80 0%,#120e0d28 38%,#120e0d00 75%),
       url('/locations/clinic/clinic-workshop-cold.webp');
-    background-position:center top;background-size:cover;background-repeat:no-repeat}
-  .clinic-heading{padding:14px 20px;border:1px solid #725a3b;background:#2a211bb8;backdrop-filter:blur(2px)}
+    background-size:cover;background-position:center 44%;background-repeat:no-repeat}
+  .clinic-heading{position:relative;z-index:1;box-sizing:border-box;
+    width:min(610px,calc(100% - 36px));margin:18px;
+    padding:14px 20px;border:1px solid #725a3b;background:#2a211bbc;
+    backdrop-filter:blur(2px)}
   .clinic-heading small,.journal small{font:700 13px/1.3 Arial,sans-serif;letter-spacing:.1em}
   .clinic-heading h1{margin:4px 0 10px;color:#f0d5ab;font:600 31px/1.2 Georgia,serif}
   .clinic-heading p{margin:5px 0;font-size:15px;line-height:1.5;color:#e3cfb2}
@@ -316,6 +328,16 @@
   .fallback{max-width:760px;margin:8vh auto;padding:30px;background:#28221d;
     border:1px solid #866546;color:#eadfcf}
   .fallback a{color:#eac498}
-  @media(max-width:900px){.clinic-layout{grid-template-columns:1fr}.clinic{padding:8px}}
-  @media(max-width:550px){.small-stats{grid-template-columns:1fr}.condition,.exchange{padding:14px}}
+  @media(max-width:900px){
+    .clinic-layout{grid-template-columns:1fr}
+    .clinic{padding:8px}
+    .clinic-scene{min-height:360px;background-position:57% center}
+  }
+  @media(max-width:550px){
+    .small-stats{grid-template-columns:1fr}
+    .condition,.exchange{padding:14px}
+    .clinic-scene{min-height:350px;background-position:59% center}
+    .clinic-heading{margin:10px;width:calc(100% - 20px);padding:11px 14px}
+    .clinic-heading h1{font-size:26px}
+  }
 </style>
