@@ -542,6 +542,7 @@ test('Unpaid Stage 7 rewind returns to a fresh Flint fight with original Health 
   assert.equal(rewind.status,200,JSON.stringify(rewind.body));
   assert.equal(rewind.body!.stage,6);
   assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/combat');
+  assert.equal(rewind.body!.coinDelta,0,'Unpaid rewind must not generate a coin cue');
   const player=await db.query<{tutorial_stage:number;tutorial_status:string;current_health:number;coins:string}>(
     'SELECT tutorial_stage,tutorial_status,current_health,coins FROM player_characters WHERE id=$1',[c.id]
   );
@@ -572,6 +573,7 @@ test('Paid Stage 7 rewind refunds exactly one fee and does not replay old paymen
   assert.equal(paid.after.hp,50);
   const rewind=await devRewind(c,7);
   assert.equal(rewind.status,200,JSON.stringify(rewind.body));
+  assert.equal(rewind.body!.coinDelta,10,'Paid replay reports exactly one real refund');
   assert.equal((await devRewind(c,7)).status,409,'Cannot refund twice');
   const beforeReplay=await db.query<{coins:string;tutorial_stage:number;current_health:number}>(
     'SELECT coins,tutorial_stage,current_health FROM player_characters WHERE id=$1',[c.id]
@@ -623,6 +625,7 @@ test('After leaving the clinic, Back to Stage 6 remains available until Stage 8 
   assert.equal(rewind.status,200,JSON.stringify(rewind.body));
   assert.equal(rewind.body!.stage,6);
   assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/combat');
+  assert.equal(rewind.body!.coinDelta,10,'Stage 8 review reports real paid refund');
   assert.equal((await devRewind(c,8)).status,409,'Completed visit cannot refund twice');
   const char=await db.query<{coins:string;current_health:number;tutorial_status:string}>(
     'SELECT coins,current_health,tutorial_status FROM player_characters WHERE id=$1',[c.id]
