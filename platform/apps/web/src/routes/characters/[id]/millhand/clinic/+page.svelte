@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount} from 'svelte';
+  import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {
@@ -44,6 +44,7 @@
     :next==='pay'?'Pay 10 coins'
     :next==='leave'?'Leave the clinic':'');
   let journalOpen=$state(false);
+  let journalElement:HTMLElement|undefined;
   const assessment=$derived(clinic
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
   const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
@@ -55,6 +56,12 @@
         ?"The clinician checked me over and treated what they could. Ten coins for the examination and care. I needed the help, but that's half my money gone. Still nothing paid for the council work."
         :"The clinician examined what the fight had done to me. Ten coins for the examination and getting me fit to leave. Half my money gone, and still nothing earned from the council."
     :"Made it to the clinic after the fight with Flint. I've not got much money left, but I ought to get checked.");
+
+  async function toggleJournal(){
+    journalOpen=!journalOpen;
+    await tick();
+    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
+  }
 
   async function start(){
     const response=await fetch(route,{method:'POST',headers:{'content-type':'application/json'},
@@ -225,22 +232,27 @@
           </details>
 
           <button type="button" class="pall-framed-button journal-toggle"
-            aria-expanded={journalOpen} aria-controls="clinic-journal"
-            onclick={()=>{journalOpen=!journalOpen;}}>
+            data-pall-sfx="paper" aria-expanded={journalOpen} aria-controls="clinic-journal"
+            onclick={()=>{void toggleJournal();}}>
             {journalOpen?'Close journal':'Review journal'}
           </button>
         </aside>
+      </div>
 
-        {#if journalOpen}
-          <section id="clinic-journal" class="journal" aria-label="Personal Journal">
-            <header class="journal-head">
-              <div><small>PERSONAL JOURNAL</small><h2>The Clinic</h2></div>
-            </header>
+      {#if journalOpen}
+        <section id="clinic-journal" class="journal" bind:this={journalElement}
+          aria-label="Personal Journal">
+          <header class="journal-head">
+            <div><small>PERSONAL JOURNAL</small><h2>The Clinic</h2></div>
+            <button type="button" class="journal-button" data-pall-sfx="paper"
+              onclick={()=>{void toggleJournal();}}>Close journal</button>
+          </header>
+          <div class="journal-entries">
             <p>{journal}</p>
             {#if clinic.phase==='LEFT'}<p>I've got ten coins left. Time to head home.</p>{/if}
-          </section>
-        {/if}
-      </div>
+          </div>
+        </section>
+      {/if}
     </section>
   </TutorialShell>
 {:else}
@@ -276,20 +288,20 @@
     background:linear-gradient(90deg,#17120d0a 0%,#10121b12 48%,#10101555 100%)}
   .clinic-dialogue{position:absolute;z-index:5;top:3.5%;right:2.4%;
     box-sizing:border-box;width:min(46%,650px);max-height:91%;overflow-y:auto;
-    background:#ead8b8;color:#2b1c11;
+    background:transparent;color:#2b1c11;
     border:solid transparent;border-width:21px 25px 20px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
     border-image-width:21px 25px 20px;border-image-repeat:stretch;
     margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)}
   .eyebrow,.speaker{font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.065em;color:#60402a;margin:0 0 10px}
+    letter-spacing:.065em;color:#382416;margin:0 0 10px}
   h1{margin:0 0 12px;font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);
-    color:#352215}
+    color:#2b1b12}
   .narration,.speech,.instruction{font:16px/1.45 var(--pall-font-reading,Georgia,serif);
-    color:#302016;margin:0 0 13px}
+    color:#21150e;margin:0 0 13px}
   .speech{font-weight:600}
-  .narration{color:#463020}
+  .narration{color:#302016}
   .instruction{font-weight:700}
   .speaker{margin:10px 0 5px}
   .price{display:grid;grid-template-columns:minmax(0,1fr) auto;
@@ -297,29 +309,34 @@
     border-top:1px solid #967650;border-bottom:1px solid #967650;
     background:#e0cba7;color:#3a2616;font:14px/1.4 Georgia,serif}
   .price strong{text-align:right;font-variant-numeric:tabular-nums}
-  .receipt,.next-note{font-size:14px;line-height:1.5;color:#604227;margin:10px 0}
+  .receipt,.next-note{font-size:14px;line-height:1.5;color:#3d291b;margin:10px 0}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 10px}
   .advance{min-width:210px;max-width:100%}
   .error{padding:8px 10px;background:#f4d3c2;border-left:3px solid #a34129;
     font-size:14px;line-height:1.4;color:#702018}
   .medical-record{margin:12px 0 0;border-top:1px solid #bb9c70;
-    padding:9px 1px 0;color:#533a25;font:13px/1.45 Georgia,serif}
+    padding:9px 1px 0;color:#3d291b;font:13px/1.45 Georgia,serif}
   .medical-record summary{cursor:pointer;font-weight:700}
   .medical-record p{margin:8px 0}
   .medical-record ul{margin:8px 0;padding-left:23px}
   .journal-toggle{margin:12px 0 0;min-width:170px;min-height:44px}
-  .journal{position:absolute;z-index:6;left:2.4%;bottom:3%;
-    box-sizing:border-box;width:min(46%,650px);max-height:80%;overflow-y:auto;
-    border:solid transparent;border-width:21px 25px 20px;
-    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
-    border-image-slice:145 190 125 190 fill;
-    border-image-width:21px 25px 20px;border-image-repeat:stretch;
-    padding:10px 15px 12px;background:#ead8b8;color:#2b1c11;
-    filter:drop-shadow(0 6px 8px #0008)}
-  .journal-head small{font:600 13px/1.25 var(--pall-font-label,Arial,sans-serif);
-    color:#624328;letter-spacing:.09em}
-  .journal-head h2{margin:4px 0 12px;font:600 23px/1.2 Georgia,serif}
-  .journal p{font:15px/1.5 Georgia,serif;margin:0 0 10px}
+  /* Match the full-width personal journals used in Stages 5 and 6. */
+  .journal{background:#e6d5b5;color:#24160e;
+    padding:23px clamp(16px,3vw,45px);border-top:2px solid #94704a;
+    scroll-margin-top:14px}
+  .journal-head{max-width:960px;display:flex;justify-content:space-between;
+    align-items:center;margin:0 auto 15px;gap:12px}
+  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.09em;color:#47301d}
+  .journal-head h2{margin:4px 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
+    color:#25170f}
+  .journal-entries{max-width:960px;margin:0 auto}
+  .journal-entries p{margin:0 0 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
+    color:#24160e}
+  .journal-button{background:#e5d1ae;border:1px solid #906c49;padding:6px 10px;
+    font:600 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#352414;cursor:pointer}
+  .journal-button:is(:hover,:focus-visible){background:#f6e4c3}
+  .journal-button:focus-visible{outline:2px solid #614022;outline-offset:2px}
   .fallback{max-width:760px;margin:8vh auto;padding:30px;background:#28221d;
     border:1px solid #866546;color:#eadfcf}
   .fallback a{color:#eac498}
@@ -327,13 +344,12 @@
     .clinic-scene{height:auto;min-height:660px;display:flex;
       flex-direction:column;gap:14px;padding:22px 14px;align-items:flex-end;
       background-position:45% center}
-    .clinic-dialogue,.journal{position:relative;top:auto;right:auto;bottom:auto;
+    .clinic-dialogue{position:relative;top:auto;right:auto;bottom:auto;
       left:auto;width:min(100%,590px);max-height:none;overflow:visible}
-    .journal{align-self:flex-start}
   }
   @media(max-width:550px){
     .clinic-scene{padding:12px 8px;min-height:670px;background-position:48% center}
-    .clinic-dialogue,.journal{width:100%;border-width:17px 18px 17px;
+    .clinic-dialogue{width:100%;border-width:17px 18px 17px;
       border-image-width:17px 18px 17px;padding:8px 11px}
     .narration,.speech,.instruction{font-size:14px}
     .eyebrow,.speaker{font-size:12px}
