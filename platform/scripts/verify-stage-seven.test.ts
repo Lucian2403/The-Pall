@@ -208,7 +208,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     web.includes("url('/ui-kit/frames/dialogue-frame-trim.png')") &&
     web.includes('class="medical-record"') &&
     web.includes('class="journal"') &&
-    web.includes('aria-expanded={journalOpen}') &&
+    web.includes("registerSceneJournal?.({id:'clinic-journal'") &&
     !web.includes('class="clinic-layout"') &&
     !web.includes('class="small-stats"') &&
     !web.includes('class="condition"'),
