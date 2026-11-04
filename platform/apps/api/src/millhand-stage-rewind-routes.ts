@@ -185,7 +185,9 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query('COMMIT');transaction=false;
         return {
           stage:6,tutorialStatus:'NOT_STARTED',
-          route:'/characters/'+req.params.id+'/millhand/combat'
+          route:'/characters/'+req.params.id+'/millhand/combat',
+          // Presentation-only fact from the committed transaction; no new mutation.
+          coinDelta:wasPaid?10:0
         };
       }
 
