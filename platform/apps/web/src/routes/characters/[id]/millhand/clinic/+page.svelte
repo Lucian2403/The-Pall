@@ -2,6 +2,9 @@
   import {onMount} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import {
+    clinicianAssessment,clinicianDischarge,clinicianFatigue
+  } from '$lib/millhand-clinic-dialogue';
 
   type Wound={type:string;zone?:string;severity:string};
   type Condition={
@@ -40,15 +43,17 @@
     :next==='review_price'?'Review the price'
     :next==='pay'?'Pay 10 coins'
     :next==='leave'?'Leave the clinic':'');
-  const diagnosis=$derived(clinic?.conditionType==='unhurt'
-    ?'No injuries found. No treatment needed.'
-    :clinic?.conditionType==='cut'
-      ?"A cut is recorded. It needs cleaning and dressing."
-      :'The examination records your current Health and combat condition.');
+  let journalOpen=$state(false);
+  const assessment=$derived(clinic
+    ?clinicianAssessment(clinic.before,clinic.conditionType):'');
+  const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
+  const departure=$derived(clinic?clinicianDischarge(clinic.conditionType):'');
   const journal=$derived(clinic?.paid
     ?clinic?.conditionType==='unhurt'
       ?"They couldn't find anything wrong with me. Good. Still cost ten coins just to be examined. Half my money gone, and I haven't earned a thing today."
-      :"The clinician checked me over and treated what they could. Ten coins for the examination and care. I needed the help, but that's half my money gone. Still nothing paid for the council work."
+      :clinic?.conditionType==='cut'
+        ?"The clinician checked me over and treated what they could. Ten coins for the examination and care. I needed the help, but that's half my money gone. Still nothing paid for the council work."
+        :"The clinician examined what the fight had done to me. Ten coins for the examination and getting me fit to leave. Half my money gone, and still nothing earned from the council."
     :"Made it to the clinic after the fight with Flint. I've not got much money left, but I ought to get checked.");
 
   async function start(){
@@ -132,123 +137,111 @@
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
 {#if status==='ready' && character && clinic}
-  <TutorialShell {character} sceneLocation="City clinic"
+  <TutorialShell {character} sceneLocation="City clinic" sceneStage={7}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}>
-    <div class="clinic">
-      <!-- Unobstructed owner-supplied clinic illustration, before the existing
-           condition / examination columns and the Personal Journal. -->
-      <section class="clinic-scene" aria-label="City clinic interior">
-        <header class="clinic-heading">
-          <small>MILLHAND · STAGE VII</small>
+    <section class="clinic" aria-label="Stage 7 clinic">
+      <div class="clinic-scene" aria-label="Grand Cylinder City clinic interior">
+        <aside class="clinic-dialogue" aria-label="Conversation with the clinician">
+          <p class="eyebrow">THE CLINIC · STAGE VII</p>
           <h1>The Clinic</h1>
-          <p>{clinic.outcome==='player_defeat'
-            ?'Another worker helps you reach the clinic after Flint defeats you.'
-            :'You leave the passage and reach the clinic after Flint withdraws.'}</p>
-          <p>There is a place to sit. A clinician is available to examine you.</p>
-        </header>
-      </section>
-      <div class="clinic-layout">
-        <section class="condition" aria-label="Recorded condition">
-          <h2>Your condition</h2>
-          <div class="health">
-            <span>Health on arrival</span>
-            <strong>{clinic.before.hp} / {clinic.before.hpMax}</strong>
-          </div>
-          <div class="small-stats">
-            <span>Stamina <b>{clinic.before.stamina}</b></span>
-            <span>Fatigue <b>{clinic.before.fatigue}</b></span>
-            <span>Composure <b>{clinic.before.composure}</b></span>
-            <span>Stress <b>{clinic.before.stress}</b></span>
-            <span>Momentum <b>{clinic.before.momentum}</b></span>
-            <span>Bleeding <b>{clinic.before.bleed}</b></span>
-          </div>
-          <h3>Recorded injuries</h3>
-          {#if clinic.before.wounds.length===0}
-            <p>None recorded.</p>
-          {:else}
-            <ul>
-              {#each clinic.before.wounds as wound,i (i)}
-                <li>{wound.type}{wound.zone?' · '+wound.zone:''} · {wound.severity}</li>
-              {/each}
-            </ul>
+
+          {#if clinic.phase==='ARRIVAL'}
+            <p class="narration">{clinic.outcome==='player_defeat'
+              ?'Another worker helps you reach the clinic after Flint defeats you.'
+              :'You leave the passage and reach the clinic after Flint withdraws.'}</p>
+            <p class="narration">There is a place to sit. A clinician is available to examine you.</p>
+            <p class="instruction">Check your condition before speaking to the clinician.</p>
+          {:else if clinic.phase==='EXAMINED'}
+            <p class="narration">You sit on the edge of a bed and check yourself after the fight.</p>
+            <p class="narration">The clinician waits for you to speak.</p>
+          {:else if clinic.phase==='SPOKEN'}
+            <p class="speaker">CLINICIAN</p>
+            <p class="speech">“Sit. Let me see.”</p>
+            <p class="speaker">CLINICIAN</p>
+            <p class="speech">“{assessment}”</p>
+            {#if fatigueNote}
+              <p class="speech">“{fatigueNote}”</p>
+            {/if}
+            <p class="instruction">Find out what the examination will cost.</p>
+          {:else if clinic.phase==='PRICED'}
+            <p class="speaker">YOU</p>
+            <p class="speech">“How much?”</p>
+            <p class="speaker">CLINICIAN</p>
+            <p class="speech">“Ten coins.”</p>
+            <p class="speaker">YOU</p>
+            <p class="speech">“Ten?”</p>
+            <p class="speaker">CLINICIAN</p>
+            <p class="speech">“{clinic.conditionType==='cut'
+              ?'That includes the dressing.'
+              :clinic.conditionType==='unhurt'
+                ?'For the examination.'
+                :'For the examination and any care you need.'}”</p>
+            <div class="price" aria-label="Price before payment">
+              <span>Examination and basic care if necessary</span>
+              <strong>{clinic.fee} coins</strong>
+              <span>Coins in hand</span>
+              <strong>{clinic.coins}</strong>
+            </div>
+          {:else if clinic.phase==='PAID'}
+            <p class="narration">You pay ten coins. The examination and any necessary care are complete.</p>
+            <p class="speaker">CLINICIAN</p>
+            <p class="speech">“{departure}”</p>
+            <p class="receipt">Coins remaining: {clinic.coins}. No further fee is due.</p>
+          {:else if clinic.phase==='LEFT'}
+            <p class="narration">You leave the clinic and head toward your rented home.</p>
+            <p class="receipt">Coins remaining: {clinic.coins}.</p>
+            <p class="next-note">Return Home is the next chapter. Its playable scene is not yet connected.</p>
           {/if}
-          {#if clinic.phase!=='ARRIVAL'}
-            <p class="diagnosis">{diagnosis}</p>
-          {/if}
-          {#if clinic.after}
-            <div class="discharge">
-              <h3>Condition after care</h3>
-              <p>Health {clinic.after.hp} / {clinic.after.hpMax} · Stamina {clinic.after.stamina}
-                · Composure {clinic.after.composure}</p>
-              <p>Fatigue {clinic.after.fatigue} · Stress {clinic.after.stress}
-                · Momentum {clinic.after.momentum} · Bleeding {clinic.after.bleed}
-                · Active wounds {clinic.after.wounds.length}</p>
-              <p class="small">Combat reserves were reset for tutorial discharge.
-                The saved battle record is unchanged.</p>
+
+          {#if next}
+            <div class="actions">
+              <button class="pall-framed-button advance" type="button" disabled={pending}
+                onclick={()=>{if(next)void perform(next);}}>
+                {pending?'Saving…':label}
+              </button>
             </div>
           {/if}
-        </section>
-        <section class="exchange" aria-label="Examination and payment">
-          <h2>Examination</h2>
-          {#if clinic.phase==='ARRIVAL'}
-            <p>You check your condition and prepare to speak to the clinician.</p>
-          {:else}
-            {#if clinic.phase==='EXAMINED'}
-              <p>{diagnosis}</p>
-            {:else}
-              <p><strong>CLINICIAN:</strong> “Sit. Let me see.”</p>
-              {#if clinic.conditionType==='cut'}
-                <p><strong>CLINICIAN:</strong> “Needs cleaning. I'll dress it.”</p>
-              {:else if clinic.conditionType==='unhurt'}
-                <p><strong>EXAMINATION RESULT:</strong> No injuries found. No treatment needed.</p>
-              {:else}
-                <p>{diagnosis}</p>
-              {/if}
-              <p><strong>YOU:</strong> “How much?”</p>
-              <p><strong>CLINICIAN:</strong> “Ten coins.”</p>
-              <p><strong>YOU:</strong> “Ten?”</p>
-              <p><strong>CLINICIAN:</strong> “{clinic.conditionType==='cut'
-                ?'That includes the dressing.'
-                :clinic.conditionType==='unhurt'
-                  ?'For the examination.'
-                  :'For the examination and any care you need.'}”</p>
-            {/if}
-          {/if}
-          <div class="fee" aria-label="Clinic service fee">
-            <div><span>Examination and necessary basic care</span><strong>{clinic.fee} coins</strong></div>
-            <div><span>Coins in hand</span><strong>{clinic.coins}</strong></div>
-            {#if clinic.phase==='PRICED'}
-              <div><span>Coins after payment</span><strong>{clinic.coins-clinic.fee}</strong></div>
-            {/if}
-            {#if clinic.paid}<p class="paid">Examination paid. No further fee is due.</p>{/if}
-          </div>
-          {#if clinic.phase==='PAID'}
-            <p class="completion">The clinician has completed the examination
-              {clinic.conditionType==='unhurt'?'without unnecessary treatment.'
-                :'and the tutorial discharge care.'}
-              Your starting condition has been restored.</p>
-          {/if}
-          {#if clinic.phase==='LEFT'}
-            <p class="completion">You leave the clinic and head toward your rented home.</p>
-            <p>Stage 8 — Return Home is the next chapter. Its playable scene is not yet connected.</p>
-          {:else if next}
-            <button class="pall-framed-button advance" type="button" disabled={pending}
-              onclick={()=>{if(next)void perform(next);}}>
-              {pending?'Saving…':label}
-            </button>
-          {/if}
           {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
-        </section>
+
+          <details class="medical-record">
+            <summary>Review examination record</summary>
+            <p>Health after the fight: {clinic.before.hp} / {clinic.before.hpMax}</p>
+            {#if clinic.before.wounds.length}
+              <ul>
+                {#each clinic.before.wounds as wound,i (i)}
+                  <li>{wound.type}{wound.zone?' · '+wound.zone:''} · {wound.severity}</li>
+                {/each}
+              </ul>
+            {:else}
+              <p>No recorded wounds.</p>
+            {/if}
+            {#if clinic.before.bleed>0}<p>Bleeding recorded: {clinic.before.bleed}</p>{/if}
+            <p>Stamina {clinic.before.stamina} · Fatigue {clinic.before.fatigue}
+              · Composure {clinic.before.composure}</p>
+            {#if clinic.after}
+              <p>After care: Health {clinic.after.hp} / {clinic.after.hpMax},
+                Stamina {clinic.after.stamina}, no active combat wounds.</p>
+            {/if}
+          </details>
+
+          <button type="button" class="pall-framed-button journal-toggle"
+            aria-expanded={journalOpen} aria-controls="clinic-journal"
+            onclick={()=>{journalOpen=!journalOpen;}}>
+            {journalOpen?'Close journal':'Review journal'}
+          </button>
+        </aside>
+
+        {#if journalOpen}
+          <section id="clinic-journal" class="journal" aria-label="Personal Journal">
+            <header class="journal-head">
+              <div><small>PERSONAL JOURNAL</small><h2>The Clinic</h2></div>
+            </header>
+            <p>{journal}</p>
+            {#if clinic.phase==='LEFT'}<p>I've got ten coins left. Time to head home.</p>{/if}
+          </section>
+        {/if}
       </div>
-      <section class="journal" aria-label="Personal Journal">
-        <div class="reading">
-          <small>PERSONAL JOURNAL</small>
-          <h2>The Clinic</h2>
-          <p>{journal}</p>
-          {#if clinic.phase==='LEFT'}<p>I've got ten coins left. Time to head home.</p>{/if}
-        </div>
-      </section>
-    </div>
+    </section>
   </TutorialShell>
 {:else}
   <main class="fallback">
@@ -271,73 +264,80 @@
 
 <style>
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
-  /* Give the supplied clinic artwork a dedicated visible stage. Previously
-     it sat behind nearly opaque full-width panels and was effectively hidden.
-     The condition, dialogue, fee and Journal keep their existing order. */
-  .clinic{display:flex;flex-direction:column;gap:14px;padding:16px 19px 24px;
-    min-height:620px;background:#1d1b1a}
-  .clinic-scene{position:relative;box-sizing:border-box;width:100%;
-    min-height:clamp(340px,38vw,540px);
-    display:flex;align-items:flex-start;
-    border:1px solid #725a3b;
-    background-color:#30303a;
-    background-image:linear-gradient(90deg,#120e0d80 0%,#120e0d28 38%,#120e0d00 75%),
-      url('/locations/clinic/clinic-workshop-cold.webp');
-    background-size:cover;background-position:center 44%;background-repeat:no-repeat}
-  .clinic-heading{position:relative;z-index:1;box-sizing:border-box;
-    width:min(610px,calc(100% - 36px));margin:18px;
-    padding:14px 20px;border:1px solid #725a3b;background:#2a211bbc;
-    backdrop-filter:blur(2px)}
-  .clinic-heading small,.journal small{font:700 13px/1.3 Arial,sans-serif;letter-spacing:.1em}
-  .clinic-heading h1{margin:4px 0 10px;color:#f0d5ab;font:600 31px/1.2 Georgia,serif}
-  .clinic-heading p{margin:5px 0;font-size:15px;line-height:1.5;color:#e3cfb2}
-  .clinic-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px}
-  .condition,.exchange{padding:19px 22px;background:#28231fd9;border:1px solid #866546;
-    min-width:0}
-  h2{font:600 22px/1.3 Georgia,serif;color:#f0d3a9;margin:0 0 13px}
-  h3{font:600 17px/1.4 Georgia,serif;color:#dcc39e;margin:15px 0 8px}
-  p{line-height:1.55}
-  .condition ul{padding-left:24px}
-  .condition li{margin-bottom:6px}
-  .health,.fee div{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
-  .health{padding:10px 0;border-top:1px solid #695037;border-bottom:1px solid #695037}
-  .health strong{font-size:20px;color:#eed4ae;font-variant-numeric:tabular-nums}
-  .small-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 17px;
-    margin-top:12px}
-  .small-stats span{display:flex;justify-content:space-between;gap:8px;font-size:14px}
-  .small-stats b{color:#f4d7b1;font-variant-numeric:tabular-nums}
-  .diagnosis{padding:9px 12px;border-left:3px solid #cfad77;background:#382f25}
-  .exchange>p{margin:9px 0}
-  .fee{background:#201d1a;border:1px solid #755b40;padding:12px 15px;margin:20px 0 14px}
-  .fee div{padding:6px 0;border-bottom:1px solid #503e2d;font-size:14px}
-  .fee div:last-of-type{border-bottom:0}
-  .fee strong{color:#f1d5ad;white-space:nowrap;font-variant-numeric:tabular-nums}
-  .paid{margin:9px 0 0;color:#c1dbb7;font-weight:700}
-  .completion{border-left:3px solid #8fa883;padding:10px 12px;background:#2e392b}
-  .discharge{padding:10px 12px;margin-top:18px;background:#313323;border:1px solid #63724c}
-  .discharge h3{margin:0 0 8px}
-  .discharge p{margin:5px 0;font-size:14px}
-  .discharge .small{font-size:12px;color:#d1c8af}
-  .advance{margin-top:12px}
-  .error{color:#ffd1bc}
-  .journal{margin-top:2px;background:#e6d5b5;color:#24160e;padding:23px clamp(16px,3vw,45px)}
-  .reading{max-width:960px;margin:auto}
-  .journal small{color:#47301d}
-  .journal h2{margin:5px 0;color:#25170f;font-size:24px}
-  .journal p{font:600 16px/1.55 Georgia,serif;margin:0 0 10px}
+  .clinic{display:block;min-width:0;color:#2b1c11;
+    font-family:var(--pall-font-reading,Georgia,serif)}
+  /* The scene fills the chapter surface, as in Stages 3–5. Dialogue is
+     overlaid on the original, fully visible illustration. */
+  .clinic-scene{position:relative;isolation:isolate;box-sizing:border-box;
+    width:100%;height:clamp(650px,65vw,820px);overflow:hidden;
+    background:#20212a url('/locations/clinic/clinic-workshop-cold.webp')
+      center center/cover no-repeat}
+  .clinic-scene::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(90deg,#17120d0a 0%,#10121b12 48%,#10101555 100%)}
+  .clinic-dialogue{position:absolute;z-index:5;top:3.5%;right:2.4%;
+    box-sizing:border-box;width:min(46%,650px);max-height:91%;overflow-y:auto;
+    background:#ead8b8;color:#2b1c11;
+    border:solid transparent;border-width:21px 25px 20px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:21px 25px 20px;border-image-repeat:stretch;
+    margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)}
+  .eyebrow,.speaker{font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.065em;color:#60402a;margin:0 0 10px}
+  h1{margin:0 0 12px;font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);
+    color:#352215}
+  .narration,.speech,.instruction{font:16px/1.45 var(--pall-font-reading,Georgia,serif);
+    color:#302016;margin:0 0 13px}
+  .speech{font-weight:600}
+  .narration{color:#463020}
+  .instruction{font-weight:700}
+  .speaker{margin:10px 0 5px}
+  .price{display:grid;grid-template-columns:minmax(0,1fr) auto;
+    align-items:baseline;gap:7px 12px;padding:12px 13px;margin:13px 0;
+    border-top:1px solid #967650;border-bottom:1px solid #967650;
+    background:#e0cba7;color:#3a2616;font:14px/1.4 Georgia,serif}
+  .price strong{text-align:right;font-variant-numeric:tabular-nums}
+  .receipt,.next-note{font-size:14px;line-height:1.5;color:#604227;margin:10px 0}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 10px}
+  .advance{min-width:210px;max-width:100%}
+  .error{padding:8px 10px;background:#f4d3c2;border-left:3px solid #a34129;
+    font-size:14px;line-height:1.4;color:#702018}
+  .medical-record{margin:12px 0 0;border-top:1px solid #bb9c70;
+    padding:9px 1px 0;color:#533a25;font:13px/1.45 Georgia,serif}
+  .medical-record summary{cursor:pointer;font-weight:700}
+  .medical-record p{margin:8px 0}
+  .medical-record ul{margin:8px 0;padding-left:23px}
+  .journal-toggle{margin:12px 0 0;min-width:170px;min-height:44px}
+  .journal{position:absolute;z-index:6;left:2.4%;bottom:3%;
+    box-sizing:border-box;width:min(46%,650px);max-height:80%;overflow-y:auto;
+    border:solid transparent;border-width:21px 25px 20px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:21px 25px 20px;border-image-repeat:stretch;
+    padding:10px 15px 12px;background:#ead8b8;color:#2b1c11;
+    filter:drop-shadow(0 6px 8px #0008)}
+  .journal-head small{font:600 13px/1.25 var(--pall-font-label,Arial,sans-serif);
+    color:#624328;letter-spacing:.09em}
+  .journal-head h2{margin:4px 0 12px;font:600 23px/1.2 Georgia,serif}
+  .journal p{font:15px/1.5 Georgia,serif;margin:0 0 10px}
   .fallback{max-width:760px;margin:8vh auto;padding:30px;background:#28221d;
     border:1px solid #866546;color:#eadfcf}
   .fallback a{color:#eac498}
-  @media(max-width:900px){
-    .clinic-layout{grid-template-columns:1fr}
-    .clinic{padding:8px}
-    .clinic-scene{min-height:360px;background-position:57% center}
+  @media(max-width:950px){
+    .clinic-scene{height:auto;min-height:660px;display:flex;
+      flex-direction:column;gap:14px;padding:22px 14px;align-items:flex-end;
+      background-position:45% center}
+    .clinic-dialogue,.journal{position:relative;top:auto;right:auto;bottom:auto;
+      left:auto;width:min(100%,590px);max-height:none;overflow:visible}
+    .journal{align-self:flex-start}
   }
   @media(max-width:550px){
-    .small-stats{grid-template-columns:1fr}
-    .condition,.exchange{padding:14px}
-    .clinic-scene{min-height:350px;background-position:59% center}
-    .clinic-heading{margin:10px;width:calc(100% - 20px);padding:11px 14px}
-    .clinic-heading h1{font-size:26px}
+    .clinic-scene{padding:12px 8px;min-height:670px;background-position:48% center}
+    .clinic-dialogue,.journal{width:100%;border-width:17px 18px 17px;
+      border-image-width:17px 18px 17px;padding:8px 11px}
+    .narration,.speech,.instruction{font-size:14px}
+    .eyebrow,.speaker{font-size:12px}
+    h1{font-size:22px}
+    .actions .pall-framed-button{width:100%}
   }
 </style>

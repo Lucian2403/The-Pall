@@ -603,3 +603,66 @@ test('Stage 7 rewind blocks inconsistent character Health without partial deleti
   assert.equal(fight.status,200);
   assert.equal(fight.body!.status,'finished');
 });
+
+
+test('After leaving the clinic, Back to Stage 6 remains available until Stage 8 begins',async()=>{
+  const {c}=await outcomeWith(()=>({type:'guard'}));
+  const priced=await completeExamination(c);
+  const paid=await clinicAdvance(c,priced,'pay');
+  const left=await clinicAdvance(c,paid,'leave');
+  assert.equal(left.phase,'LEFT');
+  const endpoint=base+c.id+'/dev/rewind-stage';
+  const options=await request('GET',endpoint);
+  assert.equal(options.status,200);
+  assert.deepEqual(options.body,{
+    enabled:true,canRewind:true,stage:8,targetStage:6
+  });
+  assert.equal((await devRewind(c,7)).status,409,
+    'An outdated Stage 7 request cannot bypass the completed clinic boundary');
+  const rewind=await devRewind(c,8);
+  assert.equal(rewind.status,200,JSON.stringify(rewind.body));
+  assert.equal(rewind.body!.stage,6);
+  assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/combat');
+  assert.equal((await devRewind(c,8)).status,409,'Completed visit cannot refund twice');
+  const char=await db.query<{coins:string;current_health:number;tutorial_status:string}>(
+    'SELECT coins,current_health,tutorial_status FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(Number(char.rows[0].coins),20);
+  assert.equal(char.rows[0].current_health,50);
+  assert.equal(char.rows[0].tutorial_status,'NOT_STARTED');
+  const startAgain=await start(c);
+  assert.equal(startAgain.status,'active');
+  assert.equal(startAgain.revision,0);
+});
+
+test('Completed-clinic rewind is disabled after Stage 8 starts or if clinic state diverges',async()=>{
+  const {c}=await outcomeWith(()=>({type:'guard'}));
+  let priced=await completeExamination(c);
+  let paid=await clinicAdvance(c,priced,'pay');
+  await clinicAdvance(c,paid,'leave');
+  const endpoint=base+c.id+'/dev/rewind-stage';
+  await db.query(
+    "UPDATE player_characters SET tutorial_status='IN_PROGRESS' WHERE id=$1",[c.id]
+  );
+  assert.equal((await request('GET',endpoint)).body!.canRewind,false);
+  const playing=await devRewind(c,8);
+  assert.equal(playing.status,409);
+  assert.equal(playing.body?.error,'unsafe_clinic_state');
+  const coins=await db.query<{coins:string}>(
+    'SELECT coins FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(Number(coins.rows[0].coins),10);
+  await db.query(
+    "UPDATE player_characters SET tutorial_status='NOT_STARTED' WHERE id=$1",[c.id]
+  );
+  await db.query(
+    "UPDATE player_character_clinic SET state=jsonb_set(state,'{phase}','\"PAID\"'::jsonb) WHERE character_id=$1",
+    [c.id]
+  );
+  assert.equal((await request('GET',endpoint)).body!.canRewind,false);
+  const invalid=await devRewind(c,8);
+  assert.equal(invalid.status,409);
+  assert.equal(invalid.body?.error,'unsafe_clinic_state');
+  assert.equal((await request('GET',c.path)).body!.status,'finished');
+  assert.equal((await request('GET',base+c.id+'/millhand/clinic')).body!.coins,10);
+});

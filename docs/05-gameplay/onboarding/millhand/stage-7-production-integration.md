@@ -120,3 +120,37 @@ In the owner-confirmed developer replay transaction:
 PostgreSQL integration tests exercise paid/unpaid replay, ownership,
 single refund, revived fight readiness and all-or-nothing rejection.
 The approved original combat engine remains byte-for-byte unchanged.
+
+## Stage 7 immersive dialogue refinement — 2026-11-04
+
+The owner requested the same **in-scene dialogue frame** used in prior
+chapters rather than two dense UI columns below the clinic art.
+
+- The original owner-supplied clinic interior remains the **whole visible
+  encounter scene**, with the same parchment/metal nine-slice dialogue
+  frame used in Stage 5 placed over the right side of the image.
+- The saved **Examine → Speak → Review price → Pay → Leave** sequence and
+  exact 10-coin billing logic remain unchanged.
+- At each step only the relevant narration or clinician exchange is shown;
+  the previous dense "Your condition" panel, six-stat readout, duplicate
+  diagnosis and always-open Journal are removed.
+- The clinician's observations come strictly from the saved Health,
+  fatigue, stamina, bleeding and actual wound types. **No recorded wound
+  with reduced Health** is described as being knocked about, not as a
+  fictitious cut. Only a genuine recorded cut receives the cleaning/
+  dressing dialogue. A genuinely unhurt patient hears the approved
+  no-injuries/no-treatment result.
+- Players can expand **Review examination record** for the precise
+  numerical pre-care Health, wounds, bleeding and key reserves, or
+  **Review journal** for the existing first-person account. Neither
+  normally crowds the illustrated room.
+- Buttons reuse the approved normal/hover/pressed nine-slice artwork.
+
+**Back to Stage 6** remains development/loopback-only. It works both
+during Stage 7 and when the clinic has been marked LEFT and Stage 8 has
+been **unlocked but not started**. The clinic page continues to display
+the Stage VII chapter label while reviewing the completed visit.
+A completed-clinic rewind is refused once Stage 8 changes to
+IN_PROGRESS, or if the clinic is not actually LEFT and paid. The
+existing transactional one-time 10-coin refund, original pre-fight
+Health restore, and combat replay safety checks are retained.
