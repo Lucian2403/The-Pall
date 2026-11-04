@@ -8,6 +8,9 @@ import {
   clinicView,initialClinic,defaultTutorialDischarge
 } from '../apps/api/src/millhand-clinic-state.ts';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
+import {
+  clinicianAssessment,clinicianDischarge,clinicianFatigue
+} from '../apps/web/src/lib/millhand-clinic-dialogue.ts';
 
 const root=resolve(import.meta.dirname,'..');
 const source=(name:string)=>readFileSync(resolve(root,name),'utf8');
@@ -87,9 +90,29 @@ test('Paid discharge uses actual fixture defaults and retains fight history',()=
   assert.equal(paid.outcome,'player_defeat');
 });
 
+test('Clinician remarks depend on actual wounds, blood loss and Health, not invented treatment',()=>{
+  const normal={hp:50,hpMax:50,stamina:90,fatigue:0,bleed:0,wounds:[]};
+  assert.equal(clinicianAssessment(normal,'unhurt'),'No injuries found. No treatment needed.');
+  assert.equal(clinicianFatigue(normal),null);
+  const lowHealth={...normal,hp:19,stamina:29};
+  assert.match(clinicianAssessment(lowHealth,'other'),/taken a beating/);
+  assert.doesNotMatch(clinicianAssessment(lowHealth,'other'),/cut needs cleaning/i);
+  assert.match(clinicianFatigue(lowHealth)??'',/worn yourself out/);
+  const cutting={...normal,hp:38,wounds:[{type:'cut',zone:'head',severity:'minor'}]};
+  assert.equal(clinicianAssessment(cutting,'cut'),"Needs cleaning. I'll dress it.");
+  const impact={...normal,hp:26,wounds:[{type:'impact',zone:'torso',severity:'serious'}]};
+  assert.match(clinicianAssessment(impact,'other'),/fight has left you hurt/);
+  assert.doesNotMatch(clinicianAssessment(impact,'other'),/dress it/);
+  const bleeding={...normal,hp:24,bleed:2};
+  assert.match(clinicianAssessment(bleeding,'other'),/still bleeding/);
+  assert.match(clinicianDischarge('unhurt'),/No treatment needed/);
+  assert.match(clinicianDischarge('other'),/fit to get back on your feet/);
+});
+
 test('Web and API wire the clinic without altering original combat rules',()=>{
   const api=source('apps/api/src/millhand-clinic-routes.ts');
   const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+  const clinician=source('apps/web/src/lib/millhand-clinic-dialogue.ts');
   const battle=source('apps/web/src/lib/MillhandCombatScene.svelte');
   const migration=source('db/migrations/0008_millhand_clinic.sql');
   const boot=source('apps/api/src/index.ts');
@@ -104,7 +127,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(web.includes('Examine condition'));
   assert.ok(web.includes('Review the price'));
   assert.ok(web.includes('Pay 10 coins'));
-  assert.ok(web.includes('No injuries found. No treatment needed.'));
+  assert.ok(clinician.includes('No injuries found. No treatment needed.'));
   assert.ok(battle.includes('Continue to medical care'));
   const shared=source('apps/web/src/lib/pall-owner-ui.css');
   const wage=source('apps/web/src/lib/MillhandWageClaimScene.svelte');
@@ -123,15 +146,23 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     'Use optimized, real owner-supplied illustrated clinic artwork');
   assert.ok(web.includes("url('/locations/clinic/clinic-workshop-cold.webp')") &&
     web.includes('class="clinic-scene"') &&
-    web.includes('min-height:clamp(340px,38vw,540px)') &&
-    web.indexOf('class="clinic-scene"') < web.indexOf('class="clinic-layout"') &&
-    web.includes('background:#1d1b1a') &&
-    !web.includes('min-height:clamp(720px,62vw,960px);background-color:#17191d;') &&
-    web.includes('class="clinic-layout"') &&
-    web.includes('class="condition"') &&
-    web.includes('class="exchange"') &&
-    web.includes('class="journal"'),
-    'Stage 7 must use the clinic backdrop without discarding its approved dialogue layout');
+    web.includes('height:clamp(650px,65vw,820px)') &&
+    web.includes('class="clinic-dialogue"') &&
+    web.includes('position:absolute;z-index:5;top:3.5%;right:2.4%') &&
+    web.includes("url('/ui-kit/frames/dialogue-frame-trim.png')") &&
+    web.includes('class="medical-record"') &&
+    web.includes('class="journal"') &&
+    web.includes('aria-expanded={journalOpen}') &&
+    !web.includes('class="clinic-layout"') &&
+    !web.includes('class="small-stats"') &&
+    !web.includes('class="condition"'),
+    'The clinic must remain an immersive scene with a framed dialogue overlay and optional details');
+  assert.ok(web.includes('clinicianAssessment(clinic.before,clinic.conditionType)') &&
+    web.includes('clinicianFatigue(clinic.before)') &&
+    web.includes('clinicianDischarge(clinic.conditionType)') &&
+    web.includes('sceneStage={7}') &&
+    web.includes('Pay 10 coins'),
+    'The clinician must narrate saved facts and keep the existing action sequence');
   const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
   const shell=source('apps/web/src/lib/TutorialShell.svelte');
   assert.ok(rewind.includes('if(expectedStage===7)') &&
@@ -141,7 +172,10 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     rewind.includes('wasPaid?10:0') &&
     rewind.includes('tutorial_stage=6,tutorial_status=\'NOT_STARTED\'') &&
     shell.includes('Back to Stage ') &&
-    shell.includes('fromStage===7') &&
+    shell.includes('fromStage===7||fromStage===8') &&
+    shell.includes('rewindTargetStage') &&
+    rewind.includes('if(expectedStage===7||expectedStage===8)') &&
+    rewind.includes('completedClinic') &&
     web.includes("character={...character,tutorial:clinic.phase==='LEFT'"),
     'Stage 7 must safely rewind to a replayable Stage 6, reversing only committed clinic payment');
   assert.equal(CLINIC_FEE,10);
