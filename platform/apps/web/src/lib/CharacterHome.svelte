@@ -61,6 +61,18 @@
       label:'Continue the fight with Flint',
       href:base+'/millhand/combat'
     };
+    if(character.origin==='Millhand'&&character.tutorial.stage===7) return {
+      title:'The Clinic',
+      description:'The fight has ended. Your examination, condition and payment progress are saved.',
+      label:'Continue the clinic visit',
+      href:base+'/millhand/clinic'
+    };
+    if(character.origin==='Millhand'&&character.tutorial.stage===8) return {
+      title:'Return Home',
+      description:'The clinic is complete. The final home chapter is awaiting playable integration.',
+      label:'Review the completed clinic visit',
+      href:base+'/millhand/clinic'
+    };
     return null;
   });
 
