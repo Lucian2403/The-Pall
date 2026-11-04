@@ -132,7 +132,7 @@ assert.ok(charactersSql.includes("'NOT_STARTED','IN_PROGRESS','COMPLETED'") &&
 // Developer-only Stage 6 → 5 rewind: exact starting Health is recovered
 // from the revision-zero start receipt, not guessed from maximum Health.
 assert.ok(rewind.includes("process.env.NODE_ENV==='production'||!loopback") &&
-  rewind.includes('stage>=2&&stage<=6') &&
+  rewind.includes('stage>=2&&stage<=7') &&
   rewind.includes('expectedStage===6') &&
   rewind.includes('previousWageClaim(claim.rows[0].state)') &&
   rewind.includes("response->>'revision'='0'") &&

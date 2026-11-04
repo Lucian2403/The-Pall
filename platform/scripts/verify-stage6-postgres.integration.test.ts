@@ -17,6 +17,7 @@ import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
+import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -43,6 +44,7 @@ const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
+registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
@@ -514,3 +516,90 @@ test('Insufficient coins leaves the medical bill unpaid and all records untouche
   assert.equal(original.rows[0].current_health,state.body!.before.hp);
 });
 
+
+
+async function devRewind(c:Awaited<ReturnType<typeof character>>,stage:number,account:string|null=owner){
+  return request('POST',base+c.id+'/dev/rewind-stage',account,{expectedStage:stage});
+}
+
+test('Unpaid Stage 7 rewind returns to a fresh Flint fight with original Health and no charge',async()=>{
+  const {c}=await outcomeWith(()=>({type:'attack',zone:'torso'}));
+  const original=await db.query<{response:Record<string,any>}>(
+    "SELECT response FROM player_character_flint_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' LIMIT 1",
+    [c.id]
+  );
+  const originalHP=original.rows[0].response.player.hp;
+  const opened=await clinicCommand(c,'start');
+  assert.equal(opened.status,200);
+  await clinicAdvance(c,opened.body!,'examine');
+  const endpoint=base+c.id+'/dev/rewind-stage';
+  assert.deepEqual((await request('GET',endpoint)).body,{
+    enabled:true,canRewind:true,stage:7,targetStage:6
+  });
+  assert.equal((await devRewind(c,7,stranger)).status,404);
+  assert.equal((await devRewind(c,6)).status,409);
+  const rewind=await devRewind(c,7);
+  assert.equal(rewind.status,200,JSON.stringify(rewind.body));
+  assert.equal(rewind.body!.stage,6);
+  assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/combat');
+  const player=await db.query<{tutorial_stage:number;tutorial_status:string;current_health:number;coins:string}>(
+    'SELECT tutorial_stage,tutorial_status,current_health,coins FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(player.rows[0].tutorial_stage,6);
+  assert.equal(player.rows[0].tutorial_status,'NOT_STARTED');
+  assert.equal(player.rows[0].current_health,originalHP);
+  assert.equal(Number(player.rows[0].coins),20);
+  for(const table of [
+    'player_character_clinic_receipts','player_character_clinic',
+    'player_character_flint_combat_receipts','player_character_flint_combat'
+  ]){
+    const rows=await db.query<{count:string}>(
+      'SELECT count(*)::text count FROM '+table+' WHERE character_id=$1',[c.id]
+    );
+    assert.equal(Number(rows.rows[0].count),0,table+' must be cleared atomically');
+  }
+  const replay=await start(c);
+  assert.equal(replay.revision,0);
+  assert.equal(replay.player.hp,originalHP);
+});
+
+test('Paid Stage 7 rewind refunds exactly one fee and does not replay old payment',async()=>{
+  const {c}=await outcomeWith(()=>({type:'guard'}));
+  const price=await completeExamination(c);
+  const paymentKey=randomUUID();
+  const paid=await clinicAdvance(c,price,'pay',paymentKey);
+  assert.equal(paid.coins,10);
+  assert.equal(paid.after.hp,50);
+  const rewind=await devRewind(c,7);
+  assert.equal(rewind.status,200,JSON.stringify(rewind.body));
+  assert.equal((await devRewind(c,7)).status,409,'Cannot refund twice');
+  const beforeReplay=await db.query<{coins:string;tutorial_stage:number;current_health:number}>(
+    'SELECT coins,tutorial_stage,current_health FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(Number(beforeReplay.rows[0].coins),20);
+  assert.equal(beforeReplay.rows[0].tutorial_stage,6);
+  assert.equal(beforeReplay.rows[0].current_health,50);
+  const oldPayment=await clinicCommand(c,'action','pay',price.revision,paymentKey);
+  assert.equal(oldPayment.status,409,'Old clinic receipts must never pay again');
+  const restarted=await start(c);
+  assert.equal(restarted.status,'active');
+  assert.equal(restarted.revision,0);
+  assert.equal(restarted.player.hp,50);
+});
+
+test('Stage 7 rewind blocks inconsistent character Health without partial deletion or refund',async()=>{
+  const {c}=await outcomeWith(()=>({type:'guard'}));
+  const price=await completeExamination(c);
+  await clinicAdvance(c,price,'pay');
+  await db.query('UPDATE player_characters SET current_health=49 WHERE id=$1',[c.id]);
+  const bad=await devRewind(c,7);
+  assert.equal(bad.status,409);
+  assert.equal(bad.body?.error,'unsafe_clinic_health_state');
+  const state=await request('GET',base+c.id+'/millhand/clinic');
+  assert.equal(state.status,200);
+  assert.equal(state.body!.paid,true);
+  assert.equal(state.body!.coins,10);
+  const fight=await request('GET',c.path);
+  assert.equal(fight.status,200);
+  assert.equal(fight.body!.status,'finished');
+});

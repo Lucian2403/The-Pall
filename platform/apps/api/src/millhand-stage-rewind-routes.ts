@@ -5,24 +5,35 @@
  */
 import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
+import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
+import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
+import type {ClinicState} from './millhand-clinic-state.js';
 import {auth} from './auth.js';
 import {INITIAL_PLATEWORK,planMillhandRewind,MillhandRewindInvalid,previousWageClaim,WageClaimInvalidAction} from '@the-pall/game-core';
 import type {MissingStampBranch,WageClaimState} from '@the-pall/game-core';
 
-const db = new pg.Pool({connectionString:process.env.DATABASE_URL});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params={id:string};
 type CharacterState={origin:string;tutorial_stage:number;tutorial_status:string;major_skill_bonuses:Record<string,number>;current_health:number;max_health:number};
 
-export function registerMillhandStageRewindRoutes(app:FastifyInstance){
-  app.addHook('onClose',async()=>{await db.end();});
+type SessionAccount={user:{id:string;emailVerified:boolean}}|null;
+type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
+/** Development/loopback-only handler; identity substitution is exclusively
+ * for in-process PostgreSQL integration tests. No HTTP bypass exists. */
+export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
+  pool?:pg.Pool;resolveSession?:SessionResolver;
+}={}){
+  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
+    auth.api.getSession({headers:fromNodeHeaders(headers)}));
+  app.addHook('onClose',async()=>{if(!options.pool)await db.end();});
   const host=process.env.API_HOST??'127.0.0.1';
   const loopback=host==='127.0.0.1'||host==='::1'||host==='localhost';
   if(process.env.NODE_ENV==='production'||!loopback)return;
 
   app.get<{Params:Params}>('/api/characters/:id/dev/rewind-stage',async(req,reply)=>{
-    const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+    const session=await resolveSession(req.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
     const result=await db.query<CharacterState>(
@@ -32,11 +43,11 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
     if(!result.rowCount||result.rows[0].origin!=='Millhand')
       return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
-    return {enabled:true,canRewind:stage>=2&&stage<=6,stage,targetStage:stage>1&&stage<=6?stage-1:null};
+    return {enabled:true,canRewind:stage>=2&&stage<=7,stage,targetStage:stage>1&&stage<=7?stage-1:null};
   });
 
   app.post<{Params:Params}>('/api/characters/:id/dev/rewind-stage',async(req,reply)=>{
-    const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+    const session=await resolveSession(req.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
     if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
     const origin=req.headers.origin;
@@ -49,7 +60,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
         Object.keys(body).sort().join(',')!=='expectedStage')
       return reply.code(400).send({error:'invalid_body'});
     const expectedStage=(body as {expectedStage:unknown}).expectedStage;
-    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>6)
+    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>7)
       return reply.code(400).send({error:'invalid_stage'});
 
     const client=await db.connect();
@@ -69,6 +80,91 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
       if(c.rows[0].tutorial_stage!==expectedStage){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'stale_stage',stage:c.rows[0].tutorial_stage});
+      }
+
+
+      if(expectedStage===7){
+        // Developer replay from the paid or unpaid clinic must start a fresh
+        // Stage 6 encounter, not reopen an already-finished Flint fight.
+        // The character row lock serializes this with clinic payment/turns.
+        const clinic=await client.query<{state:ClinicState}>(
+          'SELECT state FROM player_character_clinic WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        const combat=await client.query<{state:CombatState;stance:string}>(
+          'SELECT state,stance FROM player_character_flint_combat WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        const saved=clinic.rows[0]?.state;
+        const fight=combat.rows[0];
+        if(!saved||!fight||fight.state.status!=='finished'||
+          (fight.state.outcome!=='player_victory'&&fight.state.outcome!=='player_defeat')||
+          saved.outcome!==fight.state.outcome||
+          saved.before.hp!==fight.state.player.hp||
+          saved.before.hpMax!==fight.state.player.hpMax||
+          saved.phase==='LEFT'||c.rows[0].tutorial_status!=='IN_PROGRESS'){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_clinic_state'});
+        }
+        const wasPaid=saved.paid===true;
+        if(wasPaid !== (saved.phase==='PAID')||
+          (wasPaid?(!saved.after||
+            saved.after.hp!==c.rows[0].current_health||
+            saved.after.hp!==c.rows[0].max_health)
+            :saved.after!==null||
+              c.rows[0].current_health!==fight.state.player.hp)){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_clinic_health_state'});
+        }
+        // Replay always restores the exact pre-fight Health captured by
+        // the initial saved revision-zero combat receipt.
+        const start=await client.query<{response:{
+          revision:number;stance:string;player:{hp:number}
+        }}>(
+          "SELECT response FROM player_character_flint_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+          [req.params.id]
+        );
+        const first=start.rows[0]?.response;
+        const wage=await client.query<{state:WageClaimState}>(
+          'SELECT state FROM player_character_wage_claim WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        if(!first||first.revision!==0||
+          !Number.isSafeInteger(first.player?.hp)||first.player.hp<=0||
+          first.player.hp>c.rows[0].max_health||
+          first.stance!==fight.stance||
+          wage.rows[0]?.state.phase!=='DONE'||
+          wage.rows[0].state.stance!==fight.stance){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_combat_initial_health'});
+        }
+        // The refund and both stage resets form one transaction. In-flight
+        // pay attempts either finish before this lock or see stale_stage.
+        await client.query(
+          'DELETE FROM player_character_clinic_receipts WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_clinic WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_flint_combat_receipts WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_flint_combat WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=6,tutorial_status='NOT_STARTED',current_health=$2,coins=coins+$3 WHERE id=$1",
+          [req.params.id,first.player.hp,wasPaid?10:0]
+        );
+        await client.query('COMMIT');transaction=false;
+        return {
+          stage:6,tutorialStatus:'NOT_STARTED',
+          route:'/characters/'+req.params.id+'/millhand/combat'
+        };
       }
 
       if(expectedStage===6){
@@ -222,8 +318,10 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance){
     } catch(e) {
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
       if((e as {code?:string})?.code==='42P01')
-        return reply.code(503).send({error:expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
-          setup:expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'});
+        return reply.code(503).send({
+          error:expectedStage===7?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
+          setup:expectedStage===7?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
+        });
       throw e;
     } finally {client.release();}
   });
