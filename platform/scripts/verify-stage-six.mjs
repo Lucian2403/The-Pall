@@ -65,7 +65,8 @@ assert.ok(scene.includes('snapshot.enemyIntent') &&
   scene.includes('snapshot.rules') &&
   scene.includes('snapshot.player.wounds.some') &&
   scene.includes('snapshot.outcome') &&
-  scene.includes('Stage 7 is not yet connected'),
+  scene.includes('Continue to medical care') &&
+  scene.includes('/millhand/clinic'),
   'UI must use real combat state and avoid fake clinic');
 assert.ok(view.includes('TEST_CONFIG')&&view.includes('testAttackCost'));
 assert.ok(mig.includes('player_character_flint_combat_receipts')&&mig.includes('history JSONB'));
@@ -322,7 +323,7 @@ assert.deepEqual(floatingFeedbackForSavedTurn(before,{
 }),[],'Old Chronicle entries must not animate without a new turn event');
 assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous,result):[]') &&
   page.includes('feedback=[];') &&
-  page.includes('<MillhandCombatScene snapshot={battle} {feedback}') &&
+  page.includes('<MillhandCombatScene snapshot={battle} characterId={id} {feedback}') &&
   scene.includes("feedback.filter(item => item.target === 'enemy')") &&
   scene.includes("feedback.filter(item => item.target === 'player')") &&
   scene.includes('class:impact={event.kind === \'damage\'}') &&
@@ -331,4 +332,4 @@ assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous
   scene.includes('@media(prefers-reduced-motion:reduce)'),
   'The short-lived floating feedback must restart every turn without replaying old events');
 
-console.log('PASS: original v0.5.1 checksum, stage handoff, authenticated atomic turns, real Chronicle and no invented Stage 7.');
+console.log('PASS: original v0.5.1 checksum, combat handoff, authenticated atomic turns, real Chronicle and Stage 7 clinic link.');

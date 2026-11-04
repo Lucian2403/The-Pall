@@ -16,6 +16,7 @@ import Fastify from 'fastify';
 import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
+import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -29,7 +30,7 @@ const schema=[
   '0002_characters.sql','0003_millhand_platework.sql',
   '0004_millhand_missing_stamp.sql','0005_millhand_second_job.sql',
   '0006_character_portraits.sql','0006_millhand_wage_claim.sql',
-  '0007_millhand_flint_combat.sql'
+  '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql'
 ];
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
   // This resolver is injected only via register*Routes options in this
@@ -41,6 +42,7 @@ const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
 const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
+registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
@@ -319,7 +321,8 @@ test('Account-owned deletion removes Stage 5/6 records, receipts and old chapter
     'player_character_create_receipts',
     'player_character_second_job_receipts','player_character_second_job',
     'player_character_wage_claim_receipts','player_character_wage_claim',
-    'player_character_flint_combat_receipts','player_character_flint_combat'
+    'player_character_flint_combat_receipts','player_character_flint_combat',
+    'player_character_clinic_receipts','player_character_clinic'
   ]){
     const result=await db.query<{count:string}>(
       'SELECT COUNT(*)::text AS count FROM '+table+' WHERE character_id=$1',[c.id]
@@ -331,3 +334,183 @@ test('Account-owned deletion removes Stage 5/6 records, receipts and old chapter
   );
   assert.equal(Number(account.rows[0].revision),1);
 });
+
+
+async function clinicCommand(
+  c:Awaited<ReturnType<typeof character>>,
+  kind:'start'|'action',action?:string,revision?:number,requestId=randomUUID(),
+  account:string|null=owner
+){
+  return request('POST',base+c.id+'/millhand/clinic',account,
+    kind==='start'?{kind,requestId}
+      :{kind,action,expectedRevision:revision,requestId});
+}
+async function clinicAdvance(
+  c:Awaited<ReturnType<typeof character>>,
+  state:Record<string,any>,action:string,requestId=randomUUID()
+){
+  const response=await clinicCommand(c,'action',action,state.revision,requestId);
+  assert.equal(response.status,200,JSON.stringify(response.body));
+  return response.body!;
+}
+async function completeExamination(c:Awaited<ReturnType<typeof character>>){
+  const begin=await clinicCommand(c,'start');
+  assert.equal(begin.status,200,JSON.stringify(begin.body));
+  let state=begin.body!;
+  for(const action of ['examine','speak','review_price'])
+    state=await clinicAdvance(c,state,action);
+  return state;
+}
+
+test('Stage 7 enforces the finished-fight boundary and account ownership',async()=>{
+  const c=await character();
+  await start(c);
+  const route=base+c.id+'/millhand/clinic';
+  assert.equal((await request('GET',route,null)).status,401);
+  assert.equal((await request('GET',route,stranger)).status,404);
+  assert.equal((await clinicCommand(c,'start',undefined,undefined,randomUUID(),stranger)).status,404);
+  const early=await clinicCommand(c,'start');
+  assert.equal(early.status,409);
+  assert.equal(early.body?.error,'combat_not_finished');
+  assert.equal((await request('GET',route)).status,409);
+});
+
+test('Victory clinic charges once, preserves the battle and advances only after leaving',async()=>{
+  const {c,state:fight}=await outcomeWith(()=>({type:'attack',zone:'torso'}));
+  const combatBefore=await db.query<{state:any;history:any[]}>(
+    'SELECT state,history FROM player_character_flint_combat WHERE character_id=$1',[c.id]
+  );
+  const price=await completeExamination(c);
+  assert.equal(price.conditionType==='unhurt',fight.player.hp===fight.player.hpMax
+    &&fight.player.wounds.length===0&&fight.player.bleed===0);
+  assert.equal(price.coins,20);
+  assert.equal(price.fee,10);
+  assert.equal(price.paid,false);
+  const earlyLeave=await clinicCommand(c,'action','leave',price.revision);
+  assert.equal(earlyLeave.status,409);
+  assert.equal(earlyLeave.body?.error,'wrong_clinic_phase');
+  const requestId=randomUUID();
+  const paid=await clinicAdvance(c,price,'pay',requestId);
+  assert.equal(paid.coins,10);
+  assert.equal(paid.after.hp,50);
+  assert.equal(paid.after.stamina,90);
+  assert.equal(paid.after.composure,80);
+  assert.equal(paid.after.fatigue,0);
+  assert.equal(paid.after.momentum,0);
+  assert.equal(paid.after.wounds.length,0);
+  assert.equal(paid.after.bleed,0);
+  assert.equal(paid.paid,true);
+  const retry=await clinicCommand(c,'action','pay',price.revision,requestId);
+  assert.equal(retry.status,200);
+  assert.deepEqual(retry.body,paid,'Receipt must replay identical payment response');
+  const second=await clinicCommand(c,'action','pay',paid.revision);
+  assert.equal(second.status,409,'A second fee must never be permitted');
+  const readback=await request('GET',base+c.id+'/millhand/clinic');
+  assert.equal(readback.status,200);
+  assert.deepEqual(readback.body,paid);
+  const beforeLeaving=await db.query<{tutorial_stage:number;current_health:number;coins:string}>(
+    'SELECT tutorial_stage,current_health,coins FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(beforeLeaving.rows[0].tutorial_stage,7);
+  assert.equal(Number(beforeLeaving.rows[0].coins),10);
+  assert.equal(beforeLeaving.rows[0].current_health,50);
+  const left=await clinicAdvance(c,paid,'leave');
+  assert.equal(left.completed,true);
+  assert.equal(left.nextStage,8);
+  const finished=await db.query<{
+    tutorial_stage:number;tutorial_status:string;current_health:number;
+    coins:string;major_skill_bonuses:Record<string,number>
+  }>('SELECT tutorial_stage,tutorial_status,current_health,coins,major_skill_bonuses FROM player_characters WHERE id=$1',[c.id]);
+  assert.equal(finished.rows[0].tutorial_stage,8);
+  assert.equal(finished.rows[0].tutorial_status,'NOT_STARTED');
+  assert.equal(finished.rows[0].current_health,50);
+  assert.equal(Number(finished.rows[0].coins),10);
+  assert.deepEqual(finished.rows[0].major_skill_bonuses,{Craftsmanship:3,Industry:1});
+  const combatAfter=await db.query<{state:any;history:any[]}>(
+    'SELECT state,history FROM player_character_flint_combat WHERE character_id=$1',[c.id]
+  );
+  assert.deepEqual(combatAfter.rows[0],combatBefore.rows[0],
+    'Clinic must not rewrite outcome, wound history or original combat state');
+  assert.equal((await request('GET',base+c.id+'/millhand/clinic')).body!.completed,true);
+  assert.equal((await clinicCommand(c,'action','pay',paid.revision)).status,409);
+});
+
+test('Defeat at zero Health still enters clinic and finishes at full starting condition',async()=>{
+  const {c,state:fight}=await outcomeWith(()=>({type:'guard'}));
+  assert.equal(fight.player.hp,0);
+  const price=await completeExamination(c);
+  assert.equal(price.outcome,'player_defeat');
+  assert.equal(price.before.hp,0);
+  assert.equal(price.conditionType==='unhurt',false);
+  const paid=await clinicAdvance(c,price,'pay');
+  assert.equal(paid.after.hp,50);
+  assert.equal(paid.before.hp,0,'The original injury condition is retained');
+  const left=await clinicAdvance(c,paid,'leave');
+  assert.equal(left.coins,10);
+  assert.equal(left.nextStage,8);
+});
+
+test('Paid examination is serialized between browser tabs and cannot charge twice',async()=>{
+  const {c}=await outcomeWith(()=>({type:'guard'}));
+  const price=await completeExamination(c);
+  const [a,b]=await Promise.all([
+    clinicCommand(c,'action','pay',price.revision),
+    clinicCommand(c,'action','pay',price.revision)
+  ]);
+  assert.deepEqual([a.status,b.status].sort(),[200,409]);
+  const row=await db.query<{coins:string;current_health:number}>(
+    'SELECT coins,current_health FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(Number(row.rows[0].coins),10);
+  assert.equal(row.rows[0].current_health,50);
+  const receipts=await db.query<{count:string}>(
+    'SELECT COUNT(*)::text count FROM player_character_clinic_receipts WHERE character_id=$1',[c.id]
+  );
+  assert.equal(Number(receipts.rows[0].count),5,
+    'Start, Examine, Speak, Review and one successful Pay receipt');
+});
+
+test('Unhurt full-Health encounter receives examination without fabricated injury',async()=>{
+  const c=await character();
+  await start(c);
+  const row=await db.query<{state:any}>(
+    'SELECT state FROM player_character_flint_combat WHERE character_id=$1',[c.id]
+  );
+  // Synthetic zero-damage victory fixture tests the clinic gate only.
+  const combat={...row.rows[0].state,status:'finished',outcome:'player_victory'};
+  combat.player.hp=50;
+  combat.player.bleed=0;combat.player.wounds=[];
+  await db.query(
+    "UPDATE player_character_flint_combat SET state=$2::jsonb,outcome='player_victory' WHERE character_id=$1",
+    [c.id,JSON.stringify(combat)]
+  );
+  await db.query(
+    "UPDATE player_characters SET tutorial_status='COMPLETED' WHERE id=$1",[c.id]
+  );
+  const price=await completeExamination(c);
+  assert.equal(price.conditionType,'unhurt');
+  assert.equal(price.before.wounds.length,0);
+  const paid=await clinicAdvance(c,price,'pay');
+  assert.deepEqual(paid.before.wounds,[]);
+  assert.deepEqual(paid.after.wounds,[]);
+  assert.equal(paid.before.hp,paid.after.hp);
+  assert.equal(paid.coins,10);
+});
+
+test('Insufficient coins leaves the medical bill unpaid and all records untouched',async()=>{
+  const {c}=await outcomeWith(()=>({type:'guard'}));
+  const price=await completeExamination(c);
+  await db.query('UPDATE player_characters SET coins=9 WHERE id=$1',[c.id]);
+  const no=await clinicCommand(c,'action','pay',price.revision);
+  assert.equal(no.status,409);
+  assert.equal(no.body?.error,'insufficient_coins');
+  const state=await request('GET',base+c.id+'/millhand/clinic');
+  assert.equal(state.body!.phase,'PRICED');
+  assert.equal(state.body!.paid,false);
+  assert.equal(state.body!.coins,9);
+  const original=await db.query<{current_health:number}>(
+    'SELECT current_health FROM player_characters WHERE id=$1',[c.id]
+  );
+  assert.equal(original.rows[0].current_health,state.body!.before.hp);
+});
+

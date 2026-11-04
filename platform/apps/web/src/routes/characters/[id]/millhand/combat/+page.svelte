@@ -110,7 +110,7 @@
 {#if status==='ready' && character && battle}
   <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
     combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
-    <MillhandCombatScene snapshot={battle} {feedback} {pending} {errorMessage} {perform}/>
+    <MillhandCombatScene snapshot={battle} characterId={id} {feedback} {pending} {errorMessage} {perform}/>
   </TutorialShell>
 {:else}
   <main class="fallback">
