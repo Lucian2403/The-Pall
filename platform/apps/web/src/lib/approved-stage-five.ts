@@ -111,7 +111,7 @@ export const WAGE_CLAIM_ACTION_LABELS:Record<WageClaimAction,string>={
   read_demand:'Read the demand',
   challenge_authority:'Ask who sent Flint',
   share_route_evidence:'Tell Flint what you found',
-  say_going_home:"I'm going home.",
+  say_going_home:'Continue',
   brace_and_defend:'Brace and defend',
   keep_moving:'Keep moving',
   use_cart_as_cover:'Use the cart as cover',
