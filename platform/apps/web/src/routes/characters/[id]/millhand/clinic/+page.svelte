@@ -73,8 +73,13 @@
       const result=await visit.json() as Clinic|{needsStart:true};
       if('needsStart' in result)await start();
       else clinic=result;
-      if(clinic?.phase==='LEFT'&&character)
-        character={...character,tutorial:{stage:8,status:'NOT_STARTED'}};
+      // Starting the clinic already advances the saved character to Stage 7.
+      // Keep the mounted shell in sync so its dev-only Back to Stage 6
+      // control appears immediately, not only after a full page reload.
+      if(clinic&&character)
+        character={...character,tutorial:clinic.phase==='LEFT'
+          ?{stage:8,status:'NOT_STARTED'}
+          :{stage:7,status:'IN_PROGRESS'}};
       status='ready';
     }catch(error){
       status='error';
@@ -262,14 +267,20 @@
 
 <style>
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
+  /* Owner-supplied clinic interior is the actual Stage 7 backdrop.
+     Keep the existing heading, two-column diagnosis/dialogue layout and
+     parchment Journal; use translucent surfaces for readable text. */
   .clinic{display:flex;flex-direction:column;gap:14px;padding:16px 19px 24px;
-    background:linear-gradient(#211d19ef,#141413f5);min-height:620px}
-  .clinic-heading{padding:14px 20px;border:1px solid #725a3b;background:#32271fdc}
+    min-height:clamp(720px,62vw,960px);background-color:#17191d;
+    background-image:linear-gradient(180deg,#1111163b 0%,#16161754 48%,#171414b8 100%),
+      url('/locations/clinic/clinic-workshop-cold.webp');
+    background-position:center top;background-size:cover;background-repeat:no-repeat}
+  .clinic-heading{padding:14px 20px;border:1px solid #725a3b;background:#2a211bb8;backdrop-filter:blur(2px)}
   .clinic-heading small,.journal small{font:700 13px/1.3 Arial,sans-serif;letter-spacing:.1em}
   .clinic-heading h1{margin:4px 0 10px;color:#f0d5ab;font:600 31px/1.2 Georgia,serif}
   .clinic-heading p{margin:5px 0;font-size:15px;line-height:1.5;color:#e3cfb2}
   .clinic-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px}
-  .condition,.exchange{padding:19px 22px;background:#28231fed;border:1px solid #866546;
+  .condition,.exchange{padding:19px 22px;background:#28231fd9;border:1px solid #866546;
     min-width:0}
   h2{font:600 22px/1.3 Georgia,serif;color:#f0d3a9;margin:0 0 13px}
   h3{font:600 17px/1.4 Georgia,serif;color:#dcc39e;margin:15px 0 8px}
