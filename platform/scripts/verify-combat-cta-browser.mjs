@@ -52,6 +52,17 @@ try{
     const response=await fetch(site);
     return response.ok;
   },45000,'Vite combat scene fixture');
+  // Regression for Stage 7: verify that Vite serves the owner-supplied
+  // background as an actual WebP, not a missing static asset.
+  const clinicArt=await fetch('http://127.0.0.1:5173/locations/clinic/clinic-workshop-cold.webp');
+  assert.equal(clinicArt.status,200,'The Stage 7 backdrop must be publicly served by Vite');
+  assert.ok(clinicArt.headers.get('content-type')?.includes('image/webp'),
+    'The clinic background must have a WebP content type');
+  const bytes=new Uint8Array(await clinicArt.arrayBuffer());
+  assert.ok(bytes.byteLength>40000,'The clinic image body is empty or truncated');
+  assert.equal(Buffer.from(bytes.subarray(0,4)).toString('ascii'),'RIFF');
+  assert.equal(Buffer.from(bytes.subarray(8,12)).toString('ascii'),'WEBP');
+  console.log('PASS: the supplied clinic background is served as a real WebP by Vite');
   chromeProcess=spawn(chrome,[
     '--headless=new','--no-sandbox','--disable-gpu',
     '--disable-dev-shm-usage','--no-first-run',
