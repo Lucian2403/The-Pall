@@ -184,10 +184,10 @@
           {#if clinic.phase==='ARRIVAL'}
             <p>You check your condition and prepare to speak to the clinician.</p>
           {:else}
-            <p><strong>CLINICIAN:</strong> “Sit. Let me see.”</p>
             {#if clinic.phase==='EXAMINED'}
               <p>{diagnosis}</p>
             {:else}
+              <p><strong>CLINICIAN:</strong> “Sit. Let me see.”</p>
               {#if clinic.conditionType==='cut'}
                 <p><strong>CLINICIAN:</strong> “Needs cleaning. I'll dress it.”</p>
               {:else if clinic.conditionType==='unhurt'}
