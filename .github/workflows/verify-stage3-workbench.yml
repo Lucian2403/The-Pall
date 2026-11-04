@@ -11,6 +11,8 @@ on:
       - 'platform/scripts/verify-stage4-exits.mjs'
       - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/scripts/verify-stage-six.mjs'
+      - 'platform/scripts/verify-stage-seven.test.ts'
+      - 'platform/db/migrations/0008_millhand_clinic.sql'
       - 'platform/scripts/verify-stage6-postgres.integration.test.ts'
       - 'platform/db/migrations/**'
       - 'platform/apps/api/src/millhand-combat-opening.ts'
@@ -61,6 +63,8 @@ jobs:
       - run: npm run verify:stage-five
       - run: node --test packages/game-core/vendor/combat-v0.5.1/test.mjs packages/game-core/vendor/combat-v0.5.1/integration.test.mjs
       - run: npm run verify:stage-six
+      - name: Stage 7 clinic state and canon
+        run: npm run verify:stage-seven
       - name: PostgreSQL Stage 6 combat and character lifecycle integration
         env:
           STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
