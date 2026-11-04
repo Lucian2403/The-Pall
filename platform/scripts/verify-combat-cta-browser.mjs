@@ -194,3 +194,6 @@ try{
   clearTimeout(watchdog);
   close();
 }
+// npm run dev:web may leave Vite subprocess handles attached even after its
+// parent exits. The preceding browser assertions finished successfully.
+process.exit(0);
