@@ -130,6 +130,41 @@ test('Clinic dialogue and journal match earlier stage presentation',()=>{
     'The journal uses the established full-width parchment and reading typography');
 });
 
+test('Priced clinic conversation advances one owner-approved beat at a time before payment',()=>{
+  const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+  const script=web.slice(web.indexOf('const PRICED_DIALOGUE_BEATS:'),web.indexOf('  type Character='));
+  assert.equal((script.match(/kind:'(?:narration|speech)'/g)??[]).length,9,
+    'The price conversation has two stage directions and seven spoken lines');
+  for(const line of [
+    'The clinician looks you over, then pulls a chair closer.',
+    'How much is this gonna cost me?',
+    'Ten coins.',
+    'Ten? Just for having a look?',
+    'For the examination and whatever treatment you need.',
+    "Bloody hell. That's half the money I've got left.",
+    "Well, you can barely stand straight. I'd say you need looking at.",
+    'You glance down at yourself, then back at the clinician.',
+    'Yeah... alright. Just get on with it.'
+  ])assert.ok(script.includes(line),'Missing approved dialogue: '+line);
+  const price=web.slice(web.indexOf("{:else if clinic.phase==='PRICED'}"),
+    web.indexOf("{:else if clinic.phase==='PAID'}"));
+  assert.ok(price.includes("pricedBeat.kind==='narration'") &&
+    price.includes('{pricedBeat.text}') &&
+    price.includes('<p class="speaker">{pricedBeat.speaker}</p>') &&
+    price.includes('{#if pricedAtEnd}') &&
+    price.includes('class="price"'),
+    'Render one current beat, with price details only after the final line');
+  assert.ok(web.includes("clinic.phase==='PRICED' && !pricedAtEnd") &&
+    web.includes('onclick={advancePricedDialogue}>Continue</button>') &&
+    web.includes("action==='pay'&&!pricedAtEnd") &&
+    web.includes('pricedDialogueIndex+=1;') &&
+    web.includes("if(clinic?.phase!=='PRICED')pricedDialogueIndex=0;"),
+    'Continue is local and payment is guarded until the conversation completes');
+  assert.ok(web.includes('class="narration stage-direction"') &&
+    web.includes('.stage-direction{font-style:italic}'),
+    'Stage directions keep the established reading face and use italics');
+});
+
 test('Web and API wire the clinic without altering original combat rules',()=>{
   const api=source('apps/api/src/millhand-clinic-routes.ts');
   const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
@@ -144,7 +179,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(api.includes('tutorial_stage=8'));
   assert.ok(!api.includes('UPDATE player_character_flint_combat'));
   assert.ok(!api.includes('ordinary_xp'));
-  assert.ok(web.includes("clinic.conditionType==='cut'"));
+  assert.ok(web.includes("clinic?.conditionType==='cut'"));
   assert.ok(web.includes('Examine condition'));
   assert.ok(web.includes('Review the price'));
   assert.ok(web.includes('Pay 10 coins'));
