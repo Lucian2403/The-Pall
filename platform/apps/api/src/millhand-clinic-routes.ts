@@ -24,7 +24,7 @@ type RecordRow={state:ClinicState};
 type Command={kind:'start';requestId:string}|{
   kind:'action';requestId:string;expectedRevision:number;action:ClinicAction
 };
-const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const actions=['examine','speak','review_price','pay','leave'];
 function parseCommand(input:unknown):Command{
   if(!input||typeof input!=='object'||Array.isArray(input))
