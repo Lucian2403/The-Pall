@@ -791,7 +791,8 @@ function playFile(filename:string,gain=1,delaySeconds=0){
     // UI_Click02 has ~80 ms of initial silence. Skip that idle pre-roll
     // in the playback buffer without altering the owner's original WAV.
     const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0;
-    source.start(delaySeconds>0?context.currentTime+delaySeconds:0,offset);
+    if(delaySeconds>0)source.start(context.currentTime+delaySeconds,offset);
+    else source.start(0,offset);
   }catch{
     // Browsers without a functional audio output remain fully usable.
   }
