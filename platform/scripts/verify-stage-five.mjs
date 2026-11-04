@@ -104,7 +104,16 @@ assert.match(scene,/flint-standing\.webp/);
 assert.match(scene,/class="work-dialogue"/);
 assert.match(scene,/class="workshop-object-label"/);
 assert.match(scene,/data-pall-sfx="paper"/);
-assert.match(scene,/Review journal/);
+assert.match(scene,/registerSceneJournal/);
+assert.match(shell,/Review journal/);
+assert.ok(!scene.includes('Choose your response</p>\n        {/if}\n        <div') ||
+  !scene.includes("'CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'"),
+  'LEAVING must not be rendered as a one-option response choice');
+assert.ok(scene.includes("state.phase==='LEAVING'") &&
+  scene.includes("“I'm going home.”") &&
+  copy.includes("say_going_home:'Continue'") &&
+  core.includes("dialogueIndex=action==='say_going_home'?1:0"),
+  'Scripted going-home remark uses Continue and cannot duplicate its first saved beat');
 assert.match(scene,/Your position is saved\. The encounter begins in Stage 6\./);
 assert.match(scene,/Enter the fight/);
 assert.doesNotMatch(scene,/Stage 6 combat is not yet integrated/);
