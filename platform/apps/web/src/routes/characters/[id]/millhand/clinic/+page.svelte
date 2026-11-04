@@ -5,6 +5,7 @@
   import {
     clinicianAssessment,clinicianDischarge,clinicianFatigue
   } from '$lib/millhand-clinic-dialogue';
+  import {playCoinTransactionSfx} from '$lib/pall-audio';
 
   type Wound={type:string;zone?:string;severity:string};
   type Condition={
@@ -139,7 +140,10 @@
       });
       const result=await response.json() as Clinic&{error?:string};
       if(response.ok){
+        // Only a newly confirmed, balance-changing payment receives the coin cue.
+        const paidNow=action==='pay'&&result.paid===true&&result.coins<clinic.coins;
         clinic=result;retryId=null;retrySignature=null;
+        if(paidNow)playCoinTransactionSfx();
         if(character){
           character={...character,coins:result.coins,
             health:{...character.health,current:result.after?.hp??character.health.current},
@@ -169,7 +173,7 @@
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
 {#if status==='ready' && character && clinic}
-  <TutorialShell {character} sceneLocation="City clinic" sceneStage={7}
+  <TutorialShell {character} sceneLocation="City clinic" sceneStage={7} clinicBackdrop={true}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}>
     <section class="clinic" aria-label="Stage 7 clinic">
       <div class="clinic-scene" aria-label="Grand Cylinder City clinic interior">
@@ -203,11 +207,13 @@
               <p class="speech">“{pricedBeat.text}”</p>
             {/if}
             {#if pricedAtEnd}
-              <div class="price" aria-label="Price before payment">
-                <span>Examination and basic care if necessary</span>
-                <strong>{clinic.fee} coins</strong>
-                <span>Coins in hand</span>
-                <strong>{clinic.coins}</strong>
+              <div class="charge-slip" aria-label="Clinic charge before payment">
+                <p class="charge-heading">Clinic charge</p>
+                <dl>
+                  <div><dt>Service</dt><dd>Examination and basic care if necessary</dd></div>
+                  <div><dt>Fee</dt><dd>{clinic.fee} coins</dd></div>
+                  <div><dt>Coins in hand</dt><dd>{clinic.coins} coins</dd></div>
+                </dl>
               </div>
             {/if}
           {:else if clinic.phase==='PAID'}
@@ -236,6 +242,17 @@
           {/if}
           {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
 
+
+
+          <button type="button" class="pall-framed-button journal-toggle"
+            data-pall-sfx="paper" aria-expanded={journalOpen} aria-controls="clinic-journal"
+            onclick={()=>{void toggleJournal();}}>
+            {journalOpen?'Close journal':'Review journal'}
+          </button>
+        </aside>
+      </div>
+
+      <section class="medical-record-wrapper" aria-label="Clinical findings">
           <details class="medical-record">
             <summary>Review examination record</summary>
             <p>Health after the fight: {clinic.before.hp} / {clinic.before.hpMax}</p>
@@ -256,14 +273,7 @@
                 Stamina {clinic.after.stamina}, no active combat wounds.</p>
             {/if}
           </details>
-
-          <button type="button" class="pall-framed-button journal-toggle"
-            data-pall-sfx="paper" aria-expanded={journalOpen} aria-controls="clinic-journal"
-            onclick={()=>{void toggleJournal();}}>
-            {journalOpen?'Close journal':'Review journal'}
-          </button>
-        </aside>
-      </div>
+      </section>
 
       {#if journalOpen}
         <section id="clinic-journal" class="journal" bind:this={journalElement}
@@ -331,19 +341,31 @@
   .stage-direction{font-style:italic}
   .instruction{font-weight:700}
   .speaker{margin:10px 0 5px}
-  .price{display:grid;grid-template-columns:minmax(0,1fr) auto;
-    align-items:baseline;gap:7px 12px;padding:12px 13px;margin:13px 0;
-    border-top:1px solid #967650;border-bottom:1px solid #967650;
-    background:#e0cba7;color:#3a2616;font:14px/1.4 Georgia,serif}
-  .price strong{text-align:right;font-variant-numeric:tabular-nums}
+  .charge-slip{margin:14px 0 4px;padding:12px 16px;
+    color:#38251a;background:#e4d1b1;border:1px solid #896c4c;
+    box-shadow:inset 0 0 0 2px #f0dfbf55;font:14px/1.4 Georgia,serif}
+  .charge-heading{margin:0 0 8px;padding-bottom:7px;
+    border-bottom:1px solid #a58862;font:600 15px/1.3 Georgia,serif;
+    color:#332115}
+  .charge-slip dl{margin:0}
+  .charge-slip dl>div{display:flex;justify-content:space-between;align-items:baseline;
+    gap:12px;margin:6px 0}
+  .charge-slip dt{font-weight:400;flex:0 1 auto}
+  .charge-slip dd{margin:0;text-align:right;font-weight:700;
+    flex:0 1 54%;font-variant-numeric:tabular-nums}
+  @media(max-width:550px){.charge-slip dl>div{flex-wrap:wrap;gap:2px}.charge-slip dd{flex:1 1 100%;text-align:left}}
   .receipt,.next-note{font-size:14px;line-height:1.5;color:#3d291b;margin:10px 0}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 10px}
   .advance{min-width:210px;max-width:100%}
   .error{padding:8px 10px;background:#f4d3c2;border-left:3px solid #a34129;
     font-size:14px;line-height:1.4;color:#702018}
-  .medical-record{margin:12px 0 0;border-top:1px solid #bb9c70;
-    padding:9px 1px 0;color:#3d291b;font:13px/1.45 Georgia,serif}
-  .medical-record summary{cursor:pointer;font-weight:700}
+  .medical-record-wrapper{background:#e6d5b5;border-top:1px solid #967650;
+    padding:13px clamp(16px,3vw,45px);color:#3d291b}
+  .medical-record{max-width:960px;margin:0 auto;
+    border:1px solid #c5a882;padding:10px 15px;
+    color:#3d291b;font:13px/1.45 Georgia,serif;background:#e9d9bb}
+  .medical-record summary{cursor:pointer;font-weight:700;padding:3px 0}
+  .medical-record summary:focus-visible{outline:2px solid #745230;outline-offset:3px}
   .medical-record p{margin:8px 0}
   .medical-record ul{margin:8px 0;padding-left:23px}
   .journal-toggle{margin:12px 0 0;min-width:170px;min-height:44px}
