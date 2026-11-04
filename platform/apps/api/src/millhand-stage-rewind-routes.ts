@@ -43,7 +43,22 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
     if(!result.rowCount||result.rows[0].origin!=='Millhand')
       return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
-    return {enabled:true,canRewind:stage>=2&&stage<=7,stage,targetStage:stage>1&&stage<=7?stage-1:null};
+    let completedClinic=false;
+    if(stage===8&&result.rows[0].tutorial_status==='NOT_STARTED'){
+      const visit=await db.query<{state:ClinicState}>(
+        'SELECT state FROM player_character_clinic WHERE character_id=$1',
+        [req.params.id]
+      );
+      completedClinic=visit.rows[0]?.state.phase==='LEFT' &&
+        visit.rows[0].state.paid===true;
+    }
+    const canRewind=stage>=2&&stage<=7||completedClinic;
+    return {
+      enabled:true,canRewind,stage,
+      // Stage 8 is only a completed Stage 7 review at this boundary,
+      // not a playable Stage 8 chapter; replay the Flint fight from here.
+      targetStage:completedClinic?6:stage>1&&stage<=7?stage-1:null
+    };
   });
 
   app.post<{Params:Params}>('/api/characters/:id/dev/rewind-stage',async(req,reply)=>{
@@ -60,7 +75,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         Object.keys(body).sort().join(',')!=='expectedStage')
       return reply.code(400).send({error:'invalid_body'});
     const expectedStage=(body as {expectedStage:unknown}).expectedStage;
-    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>7)
+    if(!Number.isSafeInteger(expectedStage)||(expectedStage as number)<2||(expectedStage as number)>8)
       return reply.code(400).send({error:'invalid_stage'});
 
     const client=await db.connect();
@@ -83,7 +98,10 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       }
 
 
-      if(expectedStage===7){
+      if(expectedStage===7||expectedStage===8){
+        // A Stage 8 rewind is allowed only from an already LEFT clinic,
+        // before Stage 8 itself has begun; no future Stage 8 progress is lost.
+        const completedClinic=expectedStage===8;
         // Developer replay from the paid or unpaid clinic must start a fresh
         // Stage 6 encounter, not reopen an already-finished Flint fight.
         // The character row lock serializes this with clinic payment/turns.
@@ -102,12 +120,16 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           saved.outcome!==fight.state.outcome||
           saved.before.hp!==fight.state.player.hp||
           saved.before.hpMax!==fight.state.player.hpMax||
-          saved.phase==='LEFT'||c.rows[0].tutorial_status!=='IN_PROGRESS'){
+          (completedClinic
+            ?saved.phase!=='LEFT'||!saved.paid||
+              c.rows[0].tutorial_status!=='NOT_STARTED'
+            :saved.phase==='LEFT'||
+              c.rows[0].tutorial_status!=='IN_PROGRESS')){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_clinic_state'});
         }
         const wasPaid=saved.paid===true;
-        if(wasPaid !== (saved.phase==='PAID')||
+        if(wasPaid !== (saved.phase==='PAID'||saved.phase==='LEFT')||
           (wasPaid?(!saved.after||
             saved.after.hp!==c.rows[0].current_health||
             saved.after.hp!==c.rows[0].max_health)
@@ -319,8 +341,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
       if((e as {code?:string})?.code==='42P01')
         return reply.code(503).send({
-          error:expectedStage===7?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
-          setup:expectedStage===7?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
+          error:expectedStage===7||expectedStage===8?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
+          setup:expectedStage===7||expectedStage===8?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
         });
       throw e;
     } finally {client.release();}
