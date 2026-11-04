@@ -74,3 +74,36 @@ export function observeObject(object: ObjectKey, state: PlateworkState): string 
       return 'A heavy hammer used to strike the number stamps against a metal plate.';
   }
 }
+
+
+// Owner-approved Millhand Stage 2 personal journal, from
+// docs/05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md.
+// Saved phase, handling and correction decide which entries are factual.
+export function stageTwoJournal(s:PlateworkState):readonly string[]{
+  const entries:string[]=[];
+  const afterStamps=['HANDLE_BENT_PLATE','STAMP','INSPECT','CORRECT',
+    'REVIEW','RETURN_PAPER','COMPLETE'].includes(s.phase);
+  if(afterStamps){
+    entries.push("Got the number from the work paper and set the stamps. One plate has a bent corner. I'll have to deal with that before the lot's finished.");
+  }
+  if(s.handling==='straighten'){
+    entries.push("I straightened the corner and used the same plate. Took more work, but I didn't waste the metal.");
+  }else if(s.handling==='replace'){
+    entries.push("Put the bent plate aside and took another. Quicker than fixing the old one.");
+  }else if(s.handling==='stamp_as_is'&&['INSPECT','CORRECT','REVIEW',
+    'RETURN_PAPER','COMPLETE'].includes(s.phase)){
+    entries.push("I stamped the plate with its corner still bent. I knew it wasn't lying flat.");
+  }
+  if(s.markQuality==='POOR'||s.correction!==null){
+    entries.push("Part of that number was too faint to read. Had to fix it before handing the work in.");
+  }
+  if(s.correction==='fix_mark'){
+    entries.push("Set the plate steady and stamped the faint part again. The number's clear now.");
+  }else if(s.correction==='replace_marked_plate'){
+    entries.push("Put the badly marked plate aside and used another. This one's clear.");
+  }
+  if(s.phase==='RETURN_PAPER'||s.phase==='COMPLETE'){
+    entries.push("The plates are marked and checked. I'd like to be paid for this, but the inspector still has to approve the lot.");
+  }
+  return entries;
+}
