@@ -224,7 +224,7 @@
             <p>Stage 8 — Return Home is the next chapter. Its playable scene is not yet connected.</p>
           {:else if next}
             <button class="advance" type="button" disabled={pending}
-              onclick={()=>perform(next)}>
+              onclick={()=>{if(next)void perform(next);}}>
               {pending?'Saving…':label}
             </button>
           {/if}
