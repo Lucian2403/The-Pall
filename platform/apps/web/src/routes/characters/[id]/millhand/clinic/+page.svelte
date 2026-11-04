@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -69,6 +71,12 @@
     pricedDialogueIndex+=1;
   }
   let journalOpen=$state(false);
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+
+    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement:HTMLElement|undefined;
   const assessment=$derived(clinic
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
@@ -257,11 +265,6 @@
             {/if}
           </details>
 
-          <button type="button" class="pall-framed-button journal-toggle"
-            data-pall-sfx="paper" aria-expanded={journalOpen} aria-controls="clinic-journal"
-            onclick={()=>{void toggleJournal();}}>
-            {journalOpen?'Close journal':'Review journal'}
-          </button>
         </aside>
       </div>
 
