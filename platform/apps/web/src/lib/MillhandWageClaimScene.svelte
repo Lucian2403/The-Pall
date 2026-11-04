@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
   import {page} from '$app/state';
   import type {WageClaimState,WageClaimAction} from '@the-pall/game-core';
@@ -36,6 +38,12 @@
   let inspected=$state<'bill'|'club'|'cart'|null>(null);
   let inspectionNote=$state('');
   let journalOpen=$state(false);
+  // The persistent corner control is owned by TutorialShell, not this dialogue.
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    registerSceneJournal?.({id:'wage-claim-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement:HTMLElement|undefined;
 
   function inspect(which:'bill'|'club'|'cart'){
@@ -155,11 +163,6 @@
       {/if}
       {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
       {#if pending}<p class="saving" role="status">Saving the conversation…</p>{/if}
-      <div class="journal-trigger">
-        <button type="button" class="journal-button" data-pall-sfx="paper"
-          aria-expanded={journalOpen} aria-controls="wage-claim-journal"
-          onclick={()=>{void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
-      </div>
     </aside>
   </div>
 
