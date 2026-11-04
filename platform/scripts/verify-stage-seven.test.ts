@@ -111,7 +111,7 @@ test('Clinician remarks depend on actual wounds, blood loss and Health, not inve
 
 test('Clinic dialogue and journal match earlier stage presentation',()=>{
   const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
-  const frame=web.match(/\\.clinic-dialogue\\{[^}]*\\}/)?.[0]??'';
+  const frame=web.slice(web.indexOf('  .clinic-dialogue{'),web.indexOf('  .eyebrow,.speaker{'));
   assert.ok(frame.includes('background:transparent;'),
     'Transparent frame corners must show the clinic, not a solid pale rectangle');
   assert.ok(frame.includes("border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')"),
@@ -119,10 +119,10 @@ test('Clinic dialogue and journal match earlier stage presentation',()=>{
   assert.ok(web.includes("color:#21150e;margin:0 0 13px}") &&
     web.includes('font:16px/1.45 var(--pall-font-reading,Georgia,serif)'),
     'Increase dialogue contrast without changing its established font or size');
-  assert.ok(web.includes('      </div>\\n\\n      {#if journalOpen}') &&
-    web.includes('bind:this={journalElement}') &&
+  assert.ok(web.includes('bind:this={journalElement}') &&
     web.includes('class="journal-entries"') &&
-    !web.includes('.journal{position:absolute'),
+    !web.includes('.journal{position:absolute') &&
+    web.indexOf('id="clinic-journal"') > web.indexOf('</aside>'),
     'The optional journal belongs below the painted scene, not over the clinic');
   assert.ok(web.includes('background:#e6d5b5;color:#24160e;') &&
     web.includes('border-top:2px solid #94704a') &&
