@@ -85,3 +85,38 @@ API type-check and production web build are also mandatory.
 A later milestone must implement the approved shared home scene. No
 invented rent notice, new NPC identity, new named clinic or additional
 health-system mechanics are included here.
+
+
+## Owner clinic background and local replay (2026-11-04)
+
+Stage 7 paints the owner's supplied `Clinic_Workshop_cold.png` image,
+optimized losslessly in dimension to `static/locations/clinic/clinic-workshop-cold.webp`
+(1672 × 941, WebP quality 84). The complete scene remains visible behind
+translucent clinic UI surfaces. The existing two-column condition/examination
+layout, spoken dialogue, fee, approved framed buttons and Personal Journal
+remain in the same order and retain their current logic.
+
+The existing loopback-only developer `Back to Stage` control is now
+available in Stage 7 as **Back to Stage 6**. The clinic route synchronizes
+its newly started stage in the mounted shell so the button appears on first
+arrival, without reloading.
+
+In the owner-confirmed developer replay transaction:
+
+- The character must be owned, in Stage 7, and have a consistent
+  completed fight, clinic snapshot and pre-fight combat start receipt.
+- Clinic receipts and clinic record are removed, followed by combat
+  receipts and finished fight, under a single character-row lock.
+- Original pre-fight Health is restored from the revision-zero start
+  receipt. The Stage 5 choice and earlier skill/item rewards remain saved.
+- If the fee was paid, exactly 10 coins are refunded. If it was not
+  paid, no coins change. Returning twice cannot issue another refund.
+- The player returns to a clean Stage 6 that can start a **new** Flint
+  encounter, rather than a stale finished encounter. Stage 8 cannot use
+  this shortcut; it is reserved for the Stage 7 test sequence.
+- Inconsistent Health/clinic state cancels the transaction entirely.
+  Production API binds or `NODE_ENV=production` never expose this route.
+
+PostgreSQL integration tests exercise paid/unpaid replay, ownership,
+single refund, revived fight readiness and all-or-nothing rejection.
+The approved original combat engine remains byte-for-byte unchanged.
