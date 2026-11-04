@@ -71,7 +71,7 @@ test('Going-home line is a scripted Continue, not a second stored response beat'
   assert.equal(s.dialogueIndex,1,'Index zero was already spoken in LEAVING');
   const previous=apply(s,'previous_dialogue');
   assert.equal(previous.phase,'LEAVING');
-  assert.equal(previous.dialogueIndex,1);
+  assert.equal(previous.dialogueIndex,0,'Going back must reset the previous step cursor');
   s=beats(s,7);
   assert.equal(s.phase,'CHOOSE_STANCE');
 });
