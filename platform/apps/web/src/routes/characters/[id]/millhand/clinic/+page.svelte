@@ -137,7 +137,7 @@
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
 {#if status==='ready' && character && clinic}
-  <TutorialShell {character} sceneLocation="City clinic"
+  <TutorialShell {character} sceneLocation="City clinic" sceneStage={7}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}>
     <section class="clinic" aria-label="Stage 7 clinic">
       <div class="clinic-scene" aria-label="Grand Cylinder City clinic interior">
