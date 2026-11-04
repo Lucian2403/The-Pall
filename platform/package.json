@@ -69,6 +69,7 @@
     "verify:depot-ambience-asset": "node scripts/verify-depot-ambience-asset.mjs",
     "verify:owner-ui-kit": "node scripts/verify-owner-ui-kit.mjs",
     "combat:migrate": "node --env-file=.env scripts/combat-migrate.mjs",
+    "clinic:migrate": "node --env-file=.env scripts/clinic-migrate.mjs",
     "verify:stage-six": "node scripts/verify-stage-six.mjs"
   }
 }
