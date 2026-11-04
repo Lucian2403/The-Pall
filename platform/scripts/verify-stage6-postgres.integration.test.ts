@@ -541,7 +541,7 @@ test('Unpaid Stage 7 rewind returns to a fresh Flint fight with original Health 
   const rewind=await devRewind(c,7);
   assert.equal(rewind.status,200,JSON.stringify(rewind.body));
   assert.equal(rewind.body!.stage,6);
-  assert.equal(rewind.body!.route,c.path);
+  assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/combat');
   const player=await db.query<{tutorial_stage:number;tutorial_status:string;current_health:number;coins:string}>(
     'SELECT tutorial_stage,tutorial_status,current_health,coins FROM player_characters WHERE id=$1',[c.id]
   );
