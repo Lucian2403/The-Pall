@@ -42,7 +42,7 @@
     backStageBusy?:boolean;
     backStageError?:string;
   }=$props();
-  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage === 7
+  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 7
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/clinic'
     : character.origin === 'Millhand' && character.tutorial.stage === 6
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/combat'
