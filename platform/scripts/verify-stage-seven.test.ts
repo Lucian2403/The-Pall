@@ -116,5 +116,28 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(!web.includes('background:#735236;border:1px solid #d4ad78'),
     'The old flat clinic action button styling must stay retired');
   assert.ok(migration.includes('REFERENCES player_characters(id) ON DELETE RESTRICT'));
+  const clinicArt=readFileSync(resolve(root,'apps/web/static/locations/clinic/clinic-workshop-cold.webp'));
+  assert.equal(clinicArt.toString('ascii',0,4),'RIFF','Clinic artwork must be WebP');
+  assert.equal(clinicArt.toString('ascii',8,12),'WEBP','Clinic artwork must be WebP');
+  assert.ok(clinicArt.length>40000&&clinicArt.length<400000,
+    'Use optimized, real owner-supplied illustrated clinic artwork');
+  assert.ok(web.includes("url('/locations/clinic/clinic-workshop-cold.webp')") &&
+    web.includes('class="clinic-layout"') &&
+    web.includes('class="condition"') &&
+    web.includes('class="exchange"') &&
+    web.includes('class="journal"'),
+    'Stage 7 must use the clinic backdrop without discarding its approved dialogue layout');
+  const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
+  const shell=source('apps/web/src/lib/TutorialShell.svelte');
+  assert.ok(rewind.includes('if(expectedStage===7)') &&
+    rewind.includes('unsafe_clinic_health_state') &&
+    rewind.includes('DELETE FROM player_character_clinic_receipts') &&
+    rewind.includes('DELETE FROM player_character_clinic WHERE character_id') &&
+    rewind.includes('wasPaid?10:0') &&
+    rewind.includes('tutorial_stage=6,tutorial_status=\'NOT_STARTED\'') &&
+    shell.includes('Back to Stage ') &&
+    shell.includes('fromStage===7') &&
+    web.includes("character={...character,tutorial:clinic.phase==='LEFT'"),
+    'Stage 7 must safely rewind to a replayable Stage 6, reversing only committed clinic payment');
   assert.equal(CLINIC_FEE,10);
 });
