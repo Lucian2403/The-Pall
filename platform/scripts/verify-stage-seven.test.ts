@@ -197,6 +197,20 @@ test('Clinic record is separate from scene dialogue; payment and ambience are co
     'Both owner coin samples are used in one combined transaction cue');
 });
 
+test('Owner coin and clinic ambience exports are really present and decodable file types',()=>{
+  const dir='apps/web/static/audio/the-pall/';
+  for(const name of ['ui-coins1.wav','ui-coins2.wav']){
+    const wav=readFileSync(resolve(root,dir+name));
+    assert.equal(wav.toString('ascii',0,4),'RIFF',name+' must be a real WAV');
+    assert.equal(wav.toString('ascii',8,12),'WAVE',name+' must be PCM audio');
+    assert.ok(wav.length>20000&&wav.length<250000,'Coin effect has a plausible short size');
+  }
+  const clinicAudio=readFileSync(resolve(root,dir+'medical-clinic-ambience.mp3'));
+  assert.equal(clinicAudio.toString('ascii',0,3),'ID3','Clinic ambience must be browser MP3');
+  assert.ok(clinicAudio.length>500000&&clinicAudio.length<5000000,
+    'Clinic ambience must be a practical browser-ready compressed export');
+});
+
 test('Web and API wire the clinic without altering original combat rules',()=>{
   const api=source('apps/api/src/millhand-clinic-routes.ts');
   const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
