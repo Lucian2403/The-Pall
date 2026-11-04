@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {Snippet} from 'svelte';
-  import {onMount,setContext} from 'svelte';
+  import {onMount,setContext,tick} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
@@ -97,6 +97,13 @@
   let emptyJournalOpen=$state(false);
   const registerJournal:SceneJournalRegistrar=(controller)=>{sceneJournal=controller;};
   setContext(SCENE_JOURNAL_CONTEXT,registerJournal);
+  async function toggleEmptyJournal(){
+    emptyJournalOpen=!emptyJournalOpen;
+    if(emptyJournalOpen){
+      await tick();
+      document.getElementById('scene-empty-journal')?.scrollIntoView({block:'start',behavior:'smooth'});
+    }
+  }
 
   // Audio scope belongs to the *actual mounted game shell*, not a guess
   // about the URL in a separate root layout. All HUD controls are therefore
@@ -341,7 +348,7 @@
         aria-controls={sceneJournal?.id??'scene-empty-journal'}
         onclick={()=>{
           if(sceneJournal)sceneJournal.toggle();
-          else emptyJournalOpen=!emptyJournalOpen;
+          else void toggleEmptyJournal();
         }}>
         {(sceneJournal?.open??emptyJournalOpen)?'Close journal':'Review journal'}
       </button>
@@ -507,11 +514,12 @@
     font:700 14px/1.3 var(--pall-font-reading,Georgia,serif)}
   .scene-journal-button:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .scene-journal-button:focus-visible{outline:2px solid #efd092;outline-offset:2px}
-  .empty-journal{padding:22px clamp(16px,3vw,45px);background:#e6d5b5;color:#24160e;border-top:2px solid #94704a}
+  .empty-journal{padding:22px clamp(16px,3vw,45px);background:#e6d5b5;color:#24160e;border-top:2px solid #94704a;scroll-margin-top:65px}
   .empty-journal small{font:700 13px var(--pall-font-label,'Arial Narrow',sans-serif)}
   .empty-journal h2{margin:5px 0 10px;font:600 23px Georgia,serif}
   .empty-journal p{font:600 16px/1.55 Georgia,serif}
   .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
+  .chapter-content :global([id$="-journal"]){scroll-margin-top:65px}
   .onboarding-footer{border-top:1px solid #4d3928;padding:12px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .mobile-nav{display:none}
   @media(max-width:1270px){
