@@ -22,8 +22,8 @@
     {kind:'speech',speaker:'CLINICIAN',text:'Ten coins.'},
     {kind:'speech',speaker:'YOU',text:'Ten? Just for having a look?'},
     {kind:'speech',speaker:'CLINICIAN',text:'For the examination and whatever treatment you need.'},
-    {kind:'speech',speaker:'YOU',text:"Bloody hell. That’s half the money I’ve got left."},
-    {kind:'speech',speaker:'CLINICIAN',text:"Well, you can barely stand straight. I’d say you need looking at."},
+    {kind:'speech',speaker:'YOU',text:"Bloody hell. That's half the money I've got left."},
+    {kind:'speech',speaker:'CLINICIAN',text:"Well, you can barely stand straight. I'd say you need looking at."},
     {kind:'narration',text:'You glance down at yourself, then back at the clinician.'},
     {kind:'speech',speaker:'YOU',text:'Yeah... alright. Just get on with it.'}
   ];
@@ -58,7 +58,7 @@
     :next==='pay'?'Pay 10 coins'
     :next==='leave'?'Leave the clinic':'');
   let pricedDialogueIndex=$state(0);
-  const pricedBeat=$derived(PRICED_DIALOGUE_BEATS[pricedDialogueIndex]);
+  const pricedBeat=$derived(PRICED_DIALOGUE_BEATS[pricedDialogueIndex]!);
   const pricedAtEnd=$derived(pricedDialogueIndex===PRICED_DIALOGUE_BEATS.length-1);
   $effect(()=>{
     // The spoken price exchange is purely local; a new clinic visit begins at its first line.
