@@ -37,10 +37,10 @@
       ? 'You move along the side of the passage, looking for space to get past Flint.'
       : 'You begin the fight with the work cart between you and Flint.');
   const resultText = $derived(snapshot.outcome === 'player_defeat'
-    ? 'You are knocked down and cannot get past Flint. Other workers enter the passage. Flint moves away without collecting money. One of them helps you towards medical care.'
+    ? 'You go down hard on the stones. You try getting up, but your legs give out. A few workers come round the corner, and Flint takes one look before buggering off. Didn\'t get a coin out of you.\nOne of the lads grabs you under the arm and hauls you up. You lean on his shoulder as he helps you hobble towards the clinic.'
     : snapshot.enemy.hp <= 0
-      ? 'Flint is on the ground and cannot stop you. You move past him and leave the passage.'
-      : 'Flint steps aside. You wait until there is room to pass, then leave.');
+      ? 'Flint is on the ground and cannot stop you. You move past him and leave the passage.You\'re battered and aching all over. Better get yourself to the clinic'
+      : 'Flint finally gets out of your way. You keep an eye on him as you walk past, then head down the passage. You\'re battered and aching all over. Better get yourself to the clinic.');
   const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
     snapshot.player.wounds.some(wound => wound.severity === 'serious'));
   const journal = $derived(snapshot.outcome === 'player_defeat'
