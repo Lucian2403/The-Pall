@@ -13,6 +13,20 @@
   };
   type Phase='ARRIVAL'|'EXAMINED'|'SPOKEN'|'PRICED'|'PAID'|'LEFT';
   type Action='examine'|'speak'|'review_price'|'pay'|'leave';
+  type PricedBeat=
+    |{kind:'narration';text:string}
+    |{kind:'speech';speaker:'YOU'|'CLINICIAN';text:string};
+  const PRICED_DIALOGUE_BEATS:readonly PricedBeat[]=[
+    {kind:'narration',text:'The clinician looks you over, then pulls a chair closer.'},
+    {kind:'speech',speaker:'YOU',text:"How much is this gonna cost me?"},
+    {kind:'speech',speaker:'CLINICIAN',text:'Ten coins.'},
+    {kind:'speech',speaker:'YOU',text:'Ten? Just for having a look?'},
+    {kind:'speech',speaker:'CLINICIAN',text:'For the examination and whatever treatment you need.'},
+    {kind:'speech',speaker:'YOU',text:"Bloody hell. That’s half the money I’ve got left."},
+    {kind:'speech',speaker:'CLINICIAN',text:"Well, you can barely stand straight. I’d say you need looking at."},
+    {kind:'narration',text:'You glance down at yourself, then back at the clinician.'},
+    {kind:'speech',speaker:'YOU',text:'Yeah... alright. Just get on with it.'}
+  ];
   type Clinic={
     stage:7;revision:number;phase:Phase;
     outcome:'player_victory'|'player_defeat';before:Condition;after:Condition|null;
@@ -43,6 +57,17 @@
     :next==='review_price'?'Review the price'
     :next==='pay'?'Pay 10 coins'
     :next==='leave'?'Leave the clinic':'');
+  let pricedDialogueIndex=$state(0);
+  const pricedBeat=$derived(PRICED_DIALOGUE_BEATS[pricedDialogueIndex]);
+  const pricedAtEnd=$derived(pricedDialogueIndex===PRICED_DIALOGUE_BEATS.length-1);
+  $effect(()=>{
+    // The spoken price exchange is purely local; a new clinic visit begins at its first line.
+    if(clinic?.phase!=='PRICED')pricedDialogueIndex=0;
+  });
+  function advancePricedDialogue(){
+    if(pending||clinic?.phase!=='PRICED'||pricedAtEnd)return;
+    pricedDialogueIndex+=1;
+  }
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
   const assessment=$derived(clinic
@@ -100,7 +125,7 @@
   }
   onMount(()=>{void refresh();});
   async function perform(action:Action){
-    if(pending||!clinic||next!==action)return;
+    if(pending||!clinic||next!==action||(action==='pay'&&!pricedAtEnd))return;
     pending=true;errorMessage='';
     const signature=clinic.revision+':'+action;
     if(signature!==retrySignature||!retryId){
@@ -171,24 +196,20 @@
             {/if}
             <p class="instruction">Find out what the examination will cost.</p>
           {:else if clinic.phase==='PRICED'}
-            <p class="speaker">YOU</p>
-            <p class="speech">“How much?”</p>
-            <p class="speaker">CLINICIAN</p>
-            <p class="speech">“Ten coins.”</p>
-            <p class="speaker">YOU</p>
-            <p class="speech">“Ten?”</p>
-            <p class="speaker">CLINICIAN</p>
-            <p class="speech">“{clinic.conditionType==='cut'
-              ?'That includes the dressing.'
-              :clinic.conditionType==='unhurt'
-                ?'For the examination.'
-                :'For the examination and any care you need.'}”</p>
-            <div class="price" aria-label="Price before payment">
-              <span>Examination and basic care if necessary</span>
-              <strong>{clinic.fee} coins</strong>
-              <span>Coins in hand</span>
-              <strong>{clinic.coins}</strong>
-            </div>
+            {#if pricedBeat.kind==='narration'}
+              <p class="narration stage-direction">{pricedBeat.text}</p>
+            {:else}
+              <p class="speaker">{pricedBeat.speaker}</p>
+              <p class="speech">“{pricedBeat.text}”</p>
+            {/if}
+            {#if pricedAtEnd}
+              <div class="price" aria-label="Price before payment">
+                <span>Examination and basic care if necessary</span>
+                <strong>{clinic.fee} coins</strong>
+                <span>Coins in hand</span>
+                <strong>{clinic.coins}</strong>
+              </div>
+            {/if}
           {:else if clinic.phase==='PAID'}
             <p class="narration">You pay ten coins. The examination and any necessary care are complete.</p>
             <p class="speaker">CLINICIAN</p>
@@ -202,10 +223,15 @@
 
           {#if next}
             <div class="actions">
-              <button class="pall-framed-button advance" type="button" disabled={pending}
-                onclick={()=>{if(next)void perform(next);}}>
-                {pending?'Saving…':label}
-              </button>
+              {#if clinic.phase==='PRICED' && !pricedAtEnd}
+                <button class="pall-framed-button advance" type="button"
+                  disabled={pending} onclick={advancePricedDialogue}>Continue</button>
+              {:else}
+                <button class="pall-framed-button advance" type="button" disabled={pending}
+                  onclick={()=>{if(next)void perform(next);}}>
+                  {pending?'Saving…':label}
+                </button>
+              {/if}
             </div>
           {/if}
           {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -302,6 +328,7 @@
     color:#21150e;margin:0 0 13px}
   .speech{font-weight:600}
   .narration{color:#302016}
+  .stage-direction{font-style:italic}
   .instruction{font-weight:700}
   .speaker{margin:10px 0 5px}
   .price{display:grid;grid-template-columns:minmax(0,1fr) auto;
