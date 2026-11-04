@@ -323,7 +323,7 @@ assert.deepEqual(floatingFeedbackForSavedTurn(before,{
 }),[],'Old Chronicle entries must not animate without a new turn event');
 assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous,result):[]') &&
   page.includes('feedback=[];') &&
-  page.includes('<MillhandCombatScene snapshot={battle} {feedback}') &&
+  page.includes('<MillhandCombatScene snapshot={battle} characterId={id} {feedback}') &&
   scene.includes("feedback.filter(item => item.target === 'enemy')") &&
   scene.includes("feedback.filter(item => item.target === 'player')") &&
   scene.includes('class:impact={event.kind === \'damage\'}') &&
