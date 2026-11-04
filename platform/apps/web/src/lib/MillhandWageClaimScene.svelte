@@ -30,7 +30,7 @@
   // during a stale local API build that omits the previous_dialogue action,
   // so the user receives a clear server error instead of a dead button.
   const canGoBack=$derived(state.phase!=='APPROACHING');
-  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'].includes(state.phase));
+  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','CHOOSE_STANCE'].includes(state.phase));
   const forwardActions=$derived(snapshot.availableActions.filter(a=>a!=='previous_dialogue'));
   let flintImageMissing=$state(false);
   const cornered=$derived(
@@ -116,6 +116,9 @@
         {/if}
       {:else if approaching}
         <p class="context current-beat">{WAGE_CLAIM_WALK_HOME[state.branch]}</p>
+      {:else if state.phase==='LEAVING'}
+        <p class="speaker">You</p>
+        <p class="speech">“I'm going home.”</p>
       {:else if state.phase==='CHOOSE_STANCE'}
         <p class="context">You have to choose how to meet him. Flint is close enough to strike if you try to push past.</p>
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
