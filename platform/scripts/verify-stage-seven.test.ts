@@ -106,6 +106,15 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(web.includes('Pay 10 coins'));
   assert.ok(web.includes('No injuries found. No treatment needed.'));
   assert.ok(battle.includes('Continue to medical care'));
+  const shared=source('apps/web/src/lib/pall-owner-ui.css');
+  const wage=source('apps/web/src/lib/MillhandWageClaimScene.svelte');
+  assert.ok(web.includes('class="pall-framed-button advance"'));
+  assert.ok(web.includes('class="pall-framed-button" type="button" onclick={refresh}'));
+  assert.ok(wage.includes('class="pall-framed-button combat-link"'));
+  assert.ok(shared.includes('border-image-slice:50 180 45 180 fill'));
+  assert.ok(shared.includes('pointer-events:auto;'));
+  assert.ok(!web.includes('background:#735236;border:1px solid #d4ad78'),
+    'The old flat clinic action button styling must stay retired');
   assert.ok(migration.includes('REFERENCES player_characters(id) ON DELETE RESTRICT'));
   assert.equal(CLINIC_FEE,10);
 });

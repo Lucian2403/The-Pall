@@ -332,4 +332,24 @@ assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous
   scene.includes('@media(prefers-reduced-motion:reduce)'),
   'The short-lived floating feedback must restart every turn without replaying old events');
 
+
+// Regression for the non-clickable Stage 6 -> clinic CTA. The scenery
+// deliberately ignores pointer input, so its outcome parchment MUST
+// opt back in; otherwise the native link displays but cannot be clicked.
+const framedStyles=read('apps/web/src/lib/pall-owner-ui.css');
+const wageScene=read('apps/web/src/lib/MillhandWageClaimScene.svelte');
+assert.ok(
+  scene.includes('.stage-scenery{position:absolute;inset:0;pointer-events:none}') &&
+  scene.includes('pointer-events:auto;filter:drop-shadow(0 6px 10px #0008)') &&
+  scene.includes('<a class="pall-framed-button clinic-link" href=') &&
+  scene.includes('.clinic-link{position:relative;z-index:1;') &&
+  wageScene.includes('<a class="pall-framed-button combat-link" href=') &&
+  framedStyles.includes('.pall-framed-button {') &&
+  framedStyles.includes("url('/ui-kit/buttons/button-normal-trim.png')") &&
+  framedStyles.includes("url('/ui-kit/buttons/button-hover-trim.png')") &&
+  framedStyles.includes("url('/ui-kit/buttons/button-pressed-trim.png')") &&
+  framedStyles.includes('border-image-slice:50 180 45 180 fill;'),
+  'The battle progression CTA must actually receive pointer events and share the approved frame'
+);
+
 console.log('PASS: original v0.5.1 checksum, combat handoff, authenticated atomic turns, real Chronicle and Stage 7 clinic link.');

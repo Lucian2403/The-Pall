@@ -155,7 +155,7 @@
             ? 'Flint defeated you. Other workers intervened.' : 'You defeated Flint.'}</p>
           <p>{resultText}</p>
           <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
-          <a class="clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
+          <a class="pall-framed-button clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
         {:else}
           <p class="telegraph-title">FLINT'S OBSERVABLE INTENTION</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -304,6 +304,8 @@
     background:#1b222b url('/locations/alley/alley-background.webp') center/cover no-repeat}
   .alley::after{content:'';position:absolute;inset:auto 0 0;height:235px;
     background:linear-gradient(transparent,#161410aa 65%,#181512f0);pointer-events:none;z-index:1}
+  /* Scenery remains non-interactive; its framed outcome card must receive
+     real pointer hits, including all descendants and the clinic link. */
   .stage-scenery{position:absolute;inset:0;pointer-events:none}
   .flint{position:absolute;left:3%;bottom:7%;width:29%;height:84%;display:flex;flex-direction:column;
     align-items:center;justify-content:flex-end;z-index:1}
@@ -323,7 +325,7 @@
     border-width:21px 25px 20px;border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
     border-image-width:21px 25px 20px;border-image-repeat:stretch;
-    filter:drop-shadow(0 6px 10px #0008)}
+    pointer-events:auto;filter:drop-shadow(0 6px 10px #0008)}
   .parchment h2{font:700 clamp(19px,1.5vw,25px)/1.2 Georgia,serif;margin:0;text-transform:uppercase}
   .parchment p{margin:0 0 7px;line-height:1.4}
   .encounter-line{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
@@ -443,8 +445,7 @@
   .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font-size:13px;line-height:1.5}
-  .clinic-link{display:inline-block;padding:9px 14px;margin-top:9px;background:#765332;border:1px solid #cfad77;color:#ffe6bb;font-weight:700;text-decoration:none}
-  .clinic-link:hover{background:#926e47}
+  .clinic-link{position:relative;z-index:1;max-width:100%;margin:12px 0 1px;pointer-events:auto}
   /* Transient hit/miss overlays are anchored to the target, never to a guessed
      attack roll. Actual damage comes from the committed combat Chronicle. */
   .combat-float{position:absolute;z-index:6;top:29%;left:52%;

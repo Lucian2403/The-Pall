@@ -50,6 +50,57 @@
 }
 
 /*
+ * Shared progression / confirmation control. Works on native <button> and
+ * <a> elements; no fake button div or overlay that could intercept clicks.
+ * Use these exact owner-approved normal, hover and pressed images.
+ */
+.pall-framed-button {
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:220px;
+  min-height:51px;
+  padding:4px 17px;
+  appearance:none;
+  text-decoration:none;
+  text-align:center;
+  vertical-align:middle;
+  background:transparent;
+  border-style:solid;
+  border-color:transparent;
+  border-width:13px 34px 12px;
+  border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+  border-image-slice:50 180 45 180 fill;
+  border-image-width:13px 34px 12px;
+  border-image-repeat:stretch;
+  border-radius:0;
+  color:#332319;
+  font:700 15px/1.25 var(--pall-font-reading,Georgia,serif);
+  text-shadow:none;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.pall-framed-button:hover:not(:disabled) {
+  border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
+  color:#23160d;
+}
+.pall-framed-button:active:not(:disabled) {
+  border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
+}
+.pall-framed-button:focus-visible {
+  outline:2px solid #e6ba75;
+  outline-offset:3px;
+}
+.pall-framed-button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+@media(max-width:400px) {
+  .pall-framed-button {max-width:100%;min-width:0;}
+}
+
+/*
  * The Pall shared dialogue and actions — owner-supplied nine-slice art.
  * The owner's transparently padded art is cropped to a tight alpha bounding
  * box before installation (provided in the companion patch ZIP). Transparent

@@ -115,7 +115,7 @@
         <p class="context">{WAGE_CLAIM_STANCE_OUTCOMES[state.stance]}</p>
         <p class="instruction">Your position is saved. The encounter begins in Stage 6.</p>
         {#if snapshot.stage===6}
-          <a class="combat-link" href={'/characters/'+encodeURIComponent(page.params.id)+'/millhand/combat'}>Enter the fight</a>
+          <a class="pall-framed-button combat-link" href={'/characters/'+encodeURIComponent(page.params.id)+'/millhand/combat'}>Enter the fight</a>
         {/if}
       {:else}
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
@@ -296,6 +296,5 @@
     .inspection-text,.inspection-weapon{font-size:15px;line-height:1.5}
   }
   @media(prefers-reduced-motion:reduce){.object,.actions button{transition:none}}
-  .combat-link{display:block;margin:12px 0;padding:10px 12px;text-align:center;background:#35271d;color:#f4e3c3;border:1px solid #90714e;text-decoration:none;font-weight:700}
-  .combat-link:focus-visible{outline:2px solid #75562d;outline-offset:3px}
+  .combat-link{display:flex;width:100%;margin:12px 0 0}
 </style>
