@@ -137,8 +137,7 @@
     <div class="clinic">
       <!-- Unobstructed owner-supplied clinic illustration, before the existing
            condition / examination columns and the Personal Journal. -->
-      <div class="clinic-scene" role="img"
-        aria-label="Illustrated Grand Cylinder City clinic interior with treatment beds, shelves and a window">
+      <section class="clinic-scene" aria-label="City clinic interior">
         <header class="clinic-heading">
           <small>MILLHAND · STAGE VII</small>
           <h1>The Clinic</h1>
@@ -147,7 +146,7 @@
             :'You leave the passage and reach the clinic after Flint withdraws.'}</p>
           <p>There is a place to sit. A clinician is available to examine you.</p>
         </header>
-      </div>
+      </section>
       <div class="clinic-layout">
         <section class="condition" aria-label="Recorded condition">
           <h2>Your condition</h2>
