@@ -343,6 +343,11 @@ assert.ok(scene.includes("id:'focus',label:'Focused Stance'") &&
   scene.includes('grid-template-columns:repeat(6,minmax(0,54px))') &&
   scene.includes('height:57px') &&
   scene.includes('width:min(74%,790px)') &&
+  scene.includes('<svelte:window onkeydown={handleHotbarKey} />') &&
+  scene.includes("if(!/^[1-6]$/.test(event.key))return") &&
+  scene.includes('fatigueInfoDialog?.open') &&
+  scene.includes("target.closest('input,select,textarea,[contenteditable=\"true\"],dialog')") &&
+  scene.includes('selected=choice.id;') &&
   !scene.includes('min-height:69px') &&
   !scene.includes("id:'feint'") &&
   !engine.includes("case 'feint':"),
