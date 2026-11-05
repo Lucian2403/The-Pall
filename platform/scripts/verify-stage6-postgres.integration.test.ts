@@ -169,6 +169,11 @@ test('Welcome is persisted per character and never unlocks tutorial gameplay its
   const other=await request('GET',base+second.id);
   assert.equal(other.body!.character.welcomeSeen,false,
     'Acknowledging one character must not dismiss another');
+  // Re-running the additive migration must not silently mark newly created
+  // but still unread characters as already introduced.
+  await db.query(readFileSync(resolve(root,'db/migrations','0009_character_welcome.sql'),'utf8'));
+  assert.equal((await request('GET',base+second.id)).body!.character.welcomeSeen,false,
+    'Migration rerun must preserve an unread welcome on a new character');
   const reset=await request('POST',base+first.id+'/dev/reset-welcome',owner,{});
   assert.equal(reset.status,200,JSON.stringify(reset.body));
   assert.equal(reset.body!.welcomeSeen,false);
