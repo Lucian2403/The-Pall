@@ -6,7 +6,7 @@
  */
 
 export const TEST_CONFIG = Object.freeze({
-  strikeCost: 10, repeatedStrikeSurcharge: 3, guardCost: 15, moveCost: 5, useCost: 2,
+  strikeCost: 10, repeatedStrikeSurcharge: 0, guardCost: 15, moveCost: 5, useCost: 2,
   recoverGain: 25, mentalRecoverGain: 12, lowReserve: 20,
   guardReduction:{min:.30,max:.60},
   fatigueGain: 5, strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
@@ -29,6 +29,7 @@ const actor = (name, opts = {}) => ({
   fatigue: opts.fatigue ?? 0, stress: opts.stress ?? 0, momentum: opts.momentum ?? 0,
   wounds: [], bleed: 0, bandages: opts.bandages ?? 0, guard: false,
   armHits:opts.armHits??0,armImpaired:opts.armImpaired??false,
+  reloadSlowdownPercent:opts.reloadSlowdownPercent??0,
   readiness: opts.readiness ?? 0, weapon: opts.weapon ?? {damage: 6,accuracy: .70,type: 'blunt',reach: 'contact',unarmed:true},
 });
 function rng(state) {
@@ -344,10 +345,13 @@ function tryAttack(s, who, a) {
     if(!dst.wounds.some(w=>w.severity==='serious'))dst.wounds.push({type:'impact',zone,severity:'serious'});
     log(s,`${dst.name} suffers a severe impact. Their effective Health ceiling is reduced.`,'wound',{actor:targetWho});
   }
-  if(damage>0&&zone==='limbs'&&dst.weapon?.reach==='contact'){
+  if(damage>0&&zone==='limbs'){
     dst.armHits=(dst.armHits??0)+1;
     if(dst.armHits===2){
       dst.armImpaired=true;
+      // An armed reload action is not present in Stage 6, but the persisted
+      // impairment modifier can be consumed by one when weapon reload exists.
+      dst.reloadSlowdownPercent=25;
       log(s,`${dst.name} has taken repeated arm strikes. Attack accuracy is reduced by 10 percentage points.`,
         'wound',{actor:targetWho,zone:'limbs',condition:'arm_impaired'});
     }
