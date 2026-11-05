@@ -8,6 +8,7 @@
 export const TEST_CONFIG = Object.freeze({
   strikeCost: 10, repeatedStrikeSurcharge: 3, guardCost: 15, moveCost: 5, useCost: 2,
   recoverGain: 25, mentalRecoverGain: 12, lowReserve: 20,
+  guardReduction:{min:.30,max:.60},
   fatigueGain: 5, strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
   bleedDamage: { 0: 0, 1: 1, 2: 2, 3: 3 },
   aim: { torso: 0, limbs: -0.15, head: -0.30 },
@@ -296,7 +297,11 @@ function tryAttack(s, who, a) {
   const damageHi=profile?.[1]??(hi+(special?4:0));
   const rolled=damageLo+Math.floor(rng(s)*(damageHi-damageLo+1));
   const raw=rolled+(exploited?(edge.damageBonus??5):0);
-  const reduction=dst.guard?(src.weapon.guardMitigation??.5):0; // source weapon profile; works for either actor
+  // A Guard cuts 30–60% of a landed strike. The single deterministic roll
+  // is part of the committed combat state, so replay and reload are identical.
+  const reduction=dst.guard?
+    TEST_CONFIG.guardReduction.min+rng(s)*(TEST_CONFIG.guardReduction.max-
+      TEST_CONFIG.guardReduction.min):0;
   const damage=Math.max(0,Math.round(raw*(1-reduction)));
   dst.hp=Math.max(0,dst.hp-damage);
   const part=woundName(s,who,zone);
@@ -325,7 +330,9 @@ function tryAttack(s, who, a) {
     :who==='player'&&s.enemy.hp<s.enemy.hpMax/2?' The opponent is plainly struggling now.':'';
   const guardText=dst.guard?` ${dst.name==='Player'?'Your guard':'Their guard'} absorbs ${raw-damage} of the impact.`:'';
   log(s,`${narrative}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
-      'damage',{actor:who,target:targetWho,zone,raw,damage,guarded:dst.guard,ability:special?ability:null});
+      'damage',{actor:who,target:targetWho,zone,raw,damage,guarded:dst.guard,
+        guardReductionPercent:dst.guard?Math.round(reduction*100):0,
+        ability:special?ability:null});
   if(src.weapon.type==='sharp' && damage>=6 && dst.bleed===0) {
     dst.bleed=1;dst.wounds.push({type:'cut',zone,severity:'minor'});
     log(s,`${dst.name==='Player'?'A shallow cut opens.':'A shallow cut opens on '+dst.name+'.'} Light bleeding begins.`,'wound',{actor:targetWho});
