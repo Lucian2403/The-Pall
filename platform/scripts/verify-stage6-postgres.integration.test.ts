@@ -241,7 +241,10 @@ test('Fatigue legal actions and server accuracy match committed saves at 70, 100
     'A forbidden action must not change the saved round');
   let recovered=await turn(c,snapshot,{type:'recover',mode:'breath'});
   assert.equal(recovered.status,200,JSON.stringify(recovered.body));
-  assert.equal(recovered.body!.player.fatigue,60);
+  assert.equal(recovered.body!.player.fatigue,40);
+  assert.equal(recovered.body!.player.stamina,Math.min(100,snapshot.player.stamina+10));
+  assert.equal(recovered.body!.rules.fatigue.recovery,15,
+    'Below 50 Fatigue, the next recovery uses the lower-Fatigue tier');
   assert.ok(recovered.body!.legalActions.includes('guard'));
   assert.ok(recovered.body!.legalActions.includes('attack'));
   await db.query(
@@ -253,7 +256,7 @@ test('Fatigue legal actions and server accuracy match committed saves at 70, 100
   assert.equal((await turn(c,snapshot,{type:'move',to:'side'})).status,422);
   recovered=await turn(c,snapshot,{type:'recover',mode:'nerves'});
   assert.equal(recovered.status,200,JSON.stringify(recovered.body));
-  assert.equal(recovered.body!.player.fatigue,90);
+  assert.equal(recovered.body!.player.fatigue,70);
   assert.deepEqual(recovered.body!.legalActions,['move','recover']);
 
   // Old stored intent from before the lock must not execute for a tired NPC.
@@ -266,7 +269,7 @@ test('Fatigue legal actions and server accuracy match committed saves at 70, 100
   assert.match(snapshot.enemyIntent,/breathes hard/);
   const enemyRest=await turn(c,snapshot,{type:'recover',mode:'breath'});
   assert.equal(enemyRest.status,200,JSON.stringify(enemyRest.body));
-  assert.equal(enemyRest.body!.enemy.fatigue,90);
+  assert.equal(enemyRest.body!.enemy.fatigue,70);
   assert.ok(!enemyRest.body!.turnEvents.some((e:any)=>
     e.actor==='enemy'&&e.kind==='damage'),
     'An old NPC attack cannot bypass exhausted-state restrictions');
@@ -285,6 +288,31 @@ test('Fatigue legal actions and server accuracy match committed saves at 70, 100
   assert.equal(overdraft.body!.player.fatigue,79,
     'Starting at zero Stamina adds 10 Fatigue to an Attack');
   assert.deepEqual(overdraft.body!.legalActions,['move','recover']);
+});
+
+test('Server projection uses the same Recover tier shown in the browser, including 49/50 boundary',async()=>{
+  const c=await character(owner,'brace');
+  await start(c);
+  for(const [before,removed,restored] of [
+    [49,15,20],[50,30,10],[100,30,10]
+  ]){
+    await db.query(
+      "UPDATE player_character_flint_combat SET state=jsonb_set(jsonb_set(state,'{player,fatigue}',$2::jsonb),'{player,stamina}','0'::jsonb) WHERE character_id=$1",
+      [c.id,JSON.stringify(before)]
+    );
+    const prior=(await request('GET',c.path)).body!;
+    assert.equal(prior.rules.recoverStamina,restored);
+    assert.equal(prior.rules.fatigue.recovery,removed);
+    assert.equal(prior.rules.fatigue.recoveryThreshold,50);
+    const result=await turn(c,prior,{type:'recover',mode:'breath'});
+    assert.equal(result.status,200,JSON.stringify(result.body));
+    assert.equal(result.body!.player.fatigue,Math.max(0,before-removed));
+    assert.equal(result.body!.player.stamina,restored);
+    const recovery=result.body!.turnEvents.find((e:any)=>e.kind==='recovery'&&e.actor==='player');
+    assert.equal(recovery?.fatigueRemoved,removed);
+    assert.equal(recovery?.staminaRestored,restored);
+    assert.equal(recovery?.fatigueBefore,before);
+  }
 });
 
 test('Three saved stances give distinct first-round tactical states',async()=>{
