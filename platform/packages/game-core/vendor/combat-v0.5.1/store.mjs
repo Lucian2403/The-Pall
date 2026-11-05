@@ -76,7 +76,7 @@ const view = (state,history=[]) => {
     attack:{cost:testAttackCost(state,'player'),minDamage:from+(edge?(edge.damageBonus??5):0),maxDamage:to+(edge?(edge.damageBonus??5):0),accuracy:{torso:hitProbability('torso'),limbs:hitProbability('limbs'),head:hitProbability('head')},momentumGain:TEST_CONFIG.strikeMomentum,repeatedStrikeSurcharge:TEST_CONFIG.repeatedStrikeSurcharge,repeatActive:repeated},
     guard:{cost:TEST_CONFIG.guardCost,mitigationPercent:guardReduction,momentumGain:TEST_CONFIG.guardMomentum},
     move:{cost:TEST_CONFIG.moveCost,momentumGain:TEST_CONFIG.moveMomentum},
-    technique:{staminaCost:12,momentumCost:20,damageBonus:4},
+    technique:{staminaCost:15,momentumCost:20,damageBonus:4},
     recover:{stamina:TEST_CONFIG.recoverGain,composure:TEST_CONFIG.mentalRecoverGain},
     use:{cost:TEST_CONFIG.useCost},
     stanceOpen:state.openings?.enemy?.expires>=state.round && state.openings.enemy.reason==='your repeated attacks leave your stance open',
