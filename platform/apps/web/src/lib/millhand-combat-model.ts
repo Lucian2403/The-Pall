@@ -3,6 +3,7 @@ export type CombatActorView={
   name:string;hp:number;hpMax:number;ceiling:number;stamina:number;
   composure:number;fatigue:number;stress:number;momentum:number;bleed:number;
   wounds:Array<{type:string;zone?:string;severity:string}>;
+  armHits?:number;armImpaired?:boolean;
 };
 export type CombatEventView={
   round:number;
@@ -29,6 +30,9 @@ export type CombatSnapshot={
     unarmed:boolean;weaponLabel:string;
     strikeDamage:{min:number;max:number};
     techniqueDamage:{min:number;max:number};
+    strikeByZone:Record<'torso'|'limbs'|'head',{min:number;max:number}>;
+    techniqueByZone:Record<'torso'|'limbs'|'head',{min:number;max:number}>;
+    dodgeChance:{side:number;cover:number;back:number;close:number};
     openingDamageBonus:number;openingReason:string|null;
     enemyStrikeDamage:{min:number;max:number};
     guardedEnemyStrikeDamage:{min:number;max:number};
