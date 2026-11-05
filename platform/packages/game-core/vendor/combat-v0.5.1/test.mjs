@@ -54,6 +54,28 @@ test('attacker and actual guarding defender can earn Momentum in same round',()=
  let s=newEncounter('flint',{seed:1,enemy:{weapon:{damage:10,accuracy:.95,type:'blunt',reach:'contact'}}});
  s=act(s,{type:'guard'});assert.equal(s.player.momentum,8);assert.equal(s.enemy.momentum,10);
 });
+test('Guard consumes 15 Stamina, rolls real 30–60% reduction, and lasts one turn',()=>{
+  const reductions=new Set();
+  for(let seed=1;seed<=200;seed++){
+    const enemy={weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.95,
+      type:'blunt',reach:'contact'}};
+    const before=newEncounter('flint',{seed,enemy});
+    const after=act(before,{type:'guard'},'guard-'+seed);
+    assert.equal(after.player.stamina,75);
+    assert.equal(after.player.guard,false,'Guard must not leak into another turn');
+    const hit=after.events.find(e=>e.kind==='damage'&&e.actor==='enemy'&&e.guarded);
+    if(!hit)continue;
+    assert.ok(hit.guardReductionPercent>=30&&hit.guardReductionPercent<=60,
+      'Actual guard reduction is outside owner-approved range');
+    assert.ok(hit.damage>=6&&hit.damage<=12,
+      'Guarded ordinary Flint club hit exceeds declared after-guard range');
+    assert.equal(hit.raw-hit.damage>0,true);
+    reductions.add(hit.guardReductionPercent);
+  }
+  assert.ok(reductions.size>=10,
+    'Guard must roll different percentages; a fixed 60% is not the owner mechanic');
+});
+
 test('Stamina is persistent, Fatigue only at/below 20 from physical exertion',()=>{
  let s=newEncounter('flint',{seed:1,player:{stamina:27}});
  s=act(s,{type:'attack'});assert.equal(s.player.stamina,17);assert.equal(s.player.fatigue,5);
