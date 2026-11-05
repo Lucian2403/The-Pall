@@ -56,11 +56,28 @@ const contexts=[];
 class MockAudioContext{
   constructor(){
     this.state='suspended';this.gains=[];this.started=0;this.starts=[];
+    this.combatCompressors=[];
     this.currentTime=8;contexts.push(this);
     this.destination={};
   }
   resume(){this.state='running';return Promise.resolve();}
-  decodeAudioData(){return Promise.resolve({duration:.23});}
+  decodeAudioData(){
+    // Non-silent, constant 0.05 PCM gives a deterministic calibration
+    // expectation: -20 dBFS active RMS -> 2x file amplitude.
+    const channel=new Float32Array(1600).fill(.05);
+    return Promise.resolve({
+      duration:.23,sampleRate:16000,numberOfChannels:2,length:channel.length,
+      getChannelData:()=>channel
+    });
+  }
+  createDynamicsCompressor(){
+    const node={
+      threshold:{value:0},knee:{value:0},ratio:{value:0},
+      attack:{value:0},release:{value:0},
+      connect(){},disconnect(){}
+    };
+    this.combatCompressors.push(node);return node;
+  }
   createGain(){
     const node={gain:{value:1},connect(){},disconnect(){}};
     this.gains.push(node);return node;
@@ -74,6 +91,7 @@ class MockAudioContext{
 }
 let currentTime=1000;
 const module={exports:{}};
+const fetchedUrls=[];
 const sandbox={
   module,exports:module.exports,
   require(name){
@@ -82,7 +100,10 @@ const sandbox={
   },
   window,document,Audio:MockAudio,AudioContext:MockAudioContext,
   performance:{now:()=>currentTime},
-  fetch:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(64)}),
+  fetch:async url=>{
+    fetchedUrls.push(url);
+    return {ok:true,arrayBuffer:async()=>new ArrayBuffer(64)};
+  },
   setTimeout,clearTimeout,
   Math:Object.assign(Object.create(Math),{random:()=>0.1}),
   Symbol,Number,String,Map,Set,Promise,Error,JSON
@@ -335,6 +356,53 @@ engine.setPallAudioSettings({sfxVolume:0});
 engine.playCoinTransactionSfx();
 assert.equal(contexts[0].started,startCount+2,'Muted effects do not play a transaction.');
 engine.setPallAudioSettings({sfxVolume:.5});
+// All 17 combat sounds, existing and newly supplied, use one calibrated
+// playback target, one shared limiter, and the unchanged SFX slider.
+const releaseCombat=engine.claimCombatSfx();
+await flush();
+const combatNames=[
+  ...['hit-01','hit-02','hit-03','hit-04',
+    'male-grunt-01','male-grunt-02','male-grunt-03','male-grunt-04',
+    'miss-01','miss-02','miss-03',
+    'male-low-stamina','reposition','guard','fight-finished','focus','recovery']
+      .map(name=>'combat/'+name+'.mp3')
+];
+for(const filename of combatNames){
+  assert.ok(fetchedUrls.some(url=>url.endsWith(filename)),
+    'Combat clip should be predecoded: '+filename);
+}
+const combatBefore=contexts[0].started;
+const combatGainBefore=contexts[0].gains.length;
+for(const cue of ['hit','miss','maleGrunt','maleLowStamina','reposition',
+                  'guard','fightFinished','focus','recovery']){
+  engine.playCombatSfx(cue);
+}
+assert.equal(contexts[0].started-combatBefore,9,
+  'Nine combat cues produce one actual WebAudio output each');
+const combatGains=contexts[0].gains.slice(combatGainBefore).map(x=>x.gain.value);
+const expectedGain=.5*(Math.pow(10,-20/20)/.05)*.84;
+for(const gain of combatGains)
+  assert.ok(Math.abs(gain-expectedGain)<.0001,
+    'All old/new combat sounds share one calibrated active-RMS output dB and slider');
+assert.equal(contexts[0].combatCompressors.length,1,
+  'All combat effects, old and new, must share the same output limiter');
+const compressor=contexts[0].combatCompressors[0];
+assert.equal(compressor.threshold.value,-12);
+assert.equal(compressor.ratio.value,6);
+engine.setPallAudioSettings({sfxVolume:.25});
+const halfLevel=contexts[0].gains.length;
+engine.playCombatSfx('focus');
+assert.ok(Math.abs(contexts[0].gains[halfLevel].gain.value-expectedGain*.5)<.0001,
+  'Reducing SFX volume must scale all combat sounds by the same factor');
+engine.setPallAudioSettings({sfxVolume:0});
+engine.playCombatSfx('recovery');
+assert.equal(contexts[0].started,combatBefore+10,
+  'Muted new combat samples must never play');
+engine.setPallAudioSettings({sfxVolume:.5});
+releaseCombat();
+engine.playCombatSfx('miss');
+assert.equal(contexts[0].started,combatBefore+10,
+  'Audio outside an active combat claim must be silent');
 releaseClinic();
 assert.equal(clinic.paused,true,'Leaving the clinic stops ambient playback immediately.');
 assert.equal(clinic.currentTime,0,'Leaving the clinic resets the ambient loop.');
@@ -348,4 +416,4 @@ assert.equal(music.paused,true,'Leaving the game must pause music.');
 detach();
 assert.equal(listeners.get('pointerdown')?.size??0,0,'Release gesture listeners.');
 assert.equal(listeners.get('keydown')?.size??0,0,'Release keyboard listeners.');
-console.log('PASS: forge, council, alley, depot and clinic soundscapes, transaction cues, mute, slider and visibility.');
+console.log('PASS: forge, council, alley, depot and clinic soundscapes; all 17 calibrated combat effects, shared limiter, mute, sliders and visibility.');
