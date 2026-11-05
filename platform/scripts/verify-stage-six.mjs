@@ -233,7 +233,7 @@ assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))')
   view.includes('currentAccuracyLoss:') &&
   scene.includes('snapshot.rules.fatigue.currentAccuracyLoss') &&
   scene.includes('At 100 Fatigue, only Recover is possible.') &&
-  scene.includes('up to {snapshot.rules.fatigue.recovery} Fatigue') &&
+  scene.includes('Up to {snapshot.rules.fatigue.recovery} Fatigue') &&
   scene.includes('Unprotected while recovering.') &&
   scene.includes('full, unguarded damage') &&
   scene.includes('snapshot.rules.fatigue.recoveryFrom50') &&
