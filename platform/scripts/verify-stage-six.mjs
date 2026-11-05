@@ -100,7 +100,7 @@ assert.ok(scene.includes("iconBase + 'confirm-action.webp'")&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
   scene.includes('opacity:.76')&&
-  scene.includes('snapshot.events.slice(-3)')&&
+  scene.includes('snapshot.events.slice(-6)')&&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
 
@@ -121,6 +121,63 @@ assert.ok(scene.includes('class="action-zone"') &&
   !scene.includes('class="decision-row"'),
   'Combat layout must present one battlefield action bar, compact fighter comparison and adjacent Chronicle');
 
+
+// Action information must be extracted from server combat rules, not
+// invented generic tooltips or zone-based damage multipliers.
+const model=read('apps/web/src/lib/millhand-combat-model.ts');
+const chronicle=read('apps/web/src/lib/millhand-combat-chronicle.ts');
+assert.ok(view.includes('strikeDamage:unarmedDamage')&&
+  view.includes('techniqueDamage:{min:unarmedDamage.min+4,max:unarmedDamage.max+4}')&&
+  view.includes('guardMitigationPercent:Math.round(100*mitigation)')&&
+  view.includes('guardedEnemyStrikeDamage:')&&
+  view.includes('openingDamageBonus:opening?(opening.damageBonus??5):0')&&
+  view.includes('repositionUsesDistance:true')&&
+  scene.includes('Your weapon:')&&
+  scene.includes('snapshot.rules.weaponLabel')&&
+  scene.includes('damageMin')&&scene.includes('damageMax')&&
+  scene.includes('snapshot.rules.accuracy[zone]')&&
+  scene.includes('snapshot.rules.guardMitigationPercent')&&
+  scene.includes('Dodge protection:')&&scene.includes('position-based, not a %')&&
+  scene.includes('snapshot.rules.techniqueMomentum')&&
+  scene.includes('A damaging hit earns 10 Momentum')&&
+  scene.includes('disabled={pending || !available(visibleSelection)}')&&
+  scene.includes('You can inspect it, but not confirm it.')&&
+  model.includes('unarmed:boolean')&&model.includes('strikeDamage:')&&
+  model.includes('actionType?:')&&
+  chronicle.includes("event.actor==='enemy'"),
+  'Combat UI must explain authentic current trial effects even when an action is locked');
+
+assert.ok(scene.includes('snapshot.events.slice(-6)')&&
+  scene.includes('Latest 6 of {snapshot.events.length} entries.')&&
+  scene.includes('combatActionLabel(event)')&&
+  scene.includes('class:enemy-action={isEnemyCombatAction(event)}')&&
+  scene.includes('.event-action.enemy-action{color:#ff7468'),
+  'Chronicle must show six latest entries, exact action labels and red enemy actions');
+assert.ok(api.includes('describeCommittedTurn')&&
+  api.includes('state.events=describeCommittedTurn(state.events,command.action,record.state.intent)')&&
+  api.includes('actionType:type,actionDetail:detail,actionName:name'),
+  'Save action types in the authoritative event history without changing combat turns');
+const {combatActionLabel,isEnemyCombatAction}=
+  await import('../apps/web/src/lib/millhand-combat-chronicle.ts');
+assert.equal(combatActionLabel({kind:'damage',actor:'enemy',actionType:'attack',
+  actionDetail:'torso',text:'Flint hits',round:3}),'Attack-Torso');
+assert.equal(combatActionLabel({kind:'miss',actor:'enemy',actionType:'technique',
+  actionDetail:'limbs',actionName:'Hook and Draw',text:'Flint misses',round:3}),
+  'Hook and Draw-Limbs');
+assert.equal(combatActionLabel({kind:'damage',actor:'player',actionType:'technique',
+  actionDetail:'head',text:'Your hit',round:3}),'Press Advantage-Head');
+assert.equal(combatActionLabel({kind:'move',actor:'player',actionType:'move',
+  actionDetail:'cover',text:'You move',round:3}),'Reposition-Cover');
+assert.equal(combatActionLabel({kind:'recovery',actor:'player',actionType:'recover',
+  actionDetail:'breath',text:'You recover',round:3}),'Recover-Stamina');
+assert.equal(combatActionLabel({kind:'tactical',actor:'player',actionType:'guard',
+  text:'Guard checks attack',round:3}),'Guard');
+assert.equal(combatActionLabel({kind:'intent',actor:'enemy',text:'Flint readies club',round:3}),'Intent');
+assert.equal(isEnemyCombatAction({kind:'intent',actor:'enemy',text:'Flint waits',round:3}),false);
+assert.equal(isEnemyCombatAction({kind:'damage',actor:'enemy',actionType:'attack',
+  text:'Flint hits',round:3}),true);
+assert.equal(isEnemyCombatAction({kind:'guard',actor:'player',actionType:'guard',
+  text:'You guard',round:3}),false);
 
 // PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
 // That mismatch formerly rolled back the final Flint turn with HTTP 500.
