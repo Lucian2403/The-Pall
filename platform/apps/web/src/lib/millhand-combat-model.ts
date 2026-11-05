@@ -25,11 +25,13 @@ export type CombatSnapshot={
   events:CombatEventView[];turnEvents:CombatEventView[];
   rules:{
     strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
+    recoverStaminaBelow50:number;recoverStaminaFrom50:number;
     recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
     fatigue:{
       cap:number;lowStaminaThreshold:number;lowStaminaGain:number;
       exhaustedAttackGain:number;exhaustedDefenseGain:number;
-      recovery:number;limitedAt:number;recoverOnlyAt:number;
+      recovery:number;recoveryBelow50:number;recoveryFrom50:number;
+      recoveryThreshold:number;limitedAt:number;recoverOnlyAt:number;
       accuracyLossPerTen:number;currentAccuracyLoss:number;
     };
     accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:string;guardReductionMinPercent:number;guardReductionMaxPercent:number;prototype:boolean;
