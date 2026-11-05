@@ -193,6 +193,27 @@ assert.equal(isEnemyCombatAction({kind:'damage',actor:'enemy',actionType:'attack
 assert.equal(isEnemyCombatAction({kind:'guard',actor:'player',actionType:'guard',
   text:'You guard',round:3}),false);
 
+// An enhanced strike must always reveal exactly where extra damage came from.
+// The target inspector distinguishes base range from an active conditional bonus.
+assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus??5):0') &&
+  engine.includes('baseDamage:rolled,openingDamageBonus') &&
+  engine.includes('base damage + ${openingDamageBonus} Opening bonus') &&
+  engine.includes('${damageBreakdown}${guardText}') &&
+  scene.includes('<b>Base Damage:</b>') &&
+  scene.includes('class="opening-stat"') &&
+  scene.includes('<b>Opening:</b> +{openingBonus}') &&
+  scene.includes('class="potential-stat"') &&
+  scene.includes('<b>Total:</b>') &&
+  scene.includes('Base Damage is before an Opening bonus') &&
+  scene.includes('base damage, bonus and total separately'),
+  'Opening math must be visible before the action and preserved in exact combat history');
+// Fatigue is tracked in the current prototype but has no effect modifier yet.
+// Do not advertise any unimplemented accuracy, damage or dodge fatigue penalty.
+assert.ok(engine.includes('a.fatigue += TEST_CONFIG.fatigueGain') &&
+  !engine.includes('src.fatigue*.') &&
+  scene.includes("key:'fatigue',label:'Fatigue'"),
+  'Fatigue accumulation and display must remain intact, with no fictional penalty');
+
 // PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
 // That mismatch formerly rolled back the final Flint turn with HTTP 500.
 assert.ok(charactersSql.includes("'NOT_STARTED','IN_PROGRESS','COMPLETED'") &&
