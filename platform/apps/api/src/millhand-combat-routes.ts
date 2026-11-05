@@ -70,6 +70,41 @@ function readyStance(claim:Claim|undefined):StageSixStance|null{
   const stance=claim.state.stance;
   return stance==='brace'||stance==='moving'||stance==='cart'?stance:null;
 }
+/** Annotate authoritative engine events with the actual chosen actions.
+ * This changes presentation metadata only, never RNG, damage or resolution.
+ * It also makes saved history truthful across reloads and repeated requests. */
+function describeCommittedTurn(
+  events:CombatEvent[],chosen:CombatAction,enemyIntent:CombatState['intent']
+):CombatEvent[]{
+  return events.map(event=>{
+    let who=event.actor;
+    // The v0.5.1 prototype omits actor on Recover, despite naming the
+    // recovering actor in text. Recover is the only such direct action.
+    if(event.kind==='recovery'&&!who){
+      if(event.text.startsWith('You '))who='player';
+      else if(event.text.startsWith('Flint '))who='enemy';
+    }
+    if(who!=='player'&&who!=='enemy')return event;
+    const action=who==='player'?chosen:enemyIntent;
+    if(!action)return {...event,actor:who};
+    const direct=['damage','miss','guard','move','recovery','technique'].includes(event.kind);
+    // A new opening produced by a guarded strike belongs to the actor's
+    // guard, not to a fictional extra attack.
+    const defensiveOpening=event.kind==='tactical'&&who==='player'&&
+      chosen.type==='guard'&&event.text.includes('firm guard');
+    if(!direct&&!defensiveOpening)return {...event,actor:who};
+    const type=action.type;
+    if(!['attack','technique','guard','move','recover'].includes(type))return {...event,actor:who};
+    const detail=typeof action.zone==='string'?action.zone:
+      typeof action.to==='string'?action.to:
+      typeof action.mode==='string'?action.mode:undefined;
+    const name=type==='technique'
+      ?(typeof action.ability==='string'?action.ability:'Press Advantage')
+      :undefined;
+    return {...event,actor:who,actionType:type,actionDetail:detail,actionName:name};
+  });
+}
+
 function snapshot(record:CombatRecord){
   return combatView(record.state,record.history,record.stance);
 }
@@ -206,6 +241,9 @@ export function registerMillhandCombatRoutes(app:FastifyInstance,options:{
         }
         if(state.status==='finished'&&state.outcome!=='player_victory'&&state.outcome!=='player_defeat')
           throw new Error('unexpected_encounter_outcome');
+        // Enemy intention was committed before resolving this turn. Keep it
+        // exclusively in historical log metadata; never reveal future AI.
+        state.events=describeCommittedTurn(state.events,command.action,record.state.intent);
         record={state,stance,history:[...record.history,...state.events]};
         await client.query(
           'UPDATE player_character_flint_combat SET revision=$2,state=$3::jsonb,history=$4::jsonb,outcome=$5,updated_at=NOW() WHERE character_id=$1',
