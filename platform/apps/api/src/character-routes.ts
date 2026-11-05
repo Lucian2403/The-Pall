@@ -17,7 +17,7 @@ const STARTING_LOCATIONS: Record<string, string> = {
   Inkbound: 'Civic Copying Office'
 };
 const columns = `id, name, sex, origin, str, dex, intel, res, max_health, current_health,
-  coins, major_skill_bonuses, starter_item_requirements, starting_location, tutorial_stage, tutorial_status, avatar_id, created_at`;
+  coins, major_skill_bonuses, starter_item_requirements, starting_location, tutorial_stage, tutorial_status, avatar_id, created_at, welcome_seen_at`;
 
 type CharacterRow = {
   id: string; name: string; sex: string; origin: string;
@@ -25,7 +25,7 @@ type CharacterRow = {
   max_health: number; current_health: number; coins: string | number;
   major_skill_bonuses: Record<string, number>;
   starter_item_requirements: {name: string; quantity: number}[];
-  starting_location: string; tutorial_stage: number; tutorial_status: string; avatar_id: string|null; created_at: Date;
+  starting_location: string; tutorial_stage: number; tutorial_status: string; avatar_id: string|null; created_at: Date; welcome_seen_at:Date|null;
 };
 
 function serialize(row: CharacterRow) {
@@ -38,6 +38,7 @@ function serialize(row: CharacterRow) {
     starterItemRequirements: row.starter_item_requirements,
     startingLocation: row.starting_location,
     tutorial: {stage: row.tutorial_stage, status: row.tutorial_status},
+    welcomeSeen:row.welcome_seen_at!==null,
     createdAt: row.created_at
   };
 }
@@ -85,6 +86,56 @@ export function registerCharacterRoutes(app:FastifyInstance,options:{
     if (!result.rowCount) return reply.code(404).send({error: 'not_found'});
     return {character: serialize(result.rows[0] as CharacterRow)};
   });
+
+  /** Server-owned one-time acknowledgement. Never award progress on this
+   * endpoint: Begin Your Story unlocks the already-approved Stage 1 UI only. */
+  app.post<{Params:{id:string}}>('/api/characters/:id/welcome',async(request,reply)=>{
+    const session=await resolveSession(request.headers);
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!CHARACTER_UUID.test(request.params.id))return reply.code(404).send({error:'not_found'});
+    const origin=request.headers.origin;
+    if(origin&&origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
+      return reply.code(403).send({error:'invalid_origin'});
+    if(!request.headers['content-type']?.toLowerCase().startsWith('application/json'))
+      return reply.code(415).send({error:'json_required'});
+    if(!request.body||typeof request.body!=='object'||Array.isArray(request.body)||
+        Object.keys(request.body).length!==0)
+      return reply.code(400).send({error:'invalid_body'});
+
+    // Atomic and idempotent. Retried requests cannot create a second welcome
+    // acknowledgement or change the character's tutorial/coins/rewards.
+    const changed=await pool.query<{welcome_seen_at:Date}>(
+      'UPDATE player_characters SET welcome_seen_at=COALESCE(welcome_seen_at,NOW()) WHERE id=$1 AND account_id=$2 RETURNING welcome_seen_at',
+      [request.params.id,session.user.id]
+    );
+    if(!changed.rowCount)return reply.code(404).send({error:'not_found'});
+    return {welcomeSeen:true};
+  });
+
+  // Developer-only explicit replay of the intro, never on a production host.
+  const devHost=process.env.API_HOST??'127.0.0.1';
+  if(process.env.NODE_ENV!=='production'&&
+    (devHost==='127.0.0.1'||devHost==='localhost'||devHost==='::1')){
+    app.post<{Params:{id:string}}>('/api/characters/:id/dev/reset-welcome',async(request,reply)=>{
+      const session=await resolveSession(request.headers);
+      if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+      if(!CHARACTER_UUID.test(request.params.id))return reply.code(404).send({error:'not_found'});
+      const origin=request.headers.origin;
+      if(origin&&origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
+        return reply.code(403).send({error:'invalid_origin'});
+      if(!request.headers['content-type']?.toLowerCase().startsWith('application/json'))
+        return reply.code(415).send({error:'json_required'});
+      if(!request.body||typeof request.body!=='object'||Array.isArray(request.body)||
+          Object.keys(request.body).length!==0)
+        return reply.code(400).send({error:'invalid_body'});
+      const changed=await pool.query(
+        'UPDATE player_characters SET welcome_seen_at=NULL WHERE id=$1 AND account_id=$2 RETURNING id',
+        [request.params.id,session.user.id]
+      );
+      if(!changed.rowCount)return reply.code(404).send({error:'not_found'});
+      return {welcomeSeen:false};
+    });
+  }
 
   app.post('/api/characters', async (request, reply) => {
     const session = await resolveSession(request.headers);
