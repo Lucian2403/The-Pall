@@ -276,13 +276,13 @@ test('Flint only rarely chooses Guard even when faced with aggressive play',()=>
  assert.ok(guards/commits<.15,`Flint guard share ${(guards/commits).toFixed(3)} is too high`);
 });
 
-test('Stage 6 strike starts at 10 Stamina, third consecutive attack costs 13',()=>{
+test('Stage 6 strike costs exactly 10 Stamina even after repeated attacks',()=>{
  let s=newEncounter('flint',{seed:21,player:{hp:240,hpMax:240,ceiling:240},enemy:{hp:250,hpMax:250,ceiling:250,weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
  for(let n=0;n<3;n++)s=act(s,{type:'attack',zone:'torso'},`pressure-${n}`);
- assert.equal(s.player.stamina,90-10-10-13);
+ assert.equal(s.player.stamina,90-10-10-10);
  assert.deepEqual(s.lastPlayerActions.slice(-3),['attack','attack','attack']);
 });
-test('v0.5 repeated attacks expose stance for NPC, but a different action resets the surcharge',()=>{
+test('Repeated attacks expose stance; switching actions resets the consecutive streak',()=>{
  let s=newEncounter('flint',{seed:21,player:{hp:240,hpMax:240,ceiling:240},enemy:{hp:250,hpMax:250,ceiling:250,weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
  s=act(s,{type:'attack'},'r1');s=act(s,{type:'attack'},'r2');
  assert.equal(s.openings.enemy.reason,'your repeated attacks leave your stance open');
@@ -306,7 +306,7 @@ test('v0.5 combat server publishes numerical, state-aware action descriptions',a
   const store=createStore(dir,{seedGenerator:()=>21});const {encounter,token}=await store.create('flint');
   assert.equal(encounter.rules.attack.cost,10);
   assert.deepEqual(encounter.rules.attack.accuracy,{torso:70,limbs:55,head:40});
-  assert.equal(encounter.rules.guard.mitigationPercent,60);
+  assert.deepEqual(encounter.rules.guard.mitigationPercent,{min:30,max:60});
   assert.equal(encounter.rules.attack.minDamage,4);
   assert.equal(encounter.rules.attack.maxDamage,8);
   assert.equal(encounter.rules.technique.momentumCost,20);
