@@ -20,7 +20,8 @@
   const ended = $derived(snapshot.status === 'finished');
   const flintDefeated = $derived(ended && snapshot.outcome === 'player_victory');
 
-  let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'>('guard');
+  let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'|'focus'>('guard');
+  let detailsOpen=$state(false);
   let zone = $state<'head'|'torso'|'limbs'>('torso');
   let destination = $state<'side'|'close'|'cover'|'back'>('side');
   let reserve = $state<'breath'|'nerves'>('breath');
@@ -58,7 +59,7 @@
   const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-6));
   const actionName = $derived({
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
-    recover: 'Recover', technique: 'Press Advantage'
+    recover: 'Recover', technique: 'Press Advantage',focus:'Focused Stance'
   }[visibleSelection]);
   const targetZones=['torso','limbs','head'] as const;
   const selectedDamage=$derived(visibleSelection==='technique'
@@ -87,20 +88,35 @@
   const iconBase = '/ui-kit/combat-actions/';
   const displayedResources=[
     {key:'stamina',label:'Stamina'},
+    {key:'composure',label:'Composure'},
     {key:'fatigue',label:'Fatigue'},
     {key:'momentum',label:'Momentum'}
   ] as const;
   const actionChoices = [
-    {id:'attack',label:'Attack',asset:'strike.webp'},
-    {id:'guard',label:'Guard',asset:'guard.webp'},
-    {id:'move',label:'Reposition',asset:'reposition.webp'},
-    {id:'recover',label:'Recover',asset:'recover.webp'},
-    {id:'technique',label:'Press Advantage',asset:'press-advantage.webp'}
+    {id:'attack',label:'Attack',short:'Attack',asset:'strike.webp'},
+    {id:'guard',label:'Guard',short:'Guard',asset:'guard.webp'},
+    {id:'move',label:'Reposition',short:'Move',asset:'reposition.webp'},
+    {id:'recover',label:'Recover',short:'Rest',asset:'recover.webp'},
+    {id:'technique',label:'Press Advantage',short:'Press',asset:'press-advantage.webp'},
+    {id:'focus',label:'Focused Stance',short:'Focus',asset:null}
   ] as const;
-  const selectedAsset = $derived(actionChoices.find(choice => choice.id === visibleSelection)?.asset ?? 'guard.webp');
+  const selectedAsset=$derived(actionChoices.find(choice=>choice.id===visibleSelection)?.asset??null);
+  const focusedTurns=$derived(snapshot.rules.focus?.remaining??0);
 
   function available(action: (typeof actionChoices)[number]['id']): boolean {
     return snapshot.legalActions.includes(action);
+  }
+  function handleHotbarKey(event:KeyboardEvent):void{
+    if(ended||pending||event.altKey||event.ctrlKey||event.metaKey||event.repeat||
+       fatigueInfoDialog?.open)return;
+    if(!/^[1-6]$/.test(event.key))return;
+    const target=event.target;
+    if(target instanceof HTMLElement &&
+      target.closest('input,select,textarea,[contenteditable="true"],dialog'))return;
+    const choice=actionChoices[Number(event.key)-1];
+    if(!choice)return;
+    event.preventDefault();
+    selected=choice.id;
   }
   function healthWidth(current: number, maximum: number): string {
     return `${Math.max(0, Math.min(100, Math.round(current / Math.max(1, maximum) * 100)))}%`;
@@ -119,10 +135,13 @@
       case 'move': action = {type:'move',to:destination}; break;
       case 'recover': action = {type:'recover',mode:reserve}; break;
       case 'technique': action = {type:'technique',zone}; break;
+      case 'focus': action = {type:'focus'}; break;
     }
     void perform(action);
   }
 </script>
+
+<svelte:window onkeydown={handleHotbarKey} />
 
 {#snippet combatant(actor: CombatActorView, title: string, opponent: boolean)}
   <div class="fighter" class:opponent>
@@ -162,7 +181,9 @@
     <details class="secondary-stats">
       <summary>More condition details</summary>
       <dl>
-        <div><dt>Composure</dt><dd>{actor.composure}</dd></div>
+        {#if (actor.focusedTurnsRemaining??0)>0}
+          <div><dt>Focused Stance</dt><dd>{actor.focusedTurnsRemaining} turns</dd></div>
+        {/if}
         <div><dt>Wounds</dt><dd>{actor.wounds.length}</dd></div>
         {#if actor.bleed > 0}<div><dt>Bleeding</dt><dd>{actor.bleed}</dd></div>{/if}
         {#if actor.ceiling < actor.hpMax}
@@ -218,16 +239,24 @@
       <section class="action-zone" aria-label="Combat decisions">
         <div class="actions-row">
           <div class="choices" role="group" aria-label="Choose a combat action">
-            {#each actionChoices as choice (choice.id)}
-              <button class="action-tile" class:chosen={visibleSelection === choice.id}
+            {#each actionChoices as choice, i (choice.id)}
+              <button class="action-tile" class:chosen={visibleSelection===choice.id}
                 class:unavailable={!available(choice.id)}
                 type="button" disabled={pending} aria-disabled={!available(choice.id)}
-                aria-pressed={visibleSelection === choice.id}
+                aria-pressed={visibleSelection===choice.id}
                 aria-label={`Select ${choice.label} action`}
-                title={available(choice.id) ? choice.label : choice.label + ' unavailable'}
-                onclick={() => selected = choice.id}>
-                <img src={iconBase + choice.asset} alt="" width="58" height="58" decoding="async" />
-                <span class="action-name">{choice.label}</span>
+                title={(i+1)+': '+(available(choice.id)?choice.label:choice.label+' unavailable')}
+                onclick={()=>selected=choice.id}>
+                <span class="hotkey" aria-hidden="true">{i+1}</span>
+                {#if choice.asset}
+                  <img src={iconBase+choice.asset} alt="" width="32" height="32" decoding="async" />
+                {:else}
+                  <span class="focus-symbol" aria-hidden="true">◎</span>
+                {/if}
+                <span class="action-name">{choice.short}</span>
+                {#if choice.id==='focus'&&focusedTurns>0}
+                  <span class="focus-timer" aria-label={`Focused Stance: ${focusedTurns} turns remaining`}>{focusedTurns}</span>
+                {/if}
               </button>
             {/each}
           </div>
@@ -235,16 +264,26 @@
             <button class="commit" type="button" data-pall-sfx="none"
               disabled={pending || !available(visibleSelection)} onclick={commit}
               aria-label={`Confirm ${actionName} action`}>
-              <img src={iconBase + 'confirm-action.webp'} alt="" width="41" height="41" />
-              <span>{pending ? 'Resolving…' : 'Confirm action'}</span>
+              <img src={iconBase+'confirm-action.webp'} alt="" width="26" height="26" />
+              <span>{pending?'Wait':'Confirm'}</span>
+            </button>
+            <button type="button" class="details-toggle"
+              aria-expanded={detailsOpen} aria-controls="combat-action-detail-panel"
+              onclick={()=>detailsOpen=!detailsOpen}>
+              {detailsOpen?'Hide details':'Details'}
             </button>
           </div>
         </div>
 
-        <div class="action-details" aria-label="Selected combat action details">
+        {#if detailsOpen}
+        <div class="action-details" id="combat-action-detail-panel" aria-label="Selected combat action details">
           <div class="chosen-heading">
             <div class="heading-title">
-              <img src={iconBase + selectedAsset} width="24" height="24" alt="" />
+              {#if selectedAsset}
+                <img src={iconBase + selectedAsset} width="24" height="24" alt="" />
+              {:else}
+                <span class="focus-heading-symbol" aria-hidden="true">◎</span>
+              {/if}
               <strong>{actionName}</strong>
             </div>
             {#if visibleSelection==='attack'||visibleSelection==='technique'}
@@ -258,6 +297,9 @@
                 ?'At 100 Fatigue, only Recover is possible.'
                 :snapshot.player.fatigue>=snapshot.rules.fatigue.limitedAt
                 ?'At 70 Fatigue, only Reposition and Recover remain available.'
+                :visibleSelection==='focus'
+                ?focusedTurns>0?'Focused Stance is already active for '+focusedTurns+' turns.'
+                  :'Requires '+(snapshot.rules.focus?.cost??10)+' Composure.'
                 :visibleSelection==='technique'
                 ?'Requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum (currently '+snapshot.player.momentum+').'
                 :visibleSelection==='attack'
@@ -266,6 +308,14 @@
             </p>
           {/if}
           {#if visibleSelection==='attack'||visibleSelection==='technique'}
+            <div class="stat-line attack-cost">
+              <span><b>Cost:</b> {visibleSelection==='attack'
+                ?snapshot.rules.strikeCost:15} Stamina{visibleSelection==='technique'
+                  ?' + '+snapshot.rules.techniqueMomentum+' Momentum':''}</span>
+              {#if openingBonus>0}
+                <span class="opening-stat"><b>Opening:</b> +{openingBonus} damage</span>
+              {/if}
+            </div>
             <div class="target-list" role="group" aria-label="Choose the body part to target">
               {#each targetZones as target (target)}
                 <button type="button" class="target-line" class:selected-target={zone===target}
@@ -279,7 +329,6 @@
                       ?snapshot.rules.strikeByZone[target].max
                       :snapshot.rules.techniqueByZone[target].max}</span>
                   {#if openingBonus>0}
-                    <span class="opening-stat"><b>Opening:</b> +{openingBonus}</span>
                     <span class="potential-stat"><b>Total:</b>
                       {visibleSelection==='attack'
                         ?snapshot.rules.strikeByZone[target].min+openingBonus
@@ -287,27 +336,18 @@
                         ?snapshot.rules.strikeByZone[target].max+openingBonus
                         :snapshot.rules.techniqueByZone[target].max+openingBonus}</span>
                   {/if}
-                  <span><b>Cost:</b> {visibleSelection==='attack'?snapshot.rules.strikeCost:15} Stamina{visibleSelection==='technique'?' + '+snapshot.rules.techniqueMomentum+' Momentum':''}</span>
                 </button>
               {/each}
             </div>
             {#if visibleSelection==='attack'}
-              <p class="action-explanation">Strike the selected body part. Repeated Arms hits impair
-                attack accuracy and speed. Head hits deal more damage but are harder to land.
-                A damaging hit grants +10 Momentum. Base Damage is before an Opening bonus
-                or the opponent's Guard. Accuracy includes the current Fatigue penalty.</p>
+              <p class="action-explanation">Strike a body part. Arms hits impair attacks;
+                Head hits harder but is less accurate. Damaging hits grant +10 Momentum.</p>
             {:else}
-              <p class="action-explanation">A powerful strike that deals increased damage.
-                Requires {snapshot.rules.techniqueMomentum} Momentum.
-                Accuracy and damage depend on the selected body part.
-                {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}
-                Base Damage excludes the separate Opening bonus and enemy Guard.
-                Accuracy includes the current Fatigue penalty.</p>
+              <p class="action-explanation">A heavier strike. Damage and accuracy
+                depend on the targeted body part.</p>
             {/if}
             {#if snapshot.rules.openingReason}
-              <p class="detail-note">Opening: {snapshot.rules.openingReason}.
-                Shown accuracy includes its accuracy bonus; the damage rows show
-                base damage, bonus and total separately.</p>
+              <p class="detail-note">Opening: {snapshot.rules.openingReason}.</p>
             {/if}
           {:else if visibleSelection==='guard'}
             <div class="stat-line">
@@ -318,6 +358,22 @@
             <p class="action-explanation">Reduce damage from incoming attacks.
               Does not prevent all damage. Guard reduction is rolled within the shown range for every landed blow. A successful block may create an opening
               and grant +8 Momentum.</p>
+          {:else if visibleSelection==='focus'}
+            <div class="stat-line">
+              <span><b>Composure:</b> −{snapshot.rules.focus?.cost??10}</span>
+              <span><b>Accuracy:</b> +{snapshot.rules.focus?.accuracyBonusPercent??10} percentage points</span>
+              <span><b>Duration:</b> {snapshot.rules.focus?.duration??3} subsequent turns</span>
+              <span><b>Activation:</b> 1 Turn</span>
+            </div>
+            <p class="action-explanation">
+              Steady your breathing and focus on your timing. Your attacks are
+              more accurate for three turns, including misses and special attacks.
+              Damage does not increase. Focused Stance does not stack or protect
+              you while preparing; Flint may still strike normally.
+            </p>
+            {#if focusedTurns>0}
+              <p class="detail-note">Focused Stance active: {focusedTurns} turns remaining.</p>
+            {/if}
           {:else if visibleSelection==='move'}
             <div class="stat-line">
               <span><b>Cost:</b> {snapshot.rules.moveCost} Stamina</span>
@@ -377,6 +433,7 @@
             {/if}
           {/if}
         </div>
+        {/if}
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
       </section>
     {/if}
@@ -552,40 +609,54 @@
   .fatigue-info-summary{margin-bottom:0!important;padding-top:12px;
     border-top:1px solid #aa8561}
   .fatigue-info-summary span{margin:0 5px;color:#805d3c}
-  .action-zone{position:absolute;right:2.2%;bottom:22px;z-index:4;display:grid;gap:7px;
-    min-width:0;width:min(69%,1090px)}
-  .actions-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(145px,19%);
-    align-items:center;gap:10px;min-width:0}
-  .choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;min-width:0}
-  .action-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
-    min-width:0;min-height:69px;padding:2px 3px 3px;background:transparent;color:#2e1d11;
-    border:solid transparent;border-width:10px 12px 9px;
-    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
-    border-image-slice:145 190 125 190 fill;
-    border-image-width:10px 12px 9px;border-image-repeat:stretch;
-    cursor:pointer;transition:filter .15s ease,transform .15s ease}
-  .action-tile img{width:clamp(27px,2.5vw,38px);height:clamp(27px,2.5vw,38px);
-    object-fit:contain;filter:brightness(.63) sepia(.25);pointer-events:none}
-  .action-tile .action-name{font:700 clamp(10px,.8vw,12px)/1.15 var(--pall-font-reading,Georgia,serif);
-    color:#312116;opacity:.76;text-align:center}
-  .action-tile.chosen{filter:brightness(1.08) drop-shadow(0 0 4px #dca25b);transform:translateY(-1px)}
-  .action-tile.chosen .action-name{opacity:1;color:#2d190c}
-  .action-tile.unavailable:not(.chosen){opacity:.62;filter:saturate(.65)}
-  .action-tile.unavailable.chosen{box-shadow:inset 0 0 0 2px #8f5944}
-  .action-tile:hover:not(:disabled),.commit:hover:not(:disabled){filter:brightness(1.12)}
-  .action-tile:disabled,.commit:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.55)}
-  .confirm-holder{border-left:1px solid #9f805e;padding-left:10px;min-width:0}
-  .commit{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;min-height:61px;
-    padding:2px 5px;background:transparent;color:#2b1b0f;cursor:pointer;
-    border:solid transparent;border-width:10px 12px 9px;
-    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
-    border-image-slice:145 190 125 190 fill;
-    border-image-width:10px 12px 9px;border-image-repeat:stretch;
-    font:700 clamp(11px,.93vw,14px)/1.2 Georgia,serif}
-  .commit img{width:clamp(24px,2.1vw,33px);height:clamp(24px,2.1vw,33px);
-    object-fit:contain;filter:brightness(.6) sepia(.2)}
-  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:7px;
-    box-sizing:border-box;min-height:115px;width:min(100%,850px);margin:0 auto;padding:8px 15px;
+  /* Compact six-slot MMO hotbar: no large framed cards unless details are requested. */
+  .action-zone{position:absolute;right:2.2%;bottom:16px;z-index:4;
+    display:grid;justify-items:end;gap:5px;min-width:0;width:min(74%,790px)}
+  .actions-row{display:flex;justify-content:flex-end;align-items:stretch;gap:7px;
+    box-sizing:border-box;width:max-content;max-width:100%;margin:0 0 0 auto;
+    padding:5px;background:#1d1815ed;border:1px solid #9c7649;
+    border-radius:5px;box-shadow:0 3px 16px #000b}
+  .choices{display:grid;grid-template-columns:repeat(6,minmax(0,54px));gap:4px;min-width:0}
+  .action-tile{position:relative;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:0;box-sizing:border-box;
+    width:54px;height:57px;min-width:0;padding:6px 2px 2px;
+    background:linear-gradient(#403026,#201b18);color:#f2dbb2;
+    border:2px solid #7a5e40;border-radius:3px;
+    cursor:pointer;transition:border-color .12s ease,background .12s ease}
+  .action-tile img{width:30px;height:30px;object-fit:contain;
+    filter:sepia(.35) brightness(1.3);pointer-events:none}
+  .action-tile .action-name{font:700 9px/1.12 Georgia,serif;color:#f3dcad;
+    text-align:center;white-space:nowrap}
+  .action-tile .hotkey{position:absolute;top:1px;left:3px;color:#ccad7c;
+    font:700 9px/1 Arial,sans-serif}
+  .action-tile .focus-symbol{display:grid;place-items:center;width:30px;height:30px;
+    font:700 33px/1 Georgia,serif;color:#e9d9ad;text-shadow:0 0 7px #cba35f}
+  .action-tile .focus-timer{position:absolute;top:1px;right:3px;min-width:13px;
+    color:#fff2d1;background:#695123;border:1px solid #c4a064;border-radius:2px;
+    font:700 10px/1.2 Arial,sans-serif}
+  .action-tile.chosen{border-color:#f0c77f;box-shadow:inset 0 0 0 1px #d2ac64,
+    0 0 7px #e7b45885;background:linear-gradient(#5b422a,#30251b)}
+  .action-tile.unavailable:not(.chosen){opacity:.42;filter:saturate(.55)}
+  .action-tile.unavailable.chosen{border-color:#b76b51}
+  .action-tile:hover:not(:disabled),.commit:hover:not(:disabled){border-color:#e9c68d}
+  .action-tile:disabled,.commit:disabled{opacity:.4;cursor:not-allowed}
+  .confirm-holder{display:flex;flex-direction:column;gap:3px;flex:none;
+    width:74px;min-width:0;padding:0 0 0 6px;border-left:1px solid #856448}
+  .commit{display:flex;align-items:center;justify-content:center;gap:3px;
+    box-sizing:border-box;width:100%;height:36px;min-height:0;padding:2px 4px;
+    color:#f5dfb4;background:linear-gradient(#5d472a,#3b2b1b);
+    border:1px solid #b38d52;border-radius:3px;cursor:pointer;
+    font:700 10px/1 Georgia,serif}
+  .commit img{width:21px;height:21px;object-fit:contain;
+    filter:brightness(1.5) sepia(.25)}
+  .details-toggle{width:100%;min-height:18px;padding:1px 3px;
+    color:#dec49d;background:#2d241e;border:1px solid #7c6349;
+    border-radius:2px;cursor:pointer;font:700 10px/1.1 Georgia,serif}
+  .details-toggle:hover{background:#4a3629}
+  .focus-heading-symbol{font:700 27px/1 Georgia,serif;color:#6d4b20}
+  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4px;
+    box-sizing:border-box;min-height:0;
+    width:min(100%,680px);margin:0 0 0 auto;padding:8px 15px;
     background:transparent;color:#352417;border:solid transparent;border-width:10px 14px 9px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
@@ -594,14 +665,14 @@
     padding:0 0 5px;border-bottom:1px solid #b18f69;font:700 18px/1.2 Georgia,serif}
   .heading-title{display:flex;align-items:center;gap:8px}
   .chosen-heading .weapon-icon{width:39px;height:39px;object-fit:contain;filter:none}
-  .target-list{display:grid;gap:3px}
-  .target-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;
-    text-align:left;padding:5px 8px;border:1px solid transparent;background:transparent;
+  .target-list{display:grid;gap:1px}
+  .target-line{display:flex;align-items:center;gap:6px 9px;flex-wrap:wrap;width:100%;
+    text-align:left;padding:4px 6px;border:1px solid transparent;background:transparent;
     color:#382318;cursor:pointer;font:600 12px/1.35 Georgia,serif}
   .target-line span{white-space:nowrap}
   .target-line span+span{padding-left:9px;border-left:1px solid #b69a77}
   .target-line b,.stat-line b{font-weight:700}
-  .target-line .opening-stat{color:#70441e;font-weight:700}
+  .attack-cost .opening-stat{color:#70441e;font-weight:700}
   .target-line .potential-stat{color:#493013;font-weight:700}
   .target-line.selected-target{background:#ecd4a5;border-color:#b68b55;border-radius:3px}
   .target-line:hover:not(:disabled){background:#f6e5c6}
@@ -621,7 +692,8 @@
   .action-unavailable{color:#842a21;font-weight:700}
   .error{margin:0;padding:8px 12px;background:#29140fef;border:1px solid #b45d4a;
     color:#ffc6ae;font:13px/1.45 Arial,sans-serif;text-align:center}
-  .action-tile:focus-visible,.commit:focus-visible,.chronicle button:focus-visible,
+  .action-tile:focus-visible,.commit:focus-visible,.details-toggle:focus-visible,
+  .chronicle button:focus-visible,
   .detail-field select:focus-visible,.secondary-stats summary:focus-visible{
     outline:2px solid #ffda9d;outline-offset:3px}
 
@@ -638,11 +710,11 @@
     border-radius:2px;margin:10px 0}
   .hp-fill{display:block;height:100%;background:linear-gradient(90deg,#b89558,#f4d397);transition:width .2s ease}
   .hp-fill.critical,.opponent .hp-fill{background:linear-gradient(90deg,#783326,#bd4a2e)}
-  .resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:8px}
+  .resources{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;gap:6px}
   .resource{min-width:0}
   .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   .resource-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;min-width:0}
-  .resource-top dt{color:#d3b182;font:12px/1.25 Georgia,serif}
+  .resource-top dt{color:#d3b182;font:11px/1.25 Georgia,serif}
   .resource-label{display:flex;align-items:center;gap:5px;min-width:0}
   .fatigue-info-trigger{display:inline-grid;place-items:center;flex:none;
     box-sizing:border-box;width:19px;height:19px;padding:0;border:1px solid #bfa478;
@@ -650,12 +722,13 @@
     font:italic 700 12px/1 Georgia,serif;cursor:pointer}
   .fatigue-info-trigger:hover:not(:disabled){background:#60412a;color:#fff0cf}
   .fatigue-info-trigger:disabled{opacity:.4;cursor:not-allowed}
-  .resource-top dd{margin:0;color:#eed2a5;font:700 15px/1.25 Georgia,serif;
+  .resource-top dd{margin:0;color:#eed2a5;font:700 14px/1.25 Georgia,serif;
     font-variant-numeric:tabular-nums}
   .mini-track{display:block;height:7px;margin-top:6px;background:#0d0c0b;
     border:1px solid #967049;border-radius:3px;overflow:hidden}
   .mini-fill{display:block;height:100%;transition:width .2s ease}
   .mini-fill.stamina{background:linear-gradient(90deg,#326343,#71a67c)}
+  .mini-fill.composure{background:linear-gradient(90deg,#466580,#8aafc8)}
   .mini-fill.fatigue{background:linear-gradient(90deg,#8e542b,#d59a52)}
   .mini-fill.momentum{background:linear-gradient(90deg,#8b733d,#e6cb7c)}
   .secondary-stats{margin-top:11px;border-top:1px solid #4f3e31;padding-top:6px}
@@ -726,9 +799,8 @@
 
   @media(max-width:1220px){
     .enemy-status{left:29%;width:27%;min-width:230px}
-    .action-zone{right:1.7%;width:72%}
-    .choices{gap:4px}
-    .resources{grid-template-columns:1fr}
+    .action-zone{right:1.7%;width:77%}
+    .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .resource{padding-left:0}
     .resource+.resource{border-left:0;padding-left:0}
   }
@@ -740,10 +812,11 @@
     .cart-marker{top:68%}
     .enemy-status{position:relative;left:auto;top:auto;width:auto;min-width:0;margin:0 12px 8px}
     .action-zone{position:relative;left:auto;right:auto;bottom:auto;width:auto;
-      padding:12px 13px 17px;background:#211b17ef}
-    .actions-row{grid-template-columns:minmax(0,1fr) 160px}
+      justify-items:center;padding:9px 10px;background:#211b17ef}
+    .actions-row{margin:0 auto}
+    .action-details{margin:0 auto}
     .combat-console{grid-template-columns:1fr}
-    .resources{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .resources{grid-template-columns:repeat(4,minmax(0,1fr))}
     .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   }
   @media(max-width:640px){
@@ -753,24 +826,26 @@
       border-width:15px 18px 14px;border-image-width:15px 18px 14px}
     .parchment .intent{font-size:14px}
     .cart-marker{display:none}
-    .actions-row{grid-template-columns:1fr}
-    .choices{gap:5px}
-    .action-tile{min-height:59px;border-width:7px 8px;padding:2px;
-      border-image-width:7px 8px}
-    .action-tile img{width:29px;height:29px}
-    .action-tile .action-name{font-size:10px}
-    .confirm-holder{padding:8px 0 0;border-left:0;border-top:1px solid #816748}
-    .commit{min-height:48px}
+    .actions-row{width:100%;flex-wrap:wrap;justify-content:center}
+    .choices{width:100%;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+    .action-tile{width:100%;height:53px;padding:5px 1px 1px}
+    .action-tile img{width:27px;height:27px}
+    .action-tile .focus-symbol{font-size:29px;height:27px}
+    .action-tile .action-name{font-size:8px}
+    .confirm-holder{display:flex;flex-direction:row;align-items:stretch;width:100%;
+      padding:4px 0 0;border-left:0;border-top:1px solid #816748}
+    .commit{width:60%;height:31px}
+    .details-toggle{width:40%;min-height:31px}
     .action-details{width:100%;justify-content:flex-start}
     .detail-options{align-items:flex-start}
     .detail-options .detail-text+.detail-text{border:0;padding:0}
     .target-line span+span{border:0;padding:0}
     .stat-line span+span{border:0;padding:0}
-    .action-details{width:100%}
     .combat-console{padding:9px;gap:9px}
+    .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .resource:nth-child(3){border-left:0;padding-left:0}
   }
   @media(max-width:370px){
-    .choices{grid-template-columns:repeat(3,minmax(0,1fr))}
     .resources{grid-template-columns:1fr}
     .resource+.resource{border-left:0;padding-left:0}
   }

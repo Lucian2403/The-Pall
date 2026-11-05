@@ -104,11 +104,11 @@ for(const [asset,action] of Object.entries(assets)){
 }
 const confirm=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/confirm-action.webp'));
 assert.equal(confirm.toString('ascii',8,12),'WEBP','Confirm action icon missing');
-assert.ok(scene.includes("iconBase + 'confirm-action.webp'")&&
-  scene.includes('aria-pressed={visibleSelection === choice.id}')&&
+assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
+  scene.includes('aria-pressed={visibleSelection===choice.id}')&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
-  scene.includes('opacity:.76')&&
+  scene.includes('.action-tile.chosen{border-color:#f0c77f')&&
   scene.includes('snapshot.events.slice(-6)')&&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
@@ -206,9 +206,31 @@ assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus?
   scene.includes('<b>Opening:</b> +{openingBonus}') &&
   scene.includes('class="potential-stat"') &&
   scene.includes('<b>Total:</b>') &&
-  scene.includes('Base Damage is before an Opening bonus') &&
-  scene.includes('base damage, bonus and total separately'),
+  scene.includes('class="stat-line attack-cost"') &&
+  scene.includes('class="recover-tiers"') &&
+  scene.includes('<p class="detail-note">Opening: {snapshot.rules.openingReason}.') &&
+  scene.includes('Damage and accuracy') &&
+  !scene.includes('Base Damage is before an Opening bonus'),
   'Opening math must be visible before the action and preserved in exact combat history');
+// Readability: attacks show the cost and Opening once, with compact zone
+// rows; no nested scroll on the action inspector. Composure is always visible.
+assert.ok(scene.includes('<div class="stat-line attack-cost">') &&
+  scene.includes('<span class="opening-stat"><b>Opening:</b> +{openingBonus} damage</span>') &&
+  scene.includes('Arms hits impair attacks;') &&
+  scene.includes('Head hits harder but is less accurate.') &&
+  scene.includes('class="potential-stat"') &&
+  scene.includes('role="group" aria-label="Choose the body part to target"') &&
+  !scene.includes('max-height:320px;overflow-y:auto') &&
+  !scene.includes('Accuracy includes the current Fatigue penalty.') &&
+  engine.includes('const raw=rolled+openingDamageBonus;'),
+  'Condensed attack card must preserve source damage math and all target options');
+assert.ok(engine.includes('const nearDefeat=enemyCondition<=.30') &&
+  engine.includes('const wornDown=enemyCondition<=.40 && e.stamina<=20') &&
+  engine.includes('e.hp<p.hp && e.stamina<p.stamina') &&
+  engine.includes('if(!nearDefeat&&!wornDown)return false') &&
+  engine.includes("const odds=nearDefeat?.72:s.scene==='silas'?.26:.16"),
+  'Early enemy retreats must require severe injury or genuine exhaustion');
+
 // The owner-approved Fatigue system must remain symmetric: only the actual
 // engine owns changes, while the API projects the same accuracy and legal turns.
 for(const expected of [
@@ -307,10 +329,53 @@ assert.ok(scene.includes("dialogue-frame-trim.png") &&
   scene.includes('class="cart-marker scene-label"') &&
   scene.includes('class="scene-label flint-label"') &&
   scene.includes('border-image-slice:145 190 125 190 fill') &&
-  scene.includes('min-height:69px') &&
+  scene.includes('grid-template-columns:repeat(6,minmax(0,54px))') &&
   !scene.includes('        <p class="kicker">THE PASSAGE · STAGE 6</p>'),
   'The combat parchment, compact action tiles and NPC labels must use the trimmed frame');
 
+
+// Focused Stance is a real server-owned action, not a cosmetically clickable
+// shortcut. Compact mode keeps its 6 slots visible and full details optional.
+for(const expected of [
+  'focusedStanceComposureCost:10','focusedStanceAccuracyBonus:.10',
+  'focusedStanceDuration:3','export function focusedStanceTurns',
+  "if(a.type==='focus')",
+  "case 'focus': {",
+  'x.composure-=TEST_CONFIG.focusedStanceComposureCost',
+  'x.focusedUntilRound=s.round+TEST_CONFIG.focusedStanceDuration',
+  'focusedBonus=focusedStanceTurns(s,who)>0'
+])assert.ok(engine.includes(expected),'Focused Stance must be real and expire after three turns: '+expected);
+assert.ok(api.includes("case 'guard':case 'focus':") &&
+  api.includes("['damage','miss','guard','move','recovery','technique','focus']") &&
+  view.includes("...(focusCanBeUsed?['focus']:[])") &&
+  view.includes('focusedStanceTurns(state') &&
+  view.includes('focusedStanceAccuracyBonus:0') &&
+  view.includes('focus:{cost:TEST_CONFIG.focusedStanceComposureCost') &&
+  model.includes('focusedTurnsRemaining?:number') &&
+  model.includes('focus?:{cost:number;accuracyBonusPercent:number;duration:number;remaining:number}') &&
+  chronicle.includes("event.actionType==='focus'"),
+  'Focused Stance must be persisted, projected and visible in Chronicle');
+assert.ok(scene.includes("id:'focus',label:'Focused Stance'") &&
+  scene.includes("case 'focus': action = {type:'focus'};") &&
+  scene.includes("let detailsOpen=$state(false)") &&
+  scene.includes("class=\"details-toggle\"") &&
+  scene.includes('aria-expanded={detailsOpen}') &&
+  scene.includes("{#if detailsOpen}") &&
+  scene.includes('class="focus-timer"') &&
+  scene.includes('grid-template-columns:repeat(6,minmax(0,54px))') &&
+  scene.includes('height:57px') &&
+  scene.includes('width:min(74%,790px)') &&
+  scene.includes('<svelte:window onkeydown={handleHotbarKey} />') &&
+  scene.includes("if(!/^[1-6]$/.test(event.key))return") &&
+  scene.includes('fatigueInfoDialog?.open') &&
+  scene.includes("target.closest('input,select,textarea,[contenteditable=\"true\"],dialog')") &&
+  scene.includes('selected=choice.id;') &&
+  !scene.includes('min-height:69px') &&
+  !scene.includes("id:'feint'") &&
+  !engine.includes("case 'feint':"),
+  'Use an actual six-slot compact hotbar, with Feint explicitly not implemented');
+assert.ok(pgTest.includes("test('Focused Stance is an authenticated, replay-safe action"),
+  'Focus must have a real authenticated PostgreSQL regression');
 
 // Owner HUD: Flint beside his stats; Chronicle on the left, player on the right.
 const enemyPosition=scene.indexOf('<section class="enemy-status"');
@@ -382,8 +447,12 @@ assert.ok(page.includes('combatStamina={{current:battle.player.stamina,maximum:C
 // is clamped; the true numeric amount remains visible.
 assert.ok(scene.includes("displayedResources=[") &&
   scene.includes("{key:'stamina',label:'Stamina'}") &&
+  scene.includes("{key:'composure',label:'Composure'}") &&
   scene.includes("{key:'fatigue',label:'Fatigue'}") &&
   scene.includes("{key:'momentum',label:'Momentum'}") &&
+  scene.includes('grid-template-columns:repeat(4,minmax(0,1fr))') &&
+  scene.includes(".mini-fill.composure{background:") &&
+  !scene.includes('<div><dt>Composure</dt><dd>{actor.composure}</dd></div>') &&
   scene.includes('style:width={resourceWidth(actor[resource.key])}') &&
   scene.includes('<dd>{actor[resource.key]}</dd>') &&
   scene.includes('Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100)') &&

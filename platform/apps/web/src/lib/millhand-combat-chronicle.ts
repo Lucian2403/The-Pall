@@ -11,6 +11,7 @@ export function combatActionLabel(event:CombatEventView):string {
   const suffix=part?'-'+title(part):'';
   if(event.actionType==='attack')return 'Attack'+suffix;
   if(event.actionType==='guard')return 'Guard';
+  if(event.actionType==='focus')return 'Focused Stance';
   if(event.actionType==='move')return 'Reposition'+suffix;
   if(event.actionType==='recover'){
     return 'Recover-'+(event.actionDetail==='breath'?'Stamina':
@@ -29,6 +30,7 @@ export function combatActionLabel(event:CombatEventView):string {
     case 'tactical':return 'Opening';
     case 'momentum':return 'Momentum';
     case 'fatigue':return 'Fatigue';
+    case 'focus':return 'Focused Stance';
     case 'bleed':return 'Bleeding';
     case 'wound':return 'Wound';
     case 'outcome':return 'Result';
@@ -42,5 +44,5 @@ export function combatActionLabel(event:CombatEventView):string {
 export function isEnemyCombatAction(event:CombatEventView):boolean{
   return event.actor==='enemy'&&
     (event.actionType!==undefined||
-      ['damage','miss','guard','move','technique','recovery'].includes(event.kind));
+      ['damage','miss','guard','move','technique','recovery','focus'].includes(event.kind));
 }

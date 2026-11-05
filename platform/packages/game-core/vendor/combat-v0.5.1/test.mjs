@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,TEST_CONFIG} from './combat.mjs';
+import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,focusedStanceTurns,TEST_CONFIG} from './combat.mjs';
 const act=(s,a,id='a')=>step(s,a,{requestId:id,expectedRevision:s.revision});
 const is = (s,t) => s.events.some(e=>e.text.includes(t));
 
@@ -105,6 +105,76 @@ test('Chronicle separates base hit damage, Opening bonus and damage after Guard'
   assert.ok(normalHits>10,'Cover unguarded Opening hits');
 });
 
+test('Focused Stance costs one unguarded action and 10 Composure, with no Stamina drain',()=>{
+ const s=newEncounter('flint',{seed:1,player:{
+   hp:300,hpMax:300,ceiling:300,composure:15}});
+ const after=act(s,{type:'focus'});
+ assert.equal(s.player.composure,15,'Never mutate caller state');
+ assert.equal(after.player.composure,5);
+ assert.equal(after.player.stamina,90);
+ assert.equal(after.player.fatigue,0);
+ assert.equal(after.player.momentum,0);
+ assert.equal(focusedStanceTurns(after,'player'),3);
+ assert.equal(after.lastPlayerActions.at(-1),'focus');
+ assert.equal(after.revision,s.revision+1,'Focused Stance consumes one complete combat turn');
+ assert.ok(after.events.some(e=>e.kind==='focus'&&e.actor==='player'&&
+   e.composureCost===10&&e.accuracyBonusPercent===10&&e.duration===3));
+ const blow=after.events.find(e=>e.kind==='damage'&&e.actor==='enemy');
+ if(blow)assert.equal(blow.guarded,false,'Focused Stance never supplies Guard');
+});
+test('Focused Stance lasts three subsequent turns independent of attack attempts',()=>{
+ let s=newEncounter('flint',{seed:13,player:{
+   hp:500,hpMax:500,ceiling:500,composure:80},
+   enemy:{hp:500,hpMax:500,ceiling:500,
+     weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'focus'},'focus');
+ assert.equal(s.round,2);assert.equal(focusedStanceTurns(s),3);
+ assert.throws(()=>act(s,{type:'focus'},'stack'),/already active/);
+ const copy=JSON.parse(JSON.stringify(s));
+ assert.equal(focusedStanceTurns(copy),3,'Persisted focus survives reload');
+ s=act(copy,{type:'attack',zone:'torso'},'turn1');
+ assert.equal(focusedStanceTurns(s),2);
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,10);
+ s=act(s,{type:'guard'},'turn2');
+ assert.equal(focusedStanceTurns(s),1,'Guard still consumes one buff turn');
+ s=act(s,{type:'attack',zone:'torso'},'turn3');
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,10);
+ assert.equal(focusedStanceTurns(s),0,'Three-turn buff expires after third subsequent turn');
+ s=act(s,{type:'attack',zone:'torso'},'turn4');
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,0);
+ assert.equal(s.player.composure,70,'No Composure spent by later attacks');
+});
+test('Focused Stance cannot bypass Fatigue lock or inadequate Composure',()=>{
+ for(const composure of [0,5,9]){
+   const before=newEncounter('flint',{player:{composure}});
+   assert.throws(()=>act(before,{type:'focus'}),/Insufficient Composure/);
+   assert.equal(before.revision,0);
+ }
+ for(const fatigue of [70,99,100]){
+   const before=newEncounter('flint',{player:{composure:80,fatigue}});
+   assert.throws(()=>act(before,{type:'focus'}),/Fatigue/);
+   assert.equal(before.revision,0);
+ }
+});
+test('Focused Stance also works on NPCs through the shared action resolver',()=>{
+ const state=newEncounter('flint',{seed:5,enemy:{
+   hp:500,hpMax:500,ceiling:500,composure:25}});
+ state.intent={type:'focus',speed:2,signal:'concentrating',
+   tell:'Flint studies the distance and steadies his grip.'};
+ let s=act(state,{type:'guard'},'enemy-focus');
+ assert.equal(s.enemy.composure,15);
+ assert.equal(focusedStanceTurns(s,'enemy'),3);
+ assert.ok(s.events.some(e=>e.kind==='focus'&&e.actor==='enemy'));
+ s.intent={type:'attack',zone:'torso',speed:1,
+   signal:'committed',tell:'Flint commits to a swing.'};
+ s=act(s,{type:'guard'},'enemy-hit');
+ const strike=s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='enemy');
+ assert.equal(strike?.focusedBonusPercent,10);
+ assert.equal(focusedStanceTurns(s,'enemy'),2);
+});
 test('Stamina 1–20 adds 3 Fatigue, including the spend that reaches zero',()=>{
  const actor={hp:240,hpMax:240,ceiling:240};
  let s=newEncounter('flint',{seed:1,player:{...actor,stamina:27}});
@@ -576,6 +646,53 @@ test('human opponent at clear advantage does not surrender; same for Silas',()=>
       assert.notEqual(s.intent.type,'withdraw',`${scene} surrendered with 21 versus 6, seed ${seed}`);
     }
   }
+});
+test('Flint does not surrender at 24/50 HP with 50 Stamina despite player Momentum and openings',()=>{
+  for(let seed=1;seed<=400;seed++){
+    const initial=newEncounter('flint',{seed,
+      player:{hp:36,stamina:55,momentum:30},
+      enemy:{hp:24,stamina:50,momentum:10}});
+    assert.notEqual(initial.intent.type,'withdraw',
+      `Flint prematurely yielded at seed ${seed} while 24/50 HP, 50 Stamina`);
+    // Reproduce the reported round-five situation: sustained player attacks,
+    // an exploitable Opening and a healthy, energetic enemy.
+    const roundFive=newEncounter('flint',{seed,
+      player:{hp:120,hpMax:120,ceiling:120,stamina:55,momentum:30},
+      enemy:{hp:24,stamina:50,momentum:10}});
+    roundFive.round=5;
+    roundFive.lastPlayerActions=['attack','attack'];
+    roundFive.openings.player={expires:6,reason:'the swing runs past your guard'};
+    const next=act(roundFive,{type:'guard'},`round5-${seed}`);
+    assert.notEqual(next.intent?.type,'withdraw',
+      `Flint generated an early surrender for the next round at seed ${seed}`);
+  }
+});
+test('Healthy reserve blocks early human withdrawal until serious harm or exhaustion',()=>{
+ for(const scene of ['flint','silas']){
+   for(let seed=1;seed<=200;seed++){
+     for(const [hp,stamina] of [[24,50],[21,12],[20,50]]){
+       const state=newEncounter(scene,{seed,
+         player:{hp:45,stamina:75,momentum:50},
+         enemy:{hp,stamina}});
+       assert.notEqual(state.intent.type,'withdraw',
+         `${scene} yielded with HP=${hp}, Stamina=${stamina}, seed=${seed}`);
+     }
+   }
+ }
+});
+test('A genuinely worn down human opponent can still concede before 30% HP',()=>{
+ for(const scene of ['flint','silas']){
+   let retreats=0;
+   for(let seed=1;seed<=240;seed++){
+     const variedSeed=Math.imul(seed,2654435761)>>>0;
+     const s=newEncounter(scene,{seed:variedSeed,
+       player:{hp:43,stamina:65,momentum:25},
+       enemy:{hp:20,stamina:12}});
+     if(s.intent.type==='withdraw')retreats++;
+   }
+   assert.ok(retreats>0,`${scene} should sometimes withdraw at 40% HP and 12 Stamina`);
+   assert.ok(retreats<240,`${scene} surrender must remain probabilistic`);
+ }
 });
 test('genuine nonlethal retreat still possible when a human opponent is actually outmatched',()=>{
   for(const scene of ['flint','silas']){

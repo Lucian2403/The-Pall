@@ -1,5 +1,5 @@
 /** Public projection of the preserved v0.5.1 engine. No private enemy action is exposed. */
-import {TEST_CONFIG,testAttackCost,isUnarmedWeapon,canActAtFatigue,fatigueAccuracyPenalty} from '@the-pall/game-core/combat-v0.5.1';
+import {TEST_CONFIG,testAttackCost,isUnarmedWeapon,canActAtFatigue,fatigueAccuracyPenalty,focusedStanceTurns} from '@the-pall/game-core/combat-v0.5.1';
 import type {CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
 
 export type StageSixStance='brace'|'moving'|'cart';
@@ -8,6 +8,7 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
   const visibleActor=(a:CombatState['player'])=>({
     name:a.name,hp:a.hp,hpMax:a.hpMax,ceiling:a.ceiling,
     stamina:a.stamina,composure:a.composure,
+    focusedTurnsRemaining:focusedStanceTurns(state,a===state.player?'player':'enemy'),
     fatigue:Math.min(TEST_CONFIG.fatigueCap,Math.max(0,a.fatigue??0)),
     stress:a.stress,momentum:a.momentum,bleed:a.bleed,wounds:a.wounds,
     bandages:a.bandages,armHits:a.armHits??0,armImpaired:a.armImpaired??false,
@@ -19,9 +20,13 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     ?TEST_CONFIG.exhaustedRecoverGain:TEST_CONFIG.recoverGain;
   const recoveryFatigue=highFatigueRecovery
     ?TEST_CONFIG.exhaustedFatigueRecovery:TEST_CONFIG.fatigueRecovery;
+  const focusedTurns=focusedStanceTurns(state,'player');
+  const focusCanBeUsed=state.player.composure>=TEST_CONFIG.focusedStanceComposureCost &&
+    focusedTurns===0;
   const legalActions=state.status==='active'
     ? [...(contact?['attack']:[]),'guard','move','recover',
-        ...(contact&&state.player.momentum>=20?['technique']:[])]
+        ...(contact&&state.player.momentum>=20?['technique']:[]),
+        ...(focusCanBeUsed?['focus']:[])]
         .filter(action=>canActAtFatigue(state.player,action))
     : [];
   const telegraphIsLegal=canActAtFatigue(state.enemy,state.intent?.type);
@@ -53,7 +58,8 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
   const opening=opportunity&&opportunity.expires>=state.round?opportunity:null;
   const accuracy=(zone:'head'|'torso'|'limbs')=>Math.round(100*Math.min(.95,Math.max(.05,
     state.player.weapon.accuracy+TEST_CONFIG.aim[zone]+(opening?.accuracyBonus??0)-
-      (state.player.armImpaired?.10:0)-fatigueAccuracyPenalty(state.player)
+      (state.player.armImpaired?.10:0)-fatigueAccuracyPenalty(state.player)+
+      (focusedTurns>0?TEST_CONFIG.focusedStanceAccuracyBonus:0)
   )));
   return {
     stage:6,stance,status:state.status,outcome:state.outcome,
@@ -72,6 +78,9 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
       recoverStaminaBelow50:TEST_CONFIG.recoverGain,
       recoverStaminaFrom50:TEST_CONFIG.exhaustedRecoverGain,
       recoverComposure:TEST_CONFIG.mentalRecoverGain,techniqueMomentum:20,
+      focus:{cost:TEST_CONFIG.focusedStanceComposureCost,
+        accuracyBonusPercent:Math.round(TEST_CONFIG.focusedStanceAccuracyBonus*100),
+        duration:TEST_CONFIG.focusedStanceDuration,remaining:focusedTurns},
       fatigue:{
         cap:TEST_CONFIG.fatigueCap,
         lowStaminaThreshold:TEST_CONFIG.lowReserve,

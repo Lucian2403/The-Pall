@@ -2,6 +2,7 @@
 export type CombatActorView={
   name:string;hp:number;hpMax:number;ceiling:number;stamina:number;
   composure:number;fatigue:number;stress:number;momentum:number;bleed:number;
+  focusedTurnsRemaining?:number;
   wounds:Array<{type:string;zone?:string;severity:string}>;
   armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
 };
@@ -14,7 +15,7 @@ export type CombatEventView={
   damage?:number;
   zone?:'head'|'torso'|'limbs';
   ability?:string|null;
-  actionType?:'attack'|'guard'|'move'|'recover'|'technique';
+  actionType?:'attack'|'guard'|'move'|'recover'|'technique'|'focus';
   actionDetail?:string;
   actionName?:string;
 };
@@ -27,6 +28,7 @@ export type CombatSnapshot={
     strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
     recoverStaminaBelow50:number;recoverStaminaFrom50:number;
     recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
+    focus?:{cost:number;accuracyBonusPercent:number;duration:number;remaining:number};
     fatigue:{
       cap:number;lowStaminaThreshold:number;lowStaminaGain:number;
       exhaustedAttackGain:number;exhaustedDefenseGain:number;
