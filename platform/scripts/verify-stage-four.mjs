@@ -219,8 +219,9 @@ for(const name of [
     scene.includes('font:600 16px/1.55 var(--pall-font-reading') &&
     scene.includes('color:#24160e'),
     name+' must style journal buttons and prose with New Standard and high contrast');
-  assert.ok(scene.includes("journalOpen?'Close journal':'Review journal'"),
-    name+' must preserve the existing journal toggle interaction');
+  assert.ok(scene.includes('registerSceneJournal?.({id:') &&
+    scene.includes('void toggleJournal()'),
+    name+' must register the existing journal with the shared shell control');
 }
 const missingStampJournal=read('apps/web/src/lib/MillhandMissingStampScene.svelte');
 assert.ok(missingStampJournal.includes('font:600 15px/1.3 var(--pall-font-reading') &&

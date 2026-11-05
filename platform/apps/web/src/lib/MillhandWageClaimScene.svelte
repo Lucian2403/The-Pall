@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
   import {page} from '$app/state';
   import type {WageClaimState,WageClaimAction} from '@the-pall/game-core';
@@ -28,7 +30,7 @@
   // during a stale local API build that omits the previous_dialogue action,
   // so the user receives a clear server error instead of a dead button.
   const canGoBack=$derived(state.phase!=='APPROACHING');
-  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'].includes(state.phase));
+  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','CHOOSE_STANCE'].includes(state.phase));
   const forwardActions=$derived(snapshot.availableActions.filter(a=>a!=='previous_dialogue'));
   let flintImageMissing=$state(false);
   const cornered=$derived(
@@ -36,6 +38,12 @@
   let inspected=$state<'bill'|'club'|'cart'|null>(null);
   let inspectionNote=$state('');
   let journalOpen=$state(false);
+  // The persistent corner control is owned by TutorialShell, not this dialogue.
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    registerSceneJournal?.({id:'wage-claim-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement:HTMLElement|undefined;
 
   function inspect(which:'bill'|'club'|'cart'){
@@ -108,6 +116,9 @@
         {/if}
       {:else if approaching}
         <p class="context current-beat">{WAGE_CLAIM_WALK_HOME[state.branch]}</p>
+      {:else if state.phase==='LEAVING'}
+        <p class="speaker">You</p>
+        <p class="speech">“I'm going home.”</p>
       {:else if state.phase==='CHOOSE_STANCE'}
         <p class="context">You have to choose how to meet him. Flint is close enough to strike if you try to push past.</p>
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
@@ -155,11 +166,6 @@
       {/if}
       {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
       {#if pending}<p class="saving" role="status">Saving the conversation…</p>{/if}
-      <div class="journal-trigger">
-        <button type="button" class="journal-button" data-pall-sfx="paper"
-          aria-expanded={journalOpen} aria-controls="wage-claim-journal"
-          onclick={()=>{void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
-      </div>
     </aside>
   </div>
 

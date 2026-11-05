@@ -55,7 +55,8 @@ class MockAudio{
 const contexts=[];
 class MockAudioContext{
   constructor(){
-    this.state='suspended';this.gains=[];this.started=0;contexts.push(this);
+    this.state='suspended';this.gains=[];this.started=0;this.starts=[];
+    this.currentTime=8;contexts.push(this);
     this.destination={};
   }
   resume(){this.state='running';return Promise.resolve();}
@@ -67,7 +68,7 @@ class MockAudioContext{
   createBufferSource(){
     const ctx=this;
     return {buffer:null,connect(){},disconnect(){},addEventListener(){},
-      start(){ctx.started++;},stop(){}};
+      start(when=0,offset=0){ctx.started++;ctx.starts.push({when,offset});},stop(){}};
   }
   close(){this.state='closed';return Promise.resolve();}
 }
@@ -300,9 +301,51 @@ engine.stopDepotAmbience();
 assert.equal(depot.paused,true,'A new location stops Depot immediately.');
 assert.equal(depot.currentTime,0,'Confirmed departure resets Depot position.');
 
+// Stage 7: only the illustrated clinic may own the medical background loop.
+const releaseClinic=engine.claimMedicalClinicAmbience();
+const clinic=find('medical-clinic-ambience.mp3');
+assert.ok(clinic,'Clinic scene creates its own audio stream.');
+assert.equal(clinic.loop,true,'Medical recording must loop.');
+assert.equal(clinic.loadCount,1,'Medical recording preloads once.');
+await flush();
+assert.equal(clinic.paused,false,'Unlocked clinic starts ambience.');
+for(const other of [ambience,council,alley,depot])
+  assert.equal(other.paused,true,'Clinic ambience must never overlap another scene.');
+engine.setPallAudioSettings({ambienceVolume:.42});
+assert.equal(clinic.volume,.42,'Clinic follows the existing ambience slider.');
+document.hidden=true;
+document.dispatch('visibilitychange');
+assert.equal(clinic.paused,true,'Tab-hidden clinic must be quiet.');
+document.hidden=false;
+document.dispatch('visibilitychange');
+await flush();
+assert.equal(clinic.paused,false,'Returning to clinic tab resumes ambience.');
+engine.setPallAudioSettings({enabled:false});
+assert.equal(clinic.paused,true,'Master mute silences clinic.');
+engine.setPallAudioSettings({enabled:true});
+await flush();
+assert.equal(clinic.paused,false,'Unmuting resumes the clinic.');
+
+const startCount=contexts[0].started;
+engine.playCoinTransactionSfx();
+assert.equal(contexts[0].started,startCount+2,'One confirmed transfer pairs both samples.');
+assert.ok(contexts[0].starts.at(-1).when>contexts[0].starts.at(-2).when,
+  'Second coin sound is scheduled shortly after the first.');
+engine.setPallAudioSettings({sfxVolume:0});
+engine.playCoinTransactionSfx();
+assert.equal(contexts[0].started,startCount+2,'Muted effects do not play a transaction.');
+engine.setPallAudioSettings({sfxVolume:.5});
+releaseClinic();
+assert.equal(clinic.paused,true,'Leaving the clinic stops ambient playback immediately.');
+assert.equal(clinic.currentTime,0,'Leaving the clinic resets the ambient loop.');
+assert.equal(status().ambience,'Only in an illustrated environment');
+
 engine.setPallAudioScene(false);
+const inactiveCount=contexts[0].started;
+engine.playCoinTransactionSfx();
+assert.equal(contexts[0].started,inactiveCount,'A non-game page cannot play coin sounds.');
 assert.equal(music.paused,true,'Leaving the game must pause music.');
 detach();
 assert.equal(listeners.get('pointerdown')?.size??0,0,'Release gesture listeners.');
 assert.equal(listeners.get('keydown')?.size??0,0,'Release keyboard listeners.');
-console.log('PASS: forge, council, dark-alley and Depot loops are exclusive; stage handoffs, mute, slider, visibility and reset.');
+console.log('PASS: forge, council, alley, depot and clinic soundscapes, transaction cues, mute, slider and visibility.');

@@ -104,7 +104,16 @@ assert.match(scene,/flint-standing\.webp/);
 assert.match(scene,/class="work-dialogue"/);
 assert.match(scene,/class="workshop-object-label"/);
 assert.match(scene,/data-pall-sfx="paper"/);
-assert.match(scene,/Review journal/);
+assert.match(scene,/registerSceneJournal/);
+assert.match(shell,/Review journal/);
+assert.ok(!scene.includes('Choose your response</p>\n        {/if}\n        <div') ||
+  !scene.includes("'CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'"),
+  'LEAVING must not be rendered as a one-option response choice');
+assert.ok(scene.includes("state.phase==='LEAVING'") &&
+  scene.includes("“I'm going home.”") &&
+  copy.includes("say_going_home:'Continue'") &&
+  core.includes("dialogueIndex=action==='say_going_home'?1:0"),
+  'Scripted going-home remark uses Continue and cannot duplicate its first saved beat');
 assert.match(scene,/Your position is saved\. The encounter begins in Stage 6\./);
 assert.match(scene,/Enter the fight/);
 assert.doesNotMatch(scene,/Stage 6 combat is not yet integrated/);
@@ -175,4 +184,39 @@ assert.match(dev,/DELETE FROM player_character_wage_claim_receipts/);
 assert.match(dev,/DELETE FROM player_character_wage_claim WHERE/);
 assert.ok(packageJSON.scripts['wage-claim:migrate']);
 assert.ok(packageJSON.scripts['verify:stage-five-assets']);
+// The owner requires one invariant Review/Close location for every playable
+// scene, including non-Millhand opening preview and active Stage 6 combat.
+assert.ok(shell.includes('class="scene-journal-bar"') &&
+  shell.includes('position:sticky;top:0') &&
+  shell.includes("'Close journal':'Review journal'") &&
+  shell.includes('data-pall-sfx="paper"') &&
+  shell.includes('SCENE_JOURNAL_CONTEXT'),
+  'The persistent, accessible, parchment-styled corner journal must be in TutorialShell');
+for(const [sourcePath,recordId] of [
+  ['apps/web/src/lib/MillhandMissingStampScene.svelte','stage-three-journal'],
+  ['apps/web/src/lib/MillhandDepotScene.svelte','depot-job-journal'],
+  ['apps/web/src/lib/MillhandContractsScene.svelte','contracts-job-journal'],
+  ['apps/web/src/lib/MillhandRecordsScene.svelte','records-job-journal'],
+  ['apps/web/src/lib/MillhandWageClaimScene.svelte','wage-claim-journal'],
+  ['apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte','clinic-journal'],
+  ['apps/web/src/lib/MillhandCombatScene.svelte','combat-personal-journal']
+]){
+  const source=read(sourcePath);
+  assert.ok(source.includes("id:'"+recordId+"'") &&
+    source.includes('registerSceneJournal') &&
+    source.includes('journalOpen'),
+    sourcePath+' must connect its local entries to the shared corner toggle');
+  assert.ok(!source.includes("'Review journal'</button>") &&
+    !source.includes('class="journal-toggle journal-outside"'),
+    sourcePath+' must not leave duplicate local Review actions');
+}
+assert.ok(read('apps/web/src/routes/characters/[id]/opening/+page.svelte').includes('<TutorialShell') &&
+  read('apps/web/src/routes/characters/[id]/millhand/work/+page.svelte').includes('<TutorialShell'),
+  'The shell journal must be available from first opening and Stage 2 work');
+const combatJournal=read('apps/web/src/lib/MillhandCombatScene.svelte');
+assert.ok(combatJournal.includes('if(ended&&!completedJournalShown)') &&
+  combatJournal.includes('{#if journalOpen}') &&
+  combatJournal.includes('{#if ended}'),
+  'The active fight can show its journal without losing the completed outcome');
+
 console.log('PASS: Stage 4→5 handoff, approved Flint dialogue, durable route evidence, stance and combat boundary.');

@@ -24,7 +24,9 @@ assert.match(s,/class:seen=\{state\.plateRead\}/);
 assert.match(s,/class:seen=\{state\.slipRead\}/);
 assert.match(s,/clamp\(132px, 13vw, 180px\)/);
 assert.doesNotMatch(s,/scene-footer|Council-owned evidence\. No wages/);
-assert.ok(s.indexOf('class="journal-toggle journal-outside"')>s.indexOf('</aside>'));
+assert.ok(s.includes("registerSceneJournal?.({id:'stage-three-journal'"));
+assert.ok(!s.includes('class="journal-toggle journal-outside"'),
+  'The shell now owns the single journal control, not the local scene');
 assert.match(s,/id="stage-three-journal"/);
 assert.match(s,/continueToJob/);
 assert.match(s,/snapshot\.availableActions/);

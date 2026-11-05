@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import { tick } from "svelte";
   import type {
     MissingStampAction,
@@ -62,6 +64,12 @@
   // This never rewrites the saved Missing Stamp phase or automatically selects a route.
   let decisionStep = $state<0 | 1>(0);
   let journalOpen = $state(false);
+  // The persistent corner control is owned by TutorialShell, not this dialogue.
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    registerSceneJournal?.({id:'stage-three-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let sceneElement: HTMLDivElement | undefined;
   let journalElement: HTMLElement | undefined;
 
@@ -426,11 +434,6 @@
         >
       </button>
     </div>
-    <button type="button" class="journal-toggle journal-outside" data-pall-sfx="paper"
-      aria-expanded={journalOpen} aria-controls="stage-three-journal"
-      onclick={() => {void toggleJournal();}}>
-      {journalOpen ? "Close journal" : "Review journal"}
-    </button>
   </div>
   {#if journalOpen}
     <section

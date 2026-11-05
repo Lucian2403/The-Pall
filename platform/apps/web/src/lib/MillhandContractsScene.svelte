@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import { tick } from "svelte";
   import type { SecondJobAction, SecondJobState } from "@the-pall/game-core";
   import {
@@ -56,6 +58,12 @@
   let inspected = $state<"death" | "wage" | null>(null);
   let inspectionNote = $state<string | null>(null);
   let journalOpen = $state(false);
+  // The persistent corner control is owned by TutorialShell, not this dialogue.
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    registerSceneJournal?.({id:'contracts-job-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement: HTMLElement | undefined;
 
   // Each record must be physically selected. The existing server-owned actions
@@ -214,17 +222,6 @@
       >Council records remain at the office. No wages or inventory items are
       awarded here.</span
     >
-    <button
-      type="button"
-      class="journal-button"
-      aria-expanded={journalOpen}
-      aria-controls="contracts-job-journal"
-      onclick={() => {
-        void toggleJournal();
-      }}
-    >
-      {journalOpen ? "Close journal" : "Review journal"}
-    </button>
   </div>
 
   {#if journalOpen}

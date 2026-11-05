@@ -92,8 +92,9 @@ export function previousWageClaim(s:WageClaimState):WageClaimState{
     phase='APPROACH_EXCHANGE';dialogueIndex=WAGE_CLAIM_DIALOGUE_COUNTS.APPROACH_EXCHANGE-1;
   }else if(phase==='EVIDENCE_EXCHANGE'&&dialogueIndex===0){
     phase='CHOOSE_EVIDENCE';
-  }else if(phase==='CORNERED_EXCHANGE'&&dialogueIndex===0){
-    phase='LEAVING';
+  }else if(phase==='CORNERED_EXCHANGE'&&dialogueIndex<=1){
+    // This was a single LEAVING step, irrespective of old/new saved beat.
+    phase='LEAVING';dialogueIndex=0;
   }else if(dialogueIndex>0){
     dialogueIndex--;
   }else{
@@ -147,7 +148,10 @@ export function advanceWageClaim(s:WageClaimState,action:WageClaimAction):WageCl
         stance='cart';phase='DONE';break;
       default:throw new WageClaimInvalidAction();
     }
-    dialogueIndex=0;
+    // The LEAVING screen already displayed "I'm going home." as the
+    // player's automatic remark. Do not repeat it as another saved beat.
+    // Legacy CORNERED_EXCHANGE index 0 saves still remain valid.
+    dialogueIndex=action==='say_going_home'?1:0;
   }
   return {...s,revision:s.revision+1,phase,dialogueIndex,approach,stance,lastAction:action};
 }

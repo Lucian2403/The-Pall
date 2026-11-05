@@ -129,7 +129,7 @@ assert.ok(audio.includes("councilOfficeAmbienceFile='contracts-scholarship-ambie
   hud.includes('stopCouncilOfficeAmbience()') &&
   depotPage.includes("councilBackdrop={snapshot.state.branch==='contracts'||snapshot.state.branch==='records'}") &&
   mainLayout.includes('stopCouncilOfficeAmbience();') &&
-  settings.includes("Flint's dark alley"),
+  settings.includes("Flint's alley and the medical clinic"),
   'Contracts and Scholarship must share one backdrop-scoped indoor loop without altering the forge or music');
 const alleyPage=read('apps/web/src/routes/characters/[id]/millhand/wage-claim/+page.svelte');
 const alleyScene=read('apps/web/src/lib/MillhandWageClaimScene.svelte');

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
   import type {SecondJobAction, SecondJobState} from '@the-pall/game-core';
   import {
@@ -40,6 +42,12 @@
   const journal=$derived(secondJobJournal(state));
   let selected=$state<'plates'|'paper'|null>(null);
   let journalOpen=$state(false);
+  // The persistent corner control is owned by TutorialShell, not this dialogue.
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  $effect(()=>{
+    registerSceneJournal?.({id:'depot-job-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
   let journalElement:HTMLElement|undefined;
 
   function inspect(which:'plates'|'paper'){selected=selected===which?null:which;}
@@ -133,11 +141,6 @@
       {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
-      <div class="journal-trigger">
-        <button type="button" class="journal-button"
-          aria-expanded={journalOpen} aria-controls="depot-job-journal"
-          onclick={() => {void toggleJournal();}}>{journalOpen?'Close journal':'Review journal'}</button>
-      </div>
     </aside>
   </div>
   {#if journalOpen}

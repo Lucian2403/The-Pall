@@ -1,4 +1,6 @@
 <script lang="ts">
+  import {getContext,tick} from 'svelte';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
@@ -23,6 +25,28 @@
   let destination = $state<'side'|'close'|'cover'|'back'>('side');
   let reserve = $state<'breath'|'nerves'>('breath');
   let logOpen = $state(false);
+  let journalOpen=$state(false);
+  let journalElement:HTMLElement|undefined;
+  let completedJournalShown=$state(false);
+  async function toggleJournal(){
+    journalOpen=!journalOpen;
+    await tick();
+    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
+  }
+  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
+  // Preserve the existing automatic outcome journal once, but allow the
+  // persistent shell control to close or reopen it during/after combat.
+  $effect(()=>{
+    if(ended&&!completedJournalShown){
+      journalOpen=true;
+      completedJournalShown=true;
+    }
+  });
+  $effect(()=>{
+    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,
+      toggle:()=>{void toggleJournal();}});
+    return ()=>registerSceneJournal?.(null);
+  });
 
   const visibleSelection = $derived(snapshot.legalActions.includes(selected)
     ? selected : (canAttack ? 'attack' : 'guard'));
@@ -281,8 +305,9 @@
       {/each}
     </section>
 
-    {#if ended}
-      <section class="aftermath" aria-label="The Fight with Flint personal journal">
+    {#if journalOpen}
+      <section id="combat-personal-journal" class="aftermath"
+        bind:this={journalElement} aria-label="The Fight with Flint personal journal">
         <header class="journal-head">
           <div>
             <small>PERSONAL JOURNAL</small>
@@ -290,8 +315,12 @@
           </div>
         </header>
         <div class="journal-entries">
-          <p>Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.</p>
-          <p>{journal}</p>
+          {#if ended}
+            <p>Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.</p>
+            <p>{journal}</p>
+          {:else}
+            <p>The fight with Flint is still going on. I haven't recorded how it ends.</p>
+          {/if}
         </div>
       </section>
     {/if}

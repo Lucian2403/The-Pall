@@ -43,6 +43,7 @@ const smithingAmbienceFile='smithing-workshop-ambience.mp3';
 const councilOfficeAmbienceFile='contracts-scholarship-ambience.mp3';
 const nightAlleyAmbienceFile='night-alley-ambience.mp3';
 const depotAmbienceFile='depot-ambience.mp3';
+const medicalClinicAmbienceFile='medical-clinic-ambience.mp3';
 const FADE_IN=4;
 const FADE_OUT=5;
 const MUSIC_PAUSE_MIN_MS=30_000;
@@ -57,16 +58,19 @@ let ambience:HTMLAudioElement|null=null;
 let councilAmbience:HTMLAudioElement|null=null;
 let alleyAmbience:HTMLAudioElement|null=null;
 let depotAmbience:HTMLAudioElement|null=null;
+let clinicAmbience:HTMLAudioElement|null=null;
 let musicError=false;
 let ambienceError=false;
 let councilAmbienceError=false;
 let alleyAmbienceError=false;
 let depotAmbienceError=false;
+let clinicAmbienceError=false;
 let musicBlocked=false;
 let ambienceBlocked=false;
 let councilAmbienceBlocked=false;
 let alleyAmbienceBlocked=false;
 let depotAmbienceBlocked=false;
+let clinicAmbienceBlocked=false;
 let statusSnapshot='';
 // A workshop scene claims the soundscape for as long as its illustration
 // is visible. Ownership is independent of URL so non-workshop pages stay silent.
@@ -74,7 +78,8 @@ const smithingAmbienceOwners=new Set<symbol>();
 const councilAmbienceOwners=new Set<symbol>();
 const alleyAmbienceOwners=new Set<symbol>();
 const depotAmbienceOwners=new Set<symbol>();
-let activeAmbienceScene:'forge'|'council'|'alley'|'depot'|null=null;
+const clinicAmbienceOwners=new Set<symbol>();
+let activeAmbienceScene:'forge'|'council'|'alley'|'depot'|'clinic'|null=null;
 // SvelteKit briefly unmounts the old stage while the next stage loads.
 // Do not replay the 115-second forge recording from its beginning each time.
 const WORKSHOP_TRANSITION_GRACE_MS=2400;
@@ -90,10 +95,12 @@ let lastClickAt=0;
 // incur observable network/decode/startup latency (roughly 300–500 ms).
 // Keep the long theme streamed through HTMLAudioElement; only tiny SFX are
 // predecoded into Web Audio buffers.
+const coinSfxFiles=['ui-coins1.wav','ui-coins2.wav'] as const;
 const sfxFiles=[
   ...clickVariants.map(variant=>variant.file),
   ...paperVariants,
-  ...smithVariants
+  ...smithVariants,
+  ...coinSfxFiles
 ];
 
 // Optional Stage 6 cues are predecoded only while a combat scene is mounted.
@@ -127,13 +134,16 @@ function publishPlayback(){
   const activeTrack=activeAmbienceScene==='forge'?ambience
     :activeAmbienceScene==='council'?councilAmbience
     :activeAmbienceScene==='alley'?alleyAmbience
-    :activeAmbienceScene==='depot'?depotAmbience:null;
+    :activeAmbienceScene==='depot'?depotAmbience
+    :activeAmbienceScene==='clinic'?clinicAmbience:null;
   const activeError=activeAmbienceScene==='forge'?ambienceError
     :activeAmbienceScene==='council'?councilAmbienceError
-    :activeAmbienceScene==='depot'?depotAmbienceError:alleyAmbienceError;
+    :activeAmbienceScene==='depot'?depotAmbienceError
+    :activeAmbienceScene==='clinic'?clinicAmbienceError:alleyAmbienceError;
   const activeBlocked=activeAmbienceScene==='forge'?ambienceBlocked
     :activeAmbienceScene==='council'?councilAmbienceBlocked
-    :activeAmbienceScene==='depot'?depotAmbienceBlocked:alleyAmbienceBlocked;
+    :activeAmbienceScene==='depot'?depotAmbienceBlocked
+    :activeAmbienceScene==='clinic'?clinicAmbienceBlocked:alleyAmbienceBlocked;
   const ambienceState=unavailable??(settings.ambienceVolume===0?'Off'
     :activeAmbienceScene===null?'Only in an illustrated environment'
     :activeError?'File unavailable'
@@ -391,6 +401,7 @@ export function claimCouncilOfficeAmbience(){
   const owner=Symbol('council-office');
   councilAmbienceOwners.add(owner);
   activeAmbienceScene='council';
+  stopClinicTrack(true);
   cancelDepotDeparture();stopDepotTrack(true);
   cancelAlleyDeparture();
   stopAlleyTrack(true);
@@ -484,6 +495,7 @@ export function claimNightAlleyAmbience(){
   const owner=Symbol('night-alley');
   alleyAmbienceOwners.add(owner);
   activeAmbienceScene='alley';
+  stopClinicTrack(true);
   cancelDepotDeparture();stopDepotTrack(true);
   cancelAmbienceDeparture();
   cancelCouncilDeparture();
@@ -565,6 +577,7 @@ export function claimDepotAmbience(){
   const owner=Symbol('municipal-depot');
   depotAmbienceOwners.add(owner);
   activeAmbienceScene='depot';
+  stopClinicTrack(true);
   cancelAmbienceDeparture();stopAmbience(true);
   cancelCouncilDeparture();stopCouncilAmbience(true);
   cancelAlleyDeparture();stopAlleyTrack(true);
@@ -577,6 +590,63 @@ export function claimDepotAmbience(){
       if(activeAmbienceScene==='depot')activeAmbienceScene=null;
       deferDepotDeparture();
     }else updateDepotAmbience();
+    publishPlayback();
+  };
+}
+
+/** Clinic-only ambience, managed by an explicit illustrated-scene owner. */
+function canPlayMedicalClinicAmbience(){
+  return typeof document!=='undefined'&&settings.enabled&&sceneActive&&
+    unlocked&&settings.ambienceVolume>0&&clinicAmbienceOwners.size>0&&
+    activeAmbienceScene==='clinic'&&!document.hidden;
+}
+function ensureMedicalClinicAmbience(){
+  if(clinicAmbience)return clinicAmbience;
+  clinicAmbience=new Audio(base+medicalClinicAmbienceFile);
+  clinicAmbience.preload='auto';
+  clinicAmbience.loop=true;
+  clinicAmbience.volume=0;
+  clinicAmbience.addEventListener('playing',publishPlayback);
+  clinicAmbience.addEventListener('pause',publishPlayback);
+  clinicAmbience.addEventListener('error',()=>{clinicAmbienceError=true;publishPlayback();});
+  clinicAmbience.load();publishPlayback();
+  return clinicAmbience;
+}
+function stopClinicTrack(reset=false){
+  if(!clinicAmbience)return;
+  clinicAmbience.pause();
+  if(reset){try{clinicAmbience.currentTime=0;}catch{/* Not loaded */}}
+  publishPlayback();
+}
+function updateMedicalClinicAmbience(){
+  if(!canPlayMedicalClinicAmbience()){stopClinicTrack();return;}
+  const track=ensureMedicalClinicAmbience();
+  track.volume=clamp(settings.ambienceVolume,0,1);
+  if(track.paused)void track.play().then(()=>{
+    clinicAmbienceBlocked=false;publishPlayback();
+  }).catch(()=>{clinicAmbienceBlocked=true;publishPlayback();});
+  publishPlayback();
+}
+export function stopMedicalClinicAmbience(){
+  if(activeAmbienceScene==='clinic')activeAmbienceScene=null;
+  stopClinicTrack(true);
+}
+export function claimMedicalClinicAmbience(){
+  const owner=Symbol('medical-clinic');
+  clinicAmbienceOwners.add(owner);
+  activeAmbienceScene='clinic';
+  cancelAmbienceDeparture();stopAmbience(true);
+  cancelCouncilDeparture();stopCouncilAmbience(true);
+  cancelAlleyDeparture();stopAlleyTrack(true);
+  cancelDepotDeparture();stopDepotTrack(true);
+  if(typeof window!=='undefined'&&settings.enabled)ensureMedicalClinicAmbience();
+  updateMedicalClinicAmbience();publishPlayback();
+  return ()=>{
+    clinicAmbienceOwners.delete(owner);
+    if(clinicAmbienceOwners.size===0){
+      if(activeAmbienceScene==='clinic')activeAmbienceScene=null;
+      stopClinicTrack(true);
+    }else updateMedicalClinicAmbience();
     publishPlayback();
   };
 }
@@ -595,6 +665,7 @@ export function claimSmithingWorkshopAmbience(){
   const owner=Symbol('smithing-workshop');
   smithingAmbienceOwners.add(owner);
   activeAmbienceScene='forge';
+  stopClinicTrack(true);
   cancelDepotDeparture();stopDepotTrack(true);
   cancelAlleyDeparture();
   stopAlleyTrack(true);
@@ -651,6 +722,7 @@ function unlock(){
   updateCouncilAmbience();
   updateAlleyAmbience();
   updateDepotAmbience();
+    updateMedicalClinicAmbience();
   publishPlayback();
 }
 export function activatePallAudio(){
@@ -695,7 +767,7 @@ export async function previewPallEffect(){
   if(sfxBuffers.has(file))playFile(file,1);
   else publishPlayback(); // Diagnostic text identifies a missing/invalid WAV.
 }
-function playFile(filename:string,gain=1){
+function playFile(filename:string,gain=1,delaySeconds=0){
   if(typeof window==='undefined'||!settings.enabled||!unlocked||settings.sfxVolume<=0)return;
   const context=sfxContext;
   const buffer=sfxBuffers.get(filename);
@@ -719,7 +791,8 @@ function playFile(filename:string,gain=1){
     // UI_Click02 has ~80 ms of initial silence. Skip that idle pre-roll
     // in the playback buffer without altering the owner's original WAV.
     const offset=filename==='UI_Click02.wav'?Math.min(0.075,buffer.duration*0.5):0;
-    source.start(0,offset);
+    if(delaySeconds>0)source.start(context.currentTime+delaySeconds,offset);
+    else source.start(0,offset);
   }catch{
     // Browsers without a functional audio output remain fully usable.
   }
@@ -735,6 +808,13 @@ export function playUiClick(){
     offset+=choice.weight;
     if(value<offset){playFile(choice.file,choice.gain);return;}
   }
+}
+/** Paired owner samples for one confirmed incoming or outgoing payment.
+ * Scheduling on AudioContext survives scene-navigation callback disposal. */
+export function playCoinTransactionSfx(){
+  if(!sceneActive||!settings.enabled||settings.sfxVolume<=0)return;
+  playFile(coinSfxFiles[0],0.65);
+  playFile(coinSfxFiles[1],0.48,0.12);
 }
 export function playPaperSfx(){
   const index=Math.floor(Math.random()*paperVariants.length);
@@ -797,6 +877,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     stopCouncilAmbience();
     stopAlleyTrack();
     stopDepotTrack();
+    stopClinicTrack();
     stopSoundEffects();
   }else{
     prepareSoundEffects();
@@ -807,6 +888,7 @@ export function setPallAudioSettings(next:Partial<PallAudioSettings>){
     updateCouncilAmbience();
     updateAlleyAmbience();
     updateDepotAmbience();
+    updateMedicalClinicAmbience();
   }
   publishPlayback();
 }
@@ -821,6 +903,7 @@ export function setPallAudioScene(active:boolean){
     updateCouncilAmbience();
     updateAlleyAmbience();
     updateDepotAmbience();
+    updateMedicalClinicAmbience();
   }else{
     stopMusic();
     // The incoming stage may render the same painted forge background.
@@ -868,12 +951,14 @@ function visible(){
     stopCouncilAmbience();
     stopAlleyTrack();
     stopDepotTrack();
+    stopClinicTrack();
   }else{
     startMusic();
     updateAmbience();
     updateCouncilAmbience();
     updateAlleyAmbience();
     updateDepotAmbience();
+    updateMedicalClinicAmbience();
   }
   publishPlayback();
 }
@@ -912,25 +997,30 @@ export function connectPallAudio(){
     stopCouncilAmbience(true);
     stopAlleyTrack(true);
     stopDepotTrack(true);
+    stopClinicTrack(true);
     ambience=null;
     councilAmbience=null;
     alleyAmbience=null;
     depotAmbience=null;
+    clinicAmbience=null;
     activeAmbienceScene=null;
     smithingAmbienceOwners.clear();
     councilAmbienceOwners.clear();
     alleyAmbienceOwners.clear();
     depotAmbienceOwners.clear();
+    clinicAmbienceOwners.clear();
     ambienceError=false;
     councilAmbienceError=false;
     alleyAmbienceError=false;
     depotAmbienceError=false;
+    clinicAmbienceError=false;
     musicError=false;
     musicBlocked=false;
     ambienceBlocked=false;
     councilAmbienceBlocked=false;
     alleyAmbienceBlocked=false;
     depotAmbienceBlocked=false;
+    clinicAmbienceBlocked=false;
     stopSoundEffects();
     sfxBuffers.clear();
     sfxLoading.clear();
