@@ -216,18 +216,6 @@
 
     {#if !ended}
       <section class="action-zone" aria-label="Combat decisions">
-        <p class="fatigue-status" aria-live="polite">
-          <strong>Fatigue {snapshot.player.fatigue}/{snapshot.rules.fatigue.cap}</strong>
-          <span>Accuracy penalty: −{snapshot.rules.fatigue.currentAccuracyLoss} percentage points</span>
-          {#if snapshot.player.fatigue>=snapshot.rules.fatigue.recoverOnlyAt}
-            <strong class="fatigue-warning">Fully exhausted. Recover only.</strong>
-          {:else if snapshot.player.fatigue>=snapshot.rules.fatigue.limitedAt}
-            <strong class="fatigue-warning">Exhausted. Reposition or Recover only.</strong>
-          {:else}
-            <span>At {snapshot.rules.fatigue.limitedAt}, attacks and Guard lock;
-              at {snapshot.rules.fatigue.recoverOnlyAt}, only Recover remains.</span>
-          {/if}
-        </p>
         <div class="actions-row">
           <div class="choices" role="group" aria-label="Choose a combat action">
             {#each actionChoices as choice (choice.id)}
@@ -534,11 +522,6 @@
 
   /* Enemy condition is physically linked to Flint, not the player controls. */
   .enemy-status{position:absolute;z-index:3;top:30px;left:31%;width:min(25%,380px);min-width:260px}
-  .fatigue-status{display:flex;justify-content:center;align-items:baseline;
-    flex-wrap:wrap;gap:4px 12px;margin:2px 0 5px;padding:5px 10px;
-    background:#281f1a;color:#edd9c1;border:1px solid #6e513b;
-    font:600 12px/1.4 Georgia,serif}
-  .fatigue-warning{color:#ffb1a1}
   .recover-tiers{margin:2px 0 0;padding:0 0 0 19px;color:#50331c;
     font:600 12px/1.45 Georgia,serif}
   .recover-tiers li{margin:2px 0}
