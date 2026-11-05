@@ -95,11 +95,12 @@ function describeCommittedTurn(
     if(!direct&&!defensiveOpening)return {...event,actor:who};
     const type=action.type;
     if(!['attack','technique','guard','move','recover'].includes(type))return {...event,actor:who};
-    const detail=typeof action.zone==='string'?action.zone:
-      typeof action.to==='string'?action.to:
-      typeof action.mode==='string'?action.mode:undefined;
+    const detail='zone' in action&&typeof action.zone==='string'?action.zone:
+      'to' in action&&typeof action.to==='string'?action.to:
+      'mode' in action&&typeof action.mode==='string'?action.mode:undefined;
     const name=type==='technique'
-      ?(typeof action.ability==='string'?action.ability:'Press Advantage')
+      ?('ability' in action&&typeof action.ability==='string'
+          ?action.ability:'Press Advantage')
       :undefined;
     return {...event,actor:who,actionType:type,actionDetail:detail,actionName:name};
   });
