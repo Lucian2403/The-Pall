@@ -304,6 +304,10 @@ function tryAttack(s, who, a) {
     src.momentum-=spend;
     log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend});
   }
+  // The chance advertised before confirming an action uses the fighter's
+  // starting Fatigue. The action's new exertion applies on the next attack,
+  // avoiding a hidden penalty at the moment of confirmation.
+  const fatigueAtCommit=src.fatigue??0;
   cost(s,who,special?15:testAttackCost(s,who),special?'technique':'attack');
   // A failed committed dodge lets this specific club swing catch the mover
   // despite new spacing. A successful dodge uses the ordinary reach/miss path.
@@ -323,7 +327,7 @@ function tryAttack(s, who, a) {
   const edge=exploited?s.openings[who]:null;
   if(exploited)s.openings[who]=null;
   const impairment=src.armImpaired?.10:0;
-  const fatiguePenalty=fatigueAccuracyPenalty(src);
+  const fatiguePenalty=fatigueAccuracyPenalty({fatigue:fatigueAtCommit});
   const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]-
     (special&&who==='enemy'?.07:0)+(exploited?(edge.accuracyBonus??.20):0)-
     impairment-fatiguePenalty,.05,.95);
