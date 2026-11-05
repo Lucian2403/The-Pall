@@ -3,7 +3,7 @@ export type CombatActorView={
   name:string;hp:number;hpMax:number;ceiling:number;stamina:number;
   composure:number;fatigue:number;stress:number;momentum:number;bleed:number;
   wounds:Array<{type:string;zone?:string;severity:string}>;
-  armHits?:number;armImpaired?:boolean;
+  armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
 };
 export type CombatEventView={
   round:number;
