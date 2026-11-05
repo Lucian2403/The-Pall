@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,TEST_CONFIG} from './combat.mjs';
+import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,focusedStanceTurns,TEST_CONFIG} from './combat.mjs';
 const act=(s,a,id='a')=>step(s,a,{requestId:id,expectedRevision:s.revision});
 const is = (s,t) => s.events.some(e=>e.text.includes(t));
 
@@ -105,6 +105,76 @@ test('Chronicle separates base hit damage, Opening bonus and damage after Guard'
   assert.ok(normalHits>10,'Cover unguarded Opening hits');
 });
 
+test('Focused Stance costs one unguarded action and 10 Composure, with no Stamina drain',()=>{
+ const s=newEncounter('flint',{seed:1,player:{
+   hp:300,hpMax:300,ceiling:300,composure:15}});
+ const after=act(s,{type:'focus'});
+ assert.equal(s.player.composure,15,'Never mutate caller state');
+ assert.equal(after.player.composure,5);
+ assert.equal(after.player.stamina,90);
+ assert.equal(after.player.fatigue,0);
+ assert.equal(after.player.momentum,0);
+ assert.equal(focusedStanceTurns(after,'player'),3);
+ assert.equal(after.lastPlayerActions.at(-1),'focus');
+ assert.equal(after.revision,s.revision+1,'Focused Stance consumes one complete combat turn');
+ assert.ok(after.events.some(e=>e.kind==='focus'&&e.actor==='player'&&
+   e.composureCost===10&&e.accuracyBonusPercent===10&&e.duration===3));
+ const blow=after.events.find(e=>e.kind==='damage'&&e.actor==='enemy');
+ if(blow)assert.equal(blow.guarded,false,'Focused Stance never supplies Guard');
+});
+test('Focused Stance lasts three subsequent turns independent of attack attempts',()=>{
+ let s=newEncounter('flint',{seed:13,player:{
+   hp:500,hpMax:500,ceiling:500,composure:80},
+   enemy:{hp:500,hpMax:500,ceiling:500,
+     weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'focus'},'focus');
+ assert.equal(s.round,2);assert.equal(focusedStanceTurns(s),3);
+ assert.throws(()=>act(s,{type:'focus'},'stack'),/already active/);
+ const copy=JSON.parse(JSON.stringify(s));
+ assert.equal(focusedStanceTurns(copy),3,'Persisted focus survives reload');
+ s=act(copy,{type:'attack',zone:'torso'},'turn1');
+ assert.equal(focusedStanceTurns(s),2);
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,10);
+ s=act(s,{type:'guard'},'turn2');
+ assert.equal(focusedStanceTurns(s),1,'Guard still consumes one buff turn');
+ s=act(s,{type:'attack',zone:'torso'},'turn3');
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,10);
+ assert.equal(focusedStanceTurns(s),0,'Three-turn buff expires after third subsequent turn');
+ s=act(s,{type:'attack',zone:'torso'},'turn4');
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,0);
+ assert.equal(s.player.composure,70,'No Composure spent by later attacks');
+});
+test('Focused Stance cannot bypass Fatigue lock or inadequate Composure',()=>{
+ for(const composure of [0,5,9]){
+   const before=newEncounter('flint',{player:{composure}});
+   assert.throws(()=>act(before,{type:'focus'}),/Insufficient Composure/);
+   assert.equal(before.revision,0);
+ }
+ for(const fatigue of [70,99,100]){
+   const before=newEncounter('flint',{player:{composure:80,fatigue}});
+   assert.throws(()=>act(before,{type:'focus'}),/Fatigue/);
+   assert.equal(before.revision,0);
+ }
+});
+test('Focused Stance also works on NPCs through the shared action resolver',()=>{
+ const state=newEncounter('flint',{seed:5,enemy:{
+   hp:500,hpMax:500,ceiling:500,composure:25}});
+ state.intent={type:'focus',speed:2,signal:'concentrating',
+   tell:'Flint studies the distance and steadies his grip.'};
+ let s=act(state,{type:'guard'},'enemy-focus');
+ assert.equal(s.enemy.composure,15);
+ assert.equal(focusedStanceTurns(s,'enemy'),3);
+ assert.ok(s.events.some(e=>e.kind==='focus'&&e.actor==='enemy'));
+ s.intent={type:'attack',zone:'torso',speed:1,
+   signal:'committed',tell:'Flint commits to a swing.'};
+ s=act(s,{type:'guard'},'enemy-hit');
+ const strike=s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='enemy');
+ assert.equal(strike?.focusedBonusPercent,10);
+ assert.equal(focusedStanceTurns(s,'enemy'),2);
+});
 test('Stamina 1–20 adds 3 Fatigue, including the spend that reaches zero',()=>{
  const actor={hp:240,hpMax:240,ceiling:240};
  let s=newEncounter('flint',{seed:1,player:{...actor,stamina:27}});
