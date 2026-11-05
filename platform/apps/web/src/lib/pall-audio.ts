@@ -109,12 +109,24 @@ const combatHits=['combat/hit-01.mp3','combat/hit-02.mp3',
   'combat/hit-03.mp3','combat/hit-04.mp3'] as const;
 const combatGrunts=['combat/male-grunt-01.mp3','combat/male-grunt-02.mp3',
   'combat/male-grunt-03.mp3','combat/male-grunt-04.mp3'] as const;
-const combatSfxFiles=[...combatHits,...combatGrunts,
+const combatMisses=['combat/miss-01.mp3','combat/miss-02.mp3',
+  'combat/miss-03.mp3'] as const;
+const combatSfxFiles=[...combatHits,...combatGrunts,...combatMisses,
   'combat/male-low-stamina.mp3','combat/reposition.mp3',
-  'combat/fight-finished.mp3','combat/guard.mp3'] as const;
+  'combat/fight-finished.mp3','combat/guard.mp3',
+  'combat/recovery.mp3','combat/focus.mp3'] as const;
 const combatSfxOwners=new Set<symbol>();
-export type CombatSfxCue='hit'|'maleGrunt'|'maleLowStamina'|
-  'reposition'|'guard'|'fightFinished';
+const combatSfxSet=new Set<string>(combatSfxFiles);
+export type CombatSfxCue='hit'|'miss'|'maleGrunt'|'maleLowStamina'|
+  'reposition'|'guard'|'fightFinished'|'recovery'|'focus';
+// Every combat sample uses one calibration target instead of arbitrary
+// per-file boosts. These values describe the signal BEFORE the user SFX slider.
+const COMBAT_ACTIVE_RMS_DBFS=-20;
+const COMBAT_ACTIVE_RMS=Math.pow(10,COMBAT_ACTIVE_RMS_DBFS/20);
+const COMBAT_PEAK_HEADROOM=.82;
+const COMBAT_MASTER=.84;
+const combatFileGain=new Map<string,number>();
+let combatLimiter:DynamicsCompressorNode|null=null;
 let sfxContext:AudioContext|null=null;
 const sfxBuffers=new Map<string,AudioBuffer>();
 const sfxLoading=new Map<string,Promise<void>>();
@@ -186,7 +198,11 @@ function prepareSoundEffects(files:readonly string[]=sfxFiles){
       })
       .then(bytes=>context.decodeAudioData(bytes))
       .then(buffer=>{
-        if(sfxContext===context)sfxBuffers.set(filename,buffer);
+        if(sfxContext===context){
+          sfxBuffers.set(filename,buffer);
+          if(combatSfxSet.has(filename))
+            combatFileGain.set(filename,calibrateCombatLoudness(buffer));
+        }
         sfxFailures.delete(filename);
         publishPlayback();
       })
@@ -204,6 +220,57 @@ function prepareSoundEffects(files:readonly string[]=sfxFiles){
   }
 }
 
+/**
+ * Active (non-silent) 20ms windows determine perceived combat effect level.
+ * A whole-clip RMS would overboost sharp misses containing long quiet tails.
+ * The top quartile's RMS is calibrated to −20 dBFS, with hard headroom on
+ * the ORIGINAL PCM peak. Grunts, impacts, recovery and focus therefore share
+ * a documented target without modifying noncombat audio or the SFX slider.
+ */
+function calibrateCombatLoudness(buffer:AudioBuffer):number{
+  if(!buffer.numberOfChannels||!buffer.length||!buffer.sampleRate||
+     typeof buffer.getChannelData!=='function')return 1;
+  const width=Math.max(128,Math.round(buffer.sampleRate*.02));
+  const channels=Array.from({length:buffer.numberOfChannels},
+    (_,index)=>buffer.getChannelData(index));
+  const rmsBlocks:number[]=[];
+  let peak=0;
+  for(let start=0;start<buffer.length;start+=width){
+    const end=Math.min(start+width,buffer.length);
+    let energy=0,count=0;
+    for(const channel of channels){
+      for(let i=start;i<end;i+=2){
+        const sample=channel[i];
+        if(!Number.isFinite(sample))continue;
+        energy+=sample*sample;
+        peak=Math.max(peak,Math.abs(sample));
+        count++;
+      }
+    }
+    if(count>0)rmsBlocks.push(Math.sqrt(energy/count));
+  }
+  if(rmsBlocks.length===0||peak<.00001)return 0;
+  rmsBlocks.sort((a,b)=>b-a);
+  const active=rmsBlocks.slice(0,Math.max(1,Math.ceil(rmsBlocks.length*.25)));
+  const activeRms=Math.sqrt(active.reduce((sum,r)=>sum+r*r,0)/active.length);
+  if(activeRms<.00001)return 0;
+  return clamp(Math.min(COMBAT_ACTIVE_RMS/activeRms,COMBAT_PEAK_HEADROOM/peak),.05,6);
+}
+function combatDestination(context:AudioContext):AudioNode{
+  if(combatLimiter)return combatLimiter;
+  // The audio runtime has a WebAudio mock without createDynamicsCompressor;
+  // real browsers share one limiter, after separately calibrated sounds mix.
+  if(typeof context.createDynamicsCompressor!=='function')return context.destination;
+  const limiter=context.createDynamicsCompressor();
+  limiter.threshold.value=-12;
+  limiter.knee.value=10;
+  limiter.ratio.value=6;
+  limiter.attack.value=.003;
+  limiter.release.value=.13;
+  limiter.connect(context.destination);
+  combatLimiter=limiter;
+  return limiter;
+}
 function stopSoundEffects(){
   for(const source of activeSources){
     try{source.stop();}catch{/* Source already ended. */}
@@ -779,9 +846,15 @@ function playFile(filename:string,gain=1,delaySeconds=0){
     const source=context.createBufferSource();
     const volume=context.createGain();
     source.buffer=buffer;
-    volume.gain.value=clamp(settings.sfxVolume*gain,0,1);
+    const combat=combatSfxSet.has(filename);
+    const calibrated=combat?(combatFileGain.get(filename)??1)*COMBAT_MASTER:1;
+    // The combat gain may exceed 1 for quiet source files, but calibrated
+    // original peaks cannot exceed the common .82 dBFS amplitude headroom.
+    volume.gain.value=combat
+      ?Math.max(0,settings.sfxVolume*gain*calibrated)
+      :clamp(settings.sfxVolume*gain,0,1);
     source.connect(volume);
-    volume.connect(context.destination);
+    volume.connect(combat?combatDestination(context):context.destination);
     activeSources.add(source);
     source.addEventListener('ended',()=>{
       activeSources.delete(source);
@@ -845,17 +918,23 @@ export function playCombatSfx(cue:CombatSfxCue):void {
      typeof document==='undefined'||document.hidden)return;
   switch(cue){
     case 'hit':
-      playFile(combatHits[Math.floor(Math.random()*combatHits.length)],0.75);break;
+      playFile(combatHits[Math.floor(Math.random()*combatHits.length)]);break;
+    case 'miss':
+      playFile(combatMisses[Math.floor(Math.random()*combatMisses.length)]);break;
     case 'maleGrunt':
-      playFile(combatGrunts[Math.floor(Math.random()*combatGrunts.length)],0.58);break;
+      playFile(combatGrunts[Math.floor(Math.random()*combatGrunts.length)]);break;
     case 'maleLowStamina':
-      playFile('combat/male-low-stamina.mp3',0.56);break;
+      playFile('combat/male-low-stamina.mp3');break;
     case 'reposition':
-      playFile('combat/reposition.mp3',0.65);break;
+      playFile('combat/reposition.mp3');break;
     case 'guard':
-      playFile('combat/guard.mp3',0.70);break;
+      playFile('combat/guard.mp3');break;
     case 'fightFinished':
-      playFile('combat/fight-finished.mp3',0.84);break;
+      playFile('combat/fight-finished.mp3');break;
+    case 'recovery':
+      playFile('combat/recovery.mp3');break;
+    case 'focus':
+      playFile('combat/focus.mp3');break;
   }
 }
 export function setPallAudioSettings(next:Partial<PallAudioSettings>){
@@ -1023,6 +1102,9 @@ export function connectPallAudio(){
     clinicAmbienceBlocked=false;
     stopSoundEffects();
     sfxBuffers.clear();
+    combatFileGain.clear();
+    combatLimiter?.disconnect();
+    combatLimiter=null;
     sfxLoading.clear();
     sfxFailures.clear();
     if(sfxContext){
