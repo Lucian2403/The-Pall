@@ -19,7 +19,6 @@
   // The server determines every value, legal action, and actual result.
   const ended = $derived(snapshot.status === 'finished');
   const flintDefeated = $derived(ended && snapshot.outcome === 'player_victory');
-  const canAttack = $derived(snapshot.legalActions.includes('attack'));
 
   let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'>('guard');
   let zone = $state<'head'|'torso'|'limbs'>('torso');
@@ -49,8 +48,8 @@
     return ()=>registerSceneJournal?.(null);
   });
 
-  const visibleSelection = $derived(snapshot.legalActions.includes(selected)
-    ? selected : (canAttack ? 'attack' : 'guard'));
+  // Disabled actions remain inspectable; only Confirm is blocked.
+  const visibleSelection = $derived(selected);
   const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-6));
   const actionName = $derived({
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
@@ -208,7 +207,8 @@
           <div class="choices" role="group" aria-label="Choose a combat action">
             {#each actionChoices as choice (choice.id)}
               <button class="action-tile" class:chosen={visibleSelection === choice.id}
-                type="button" disabled={pending || !available(choice.id)}
+                class:unavailable={!available(choice.id)}
+                type="button" disabled={pending} aria-disabled={!available(choice.id)}
                 aria-pressed={visibleSelection === choice.id}
                 aria-label={`Select ${choice.label} action`}
                 title={available(choice.id) ? choice.label : choice.label + ' unavailable'}
@@ -220,7 +220,7 @@
           </div>
           <div class="confirm-holder">
             <button class="commit" type="button" data-pall-sfx="none"
-              disabled={pending} onclick={commit}
+              disabled={pending || !available(visibleSelection)} onclick={commit}
               aria-label={`Confirm ${actionName} action`}>
               <img src={iconBase + 'confirm-action.webp'} alt="" width="41" height="41" />
               <span>{pending ? 'Resolving…' : 'Confirm action'}</span>
@@ -233,6 +233,15 @@
             <img src={iconBase + selectedAsset} width="32" height="32" alt="" />
             <strong>{actionName}</strong>
           </div>
+          {#if !available(visibleSelection)}
+            <p class="detail-note action-unavailable">Not currently available:
+              {visibleSelection==='technique'
+                ?'Press Advantage requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum. You have '+snapshot.player.momentum+'.'
+                :visibleSelection==='attack'
+                ?'You must move into contact range before attacking.'
+                :'The current fight state does not permit this action.'}
+              You can inspect it, but not confirm it.</p>
+          {/if}
           {#if visibleSelection === 'attack' || visibleSelection === 'technique'}
             <div class="detail-options">
               <div class="detail-field">
@@ -438,6 +447,8 @@
     color:#312116;opacity:.76;text-align:center}
   .action-tile.chosen{filter:brightness(1.08) drop-shadow(0 0 4px #dca25b);transform:translateY(-1px)}
   .action-tile.chosen .action-name{opacity:1;color:#2d190c}
+  .action-tile.unavailable:not(.chosen){opacity:.62;filter:saturate(.65)}
+  .action-tile.unavailable.chosen{box-shadow:inset 0 0 0 2px #8f5944}
   .action-tile:hover:not(:disabled),.commit:hover:not(:disabled){filter:brightness(1.12)}
   .action-tile:disabled,.commit:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.55)}
   .confirm-holder{border-left:1px solid #9f805e;padding-left:10px;min-width:0}
@@ -469,6 +480,7 @@
     background:#f3e2bf;color:#2d1b0f;border:1px solid #9d7750;font:12px Georgia,serif}
   .detail-options .detail-text+.detail-text{border-left:1px solid #927251;padding-left:10px}
   .detail-note{margin:0;font:600 12px/1.4 Georgia,serif;color:#624226}
+  .action-unavailable{color:#842a21;font-weight:700}
   .error{margin:0;padding:8px 12px;background:#29140fef;border:1px solid #b45d4a;
     color:#ffc6ae;font:13px/1.45 Arial,sans-serif;text-align:center}
   .action-tile:focus-visible,.commit:focus-visible,.chronicle button:focus-visible,
