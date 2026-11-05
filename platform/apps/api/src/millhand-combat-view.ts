@@ -9,7 +9,8 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     name:a.name,hp:a.hp,hpMax:a.hpMax,ceiling:a.ceiling,
     stamina:a.stamina,composure:a.composure,fatigue:a.fatigue,
     stress:a.stress,momentum:a.momentum,bleed:a.bleed,wounds:a.wounds,
-    bandages:a.bandages,armHits:a.armHits??0,armImpaired:a.armImpaired??false
+    bandages:a.bandages,armHits:a.armHits??0,armImpaired:a.armImpaired??false,
+    reloadSlowdownPercent:a.reloadSlowdownPercent??0
   });
   const contact=state.distance==='contact';
   const legalActions=state.status==='active'
