@@ -165,27 +165,31 @@ function shouldHumanYield(s) {
   const e=s.enemy,p=s.player;
   const enemyCondition=e.hp/Math.max(1,e.ceiling);
   const playerCondition=p.hp/Math.max(1,p.ceiling);
-  if(enemyCondition>.55) return false;
 
-  // Having been struck a few times is not enough to justify giving up when the
-  // opponent is collapsing. This was the v0.5 bug: Flint withdrew with 18/50
-  // Health despite having reduced the unarmed player to 2/50. These gates are
-  // illustrative AI weights, NOT a final universal morale or surrender formula.
+  // Do not mistake an opponent's Momentum, a fleeting Opening or repeated
+  // attacks for proof that Flint is defeated. At 24/50 Health and 50 Stamina,
+  // he used to yield on a 34% roll despite having ample strength to continue.
+  // Surrender here is deliberately a late-fight, nonlethal possibility.
+  const nearDefeat=enemyCondition<=.30;
+  const wornDown=enemyCondition<=.40 && e.stamina<=20 &&
+    e.hp<p.hp && e.stamina<p.stamina;
+  if(!nearDefeat&&!wornDown)return false;
+
+  // An opponent who is about to beat an even more battered player should
+  // continue fighting. Never confuse an opponent's low HP with losing.
   const playerAboutToFall=playerCondition<=.25;
   const enemyClearlyHealthier=(enemyCondition-playerCondition)>=.08 && e.hp>p.hp;
   const enemyCanKeepPressing=e.stamina>=10;
-  if(playerAboutToFall&&enemyClearlyHealthier&&enemyCanKeepPressing) return false;
+  if(playerAboutToFall&&enemyClearlyHealthier&&enemyCanKeepPressing)return false;
 
-  // Retreat still depends on visible pressure and the actor's actual objectives;
-  // nonlethal victory remains possible without taking every enemy to zero.
-  const outmatched=enemyCondition<=.30;
+  // Still require a credible reason to concede when the fighter is merely
+  // worn down; critical injury alone can justify withdrawing.
   const pressured=p.momentum>=15 || (e.wounds?.length??0)>0 || hasOpening(s,'player')
-    || s.distance!=='contact' || (s.lastPlayerActions??[]).filter(x=>x==='attack'||x==='technique').length>=2;
-  if(!pressured&&!outmatched)return false;
-  // Preserve the existing nonlethal outcomes and opponent-specific probabilities
-  // except where the actor is clearly winning against a near-downed player.
-  // All probabilities remain prototype values, not locked character statistics.
-  const odds=outmatched?.72:s.scene==='silas'?.26:.34;
+    || s.distance!=='contact' ||
+    (s.lastPlayerActions??[]).filter(x=>x==='attack'||x==='technique').length>=2;
+  if(!pressured&&!nearDefeat)return false;
+  // Trial AI weights, not permanent morale/Composure design.
+  const odds=nearDefeat?.72:s.scene==='silas'?.26:.16;
   return rng(s)<odds;
 }
 function makeIntent(state) {
