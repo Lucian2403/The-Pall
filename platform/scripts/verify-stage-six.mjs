@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
@@ -391,18 +392,36 @@ assert.ok(enemyPosition>0 && enemyPosition<actionPosition &&
   scene.includes('@media(max-width:920px)') &&
   scene.includes('.enemy-status{position:relative'),
   'Flint condition near him, Chronicle left of player; narrow screens remain usable');
+// One currently real enemy, up to three clearly separated enemy status cards
+// when future encounter data supplies them. No fabricated second/third enemy.
+assert.ok(scene.includes('opponents?:EnemyHudCard[];') &&
+  scene.includes('const extraOpponents=$derived((opponents??[]).slice(0,3));') &&
+  scene.includes('const enemyHudCount=$derived(extraOpponents.length||1);') &&
+  scene.includes('<section class="enemy-status" data-count={enemyHudCount}') &&
+  scene.includes('<div class="enemy-hud-card">') &&
+  scene.includes('class:triple-enemy={enemyHudCount===3}') &&
+  scene.includes('grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px') &&
+  scene.includes('.enemy-status .resource:nth-child(even)') &&
+  scene.includes('.enemy-status[data-count="3"]{gap:6px}') &&
+  scene.includes('repeat(auto-fit,minmax(min(100%,275px),1fr))') &&
+  scene.includes('min-height:clamp(725px,55vw,920px)') &&
+  scene.includes('white-space:nowrap') &&
+  scene.includes('enemy-status .resource-top dd{font-size:14px;flex:none'),
+  'Enemy display must fit full Composure / Fatigue values and reserve room for 3 foes');
 assert.ok(scene.includes('/characters/flint/flint-defeated.webp') &&
   scene.includes("snapshot.outcome === 'player_victory'") &&
   scene.includes('/characters/flint/flint-standing.webp'),
   'Flint defeated art must replace the standing cutout after a saved victory');
 
-// Twelve owner cues. Verify the binary files, shared mixer and server truth.
+// All 17 owner cues. Verify binary assets, common output and server truth.
 const audio=read('apps/web/src/lib/pall-audio.ts');
 const soundMap=read('apps/web/src/lib/millhand-combat-sound.ts');
 const soundNames=[
   'guard.mp3','reposition.mp3','fight-finished.mp3','male-low-stamina.mp3',
   ...[1,2,3,4].map(n=>'hit-0'+n+'.mp3'),
-  ...[1,2,3,4].map(n=>'male-grunt-0'+n+'.mp3')
+  ...[1,2,3,4].map(n=>'male-grunt-0'+n+'.mp3'),
+  ...[1,2,3].map(n=>'miss-0'+n+'.mp3'),
+  'recovery.mp3','focus.mp3'
 ];
 for(const name of soundNames){
   const buffer=readFileSync(resolve(root,'apps/web/static/audio/the-pall/combat',name));
@@ -410,6 +429,44 @@ for(const name of soundNames){
   assert.ok(buffer.length>3000 && buffer.length<35000,name+' must be a compact sound');
   assert.ok(audio.includes('combat/'+name),'Audio source missing '+name);
 }
+// These five exactly match the re-encoded owner's uploaded short effects.
+// The reference fingerprints prevent passing with placeholders or stale names.
+const ownerSoundHashes={
+  'miss-01.mp3':'b9c52ee2fb83839cec82caa8adfbefa6b5ea0a70da6b73ea42d1eff952811bfc',
+  'miss-02.mp3':'857fe99cb69029044afd29d579b436d6a48fa4b0225a73ea086a8f40c14648db',
+  'miss-03.mp3':'dcfd805aa7d601d6370d64ec4372a2b9203cbac5dbdfbfeb435a24b900869ac5',
+  'recovery.mp3':'75c246f93560e11add93f7859d007efca22ddb12acd395a6ed00271613609d14',
+  'focus.mp3':'275ab0b51f4c81f14ab14a9aa414c3eb2a1c90bcd2b4c4c9974d740690041a78'
+};
+for(const [name,hash] of Object.entries(ownerSoundHashes)){
+  const sample=readFileSync(resolve(root,'apps/web/static/audio/the-pall/combat',name));
+  assert.equal(createHash('sha256').update(sample).digest('hex'),hash,
+    'Owner-provided sound must match its peak-controlled, compact version: '+name);
+}
+assert.ok(audio.includes("const combatMisses=['combat/miss-01.mp3'") &&
+  audio.includes("'combat/miss-03.mp3'") &&
+  audio.includes("'combat/recovery.mp3','combat/focus.mp3'") &&
+  audio.includes("case 'miss':") &&
+  audio.includes("case 'recovery':") &&
+  audio.includes("case 'focus':") &&
+  audio.includes('const COMBAT_ACTIVE_RMS_DBFS=-20;') &&
+  audio.includes('const COMBAT_PEAK_HEADROOM=.82;') &&
+  audio.includes('const COMBAT_MASTER=.84;') &&
+  audio.includes('calibrateCombatLoudness(buffer)') &&
+  audio.includes('combatLimiter=limiter') &&
+  audio.includes('limiter.ratio.value=6;') &&
+  audio.includes('volume.connect(combat?combatDestination(context):context.destination)'),
+  'All 17 combat samples need common dBFS target, peak headroom and one limiter');
+assert.ok(soundMap.includes("e.kind==='focus'") &&
+  soundMap.includes("e.kind==='recovery'") &&
+  soundMap.includes("e.kind==='miss'") &&
+  soundMap.includes("e.actionType==='attack'||e.actionType==='technique'") &&
+  soundMap.includes("playCombatSfx('miss')") &&
+  soundMap.includes("playCombatSfx('focus')") &&
+  soundMap.includes("playCombatSfx('recovery')") &&
+  soundMap.includes('next.revision <= previous.revision') &&
+  soundMap.includes('event.round === previous.round'),
+  'New sounds must trigger only from genuinely committed turns, never replays');
 assert.ok(audio.includes('claimCombatSfx') &&
   audio.includes('playCombatSfx') &&
   audio.includes('combatSfxOwners') &&
