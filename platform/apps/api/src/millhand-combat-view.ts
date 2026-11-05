@@ -14,6 +14,11 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     reloadSlowdownPercent:a.reloadSlowdownPercent??0
   });
   const contact=state.distance==='contact';
+  const highFatigueRecovery=state.player.fatigue>=TEST_CONFIG.highFatigueRecoverThreshold;
+  const recoveryStamina=highFatigueRecovery
+    ?TEST_CONFIG.exhaustedRecoverGain:TEST_CONFIG.recoverGain;
+  const recoveryFatigue=highFatigueRecovery
+    ?TEST_CONFIG.exhaustedFatigueRecovery:TEST_CONFIG.fatigueRecovery;
   const legalActions=state.status==='active'
     ? [...(contact?['attack']:[]),'guard','move','recover',
         ...(contact&&state.player.momentum>=20?['technique']:[])]
@@ -63,7 +68,9 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     turnEvents:state.events,
     rules:{
       strikeCost:testAttackCost(state,'player'),guardCost:TEST_CONFIG.guardCost,
-      moveCost:TEST_CONFIG.moveCost,recoverStamina:TEST_CONFIG.recoverGain,
+      moveCost:TEST_CONFIG.moveCost,recoverStamina:recoveryStamina,
+      recoverStaminaBelow50:TEST_CONFIG.recoverGain,
+      recoverStaminaFrom50:TEST_CONFIG.exhaustedRecoverGain,
       recoverComposure:TEST_CONFIG.mentalRecoverGain,techniqueMomentum:20,
       fatigue:{
         cap:TEST_CONFIG.fatigueCap,
@@ -71,7 +78,10 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
         lowStaminaGain:TEST_CONFIG.fatigueLowGain,
         exhaustedAttackGain:TEST_CONFIG.fatigueExhaustedAttackGain,
         exhaustedDefenseGain:TEST_CONFIG.fatigueExhaustedDefenseGain,
-        recovery:TEST_CONFIG.fatigueRecovery,
+        recovery:recoveryFatigue,
+        recoveryBelow50:TEST_CONFIG.fatigueRecovery,
+        recoveryFrom50:TEST_CONFIG.exhaustedFatigueRecovery,
+        recoveryThreshold:TEST_CONFIG.highFatigueRecoverThreshold,
         limitedAt:TEST_CONFIG.fatigueAttackLock,
         recoverOnlyAt:TEST_CONFIG.fatigueCap,
         accuracyLossPerTen:Math.round(100*TEST_CONFIG.fatigueAccuracyPenaltyPerStep),
