@@ -189,11 +189,11 @@ test('Combat rules report exact unarmed ranges and saved Chronicle action identi
   assert.equal(initial.rules.unarmed,true);
   assert.deepEqual(initial.rules.strikeDamage,{min:4,max:8});
   assert.deepEqual(initial.rules.techniqueDamage,{min:8,max:12});
-  assert.deepEqual(initial.rules.accuracy,{head:45,torso:70,limbs:58});
+  assert.deepEqual(initial.rules.accuracy,{head:40,torso:70,limbs:55});
   assert.equal(initial.rules.openingDamageBonus,0);
-  assert.equal(initial.rules.guardMitigationPercent,68);
+  assert.equal(initial.rules.guardMitigationPercent,60);
   assert.deepEqual(initial.rules.enemyStrikeDamage,{min:14,max:17});
-  assert.deepEqual(initial.rules.guardedEnemyStrikeDamage,{min:4,max:5});
+  assert.deepEqual(initial.rules.guardedEnemyStrikeDamage,{min:6,max:7});
   assert.equal(initial.rules.repositionUsesDistance,true);
   const guarded=await turn(c,initial,{type:'guard'});
   assert.equal(guarded.status,200,JSON.stringify(guarded.body));
