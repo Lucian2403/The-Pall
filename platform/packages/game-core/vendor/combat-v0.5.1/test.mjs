@@ -647,6 +647,52 @@ test('human opponent at clear advantage does not surrender; same for Silas',()=>
     }
   }
 });
+test('Flint does not surrender at 24/50 HP with 50 Stamina despite player Momentum and openings',()=>{
+  for(let seed=1;seed<=400;seed++){
+    const initial=newEncounter('flint',{seed,
+      player:{hp:36,stamina:55,momentum:30},
+      enemy:{hp:24,stamina:50,momentum:10}});
+    assert.notEqual(initial.intent.type,'withdraw',
+      `Flint prematurely yielded at seed ${seed} while 24/50 HP, 50 Stamina`);
+    // Reproduce the reported round-five situation: sustained player attacks,
+    // an exploitable Opening and a healthy, energetic enemy.
+    const roundFive=newEncounter('flint',{seed,
+      player:{hp:120,hpMax:120,ceiling:120,stamina:55,momentum:30},
+      enemy:{hp:24,stamina:50,momentum:10}});
+    roundFive.round=5;
+    roundFive.lastPlayerActions=['attack','attack'];
+    roundFive.openings.player={expires:6,reason:'the swing runs past your guard'};
+    const next=act(roundFive,{type:'guard'},`round5-${seed}`);
+    assert.notEqual(next.intent?.type,'withdraw',
+      `Flint generated an early surrender for the next round at seed ${seed}`);
+  }
+});
+test('Healthy reserve blocks early human withdrawal until serious harm or exhaustion',()=>{
+ for(const scene of ['flint','silas']){
+   for(let seed=1;seed<=200;seed++){
+     for(const [hp,stamina] of [[24,50],[21,12],[20,50]]){
+       const state=newEncounter(scene,{seed,
+         player:{hp:45,stamina:75,momentum:50},
+         enemy:{hp,stamina}});
+       assert.notEqual(state.intent.type,'withdraw',
+         `${scene} yielded with HP=${hp}, Stamina=${stamina}, seed=${seed}`);
+     }
+   }
+ }
+});
+test('A genuinely worn down human opponent can still concede before 30% HP',()=>{
+ for(const scene of ['flint','silas']){
+   let retreats=0;
+   for(let seed=1;seed<=240;seed++){
+     const s=newEncounter(scene,{seed,
+       player:{hp:43,stamina:65,momentum:25},
+       enemy:{hp:20,stamina:12}});
+     if(s.intent.type==='withdraw')retreats++;
+   }
+   assert.ok(retreats>0,`${scene} should sometimes withdraw at 40% HP and 12 Stamina`);
+   assert.ok(retreats<240,`${scene} surrender must remain probabilistic`);
+ }
+});
 test('genuine nonlethal retreat still possible when a human opponent is actually outmatched',()=>{
   for(const scene of ['flint','silas']){
     let yields=0;
