@@ -182,6 +182,45 @@ test('Welcome is persisted per character and never unlocks tutorial gameplay its
     'Explicit reset must permit exactly one new acknowledgement');
 });
 
+test('Combat rules report exact unarmed ranges and saved Chronicle action identities',async()=>{
+  const c=await character(owner,'brace');
+  const initial=await start(c);
+  assert.equal(initial.rules.weaponLabel,'Unarmed — fists');
+  assert.equal(initial.rules.unarmed,true);
+  assert.deepEqual(initial.rules.strikeDamage,{min:4,max:8});
+  assert.deepEqual(initial.rules.techniqueDamage,{min:8,max:12});
+  assert.deepEqual(initial.rules.accuracy,{head:45,torso:70,limbs:58});
+  assert.equal(initial.rules.openingDamageBonus,0);
+  assert.equal(initial.rules.guardMitigationPercent,68);
+  assert.deepEqual(initial.rules.enemyStrikeDamage,{min:14,max:17});
+  assert.deepEqual(initial.rules.guardedEnemyStrikeDamage,{min:4,max:5});
+  assert.equal(initial.rules.repositionUsesDistance,true);
+  const guarded=await turn(c,initial,{type:'guard'});
+  assert.equal(guarded.status,200,JSON.stringify(guarded.body));
+  const playerGuard=guarded.body!.turnEvents.find((e:any)=>
+    e.kind==='guard'&&e.actor==='player');
+  assert.equal(playerGuard?.actionType,'guard');
+  const foeAction=guarded.body!.turnEvents.find((e:any)=>
+    e.actor==='enemy'&&['damage','miss','guard','move','technique'].includes(e.kind));
+  if(foeAction){
+    assert.ok(['attack','technique','guard','move'].includes(foeAction.actionType),
+      'Enemy actions need their genuine saved type, not guessed labels');
+    if(foeAction.kind==='damage'||foeAction.kind==='miss')
+      assert.ok(['torso','head','limbs'].includes(foeAction.actionDetail),
+        'An actual enemy strike must identify its target');
+  }
+  const persisted=await request('GET',c.path);
+  assert.equal(persisted.status,200);
+  assert.deepEqual(persisted.body!.events,guarded.body!.events,
+    'Action metadata remains part of saved combat history across reloads');
+  const recovered=await turn(c,guarded.body!,{type:'recover',mode:'breath'});
+  assert.equal(recovered.status,200,JSON.stringify(recovered.body));
+  assert.ok(recovered.body!.turnEvents.some((e:any)=>
+    e.kind==='recovery'&&e.actor==='player'&&
+    e.actionType==='recover'&&e.actionDetail==='breath'),
+    'Recovery must carry its actual actor and option, not an inferred generic tag');
+});
+
 test('Three saved stances give distinct first-round tactical states',async()=>{
   const b=await character(owner,'brace');
   const m=await character(owner,'moving');
