@@ -15,6 +15,7 @@ export const TEST_CONFIG = Object.freeze({
   fatigueRecovery:15,exhaustedFatigueRecovery:30,
   highFatigueRecoverThreshold:50,fatigueCap:100,fatigueAttackLock:70,
   fatigueAccuracyStep:10,fatigueAccuracyPenaltyPerStep:.03,
+  focusedStanceComposureCost:10,focusedStanceAccuracyBonus:.10,focusedStanceDuration:3,
   strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
   bleedDamage: { 0: 0, 1: 1, 2: 2, 3: 3 },
   aim: { torso: 0, limbs: -0.15, head: -0.30 },
@@ -37,7 +38,9 @@ const actor = (name, opts = {}) => ({
   wounds: [], bleed: 0, bandages: opts.bandages ?? 0, guard: false,
   armHits:opts.armHits??0,armImpaired:opts.armImpaired??false,
   reloadSlowdownPercent:opts.reloadSlowdownPercent??0,
-  readiness: opts.readiness ?? 0, weapon: opts.weapon ?? {damage: 6,accuracy: .70,type: 'blunt',reach: 'contact',unarmed:true},
+  readiness: opts.readiness ?? 0,
+  focusedUntilRound:opts.focusedUntilRound??0,
+  weapon: opts.weapon ?? {damage: 6,accuracy: .70,type: 'blunt',reach: 'contact',unarmed:true},
 });
 function rng(state) {
   // Deterministic LCG. Not secure; replaced by server-owned RNG in production.
@@ -107,6 +110,12 @@ export function canActAtFatigue(actor,actionType){
   if(fatigue>=TEST_CONFIG.fatigueAttackLock)
     return actionType==='move'||actionType==='recover';
   return true;
+}
+export function focusedStanceTurns(state,who='player'){
+  const fighter=state[who];
+  if(!fighter||state.status!=='active')return 0;
+  return clamp((fighter.focusedUntilRound??0)-state.round+1,0,
+    TEST_CONFIG.focusedStanceDuration);
 }
 export function fatigueAccuracyPenalty(actor){
   const fatigue=clamp(actor.fatigue??0,0,TEST_CONFIG.fatigueCap);
@@ -274,7 +283,7 @@ export function newEncounter(scene, opts = {}) {
   return state;
 }
 function verifyAction(s,a) {
-  if (!a || !['attack','guard','move','use','recover','withdraw','technique'].includes(a.type)) throw new CombatError('Unknown action');
+  if (!a || !['attack','guard','move','use','recover','withdraw','technique','focus'].includes(a.type)) throw new CombatError('Unknown action');
   if(!canActAtFatigue(s.player,a.type))
     throw new CombatError(s.player.fatigue>=TEST_CONFIG.fatigueCap
       ?'At 100 Fatigue only Recover is available'
@@ -287,9 +296,15 @@ function verifyAction(s,a) {
   if(a.type==='move' && !['side','close','cover','back'].includes(a.to)) throw new CombatError('No such reachable destination');
   if(a.type==='use' && (a.item !== 'bandage'||s.player.bandages<1||s.player.bleed<1)) throw new CombatError('No applicable bandage/bleeding');
   if(a.type==='recover' && !['breath','nerves'].includes(a.mode)) throw new CombatError('Select a recovery mode');
+  if(a.type==='focus'){
+    if(s.player.composure<TEST_CONFIG.focusedStanceComposureCost)
+      throw new CombatError('Insufficient Composure for Focused Stance');
+    if(focusedStanceTurns(s,'player')>0)
+      throw new CombatError('Focused Stance is already active');
+  }
 }
 function actionSpeed(who, a, s) {
-  const speed = a.speed ?? ({attack:4,guard:10,move:6,use:3,recover:2,withdraw:5,technique:3}[a.type]);
+  const speed = a.speed ?? ({attack:4,guard:10,move:6,use:3,recover:2,withdraw:5,technique:3,focus:2}[a.type]);
   // Repeated arm hits slow committed attacks, not only their accuracy.
   const impaired=s[who].armImpaired&&(a.type==='attack'||a.type==='technique');
   return speed + s[who].readiness-(impaired?1:0);
@@ -329,7 +344,9 @@ function tryAttack(s, who, a) {
   if(exploited)s.openings[who]=null;
   const impairment=src.armImpaired?.10:0;
   const fatiguePenalty=fatigueAccuracyPenalty({fatigue:fatigueAtCommit});
-  const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]-
+  const focusedBonus=focusedStanceTurns(s,who)>0
+    ?TEST_CONFIG.focusedStanceAccuracyBonus:0;
+  const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]+focusedBonus-
     (special&&who==='enemy'?.07:0)+(exploited?(edge.accuracyBonus??.20):0)-
     impairment-fatiguePenalty,.05,.95);
   if (rng(s)>=chance) {
@@ -340,7 +357,8 @@ function tryAttack(s, who, a) {
        :s.scene==='boar'
         ? ["The boar rushes past, hooves scraping at the ground.","Its head drives through the gap you have already left behind."]
         :["The coal hook catches nothing but air.","Silas lunges, but the curved iron passes clear of you."];
-    log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',{actor:who,zone,damage:0});
+    log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',
+      {actor:who,zone,damage:0,focusedBonusPercent:Math.round(focusedBonus*100)});
     if(targetWho==='player' && (s.scene==='flint'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
     return;
   }
@@ -394,6 +412,7 @@ function tryAttack(s, who, a) {
   log(s,`${narrative}${damageBreakdown}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
       'damage',{actor:who,target:targetWho,zone,raw,damage,
         baseDamage:rolled,openingDamageBonus,guarded:dst.guard,
+        focusedBonusPercent:Math.round(focusedBonus*100),
         guardReductionPercent:dst.guard?Math.round(reduction*100):0,
         ability:special?ability:null});
   if(src.weapon.type==='sharp' && damage>=6 && dst.bleed===0) {
@@ -426,6 +445,21 @@ function perform(s,who,a) {
   const x=s[who];
   switch(a.type) {
     case 'attack':case 'technique':tryAttack(s,who,a);break;
+    case 'focus': {
+      if(x.composure<TEST_CONFIG.focusedStanceComposureCost || focusedStanceTurns(s,who)>0){
+        log(s,`${x.name} cannot enter Focused Stance right now.`,'warning',{actor:who});
+        break;
+      }
+      x.composure-=TEST_CONFIG.focusedStanceComposureCost;
+      x.focusedUntilRound=s.round+TEST_CONFIG.focusedStanceDuration;
+      log(s,x.name==='Player'
+        ?`You steady your breathing and concentrate on your timing. Focused Stance: +10 percentage points attack accuracy for the next 3 turns. −10 Composure.`
+        :`${x.name} settles into a deliberate fighting stance. Focused Stance is active for 3 turns.`,
+        'focus',{actor:who,composureCost:TEST_CONFIG.focusedStanceComposureCost,
+          accuracyBonusPercent:Math.round(100*TEST_CONFIG.focusedStanceAccuracyBonus),
+          duration:TEST_CONFIG.focusedStanceDuration});
+      break;
+    }
     case 'guard': cost(s,who,TEST_CONFIG.guardCost,'guard');log(s,x.name==='Player'?'You brace for the incoming blow, letting your chance to strike pass.':`${x.name} raises a deliberate guard and waits for your attack.`, 'guard', {actor:who});break;
     case 'move':
       cost(s,who,TEST_CONFIG.moveCost,'move');
