@@ -684,7 +684,8 @@ test('A genuinely worn down human opponent can still concede before 30% HP',()=>
  for(const scene of ['flint','silas']){
    let retreats=0;
    for(let seed=1;seed<=240;seed++){
-     const s=newEncounter(scene,{seed,
+     const variedSeed=Math.imul(seed,2654435761)>>>0;
+     const s=newEncounter(scene,{seed:variedSeed,
        player:{hp:43,stamina:65,momentum:25},
        enemy:{hp:20,stamina:12}});
      if(s.intent.type==='withdraw')retreats++;
