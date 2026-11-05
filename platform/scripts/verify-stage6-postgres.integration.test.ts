@@ -147,6 +147,36 @@ before(async()=>{
 });
 after(async()=>{await app.close();await db.end();});
 
+test('Welcome is persisted per character and never unlocks tutorial gameplay itself',async()=>{
+  const first=await character(owner);
+  const second=await character(owner);
+  const path=base+first.id+'/welcome';
+  const initial=await request('GET',base+first.id);
+  assert.equal(initial.status,200);
+  assert.equal(initial.body!.character.welcomeSeen,false,'New character must require welcome');
+  assert.equal((await request('POST',path,null,{})).status,401);
+  assert.equal((await request('POST',path,stranger,{})).status,404);
+  assert.equal((await request('POST',path,owner,{unexpected:true})).status,400);
+  const acknowledge=await request('POST',path,owner,{});
+  assert.equal(acknowledge.status,200,JSON.stringify(acknowledge.body));
+  assert.equal(acknowledge.body!.welcomeSeen,true);
+  assert.equal((await request('POST',path,owner,{})).status,200,
+    'Retry must be safe and idempotent');
+  const checked=await request('GET',base+first.id);
+  assert.equal(checked.body!.character.welcomeSeen,true);
+  assert.equal(checked.body!.character.tutorial.stage,6,
+    'Welcome may not modify stage or give any gameplay progress');
+  const other=await request('GET',base+second.id);
+  assert.equal(other.body!.character.welcomeSeen,false,
+    'Acknowledging one character must not dismiss another');
+  const reset=await request('POST',base+first.id+'/dev/reset-welcome',owner,{});
+  assert.equal(reset.status,200,JSON.stringify(reset.body));
+  assert.equal(reset.body!.welcomeSeen,false);
+  assert.equal((await request('GET',base+first.id)).body!.character.welcomeSeen,false);
+  assert.equal((await request('POST',path,owner,{})).body!.welcomeSeen,true,
+    'Explicit reset must permit exactly one new acknowledgement');
+});
+
 test('Three saved stances give distinct first-round tactical states',async()=>{
   const b=await character(owner,'brace');
   const m=await character(owner,'moving');
