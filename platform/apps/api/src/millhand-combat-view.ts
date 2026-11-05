@@ -16,6 +16,16 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     ? [...(contact?['attack']:[]),'guard','move','recover',
         ...(contact&&state.player.momentum>=20?['technique']:[])]
     : [];
+  // The action panel mirrors the existing prototype formulas, including the
+  // equipped weapon's actual profile. In Stage 6 the player fights barehanded.
+  const range=(weapon:CombatState['player']['weapon'])=>({
+    min:Math.max(1,weapon.minDamage??Math.floor(weapon.damage*.72)),
+    max:Math.max(1,weapon.minDamage??Math.floor(weapon.damage*.72),
+      weapon.maxDamage??Math.ceil(weapon.damage*1.3))
+  });
+  const unarmedDamage=range(state.player.weapon);
+  const clubDamage=range(state.enemy.weapon);
+  const mitigation=state.enemy.weapon.guardMitigation??.5;
   const opportunity=state.openings.player;
   const opening=opportunity&&opportunity.expires>=state.round?opportunity:null;
   const accuracy=(zone:'head'|'torso'|'limbs')=>Math.round(100*Math.min(.95,Math.max(.05,
@@ -38,7 +48,20 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
       recoverComposure:TEST_CONFIG.mentalRecoverGain,techniqueMomentum:20,
       accuracy:{head:accuracy('head'),torso:accuracy('torso'),limbs:accuracy('limbs')},
       repeatedStrikeSurcharge:TEST_CONFIG.repeatedStrikeSurcharge,
-      guardMitigationPercent:Math.round(100*(state.enemy.weapon.guardMitigation??.5)),
+      guardMitigationPercent:Math.round(100*mitigation),
+      unarmed:true,weaponLabel:'Unarmed — fists',
+      strikeDamage:unarmedDamage,
+      techniqueDamage:{min:unarmedDamage.min+4,max:unarmedDamage.max+4},
+      openingDamageBonus:opening?(opening.damageBonus??5):0,
+      openingReason:opening?.reason??null,
+      enemyStrikeDamage:clubDamage,
+      guardedEnemyStrikeDamage:{
+        min:Math.round(clubDamage.min*(1-mitigation)),
+        max:Math.round(clubDamage.max*(1-mitigation))
+      },
+      // A move changes contact reach before a committed attack; there is no
+      // dodge roll or dodge probability in v0.5.1.
+      repositionUsesDistance:true,
       prototype:true
     },
     // State is saved on every authenticated command; no monetary/XP changes.
