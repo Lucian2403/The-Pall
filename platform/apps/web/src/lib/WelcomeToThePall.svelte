@@ -66,7 +66,9 @@
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
     border-image-repeat:stretch;
-    color:#302015;background:#e5d0aa;
+    /* Nine-slice fill already paints the parchment. A solid dialog background
+       leaks through the frame's transparent corner pixels as pale squares. */
+    color:#302015;background:transparent;
     box-shadow:0 18px 65px #000b;
   }
   .welcome-dialog::backdrop{background:#0c0b0ae8;backdrop-filter:blur(4px)}
@@ -77,7 +79,7 @@
     color:#6c4526;letter-spacing:.08em;margin:12px 0 18px}
   .welcome-copy{text-align:left;max-width:610px;margin:0 auto 23px;
     padding-top:14px;border-top:1px solid #b2946b}
-  .welcome-copy p{margin:0 0 13px;font:400 clamp(15px,1.75vw,17px)/1.58
+  .welcome-copy p{margin:0 0 13px;font:700 clamp(15px,1.75vw,17px)/1.58
     var(--pall-font-reading,Georgia,serif);color:#352315}
   .welcome-copy strong{font-weight:700;color:#2c1b0e}
   .welcome-begin{appearance:none;display:block;margin:0 auto;min-height:55px;
@@ -91,7 +93,7 @@
     border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .welcome-begin:focus-visible{outline:3px solid #9f6535;outline-offset:3px}
   .welcome-begin:disabled{opacity:.7;cursor:wait}
-  .welcome-error{font:600 14px/1.45 var(--pall-font-reading,Georgia,serif);
+  .welcome-error{font:700 14px/1.45 var(--pall-font-reading,Georgia,serif);
     color:#782817;margin:0 auto 16px;max-width:530px}
   @media(max-width:520px){
     .welcome-dialog{width:calc(100vw - 12px);max-height:96dvh;
