@@ -26,7 +26,7 @@ export type CombatSnapshot={
   rules:{
     strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
     recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
-    accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:number;prototype:boolean;
+    accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:string;guardReductionMinPercent:number;guardReductionMaxPercent:number;prototype:boolean;
     unarmed:boolean;weaponLabel:string;
     strikeDamage:{min:number;max:number};
     techniqueDamage:{min:number;max:number};
