@@ -6,6 +6,7 @@
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
+  import WelcomeToThePall from '$lib/WelcomeToThePall.svelte';
   import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience,claimDepotAmbience,stopDepotAmbience,claimMedicalClinicAmbience,stopMedicalClinicAmbience,playCoinTransactionSfx} from '$lib/pall-audio';
 
   type SavedCharacter = {
@@ -21,6 +22,7 @@
     fatigue?: {current:number;maximum:number};
     focus?: {current:number;maximum:number};
     startingLocation: string;
+    welcomeSeen?:boolean;
     tutorial: {stage: number; status: string};
   };
 
@@ -60,6 +62,17 @@
         ? '/characters/' + encodeURIComponent(character.id) + '/millhand/work'
         : '/characters/' + encodeURIComponent(character.id) + '/opening');
   const detail = $derived('/characters/' + encodeURIComponent(character.id));
+  // The server owns first-entry acknowledgement. QA fixture characters that
+  // predate the field remain unaffected; newly created ones explicitly say false.
+  let welcomedThisMount=$state(false);
+  const welcomeRequired=$derived(character.welcomeSeen===false&&!welcomedThisMount);
+  async function beginWelcomeStory(){
+    welcomedThisMount=true;
+    if(character.tutorial.stage===1){
+      await goto('/characters/'+encodeURIComponent(character.id)+'/opening',
+        {replaceState:true,invalidateAll:true});
+    }
+  }
   // Prefer the currently rendered combat snapshot over the character sheet.
   // Outside combat, retain the existing saved-resource/provisional HUD behavior.
   const staminaShown=$derived(isMeasured(combatStamina)
@@ -375,6 +388,10 @@
     <footer class="onboarding-footer">GUIDED CHAPTER · Normal Home navigation becomes available only after Stage 8.</footer>
   </div>
 </div>
+
+{#if welcomeRequired}
+  <WelcomeToThePall characterId={character.id} onStarted={beginWelcomeStory}/>
+{/if}
 
 <nav class="mobile-nav" aria-label="Tutorial navigation">
   <a href={chapter} aria-current={activePage === 'scene' ? 'page' : undefined}><span aria-hidden="true">⌂</span>Scene</a>
