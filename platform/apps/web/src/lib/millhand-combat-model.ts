@@ -11,6 +11,11 @@ export type CombatEventView={
   actor?:'player'|'enemy';
   target?:'player'|'enemy';
   damage?:number;
+  zone?:'head'|'torso'|'limbs';
+  ability?:string|null;
+  actionType?:'attack'|'guard'|'move'|'recover'|'technique';
+  actionDetail?:string;
+  actionName?:string;
 };
 export type CombatSnapshot={
   status:'active'|'finished';outcome:string|null;stance:'brace'|'moving'|'cart';
@@ -20,7 +25,14 @@ export type CombatSnapshot={
   rules:{
     strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
     recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
-    accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:number;prototype:boolean
+    accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:number;prototype:boolean;
+    unarmed:boolean;weaponLabel:string;
+    strikeDamage:{min:number;max:number};
+    techniqueDamage:{min:number;max:number};
+    openingDamageBonus:number;openingReason:string|null;
+    enemyStrikeDamage:{min:number;max:number};
+    guardedEnemyStrikeDamage:{min:number;max:number};
+    repositionUsesDistance:boolean
   };
 };
 
