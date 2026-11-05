@@ -231,7 +231,9 @@ for(const expected of [
 assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))') &&
   view.includes('fatigueAccuracyPenalty(state.player)') &&
   view.includes('currentAccuracyLoss:') &&
-  scene.includes('snapshot.rules.fatigue.currentAccuracyLoss') &&
+  !scene.includes('class="fatigue-status"') &&
+  !scene.includes('.fatigue-status{') &&
+  scene.includes('aria-label="About Fatigue"') &&
   scene.includes('At 100 Fatigue, only Recover is possible.') &&
   scene.includes('Up to {snapshot.rules.fatigue.recovery} Fatigue') &&
   scene.includes('Recover is not Guard:') &&
