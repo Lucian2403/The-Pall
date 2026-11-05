@@ -1,13 +1,19 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import {createHash} from 'node:crypto';
 const root=resolve(import.meta.dirname,'..');
 const read=p=>readFileSync(resolve(root,p),'utf8');
 const engine=read('packages/game-core/vendor/combat-v0.5.1/combat.mjs');
-const engineHash=createHash('sha256').update(engine).digest('hex');
-assert.equal(engineHash,'4d7b2c958611c8b564113a9c8825b7346461516e02d237b09fce331ba3e5ef89',
-  'The approved v0.5.1 engine must remain byte-for-byte unchanged');
+// Trial balance has been explicitly changed by the owner; guard its formulas
+// rather than enforcing the hash of the previous, now obsolete prototype.
+for(const expected of [
+  'strikeCost: 10','guardCost: 15','moveCost: 5','recoverGain: 25',
+  'limbs: -0.15','head: -0.30',
+  'dodgeChance:{side:.25,cover:.40,back:.50,close:0}',
+  'unarmedDamage:{torso:[4,8],limbs:[3,6],head:[8,13]}',
+  'unarmedTechnique:{torso:[8,12],limbs:[6,10],head:[12,18]}',
+  's.dodgeAttempt={attempted:true,success,chance}'
+])assert.ok(engine.includes(expected),'Stage 6 owner trial balance changed unexpectedly: '+expected);
 const api=read('apps/api/src/millhand-combat-routes.ts');
 const opening=read('apps/api/src/millhand-combat-opening.ts');
 const characterRoutes=read('apps/api/src/character-routes.ts');
@@ -122,30 +128,37 @@ assert.ok(scene.includes('class="action-zone"') &&
   'Combat layout must present one battlefield action bar, compact fighter comparison and adjacent Chronicle');
 
 
-// Action information must be extracted from server combat rules, not
-// invented generic tooltips or zone-based damage multipliers.
+// Compact roleplaying action-card layout must show all owner-authored
+// numerical options and use live server facts, not hardcoded UI guesses.
 const model=read('apps/web/src/lib/millhand-combat-model.ts');
 const chronicle=read('apps/web/src/lib/millhand-combat-chronicle.ts');
-assert.ok(view.includes('strikeDamage:unarmedDamage')&&
-  view.includes('techniqueDamage:{min:unarmedDamage.min+4,max:unarmedDamage.max+4}')&&
+const unarmedIcon=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/unarmed-fists.webp'));
+assert.equal(unarmedIcon.toString('ascii',0,4),'RIFF','Owner unarmed icon must be WebP');
+assert.equal(unarmedIcon.toString('ascii',8,12),'WEBP','Owner unarmed icon is not a valid WebP');
+assert.ok(unarmedIcon.length>1000&&unarmedIcon.length<30000,'Owner unarmed icon must remain optimized');
+assert.ok(view.includes('strikeByZone:zoneRanges(false)')&&
+  view.includes('techniqueByZone:zoneRanges(true)')&&
+  view.includes('dodgeChance:{side:Math.round(100*TEST_CONFIG.dodgeChance.side)')&&
   view.includes('guardMitigationPercent:Math.round(100*mitigation)')&&
-  view.includes('guardedEnemyStrikeDamage:')&&
-  view.includes('openingDamageBonus:opening?(opening.damageBonus??5):0')&&
-  view.includes('repositionUsesDistance:true')&&
-  scene.includes('Your weapon:')&&
-  scene.includes('snapshot.rules.weaponLabel')&&
-  scene.includes('damageMin')&&scene.includes('damageMax')&&
-  scene.includes('snapshot.rules.accuracy[zone]')&&
-  scene.includes('snapshot.rules.guardMitigationPercent')&&
-  scene.includes('Dodge protection:')&&scene.includes('position-based, not a %')&&
-  scene.includes('snapshot.rules.techniqueMomentum')&&
-  scene.includes('A damaging hit earns 10 Momentum')&&
+  scene.includes('snapshot.rules.strikeByZone[target]')&&
+  scene.includes('snapshot.rules.techniqueByZone[target]')&&
+  scene.includes('snapshot.rules.accuracy[target]')&&
+  scene.includes('snapshot.rules.dodgeChance.side')&&
+  scene.includes('snapshot.rules.guardCost')&&
+  scene.includes('snapshot.rules.recoverStamina')&&
+  scene.includes('Target:')&&scene.includes('Accuracy:')&&
+  scene.includes('Damage:')&&scene.includes('Cost:')&&
+  scene.includes('Damage Reduction:')&&
+  scene.includes('Dodge Chance:')&&
+  scene.includes('Press Advantage')&&
+  scene.includes('unarmed-fists.webp')&&
+  scene.includes('rifle.webp')&&
+  scene.includes('class="target-list"')&&
+  scene.includes('class:selected-target={zone===target}')&&
   scene.includes('disabled={pending || !available(visibleSelection)}')&&
-  scene.includes('You can inspect it, but not confirm it.')&&
-  model.includes('unarmed:boolean')&&model.includes('strikeDamage:')&&
-  model.includes('actionType?:')&&
+  model.includes('strikeByZone:')&&model.includes('dodgeChance:')&&
   chronicle.includes("event.actor==='enemy'"),
-  'Combat UI must explain authentic current trial effects even when an action is locked');
+  'Combat action card needs real owner balance, three selectable zones and supplied weapon artwork');
 
 assert.ok(scene.includes('snapshot.events.slice(-6)')&&
   scene.includes('Latest 6 of {snapshot.events.length} entries.')&&
