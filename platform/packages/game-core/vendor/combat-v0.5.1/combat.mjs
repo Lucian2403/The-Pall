@@ -7,12 +7,13 @@
 
 export const TEST_CONFIG = Object.freeze({
   strikeCost: 10, repeatedStrikeSurcharge: 0, guardCost: 15, moveCost: 5, useCost: 2,
-  recoverGain: 25, mentalRecoverGain: 12, lowReserve: 20,
+  recoverGain: 20,exhaustedRecoverGain:10,mentalRecoverGain:12,lowReserve:20,
   guardReduction:{min:.30,max:.60},
   // Owner-approved threshold model: the cost of already being completely spent
   // differs from the last paid Stamina spend that reached zero.
   fatigueLowGain:3,fatigueExhaustedDefenseGain:5,fatigueExhaustedAttackGain:10,
-  fatigueRecovery:10,fatigueCap:100,fatigueAttackLock:70,
+  fatigueRecovery:15,exhaustedFatigueRecovery:30,
+  highFatigueRecoverThreshold:50,fatigueCap:100,fatigueAttackLock:70,
   fatigueAccuracyStep:10,fatigueAccuracyPenaltyPerStep:.03,
   strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
   bleedDamage: { 0: 0, 1: 1, 2: 2, 3: 3 },
@@ -441,20 +442,30 @@ function perform(s,who,a) {
       }
       break;
     case 'recover': {
+      // A committed Recover is not Guard. At contact range the opponent's
+      // attack still resolves against an unguarded fighter, with no bonus
+      // reduction or invulnerability during this turn.
       const formerFatigue=clamp(x.fatigue??0,0,TEST_CONFIG.fatigueCap);
-      x.fatigue=Math.max(0,formerFatigue-TEST_CONFIG.fatigueRecovery);
+      const highFatigue=formerFatigue>=TEST_CONFIG.highFatigueRecoverThreshold;
+      const plannedFatigueRecovery=highFatigue
+        ?TEST_CONFIG.exhaustedFatigueRecovery:TEST_CONFIG.fatigueRecovery;
+      x.fatigue=Math.max(0,formerFatigue-plannedFatigueRecovery);
       const fatigueRemoved=formerFatigue-x.fatigue;
-      const fatigueText=fatigueRemoved>0?` −${fatigueRemoved} Fatigue.`:'';
+      const fatigueText=` −${fatigueRemoved} Fatigue.`;
       if(a.mode==='breath'){
-        const gain=Math.min(TEST_CONFIG.recoverGain,100-x.stamina);
+        const recoveryAmount=highFatigue
+          ?TEST_CONFIG.exhaustedRecoverGain:TEST_CONFIG.recoverGain;
+        const gain=Math.min(recoveryAmount,100-x.stamina);
         x.stamina+=gain;
         log(s,`${x.name==='Player'?'You draw a slow breath and steady your weight.':x.name+' pauses to recover.'} +${gain} Stamina.${fatigueText}`,
-          'recovery',{actor:who,mode:'breath',staminaRestored:gain,fatigueRemoved});
+          'recovery',{actor:who,mode:'breath',staminaRestored:gain,fatigueRemoved,
+            fatigueBefore:formerFatigue,fatigueAfter:x.fatigue});
       }else{
         const gain=Math.min(TEST_CONFIG.mentalRecoverGain,100-x.composure);
         x.composure+=gain;
         log(s,`${x.name==='Player'?'You force your breathing back under control.':x.name+' steadies themself.'} +${gain} Composure.${fatigueText}`,
-          'recovery',{actor:who,mode:'nerves',composureRestored:gain,fatigueRemoved});
+          'recovery',{actor:who,mode:'nerves',composureRestored:gain,fatigueRemoved,
+            fatigueBefore:formerFatigue,fatigueAfter:x.fatigue});
       }
       break;
     }
