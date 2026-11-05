@@ -7,7 +7,9 @@ const engine=read('packages/game-core/vendor/combat-v0.5.1/combat.mjs');
 // Trial balance has been explicitly changed by the owner; guard its formulas
 // rather than enforcing the hash of the previous, now obsolete prototype.
 for(const expected of [
-  'strikeCost: 10','guardCost: 15','moveCost: 5','recoverGain: 25',
+  'strikeCost: 10','guardCost: 15','moveCost: 5','recoverGain: 20',
+  'exhaustedRecoverGain:10','exhaustedFatigueRecovery:30',
+  'highFatigueRecoverThreshold:50',
   'limbs: -0.15','head: -0.30',
   'dodgeChance:{side:.25,cover:.40,back:.50,close:0}',
   'unarmedDamage:{torso:[4,8],limbs:[3,6],head:[8,13]}',
@@ -211,7 +213,8 @@ assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus?
 // engine owns changes, while the API projects the same accuracy and legal turns.
 for(const expected of [
   'fatigueLowGain:3','fatigueExhaustedDefenseGain:5',
-  'fatigueExhaustedAttackGain:10','fatigueRecovery:10',
+  'fatigueExhaustedAttackGain:10','fatigueRecovery:15',
+  'exhaustedFatigueRecovery:30','highFatigueRecoverThreshold:50',
   'fatigueCap:100','fatigueAttackLock:70',
   'fatigueAccuracyStep:10','fatigueAccuracyPenaltyPerStep:.03',
   'export function canActAtFatigue','export function fatigueAccuracyPenalty',
@@ -221,7 +224,9 @@ for(const expected of [
   'fatigueAccuracyPenalty({fatigue:fatigueAtCommit})',
   'if(e.fatigue>=TEST_CONFIG.fatigueAttackLock)',
   'const foe=canActAtFatigue(s.enemy,s.intent?.type)?s.intent:makeIntent(s)',
-  'x.fatigue=Math.max(0,formerFatigue-TEST_CONFIG.fatigueRecovery)'
+  'x.fatigue=Math.max(0,formerFatigue-plannedFatigueRecovery)',
+  'const highFatigue=formerFatigue>=TEST_CONFIG.highFatigueRecoverThreshold',
+  "const recoveryAmount=highFatigue",
 ])assert.ok(engine.includes(expected),'Missing real Fatigue rule: '+expected);
 assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))') &&
   view.includes('fatigueAccuracyPenalty(state.player)') &&
@@ -229,6 +234,13 @@ assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))')
   scene.includes('snapshot.rules.fatigue.currentAccuracyLoss') &&
   scene.includes('At 100 Fatigue, only Recover is possible.') &&
   scene.includes('up to {snapshot.rules.fatigue.recovery} Fatigue') &&
+  scene.includes('Unprotected while recovering.') &&
+  scene.includes('full, unguarded damage') &&
+  scene.includes('snapshot.rules.fatigue.recoveryFrom50') &&
+  scene.includes('snapshot.rules.recoverStaminaFrom50') &&
+  view.includes('highFatigueRecovery') &&
+  view.includes('recoverStamina:recoveryStamina') &&
+  view.includes('recovery:recoveryFatigue') &&
   scene.includes("key:'fatigue',label:'Fatigue'"),
   'Real Fatigue effects, action locks, and recovery must agree in UI and engine');
 
