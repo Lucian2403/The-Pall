@@ -13,6 +13,8 @@ on:
       - 'platform/scripts/verify-stage-six.mjs'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-stage-seven.test.ts'
+      - 'platform/scripts/verify-character-welcome.mjs'
+      - 'platform/scripts/characters-migrate.mjs'
       - 'platform/db/migrations/0008_millhand_clinic.sql'
       - 'platform/scripts/verify-stage6-postgres.integration.test.ts'
       - 'platform/db/migrations/**'
@@ -58,6 +60,8 @@ jobs:
       - run: npm ci
       - run: npm run build:packages
       - run: npm run verify:stage3-workbench-ui
+      - name: First-entry Welcome modal and character storage contract
+        run: npm run verify:welcome
       - run: npm run verify:stage4-transport-ui
       - run: node --test packages/game-core/test/millhand-second-job.test.mjs packages/game-core/test/millhand-rewind.test.mjs packages/game-core/test/millhand-wage-claim.test.mjs
       - run: npm run verify:stage4-exits
