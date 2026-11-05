@@ -84,8 +84,15 @@ class MockAudioContext{
   }
   createBufferSource(){
     const ctx=this;
-    return {buffer:null,connect(){},disconnect(){},addEventListener(){},
-      start(when=0,offset=0){ctx.started++;ctx.starts.push({when,offset});},stop(){}};
+    return {buffer:null,onEnd:null,connect(){},disconnect(){},
+      addEventListener(name,fn){if(name==='ended')this.onEnd=fn;},
+      start(when=0,offset=0){
+        ctx.started++;ctx.starts.push({when,offset});
+        // End the short sample immediately in this deterministic mock so
+        // the real mixer source limit does not permanently mute later tests.
+        this.onEnd?.();
+      },
+      stop(){this.onEnd?.();}};
   }
   close(){this.state='closed';return Promise.resolve();}
 }
