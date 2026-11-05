@@ -1,5 +1,5 @@
 /** Public projection of the preserved v0.5.1 engine. No private enemy action is exposed. */
-import {TEST_CONFIG,testAttackCost} from '@the-pall/game-core/combat-v0.5.1';
+import {TEST_CONFIG,testAttackCost,isUnarmedWeapon} from '@the-pall/game-core/combat-v0.5.1';
 import type {CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
 
 export type StageSixStance='brace'|'moving'|'cart';
@@ -23,7 +23,7 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     max:Math.max(1,weapon.minDamage??Math.floor(weapon.damage*.72),
       weapon.maxDamage??Math.ceil(weapon.damage*1.3))
   });
-  const unarmed=state.player.weapon.unarmed===true;
+  const unarmed=isUnarmedWeapon(state.player.weapon);
   const unarmedDamage=range(state.player.weapon);
   const zoneRanges=(special:boolean)=>Object.fromEntries(
     (['torso','limbs','head'] as const).map(zone=>{
