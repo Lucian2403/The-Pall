@@ -105,6 +105,18 @@
   function available(action: (typeof actionChoices)[number]['id']): boolean {
     return snapshot.legalActions.includes(action);
   }
+  function handleHotbarKey(event:KeyboardEvent):void{
+    if(ended||pending||event.altKey||event.ctrlKey||event.metaKey||event.repeat||
+       fatigueInfoDialog?.open)return;
+    if(!/^[1-6]$/.test(event.key))return;
+    const target=event.target;
+    if(target instanceof HTMLElement &&
+      target.closest('input,select,textarea,[contenteditable="true"],dialog'))return;
+    const choice=actionChoices[Number(event.key)-1];
+    if(!choice)return;
+    event.preventDefault();
+    selected=choice.id;
+  }
   function healthWidth(current: number, maximum: number): string {
     return `${Math.max(0, Math.min(100, Math.round(current / Math.max(1, maximum) * 100)))}%`;
   }
@@ -127,6 +139,8 @@
     void perform(action);
   }
 </script>
+
+<svelte:window onkeydown={handleHotbarKey} />
 
 {#snippet combatant(actor: CombatActorView, title: string, opponent: boolean)}
   <div class="fighter" class:opponent>
@@ -231,7 +245,7 @@
                 type="button" disabled={pending} aria-disabled={!available(choice.id)}
                 aria-pressed={visibleSelection===choice.id}
                 aria-label={`Select ${choice.label} action`}
-                title={available(choice.id)?choice.label:choice.label+' unavailable'}
+                title={(i+1)+': '+(available(choice.id)?choice.label:choice.label+' unavailable')}
                 onclick={()=>selected=choice.id}>
                 <span class="hotkey" aria-hidden="true">{i+1}</span>
                 {#if choice.asset}
