@@ -35,7 +35,8 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     })
   ) as Record<'torso'|'limbs'|'head',{min:number;max:number}>;
   const clubDamage=range(state.enemy.weapon);
-  const mitigation=state.enemy.weapon.guardMitigation??.5;
+  const guardMin=TEST_CONFIG.guardReduction.min;
+  const guardMax=TEST_CONFIG.guardReduction.max;
   const opportunity=state.openings.player;
   const opening=opportunity&&opportunity.expires>=state.round?opportunity:null;
   const accuracy=(zone:'head'|'torso'|'limbs')=>Math.round(100*Math.min(.95,Math.max(.05,
@@ -59,7 +60,9 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
       recoverComposure:TEST_CONFIG.mentalRecoverGain,techniqueMomentum:20,
       accuracy:{head:accuracy('head'),torso:accuracy('torso'),limbs:accuracy('limbs')},
       repeatedStrikeSurcharge:TEST_CONFIG.repeatedStrikeSurcharge,
-      guardMitigationPercent:Math.round(100*mitigation),
+      guardMitigationPercent:Math.round(100*guardMin)+'–'+Math.round(100*guardMax),
+      guardReductionMinPercent:Math.round(100*guardMin),
+      guardReductionMaxPercent:Math.round(100*guardMax),
       unarmed,weaponLabel:unarmed?'Unarmed — fists':'Equipped weapon',
       strikeDamage:zoneRanges(false).torso,
       techniqueDamage:zoneRanges(true).torso,
@@ -68,8 +71,8 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
       openingReason:opening?.reason??null,
       enemyStrikeDamage:clubDamage,
       guardedEnemyStrikeDamage:{
-        min:Math.round(clubDamage.min*(1-mitigation)),
-        max:Math.round(clubDamage.max*(1-mitigation))
+        min:Math.round(clubDamage.min*(1-guardMax)),
+        max:Math.round(clubDamage.max*(1-guardMin))
       },
       dodgeChance:{side:Math.round(100*TEST_CONFIG.dodgeChance.side),
         cover:Math.round(100*TEST_CONFIG.dodgeChance.cover),
