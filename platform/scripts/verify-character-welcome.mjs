@@ -23,6 +23,18 @@ for(const line of [
 ]){
   assert.ok(modal.includes(line),'Welcome copy has drifted: '+line.slice(0,55));
 }
+// Owner visual correction: all letterpress copy is bold, and the existing
+// nine-slice image provides the parchment fill without pale corner rectangles.
+assert.ok(modal.includes('color:#302015;background:transparent;') &&
+  !modal.includes('background:#e5d0aa;') &&
+  modal.includes('border-image-slice:145 190 125 190 fill;') &&
+  modal.includes('welcome-copy p{margin:0 0 13px;font:700') &&
+  modal.includes('welcome-error{font:700') &&
+  modal.includes('welcome-inner h1{font:700') &&
+  modal.includes('welcome-inner h2{font:700') &&
+  modal.includes('font:700 17px/1.25'),
+  'The framed Welcome must have transparent corners and bold copy on every line');
+
 assert.ok(modal.includes('<dialog')&&modal.includes('dialog.showModal()')&&
   modal.includes('oncancel={(event)=>event.preventDefault()}')&&
   modal.includes('dialog.open)dialog.close()')&&
