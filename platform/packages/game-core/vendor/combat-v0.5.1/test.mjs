@@ -9,9 +9,21 @@ test('Flint telegraphs before action; guard mitigates and can earn defensive Mom
  s=act(s,{type:'guard'});
  assert.ok(is(s,tell));assert.ok(s.player.hp<=50);assert.ok(s.player.momentum===0||s.player.momentum===8);
 });
-test('a genuinely avoided attack grants movement Momentum, no forced hit',()=>{
- let s=newEncounter('flint',{seed:1});s=act(s,{type:'move',to:'side'});
- assert.equal(s.player.hp,50);assert.equal(s.player.momentum,5);assert.equal(s.player.stamina,84);
+test('Flint Reposition rolls for evasion; only successful dodges grant Momentum',()=>{
+ let successes=0,failures=0;
+ for(let seed=1;seed<=250;seed++){
+   const s=act(newEncounter('flint',{seed}),{type:'move',to:'side'});
+   assert.equal(s.player.stamina,85);
+   if(s.events.some(e=>e.condition==='dodge_success')){
+     successes++;
+     assert.equal(s.player.momentum,5);
+     assert.equal(s.player.hp,50);
+   }else if(s.events.some(e=>e.condition==='dodge_failed')){
+     failures++;
+     assert.equal(s.player.momentum,0);
+   }
+ }
+ assert.ok(successes>0&&failures>0,'Dodge must not be automatic');
 });
 test('boar starts at 30/65 and a single sidestep cannot grant instant victory',()=>{
  let s=newEncounter('boar',{seed:1});
@@ -44,7 +56,7 @@ test('attacker and actual guarding defender can earn Momentum in same round',()=
 });
 test('Stamina is persistent, Fatigue only at/below 20 from physical exertion',()=>{
  let s=newEncounter('flint',{seed:1,player:{stamina:27}});
- s=act(s,{type:'attack'});assert.equal(s.player.stamina,16);assert.equal(s.player.fatigue,5);
+ s=act(s,{type:'attack'});assert.equal(s.player.stamina,17);assert.equal(s.player.fatigue,5);
  let fresh=newEncounter('flint',{seed:1});fresh=act(fresh,{type:'guard'});assert.equal(fresh.player.fatigue,0);
 });
 test('bandage must be held and consume action; can control bleeding only',()=>{
@@ -76,7 +88,7 @@ test('Downed is a real defeat, not permadeath or forced victory',()=>{
 test('recover does not restore Health, clear fatigue, or give Momentum',()=>{
  let s=newEncounter('flint',{seed:1,player:{stamina:32,hp:40,fatigue:10}});
  s=act(s,{type:'recover',mode:'breath'});
- assert.equal(s.player.stamina,48);assert.equal(s.player.fatigue,10);assert.equal(s.player.momentum,0);
+ assert.equal(s.player.stamina,57);assert.equal(s.player.fatigue,10);assert.equal(s.player.momentum,0);
  assert.ok(s.player.hp<=40);
 });
 test('trained opponent can Guard; its own Momentum rises only on real mitigation',()=>{
@@ -94,7 +106,7 @@ test('no passive Fatigue or Stress merely from low reserves',()=>{
 test('an avoided enemy committed attack still consumes enemy physical Stamina',()=>{
  let s=newEncounter('flint',{seed:1});
  s=act(s,{type:'move',to:'cover'});
- assert.equal(s.enemy.stamina,79);
+ assert.equal(s.enemy.stamina,80);
  assert.equal(s.player.hp,50);
 });
 
@@ -264,10 +276,10 @@ test('Flint only rarely chooses Guard even when faced with aggressive play',()=>
  assert.ok(guards/commits<.15,`Flint guard share ${(guards/commits).toFixed(3)} is too high`);
 });
 
-test('v0.5 basic strike starts at 11 Stamina, third consecutive attack costs 14',()=>{
+test('Stage 6 strike starts at 10 Stamina, third consecutive attack costs 13',()=>{
  let s=newEncounter('flint',{seed:21,player:{hp:240,hpMax:240,ceiling:240},enemy:{hp:250,hpMax:250,ceiling:250,weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
  for(let n=0;n<3;n++)s=act(s,{type:'attack',zone:'torso'},`pressure-${n}`);
- assert.equal(s.player.stamina,90-11-11-14);
+ assert.equal(s.player.stamina,90-10-10-13);
  assert.deepEqual(s.lastPlayerActions.slice(-3),['attack','attack','attack']);
 });
 test('v0.5 repeated attacks expose stance for NPC, but a different action resets the surcharge',()=>{
@@ -279,7 +291,7 @@ test('v0.5 repeated attacks expose stance for NPC, but a different action resets
  assert.equal(s.lastPlayerActions.at(-1),'guard');
  const costBefore=s.player.stamina;
  s=act(s,{type:'attack'},'r4');
- assert.equal(s.player.stamina,costBefore-11);
+ assert.equal(s.player.stamina,costBefore-10);
 });
 test('v0.5 Flint has high but unreliable club impact; he never receives a free hit',()=>{
  const s=newEncounter('flint',{seed:1});
@@ -292,9 +304,9 @@ test('v0.5 combat server publishes numerical, state-aware action descriptions',a
  const dir=await mkdtemp(join(tmpdir(),'pall-rules-'));
  try{
   const store=createStore(dir,{seedGenerator:()=>21});const {encounter,token}=await store.create('flint');
-  assert.equal(encounter.rules.attack.cost,11);
-  assert.deepEqual(encounter.rules.attack.accuracy,{torso:70,limbs:58,head:45});
-  assert.equal(encounter.rules.guard.mitigationPercent,68);
+  assert.equal(encounter.rules.attack.cost,10);
+  assert.deepEqual(encounter.rules.attack.accuracy,{torso:70,limbs:55,head:40});
+  assert.equal(encounter.rules.guard.mitigationPercent,60);
   assert.equal(encounter.rules.attack.minDamage,4);
   assert.equal(encounter.rules.attack.maxDamage,8);
   assert.equal(encounter.rules.technique.momentumCost,20);
@@ -320,6 +332,30 @@ test('v0.5 no vulnerability after just one strike; the second is the threshold',
 
 // v0.5.1 regression: Flint must not yield while clearly finishing a nearly
 // downed novice just because Flint is below his own old HP cutoff.
+test('unarmed zones and techniques roll within their distinct owner damage bands',()=>{
+ for(const [zone,attackRange,specialRange] of [
+   ['torso',[4,8],[8,12]],['limbs',[3,6],[6,10]],['head',[8,13],[12,18]]
+ ]){
+   const hits=new Set(),techniques=new Set();
+   for(let seed=1;seed<500;seed++){
+     const a=act(newEncounter('flint',{seed}),{type:'attack',zone});
+     for(const e of a.events)if(e.kind==='damage'&&e.actor==='player')hits.add(e.raw);
+     const b=act(newEncounter('flint',{seed,player:{momentum:40}}),{type:'technique',zone});
+     for(const e of b.events)if(e.kind==='damage'&&e.actor==='player')techniques.add(e.raw);
+   }
+   assert.deepEqual([Math.min(...hits),Math.max(...hits)],attackRange,zone+' attack range');
+   assert.deepEqual([Math.min(...techniques),Math.max(...techniques)],specialRange,zone+' special range');
+ }
+});
+test('repeated Arms hits impair attack accuracy and timing',()=>{
+ let s=newEncounter('flint',{seed:1,enemy:{hp:350,hpMax:350,ceiling:350,
+   weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.95,type:'blunt',reach:'contact'}}});
+ for(let n=0;n<100&&!s.enemy.armImpaired&&s.status==='active';n++)
+   s=act(s,{type:'attack',zone:'limbs'},'arm-'+n);
+ assert.equal(s.enemy.armImpaired,true);
+ assert.ok(s.enemy.armHits>=2);
+});
+
 test('Flint does not abandon a dominant 18/50 versus 2/50 position',()=>{
   for(let seed=1;seed<=300;seed++){
     const s=newEncounter('flint',{seed,player:{hp:2,momentum:45},enemy:{hp:18}});
