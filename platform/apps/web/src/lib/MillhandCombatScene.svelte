@@ -254,12 +254,21 @@
                   aria-pressed={zone===target} disabled={pending} onclick={()=>zone=target}>
                   <span><b>Target:</b> {target==='limbs'?'Arms':target==='head'?'Head':'Torso'}</span>
                   <span><b>Accuracy:</b> {snapshot.rules.accuracy[target]}%</span>
-                  <span><b>Damage:</b>
+                  <span><b>Base Damage:</b>
                     {visibleSelection==='attack'
-                      ?snapshot.rules.strikeByZone[target].min+openingBonus
-                      :snapshot.rules.techniqueByZone[target].min+openingBonus}–{visibleSelection==='attack'
-                      ?snapshot.rules.strikeByZone[target].max+openingBonus
-                      :snapshot.rules.techniqueByZone[target].max+openingBonus}</span>
+                      ?snapshot.rules.strikeByZone[target].min
+                      :snapshot.rules.techniqueByZone[target].min}–{visibleSelection==='attack'
+                      ?snapshot.rules.strikeByZone[target].max
+                      :snapshot.rules.techniqueByZone[target].max}</span>
+                  {#if openingBonus>0}
+                    <span class="opening-stat"><b>Opening:</b> +{openingBonus}</span>
+                    <span class="potential-stat"><b>Total:</b>
+                      {visibleSelection==='attack'
+                        ?snapshot.rules.strikeByZone[target].min+openingBonus
+                        :snapshot.rules.techniqueByZone[target].min+openingBonus}–{visibleSelection==='attack'
+                        ?snapshot.rules.strikeByZone[target].max+openingBonus
+                        :snapshot.rules.techniqueByZone[target].max+openingBonus}</span>
+                  {/if}
                   <span><b>Cost:</b> {visibleSelection==='attack'?snapshot.rules.strikeCost:15} Stamina{visibleSelection==='technique'?' + '+snapshot.rules.techniqueMomentum+' Momentum':''}</span>
                 </button>
               {/each}
@@ -267,16 +276,19 @@
             {#if visibleSelection==='attack'}
               <p class="action-explanation">Strike the selected body part. Repeated Arms hits impair
                 attack accuracy and speed. Head hits deal more damage but are harder to land.
-                A damaging hit grants +10 Momentum.</p>
+                A damaging hit grants +10 Momentum. Base Damage is before an Opening bonus
+                or the opponent's Guard.</p>
             {:else}
               <p class="action-explanation">A powerful strike that deals increased damage.
                 Requires {snapshot.rules.techniqueMomentum} Momentum.
                 Accuracy and damage depend on the selected body part.
-                {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}</p>
+                {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}
+                Base Damage excludes the separate Opening bonus and enemy Guard.</p>
             {/if}
             {#if snapshot.rules.openingReason}
               <p class="detail-note">Opening: {snapshot.rules.openingReason}.
-                The accuracy and damage above include its bonuses.</p>
+                Shown accuracy includes its accuracy bonus; the damage rows show
+                base damage, bonus and total separately.</p>
             {/if}
           {:else if visibleSelection==='guard'}
             <div class="stat-line">
@@ -483,6 +495,8 @@
   .target-line span{white-space:nowrap}
   .target-line span+span{padding-left:9px;border-left:1px solid #b69a77}
   .target-line b,.stat-line b{font-weight:700}
+  .target-line .opening-stat{color:#70441e;font-weight:700}
+  .target-line .potential-stat{color:#493013;font-weight:700}
   .target-line.selected-target{background:#ecd4a5;border-color:#b68b55;border-radius:3px}
   .target-line:hover:not(:disabled){background:#f6e5c6}
   .target-line:focus-visible{outline:2px solid #855a31;outline-offset:2px}
