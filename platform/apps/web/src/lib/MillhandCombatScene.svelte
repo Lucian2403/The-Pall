@@ -88,6 +88,7 @@
   const iconBase = '/ui-kit/combat-actions/';
   const displayedResources=[
     {key:'stamina',label:'Stamina'},
+    {key:'composure',label:'Composure'},
     {key:'fatigue',label:'Fatigue'},
     {key:'momentum',label:'Momentum'}
   ] as const;
@@ -180,7 +181,6 @@
     <details class="secondary-stats">
       <summary>More condition details</summary>
       <dl>
-        <div><dt>Composure</dt><dd>{actor.composure}</dd></div>
         {#if (actor.focusedTurnsRemaining??0)>0}
           <div><dt>Focused Stance</dt><dd>{actor.focusedTurnsRemaining} turns</dd></div>
         {/if}
@@ -308,6 +308,14 @@
             </p>
           {/if}
           {#if visibleSelection==='attack'||visibleSelection==='technique'}
+            <div class="stat-line attack-cost">
+              <span><b>Cost:</b> {visibleSelection==='attack'
+                ?snapshot.rules.strikeCost:15} Stamina{visibleSelection==='technique'
+                  ?' + '+snapshot.rules.techniqueMomentum+' Momentum':''}</span>
+              {#if openingBonus>0}
+                <span class="opening-stat"><b>Opening:</b> +{openingBonus} damage</span>
+              {/if}
+            </div>
             <div class="target-list" role="group" aria-label="Choose the body part to target">
               {#each targetZones as target (target)}
                 <button type="button" class="target-line" class:selected-target={zone===target}
@@ -321,7 +329,6 @@
                       ?snapshot.rules.strikeByZone[target].max
                       :snapshot.rules.techniqueByZone[target].max}</span>
                   {#if openingBonus>0}
-                    <span class="opening-stat"><b>Opening:</b> +{openingBonus}</span>
                     <span class="potential-stat"><b>Total:</b>
                       {visibleSelection==='attack'
                         ?snapshot.rules.strikeByZone[target].min+openingBonus
@@ -329,27 +336,18 @@
                         ?snapshot.rules.strikeByZone[target].max+openingBonus
                         :snapshot.rules.techniqueByZone[target].max+openingBonus}</span>
                   {/if}
-                  <span><b>Cost:</b> {visibleSelection==='attack'?snapshot.rules.strikeCost:15} Stamina{visibleSelection==='technique'?' + '+snapshot.rules.techniqueMomentum+' Momentum':''}</span>
                 </button>
               {/each}
             </div>
             {#if visibleSelection==='attack'}
-              <p class="action-explanation">Strike the selected body part. Repeated Arms hits impair
-                attack accuracy and speed. Head hits deal more damage but are harder to land.
-                A damaging hit grants +10 Momentum. Base Damage is before an Opening bonus
-                or the opponent's Guard. Accuracy includes the current Fatigue penalty.</p>
+              <p class="action-explanation">Strike a body part. Arms hits impair attacks;
+                Head hits harder but is less accurate. Damaging hits grant +10 Momentum.</p>
             {:else}
-              <p class="action-explanation">A powerful strike that deals increased damage.
-                Requires {snapshot.rules.techniqueMomentum} Momentum.
-                Accuracy and damage depend on the selected body part.
-                {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}
-                Base Damage excludes the separate Opening bonus and enemy Guard.
-                Accuracy includes the current Fatigue penalty.</p>
+              <p class="action-explanation">A heavier strike. Damage and accuracy
+                depend on the targeted body part.</p>
             {/if}
             {#if snapshot.rules.openingReason}
-              <p class="detail-note">Opening: {snapshot.rules.openingReason}.
-                Shown accuracy includes its accuracy bonus; the damage rows show
-                base damage, bonus and total separately.</p>
+              <p class="detail-note">Opening: {snapshot.rules.openingReason}.</p>
             {/if}
           {:else if visibleSelection==='guard'}
             <div class="stat-line">
@@ -656,8 +654,8 @@
     border-radius:2px;cursor:pointer;font:700 10px/1.1 Georgia,serif}
   .details-toggle:hover{background:#4a3629}
   .focus-heading-symbol{font:700 27px/1 Georgia,serif;color:#6d4b20}
-  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:7px;
-    box-sizing:border-box;max-height:320px;overflow-y:auto;min-height:0;
+  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4px;
+    box-sizing:border-box;min-height:0;
     width:min(100%,680px);margin:0 0 0 auto;padding:8px 15px;
     background:transparent;color:#352417;border:solid transparent;border-width:10px 14px 9px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
@@ -667,14 +665,14 @@
     padding:0 0 5px;border-bottom:1px solid #b18f69;font:700 18px/1.2 Georgia,serif}
   .heading-title{display:flex;align-items:center;gap:8px}
   .chosen-heading .weapon-icon{width:39px;height:39px;object-fit:contain;filter:none}
-  .target-list{display:grid;gap:3px}
-  .target-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;
-    text-align:left;padding:5px 8px;border:1px solid transparent;background:transparent;
+  .target-list{display:grid;gap:1px}
+  .target-line{display:flex;align-items:center;gap:6px 9px;flex-wrap:wrap;width:100%;
+    text-align:left;padding:4px 6px;border:1px solid transparent;background:transparent;
     color:#382318;cursor:pointer;font:600 12px/1.35 Georgia,serif}
   .target-line span{white-space:nowrap}
   .target-line span+span{padding-left:9px;border-left:1px solid #b69a77}
   .target-line b,.stat-line b{font-weight:700}
-  .target-line .opening-stat{color:#70441e;font-weight:700}
+  .attack-cost .opening-stat{color:#70441e;font-weight:700}
   .target-line .potential-stat{color:#493013;font-weight:700}
   .target-line.selected-target{background:#ecd4a5;border-color:#b68b55;border-radius:3px}
   .target-line:hover:not(:disabled){background:#f6e5c6}
@@ -712,7 +710,7 @@
     border-radius:2px;margin:10px 0}
   .hp-fill{display:block;height:100%;background:linear-gradient(90deg,#b89558,#f4d397);transition:width .2s ease}
   .hp-fill.critical,.opponent .hp-fill{background:linear-gradient(90deg,#783326,#bd4a2e)}
-  .resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:8px}
+  .resources{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;gap:8px}
   .resource{min-width:0}
   .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   .resource-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;min-width:0}
@@ -730,6 +728,7 @@
     border:1px solid #967049;border-radius:3px;overflow:hidden}
   .mini-fill{display:block;height:100%;transition:width .2s ease}
   .mini-fill.stamina{background:linear-gradient(90deg,#326343,#71a67c)}
+  .mini-fill.composure{background:linear-gradient(90deg,#466580,#8aafc8)}
   .mini-fill.fatigue{background:linear-gradient(90deg,#8e542b,#d59a52)}
   .mini-fill.momentum{background:linear-gradient(90deg,#8b733d,#e6cb7c)}
   .secondary-stats{margin-top:11px;border-top:1px solid #4f3e31;padding-top:6px}
@@ -817,7 +816,7 @@
     .actions-row{margin:0 auto}
     .action-details{margin:0 auto}
     .combat-console{grid-template-columns:1fr}
-    .resources{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .resources{grid-template-columns:repeat(4,minmax(0,1fr))}
     .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   }
   @media(max-width:640px){
@@ -843,6 +842,8 @@
     .target-line span+span{border:0;padding:0}
     .stat-line span+span{border:0;padding:0}
     .combat-console{padding:9px;gap:9px}
+    .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .resource:nth-child(3){border-left:0;padding-left:0}
   }
   @media(max-width:370px){
     .resources{grid-template-columns:1fr}
