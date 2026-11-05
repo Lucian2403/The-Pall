@@ -104,11 +104,11 @@ for(const [asset,action] of Object.entries(assets)){
 }
 const confirm=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/confirm-action.webp'));
 assert.equal(confirm.toString('ascii',8,12),'WEBP','Confirm action icon missing');
-assert.ok(scene.includes("iconBase + 'confirm-action.webp'")&&
-  scene.includes('aria-pressed={visibleSelection === choice.id}')&&
+assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
+  scene.includes('aria-pressed={visibleSelection===choice.id}')&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
-  scene.includes('opacity:.76')&&
+  scene.includes('.action-tile.chosen{border-color:#f0c77f')&&
   scene.includes('snapshot.events.slice(-6)')&&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
@@ -307,10 +307,48 @@ assert.ok(scene.includes("dialogue-frame-trim.png") &&
   scene.includes('class="cart-marker scene-label"') &&
   scene.includes('class="scene-label flint-label"') &&
   scene.includes('border-image-slice:145 190 125 190 fill') &&
-  scene.includes('min-height:69px') &&
+  scene.includes('grid-template-columns:repeat(6,minmax(0,54px))') &&
   !scene.includes('        <p class="kicker">THE PASSAGE · STAGE 6</p>'),
   'The combat parchment, compact action tiles and NPC labels must use the trimmed frame');
 
+
+// Focused Stance is a real server-owned action, not a cosmetically clickable
+// shortcut. Compact mode keeps its 6 slots visible and full details optional.
+for(const expected of [
+  'focusedStanceComposureCost:10','focusedStanceAccuracyBonus:.10',
+  'focusedStanceDuration:3','export function focusedStanceTurns',
+  "if(a.type==='focus')",
+  "case 'focus': {",
+  'x.composure-=TEST_CONFIG.focusedStanceComposureCost',
+  'x.focusedUntilRound=s.round+TEST_CONFIG.focusedStanceDuration',
+  'focusedBonus=focusedStanceTurns(s,who)>0'
+])assert.ok(engine.includes(expected),'Focused Stance must be real and expire after three turns: '+expected);
+assert.ok(api.includes("case 'guard':case 'focus':") &&
+  api.includes("['damage','miss','guard','move','recovery','technique','focus']") &&
+  view.includes("...(focusCanBeUsed?['focus']:[])") &&
+  view.includes('focusedStanceTurns(state') &&
+  view.includes('focusedStanceAccuracyBonus:0') &&
+  view.includes('focus:{cost:TEST_CONFIG.focusedStanceComposureCost') &&
+  model.includes('focusedTurnsRemaining?:number') &&
+  model.includes('focus?:{cost:number;accuracyBonusPercent:number;duration:number;remaining:number}') &&
+  chronicle.includes("event.actionType==='focus'"),
+  'Focused Stance must be persisted, projected and visible in Chronicle');
+assert.ok(scene.includes("id:'focus',label:'Focused Stance'") &&
+  scene.includes("case 'focus': action = {type:'focus'};") &&
+  scene.includes("let detailsOpen=$state(false)") &&
+  scene.includes("class=\"details-toggle\"") &&
+  scene.includes('aria-expanded={detailsOpen}') &&
+  scene.includes("{#if detailsOpen}") &&
+  scene.includes('class="focus-timer"') &&
+  scene.includes('grid-template-columns:repeat(6,minmax(0,54px))') &&
+  scene.includes('height:57px') &&
+  scene.includes('width:min(74%,790px)') &&
+  !scene.includes('min-height:69px') &&
+  !scene.includes("id:'feint'") &&
+  !engine.includes("case 'feint':"),
+  'Use an actual six-slot compact hotbar, with Feint explicitly not implemented');
+assert.ok(pgTest.includes("test('Focused Stance is an authenticated, replay-safe action"),
+  'Focus must have a real authenticated PostgreSQL regression');
 
 // Owner HUD: Flint beside his stats; Chronicle on the left, player on the right.
 const enemyPosition=scene.indexOf('<section class="enemy-status"');
