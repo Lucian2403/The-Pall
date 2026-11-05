@@ -1,4 +1,4 @@
-/** Types for the unmodified v0.5.1 combat prototype. Values remain trial balance. */
+/** Types for the Stage 6 owner-tuned v0.5.1 combat prototype. Values remain trial balance. */
 export type CombatOutcome = 'player_victory' | 'player_defeat' | 'player_escaped' | null;
 export type CombatZone = 'head' | 'torso' | 'limbs';
 export type CombatAction =
@@ -19,8 +19,9 @@ export type CombatActor = {
   composure:number;fatigue:number;stress:number;momentum:number;
   wounds:Array<{type:string;zone?:CombatZone;severity:string;[key:string]:unknown}>;
   bleed:number;bandages:number;guard:boolean;readiness:number;
+  armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
   weapon:{damage:number;accuracy:number;type:string;reach:string;
-    minDamage?:number;maxDamage?:number;guardMitigation?:number};
+    minDamage?:number;maxDamage?:number;guardMitigation?:number;unarmed?:boolean};
 };
 export type CombatState = {
   id:string;scene:'flint'|'boar'|'silas';round:number;revision:number;rng:number;
@@ -32,10 +33,15 @@ export type CombatState = {
   lastPlayerActions:string[];lastEnemyActions:string[];
   [extra:string]:unknown;
 };
+export declare function isUnarmedWeapon(weapon:CombatActor['weapon']):boolean;
 export declare const TEST_CONFIG:Readonly<{
   strikeCost:number;repeatedStrikeSurcharge:number;guardCost:number;moveCost:number;
   recoverGain:number;mentalRecoverGain:number;aim:Record<CombatZone,number>;
   strikeMomentum:number;guardMomentum:number;moveMomentum:number;
+  guardReduction:Readonly<{min:number;max:number}>;
+  dodgeChance:Readonly<{side:number;cover:number;back:number;close:number}>;
+  unarmedDamage:Readonly<Record<CombatZone,readonly [number,number]>>;
+  unarmedTechnique:Readonly<Record<CombatZone,readonly [number,number]>>;
 }>;
 export declare class CombatError extends Error {}
 export declare function newEncounter(scene:'flint'|'boar'|'silas',opts?:{

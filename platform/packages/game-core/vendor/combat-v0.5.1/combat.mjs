@@ -1,26 +1,36 @@
 /**
  * The Pall — standalone deterministic combat SPIKE (not production MMO code).
  * All costs, damages, percentages and yields are NON-CANONICAL test fixtures.
+ * Stage 6 owner-approved trial balance: zone damage, guard and probabilistic dodge.
  * Pure state transitions: callers must persist state with a transaction/CAS.
  */
 
 export const TEST_CONFIG = Object.freeze({
-  strikeCost: 11, repeatedStrikeSurcharge: 3, guardCost: 5, moveCost: 6, useCost: 2,
-  recoverGain: 16, mentalRecoverGain: 12, lowReserve: 20,
+  strikeCost: 10, repeatedStrikeSurcharge: 0, guardCost: 15, moveCost: 5, useCost: 2,
+  recoverGain: 25, mentalRecoverGain: 12, lowReserve: 20,
+  guardReduction:{min:.30,max:.60},
   fatigueGain: 5, strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
   bleedDamage: { 0: 0, 1: 1, 2: 2, 3: 3 },
-  aim: { torso: 0, limbs: -0.12, head: -0.25 },
+  aim: { torso: 0, limbs: -0.15, head: -0.30 },
+  dodgeChance:{side:.25,cover:.40,back:.50,close:0},
+  unarmedDamage:{torso:[4,8],limbs:[3,6],head:[8,13]},
+  unarmedTechnique:{torso:[8,12],limbs:[6,10],head:[12,18]},
 });
 
 export class CombatError extends Error {}
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+// Earlier persisted Flint fights precede the explicit unarmed marker.
+export const isUnarmedWeapon=w=>w.unarmed===true ||
+  (w.unarmed===undefined&&w.damage===6&&w.accuracy===.70&&w.type==='blunt');
 const copy = x => structuredClone(x);
 const actor = (name, opts = {}) => ({
   name, hp: opts.hp ?? 50, hpMax: opts.hpMax ?? 50, ceiling: opts.ceiling ?? 50,
   stamina: opts.stamina ?? 90, composure: opts.composure ?? 80,
   fatigue: opts.fatigue ?? 0, stress: opts.stress ?? 0, momentum: opts.momentum ?? 0,
   wounds: [], bleed: 0, bandages: opts.bandages ?? 0, guard: false,
-  readiness: opts.readiness ?? 0, weapon: opts.weapon ?? {damage: 6,accuracy: .70,type: 'blunt',reach: 'contact'},
+  armHits:opts.armHits??0,armImpaired:opts.armImpaired??false,
+  reloadSlowdownPercent:opts.reloadSlowdownPercent??0,
+  readiness: opts.readiness ?? 0, weapon: opts.weapon ?? {damage: 6,accuracy: .70,type: 'blunt',reach: 'contact',unarmed:true},
 });
 function rng(state) {
   // Deterministic LCG. Not secure; replaced by server-owned RNG in production.
@@ -196,7 +206,7 @@ export function newEncounter(scene, opts = {}) {
   if(scene==='boar'&&!['hold','fence','embankment'].includes(approach))throw new CombatError('Unknown boar staging');
   const enemies = {
     flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,
-      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.68,type:'blunt',reach:'contact'}},
+      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
     boar: {name:'Young Injured Wild Boar', hp:30,hpMax:65,ceiling:65, readiness:1,
       weapon:{damage:12,accuracy:.70,guardMitigation:.30,type:'blunt',reach:'contact'}},
     silas: {name:'Silas Pumpard', hp:50,hpMax:50,ceiling:50,readiness:0,
@@ -231,7 +241,9 @@ function verifyAction(s,a) {
 }
 function actionSpeed(who, a, s) {
   const speed = a.speed ?? ({attack:4,guard:10,move:6,use:3,recover:2,withdraw:5,technique:3}[a.type]);
-  return speed + s[who].readiness;
+  // Repeated arm hits slow committed attacks, not only their accuracy.
+  const impaired=s[who].armImpaired&&(a.type==='attack'||a.type==='technique');
+  return speed + s[who].readiness-(impaired?1:0);
 }
 function tryAttack(s, who, a) {
   const src=s[who],targetWho=who==='player'?'enemy':'player',dst=s[targetWho];
@@ -244,8 +256,13 @@ function tryAttack(s, who, a) {
     src.momentum-=spend;
     log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend});
   }
-  cost(s,who,special?12:testAttackCost(s,who));
-  if(s.distance==='far' || (s.distance==='near' && !(s.scene==='boar' && who==='enemy'))){
+  cost(s,who,special?15:testAttackCost(s,who));
+  // A failed committed dodge lets this specific club swing catch the mover
+  // despite new spacing. A successful dodge uses the ordinary reach/miss path.
+  const caughtDodging=who==='enemy'&&s.scene==='flint'&&
+    s.dodgeAttempt?.attempted===true&&!s.dodgeAttempt.success;
+  if(!caughtDodging&&(s.distance==='far' ||
+    (s.distance==='near' && !(s.scene==='boar' && who==='enemy')))){
     log(s,`${src.name}'s committed ${special?'maneuver':'strike'} falls short. The target is no longer within reach.`,'miss',{actor:who});
     return;
   }
@@ -257,7 +274,8 @@ function tryAttack(s, who, a) {
   const exploited=hasOpening(s,who);
   const edge=exploited?s.openings[who]:null;
   if(exploited)s.openings[who]=null;
-  const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]-(special && who==='enemy'?.07:0)+(exploited?(edge.accuracyBonus??.20):0),.05,.95);
+  const impairment=src.armImpaired?.10:0;
+  const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]-(special && who==='enemy'?.07:0)+(exploited?(edge.accuracyBonus??.20):0)-impairment,.05,.95);
   if (rng(s)>=chance) {
     const actions=who==='player'
       ? ["Your blow passes wide. You find nothing but air.","You commit to the strike, but the opponent slips outside its path.","You reach for an opening that closes too quickly."]
@@ -274,9 +292,18 @@ function tryAttack(s, who, a) {
   // TRIAL ONLY: ±roughly 30% damage spread. Never change final equipment stats from this spike.
   const lo=Math.max(1,src.weapon.minDamage??Math.floor(base*.72));
   const hi=Math.max(lo,src.weapon.maxDamage??Math.ceil(base*1.3));
-  const rolled=lo+Math.floor(rng(s)*(hi-lo+1));
-  const raw=rolled+(special?4:0)+(exploited?(edge.damageBonus??5):0);
-  const reduction=dst.guard?(src.weapon.guardMitigation??.5):0; // source weapon profile; works for either actor
+  const profile=who==='player'&&isUnarmedWeapon(src.weapon)
+    ?(special?TEST_CONFIG.unarmedTechnique:TEST_CONFIG.unarmedDamage)[zone]:null;
+  const damageLo=profile?.[0]??(lo+(special?4:0));
+  const damageHi=profile?.[1]??(hi+(special?4:0));
+  const rolled=damageLo+Math.floor(rng(s)*(damageHi-damageLo+1));
+  const openingDamageBonus=exploited?(edge.damageBonus??5):0;
+  const raw=rolled+openingDamageBonus;
+  // A Guard cuts 30–60% of a landed strike. The single deterministic roll
+  // is part of the committed combat state, so replay and reload are identical.
+  const reduction=dst.guard?
+    TEST_CONFIG.guardReduction.min+rng(s)*(TEST_CONFIG.guardReduction.max-
+      TEST_CONFIG.guardReduction.min):0;
   const damage=Math.max(0,Math.round(raw*(1-reduction)));
   dst.hp=Math.max(0,dst.hp-damage);
   const part=woundName(s,who,zone);
@@ -297,6 +324,10 @@ function tryAttack(s, who, a) {
     `The curved work iron strikes along your ${part}.`,
     `Silas catches you with the hook as he steps inside your reach.`]);
   if(exploited)narrative=`${src.name==='Player'?'You take the opening.':src.name+' exploits the opening.'} ${narrative}`;
+  // Explain exceptional damage within the same persisted event. The roll and
+  // opening bonus are distinct; Guard may still reduce the resulting total.
+  const damageBreakdown=openingDamageBonus>0
+    ?` ${rolled} base damage + ${openingDamageBonus} Opening bonus = ${raw} before Guard.`:'';
   // Truthful, situation-driven detail, never invented injuries or scenery.
   const prior=s.lastPlayerActions?.at(-1);
   const contextual=who==='player' && prior==='guard'?' You have just come out of a defensive stance.'
@@ -304,8 +335,11 @@ function tryAttack(s, who, a) {
     :who==='enemy'&&s.scene==='boar'&&s.terrain.playerSpot==='fence'?' The broken fence offers little room for the animal to turn.'
     :who==='player'&&s.enemy.hp<s.enemy.hpMax/2?' The opponent is plainly struggling now.':'';
   const guardText=dst.guard?` ${dst.name==='Player'?'Your guard':'Their guard'} absorbs ${raw-damage} of the impact.`:'';
-  log(s,`${narrative}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
-      'damage',{actor:who,target:targetWho,zone,raw,damage,guarded:dst.guard,ability:special?ability:null});
+  log(s,`${narrative}${damageBreakdown}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
+      'damage',{actor:who,target:targetWho,zone,raw,damage,
+        baseDamage:rolled,openingDamageBonus,guarded:dst.guard,
+        guardReductionPercent:dst.guard?Math.round(reduction*100):0,
+        ability:special?ability:null});
   if(src.weapon.type==='sharp' && damage>=6 && dst.bleed===0) {
     dst.bleed=1;dst.wounds.push({type:'cut',zone,severity:'minor'});
     log(s,`${dst.name==='Player'?'A shallow cut opens.':'A shallow cut opens on '+dst.name+'.'} Light bleeding begins.`,'wound',{actor:targetWho});
@@ -316,6 +350,17 @@ function tryAttack(s, who, a) {
     dst.ceiling=Math.max(1,dst.hpMax-8);dst.hp=Math.min(dst.hp,dst.ceiling);
     if(!dst.wounds.some(w=>w.severity==='serious'))dst.wounds.push({type:'impact',zone,severity:'serious'});
     log(s,`${dst.name} suffers a severe impact. Their effective Health ceiling is reduced.`,'wound',{actor:targetWho});
+  }
+  if(damage>0&&zone==='limbs'){
+    dst.armHits=(dst.armHits??0)+1;
+    if(dst.armHits===2){
+      dst.armImpaired=true;
+      // An armed reload action is not present in Stage 6, but the persisted
+      // impairment modifier can be consumed by one when weapon reload exists.
+      dst.reloadSlowdownPercent=25;
+      log(s,`${dst.name} has taken repeated arm strikes. Attack accuracy is reduced by 10 percentage points.`,
+        'wound',{actor:targetWho,zone:'limbs',condition:'arm_impaired'});
+    }
   }
   if(!special&&damage>0)grant(s,who,TEST_CONFIG.strikeMomentum);
   if(dst.guard&&damage>0&&raw>damage){grant(s,targetWho,TEST_CONFIG.guardMomentum);opening(s,targetWho,'the blow is checked by a firm guard');}
@@ -341,7 +386,7 @@ function perform(s,who,a) {
       }
       break;
     case 'recover':
-      if(a.mode==='breath'){x.stamina=Math.min(100,x.stamina+TEST_CONFIG.recoverGain);log(s,`${x.name==='Player'?'You draw a slow breath and steady your weight.':x.name+' pauses to recover.'} +16 Stamina.`,'recovery');}
+      if(a.mode==='breath'){const gain=Math.min(TEST_CONFIG.recoverGain,100-x.stamina);x.stamina+=gain;log(s,`${x.name==='Player'?'You draw a slow breath and steady your weight.':x.name+' pauses to recover.'} +${gain} Stamina.`,'recovery');}
       else {x.composure=Math.min(100,x.composure+TEST_CONFIG.mentalRecoverGain);log(s,`${x.name==='Player'?'You force your breathing back under control.':x.name+' steadies themself.'} +12 Composure.`,'recovery');}break;
     case 'use':
       cost(s,who,TEST_CONFIG.useCost);x.bandages--;x.bleed=0;
@@ -361,6 +406,7 @@ export function step(input, chosen, {requestId,expectedRevision}={}) {
   if(input.status!=='active')throw new CombatError('Encounter is over');
   verifyAction(input,chosen);
   const s=copy(input);s.events=[];
+  s.dodgeAttempt=null;
   const foe=s.intent;
   log(s,foe.tell,'intent',{actor:'enemy'});
   if(chosen.type==='technique' && s.player.momentum<20)throw new CombatError('No Momentum');
@@ -373,10 +419,24 @@ export function step(input, chosen, {requestId,expectedRevision}={}) {
     if(s[t.who].hp<=0)continue;
     const before=s.distance;
     perform(s,t.who,t.a);
-    if(t.who==='player'&&t.a.type==='move'&&foe.type==='attack'&&actionSpeed('player',t.a,s)>=actionSpeed('enemy',foe,s) && (
-      (before==='contact'&&s.distance!=='contact'&&s.scene!=='boar') ||
-      (s.scene==='boar'&&foe.targetSpot&&s.terrain.playerSpot!==foe.targetSpot)
-    ))movedSuccessfullyAvoiding=true;
+    if(t.who==='player'&&t.a.type==='move'&&foe.type==='attack'&&
+      actionSpeed('player',t.a,s)>=actionSpeed('enemy',foe,s)){
+      const outOfReach=(before==='contact'&&s.distance!=='contact'&&s.scene!=='boar') ||
+        (s.scene==='boar'&&foe.targetSpot&&s.terrain.playerSpot!==foe.targetSpot);
+      if(outOfReach&&s.scene==='flint'){
+        const chance=TEST_CONFIG.dodgeChance[t.a.to]??0;
+        const success=rng(s)<chance;
+        s.dodgeAttempt={attempted:true,success,chance};
+        if(success){
+          movedSuccessfullyAvoiding=true;
+          log(s,`You dodge Flint's committed swing (${Math.round(chance*100)}% chance).`,
+            'tactical',{actor:'player',condition:'dodge_success',chance});
+        }else{
+          log(s,`Your reposition does not evade the committed club swing (${Math.round(chance*100)}% dodge chance).`,
+            'tactical',{actor:'player',condition:'dodge_failed',chance});
+        }
+      }else if(outOfReach)movedSuccessfullyAvoiding=true;
+    }
     if(downed(s))break;
   }
   if(s.status==='active'&&movedSuccessfullyAvoiding) {grant(s,'player',TEST_CONFIG.moveMomentum);opening(s,'player','your opponent strikes the space you just left');}
@@ -387,6 +447,7 @@ export function step(input, chosen, {requestId,expectedRevision}={}) {
     downed(s);
   }
   s.player.guard=false;s.enemy.guard=false;
+  s.dodgeAttempt=null;
   s.lastPlayerActions.push(chosen.type);if(s.lastPlayerActions.length>4)s.lastPlayerActions.shift();
   s.lastEnemyActions.push(foe.type);if(s.lastEnemyActions.length>4)s.lastEnemyActions.shift();
   // An observable vulnerability, not a hidden accuracy penalty: only after two

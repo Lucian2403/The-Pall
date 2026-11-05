@@ -38,12 +38,12 @@ test('server creates sessions, rejects missing and forged tokens, and persists r
   const state=await send(base+'/api/encounters/'+id,{token});assert.equal(state.data.revision,0);assert.equal(state.data.enemy.hp,50);assert.ok(state.data.enemyIntent.length>10);assert.notEqual(state.data.intentType,'attack');
   const a=await send(base+`/api/encounters/${id}/actions`,{method:'POST',token,body:action(0)});
   assert.equal(a.status,200);assert.equal(a.data.revision,1);
-  assert.equal(a.data.player.stamina,85);
+  assert.equal(a.data.player.stamina,75);
   assert.ok(a.data.events.length>0);
   await close(app);
   app=createApp({dataDir:dir,seedGenerator:()=>999});base=await listen(app);
   const persisted=await send(base+'/api/encounters/'+id,{token});
-  assert.equal(persisted.data.revision,1);assert.equal(persisted.data.player.stamina,85);
+  assert.equal(persisted.data.revision,1);assert.equal(persisted.data.player.stamina,75);
   assert.equal(persisted.data.events.length,a.data.events.length);
 });
 
