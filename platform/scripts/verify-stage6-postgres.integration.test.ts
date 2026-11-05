@@ -223,6 +223,98 @@ test('Combat rules report exact unarmed ranges and saved Chronicle action identi
     'Recovery must carry its actual actor and option, not an inferred generic tag');
 });
 
+test('Fatigue legal actions and server accuracy match committed saves at 70, 100 and zero Stamina',async()=>{
+  const c=await character(owner,'brace');
+  await start(c);
+  await db.query(
+    "UPDATE player_character_flint_combat SET state=jsonb_set(state,'{player,fatigue}','70'::jsonb) WHERE character_id=$1",
+    [c.id]
+  );
+  let snapshot=(await request('GET',c.path)).body!;
+  assert.deepEqual(snapshot.legalActions,['move','recover'],
+    'At 70 the API must not advertise Attack, Guard or Press Advantage');
+  assert.equal(snapshot.rules.fatigue.currentAccuracyLoss,21);
+  assert.equal(snapshot.rules.accuracy.torso,49,'70 Fatigue changes actual accuracy');
+  const invalid=await turn(c,snapshot,{type:'attack',zone:'torso'});
+  assert.equal(invalid.status,422);
+  assert.equal((await request('GET',c.path)).body!.revision,snapshot.revision,
+    'A forbidden action must not change the saved round');
+  let recovered=await turn(c,snapshot,{type:'recover',mode:'breath'});
+  assert.equal(recovered.status,200,JSON.stringify(recovered.body));
+  assert.equal(recovered.body!.player.fatigue,40);
+  assert.equal(recovered.body!.player.stamina,Math.min(100,snapshot.player.stamina+10));
+  assert.equal(recovered.body!.rules.fatigue.recovery,15,
+    'Below 50 Fatigue, the next recovery uses the lower-Fatigue tier');
+  assert.ok(recovered.body!.legalActions.includes('guard'));
+  assert.ok(recovered.body!.legalActions.includes('attack'));
+  await db.query(
+    "UPDATE player_character_flint_combat SET state=jsonb_set(state,'{player,fatigue}','100'::jsonb) WHERE character_id=$1",
+    [c.id]
+  );
+  snapshot=(await request('GET',c.path)).body!;
+  assert.deepEqual(snapshot.legalActions,['recover']);
+  assert.equal((await turn(c,snapshot,{type:'move',to:'side'})).status,422);
+  recovered=await turn(c,snapshot,{type:'recover',mode:'nerves'});
+  assert.equal(recovered.status,200,JSON.stringify(recovered.body));
+  assert.equal(recovered.body!.player.fatigue,70);
+  assert.deepEqual(recovered.body!.legalActions,['move','recover']);
+
+  // Old stored intent from before the lock must not execute for a tired NPC.
+  await db.query(
+    "UPDATE player_character_flint_combat SET state=jsonb_set(state,'{enemy,fatigue}','100'::jsonb) WHERE character_id=$1",
+    [c.id]
+  );
+  snapshot=(await request('GET',c.path)).body!;
+  assert.equal(snapshot.intentType,'exhausted');
+  assert.match(snapshot.enemyIntent,/breathes hard/);
+  const enemyRest=await turn(c,snapshot,{type:'recover',mode:'breath'});
+  assert.equal(enemyRest.status,200,JSON.stringify(enemyRest.body));
+  assert.equal(enemyRest.body!.enemy.fatigue,70);
+  assert.ok(!enemyRest.body!.turnEvents.some((e:any)=>
+    e.actor==='enemy'&&e.kind==='damage'),
+    'An old NPC attack cannot bypass exhausted-state restrictions');
+
+  const other=await character(owner,'brace');
+  await start(other);
+  await db.query(
+    "UPDATE player_character_flint_combat SET state=jsonb_set(jsonb_set(state,'{player,stamina}','0'::jsonb),'{player,fatigue}','69'::jsonb) WHERE character_id=$1",
+    [other.id]
+  );
+  snapshot=(await request('GET',other.path)).body!;
+  assert.equal(snapshot.rules.fatigue.currentAccuracyLoss,18);
+  const overdraft=await turn(other,snapshot,{type:'attack',zone:'torso'});
+  assert.equal(overdraft.status,200,JSON.stringify(overdraft.body));
+  assert.equal(overdraft.body!.player.stamina,0);
+  assert.equal(overdraft.body!.player.fatigue,79,
+    'Starting at zero Stamina adds 10 Fatigue to an Attack');
+  assert.deepEqual(overdraft.body!.legalActions,['move','recover']);
+});
+
+test('Server projection uses the same Recover tier shown in the browser, including 49/50 boundary',async()=>{
+  const c=await character(owner,'brace');
+  await start(c);
+  for(const [before,removed,restored] of [
+    [49,15,20],[50,30,10],[100,30,10]
+  ]){
+    await db.query(
+      "UPDATE player_character_flint_combat SET state=jsonb_set(jsonb_set(state,'{player,fatigue}',$2::jsonb),'{player,stamina}','0'::jsonb) WHERE character_id=$1",
+      [c.id,JSON.stringify(before)]
+    );
+    const prior=(await request('GET',c.path)).body!;
+    assert.equal(prior.rules.recoverStamina,restored);
+    assert.equal(prior.rules.fatigue.recovery,removed);
+    assert.equal(prior.rules.fatigue.recoveryThreshold,50);
+    const result=await turn(c,prior,{type:'recover',mode:'breath'});
+    assert.equal(result.status,200,JSON.stringify(result.body));
+    assert.equal(result.body!.player.fatigue,Math.max(0,before-removed));
+    assert.equal(result.body!.player.stamina,restored);
+    const recovery=result.body!.turnEvents.find((e:any)=>e.kind==='recovery'&&e.actor==='player');
+    assert.equal(recovery?.fatigueRemoved,removed);
+    assert.equal(recovery?.staminaRestored,restored);
+    assert.equal(recovery?.fatigueBefore,before);
+  }
+});
+
 test('Three saved stances give distinct first-round tactical states',async()=>{
   const b=await character(owner,'brace');
   const m=await character(owner,'moving');

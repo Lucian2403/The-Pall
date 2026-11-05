@@ -34,9 +34,17 @@ export type CombatState = {
   [extra:string]:unknown;
 };
 export declare function isUnarmedWeapon(weapon:CombatActor['weapon']):boolean;
+export declare function canActAtFatigue(actor:Pick<CombatActor,'fatigue'>,actionType?:string):boolean;
+export declare function fatigueAccuracyPenalty(actor:Pick<CombatActor,'fatigue'>):number;
 export declare const TEST_CONFIG:Readonly<{
   strikeCost:number;repeatedStrikeSurcharge:number;guardCost:number;moveCost:number;
-  recoverGain:number;mentalRecoverGain:number;aim:Record<CombatZone,number>;
+  recoverGain:number;exhaustedRecoverGain:number;
+  mentalRecoverGain:number;lowReserve:number;
+  fatigueLowGain:number;fatigueExhaustedDefenseGain:number;fatigueExhaustedAttackGain:number;
+  fatigueRecovery:number;exhaustedFatigueRecovery:number;
+  highFatigueRecoverThreshold:number;fatigueCap:number;fatigueAttackLock:number;
+  fatigueAccuracyStep:number;fatigueAccuracyPenaltyPerStep:number;
+  aim:Record<CombatZone,number>;
   strikeMomentum:number;guardMomentum:number;moveMomentum:number;
   guardReduction:Readonly<{min:number;max:number}>;
   dodgeChance:Readonly<{side:number;cover:number;back:number;close:number}>;

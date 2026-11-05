@@ -28,6 +28,7 @@ export function combatActionLabel(event:CombatEventView):string {
     case 'technique':return 'Technique';
     case 'tactical':return 'Opening';
     case 'momentum':return 'Momentum';
+    case 'fatigue':return 'Fatigue';
     case 'bleed':return 'Bleeding';
     case 'wound':return 'Wound';
     case 'outcome':return 'Result';

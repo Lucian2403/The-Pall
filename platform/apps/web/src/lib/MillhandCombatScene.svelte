@@ -25,6 +25,11 @@
   let destination = $state<'side'|'close'|'cover'|'back'>('side');
   let reserve = $state<'breath'|'nerves'>('breath');
   let logOpen = $state(false);
+  let fatigueInfoDialog:HTMLDialogElement|undefined;
+  const fatigueMilestones=[0,20,40,60,80,100] as const;
+  function openFatigueInfo(){
+    if(fatigueInfoDialog&&!fatigueInfoDialog.open)fatigueInfoDialog.showModal();
+  }
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
   let completedJournalShown=$state(false);
@@ -101,8 +106,7 @@
     return `${Math.max(0, Math.min(100, Math.round(current / Math.max(1, maximum) * 100)))}%`;
   }
 
-  // Visual fill is capped, but the numeric value is never truncated:
-  // combat v0.5.1 can accumulate Fatigue beyond the 100-point reference scale.
+  // Fatigue is now capped at 100; keep the meter resilient to legacy saves.
   function resourceWidth(value:number):string{
     const scaled=Number.isFinite(value)?value:0;
     return `${Math.max(0,Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100))}%`;
@@ -135,7 +139,17 @@
       {#each displayedResources as resource (resource.key)}
         <div class="resource">
           <div class="resource-top">
-            <dt>{resource.label}</dt>
+            <dt class="resource-label">
+              {resource.label}
+              {#if resource.key==='fatigue'}
+                <button class="fatigue-info-trigger" type="button"
+                  aria-label="About Fatigue" title="About Fatigue"
+                  data-pall-sfx="paper" disabled={!snapshot.rules.fatigue}
+                  onclick={openFatigueInfo}>
+                  <span aria-hidden="true">i</span>
+                </button>
+              {/if}
+            </dt>
             <dd>{actor[resource.key]}</dd>
           </div>
           <span class="mini-track" aria-hidden="true">
@@ -240,7 +254,11 @@
           </div>
           {#if !available(visibleSelection)}
             <p class="detail-note action-unavailable">
-              {visibleSelection==='technique'
+              {snapshot.player.fatigue>=snapshot.rules.fatigue.recoverOnlyAt
+                ?'At 100 Fatigue, only Recover is possible.'
+                :snapshot.player.fatigue>=snapshot.rules.fatigue.limitedAt
+                ?'At 70 Fatigue, only Reposition and Recover remain available.'
+                :visibleSelection==='technique'
                 ?'Requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum (currently '+snapshot.player.momentum+').'
                 :visibleSelection==='attack'
                 ?'Move into contact range before attacking.'
@@ -277,13 +295,14 @@
               <p class="action-explanation">Strike the selected body part. Repeated Arms hits impair
                 attack accuracy and speed. Head hits deal more damage but are harder to land.
                 A damaging hit grants +10 Momentum. Base Damage is before an Opening bonus
-                or the opponent's Guard.</p>
+                or the opponent's Guard. Accuracy includes the current Fatigue penalty.</p>
             {:else}
               <p class="action-explanation">A powerful strike that deals increased damage.
                 Requires {snapshot.rules.techniqueMomentum} Momentum.
                 Accuracy and damage depend on the selected body part.
                 {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}
-                Base Damage excludes the separate Opening bonus and enemy Guard.</p>
+                Base Damage excludes the separate Opening bonus and enemy Guard.
+                Accuracy includes the current Fatigue penalty.</p>
             {/if}
             {#if snapshot.rules.openingReason}
               <p class="detail-note">Opening: {snapshot.rules.openingReason}.
@@ -320,8 +339,8 @@
               you move before Flint's committed attack. Close distance gives no dodge chance.</p>
           {:else}
             <div class="stat-line">
-              <span><b>Restores:</b> Up to {snapshot.rules.recoverStamina} Stamina</span>
-              <span><b>Alternative:</b> Composure (+{snapshot.rules.recoverComposure})</span>
+              <span><b>Current Fatigue:</b> {snapshot.player.fatigue}</span>
+              <span><b>Removes:</b> Up to {snapshot.rules.fatigue.recovery} Fatigue</span>
               <span><b>Duration:</b> 1 Turn</span>
             </div>
             <div class="detail-field">
@@ -330,9 +349,32 @@
                 <option value="breath">Stamina</option>
                 <option value="nerves">Composure</option>
               </select>
+              {#if reserve==='breath'}
+                <span class="detail-text"><b>Stamina:</b> Up to +{snapshot.rules.recoverStamina}</span>
+              {:else}
+                <span class="detail-text"><b>Composure:</b> Up to +{snapshot.rules.recoverComposure} (no Stamina)</span>
+              {/if}
             </div>
-            <p class="action-explanation">Restore one combat resource.
-              Does not restore Health or remove Fatigue.</p>
+            <ul class="recover-tiers" aria-label="Recover benefits by Fatigue">
+              <li><strong>Fatigue 0–49:</strong>
+                −{snapshot.rules.fatigue.recoveryBelow50} Fatigue,
+                +{snapshot.rules.recoverStaminaBelow50} Stamina</li>
+              <li><strong>Fatigue 50–100:</strong>
+                −{snapshot.rules.fatigue.recoveryFrom50} Fatigue,
+                +{snapshot.rules.recoverStaminaFrom50} Stamina</li>
+              <li><strong>Composure:</strong> Restore
+                {snapshot.rules.recoverComposure} Composure instead of Stamina,
+                with the same Fatigue reduction.</li>
+            </ul>
+            <p class="recover-cost"><strong>Cost:</strong> 1 Turn. Does not restore Health.</p>
+            <p class="action-explanation">Take a turn to catch your breath,
+              adding Stamina and shake off some Fatigue. The more exhausted you are,
+              the harder it is to regain your strength.</p>
+            {#if snapshot.distance==='contact'}
+              <p class="recovery-risk">Flint is in striking range.
+                Recover is not Guard: his club can still hit you for full,
+                unguarded damage.</p>
+            {/if}
           {/if}
         </div>
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -404,6 +446,40 @@
   </div>
 </section>
 
+{#if snapshot.rules.fatigue}
+<dialog bind:this={fatigueInfoDialog} class="fatigue-info-dialog"
+  aria-labelledby="fatigue-help-title" aria-describedby="fatigue-help-description">
+  <div class="fatigue-info-heading">
+    <h2 id="fatigue-help-title">Fatigue</h2>
+    <button type="button" class="fatigue-info-close" onclick={()=>fatigueInfoDialog?.close()}>
+      Close
+    </button>
+  </div>
+  <p id="fatigue-help-description">Fighting wears you down. As Fatigue builds,
+    your attacks become less accurate and your body struggles to keep up.</p>
+  <p><strong>Accuracy Penalty:</strong>
+    −{snapshot.rules.fatigue.accuracyLossPerTen} percentage points for every 10 Fatigue.</p>
+  <table class="fatigue-info-table">
+    <thead><tr><th scope="col">Fatigue</th><th scope="col">Accuracy Penalty</th></tr></thead>
+    <tbody>
+      {#each fatigueMilestones as level (level)}
+        <tr>
+          <th scope="row">{level}</th>
+          <td>{level===0?'0%':'−'+Math.floor(level/10)*snapshot.rules.fatigue.accuracyLossPerTen+'%'}</td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+  <p>Recovering reduces Fatigue, but heavy exhaustion takes more than one
+    breather to shake off.</p>
+  <p class="fatigue-info-summary"><strong>Range:</strong> 0–{snapshot.rules.fatigue.cap}
+    <span aria-hidden="true"> | </span>
+    <strong>Maximum Accuracy Penalty:</strong>
+    −{Math.floor(snapshot.rules.fatigue.cap/10)*snapshot.rules.fatigue.accuracyLossPerTen}
+    percentage points.</p>
+</dialog>
+{/if}
+
 <style>
   .battle{min-width:0;background:#1b1815;color:#eed8b5;font-family:var(--pall-font-reading,Georgia,serif)}
   .alley{position:relative;min-height:clamp(505px,36vw,625px);isolation:isolate;overflow:hidden;
@@ -446,6 +522,36 @@
 
   /* Enemy condition is physically linked to Flint, not the player controls. */
   .enemy-status{position:absolute;z-index:3;top:30px;left:31%;width:min(25%,380px);min-width:260px}
+  .recover-tiers{margin:2px 0 0;padding:0 0 0 19px;color:#50331c;
+    font:600 12px/1.45 Georgia,serif}
+  .recover-tiers li{margin:2px 0}
+  .recover-tiers strong,.recover-cost strong{font-weight:700}
+  .recover-cost{margin:0;color:#4e301b;font:600 12px/1.4 Georgia,serif}
+  .recovery-risk{margin:0;color:#8c3424;font:700 12px/1.4 Georgia,serif}
+  .fatigue-info-dialog{box-sizing:border-box;width:min(540px,calc(100vw - 24px));
+    max-width:540px;max-height:calc(100dvh - 28px);overflow:auto;overscroll-behavior:contain;
+    padding:clamp(16px,3vw,27px);margin:auto;background:#e9d6b5;color:#302114;
+    border:2px solid #8a6040;box-shadow:0 20px 75px #000a;
+    font:600 14px/1.5 Georgia,serif}
+  .fatigue-info-dialog::backdrop{background:#0d0b09bb}
+  .fatigue-info-dialog p{margin:0 0 15px}
+  .fatigue-info-heading{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin:0 0 15px;padding:0 0 10px;border-bottom:1px solid #aa8561}
+  .fatigue-info-heading h2{margin:0;font:700 26px/1.2 Georgia,serif}
+  .fatigue-info-close{cursor:pointer;padding:7px 13px;border:1px solid #8a6040;
+    color:#342116;background:#f0ddbd;font:700 13px/1.2 Georgia,serif}
+  .fatigue-info-close:hover{background:#fff1d2}
+  .fatigue-info-close:focus-visible,.fatigue-info-trigger:focus-visible{
+    outline:2px solid #aa6c36;outline-offset:3px}
+  .fatigue-info-table{border-collapse:collapse;width:100%;margin:4px 0 16px;
+    font:600 14px/1.35 Georgia,serif}
+  .fatigue-info-table th,.fatigue-info-table td{padding:7px 10px;
+    text-align:left;border-bottom:1px solid #b99e7e}
+  .fatigue-info-table thead th{background:#d6ba92;font-weight:700}
+  .fatigue-info-table tbody th{font-weight:600}
+  .fatigue-info-summary{margin-bottom:0!important;padding-top:12px;
+    border-top:1px solid #aa8561}
+  .fatigue-info-summary span{margin:0 5px;color:#805d3c}
   .action-zone{position:absolute;right:2.2%;bottom:22px;z-index:4;display:grid;gap:7px;
     min-width:0;width:min(69%,1090px)}
   .actions-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(145px,19%);
@@ -537,6 +643,13 @@
   .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   .resource-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;min-width:0}
   .resource-top dt{color:#d3b182;font:12px/1.25 Georgia,serif}
+  .resource-label{display:flex;align-items:center;gap:5px;min-width:0}
+  .fatigue-info-trigger{display:inline-grid;place-items:center;flex:none;
+    box-sizing:border-box;width:19px;height:19px;padding:0;border:1px solid #bfa478;
+    border-radius:50%;color:#f1d3a4;background:#30271f;
+    font:italic 700 12px/1 Georgia,serif;cursor:pointer}
+  .fatigue-info-trigger:hover:not(:disabled){background:#60412a;color:#fff0cf}
+  .fatigue-info-trigger:disabled{opacity:.4;cursor:not-allowed}
   .resource-top dd{margin:0;color:#eed2a5;font:700 15px/1.25 Georgia,serif;
     font-variant-numeric:tabular-nums}
   .mini-track{display:block;height:7px;margin-top:6px;background:#0d0c0b;

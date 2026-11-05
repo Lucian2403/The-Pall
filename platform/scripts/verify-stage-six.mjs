@@ -7,7 +7,9 @@ const engine=read('packages/game-core/vendor/combat-v0.5.1/combat.mjs');
 // Trial balance has been explicitly changed by the owner; guard its formulas
 // rather than enforcing the hash of the previous, now obsolete prototype.
 for(const expected of [
-  'strikeCost: 10','guardCost: 15','moveCost: 5','recoverGain: 25',
+  'strikeCost: 10','guardCost: 15','moveCost: 5','recoverGain: 20',
+  'exhaustedRecoverGain:10','exhaustedFatigueRecovery:30',
+  'highFatigueRecoverThreshold:50',
   'limbs: -0.15','head: -0.30',
   'dodgeChance:{side:.25,cover:.40,back:.50,close:0}',
   'unarmedDamage:{torso:[4,8],limbs:[3,6],head:[8,13]}',
@@ -207,13 +209,75 @@ assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus?
   scene.includes('Base Damage is before an Opening bonus') &&
   scene.includes('base damage, bonus and total separately'),
   'Opening math must be visible before the action and preserved in exact combat history');
-// Fatigue is tracked in the current prototype but has no effect modifier yet.
-// Do not advertise any unimplemented accuracy, damage or dodge fatigue penalty.
-assert.ok(engine.includes('a.fatigue += TEST_CONFIG.fatigueGain') &&
-  !engine.includes('src.fatigue*.') &&
+// The owner-approved Fatigue system must remain symmetric: only the actual
+// engine owns changes, while the API projects the same accuracy and legal turns.
+for(const expected of [
+  'fatigueLowGain:3','fatigueExhaustedDefenseGain:5',
+  'fatigueExhaustedAttackGain:10','fatigueRecovery:15',
+  'exhaustedFatigueRecovery:30','highFatigueRecoverThreshold:50',
+  'fatigueCap:100','fatigueAttackLock:70',
+  'fatigueAccuracyStep:10','fatigueAccuracyPenaltyPerStep:.03',
+  'export function canActAtFatigue','export function fatigueAccuracyPenalty',
+  'const oldFatigue=clamp(a.fatigue??0,0,TEST_CONFIG.fatigueCap)',
+  'if(before===0)','actionType===\'attack\'||actionType===\'technique\'',
+  "if(!canActAtFatigue(s.player,a.type))",
+  'fatigueAccuracyPenalty({fatigue:fatigueAtCommit})',
+  'if(e.fatigue>=TEST_CONFIG.fatigueAttackLock)',
+  'const foe=canActAtFatigue(s.enemy,s.intent?.type)?s.intent:makeIntent(s)',
+  'x.fatigue=Math.max(0,formerFatigue-plannedFatigueRecovery)',
+  'const highFatigue=formerFatigue>=TEST_CONFIG.highFatigueRecoverThreshold',
+  "const recoveryAmount=highFatigue",
+])assert.ok(engine.includes(expected),'Missing real Fatigue rule: '+expected);
+assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))') &&
+  view.includes('fatigueAccuracyPenalty(state.player)') &&
+  view.includes('currentAccuracyLoss:') &&
+  !scene.includes('class="fatigue-status"') &&
+  !scene.includes('.fatigue-status{') &&
+  scene.includes('aria-label="About Fatigue"') &&
+  scene.includes('At 100 Fatigue, only Recover is possible.') &&
+  scene.includes('Up to {snapshot.rules.fatigue.recovery} Fatigue') &&
+  scene.includes('Recover is not Guard:') &&
+  scene.includes('unguarded damage.') &&
+  scene.includes('snapshot.rules.fatigue.recoveryFrom50') &&
+  scene.includes('snapshot.rules.recoverStaminaFrom50') &&
+  view.includes('highFatigueRecovery') &&
+  view.includes('recoverStamina:recoveryStamina') &&
+  view.includes('recovery:recoveryFatigue') &&
   scene.includes("key:'fatigue',label:'Fatigue'"),
-  'Fatigue accumulation and display must remain intact, with no fictional penalty');
+  'Real Fatigue effects, action locks, and recovery must agree in UI and engine');
 
+// The owner requested a concise, per-action Recover panel and a discoverable,
+// keyboard-accessible Fatigue explainer. All values still come from the server.
+assert.ok(scene.includes('<b>Current Fatigue:</b> {snapshot.player.fatigue}') &&
+  scene.includes('<b>Removes:</b> Up to {snapshot.rules.fatigue.recovery} Fatigue') &&
+  scene.includes('class="recover-tiers"') &&
+  scene.includes('<strong>Fatigue 0–49:</strong>') &&
+  scene.includes('<strong>Fatigue 50–100:</strong>') &&
+  scene.includes('snapshot.rules.fatigue.recoveryBelow50') &&
+  scene.includes('snapshot.rules.fatigue.recoveryFrom50') &&
+  scene.includes('snapshot.rules.recoverStaminaBelow50') &&
+  scene.includes('snapshot.rules.recoverStaminaFrom50') &&
+  scene.includes('snapshot.rules.recoverComposure} Composure instead of Stamina') &&
+  scene.includes('<strong>Cost:</strong> 1 Turn. Does not restore Health.') &&
+  scene.includes('Take a turn to catch your breath,') &&
+  scene.includes('The more exhausted you are,') &&
+  scene.includes('Recover is not Guard:'),
+  'Recover tooltip must show both real Fatigue tiers, Composure and melee exposure');
+assert.ok(scene.includes('aria-label="About Fatigue"') &&
+  scene.includes('onclick={openFatigueInfo}') &&
+  scene.includes("if(fatigueInfoDialog&&!fatigueInfoDialog.open)fatigueInfoDialog.showModal()") &&
+  scene.includes('bind:this={fatigueInfoDialog}') &&
+  scene.includes('aria-labelledby="fatigue-help-title"') &&
+  scene.includes('onclick={()=>fatigueInfoDialog?.close()}') &&
+  scene.includes('Fighting wears you down. As Fatigue builds,') &&
+  scene.includes('your attacks become less accurate and your body struggles to keep up.') &&
+  scene.includes('Accuracy Penalty:</strong>') &&
+  scene.includes('snapshot.rules.fatigue.accuracyLossPerTen') &&
+  scene.includes('const fatigueMilestones=[0,20,40,60,80,100] as const') &&
+  scene.includes('Math.floor(level/10)*snapshot.rules.fatigue.accuracyLossPerTen') &&
+  scene.includes('Recovering reduces Fatigue, but heavy exhaustion takes more than one') &&
+  scene.includes('Maximum Accuracy Penalty:'),
+  'Fatigue help must open from the fighter resource and display authoritative values');
 // PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
 // That mismatch formerly rolled back the final Flint turn with HTTP 500.
 assert.ok(charactersSql.includes("'NOT_STARTED','IN_PROGRESS','COMPLETED'") &&

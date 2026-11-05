@@ -1,5 +1,5 @@
 /** Public projection of the preserved v0.5.1 engine. No private enemy action is exposed. */
-import {TEST_CONFIG,testAttackCost,isUnarmedWeapon} from '@the-pall/game-core/combat-v0.5.1';
+import {TEST_CONFIG,testAttackCost,isUnarmedWeapon,canActAtFatigue,fatigueAccuracyPenalty} from '@the-pall/game-core/combat-v0.5.1';
 import type {CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
 
 export type StageSixStance='brace'|'moving'|'cart';
@@ -7,16 +7,27 @@ export type StageSixStance='brace'|'moving'|'cart';
 export function combatView(state:CombatState,history:CombatEvent[],stance:StageSixStance){
   const visibleActor=(a:CombatState['player'])=>({
     name:a.name,hp:a.hp,hpMax:a.hpMax,ceiling:a.ceiling,
-    stamina:a.stamina,composure:a.composure,fatigue:a.fatigue,
+    stamina:a.stamina,composure:a.composure,
+    fatigue:Math.min(TEST_CONFIG.fatigueCap,Math.max(0,a.fatigue??0)),
     stress:a.stress,momentum:a.momentum,bleed:a.bleed,wounds:a.wounds,
     bandages:a.bandages,armHits:a.armHits??0,armImpaired:a.armImpaired??false,
     reloadSlowdownPercent:a.reloadSlowdownPercent??0
   });
   const contact=state.distance==='contact';
+  const highFatigueRecovery=state.player.fatigue>=TEST_CONFIG.highFatigueRecoverThreshold;
+  const recoveryStamina=highFatigueRecovery
+    ?TEST_CONFIG.exhaustedRecoverGain:TEST_CONFIG.recoverGain;
+  const recoveryFatigue=highFatigueRecovery
+    ?TEST_CONFIG.exhaustedFatigueRecovery:TEST_CONFIG.fatigueRecovery;
   const legalActions=state.status==='active'
     ? [...(contact?['attack']:[]),'guard','move','recover',
         ...(contact&&state.player.momentum>=20?['technique']:[])]
+        .filter(action=>canActAtFatigue(state.player,action))
     : [];
+  const telegraphIsLegal=canActAtFatigue(state.enemy,state.intent?.type);
+  const exposedIntent=telegraphIsLegal?state.intent?.tell:
+    `${state.enemy.name} breathes hard and struggles to steady their stance.`;
+  const exposedSignal=telegraphIsLegal?state.intent?.signal:'exhausted';
   // The action panel mirrors the existing prototype formulas, including the
   // equipped weapon's actual profile. In Stage 6 the player fights barehanded.
   const range=(weapon:CombatState['player']['weapon'])=>({
@@ -42,12 +53,12 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
   const opening=opportunity&&opportunity.expires>=state.round?opportunity:null;
   const accuracy=(zone:'head'|'torso'|'limbs')=>Math.round(100*Math.min(.95,Math.max(.05,
     state.player.weapon.accuracy+TEST_CONFIG.aim[zone]+(opening?.accuracyBonus??0)-
-      (state.player.armImpaired?.10:0)
+      (state.player.armImpaired?.10:0)-fatigueAccuracyPenalty(state.player)
   )));
   return {
     stage:6,stance,status:state.status,outcome:state.outcome,
     revision:state.revision,round:state.round,distance:state.distance,
-    enemyIntent:state.intent?.tell??null,intentType:state.intent?.signal??null,
+    enemyIntent:state.intent?exposedIntent:null,intentType:state.intent?exposedSignal:null,
     player:visibleActor(state.player),enemy:visibleActor(state.enemy),
     legalActions,
     // Historical Chronicle is capped for the UI. The engine separately
@@ -57,8 +68,25 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     turnEvents:state.events,
     rules:{
       strikeCost:testAttackCost(state,'player'),guardCost:TEST_CONFIG.guardCost,
-      moveCost:TEST_CONFIG.moveCost,recoverStamina:TEST_CONFIG.recoverGain,
+      moveCost:TEST_CONFIG.moveCost,recoverStamina:recoveryStamina,
+      recoverStaminaBelow50:TEST_CONFIG.recoverGain,
+      recoverStaminaFrom50:TEST_CONFIG.exhaustedRecoverGain,
       recoverComposure:TEST_CONFIG.mentalRecoverGain,techniqueMomentum:20,
+      fatigue:{
+        cap:TEST_CONFIG.fatigueCap,
+        lowStaminaThreshold:TEST_CONFIG.lowReserve,
+        lowStaminaGain:TEST_CONFIG.fatigueLowGain,
+        exhaustedAttackGain:TEST_CONFIG.fatigueExhaustedAttackGain,
+        exhaustedDefenseGain:TEST_CONFIG.fatigueExhaustedDefenseGain,
+        recovery:recoveryFatigue,
+        recoveryBelow50:TEST_CONFIG.fatigueRecovery,
+        recoveryFrom50:TEST_CONFIG.exhaustedFatigueRecovery,
+        recoveryThreshold:TEST_CONFIG.highFatigueRecoverThreshold,
+        limitedAt:TEST_CONFIG.fatigueAttackLock,
+        recoverOnlyAt:TEST_CONFIG.fatigueCap,
+        accuracyLossPerTen:Math.round(100*TEST_CONFIG.fatigueAccuracyPenaltyPerStep),
+        currentAccuracyLoss:Math.round(100*fatigueAccuracyPenalty(state.player))
+      },
       accuracy:{head:accuracy('head'),torso:accuracy('torso'),limbs:accuracy('limbs')},
       repeatedStrikeSurcharge:TEST_CONFIG.repeatedStrikeSurcharge,
       guardMitigationPercent:Math.round(100*guardMin)+'–'+Math.round(100*guardMax),
