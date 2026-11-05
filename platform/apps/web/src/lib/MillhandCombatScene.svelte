@@ -4,6 +4,7 @@
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
+  import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
 
   let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
@@ -50,11 +51,16 @@
 
   const visibleSelection = $derived(snapshot.legalActions.includes(selected)
     ? selected : (canAttack ? 'attack' : 'guard'));
-  const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-3));
+  const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-6));
   const actionName = $derived({
-    attack: 'Strike', guard: 'Guard', move: 'Reposition',
+    attack: 'Attack', guard: 'Guard', move: 'Reposition',
     recover: 'Recover', technique: 'Press Advantage'
   }[visibleSelection]);
+  const selectedDamage=$derived(visibleSelection==='technique'
+    ?snapshot.rules.techniqueDamage:snapshot.rules.strikeDamage);
+  const openingBonus=$derived(snapshot.rules.openingDamageBonus);
+  const damageMin=$derived(selectedDamage.min+openingBonus);
+  const damageMax=$derived(selectedDamage.max+openingBonus);
   const stanceText = $derived(snapshot.stance === 'brace'
     ? 'You raise your arms and brace yourself as Flint approaches.'
     : snapshot.stance === 'moving'
@@ -80,7 +86,7 @@
     {key:'momentum',label:'Momentum'}
   ] as const;
   const actionChoices = [
-    {id:'attack',label:'Strike',asset:'strike.webp'},
+    {id:'attack',label:'Attack',asset:'strike.webp'},
     {id:'guard',label:'Guard',asset:'guard.webp'},
     {id:'move',label:'Reposition',asset:'reposition.webp'},
     {id:'recover',label:'Recover',asset:'recover.webp'},
@@ -196,6 +202,8 @@
 
     {#if !ended}
       <section class="action-zone" aria-label="Combat decisions">
+        <p class="weapon-status">Your weapon: <strong>{snapshot.rules.weaponLabel}</strong>
+          <span>Flint's weapon: club</span></p>
         <div class="actions-row">
           <div class="choices" role="group" aria-label="Choose a combat action">
             {#each actionChoices as choice (choice.id)}
@@ -226,41 +234,79 @@
             <strong>{actionName}</strong>
           </div>
           {#if visibleSelection === 'attack' || visibleSelection === 'technique'}
-            <div class="detail-field">
-              <label for="battle-zone">Target</label>
-              <select id="battle-zone" bind:value={zone} disabled={pending}>
-                <option value="torso">Torso</option>
-                <option value="limbs">Limbs</option>
-                <option value="head">Head</option>
-              </select>
+            <div class="detail-options">
+              <div class="detail-field">
+                <label for="battle-zone">Aim at</label>
+                <select id="battle-zone" bind:value={zone} disabled={pending}>
+                  <option value="torso">Torso</option>
+                  <option value="limbs">Limbs</option>
+                  <option value="head">Head</option>
+                </select>
+              </div>
+              <span class="detail-text"><strong>{snapshot.rules.accuracy[zone]}%</strong> chance to hit</span>
+              <span class="detail-text"><strong>{damageMin}–{damageMax} Health</strong> damage if it hits, before Guard</span>
             </div>
-            <span class="detail-text">Accuracy: {snapshot.rules.accuracy[zone]}%</span>
-            <span class="detail-text">Stamina: {visibleSelection === 'attack'
-              ? snapshot.rules.strikeCost : 12}{visibleSelection === 'technique'
-              ? ' · Momentum: ' + snapshot.rules.techniqueMomentum : ''}</span>
-            {#if visibleSelection === 'attack'}<span class="detail-note">Repeated strikes cost more.</span>{/if}
+            <p class="detail-note">Same damage to torso, limbs and head. Head and limb strikes are less accurate.</p>
+            {#if visibleSelection === 'attack'}
+              <p class="detail-note">Costs {snapshot.rules.strikeCost} Stamina.
+                {snapshot.rules.strikeCost>11?'Repeated attacks add '+snapshot.rules.repeatedStrikeSurcharge+' Stamina.':''}
+                A damaging hit earns 10 Momentum.</p>
+            {:else}
+              <p class="detail-note">Costs 12 Stamina and {snapshot.rules.techniqueMomentum} Momentum.
+                Press Advantage adds 4 damage to your unarmed strike.
+                {openingBonus>0?'This opening adds another '+openingBonus+' damage.':''}</p>
+            {/if}
+            {#if snapshot.rules.openingReason}
+              <p class="detail-note">Current opening: {snapshot.rules.openingReason}.
+                Accuracy above already includes its bonus.</p>
+            {/if}
           {:else if visibleSelection === 'move'}
-            <div class="detail-field">
-              <label for="battle-move">Position</label>
-              <select id="battle-move" bind:value={destination} disabled={pending}>
-                {#if snapshot.distance !== 'contact'}<option value="close">Close distance</option>{/if}
-                <option value="side">Move sideways</option>
-                <option value="back">Fall back</option>
-                <option value="cover">Use cover</option>
-              </select>
+            <div class="detail-options">
+              <div class="detail-field">
+                <label for="battle-move">Move to</label>
+                <select id="battle-move" bind:value={destination} disabled={pending}>
+                  {#if snapshot.distance !== 'contact'}<option value="close">Close distance</option>{/if}
+                  <option value="side">Move sideways</option>
+                  <option value="back">Fall back</option>
+                  <option value="cover">Use cover</option>
+                </select>
+              </div>
+              <span class="detail-text">Cost: <strong>{snapshot.rules.moveCost} Stamina</strong></span>
+              <span class="detail-text">Dodge protection: <strong>position-based, not a %</strong></span>
             </div>
-            <span class="detail-text">Stamina: {snapshot.rules.moveCost}</span>
+            {#if destination==='close'}
+              <p class="detail-note">Close distance moves into melee range. It does not evade the club.</p>
+            {:else}
+              <p class="detail-note">Moving sideways or into cover puts you at near range;
+                falling back puts you at far range. If you move before Flint's committed
+                contact attack, it falls short (no Health lost from that blow).
+                A successful evasion earns 5 Momentum.</p>
+            {/if}
           {:else if visibleSelection === 'recover'}
-            <div class="detail-field">
-              <label for="battle-recovery">Restore</label>
-              <select id="battle-recovery" bind:value={reserve} disabled={pending}>
-                <option value="breath">Stamina +{snapshot.rules.recoverStamina}</option>
-                <option value="nerves">Composure +{snapshot.rules.recoverComposure}</option>
-              </select>
+            <div class="detail-options">
+              <div class="detail-field">
+                <label for="battle-recovery">Restore</label>
+                <select id="battle-recovery" bind:value={reserve} disabled={pending}>
+                  <option value="breath">Stamina</option>
+                  <option value="nerves">Composure</option>
+                </select>
+              </div>
+              <span class="detail-text">{reserve==='breath'
+                ?'Restore up to '+snapshot.rules.recoverStamina+' Stamina'
+                :'Restore up to '+snapshot.rules.recoverComposure+' Composure'}
+                (maximum 100)</span>
             </div>
+            <p class="detail-note">Recover uses your turn. It does not restore Health or remove Fatigue.</p>
           {:else}
-            <span class="detail-text">Stamina: {snapshot.rules.guardCost}</span>
-            <span class="detail-note">A protected impact can create an opening.</span>
+            <div class="detail-options">
+              <span class="detail-text">Cost: <strong>{snapshot.rules.guardCost} Stamina</strong></span>
+              <span class="detail-text">Flint's club: <strong>{snapshot.rules.guardMitigationPercent}% damage absorbed</strong></span>
+              <span class="detail-text">Ordinary hit: <strong>{snapshot.rules.enemyStrikeDamage.min}–{snapshot.rules.enemyStrikeDamage.max}</strong>
+                becomes <strong>{snapshot.rules.guardedEnemyStrikeDamage.min}–{snapshot.rules.guardedEnemyStrikeDamage.max} Health</strong></span>
+            </div>
+            <p class="detail-note">Guard protects against a hit this turn, not against a miss.
+              A damaging blow stopped in part by Guard earns 8 Momentum and creates an opening.
+              Special attacks can still hit harder.</p>
           {/if}
         </div>
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -287,14 +333,19 @@
               <li class:latest={i === recentEvents.length - 1}
                 class:impact={event.kind === 'damage'} class:evaded={event.kind === 'miss'}>
                 <span class="round">{String(event.round).padStart(2, '0')}</span>
-                <span>{event.text}</span>
+                <span class="event-body">
+                  <span class="event-action" class:enemy-action={isEnemyCombatAction(event)}>
+                    [{combatActionLabel(event)}]
+                  </span>
+                  <span>{event.text}</span>
+                </span>
               </li>
             {/each}
           </ol>
         {/if}
       </div>
-      {#if !logOpen && snapshot.events.length > 3}
-        <p class="history-hint">Latest 3 of {snapshot.events.length} entries.</p>
+      {#if !logOpen && snapshot.events.length > 6}
+        <p class="history-hint">Latest 6 of {snapshot.events.length} entries.</p>
       {/if}
     </section>
 
@@ -399,21 +450,25 @@
     font:700 clamp(11px,.93vw,14px)/1.2 Georgia,serif}
   .commit img{width:clamp(24px,2.1vw,33px);height:clamp(24px,2.1vw,33px);
     object-fit:contain;filter:brightness(.6) sepia(.2)}
-  .action-details{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 12px;
-    box-sizing:border-box;min-height:42px;width:min(100%,640px);margin:0 auto;padding:2px 10px;
+  .weapon-status{margin:0;padding:3px 10px;text-align:center;color:#f8dfba;
+    text-shadow:0 1px 2px #000;font:700 13px/1.3 Georgia,serif}
+  .weapon-status span{margin-left:15px;font-weight:400;color:#e1c5a2}
+  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;
+    box-sizing:border-box;min-height:74px;width:min(100%,700px);margin:0 auto;padding:6px 13px;
     background:transparent;color:#352417;border:solid transparent;border-width:10px 14px 9px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
     border-image-width:10px 14px 9px;border-image-repeat:stretch}
-  .chosen-heading{display:flex;align-items:center;gap:6px;padding-right:9px;
-    border-right:1px solid #917153;font:700 13px/1.2 Georgia,serif}
+  .chosen-heading{display:flex;align-items:center;gap:6px;padding:0 0 5px;
+    border-bottom:1px solid #b18f69;font:700 13px/1.2 Georgia,serif}
+  .detail-options{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:6px 13px}
   .chosen-heading img{width:23px;height:23px;object-fit:contain;filter:brightness(.65) sepia(.2)}
   .detail-field{display:flex;align-items:center;gap:8px}
-  .detail-field label,.detail-text{font:12px/1.3 Georgia,serif;color:#4b311c}
+  .detail-field label,.detail-text{font:600 12px/1.3 Georgia,serif;color:#4b311c}
   .detail-field select{max-width:145px;min-height:26px;padding:2px 4px;
     background:#f3e2bf;color:#2d1b0f;border:1px solid #9d7750;font:12px Georgia,serif}
-  .detail-text+.detail-text{border-left:1px solid #927251;padding-left:12px}
-  .detail-note{font:11px/1.3 Georgia,serif;color:#795438}
+  .detail-options .detail-text+.detail-text{border-left:1px solid #927251;padding-left:10px}
+  .detail-note{margin:0;font:600 12px/1.4 Georgia,serif;color:#624226}
   .error{margin:0;padding:8px 12px;background:#29140fef;border:1px solid #b45d4a;
     color:#ffc6ae;font:13px/1.45 Arial,sans-serif;text-align:center}
   .action-tile:focus-visible,.commit:focus-visible,.chronicle button:focus-visible,
@@ -462,7 +517,7 @@
   .chronicle-heading button{padding:7px 12px;background:#271f19;color:#eed4ae;
     border:1px solid #927453;cursor:pointer;font:13px/1.2 Georgia,serif;white-space:nowrap}
   .chronicle-heading button:hover{background:#403124}
-  .log-window{min-height:104px;max-height:220px;overflow:auto;scrollbar-color:#947651 #30281f;scrollbar-width:thin}
+  .log-window{min-height:150px;max-height:310px;overflow:auto;scrollbar-color:#947651 #30281f;scrollbar-width:thin}
   .log-window ol{margin:0;padding:0;list-style:none}
   .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
     font:13px/1.35 Georgia,serif;color:#ecd1a8}
@@ -472,6 +527,9 @@
   .log-window li.evaded{border-left:3px solid #d7b97b;padding-left:7px;
     color:#f4e1bf;background:#493c2b72}
   .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
+  .event-body{min-width:0;display:flex;align-items:baseline;flex-wrap:wrap;column-gap:6px;row-gap:2px}
+  .event-action{flex:none;font:700 12px/1.35 Georgia,serif;color:#e6d3a9}
+  .event-action.enemy-action{color:#ff7468;text-shadow:0 1px 2px #200804}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font-size:13px;line-height:1.5}
   .clinic-link{position:relative;z-index:1;max-width:100%;margin:12px 0 1px;pointer-events:auto}
@@ -547,6 +605,9 @@
     .confirm-holder{padding:8px 0 0;border-left:0;border-top:1px solid #816748}
     .commit{min-height:48px}
     .action-details{width:100%;justify-content:flex-start}
+    .weapon-status span{display:block;margin:2px 0 0}
+    .detail-options{align-items:flex-start}
+    .detail-options .detail-text+.detail-text{border:0;padding:0}
     .combat-console{padding:9px;gap:9px}
   }
   @media(max-width:370px){
