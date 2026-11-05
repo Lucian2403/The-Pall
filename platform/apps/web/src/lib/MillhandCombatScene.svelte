@@ -280,12 +280,12 @@
             {/if}
           {:else if visibleSelection==='guard'}
             <div class="stat-line">
-              <span><b>Damage Reduction:</b> 30–60% (Flint: {snapshot.rules.guardMitigationPercent}%)</span>
+              <span><b>Damage Reduction:</b> {snapshot.rules.guardMitigationPercent}%</span>
               <span><b>Duration:</b> 1 Turn</span>
               <span><b>Cost:</b> {snapshot.rules.guardCost} Stamina</span>
             </div>
             <p class="action-explanation">Reduce damage from incoming attacks.
-              Does not prevent all damage. A successful block may create an opening
+              Does not prevent all damage. Guard reduction is rolled within the shown range for every landed blow. A successful block may create an opening
               and grant +8 Momentum.</p>
           {:else if visibleSelection==='move'}
             <div class="stat-line">
