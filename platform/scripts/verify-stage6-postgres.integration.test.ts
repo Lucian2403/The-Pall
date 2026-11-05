@@ -223,6 +223,46 @@ test('Combat rules report exact unarmed ranges and saved Chronicle action identi
     'Recovery must carry its actual actor and option, not an inferred generic tag');
 });
 
+test('Focused Stance is an authenticated, replay-safe action with visible three-turn accuracy',async()=>{
+  const c=await character(owner,'brace');
+  let initial=await start(c);
+  assert.equal(initial.rules.focus.cost,10);
+  assert.equal(initial.rules.focus.duration,3);
+  assert.equal(initial.rules.focus.accuracyBonusPercent,10);
+  assert.equal(initial.rules.focus.remaining,0);
+  assert.ok(initial.legalActions.includes('focus'));
+  const malformed=await turn(c,initial,{type:'focus',accuracyBonusPercent:99});
+  assert.equal(malformed.status,400,'No client-controlled focus duration or accuracy');
+  assert.equal((await request('GET',c.path)).body!.revision,initial.revision);
+  // A guarding enemy produces no attack-triggered Opening during activation.
+  await db.query(
+    "UPDATE player_character_flint_combat SET state=jsonb_set(state,'{intent}',$2::jsonb) WHERE character_id=$1",
+    [c.id,JSON.stringify({type:'guard',speed:10,signal:'watchful',
+      tell:'Flint holds his guard while watching you.'})]
+  );
+  initial=(await request('GET',c.path)).body!;
+  const activated=await turn(c,initial,{type:'focus'});
+  assert.equal(activated.status,200,JSON.stringify(activated.body));
+  const focused=activated.body!;
+  assert.equal(focused.player.composure,initial.player.composure-10);
+  assert.equal(focused.player.stamina,initial.player.stamina);
+  assert.equal(focused.rules.focus.remaining,3);
+  assert.equal(focused.player.focusedTurnsRemaining,3);
+  assert.equal(focused.rules.accuracy.torso,80);
+  assert.ok(!focused.legalActions.includes('focus'),'Cannot restack Focused Stance');
+  assert.ok(focused.turnEvents.some((e:any)=>
+    e.kind==='focus'&&e.actor==='player'&&e.actionType==='focus'&&
+    e.actionName===undefined),'Chronicle stores the truthful focus action type');
+  assert.equal((await request('GET',c.path)).body!.rules.focus.remaining,3);
+  const blocked=await turn(c,focused,{type:'focus'});
+  assert.equal(blocked.status,422);
+  assert.equal((await request('GET',c.path)).body!.revision,focused.revision);
+  const guarded=await turn(c,focused,{type:'guard'});
+  assert.equal(guarded.status,200,JSON.stringify(guarded.body));
+  assert.equal(guarded.body!.rules.focus.remaining,2);
+  assert.equal(guarded.body!.player.composure,focused.player.composure);
+});
+
 test('Fatigue legal actions and server accuracy match committed saves at 70, 100 and zero Stamina',async()=>{
   const c=await character(owner,'brace');
   await start(c);
