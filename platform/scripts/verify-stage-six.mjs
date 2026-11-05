@@ -12,7 +12,8 @@ for(const expected of [
   'dodgeChance:{side:.25,cover:.40,back:.50,close:0}',
   'unarmedDamage:{torso:[4,8],limbs:[3,6],head:[8,13]}',
   'unarmedTechnique:{torso:[8,12],limbs:[6,10],head:[12,18]}',
-  's.dodgeAttempt={attempted:true,success,chance}'
+  's.dodgeAttempt={attempted:true,success,chance}',
+  'guardReduction:{min:.30,max:.60}'
 ])assert.ok(engine.includes(expected),'Stage 6 owner trial balance changed unexpectedly: '+expected);
 const api=read('apps/api/src/millhand-combat-routes.ts');
 const opening=read('apps/api/src/millhand-combat-opening.ts');
@@ -139,7 +140,7 @@ assert.ok(unarmedIcon.length>1000&&unarmedIcon.length<30000,'Owner unarmed icon 
 assert.ok(view.includes('strikeByZone:zoneRanges(false)')&&
   view.includes('techniqueByZone:zoneRanges(true)')&&
   view.includes('dodgeChance:{side:Math.round(100*TEST_CONFIG.dodgeChance.side)')&&
-  view.includes('guardMitigationPercent:Math.round(100*mitigation)')&&
+  view.includes("guardMitigationPercent:Math.round(100*guardMin)+'–'+Math.round(100*guardMax)")&&
   scene.includes('snapshot.rules.strikeByZone[target]')&&
   scene.includes('snapshot.rules.techniqueByZone[target]')&&
   scene.includes('snapshot.rules.accuracy[target]')&&
