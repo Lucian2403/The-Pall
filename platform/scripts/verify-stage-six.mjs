@@ -207,12 +207,30 @@ assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus?
   scene.includes('Base Damage is before an Opening bonus') &&
   scene.includes('base damage, bonus and total separately'),
   'Opening math must be visible before the action and preserved in exact combat history');
-// Fatigue is tracked in the current prototype but has no effect modifier yet.
-// Do not advertise any unimplemented accuracy, damage or dodge fatigue penalty.
-assert.ok(engine.includes('a.fatigue += TEST_CONFIG.fatigueGain') &&
-  !engine.includes('src.fatigue*.') &&
+// The owner-approved Fatigue system must remain symmetric: only the actual
+// engine owns changes, while the API projects the same accuracy and legal turns.
+for(const expected of [
+  'fatigueLowGain:3','fatigueExhaustedDefenseGain:5',
+  'fatigueExhaustedAttackGain:10','fatigueRecovery:10',
+  'fatigueCap:100','fatigueAttackLock:70',
+  'fatigueAccuracyStep:10','fatigueAccuracyPenaltyPerStep:.03',
+  'export function canActAtFatigue','export function fatigueAccuracyPenalty',
+  'const oldFatigue=clamp(a.fatigue??0,0,TEST_CONFIG.fatigueCap)',
+  'if(before===0)','actionType===\'attack\'||actionType===\'technique\'',
+  "if(!canActAtFatigue(s.player,a.type))",
+  'fatigueAccuracyPenalty({fatigue:fatigueAtCommit})',
+  'if(e.fatigue>=TEST_CONFIG.fatigueAttackLock)',
+  'const foe=canActAtFatigue(s.enemy,s.intent?.type)?s.intent:makeIntent(s)',
+  'x.fatigue=Math.max(0,formerFatigue-TEST_CONFIG.fatigueRecovery)'
+])assert.ok(engine.includes(expected),'Missing real Fatigue rule: '+expected);
+assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))') &&
+  view.includes('fatigueAccuracyPenalty(state.player)') &&
+  view.includes('currentAccuracyLoss:') &&
+  scene.includes('snapshot.rules.fatigue.currentAccuracyLoss') &&
+  scene.includes('At 100 Fatigue, only Recover is possible.') &&
+  scene.includes('up to {snapshot.rules.fatigue.recovery} Fatigue') &&
   scene.includes("key:'fatigue',label:'Fatigue'"),
-  'Fatigue accumulation and display must remain intact, with no fictional penalty');
+  'Real Fatigue effects, action locks, and recovery must agree in UI and engine');
 
 // PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
 // That mismatch formerly rolled back the final Flint turn with HTTP 500.
