@@ -55,9 +55,9 @@ function parseCommand(value:unknown):Command{
     case 'recover':
       if(keys!=='mode,type'||(a.mode!=='breath'&&a.mode!=='nerves'))throw Error('invalid_action');
       action={type:'recover',mode:a.mode};break;
-    case 'guard':
+    case 'guard':case 'focus':
       if(keys!=='type')throw Error('invalid_action');
-      action={type:'guard'};break;
+      action={type:a.type};break;
     default:
       // No client override for speed, AI intent, damage, consumables or escape.
       throw Error('invalid_action');
@@ -87,14 +87,14 @@ function describeCommittedTurn(
     if(who!=='player'&&who!=='enemy')return event;
     const action=who==='player'?chosen:enemyIntent;
     if(!action)return {...event,actor:who};
-    const direct=['damage','miss','guard','move','recovery','technique'].includes(event.kind);
+    const direct=['damage','miss','guard','move','recovery','technique','focus'].includes(event.kind);
     // A new opening produced by a guarded strike belongs to the actor's
     // guard, not to a fictional extra attack.
     const defensiveOpening=event.kind==='tactical'&&who==='player'&&
       chosen.type==='guard'&&event.text.includes('firm guard');
     if(!direct&&!defensiveOpening)return {...event,actor:who};
     const type=action.type;
-    if(!['attack','technique','guard','move','recover'].includes(type))return {...event,actor:who};
+    if(!['attack','technique','guard','move','recover','focus'].includes(type))return {...event,actor:who};
     const detail='zone' in action&&typeof action.zone==='string'?action.zone:
       'to' in action&&typeof action.to==='string'?action.to:
       'mode' in action&&typeof action.mode==='string'?action.mode:undefined;
