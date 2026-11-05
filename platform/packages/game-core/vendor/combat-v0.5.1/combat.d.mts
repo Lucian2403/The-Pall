@@ -33,6 +33,7 @@ export type CombatState = {
   lastPlayerActions:string[];lastEnemyActions:string[];
   [extra:string]:unknown;
 };
+export declare function isUnarmedWeapon(weapon:CombatActor['weapon']):boolean;
 export declare const TEST_CONFIG:Readonly<{
   strikeCost:number;repeatedStrikeSurcharge:number;guardCost:number;moveCost:number;
   recoverGain:number;mentalRecoverGain:number;aim:Record<CombatZone,number>;
