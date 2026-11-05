@@ -19,7 +19,7 @@ export type CombatActor = {
   composure:number;fatigue:number;stress:number;momentum:number;
   wounds:Array<{type:string;zone?:CombatZone;severity:string;[key:string]:unknown}>;
   bleed:number;bandages:number;guard:boolean;readiness:number;
-  armHits?:number;armImpaired?:boolean;
+  armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
   weapon:{damage:number;accuracy:number;type:string;reach:string;
     minDamage?:number;maxDamage?:number;guardMitigation?:number;unarmed?:boolean};
 };
@@ -38,6 +38,7 @@ export declare const TEST_CONFIG:Readonly<{
   strikeCost:number;repeatedStrikeSurcharge:number;guardCost:number;moveCost:number;
   recoverGain:number;mentalRecoverGain:number;aim:Record<CombatZone,number>;
   strikeMomentum:number;guardMomentum:number;moveMomentum:number;
+  guardReduction:Readonly<{min:number;max:number}>;
   dodgeChance:Readonly<{side:number;cover:number;back:number;close:number}>;
   unarmedDamage:Readonly<Record<CombatZone,readonly [number,number]>>;
   unarmedTechnique:Readonly<Record<CombatZone,readonly [number,number]>>;
