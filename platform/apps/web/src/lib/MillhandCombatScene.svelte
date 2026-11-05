@@ -101,8 +101,7 @@
     return `${Math.max(0, Math.min(100, Math.round(current / Math.max(1, maximum) * 100)))}%`;
   }
 
-  // Visual fill is capped, but the numeric value is never truncated:
-  // combat v0.5.1 can accumulate Fatigue beyond the 100-point reference scale.
+  // Fatigue is now capped at 100; keep the meter resilient to legacy saves.
   function resourceWidth(value:number):string{
     const scaled=Number.isFinite(value)?value:0;
     return `${Math.max(0,Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100))}%`;
@@ -202,6 +201,18 @@
 
     {#if !ended}
       <section class="action-zone" aria-label="Combat decisions">
+        <p class="fatigue-status" aria-live="polite">
+          <strong>Fatigue {snapshot.player.fatigue}/{snapshot.rules.fatigue.cap}</strong>
+          <span>Accuracy penalty: −{snapshot.rules.fatigue.currentAccuracyLoss} percentage points</span>
+          {#if snapshot.player.fatigue>=snapshot.rules.fatigue.recoverOnlyAt}
+            <strong class="fatigue-warning">Fully exhausted. Recover only.</strong>
+          {:else if snapshot.player.fatigue>=snapshot.rules.fatigue.limitedAt}
+            <strong class="fatigue-warning">Exhausted. Reposition or Recover only.</strong>
+          {:else}
+            <span>At {snapshot.rules.fatigue.limitedAt}, attacks and Guard lock;
+              at {snapshot.rules.fatigue.recoverOnlyAt}, only Recover remains.</span>
+          {/if}
+        </p>
         <div class="actions-row">
           <div class="choices" role="group" aria-label="Choose a combat action">
             {#each actionChoices as choice (choice.id)}
@@ -240,7 +251,11 @@
           </div>
           {#if !available(visibleSelection)}
             <p class="detail-note action-unavailable">
-              {visibleSelection==='technique'
+              {snapshot.player.fatigue>=snapshot.rules.fatigue.recoverOnlyAt
+                ?'At 100 Fatigue, only Recover is possible.'
+                :snapshot.player.fatigue>=snapshot.rules.fatigue.limitedAt
+                ?'At 70 Fatigue, only Reposition and Recover remain available.'
+                :visibleSelection==='technique'
                 ?'Requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum (currently '+snapshot.player.momentum+').'
                 :visibleSelection==='attack'
                 ?'Move into contact range before attacking.'
@@ -277,13 +292,14 @@
               <p class="action-explanation">Strike the selected body part. Repeated Arms hits impair
                 attack accuracy and speed. Head hits deal more damage but are harder to land.
                 A damaging hit grants +10 Momentum. Base Damage is before an Opening bonus
-                or the opponent's Guard.</p>
+                or the opponent's Guard. Accuracy includes the current Fatigue penalty.</p>
             {:else}
               <p class="action-explanation">A powerful strike that deals increased damage.
                 Requires {snapshot.rules.techniqueMomentum} Momentum.
                 Accuracy and damage depend on the selected body part.
                 {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}
-                Base Damage excludes the separate Opening bonus and enemy Guard.</p>
+                Base Damage excludes the separate Opening bonus and enemy Guard.
+                Accuracy includes the current Fatigue penalty.</p>
             {/if}
             {#if snapshot.rules.openingReason}
               <p class="detail-note">Opening: {snapshot.rules.openingReason}.
@@ -331,8 +347,9 @@
                 <option value="nerves">Composure</option>
               </select>
             </div>
-            <p class="action-explanation">Restore one combat resource.
-              Does not restore Health or remove Fatigue.</p>
+            <p class="action-explanation">Restore one combat resource and remove
+              up to {snapshot.rules.fatigue.recovery} Fatigue per turn.
+              Recover works even at 100 Fatigue. It does not restore Health.</p>
           {/if}
         </div>
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -446,6 +463,11 @@
 
   /* Enemy condition is physically linked to Flint, not the player controls. */
   .enemy-status{position:absolute;z-index:3;top:30px;left:31%;width:min(25%,380px);min-width:260px}
+  .fatigue-status{display:flex;justify-content:center;align-items:baseline;
+    flex-wrap:wrap;gap:4px 12px;margin:2px 0 5px;padding:5px 10px;
+    background:#281f1a;color:#edd9c1;border:1px solid #6e513b;
+    font:600 12px/1.4 Georgia,serif}
+  .fatigue-warning{color:#ffb1a1}
   .action-zone{position:absolute;right:2.2%;bottom:22px;z-index:4;display:grid;gap:7px;
     min-width:0;width:min(69%,1090px)}
   .actions-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(145px,19%);
