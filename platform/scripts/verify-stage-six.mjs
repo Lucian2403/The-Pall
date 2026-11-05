@@ -206,9 +206,31 @@ assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus?
   scene.includes('<b>Opening:</b> +{openingBonus}') &&
   scene.includes('class="potential-stat"') &&
   scene.includes('<b>Total:</b>') &&
-  scene.includes('Base Damage is before an Opening bonus') &&
-  scene.includes('base damage, bonus and total separately'),
+  scene.includes('class="stat-line attack-cost"') &&
+  scene.includes('class="recover-tiers"') &&
+  scene.includes('<p class="detail-note">Opening: {snapshot.rules.openingReason}.') &&
+  scene.includes('Damage and accuracy') &&
+  !scene.includes('Base Damage is before an Opening bonus'),
   'Opening math must be visible before the action and preserved in exact combat history');
+// Readability: attacks show the cost and Opening once, with compact zone
+// rows; no nested scroll on the action inspector. Composure is always visible.
+assert.ok(scene.includes('<div class="stat-line attack-cost">') &&
+  scene.includes('<span class="opening-stat"><b>Opening:</b> +{openingBonus} damage</span>') &&
+  scene.includes('Arms hits impair attacks;') &&
+  scene.includes('Head hits harder but is less accurate.') &&
+  scene.includes('class="potential-stat"') &&
+  scene.includes('role="group" aria-label="Choose the body part to target"') &&
+  !scene.includes('max-height:320px;overflow-y:auto') &&
+  !scene.includes('Accuracy includes the current Fatigue penalty.') &&
+  engine.includes('const raw=rolled+openingDamageBonus;'),
+  'Condensed attack card must preserve source damage math and all target options');
+assert.ok(engine.includes('const nearDefeat=enemyCondition<=.30') &&
+  engine.includes('const wornDown=enemyCondition<=.40 && e.stamina<=20') &&
+  engine.includes('e.hp<p.hp && e.stamina<p.stamina') &&
+  engine.includes('if(!nearDefeat&&!wornDown)return false') &&
+  engine.includes("const odds=nearDefeat?.72:s.scene==='silas'?.26:.16"),
+  'Early enemy retreats must require severe injury or genuine exhaustion');
+
 // The owner-approved Fatigue system must remain symmetric: only the actual
 // engine owns changes, while the API projects the same accuracy and legal turns.
 for(const expected of [
@@ -425,8 +447,12 @@ assert.ok(page.includes('combatStamina={{current:battle.player.stamina,maximum:C
 // is clamped; the true numeric amount remains visible.
 assert.ok(scene.includes("displayedResources=[") &&
   scene.includes("{key:'stamina',label:'Stamina'}") &&
+  scene.includes("{key:'composure',label:'Composure'}") &&
   scene.includes("{key:'fatigue',label:'Fatigue'}") &&
   scene.includes("{key:'momentum',label:'Momentum'}") &&
+  scene.includes('grid-template-columns:repeat(4,minmax(0,1fr))') &&
+  scene.includes(".mini-fill.composure{background:") &&
+  !scene.includes('<div><dt>Composure</dt><dd>{actor.composure}</dd></div>') &&
   scene.includes('style:width={resourceWidth(actor[resource.key])}') &&
   scene.includes('<dd>{actor[resource.key]}</dd>') &&
   scene.includes('Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100)') &&
