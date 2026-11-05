@@ -62,7 +62,9 @@
       if (response.ok && body.character) {
         pendingRequestId = null;
         pendingSignature = null;
-        await goto('/characters');
+        // First entry goes straight to the saved origin scene. The shared
+        // game shell opens the server-owned Welcome modal before play.
+        await goto('/characters/'+encodeURIComponent(body.character.id)+'/opening');
         return;
       }
       const errors: Record<string, string> = {

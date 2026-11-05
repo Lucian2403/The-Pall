@@ -36,7 +36,7 @@ for(const fragment of [
   'disabled={busy||!selectedAvatarId||roster.slots.used>=roster.slots.limit}',
   "pendingRequestId = crypto.randomUUID()",
   "expectedRevision: roster.revision",
-  "await goto('/characters')",
+  "await goto('/characters/'+encodeURIComponent(body.character.id)+'/opening')",
   "href=\"/characters\"",
   "href=\"/introduction\"",
   "href=\"/account\"",

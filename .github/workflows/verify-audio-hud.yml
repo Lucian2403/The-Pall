@@ -7,6 +7,8 @@ on:
       - 'platform/apps/web/src/lib/PallAudioControls.svelte'
       - 'platform/apps/web/src/lib/CharacterHome.svelte'
       - 'platform/apps/web/src/lib/TutorialShell.svelte'
+      - 'platform/apps/web/src/lib/WelcomeToThePall.svelte'
+      - 'platform/scripts/verify-character-welcome.mjs'
       - 'platform/scripts/verify-audio-*.mjs'
       - 'platform/scripts/verify-character-home.mjs'
       - 'platform/scripts/verify-workshop-hud-ambience.mjs'
@@ -43,6 +45,8 @@ jobs:
         run: npm run build:packages
       - name: Character home source and structure
         run: npm run verify:character-home
+      - name: Welcome intro and blocking behavior
+        run: npm run verify:welcome
       - name: Owner audio assets and Web Audio contracts
         run: npm run verify:audio-prototype
       - name: Workshop ambience asset and HUD contract
