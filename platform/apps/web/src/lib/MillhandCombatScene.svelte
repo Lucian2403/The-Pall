@@ -336,8 +336,8 @@
               you move before Flint's committed attack. Close distance gives no dodge chance.</p>
           {:else}
             <div class="stat-line">
-              <span><b>Restores:</b> Up to {snapshot.rules.recoverStamina} Stamina</span>
-              <span><b>Alternative:</b> Composure (+{snapshot.rules.recoverComposure})</span>
+              <span><b>Current Fatigue:</b> {snapshot.player.fatigue}</span>
+              <span><b>Removes:</b> Up to {snapshot.rules.fatigue.recovery} Fatigue</span>
               <span><b>Duration:</b> 1 Turn</span>
             </div>
             <div class="detail-field">
@@ -346,10 +346,25 @@
                 <option value="breath">Stamina</option>
                 <option value="nerves">Composure</option>
               </select>
+              {#if reserve==='breath'}
+                <span class="detail-text"><b>Stamina:</b> Up to +{snapshot.rules.recoverStamina}</span>
+              {:else}
+                <span class="detail-text"><b>Composure:</b> Up to +{snapshot.rules.recoverComposure} (no Stamina)</span>
+              {/if}
             </div>
-            <p class="action-explanation">Restore one combat resource and remove
-              up to {snapshot.rules.fatigue.recovery} Fatigue per turn.
-              Recover works even at 100 Fatigue. It does not restore Health.</p>
+            <p class="action-explanation">Below {snapshot.rules.fatigue.recoveryThreshold} Fatigue:
+              −{snapshot.rules.fatigue.recoveryBelow50} Fatigue and up to
+              +{snapshot.rules.recoverStaminaBelow50} Stamina. At {snapshot.rules.fatigue.recoveryThreshold}
+              or above: −{snapshot.rules.fatigue.recoveryFrom50} Fatigue and up to
+              +{snapshot.rules.recoverStaminaFrom50} Stamina.
+              Recover (Composure) restores Composure instead of Stamina, while removing the same Fatigue.</p>
+            <p class="action-explanation">
+              <strong>Unprotected while recovering.</strong>
+              {snapshot.distance==='contact'
+                ?' Flint is in striking range: his attack can hit you for full, unguarded damage.'
+                :' You are currently out of contact range, but Flint can close the distance.'}
+              Recover grants no Guard, damage reduction or dodge. It does not restore Health.
+            </p>
           {/if}
         </div>
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
