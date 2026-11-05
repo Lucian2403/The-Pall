@@ -297,7 +297,8 @@ function tryAttack(s, who, a) {
   const damageLo=profile?.[0]??(lo+(special?4:0));
   const damageHi=profile?.[1]??(hi+(special?4:0));
   const rolled=damageLo+Math.floor(rng(s)*(damageHi-damageLo+1));
-  const raw=rolled+(exploited?(edge.damageBonus??5):0);
+  const openingDamageBonus=exploited?(edge.damageBonus??5):0;
+  const raw=rolled+openingDamageBonus;
   // A Guard cuts 30–60% of a landed strike. The single deterministic roll
   // is part of the committed combat state, so replay and reload are identical.
   const reduction=dst.guard?
@@ -323,6 +324,10 @@ function tryAttack(s, who, a) {
     `The curved work iron strikes along your ${part}.`,
     `Silas catches you with the hook as he steps inside your reach.`]);
   if(exploited)narrative=`${src.name==='Player'?'You take the opening.':src.name+' exploits the opening.'} ${narrative}`;
+  // Explain exceptional damage within the same persisted event. The roll and
+  // opening bonus are distinct; Guard may still reduce the resulting total.
+  const damageBreakdown=openingDamageBonus>0
+    ?` ${rolled} base damage + ${openingDamageBonus} Opening bonus = ${raw} before Guard.`:'';
   // Truthful, situation-driven detail, never invented injuries or scenery.
   const prior=s.lastPlayerActions?.at(-1);
   const contextual=who==='player' && prior==='guard'?' You have just come out of a defensive stance.'
@@ -330,8 +335,9 @@ function tryAttack(s, who, a) {
     :who==='enemy'&&s.scene==='boar'&&s.terrain.playerSpot==='fence'?' The broken fence offers little room for the animal to turn.'
     :who==='player'&&s.enemy.hp<s.enemy.hpMax/2?' The opponent is plainly struggling now.':'';
   const guardText=dst.guard?` ${dst.name==='Player'?'Your guard':'Their guard'} absorbs ${raw-damage} of the impact.`:'';
-  log(s,`${narrative}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
-      'damage',{actor:who,target:targetWho,zone,raw,damage,guarded:dst.guard,
+  log(s,`${narrative}${damageBreakdown}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
+      'damage',{actor:who,target:targetWho,zone,raw,damage,
+        baseDamage:rolled,openingDamageBonus,guarded:dst.guard,
         guardReductionPercent:dst.guard?Math.round(reduction*100):0,
         ability:special?ability:null});
   if(src.weapon.type==='sharp' && damage>=6 && dst.bleed===0) {
