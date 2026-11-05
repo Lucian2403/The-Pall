@@ -31,7 +31,8 @@ const schema=[
   '0002_characters.sql','0003_millhand_platework.sql',
   '0004_millhand_missing_stamp.sql','0005_millhand_second_job.sql',
   '0006_character_portraits.sql','0006_millhand_wage_claim.sql',
-  '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql'
+  '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql',
+  '0009_character_welcome.sql'
 ];
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
   // This resolver is injected only via register*Routes options in this
