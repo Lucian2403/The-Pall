@@ -18,6 +18,9 @@ export const TEST_CONFIG = Object.freeze({
 
 export class CombatError extends Error {}
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+// Earlier persisted Flint fights precede the explicit unarmed marker.
+export const isUnarmedWeapon=w=>w.unarmed===true ||
+  (w.unarmed===undefined&&w.damage===6&&w.accuracy===.70&&w.type==='blunt');
 const copy = x => structuredClone(x);
 const actor = (name, opts = {}) => ({
   name, hp: opts.hp ?? 50, hpMax: opts.hpMax ?? 50, ceiling: opts.ceiling ?? 50,
@@ -236,7 +239,9 @@ function verifyAction(s,a) {
 }
 function actionSpeed(who, a, s) {
   const speed = a.speed ?? ({attack:4,guard:10,move:6,use:3,recover:2,withdraw:5,technique:3}[a.type]);
-  return speed + s[who].readiness;
+  // Repeated arm hits slow committed attacks, not only their accuracy.
+  const impaired=s[who].armImpaired&&(a.type==='attack'||a.type==='technique');
+  return speed + s[who].readiness-(impaired?1:0);
 }
 function tryAttack(s, who, a) {
   const src=s[who],targetWho=who==='player'?'enemy':'player',dst=s[targetWho];
@@ -285,7 +290,7 @@ function tryAttack(s, who, a) {
   // TRIAL ONLY: ±roughly 30% damage spread. Never change final equipment stats from this spike.
   const lo=Math.max(1,src.weapon.minDamage??Math.floor(base*.72));
   const hi=Math.max(lo,src.weapon.maxDamage??Math.ceil(base*1.3));
-  const profile=who==='player'&&src.weapon.unarmed
+  const profile=who==='player'&&isUnarmedWeapon(src.weapon)
     ?(special?TEST_CONFIG.unarmedTechnique:TEST_CONFIG.unarmedDamage)[zone]:null;
   const damageLo=profile?.[0]??(lo+(special?4:0));
   const damageHi=profile?.[1]??(hi+(special?4:0));
