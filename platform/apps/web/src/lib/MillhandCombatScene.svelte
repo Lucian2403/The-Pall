@@ -55,8 +55,9 @@
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
     recover: 'Recover', technique: 'Press Advantage'
   }[visibleSelection]);
+  const targetZones=['torso','limbs','head'] as const;
   const selectedDamage=$derived(visibleSelection==='technique'
-    ?snapshot.rules.techniqueDamage:snapshot.rules.strikeDamage);
+    ?snapshot.rules.techniqueByZone[zone]:snapshot.rules.strikeByZone[zone]);
   const openingBonus=$derived(snapshot.rules.openingDamageBonus);
   const damageMin=$derived(selectedDamage.min+openingBonus);
   const damageMax=$derived(selectedDamage.max+openingBonus);
@@ -201,8 +202,6 @@
 
     {#if !ended}
       <section class="action-zone" aria-label="Combat decisions">
-        <p class="weapon-status">Your weapon: <strong>{snapshot.rules.weaponLabel}</strong>
-          <span>Flint's weapon: club</span></p>
         <div class="actions-row">
           <div class="choices" role="group" aria-label="Choose a combat action">
             {#each actionChoices as choice (choice.id)}
@@ -230,92 +229,98 @@
 
         <div class="action-details" aria-label="Selected combat action details">
           <div class="chosen-heading">
-            <img src={iconBase + selectedAsset} width="32" height="32" alt="" />
-            <strong>{actionName}</strong>
+            <div class="heading-title">
+              <img src={iconBase + selectedAsset} width="24" height="24" alt="" />
+              <strong>{actionName}</strong>
+            </div>
+            {#if visibleSelection==='attack'||visibleSelection==='technique'}
+              <img class="weapon-icon" src={iconBase + (snapshot.rules.unarmed?'unarmed-fists.webp':'rifle.webp')}
+                alt={snapshot.rules.weaponLabel} width="48" height="48" />
+            {/if}
           </div>
           {#if !available(visibleSelection)}
-            <p class="detail-note action-unavailable">Not currently available:
+            <p class="detail-note action-unavailable">
               {visibleSelection==='technique'
-                ?'Press Advantage requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum. You have '+snapshot.player.momentum+'.'
+                ?'Requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum (currently '+snapshot.player.momentum+').'
                 :visibleSelection==='attack'
-                ?'You must move into contact range before attacking.'
-                :'The current fight state does not permit this action.'}
-              You can inspect it, but not confirm it.</p>
+                ?'Move into contact range before attacking.'
+                :'This action is unavailable now.'}
+            </p>
           {/if}
-          {#if visibleSelection === 'attack' || visibleSelection === 'technique'}
-            <div class="detail-options">
-              <div class="detail-field">
-                <label for="battle-zone">Aim at</label>
-                <select id="battle-zone" bind:value={zone} disabled={pending}>
-                  <option value="torso">Torso</option>
-                  <option value="limbs">Limbs</option>
-                  <option value="head">Head</option>
-                </select>
-              </div>
-              <span class="detail-text"><strong>{snapshot.rules.accuracy[zone]}%</strong> chance to hit</span>
-              <span class="detail-text"><strong>{damageMin}–{damageMax} Health</strong> damage if it hits, before Guard</span>
+          {#if visibleSelection==='attack'||visibleSelection==='technique'}
+            <div class="target-list" role="group" aria-label="Choose the body part to target">
+              {#each targetZones as target (target)}
+                <button type="button" class="target-line" class:selected-target={zone===target}
+                  aria-pressed={zone===target} disabled={pending} onclick={()=>zone=target}>
+                  <span><b>Target:</b> {target==='limbs'?'Arms':target==='head'?'Head':'Torso'}</span>
+                  <span><b>Accuracy:</b> {snapshot.rules.accuracy[target]}%</span>
+                  <span><b>Damage:</b>
+                    {visibleSelection==='attack'
+                      ?snapshot.rules.strikeByZone[target].min+openingBonus
+                      :snapshot.rules.techniqueByZone[target].min+openingBonus}–{visibleSelection==='attack'
+                      ?snapshot.rules.strikeByZone[target].max+openingBonus
+                      :snapshot.rules.techniqueByZone[target].max+openingBonus}</span>
+                  <span><b>Cost:</b> {visibleSelection==='attack'?snapshot.rules.strikeCost:15} Stamina{visibleSelection==='technique'?' + '+snapshot.rules.techniqueMomentum+' Momentum':''}</span>
+                </button>
+              {/each}
             </div>
-            <p class="detail-note">Same damage to torso, limbs and head. Head and limb strikes are less accurate.</p>
-            {#if visibleSelection === 'attack'}
-              <p class="detail-note">Costs {snapshot.rules.strikeCost} Stamina.
-                {snapshot.rules.strikeCost>11?'Repeated attacks add '+snapshot.rules.repeatedStrikeSurcharge+' Stamina.':''}
-                A damaging hit earns 10 Momentum.</p>
+            {#if visibleSelection==='attack'}
+              <p class="action-explanation">Strike the selected body part. Repeated Arms hits impair
+                attack accuracy and speed. Head hits deal more damage but are harder to land.
+                A damaging hit grants +10 Momentum.</p>
             {:else}
-              <p class="detail-note">Costs 12 Stamina and {snapshot.rules.techniqueMomentum} Momentum.
-                Press Advantage adds 4 damage to your unarmed strike.
-                {openingBonus>0?'This opening adds another '+openingBonus+' damage.':''}</p>
+              <p class="action-explanation">A powerful strike that deals increased damage.
+                Requires {snapshot.rules.techniqueMomentum} Momentum.
+                Accuracy and damage depend on the selected body part.
+                {openingBonus>0?'A current opening adds '+openingBonus+' damage.':''}</p>
             {/if}
             {#if snapshot.rules.openingReason}
-              <p class="detail-note">Current opening: {snapshot.rules.openingReason}.
-                Accuracy above already includes its bonus.</p>
+              <p class="detail-note">Opening: {snapshot.rules.openingReason}.
+                The accuracy and damage above include its bonuses.</p>
             {/if}
-          {:else if visibleSelection === 'move'}
-            <div class="detail-options">
-              <div class="detail-field">
-                <label for="battle-move">Move to</label>
-                <select id="battle-move" bind:value={destination} disabled={pending}>
-                  {#if snapshot.distance !== 'contact'}<option value="close">Close distance</option>{/if}
-                  <option value="side">Move sideways</option>
-                  <option value="back">Fall back</option>
-                  <option value="cover">Use cover</option>
-                </select>
-              </div>
-              <span class="detail-text">Cost: <strong>{snapshot.rules.moveCost} Stamina</strong></span>
-              <span class="detail-text">Dodge protection: <strong>position-based, not a %</strong></span>
+          {:else if visibleSelection==='guard'}
+            <div class="stat-line">
+              <span><b>Damage Reduction:</b> 30–60% (Flint: {snapshot.rules.guardMitigationPercent}%)</span>
+              <span><b>Duration:</b> 1 Turn</span>
+              <span><b>Cost:</b> {snapshot.rules.guardCost} Stamina</span>
             </div>
-            {#if destination==='close'}
-              <p class="detail-note">Close distance moves into melee range. It does not evade the club.</p>
-            {:else}
-              <p class="detail-note">Moving sideways or into cover puts you at near range;
-                falling back puts you at far range. If you move before Flint's committed
-                contact attack, it falls short (no Health lost from that blow).
-                A successful evasion earns 5 Momentum.</p>
-            {/if}
-          {:else if visibleSelection === 'recover'}
-            <div class="detail-options">
-              <div class="detail-field">
-                <label for="battle-recovery">Restore</label>
-                <select id="battle-recovery" bind:value={reserve} disabled={pending}>
-                  <option value="breath">Stamina</option>
-                  <option value="nerves">Composure</option>
-                </select>
-              </div>
-              <span class="detail-text">{reserve==='breath'
-                ?'Restore up to '+snapshot.rules.recoverStamina+' Stamina'
-                :'Restore up to '+snapshot.rules.recoverComposure+' Composure'}
-                (maximum 100)</span>
+            <p class="action-explanation">Reduce damage from incoming attacks.
+              Does not prevent all damage. A successful block may create an opening
+              and grant +8 Momentum.</p>
+          {:else if visibleSelection==='move'}
+            <div class="stat-line">
+              <span><b>Cost:</b> {snapshot.rules.moveCost} Stamina</span>
+              <span><b>Dodge Chance:</b> {snapshot.rules.dodgeChance.side}–{snapshot.rules.dodgeChance.back}%</span>
+              <span><b>Range:</b> Variable</span>
             </div>
-            <p class="detail-note">Recover uses your turn. It does not restore Health or remove Fatigue.</p>
+            <div class="detail-field">
+              <label for="battle-move">Move:</label>
+              <select id="battle-move" bind:value={destination} disabled={pending}>
+                {#if snapshot.distance!=='contact'}<option value="close">Close distance</option>{/if}
+                <option value="side">Move sideways</option>
+                <option value="back">Fall back</option>
+                <option value="cover">Use cover</option>
+              </select>
+              <span class="detail-text">Selected dodge: {snapshot.rules.dodgeChance[destination]}%</span>
+            </div>
+            <p class="action-explanation">Move sideways to attempt a dodge, or fall back
+              to increase distance from your opponent. A dodge roll applies only when
+              you move before Flint's committed attack. Close distance gives no dodge chance.</p>
           {:else}
-            <div class="detail-options">
-              <span class="detail-text">Cost: <strong>{snapshot.rules.guardCost} Stamina</strong></span>
-              <span class="detail-text">Flint's club: <strong>{snapshot.rules.guardMitigationPercent}% damage absorbed</strong></span>
-              <span class="detail-text">Ordinary hit: <strong>{snapshot.rules.enemyStrikeDamage.min}–{snapshot.rules.enemyStrikeDamage.max}</strong>
-                becomes <strong>{snapshot.rules.guardedEnemyStrikeDamage.min}–{snapshot.rules.guardedEnemyStrikeDamage.max} Health</strong></span>
+            <div class="stat-line">
+              <span><b>Restores:</b> Up to {snapshot.rules.recoverStamina} Stamina</span>
+              <span><b>Alternative:</b> Composure (+{snapshot.rules.recoverComposure})</span>
+              <span><b>Duration:</b> 1 Turn</span>
             </div>
-            <p class="detail-note">Guard protects against a hit this turn, not against a miss.
-              A damaging blow stopped in part by Guard earns 8 Momentum and creates an opening.
-              Special attacks can still hit harder.</p>
+            <div class="detail-field">
+              <label for="battle-recovery">Recover:</label>
+              <select id="battle-recovery" bind:value={reserve} disabled={pending}>
+                <option value="breath">Stamina</option>
+                <option value="nerves">Composure</option>
+              </select>
+            </div>
+            <p class="action-explanation">Restore one combat resource.
+              Does not restore Health or remove Fatigue.</p>
           {/if}
         </div>
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -461,19 +466,32 @@
     font:700 clamp(11px,.93vw,14px)/1.2 Georgia,serif}
   .commit img{width:clamp(24px,2.1vw,33px);height:clamp(24px,2.1vw,33px);
     object-fit:contain;filter:brightness(.6) sepia(.2)}
-  .weapon-status{margin:0;padding:3px 10px;text-align:center;color:#f8dfba;
-    text-shadow:0 1px 2px #000;font:700 13px/1.3 Georgia,serif}
-  .weapon-status span{margin-left:15px;font-weight:400;color:#e1c5a2}
-  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;
-    box-sizing:border-box;min-height:74px;width:min(100%,700px);margin:0 auto;padding:6px 13px;
+  .action-details{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:7px;
+    box-sizing:border-box;min-height:115px;width:min(100%,850px);margin:0 auto;padding:8px 15px;
     background:transparent;color:#352417;border:solid transparent;border-width:10px 14px 9px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
     border-image-width:10px 14px 9px;border-image-repeat:stretch}
-  .chosen-heading{display:flex;align-items:center;gap:6px;padding:0 0 5px;
-    border-bottom:1px solid #b18f69;font:700 13px/1.2 Georgia,serif}
+  .chosen-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:0 0 5px;border-bottom:1px solid #b18f69;font:700 18px/1.2 Georgia,serif}
+  .heading-title{display:flex;align-items:center;gap:8px}
+  .chosen-heading .weapon-icon{width:39px;height:39px;object-fit:contain;filter:none}
+  .target-list{display:grid;gap:3px}
+  .target-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;
+    text-align:left;padding:5px 8px;border:1px solid transparent;background:transparent;
+    color:#382318;cursor:pointer;font:600 12px/1.35 Georgia,serif}
+  .target-line span{white-space:nowrap}
+  .target-line span+span{padding-left:9px;border-left:1px solid #b69a77}
+  .target-line b,.stat-line b{font-weight:700}
+  .target-line.selected-target{background:#ecd4a5;border-color:#b68b55;border-radius:3px}
+  .target-line:hover:not(:disabled){background:#f6e5c6}
+  .target-line:focus-visible{outline:2px solid #855a31;outline-offset:2px}
+  .stat-line{display:flex;align-items:center;gap:9px 14px;flex-wrap:wrap;
+    font:600 13px/1.4 Georgia,serif}
+  .stat-line span+span{padding-left:13px;border-left:1px solid #b69a77}
+  .action-explanation{margin:4px 0 0;font:italic 600 12px/1.42 Georgia,serif;color:#563721}
   .detail-options{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:6px 13px}
-  .chosen-heading img{width:23px;height:23px;object-fit:contain;filter:brightness(.65) sepia(.2)}
+  .heading-title img{width:24px;height:24px;object-fit:contain;filter:brightness(.65) sepia(.2)}
   .detail-field{display:flex;align-items:center;gap:8px}
   .detail-field label,.detail-text{font:600 12px/1.3 Georgia,serif;color:#4b311c}
   .detail-field select{max-width:145px;min-height:26px;padding:2px 4px;
@@ -617,9 +635,11 @@
     .confirm-holder{padding:8px 0 0;border-left:0;border-top:1px solid #816748}
     .commit{min-height:48px}
     .action-details{width:100%;justify-content:flex-start}
-    .weapon-status span{display:block;margin:2px 0 0}
     .detail-options{align-items:flex-start}
     .detail-options .detail-text+.detail-text{border:0;padding:0}
+    .target-line span+span{border:0;padding:0}
+    .stat-line span+span{border:0;padding:0}
+    .action-details{width:100%}
     .combat-console{padding:9px;gap:9px}
   }
   @media(max-width:370px){
