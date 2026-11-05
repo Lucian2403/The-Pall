@@ -59,7 +59,8 @@ test('Guard consumes 15 Stamina, rolls real 30–60% reduction, and lasts one tu
   for(let seed=1;seed<=200;seed++){
     const enemy={weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.95,
       type:'blunt',reach:'contact'}};
-    const before=newEncounter('flint',{seed,enemy});
+    // Consecutive low LCG seeds cluster; stride around the full 32-bit space.
+    const before=newEncounter('flint',{seed:(Math.imul(seed,2654435761)>>>0),enemy});
     const after=act(before,{type:'guard'},'guard-'+seed);
     assert.equal(after.player.stamina,75);
     assert.equal(after.player.guard,false,'Guard must not leak into another turn');
