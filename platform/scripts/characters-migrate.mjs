@@ -11,6 +11,8 @@ await client.connect();
 try {
   await client.query('BEGIN');
   await client.query(sql);
+  // Additive, idempotent first-entry acknowledgement; preserves older saves.
+  await client.query(readFileSync(resolve(import.meta.dirname, '../db/migrations/0009_character_welcome.sql'), 'utf8'));
   await client.query('COMMIT');
   const found = await client.query("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename LIKE 'player_character%' ORDER BY tablename");
   console.log('M1.2 tables:', found.rows.map(row => row.tablename).join(', '));
