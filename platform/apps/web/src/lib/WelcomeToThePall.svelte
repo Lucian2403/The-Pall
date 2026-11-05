@@ -41,7 +41,6 @@
 <dialog bind:this={dialog} class="welcome-dialog" aria-labelledby="welcome-title"
   aria-describedby="welcome-subtitle" oncancel={(event)=>event.preventDefault()}>
   <div class="welcome-inner">
-    <p class="welcome-eyebrow">WELCOME TO THE PALL</p>
     <h1 id="welcome-title">WELCOME TO THE PALL</h1>
     <h2 id="welcome-subtitle">YOUR STORY BEGINS HERE</h2>
     <div class="welcome-copy">
@@ -72,8 +71,6 @@
   }
   .welcome-dialog::backdrop{background:#0c0b0ae8;backdrop-filter:blur(4px)}
   .welcome-inner{padding:clamp(12px,2.4vw,27px);min-width:0;text-align:center}
-  .welcome-eyebrow{font:700 11px/1.4 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.15em;color:#654830;margin:0 0 6px}
   .welcome-inner h1{font:700 clamp(25px,3.6vw,38px)/1.2 var(--pall-font-reading,Georgia,serif);
     letter-spacing:.025em;color:#2f1e10;margin:0}
   .welcome-inner h2{font:700 clamp(15px,2.1vw,20px)/1.3 var(--pall-font-reading,Georgia,serif);
