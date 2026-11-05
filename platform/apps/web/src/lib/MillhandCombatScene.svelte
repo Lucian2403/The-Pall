@@ -20,7 +20,8 @@
   const ended = $derived(snapshot.status === 'finished');
   const flintDefeated = $derived(ended && snapshot.outcome === 'player_victory');
 
-  let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'>('guard');
+  let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'|'focus'>('guard');
+  let detailsOpen=$state(false);
   let zone = $state<'head'|'torso'|'limbs'>('torso');
   let destination = $state<'side'|'close'|'cover'|'back'>('side');
   let reserve = $state<'breath'|'nerves'>('breath');
@@ -58,7 +59,7 @@
   const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-6));
   const actionName = $derived({
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
-    recover: 'Recover', technique: 'Press Advantage'
+    recover: 'Recover', technique: 'Press Advantage',focus:'Focused Stance'
   }[visibleSelection]);
   const targetZones=['torso','limbs','head'] as const;
   const selectedDamage=$derived(visibleSelection==='technique'
@@ -91,13 +92,15 @@
     {key:'momentum',label:'Momentum'}
   ] as const;
   const actionChoices = [
-    {id:'attack',label:'Attack',asset:'strike.webp'},
-    {id:'guard',label:'Guard',asset:'guard.webp'},
-    {id:'move',label:'Reposition',asset:'reposition.webp'},
-    {id:'recover',label:'Recover',asset:'recover.webp'},
-    {id:'technique',label:'Press Advantage',asset:'press-advantage.webp'}
+    {id:'attack',label:'Attack',short:'Attack',asset:'strike.webp'},
+    {id:'guard',label:'Guard',short:'Guard',asset:'guard.webp'},
+    {id:'move',label:'Reposition',short:'Move',asset:'reposition.webp'},
+    {id:'recover',label:'Recover',short:'Rest',asset:'recover.webp'},
+    {id:'technique',label:'Press Advantage',short:'Press',asset:'press-advantage.webp'},
+    {id:'focus',label:'Focused Stance',short:'Focus',asset:null}
   ] as const;
-  const selectedAsset = $derived(actionChoices.find(choice => choice.id === visibleSelection)?.asset ?? 'guard.webp');
+  const selectedAsset=$derived(actionChoices.find(choice=>choice.id===visibleSelection)?.asset??null);
+  const focusedTurns=$derived(snapshot.rules.focus?.remaining??0);
 
   function available(action: (typeof actionChoices)[number]['id']): boolean {
     return snapshot.legalActions.includes(action);
@@ -119,6 +122,7 @@
       case 'move': action = {type:'move',to:destination}; break;
       case 'recover': action = {type:'recover',mode:reserve}; break;
       case 'technique': action = {type:'technique',zone}; break;
+      case 'focus': action = {type:'focus'}; break;
     }
     void perform(action);
   }
@@ -163,6 +167,9 @@
       <summary>More condition details</summary>
       <dl>
         <div><dt>Composure</dt><dd>{actor.composure}</dd></div>
+        {#if (actor.focusedTurnsRemaining??0)>0}
+          <div><dt>Focused Stance</dt><dd>{actor.focusedTurnsRemaining} turns</dd></div>
+        {/if}
         <div><dt>Wounds</dt><dd>{actor.wounds.length}</dd></div>
         {#if actor.bleed > 0}<div><dt>Bleeding</dt><dd>{actor.bleed}</dd></div>{/if}
         {#if actor.ceiling < actor.hpMax}
@@ -218,16 +225,24 @@
       <section class="action-zone" aria-label="Combat decisions">
         <div class="actions-row">
           <div class="choices" role="group" aria-label="Choose a combat action">
-            {#each actionChoices as choice (choice.id)}
-              <button class="action-tile" class:chosen={visibleSelection === choice.id}
+            {#each actionChoices as choice, i (choice.id)}
+              <button class="action-tile" class:chosen={visibleSelection===choice.id}
                 class:unavailable={!available(choice.id)}
                 type="button" disabled={pending} aria-disabled={!available(choice.id)}
-                aria-pressed={visibleSelection === choice.id}
+                aria-pressed={visibleSelection===choice.id}
                 aria-label={`Select ${choice.label} action`}
-                title={available(choice.id) ? choice.label : choice.label + ' unavailable'}
-                onclick={() => selected = choice.id}>
-                <img src={iconBase + choice.asset} alt="" width="58" height="58" decoding="async" />
-                <span class="action-name">{choice.label}</span>
+                title={available(choice.id)?choice.label:choice.label+' unavailable'}
+                onclick={()=>selected=choice.id}>
+                <span class="hotkey" aria-hidden="true">{i+1}</span>
+                {#if choice.asset}
+                  <img src={iconBase+choice.asset} alt="" width="32" height="32" decoding="async" />
+                {:else}
+                  <span class="focus-symbol" aria-hidden="true">◎</span>
+                {/if}
+                <span class="action-name">{choice.short}</span>
+                {#if choice.id==='focus'&&focusedTurns>0}
+                  <span class="focus-timer" aria-label={`Focused Stance: ${focusedTurns} turns remaining`}>{focusedTurns}</span>
+                {/if}
               </button>
             {/each}
           </div>
@@ -235,16 +250,26 @@
             <button class="commit" type="button" data-pall-sfx="none"
               disabled={pending || !available(visibleSelection)} onclick={commit}
               aria-label={`Confirm ${actionName} action`}>
-              <img src={iconBase + 'confirm-action.webp'} alt="" width="41" height="41" />
-              <span>{pending ? 'Resolving…' : 'Confirm action'}</span>
+              <img src={iconBase+'confirm-action.webp'} alt="" width="26" height="26" />
+              <span>{pending?'Wait':'Confirm'}</span>
+            </button>
+            <button type="button" class="details-toggle"
+              aria-expanded={detailsOpen} aria-controls="combat-action-detail-panel"
+              onclick={()=>detailsOpen=!detailsOpen}>
+              {detailsOpen?'Hide details':'Details'}
             </button>
           </div>
         </div>
 
-        <div class="action-details" aria-label="Selected combat action details">
+        {#if detailsOpen}
+        <div class="action-details" id="combat-action-detail-panel" aria-label="Selected combat action details">
           <div class="chosen-heading">
             <div class="heading-title">
-              <img src={iconBase + selectedAsset} width="24" height="24" alt="" />
+              {#if selectedAsset}
+                <img src={iconBase + selectedAsset} width="24" height="24" alt="" />
+              {:else}
+                <span class="focus-heading-symbol" aria-hidden="true">◎</span>
+              {/if}
               <strong>{actionName}</strong>
             </div>
             {#if visibleSelection==='attack'||visibleSelection==='technique'}
@@ -258,6 +283,9 @@
                 ?'At 100 Fatigue, only Recover is possible.'
                 :snapshot.player.fatigue>=snapshot.rules.fatigue.limitedAt
                 ?'At 70 Fatigue, only Reposition and Recover remain available.'
+                :visibleSelection==='focus'
+                ?focusedTurns>0?'Focused Stance is already active for '+focusedTurns+' turns.'
+                  :'Requires '+(snapshot.rules.focus?.cost??10)+' Composure.'
                 :visibleSelection==='technique'
                 ?'Requires contact range and '+snapshot.rules.techniqueMomentum+' Momentum (currently '+snapshot.player.momentum+').'
                 :visibleSelection==='attack'
@@ -318,6 +346,22 @@
             <p class="action-explanation">Reduce damage from incoming attacks.
               Does not prevent all damage. Guard reduction is rolled within the shown range for every landed blow. A successful block may create an opening
               and grant +8 Momentum.</p>
+          {:else if visibleSelection==='focus'}
+            <div class="stat-line">
+              <span><b>Composure:</b> −{snapshot.rules.focus?.cost??10}</span>
+              <span><b>Accuracy:</b> +{snapshot.rules.focus?.accuracyBonusPercent??10} percentage points</span>
+              <span><b>Duration:</b> {snapshot.rules.focus?.duration??3} subsequent turns</span>
+              <span><b>Activation:</b> 1 Turn</span>
+            </div>
+            <p class="action-explanation">
+              Steady your breathing and focus on your timing. Your attacks are
+              more accurate for three turns, including misses and special attacks.
+              Damage does not increase. Focused Stance does not stack or protect
+              you while preparing; Flint may still strike normally.
+            </p>
+            {#if focusedTurns>0}
+              <p class="detail-note">Focused Stance active: {focusedTurns} turns remaining.</p>
+            {/if}
           {:else if visibleSelection==='move'}
             <div class="stat-line">
               <span><b>Cost:</b> {snapshot.rules.moveCost} Stamina</span>
@@ -377,6 +421,7 @@
             {/if}
           {/if}
         </div>
+        {/if}
         {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
       </section>
     {/if}
