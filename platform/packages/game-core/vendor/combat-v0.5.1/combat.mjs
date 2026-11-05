@@ -9,7 +9,12 @@ export const TEST_CONFIG = Object.freeze({
   strikeCost: 10, repeatedStrikeSurcharge: 0, guardCost: 15, moveCost: 5, useCost: 2,
   recoverGain: 25, mentalRecoverGain: 12, lowReserve: 20,
   guardReduction:{min:.30,max:.60},
-  fatigueGain: 5, strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
+  // Owner-approved threshold model: the cost of already being completely spent
+  // differs from the last paid Stamina spend that reached zero.
+  fatigueLowGain:3,fatigueExhaustedDefenseGain:5,fatigueExhaustedAttackGain:10,
+  fatigueRecovery:10,fatigueCap:100,fatigueAttackLock:70,
+  fatigueAccuracyStep:10,fatigueAccuracyPenaltyPerStep:.03,
+  strikeMomentum: 10, guardMomentum: 8, moveMomentum: 5,
   bleedDamage: { 0: 0, 1: 1, 2: 2, 3: 3 },
   aim: { torso: 0, limbs: -0.15, head: -0.30 },
   dodgeChance:{side:.25,cover:.40,back:.50,close:0},
@@ -26,7 +31,8 @@ const copy = x => structuredClone(x);
 const actor = (name, opts = {}) => ({
   name, hp: opts.hp ?? 50, hpMax: opts.hpMax ?? 50, ceiling: opts.ceiling ?? 50,
   stamina: opts.stamina ?? 90, composure: opts.composure ?? 80,
-  fatigue: opts.fatigue ?? 0, stress: opts.stress ?? 0, momentum: opts.momentum ?? 0,
+  fatigue: clamp(opts.fatigue ?? 0,0,TEST_CONFIG.fatigueCap),
+  stress: opts.stress ?? 0, momentum: opts.momentum ?? 0,
   wounds: [], bleed: 0, bandages: opts.bandages ?? 0, guard: false,
   armHits:opts.armHits??0,armImpaired:opts.armImpaired??false,
   reloadSlowdownPercent:opts.reloadSlowdownPercent??0,
@@ -90,12 +96,44 @@ function woundName(s, who, zone) {
   if (zone === 'limbs') return choose(s, ['forearm', 'leg', 'shoulder']);
   return choose(s, ['ribs', 'chest', 'side']);
 }
-function cost(state, who, amount) {
+/** The shared action legality contract is used by player validation, enemy AI,
+ * and the public view. 70–99 permits Move or Recover; 100 permits Recover only.
+ * This deliberately includes hidden bandage/withdraw actions: no bypass via API.
+ */
+export function canActAtFatigue(actor,actionType){
+  const fatigue=clamp(actor.fatigue??0,0,TEST_CONFIG.fatigueCap);
+  if(fatigue>=TEST_CONFIG.fatigueCap)return actionType==='recover';
+  if(fatigue>=TEST_CONFIG.fatigueAttackLock)
+    return actionType==='move'||actionType==='recover';
+  return true;
+}
+export function fatigueAccuracyPenalty(actor){
+  const fatigue=clamp(actor.fatigue??0,0,TEST_CONFIG.fatigueCap);
+  return Math.floor(fatigue/TEST_CONFIG.fatigueAccuracyStep)*
+    TEST_CONFIG.fatigueAccuracyPenaltyPerStep;
+}
+function cost(state, who, amount, actionType='use') {
   const a = state[who];
-  const before = a.stamina;
-  a.stamina = Math.max(0, before - amount);
-  if (amount > 0 && a.stamina <= TEST_CONFIG.lowReserve) a.fatigue += TEST_CONFIG.fatigueGain;
-  if (before < amount) log(state, `${a.name} overexerts; Fatigue rises.`);
+  const before = Math.max(0,a.stamina);
+  a.stamina = Math.max(0,before-amount);
+  if(amount<=0)return;
+  let fatigueGain=0;
+  if(before===0){
+    fatigueGain=(actionType==='attack'||actionType==='technique')
+      ?TEST_CONFIG.fatigueExhaustedAttackGain
+      :TEST_CONFIG.fatigueExhaustedDefenseGain;
+  }else if(a.stamina<=TEST_CONFIG.lowReserve){
+    fatigueGain=TEST_CONFIG.fatigueLowGain;
+  }
+  const oldFatigue=clamp(a.fatigue??0,0,TEST_CONFIG.fatigueCap);
+  a.fatigue=clamp(oldFatigue+fatigueGain,0,TEST_CONFIG.fatigueCap);
+  const added=a.fatigue-oldFatigue;
+  if(added>0){
+    const reason=before===0?'exhausted exertion':'low Stamina';
+    log(state,`${a.name} gains ${added} Fatigue from ${reason}. `+
+      `Total Fatigue: ${a.fatigue}/100.`,'fatigue',
+      {actor:who,amount:added,fatigue:a.fatigue,reason,actionType});
+  }
 }
 function grant(state, who, amount) {
   const a = state[who];
@@ -143,6 +181,12 @@ function shouldHumanYield(s) {
 function makeIntent(state) {
   if(state.status!=='active')return null;
   const {enemy:e,scene,distance}=state;
+  // Exhausted NPCs use the same restrictions as the player. Recovery removes
+  // Fatigue, so they will never loop permanently at 70 or 100.
+  if(e.fatigue>=TEST_CONFIG.fatigueAttackLock){
+    return {type:'recover',mode:e.composure<40?'nerves':'breath',speed:2,
+      signal:'exhausted',tell:`${e.name} breathes hard and struggles to steady their stance.`};
+  }
   // The committed action is stored, but the public cue is deliberately coarse.
   if(scene==='boar' && hasClearBoarExit(state)){
     if(rng(state)<.77) return {type:'withdraw',speed:8,signal:'restless',
@@ -230,6 +274,10 @@ export function newEncounter(scene, opts = {}) {
 }
 function verifyAction(s,a) {
   if (!a || !['attack','guard','move','use','recover','withdraw','technique'].includes(a.type)) throw new CombatError('Unknown action');
+  if(!canActAtFatigue(s.player,a.type))
+    throw new CombatError(s.player.fatigue>=TEST_CONFIG.fatigueCap
+      ?'At 100 Fatigue only Recover is available'
+      :'At 70 Fatigue or more only Reposition and Recover are available');
   if(a.type==='attack'||a.type==='technique') {
     if (s.distance !== 'contact') throw new CombatError('Target out of contact reach');
     if (!['head','torso','limbs'].includes(a.zone ?? 'torso')) throw new CombatError('Invalid aim zone');
@@ -256,7 +304,7 @@ function tryAttack(s, who, a) {
     src.momentum-=spend;
     log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend});
   }
-  cost(s,who,special?15:testAttackCost(s,who));
+  cost(s,who,special?15:testAttackCost(s,who),special?'technique':'attack');
   // A failed committed dodge lets this specific club swing catch the mover
   // despite new spacing. A successful dodge uses the ordinary reach/miss path.
   const caughtDodging=who==='enemy'&&s.scene==='flint'&&
@@ -275,7 +323,10 @@ function tryAttack(s, who, a) {
   const edge=exploited?s.openings[who]:null;
   if(exploited)s.openings[who]=null;
   const impairment=src.armImpaired?.10:0;
-  const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]-(special && who==='enemy'?.07:0)+(exploited?(edge.accuracyBonus??.20):0)-impairment,.05,.95);
+  const fatiguePenalty=fatigueAccuracyPenalty(src);
+  const chance=clamp(src.weapon.accuracy+TEST_CONFIG.aim[zone]-
+    (special&&who==='enemy'?.07:0)+(exploited?(edge.accuracyBonus??.20):0)-
+    impairment-fatiguePenalty,.05,.95);
   if (rng(s)>=chance) {
     const actions=who==='player'
       ? ["Your blow passes wide. You find nothing but air.","You commit to the strike, but the opponent slips outside its path.","You reach for an opening that closes too quickly."]
@@ -370,9 +421,9 @@ function perform(s,who,a) {
   const x=s[who];
   switch(a.type) {
     case 'attack':case 'technique':tryAttack(s,who,a);break;
-    case 'guard': cost(s,who,TEST_CONFIG.guardCost);log(s,x.name==='Player'?'You brace for the incoming blow, letting your chance to strike pass.':`${x.name} raises a deliberate guard and waits for your attack.`, 'guard', {actor:who});break;
+    case 'guard': cost(s,who,TEST_CONFIG.guardCost,'guard');log(s,x.name==='Player'?'You brace for the incoming blow, letting your chance to strike pass.':`${x.name} raises a deliberate guard and waits for your attack.`, 'guard', {actor:who});break;
     case 'move':
-      cost(s,who,TEST_CONFIG.moveCost);
+      cost(s,who,TEST_CONFIG.moveCost,'move');
       if(who==='enemy') {s.distance='contact'; s.side=false; log(s,`${x.name} steps around the obstruction and closes the gap.`, 'move',{actor:who});}
       else if(a.to==='close'){s.distance='contact';s.side=false;setBoarPosition(s,'close');log(s,'You step forward, close enough to trade blows.','move',{actor:who});}
       else {s.distance=a.to==='back'?'far':'near';s.side=true;
@@ -385,11 +436,26 @@ function perform(s,who,a) {
         log(s,text,'move',{actor:who,position:s.terrain?.playerSpot,exitClear:hasClearBoarExit(s)});
       }
       break;
-    case 'recover':
-      if(a.mode==='breath'){const gain=Math.min(TEST_CONFIG.recoverGain,100-x.stamina);x.stamina+=gain;log(s,`${x.name==='Player'?'You draw a slow breath and steady your weight.':x.name+' pauses to recover.'} +${gain} Stamina.`,'recovery');}
-      else {x.composure=Math.min(100,x.composure+TEST_CONFIG.mentalRecoverGain);log(s,`${x.name==='Player'?'You force your breathing back under control.':x.name+' steadies themself.'} +12 Composure.`,'recovery');}break;
+    case 'recover': {
+      const formerFatigue=clamp(x.fatigue??0,0,TEST_CONFIG.fatigueCap);
+      x.fatigue=Math.max(0,formerFatigue-TEST_CONFIG.fatigueRecovery);
+      const fatigueRemoved=formerFatigue-x.fatigue;
+      const fatigueText=fatigueRemoved>0?` −${fatigueRemoved} Fatigue.`:'';
+      if(a.mode==='breath'){
+        const gain=Math.min(TEST_CONFIG.recoverGain,100-x.stamina);
+        x.stamina+=gain;
+        log(s,`${x.name==='Player'?'You draw a slow breath and steady your weight.':x.name+' pauses to recover.'} +${gain} Stamina.${fatigueText}`,
+          'recovery',{actor:who,mode:'breath',staminaRestored:gain,fatigueRemoved});
+      }else{
+        const gain=Math.min(TEST_CONFIG.mentalRecoverGain,100-x.composure);
+        x.composure+=gain;
+        log(s,`${x.name==='Player'?'You force your breathing back under control.':x.name+' steadies themself.'} +${gain} Composure.${fatigueText}`,
+          'recovery',{actor:who,mode:'nerves',composureRestored:gain,fatigueRemoved});
+      }
+      break;
+    }
     case 'use':
-      cost(s,who,TEST_CONFIG.useCost);x.bandages--;x.bleed=0;
+      cost(s,who,TEST_CONFIG.useCost,'use');x.bandages--;x.bleed=0;
       log(s,`${x.name==='Player'?'You bind the wound firmly.':x.name+' binds a wound.'} Bleeding is controlled, but the injury remains.`,'wound');break;
     case 'withdraw':
       if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':'Silas gives ground and ends the assault, remaining by the locked coal box.');
@@ -406,8 +472,12 @@ export function step(input, chosen, {requestId,expectedRevision}={}) {
   if(input.status!=='active')throw new CombatError('Encounter is over');
   verifyAction(input,chosen);
   const s=copy(input);s.events=[];
+  s.player.fatigue=clamp(s.player.fatigue??0,0,TEST_CONFIG.fatigueCap);
+  s.enemy.fatigue=clamp(s.enemy.fatigue??0,0,TEST_CONFIG.fatigueCap);
   s.dodgeAttempt=null;
-  const foe=s.intent;
+  // Handle legacy saved intents committed before Fatigue had action locks.
+  // Otherwise an exhausted NPC might execute an obsolete attack after reload.
+  const foe=canActAtFatigue(s.enemy,s.intent?.type)?s.intent:makeIntent(s);
   log(s,foe.tell,'intent',{actor:'enemy'});
   if(chosen.type==='technique' && s.player.momentum<20)throw new CombatError('No Momentum');
   s.player.guard=chosen.type==='guard';s.enemy.guard=foe.type==='guard';
