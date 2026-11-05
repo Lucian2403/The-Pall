@@ -24,6 +24,17 @@ export function soundSavedCombatTurn(
   if (action.type === 'move' && events.some(e => e.kind === 'move' && e.actor === 'player')) {
     playCombatSfx('reposition');
   }
+  // A successful server-saved action alone produces the corresponding cue.
+  // Each actual actor's Focus or Recovery can sound; loading historic events
+  // must never replay sound or create fake combat effects.
+  for(const event of events.filter(e => e.kind==='focus').slice(0,2))
+    if(event.actor==='player'||event.actor==='enemy')playCombatSfx('focus');
+  for(const event of events.filter(e => e.kind==='recovery').slice(0,2))
+    if(event.actor==='player'||event.actor==='enemy')playCombatSfx('recovery');
+  // Miss samples represent attempted blows, not a mere positional movement.
+  for(const miss of events.filter(e => e.kind==='miss' &&
+    (e.actionType==='attack'||e.actionType==='technique')).slice(0,2))
+    if(miss.actor==='player'||miss.actor==='enemy')playCombatSfx('miss');
 
   for (const hit of events.filter(e => e.kind === 'damage' && (e.damage ?? 0) > 0).slice(0, 2)) {
     playCombatSfx('hit');
