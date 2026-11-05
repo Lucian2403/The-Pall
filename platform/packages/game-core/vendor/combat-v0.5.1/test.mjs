@@ -77,6 +77,34 @@ test('Guard consumes 15 Stamina, rolls real 30–60% reduction, and lasts one tu
     'Guard must roll different percentages; a fixed 60% is not the owner mechanic');
 });
 
+test('Chronicle separates base hit damage, Opening bonus and damage after Guard',()=>{
+  let normalHits=0,bonusedHits=0,guardedHits=0;
+  for(let seed=1;seed<=140;seed++){
+    const state=newEncounter('flint',{seed:Math.imul(seed,2654435761)>>>0,
+      player:{weapon:{damage:6,accuracy:.95,type:'blunt',reach:'contact',unarmed:true}}});
+    state.openings.player={expires:state.round+1,
+      reason:'the previous strike misses',accuracyBonus:0,damageBonus:5};
+    const struck=act(state,{type:'attack',zone:'torso'},'opening-'+seed);
+    const hit=struck.events.find(e=>e.kind==='damage'&&e.actor==='player');
+    if(!hit)continue;
+    bonusedHits++;
+    assert.ok(hit.baseDamage>=4&&hit.baseDamage<=8,
+      'Base torso damage must stay inside the owner-approved range');
+    assert.equal(hit.openingDamageBonus,5);
+    assert.equal(hit.raw,hit.baseDamage+5);
+    assert.match(hit.text,/base damage \+ 5 Opening bonus = \d+ before Guard/);
+    if(hit.guarded){
+      guardedHits++;
+      assert.ok(hit.damage<=hit.raw,'Guard may only reduce the bonus-inclusive raw hit');
+    }else{
+      normalHits++;
+      assert.equal(hit.damage,hit.raw,'Unguarded damage equals base plus Opening');
+    }
+  }
+  assert.ok(bonusedHits>20,'Seeded opening should land repeatedly');
+  assert.ok(normalHits>10,'Cover unguarded Opening hits');
+});
+
 test('Stamina is persistent, Fatigue only at/below 20 from physical exertion',()=>{
  let s=newEncounter('flint',{seed:1,player:{stamina:27}});
  s=act(s,{type:'attack'});assert.equal(s.player.stamina,17);assert.equal(s.player.fatigue,5);
