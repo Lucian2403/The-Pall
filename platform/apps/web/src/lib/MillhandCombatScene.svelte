@@ -144,7 +144,8 @@
               {#if resource.key==='fatigue'}
                 <button class="fatigue-info-trigger" type="button"
                   aria-label="About Fatigue" title="About Fatigue"
-                  data-pall-sfx="paper" onclick={openFatigueInfo}>
+                  data-pall-sfx="paper" disabled={!snapshot.rules.fatigue}
+                  onclick={openFatigueInfo}>
                   <span aria-hidden="true">i</span>
                 </button>
               {/if}
@@ -457,6 +458,7 @@
   </div>
 </section>
 
+{#if snapshot.rules.fatigue}
 <dialog bind:this={fatigueInfoDialog} class="fatigue-info-dialog"
   aria-labelledby="fatigue-help-title" aria-describedby="fatigue-help-description">
   <div class="fatigue-info-heading">
@@ -488,6 +490,7 @@
     −{Math.floor(snapshot.rules.fatigue.cap/10)*snapshot.rules.fatigue.accuracyLossPerTen}
     percentage points.</p>
 </dialog>
+{/if}
 
 <style>
   .battle{min-width:0;background:#1b1815;color:#eed8b5;font-family:var(--pall-font-reading,Georgia,serif)}
@@ -662,7 +665,8 @@
     box-sizing:border-box;width:19px;height:19px;padding:0;border:1px solid #bfa478;
     border-radius:50%;color:#f1d3a4;background:#30271f;
     font:italic 700 12px/1 Georgia,serif;cursor:pointer}
-  .fatigue-info-trigger:hover{background:#60412a;color:#fff0cf}
+  .fatigue-info-trigger:hover:not(:disabled){background:#60412a;color:#fff0cf}
+  .fatigue-info-trigger:disabled{opacity:.4;cursor:not-allowed}
   .resource-top dd{margin:0;color:#eed2a5;font:700 15px/1.25 Georgia,serif;
     font-variant-numeric:tabular-nums}
   .mini-track{display:block;height:7px;margin-top:6px;background:#0d0c0b;
