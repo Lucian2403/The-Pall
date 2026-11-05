@@ -234,8 +234,8 @@ assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))')
   scene.includes('snapshot.rules.fatigue.currentAccuracyLoss') &&
   scene.includes('At 100 Fatigue, only Recover is possible.') &&
   scene.includes('Up to {snapshot.rules.fatigue.recovery} Fatigue') &&
-  scene.includes('Unprotected while recovering.') &&
-  scene.includes('full, unguarded damage') &&
+  scene.includes('Recover is not Guard:') &&
+  scene.includes('unguarded damage.') &&
   scene.includes('snapshot.rules.fatigue.recoveryFrom50') &&
   scene.includes('snapshot.rules.recoverStaminaFrom50') &&
   view.includes('highFatigueRecovery') &&
@@ -244,6 +244,38 @@ assert.ok(view.includes('.filter(action=>canActAtFatigue(state.player,action))')
   scene.includes("key:'fatigue',label:'Fatigue'"),
   'Real Fatigue effects, action locks, and recovery must agree in UI and engine');
 
+// The owner requested a concise, per-action Recover panel and a discoverable,
+// keyboard-accessible Fatigue explainer. All values still come from the server.
+assert.ok(scene.includes('<b>Current Fatigue:</b> {snapshot.player.fatigue}') &&
+  scene.includes('<b>Removes:</b> Up to {snapshot.rules.fatigue.recovery} Fatigue') &&
+  scene.includes('class="recover-tiers"') &&
+  scene.includes('<strong>Fatigue 0–49:</strong>') &&
+  scene.includes('<strong>Fatigue 50–100:</strong>') &&
+  scene.includes('snapshot.rules.fatigue.recoveryBelow50') &&
+  scene.includes('snapshot.rules.fatigue.recoveryFrom50') &&
+  scene.includes('snapshot.rules.recoverStaminaBelow50') &&
+  scene.includes('snapshot.rules.recoverStaminaFrom50') &&
+  scene.includes('snapshot.rules.recoverComposure} Composure instead of Stamina') &&
+  scene.includes('<strong>Cost:</strong> 1 Turn. Does not restore Health.') &&
+  scene.includes('Take a turn to catch your breath,') &&
+  scene.includes('The more exhausted you are,') &&
+  scene.includes('Recover is not Guard:'),
+  'Recover tooltip must show both real Fatigue tiers, Composure and melee exposure');
+assert.ok(scene.includes('aria-label="About Fatigue"') &&
+  scene.includes('onclick={openFatigueInfo}') &&
+  scene.includes("if(fatigueInfoDialog&&!fatigueInfoDialog.open)fatigueInfoDialog.showModal()") &&
+  scene.includes('bind:this={fatigueInfoDialog}') &&
+  scene.includes('aria-labelledby="fatigue-help-title"') &&
+  scene.includes('onclick={()=>fatigueInfoDialog?.close()}') &&
+  scene.includes('Fighting wears you down. As Fatigue builds,') &&
+  scene.includes('your attacks become less accurate and your body struggles to keep up.') &&
+  scene.includes('Accuracy Penalty:</strong>') &&
+  scene.includes('snapshot.rules.fatigue.accuracyLossPerTen') &&
+  scene.includes('const fatigueMilestones=[0,20,40,60,80,100] as const') &&
+  scene.includes('Math.floor(level/10)*snapshot.rules.fatigue.accuracyLossPerTen') &&
+  scene.includes('Recovering reduces Fatigue, but heavy exhaustion takes more than one') &&
+  scene.includes('Maximum Accuracy Penalty:'),
+  'Fatigue help must open from the fighter resource and display authoritative values');
 // PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
 // That mismatch formerly rolled back the final Flint turn with HTTP 500.
 assert.ok(charactersSql.includes("'NOT_STARTED','IN_PROGRESS','COMPLETED'") &&
