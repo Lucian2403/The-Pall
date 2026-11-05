@@ -38,9 +38,11 @@ export declare function canActAtFatigue(actor:Pick<CombatActor,'fatigue'>,action
 export declare function fatigueAccuracyPenalty(actor:Pick<CombatActor,'fatigue'>):number;
 export declare const TEST_CONFIG:Readonly<{
   strikeCost:number;repeatedStrikeSurcharge:number;guardCost:number;moveCost:number;
-  recoverGain:number;mentalRecoverGain:number;lowReserve:number;
+  recoverGain:number;exhaustedRecoverGain:number;
+  mentalRecoverGain:number;lowReserve:number;
   fatigueLowGain:number;fatigueExhaustedDefenseGain:number;fatigueExhaustedAttackGain:number;
-  fatigueRecovery:number;fatigueCap:number;fatigueAttackLock:number;
+  fatigueRecovery:number;exhaustedFatigueRecovery:number;
+  highFatigueRecoverThreshold:number;fatigueCap:number;fatigueAttackLock:number;
   fatigueAccuracyStep:number;fatigueAccuracyPenaltyPerStep:number;
   aim:Record<CombatZone,number>;
   strikeMomentum:number;guardMomentum:number;moveMomentum:number;
