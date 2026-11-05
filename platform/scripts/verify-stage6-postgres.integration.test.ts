@@ -92,10 +92,20 @@ async function turn(
   });
 }
 async function outcomeWith(
-  action:(state:Record<string,any>)=>Record<string,unknown>
+  action:(state:Record<string,any>)=>Record<string,unknown>,
+  initialEnemyHealth?:number
 ){
   const c=await character();
   let state=await start(c);
+  if(initialEnemyHealth!==undefined){
+    // This test proves victory persistence, not that early surrender makes
+    // repeated novice torso attacks a guaranteed win against Flint's club.
+    await db.query(
+      "UPDATE player_character_flint_combat SET state=jsonb_set(state,'{enemy,hp}',$2::jsonb) WHERE character_id=$1",
+      [c.id,JSON.stringify(initialEnemyHealth)]
+    );
+    state=(await request('GET',c.path)).body!;
+  }
   for(let i=0;state.status==='active'&&i<80;i++){
     const result=await turn(c,state,action(state));
     assert.equal(result.status,200,JSON.stringify(result.body));
@@ -478,7 +488,7 @@ test('Two concurrent browser tabs cannot both commit the same revision',async()=
 });
 
 test('A victory saves its actual Health and never awards coins, XP or Stage 7',async()=>{
-  const {state}=await outcomeWith(()=>({type:'attack',zone:'torso'}));
+  const {state}=await outcomeWith(()=>({type:'attack',zone:'torso'}),1);
   assert.equal(state.outcome,'player_victory');
 });
 
