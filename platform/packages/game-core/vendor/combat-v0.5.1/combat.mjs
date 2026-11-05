@@ -132,7 +132,7 @@ function cost(state, who, amount, actionType='use') {
     const reason=before===0?'exhausted exertion':'low Stamina';
     log(state,`${a.name} gains ${added} Fatigue from ${reason}. `+
       `Total Fatigue: ${a.fatigue}/100.`,'fatigue',
-      {actor:who,amount:added,fatigue:a.fatigue,reason,actionType});
+      {actor:who,amount:added,fatigue:a.fatigue,reason,sourceAction:actionType});
   }
 }
 function grant(state, who, amount) {
