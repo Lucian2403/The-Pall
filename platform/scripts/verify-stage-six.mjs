@@ -1,13 +1,20 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import {createHash} from 'node:crypto';
 const root=resolve(import.meta.dirname,'..');
 const read=p=>readFileSync(resolve(root,p),'utf8');
 const engine=read('packages/game-core/vendor/combat-v0.5.1/combat.mjs');
-const engineHash=createHash('sha256').update(engine).digest('hex');
-assert.equal(engineHash,'4d7b2c958611c8b564113a9c8825b7346461516e02d237b09fce331ba3e5ef89',
-  'The approved v0.5.1 engine must remain byte-for-byte unchanged');
+// Trial balance has been explicitly changed by the owner; guard its formulas
+// rather than enforcing the hash of the previous, now obsolete prototype.
+for(const expected of [
+  'strikeCost: 10','guardCost: 15','moveCost: 5','recoverGain: 25',
+  'limbs: -0.15','head: -0.30',
+  'dodgeChance:{side:.25,cover:.40,back:.50,close:0}',
+  'unarmedDamage:{torso:[4,8],limbs:[3,6],head:[8,13]}',
+  'unarmedTechnique:{torso:[8,12],limbs:[6,10],head:[12,18]}',
+  's.dodgeAttempt={attempted:true,success,chance}',
+  'guardReduction:{min:.30,max:.60}'
+])assert.ok(engine.includes(expected),'Stage 6 owner trial balance changed unexpectedly: '+expected);
 const api=read('apps/api/src/millhand-combat-routes.ts');
 const opening=read('apps/api/src/millhand-combat-opening.ts');
 const characterRoutes=read('apps/api/src/character-routes.ts');
@@ -100,7 +107,7 @@ assert.ok(scene.includes("iconBase + 'confirm-action.webp'")&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
   scene.includes('opacity:.76')&&
-  scene.includes('snapshot.events.slice(-3)')&&
+  scene.includes('snapshot.events.slice(-6)')&&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
 
@@ -121,6 +128,91 @@ assert.ok(scene.includes('class="action-zone"') &&
   !scene.includes('class="decision-row"'),
   'Combat layout must present one battlefield action bar, compact fighter comparison and adjacent Chronicle');
 
+
+// Compact roleplaying action-card layout must show all owner-authored
+// numerical options and use live server facts, not hardcoded UI guesses.
+const model=read('apps/web/src/lib/millhand-combat-model.ts');
+const chronicle=read('apps/web/src/lib/millhand-combat-chronicle.ts');
+const unarmedIcon=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/unarmed-fists.webp'));
+assert.equal(unarmedIcon.toString('ascii',0,4),'RIFF','Owner unarmed icon must be WebP');
+assert.equal(unarmedIcon.toString('ascii',8,12),'WEBP','Owner unarmed icon is not a valid WebP');
+assert.ok(unarmedIcon.length>1000&&unarmedIcon.length<30000,'Owner unarmed icon must remain optimized');
+assert.ok(view.includes('strikeByZone:zoneRanges(false)')&&
+  view.includes('techniqueByZone:zoneRanges(true)')&&
+  view.includes('dodgeChance:{side:Math.round(100*TEST_CONFIG.dodgeChance.side)')&&
+  view.includes("guardMitigationPercent:Math.round(100*guardMin)+'–'+Math.round(100*guardMax)")&&
+  scene.includes('snapshot.rules.strikeByZone[target]')&&
+  scene.includes('snapshot.rules.techniqueByZone[target]')&&
+  scene.includes('snapshot.rules.accuracy[target]')&&
+  scene.includes('snapshot.rules.dodgeChance.side')&&
+  scene.includes('snapshot.rules.guardCost')&&
+  scene.includes('snapshot.rules.recoverStamina')&&
+  scene.includes('Target:')&&scene.includes('Accuracy:')&&
+  scene.includes('Damage:')&&scene.includes('Cost:')&&
+  scene.includes('Damage Reduction:')&&
+  scene.includes('Dodge Chance:')&&
+  scene.includes('Press Advantage')&&
+  scene.includes('unarmed-fists.webp')&&
+  scene.includes('rifle.webp')&&
+  scene.includes('class="target-list"')&&
+  scene.includes('class:selected-target={zone===target}')&&
+  scene.includes('disabled={pending || !available(visibleSelection)}')&&
+  model.includes('strikeByZone:')&&model.includes('dodgeChance:')&&
+  chronicle.includes("event.actor==='enemy'"),
+  'Combat action card needs real owner balance, three selectable zones and supplied weapon artwork');
+
+assert.ok(scene.includes('snapshot.events.slice(-6)')&&
+  scene.includes('Latest 6 of {snapshot.events.length} entries.')&&
+  scene.includes('combatActionLabel(event)')&&
+  scene.includes('class:enemy-action={isEnemyCombatAction(event)}')&&
+  scene.includes('.event-action.enemy-action{color:#ff7468'),
+  'Chronicle must show six latest entries, exact action labels and red enemy actions');
+assert.ok(api.includes('describeCommittedTurn')&&
+  api.includes('state.events=describeCommittedTurn(state.events,command.action,record.state.intent)')&&
+  api.includes('actionType:type,actionDetail:detail,actionName:name'),
+  'Save action types in the authoritative event history without changing combat turns');
+const {combatActionLabel,isEnemyCombatAction}=
+  await import('../apps/web/src/lib/millhand-combat-chronicle.ts');
+assert.equal(combatActionLabel({kind:'damage',actor:'enemy',actionType:'attack',
+  actionDetail:'torso',text:'Flint hits',round:3}),'Attack-Torso');
+assert.equal(combatActionLabel({kind:'miss',actor:'enemy',actionType:'technique',
+  actionDetail:'limbs',actionName:'Hook and Draw',text:'Flint misses',round:3}),
+  'Hook and Draw-Limbs');
+assert.equal(combatActionLabel({kind:'damage',actor:'player',actionType:'technique',
+  actionDetail:'head',text:'Your hit',round:3}),'Press Advantage-Head');
+assert.equal(combatActionLabel({kind:'move',actor:'player',actionType:'move',
+  actionDetail:'cover',text:'You move',round:3}),'Reposition-Cover');
+assert.equal(combatActionLabel({kind:'recovery',actor:'player',actionType:'recover',
+  actionDetail:'breath',text:'You recover',round:3}),'Recover-Stamina');
+assert.equal(combatActionLabel({kind:'tactical',actor:'player',actionType:'guard',
+  text:'Guard checks attack',round:3}),'Guard');
+assert.equal(combatActionLabel({kind:'intent',actor:'enemy',text:'Flint readies club',round:3}),'Intent');
+assert.equal(isEnemyCombatAction({kind:'intent',actor:'enemy',text:'Flint waits',round:3}),false);
+assert.equal(isEnemyCombatAction({kind:'damage',actor:'enemy',actionType:'attack',
+  text:'Flint hits',round:3}),true);
+assert.equal(isEnemyCombatAction({kind:'guard',actor:'player',actionType:'guard',
+  text:'You guard',round:3}),false);
+
+// An enhanced strike must always reveal exactly where extra damage came from.
+// The target inspector distinguishes base range from an active conditional bonus.
+assert.ok(engine.includes('const openingDamageBonus=exploited?(edge.damageBonus??5):0') &&
+  engine.includes('baseDamage:rolled,openingDamageBonus') &&
+  engine.includes('base damage + ${openingDamageBonus} Opening bonus') &&
+  engine.includes('${damageBreakdown}${guardText}') &&
+  scene.includes('<b>Base Damage:</b>') &&
+  scene.includes('class="opening-stat"') &&
+  scene.includes('<b>Opening:</b> +{openingBonus}') &&
+  scene.includes('class="potential-stat"') &&
+  scene.includes('<b>Total:</b>') &&
+  scene.includes('Base Damage is before an Opening bonus') &&
+  scene.includes('base damage, bonus and total separately'),
+  'Opening math must be visible before the action and preserved in exact combat history');
+// Fatigue is tracked in the current prototype but has no effect modifier yet.
+// Do not advertise any unimplemented accuracy, damage or dodge fatigue penalty.
+assert.ok(engine.includes('a.fatigue += TEST_CONFIG.fatigueGain') &&
+  !engine.includes('src.fatigue*.') &&
+  scene.includes("key:'fatigue',label:'Fatigue'"),
+  'Fatigue accumulation and display must remain intact, with no fictional penalty');
 
 // PostgreSQL's character-status CHECK uses COMPLETED, not COMPLETE.
 // That mismatch formerly rolled back the final Flint turn with HTTP 500.

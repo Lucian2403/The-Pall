@@ -71,12 +71,13 @@ const view = (state,history=[]) => {
   const to=Math.max(from,actualWeapon.maxDamage??Math.ceil(baseDamage*1.3));
   const hitProbability=zone=>Math.round(100*Math.min(.95,Math.max(.05,actualWeapon.accuracy+TEST_CONFIG.aim[zone]+(edge?(edge.accuracyBonus??.20):0))));
   const repeated=(state.lastPlayerActions??[]).slice(-2).length===2&&(state.lastPlayerActions??[]).slice(-2).every(a=>a==='attack');
-  const guardReduction=Math.round(100*(state.enemy.weapon.guardMitigation??.5));
+  const guardReduction={min:Math.round(TEST_CONFIG.guardReduction.min*100),
+    max:Math.round(TEST_CONFIG.guardReduction.max*100)};
   const rules={
     attack:{cost:testAttackCost(state,'player'),minDamage:from+(edge?(edge.damageBonus??5):0),maxDamage:to+(edge?(edge.damageBonus??5):0),accuracy:{torso:hitProbability('torso'),limbs:hitProbability('limbs'),head:hitProbability('head')},momentumGain:TEST_CONFIG.strikeMomentum,repeatedStrikeSurcharge:TEST_CONFIG.repeatedStrikeSurcharge,repeatActive:repeated},
     guard:{cost:TEST_CONFIG.guardCost,mitigationPercent:guardReduction,momentumGain:TEST_CONFIG.guardMomentum},
     move:{cost:TEST_CONFIG.moveCost,momentumGain:TEST_CONFIG.moveMomentum},
-    technique:{staminaCost:12,momentumCost:20,damageBonus:4},
+    technique:{staminaCost:15,momentumCost:20,damageBonus:4},
     recover:{stamina:TEST_CONFIG.recoverGain,composure:TEST_CONFIG.mentalRecoverGain},
     use:{cost:TEST_CONFIG.useCost},
     stanceOpen:state.openings?.enemy?.expires>=state.round && state.openings.enemy.reason==='your repeated attacks leave your stance open',

@@ -3,6 +3,7 @@ export type CombatActorView={
   name:string;hp:number;hpMax:number;ceiling:number;stamina:number;
   composure:number;fatigue:number;stress:number;momentum:number;bleed:number;
   wounds:Array<{type:string;zone?:string;severity:string}>;
+  armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
 };
 export type CombatEventView={
   round:number;
@@ -11,6 +12,11 @@ export type CombatEventView={
   actor?:'player'|'enemy';
   target?:'player'|'enemy';
   damage?:number;
+  zone?:'head'|'torso'|'limbs';
+  ability?:string|null;
+  actionType?:'attack'|'guard'|'move'|'recover'|'technique';
+  actionDetail?:string;
+  actionName?:string;
 };
 export type CombatSnapshot={
   status:'active'|'finished';outcome:string|null;stance:'brace'|'moving'|'cart';
@@ -20,7 +26,17 @@ export type CombatSnapshot={
   rules:{
     strikeCost:number;guardCost:number;moveCost:number;recoverStamina:number;
     recoverComposure:number;techniqueMomentum:number;repeatedStrikeSurcharge:number;
-    accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:number;prototype:boolean
+    accuracy:{head:number;torso:number;limbs:number};guardMitigationPercent:string;guardReductionMinPercent:number;guardReductionMaxPercent:number;prototype:boolean;
+    unarmed:boolean;weaponLabel:string;
+    strikeDamage:{min:number;max:number};
+    techniqueDamage:{min:number;max:number};
+    strikeByZone:Record<'torso'|'limbs'|'head',{min:number;max:number}>;
+    techniqueByZone:Record<'torso'|'limbs'|'head',{min:number;max:number}>;
+    dodgeChance:{side:number;cover:number;back:number;close:number};
+    openingDamageBonus:number;openingReason:string|null;
+    enemyStrikeDamage:{min:number;max:number};
+    guardedEnemyStrikeDamage:{min:number;max:number};
+    repositionUsesDistance:boolean
   };
 };
 
