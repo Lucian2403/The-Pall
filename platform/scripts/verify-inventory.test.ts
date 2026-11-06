@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {randomUUID} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
 import {
   InventoryInvalidAction,inventoryView,locationSummary,planTransfer
 } from '../apps/api/src/inventory-model.ts';
@@ -137,4 +139,36 @@ test('Slot limits are enforced independently of generous weight/volume capacity'
  assert.equal(locationSummary(filledChest,'home_chest').maxSlots,24);
  assert.throws(()=>planTransfer([...filledChest,carry],carry.id,1,
   'home_chest',randomUUID()),/chest_slots_exceeded/);
+});
+
+test('Grid UI shows 6-column carried and chest slots with a selected-item description',()=>{
+ const ui=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/InventoryPanel.svelte'),'utf8');
+ assert.ok(ui.includes('grid-template-columns:repeat(6,minmax(0,1fr))'));
+ assert.ok(ui.includes('Array.from({length:snapshot.pack.maxSlots}'));
+ assert.ok(ui.includes('Array.from({length:snapshot.chest.maxSlots}'));
+ assert.ok(ui.includes('class="item-slot occupied"'));
+ assert.ok(ui.includes('class="item-slot vacant"'));
+ assert.ok(ui.includes('class:selected={selectedId===item.id}'));
+ assert.ok(ui.includes('aria-pressed={selectedId===item.id}'));
+ assert.ok(ui.includes('aria-label="Selected item description"'));
+ assert.ok(ui.includes('{selected.description}'));
+ assert.ok(ui.includes('{itemType(selected)}'));
+ assert.ok(ui.includes('{itemBenefit(selected)}'));
+ assert.ok(ui.includes('Store in chest'));
+ assert.ok(ui.includes('Take into inventory'));
+ assert.ok(ui.includes('Items carried: {snapshot.pack.slotsUsed} / {snapshot.pack.maxSlots}'));
+ assert.ok(ui.includes('Stored: {snapshot.chest.slotsUsed} / {snapshot.chest.maxSlots}'));
+ assert.ok(!ui.includes('class="item-list"'),'Item presentation must not fall back to a list layout');
+});
+test('Item catalogue persists exact approved names, descriptive copy and bonuses',()=>{
+ const sql=readFileSync(resolve(import.meta.dirname,'../db/migrations/0011_inventory_foundation.sql'),'utf8');
+ assert.ok(sql.includes("'basic_clothes','Daily Worker Clothes','clothing'"));
+ assert.ok(sql.includes("'crude_small_bag','Simple Bag','bag'"));
+ assert.ok(sql.includes("The cloth''s stiff with old grime, the seams barely holding."));
+ assert.ok(sql.includes("They''ve seen too many long shifts and too few washes."));
+ assert.ok(sql.includes("Just don''t trust it with anything too heavy."));
+ assert.ok(sql.includes("12.000,8,'Common',0"));
+ assert.ok(sql.includes("0,0,'Common',0"));
+ assert.ok(sql.includes("ON CONFLICT(code) DO UPDATE SET"));
+ assert.ok(sql.includes("ALTER TABLE pall_item_definitions"));
 });
