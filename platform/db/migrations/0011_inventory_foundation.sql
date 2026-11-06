@@ -49,6 +49,24 @@ ON CONFLICT(code) DO UPDATE SET
  rarity_label=EXCLUDED.rarity_label,
  armour_rating=EXCLUDED.armour_rating;
 
+
+-- The renamed display copy also reaches pre-inventory character-creation
+-- snapshots. This does NOT change coins, grants, ownership or tutorial states.
+-- Only exact old starter item labels are transformed; other items survive.
+UPDATE player_characters pc
+SET starter_item_requirements=(
+  SELECT jsonb_agg(
+    CASE item->>'name'
+      WHEN 'Basic Clothes' THEN jsonb_set(item,'{name}',to_jsonb('Daily Worker Clothes'::text))
+      WHEN 'Crude Small Bag' THEN jsonb_set(item,'{name}',to_jsonb('Simple Bag'::text))
+      ELSE item
+    END ORDER BY ordinal)
+  FROM jsonb_array_elements(pc.starter_item_requirements)
+    WITH ORDINALITY AS original(item,ordinal)
+)
+WHERE pc.starter_item_requirements @> '[{"name":"Basic Clothes"}]'::jsonb
+   OR pc.starter_item_requirements @> '[{"name":"Crude Small Bag"}]'::jsonb;
+
 CREATE TABLE IF NOT EXISTS player_character_inventory_state(
   character_id UUID PRIMARY KEY REFERENCES player_characters(id) ON DELETE CASCADE,
   revision BIGINT NOT NULL DEFAULT 0 CHECK(revision>=0),
