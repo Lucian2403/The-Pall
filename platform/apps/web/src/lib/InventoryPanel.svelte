@@ -1,9 +1,12 @@
 <script lang="ts">
   import {onMount} from 'svelte';
 
+  type EquipSlot='head'|'face'|'torso'|'hands'|'pants'|'feet'|'back'
+    |'primary_weapon'|'secondary_weapon'|'respiratory_filter'|'accessory_1'|'accessory_2';
   type Item={
     id:string;code:string;name:string;category:string;description:string;
     rarity:string;armour:number;carrySlotsBonus:number;
+    equipSlot:EquipSlot|null;equipmentSlot:EquipSlot|null;
     quantity:number;stackable:boolean;maxStack:number;qualityTier:number;
     weightKg:number;volumeL:number;carryVolumeBonusL:number;
     currentDurability:number|null;maxDurability:number|null;designStatus:string;
@@ -12,26 +15,45 @@
     slotsUsed:number;maxSlots:number;weightKg:number;volumeL:number;
     maxWeightKg:number;maxVolumeL:number;overCapacity:boolean;items:Item[]
   };
-  type Snapshot={revision:number;storageEnabled:boolean;pack:Container;chest:Container};
-  type Place='pack'|'home_chest';
-
+  type Snapshot={revision:number;storageEnabled:boolean;
+    pack:Container;chest:Container;equipment:{items:Item[]}};
+  type Place='pack'|'home_chest'|'equipped';
+  type Transfer={kind:'transfer';to:'pack'|'home_chest'};
+  type Equip={kind:'equip';slot:EquipSlot};
+  const equipmentSlots:{id:EquipSlot;label:string;x:number;y:number}[]=[
+    {id:'head',label:'Head',x:35,y:0},
+    {id:'face',label:'Face',x:68,y:0},
+    {id:'respiratory_filter',label:'Filter',x:2,y:0},
+    {id:'hands',label:'Hands',x:2,y:24},
+    {id:'torso',label:'Torso',x:35,y:24},
+    {id:'back',label:'Back / Bag',x:68,y:24},
+    {id:'primary_weapon',label:'Primary',x:2,y:48},
+    {id:'pants',label:'Pants',x:35,y:48},
+    {id:'secondary_weapon',label:'Secondary',x:68,y:48},
+    {id:'accessory_1',label:'Accessory I',x:2,y:72},
+    {id:'feet',label:'Feet',x:35,y:72},
+    {id:'accessory_2',label:'Accessory II',x:68,y:72}
+  ];
   let {characterId,onClose}:{characterId:string;onClose:()=>void}=$props();
   const url=$derived('/api/characters/'+encodeURIComponent(characterId)+'/inventory');
   let snapshot=$state<Snapshot|null>(null);
   let loading=$state(true),pending=$state(false),error=$state('');
   let selectedId=$state<string|null>(null);
   let amounts=$state<Record<string,number>>({});
-  const selected=$derived.by(()=>{
-    const all=[...(snapshot?.pack.items??[]),...(snapshot?.chest.items??[])];
-    return all.find(item=>item.id===selectedId)??null;
+  const allItems=$derived([
+    ...(snapshot?.equipment.items??[]),...(snapshot?.pack.items??[]),
+    ...(snapshot?.chest.items??[])
+  ]);
+  const selected=$derived(allItems.find(item=>item.id===selectedId)??null);
+  const selectedPlace=$derived.by(():Place=>{
+    if(snapshot?.equipment.items.some(item=>item.id===selectedId))return 'equipped';
+    if(snapshot?.pack.items.some(item=>item.id===selectedId))return 'pack';
+    return 'home_chest';
   });
-  const selectedPlace=$derived(
-    snapshot?.pack.items.some(item=>item.id===selectedId)?'pack':'home_chest'
-  );
   const measure=(value:number)=>value.toFixed(1);
   const titleCase=(value:string)=>value.replace(/_/g,' ')
     .replace(/\b\w/g,letter=>letter.toUpperCase());
-  // Owner-supplied cutouts are display assets; item identity stays server-owned.
+  // Display-only mapping. Server-owned codes remain the authority for gear.
   const itemImage=(item:Item)=>item.code==='basic_clothes'
     ?'/items/daily-worker-clothes.webp'
     :item.code==='crude_small_bag'?'/items/simple-bag.webp':null;
@@ -41,12 +63,10 @@
   const itemType=(item:Item)=>item.rarity+' '+titleCase(item.category);
   const itemBenefit=(item:Item)=>item.category==='clothing'
     ?item.armour+' Armour'
-    :item.carrySlotsBonus>0
-      ?item.carrySlotsBonus+' Slots'
-      :null;
+    :item.carrySlotsBonus>0?item.carrySlotsBonus+' Slots':null;
 
   function syncSelection(next:Snapshot){
-    const all=[...next.pack.items,...next.chest.items];
+    const all=[...next.equipment.items,...next.pack.items,...next.chest.items];
     if(!selectedId||!all.some(item=>item.id===selectedId))
       selectedId=all[0]?.id??null;
   }
@@ -54,8 +74,6 @@
     loading=true;error='';
     try{
       const response=await fetch(url,{cache:'no-store'});
-      // A stale API process can return 404, while database faults return 500.
-      // Read errors defensively: a proxy may send HTML instead of JSON.
       const body:unknown=await response.json().catch(()=>null);
       if(!response.ok){
         const code=body&&typeof body==='object'&&'error' in body&&
@@ -65,15 +83,15 @@
           throw Error('Inventory database needs setup (HTTP 503). Run npm run inventory:migrate from platform.');
         if(response.status===404)
           throw Error('Inventory endpoint missing (HTTP 404). Restart the API server from the inventory branch.');
-        if(response.status===401)
-          throw Error('Inventory sign-in required (HTTP 401).');
+        if(response.status===401)throw Error('Inventory sign-in required (HTTP 401).');
         if(response.status===500)
           throw Error('Inventory server error (HTTP 500). Check the API terminal for details.');
         if(response.status===502||response.status===503||response.status===504)
           throw Error('Inventory API is unreachable (HTTP '+response.status+'). Check the API server.');
         throw Error('Inventory request failed (HTTP '+response.status+(code?'; '+code:'')+').');
       }
-      if(!body||typeof body!=='object'||!('pack' in body)||!('chest' in body))
+      if(!body||typeof body!=='object'||!('pack' in body)||!('chest' in body)||
+        !('equipment' in body))
         throw Error('Inventory returned an invalid response. Check the API terminal.');
       const next=body as Snapshot;
       snapshot=next;
@@ -82,40 +100,80 @@
     finally{loading=false;}
   }
   onMount(()=>{void reload();});
-  async function transfer(item:Item,to:Place){
+
+  async function submit(item:Item,intent:Transfer|Equip){
     if(!snapshot||pending||!snapshot.storageEnabled)return;
     const quantity=item.stackable?(amounts[item.id]??item.quantity):1;
-    if(!Number.isSafeInteger(quantity)||quantity<1||quantity>item.quantity){
+    if(intent.kind==='transfer'&&
+      (!Number.isSafeInteger(quantity)||quantity<1||quantity>item.quantity)){
       error='Choose a valid quantity.';return;
     }
     pending=true;error='';
     const requestId=crypto.randomUUID();
     const originalRevision=snapshot.revision;
+    const command=intent.kind==='equip'
+      ?{kind:'equip',requestId,expectedRevision:originalRevision,
+        itemInstanceId:item.id,slot:intent.slot}
+      :{kind:'transfer',requestId,expectedRevision:originalRevision,
+        itemInstanceId:item.id,quantity,to:intent.to};
     try{
       const response=await fetch(url,{method:'POST',
-        headers:{'content-type':'application/json'},
-        body:JSON.stringify({kind:'transfer',requestId,expectedRevision:originalRevision,
-          itemInstanceId:item.id,quantity,to})});
+        headers:{'content-type':'application/json'},body:JSON.stringify(command)});
       if(response.status===409){
         const body=await response.json() as {error?:string};
         const message=body.error==='pack_slots_exceeded'?'All inventory slots are occupied.'
           :body.error==='chest_slots_exceeded'?'All chest slots are occupied.'
           :body.error==='pack_capacity_exceeded'?'Too much weight or volume to carry.'
           :body.error==='chest_capacity_exceeded'?'The chest cannot hold that much weight or volume.'
+          :body.error==='equipment_slot_occupied'?'That equipment slot is already occupied.'
+          :body.error==='slot_incompatible'?'This item cannot go in that equipment slot.'
+          :body.error==='item_not_equippable'?'This item cannot be equipped.'
           :body.error==='stale_revision'?'Inventory changed. Current contents reloaded.'
           :body.error==='storage_not_unlocked'?'Home storage is not yet unlocked.'
-          :'Item transfer could not be completed.';
+          :'Item move could not be completed.';
         await reload();error=message;return;
       }
-      if(!response.ok)throw Error('Transfer failed. Inventory was not changed.');
+      if(!response.ok)throw Error('Move failed. Inventory was not changed.');
       const next=await response.json() as Snapshot;
       snapshot=next;
       delete amounts[item.id];
       syncSelection(next);
     }catch(cause){
       error=cause instanceof Error?cause.message:'Connection interrupted. Reopen storage to check saved items.';
-      // Avoid silently retrying with a different request ID after network failure.
     }finally{pending=false;}
+  }
+  const transfer=(item:Item,to:'pack'|'home_chest')=>submit(item,{kind:'transfer',to});
+  const equip=(item:Item,slot:EquipSlot)=>submit(item,{kind:'equip',slot});
+  function quickMove(item:Item,place:Place){
+    if(place==='equipped')void transfer(item,'pack');
+    else void transfer(item,place==='pack'?'home_chest':'pack');
+  }
+  function selectItem(event:MouseEvent,item:Item,place:Place){
+    if(event.shiftKey)quickMove(item,place);
+    else selectedId=item.id;
+  }
+  function startDrag(event:DragEvent,item:Item){
+    if(pending||!snapshot?.storageEnabled){event.preventDefault();return;}
+    event.dataTransfer?.setData('application/x-pall-item',item.id);
+    if(event.dataTransfer)event.dataTransfer.effectAllowed='move';
+  }
+  function allowDrop(event:DragEvent){
+    if(!pending&&snapshot?.storageEnabled&&
+      event.dataTransfer?.types.includes('application/x-pall-item'))
+      event.preventDefault();
+  }
+  function onDrop(event:DragEvent,destination:Place,slot?:EquipSlot){
+    event.preventDefault();
+    if(pending||!snapshot?.storageEnabled)return;
+    const item=allItems.find(x=>x.id===event.dataTransfer?.getData('application/x-pall-item'));
+    if(!item)return;
+    if(destination==='equipped'){
+      if(slot&&item.equipSlot===slot)void equip(item,slot);
+      else error='This item does not fit that equipment slot.';
+    }else if(item.equipmentSlot||selectedPlace!=='equipped'){
+      // Transfers are still validated by the server; never trust drag data.
+      void transfer(item,destination);
+    }else void transfer(item,destination);
   }
 </script>
 
