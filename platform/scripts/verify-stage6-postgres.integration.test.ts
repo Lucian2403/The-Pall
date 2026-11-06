@@ -247,6 +247,92 @@ test('Stage 8 shared home: six Millhand route/outcome combinations complete once
  }
 });
 
+test('Stage 8 bed Rest is persistent, replay-safe, and available after tutorial completion',async()=>{
+ const c=await character();
+ const route=base+c.id+'/tutorial/home';
+ const discharge={hp:43,hpMax:50,stamina:12,composure:7,fatigue:94,
+   stress:68,momentum:5,bleed:2,wounds:[{type:'cut',zone:'limbs'}]};
+ await db.query(
+   "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED',coins=10,current_health=43 WHERE id=$1",
+   [c.id]
+ );
+ await db.query(
+   'INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,1,$2::jsonb)',
+   [c.id,JSON.stringify({phase:'SELECTED',branch:'restamp'})]
+ );
+ await db.query(
+   'INSERT INTO player_character_clinic(character_id,revision,state) VALUES($1,5,$2::jsonb)',
+   [c.id,JSON.stringify({phase:'LEFT',revision:5,paid:true,
+     outcome:'player_victory',after:discharge})]
+ );
+ const started=await request('POST',route,owner,{kind:'start',requestId:randomUUID()});
+ assert.equal(started.status,200,JSON.stringify(started.body));
+ assert.equal(started.body!.phase,'HOME');
+ assert.deepEqual(started.body!.condition,
+   {stamina:12,composure:7,fatigue:94,stress:68},
+   'Real clinic discharge, not a fabricated reset, starts home resources');
+ const spoof=await request('POST',route,owner,{
+   kind:'action',requestId:randomUUID(),action:'rest',expectedRevision:0,
+   stamina:999,health:999
+ });
+ assert.equal(spoof.status,400,'Client cannot set resource amounts');
+ const key=randomUUID();
+ const command={kind:'action',requestId:key,action:'rest',expectedRevision:0};
+ const rested=await request('POST',route,owner,command);
+ assert.equal(rested.status,200,JSON.stringify(rested.body));
+ assert.deepEqual(rested.body!.condition,
+   {stamina:100,composure:100,fatigue:0,stress:0});
+ assert.equal(rested.body!.phase,'HOME');
+ assert.equal(rested.body!.revision,1);
+ assert.equal((await request('POST',route,owner,command)).body!.revision,1,
+   'A replay of the same Rest request must not create an extra turn');
+ assert.equal((await request('POST',route,owner,{
+   ...command,requestId:randomUUID()
+ })).status,409,'A stale request must never mutate saved Rest');
+ assert.deepEqual((await request('GET',route)).body!.condition,
+   {stamina:100,composure:100,fatigue:0,stress:0},
+   'Rest must survive reload from PostgreSQL');
+ assert.equal((await request('POST',route,stranger,{
+   kind:'action',requestId:randomUUID(),expectedRevision:1,action:'rest'
+ })).status,404,'Another account cannot rest this character');
+ let rev=1;
+ for(const action of ['read_notice','put_down','finish']){
+   const reply=await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),action,expectedRevision:rev
+   });
+   assert.equal(reply.status,200,JSON.stringify(reply.body));
+   rev=reply.body!.revision;
+ }
+ assert.equal(rev,4);
+ assert.equal((await request('GET',route)).body!.completed,true);
+ const afterComplete=await request('POST',route,owner,{
+   kind:'action',requestId:randomUUID(),expectedRevision:rev,action:'rest'
+ });
+ assert.equal(afterComplete.status,200,JSON.stringify(afterComplete.body));
+ assert.equal(afterComplete.body!.phase,'COMPLETE');
+ assert.equal(afterComplete.body!.completed,true);
+ assert.equal(afterComplete.body!.revision,5);
+ assert.deepEqual(afterComplete.body!.condition,
+   {stamina:100,composure:100,fatigue:0,stress:0});
+ assert.equal((await request('POST',route,owner,{
+   kind:'action',requestId:randomUUID(),expectedRevision:5,action:'finish'
+ })).status,409,'Bed rest never reopens an already completed tutorial');
+ const char=await db.query<{current_health:number;coins:string|number;
+   tutorial_status:string;tutorial_stage:number}>(
+   'SELECT current_health,coins,tutorial_status,tutorial_stage FROM player_characters WHERE id=$1',
+   [c.id]
+ );
+ assert.equal(char.rows[0].current_health,43,'Rest is not Health healing');
+ assert.equal(Number(char.rows[0].coins),10,'Rest has no coin side effect');
+ assert.equal(char.rows[0].tutorial_status,'COMPLETED');
+ assert.equal(char.rows[0].tutorial_stage,8);
+ const clinic=await db.query<{state:{after:typeof discharge}}>(
+   'SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]
+ );
+ assert.deepEqual(clinic.rows[0].state.after,discharge,
+   'Rest cannot alter injuries or Stage 7 clinic history');
+});
+
 test('Stage 8 refuses entry without completed clinic or earlier tutorial state',async()=>{
  const c=await character();
  const route=base+c.id+'/tutorial/home';
