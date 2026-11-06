@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import {initial,advance,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
 const root=resolve(import.meta.dirname,'..');
@@ -41,6 +42,15 @@ test('Six origin endings may use the same home identifier, amount, notice and ap
  assert.equal(RENT,150);
  assert.equal(view(initial('Millhand','restamp','player_victory'),'Bo',145).shortfall,5);
  assert.equal(view(initial('Millhand','restamp','player_victory'),'Bo',200).shortfall,0);
+});
+
+test('User supplied rented-room background is the exact optimized real artwork',()=>{
+ const art=readFileSync(resolve(root,'apps/web/static/locations/home/rented-room.webp'));
+ assert.equal(art.toString('ascii',0,4),'RIFF');
+ assert.equal(art.toString('ascii',8,12),'WEBP');
+ assert.equal(art.length,63940);
+ assert.equal(createHash('sha256').update(art).digest('hex'),
+  'e0d81172f86b9172fb26875a144f78918e8946873cfc2c3dc24304b20dc859cc');
 });
 
 test('Stage 8 uses authenticated persisted API, owner-directed text and preserves game boundary',()=>{
