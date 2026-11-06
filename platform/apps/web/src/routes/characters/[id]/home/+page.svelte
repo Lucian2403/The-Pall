@@ -2,6 +2,7 @@
   import {onMount,tick,getContext} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import InventoryPanel from '$lib/InventoryPanel.svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
@@ -19,7 +20,8 @@
   let character=$state<Character|null>(null);
   let home=$state<Home|null>(null);
   let status=$state<'loading'|'ready'|'unauthorized'|'missing'|'prerequisite'|'schema'|'error'>('loading');
-  let pending=$state(false),errorMessage=$state(''),chestMessage=$state(''),restMessage=$state('');
+  let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
+  let storageOpen=$state(false);
   let noticeExpanded=$state(false),journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
   let retryKey:string|null=null,retryId:string|null=null;
@@ -106,7 +108,7 @@
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <div class="home-scene" aria-label="A modest rented room in Grand Cylinder City">
         <button type="button" class="hotspot chest" aria-label="Storage"
-          title="Storage" onclick={()=>chestMessage='Storage will be added with the Inventory and Equipment system.'}>
+          title="Storage" onclick={()=>storageOpen=!storageOpen}>
           <span class="object-caption">Storage</span>
         </button>
         <button type="button" class="hotspot book" aria-label="Read journal"
@@ -163,7 +165,9 @@
         {/if}
       </div>
 
-      {#if chestMessage}<p role="status" class="status-message">{chestMessage}</p>{/if}
+      {#if storageOpen}
+        <InventoryPanel characterId={id} onClose={()=>storageOpen=false}/>
+      {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if journalOpen}
         <section id="home-journal" bind:this={journalElement} class="journal"
