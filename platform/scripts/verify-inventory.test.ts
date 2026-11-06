@@ -20,10 +20,11 @@ const sample=(overrides:Partial<InventoryRow>={}):InventoryRow=>({
  damage_rating:0,pall_protection:0,ash_protection:0,carry_weight_bonus_kg:0,
  ...overrides
 });
-const clothes=()=>sample({
+const clothes=(overrides:Partial<InventoryRow>={})=>sample({
  item_code:'basic_clothes',name:'Daily Worker Clothes',category:'clothing',
  equipment_slot:'torso',equip_slot:'torso',
- weight_kg:'1.200',volume_l:'2',carry_volume_bonus_l:0,carry_slots_bonus:0
+ weight_kg:'1.200',volume_l:'2',carry_volume_bonus_l:0,carry_slots_bonus:0,
+ ...overrides
 });
 const scrap=(overrides:Partial<InventoryRow>={})=>sample({
  item_code:'test_scrap',name:'Scrap',category:'misc',location:'pack',
