@@ -107,8 +107,14 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   web.includes("url('/locations/home/rented-room.webp')")&&
   web.includes('aria-label="Inspect chest"')&&
   web.includes('aria-label="Read journal"')&&
-  web.includes('aria-label="Read rent notice"')&&
-  web.includes('class="paper-object"')&&
+  web.includes('aria-label="Read notice"')&&
+  web.includes('class="hotspot notice-object"')&&
+  web.includes('src="/locations/home/notice.webp"')&&
+  web.includes('class="hotspot bed"')&&
+  web.includes("perform('rest')")&&
+  !web.includes('class="rent-status"')&&
+  !web.includes('class="paper-object"')&&
+  !web.includes('background:#f5d18b24')&&
   web.includes('id="home-journal"')&&
   web.includes("if(home.phase==='HOME')void perform('read_notice')")&&
   web.includes("home.phase==='COMPLETE'")&&
@@ -116,6 +122,75 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
  assert.ok(state.includes('FINAL NOTICE')&&
   state.includes('No discussion.')&&
   !state.includes('due_date')&&!state.includes('evictionDeadline'));
+});
+
+test('User-supplied Notice art is installed as a transparent WebP with a fixed hash',()=>{
+ const art=readFileSync(resolve(root,'apps/web/static/locations/home/notice.webp'));
+ assert.equal(art.toString('ascii',0,4),'RIFF');
+ assert.equal(art.toString('ascii',8,12),'WEBP');
+ assert.equal(art.length,121714);
+ assert.equal(createHash('sha256').update(art).digest('hex'),
+  'a51cfeeaa5c6cd91e8884f475b4bf7f3f4403db79cf6ad476f5405a2b79ae3ce');
+});
+test('Bed rest restores resources, is saved, and never touches the narrative phase',()=>{
+ const initialState=initial('Millhand','restamp','player_victory',{
+  stamina:14,composure:8,fatigue:94,stress:67
+ });
+ assert.deepEqual(view(initialState,'Ada',10).condition,{
+  stamina:14,composure:8,fatigue:94,stress:67
+ });
+ const rested=advance(initialState,'rest');
+ assert.equal(rested.phase,'HOME');
+ assert.equal(rested.revision,1);
+ assert.deepEqual(rested.condition,{stamina:100,composure:100,fatigue:0,stress:0});
+ assert.deepEqual(initialState.condition,
+  {stamina:14,composure:8,fatigue:94,stress:67},'Immutable caller state');
+ let s=advance(rested,'read_notice');
+ assert.equal(s.phase,'NOTICE');
+ s=advance(s,'rest');
+ assert.equal(s.phase,'NOTICE','Rest does not dismiss the notice');
+ s=advance(s,'put_down');
+ s=advance(s,'finish');
+ assert.equal(s.phase,'COMPLETE');
+ assert.equal(view(s,'Ada',10).completed,true);
+ const again=advance(s,'rest');
+ assert.equal(again.phase,'COMPLETE');
+ assert.equal(again.revision,s.revision+1);
+ assert.deepEqual(view(again,'Ada',10).condition,
+  {stamina:100,composure:100,fatigue:0,stress:0});
+ assert.equal(view(again,'Ada',10).completed,true);
+ assert.equal(view(again,'Ada',10).coins,10);
+});
+test('Old Stage 8 saves without condition can be rested safely',()=>{
+ const {condition:ignored,...older}=initial('Millhand','restamp','player_defeat');
+ assert.equal(view(older,'Ada',10).condition.stamina,90);
+ assert.equal(view(older,'Ada',10).condition.composure,80);
+ assert.deepEqual(advance(older,'rest').condition,
+  {stamina:100,composure:100,fatigue:0,stress:0});
+});
+test('Stage 8 hotspots never paint a rectangular debug hover and bed is clickable',()=>{
+ const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ assert.ok(!web.includes('class="rent-status"')&&
+  !web.includes('rent-status{')&&
+  !web.includes('Rent cannot be paid during this tutorial.')&&
+  !web.includes('Read rent notice')&&
+  !web.includes('Rent notice</span>')&&
+  !web.includes('RENT NOTICE · STAGE VIII')&&
+  web.includes('class="hotspot chest"')&&web.includes('>Storage</span>')&&
+  web.includes('class="hotspot book"')&&web.includes('>Journal</span>')&&
+  web.includes('class="hotspot bed"')&&web.includes('Rest in bed')&&
+  web.includes('class="hotspot notice-object"')&&
+  web.includes('>Notice</span>')&&
+  web.includes("restMessage=action==='rest'")&&
+  web.includes("home.completed&&action!=='rest'")&&
+  web.includes('.hotspot:not(.notice-object)::after')&&
+  !web.includes('background:#f5d18b24')&&
+  !web.includes('outline:2px solid #eccc85'));
+ const api=source('apps/api/src/tutorial-home-routes.ts');
+ assert.ok(api.includes("'read_notice','put_down','finish','rest'")&&
+  api.includes("cmd.action==='rest'&&c.tutorial_status==='COMPLETED'")&&
+  api.includes('clinic.rows[0].state.after')&&
+  !api.includes('UPDATE player_character_flint_combat'));
 });
 
 test('Stage 8 dialogue frame and typography match the approved Stage 7 clinic',()=>{
