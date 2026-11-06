@@ -144,7 +144,7 @@ test('UI provides equipped silhouette, clickable inspection, Shift-click and dra
  const ui=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/InventoryPanel.svelte'),'utf8');
  assert.ok(ui.includes('class="equipment-silhouette"'));
  assert.ok(ui.includes('equipmentSlots'));
- assert.ok(ui.includes("label:'Clothing · Torso & Legs'"));
+ assert.ok(ui.includes("label:'Body'"));
  assert.ok(!ui.includes("label:'Pants'"));
  assert.ok(ui.includes("class:outfit={slot.id==='torso'}"));
  assert.ok(ui.includes('class="equipment-bonuses"'));
@@ -152,7 +152,15 @@ test('UI provides equipped silhouette, clickable inspection, Shift-click and dra
    'Inventory Slots','Bag Volume'])assert.ok(ui.includes(label));
  assert.ok(ui.includes('snapshot.bonuses.weaponDamage'));
  assert.ok(ui.includes('snapshot.bonuses.maxWeightKg'));
- assert.ok(ui.includes('Live equipment totals'));
+ assert.ok(ui.includes('class="stat-tile"'));
+ assert.ok(ui.includes('border:2px ridge #926c40'));
+ assert.ok(!ui.includes('equipment-footnote'));
+ assert.ok(!ui.includes('bonus-note'));
+ assert.ok(!ui.includes('class="provisional"'));
+ assert.ok(!ui.includes('interaction-hint'));
+ assert.ok(!ui.includes('Worn gear counts toward carrying weight.'));
+ assert.ok(!ui.includes('Live equipment totals; damage and environmental mitigation'));
+ assert.ok(!ui.includes('Carrying weight and chest balance remain provisional.'));
  
  assert.ok(ui.includes('class="equip-socket filled"'));
  assert.ok(ui.includes('class="equip-socket empty"'));
