@@ -232,7 +232,8 @@
           {:else if clinic.phase==='LEFT'}
             <p class="narration">You leave the clinic and head toward your rented home.</p>
             <p class="receipt">Coins remaining: {clinic.coins}.</p>
-            <p class="next-note">Return Home is the next chapter. Its playable scene is not yet connected.</p>
+            <p class="next-note">The clinic is complete. Your rented home is the final chapter.</p>
+            <a class="pall-framed-button advance" href={'/characters/'+encodeURIComponent(id)+'/home'}>Return home</a>
           {/if}
 
           {#if next}

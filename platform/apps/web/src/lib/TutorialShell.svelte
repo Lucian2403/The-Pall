@@ -48,7 +48,9 @@
     backStageBusy?:boolean;
     backStageError?:string;
   }=$props();
-  const chapter = $derived(character.origin === 'Millhand' && character.tutorial.stage >= 7
+  const chapter = $derived(character.tutorial.stage === 8
+    ? '/characters/' + encodeURIComponent(character.id) + '/home'
+    : character.origin === 'Millhand' && character.tutorial.stage >= 7
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/clinic'
     : character.origin === 'Millhand' && character.tutorial.stage === 6
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/combat'
@@ -385,7 +387,7 @@
       </section>
     {/if}
 
-    <footer class="onboarding-footer">GUIDED CHAPTER · Normal Home navigation becomes available only after Stage 8.</footer>
+    <footer class="onboarding-footer">GUIDED CHAPTER · Other game systems are still in development.</footer>
   </div>
 </div>
 
