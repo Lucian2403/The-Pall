@@ -1,7 +1,7 @@
 <script lang="ts">
   import {onMount} from 'svelte';
 
-  type EquipSlot='head'|'face'|'torso'|'hands'|'pants'|'feet'|'back'
+  type EquipSlot='head'|'face'|'torso'|'hands'|'feet'|'back'
     |'primary_weapon'|'secondary_weapon'|'respiratory_filter'|'accessory_1'|'accessory_2';
   type Item={
     id:string;code:string;name:string;category:string;description:string;
@@ -15,8 +15,12 @@
     slotsUsed:number;maxSlots:number;weightKg:number;volumeL:number;
     maxWeightKg:number;maxVolumeL:number;overCapacity:boolean;items:Item[]
   };
+  type EquipmentBonuses={
+    armour:number;weaponDamage:number|null;pallProtection:number;ashProtection:number;
+    maxWeightKg:number;inventorySlots:number;maxVolumeL:number
+  };
   type Snapshot={revision:number;storageEnabled:boolean;
-    pack:Container;chest:Container;equipment:{items:Item[]}};
+    pack:Container;chest:Container;equipment:{items:Item[]};bonuses:EquipmentBonuses};
   type Place='pack'|'home_chest'|'equipped';
   type Transfer={kind:'transfer';to:'pack'|'home_chest'};
   type Equip={kind:'equip';slot:EquipSlot};
@@ -25,10 +29,9 @@
     {id:'face',label:'Face',x:68,y:0},
     {id:'respiratory_filter',label:'Filter',x:2,y:0},
     {id:'hands',label:'Hands',x:2,y:24},
-    {id:'torso',label:'Torso',x:35,y:24},
+    {id:'torso',label:'Clothing · Torso & Legs',x:35,y:24},
     {id:'back',label:'Back / Bag',x:68,y:24},
     {id:'primary_weapon',label:'Primary',x:2,y:48},
-    {id:'pants',label:'Pants',x:35,y:48},
     {id:'secondary_weapon',label:'Secondary',x:68,y:48},
     {id:'accessory_1',label:'Accessory I',x:2,y:72},
     {id:'feet',label:'Feet',x:35,y:72},
@@ -91,7 +94,7 @@
         throw Error('Inventory request failed (HTTP '+response.status+(code?'; '+code:'')+').');
       }
       if(!body||typeof body!=='object'||!('pack' in body)||!('chest' in body)||
-        !('equipment' in body))
+        !('equipment' in body)||!('bonuses' in body))
         throw Error('Inventory returned an invalid response. Check the API terminal.');
       const next=body as Snapshot;
       snapshot=next;
@@ -208,6 +211,7 @@
                 ondragover={allowDrop}
                 ondrop={event=>onDrop(event,'equipped',slot.id)}
                 class:selected={selectedId===item.id}
+                class:outfit={slot.id==='torso'}
                 aria-label={'Select equipped '+item.name+' in '+slot.label+' (Shift-click to unequip)'}
                 aria-pressed={selectedId===item.id}
                 onclick={event=>selectItem(event,item,'equipped')}>
@@ -223,6 +227,7 @@
               <button type="button" class="equip-socket empty"
                 style={'left:'+slot.x+'%;top:'+slot.y+'%'}
                 aria-disabled={pending||!snapshot.storageEnabled}
+                class:outfit={slot.id==='torso'}
                 ondragover={allowDrop}
                 ondrop={event=>onDrop(event,'equipped',slot.id)}
                 aria-label={'Empty '+slot.label+' equipment slot. Drop compatible gear here.'}
@@ -234,7 +239,21 @@
             {/if}
           {/each}
         </div>
-        <p class="equipment-footnote">Equipped items do not occupy pack squares. Only a worn bag expands capacity.</p>
+        <p class="equipment-footnote">Worn gear counts toward carrying weight. Only the equipped bag adds inventory slots.</p>
+        <div class="equipment-bonuses" aria-label="Equipment-derived character stats">
+          <h4>Equipment Stats</h4>
+          <dl class="bonus-grid">
+            <div><dt>Armor</dt><dd>{snapshot.bonuses.armour}</dd></div>
+            <div><dt>Damage</dt><dd>{snapshot.bonuses.weaponDamage===null
+              ?'—':snapshot.bonuses.weaponDamage}</dd></div>
+            <div><dt>Pall Protection</dt><dd>{snapshot.bonuses.pallProtection}</dd></div>
+            <div><dt>Ash Protection</dt><dd>{snapshot.bonuses.ashProtection}</dd></div>
+            <div><dt>Max Weight</dt><dd>{measure(snapshot.bonuses.maxWeightKg)} kg</dd></div>
+            <div><dt>Inventory Slots</dt><dd>{snapshot.bonuses.inventorySlots}</dd></div>
+            <div><dt>Bag Volume</dt><dd>{measure(snapshot.bonuses.maxVolumeL)} L</dd></div>
+          </dl>
+          <p class="bonus-note">Live equipment totals; damage and environmental mitigation remain future combat mechanics.</p>
+        </div>
       </section>
 
       <section class="grid-card pack-card" aria-label="Inventory"
@@ -291,7 +310,8 @@
           <p class="item-description">{selected.description}</p>
           <div class="item-statistics">
             <div><span>Location</span><strong>{selectedPlace==='equipped'
-              ?'Equipped · '+titleCase(selected.equipmentSlot??'')
+              ?'Equipped · '+(selected.equipmentSlot==='torso'
+                ?'Clothing (Torso & Legs)':titleCase(selected.equipmentSlot??''))
               :selectedPlace==='pack'?'Inventory':'Home Chest'}</strong></div>
             <div><span>Weight</span><strong>{measure(selected.weightKg)} kg</strong></div>
             <div><span>Volume</span><strong>{measure(selected.volumeL)} L</strong></div>
@@ -376,7 +396,7 @@
         </p>
       </section>
     </div>
-    <p class="provisional">The equipment arrangement and final carrying-weight and chest balance remain provisional.</p>
+    <p class="provisional">Carrying weight and chest balance remain provisional. Item bonuses do not yet alter combat or environmental damage.</p>
   {/if}
   {#if error}<p class="inventory-error" role="alert">{error}</p>
     <button type="button" class="reload" onclick={()=>{void reload();}}>Reload inventory</button>{/if}
@@ -395,8 +415,8 @@
     align-items:start;gap:12px}
   .interaction-hint{max-width:1580px;margin:0 auto 12px;color:#bca487;
     font:12px/1.45 var(--pall-font-reading,Georgia,serif)}
-  .equipment-card{min-height:420px}
-  .equipment-stage{height:347px;position:relative;min-width:0;margin:4px 0 10px;
+  .equipment-card{min-height:420px;align-self:stretch}
+  .equipment-stage{height:308px;position:relative;min-width:0;margin:4px 0 10px;
     border:1px solid #4e4035;background:radial-gradient(ellipse at 50% 44%,#53433533,transparent 70%)}
   .equipment-silhouette{position:absolute;left:8%;width:84%;height:96%;
     top:2%;fill:#77685640;stroke:#ac93704d;stroke-width:2;
@@ -406,6 +426,8 @@
     align-items:center;gap:2px;border:1px solid #7b6250;border-radius:3px;
     background:#2d241fc9;color:#d6bd97;min-width:0;cursor:pointer}
   .equip-socket.empty{background:#29231eab;border-style:dashed;color:#a99580}
+  .equip-socket.outfit{height:45%}
+  .equip-socket.outfit .socket-art{height:79%;max-height:108px}
   .equip-socket:focus-visible,.equip-socket.selected,.equip-socket:hover{
     outline:1px solid #dfb876;border-color:#d3a776}
   .socket-label{font:700 clamp(8px,.62vw,10px)/1.1 Arial,sans-serif;
@@ -413,7 +435,18 @@
   .socket-empty{font:22px Georgia,serif;opacity:.55}
   .socket-art{width:100%;height:67%;object-fit:contain;
     pointer-events:none;filter:drop-shadow(0 2px 2px #000b)}
-  .equipment-footnote{margin:8px 0 0;color:#af9b82;font:11px/1.4 Georgia,serif}
+  .equipment-footnote{margin:8px 0 12px;color:#af9b82;font:11px/1.4 Georgia,serif}
+  .equipment-bonuses{padding:12px 10px 10px;border-top:1px solid #705945;
+    background:linear-gradient(180deg,#32281f,#26211d);border-radius:3px}
+  .equipment-bonuses h4{margin:0 0 10px;color:#ecd0a0;font:600 16px Georgia,serif}
+  .bonus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;
+    margin:0}
+  .bonus-grid div{min-width:0;display:flex;align-items:baseline;justify-content:space-between;
+    gap:6px;border-bottom:1px solid #574636;padding-bottom:4px}
+  .bonus-grid dt{font:11px/1.25 Georgia,serif;color:#c8b395}
+  .bonus-grid dd{margin:0;font:700 12px/1.25 Georgia,serif;
+    color:#f3d6a4;white-space:nowrap;text-align:right}
+  .bonus-note{margin:10px 0 0;color:#9e8b78;font:11px/1.4 Georgia,serif}
 
   .grid-card{min-width:0;border:1px solid #6d5544;background:#282320;padding:12px;
     border-radius:4px}
