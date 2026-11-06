@@ -268,7 +268,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     'The clinician must narrate saved facts and keep the existing action sequence');
   const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
   const shell=source('apps/web/src/lib/TutorialShell.svelte');
-  assert.ok(rewind.includes('if(expectedStage===7||expectedStage===8)') &&
+  assert.ok(rewind.includes('if(expectedStage===7)') &&
     rewind.includes('unsafe_clinic_health_state') &&
     rewind.includes('DELETE FROM player_character_clinic_receipts') &&
     rewind.includes('DELETE FROM player_character_clinic WHERE character_id') &&
@@ -277,8 +277,8 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     shell.includes('Back to Stage ') &&
     shell.includes('fromStage===7||fromStage===8') &&
     shell.includes('rewindTargetStage') &&
-    rewind.includes('if(expectedStage===7||expectedStage===8)') &&
-    rewind.includes('completedClinic') &&
+    rewind.includes('if(expectedStage===7)') &&
+    rewind.includes('if(expectedStage===8)') &&
     web.includes("character={...character,tutorial:clinic.phase==='LEFT'"),
     'Stage 7 must safely rewind to a replayable Stage 6, reversing only committed clinic payment');
   assert.equal(CLINIC_FEE,10);
