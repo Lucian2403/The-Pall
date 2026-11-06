@@ -2,6 +2,7 @@
   import {onMount,tick,getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {page} from '$app/state';
+  import {goto} from '$app/navigation';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {
     clinicianAssessment,clinicianDischarge,clinicianFatigue
@@ -58,7 +59,7 @@
     :next==='speak'?'Speak to clinician'
     :next==='review_price'?'Review the price'
     :next==='pay'?'Pay 10 coins'
-    :next==='leave'?'Leave the clinic':'');
+    :next==='leave'?'Travel Home':'');
   let pricedDialogueIndex=$state(0);
   const pricedBeat=$derived(PRICED_DIALOGUE_BEATS[pricedDialogueIndex]!);
   const pricedAtEnd=$derived(pricedDialogueIndex===PRICED_DIALOGUE_BEATS.length-1);
@@ -152,6 +153,11 @@
         const paidNow=action==='pay'&&result.paid===true&&result.coins<clinic.coins;
         clinic=result;retryId=null;retrySignature=null;
         if(paidNow)playCoinTransactionSfx();
+        // Commit the paid clinic departure once, then go straight into the
+        // room: there is no intermediary city card or door interaction.
+        if(action==='leave'&&result.phase==='LEFT'){
+          await goto('/characters/'+encodeURIComponent(id)+'/home');
+        }
         if(character){
           character={...character,coins:result.coins,
             health:{...character.health,current:result.after?.hp??character.health.current},
@@ -232,7 +238,8 @@
           {:else if clinic.phase==='LEFT'}
             <p class="narration">You leave the clinic and head toward your rented home.</p>
             <p class="receipt">Coins remaining: {clinic.coins}.</p>
-            <p class="next-note">Return Home is the next chapter. Its playable scene is not yet connected.</p>
+            <p class="next-note">The clinic is complete. Your rented home is the final chapter.</p>
+            <a class="pall-framed-button advance" href={'/characters/'+encodeURIComponent(id)+'/home'}>Travel Home</a>
           {/if}
 
           {#if next}

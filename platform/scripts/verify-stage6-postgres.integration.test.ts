@@ -17,6 +17,7 @@ import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
+import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
@@ -32,7 +33,7 @@ const schema=[
   '0004_millhand_missing_stamp.sql','0005_millhand_second_job.sql',
   '0006_character_portraits.sql','0006_millhand_wage_claim.sql',
   '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql',
-  '0009_character_welcome.sql'
+  '0009_character_welcome.sql','0010_tutorial_home.sql'
 ];
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
   // This resolver is injected only via register*Routes options in this
@@ -45,6 +46,7 @@ const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
+registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 
 async function request(
@@ -156,6 +158,190 @@ before(async()=>{
   await app.ready();
 });
 after(async()=>{await app.close();await db.end();});
+
+test('Stage 8 shared home: six Millhand route/outcome combinations complete once with no rewards',async()=>{
+ for(const branch of ['restamp','contracts','records']){
+  for(const outcome of ['player_victory','player_defeat']){
+   const c=await character();
+   const route=base+c.id+'/tutorial/home';
+   await db.query(
+     "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED',coins=10,current_health=50 WHERE id=$1",
+     [c.id]
+   );
+   await db.query(
+     'INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,1,$2::jsonb)',
+     [c.id,JSON.stringify({phase:'SELECTED',branch})]
+   );
+   await db.query(
+     'INSERT INTO player_character_clinic(character_id,revision,state) VALUES($1,5,$2::jsonb)',
+     [c.id,JSON.stringify({phase:'LEFT',revision:5,paid:true,outcome})]
+   );
+   const first=await request('GET',route);
+   assert.equal(first.status,200,JSON.stringify(first.body));
+   assert.equal(first.body!.needsStart,true);
+   const startId=randomUUID();
+   const startBody={kind:'start',requestId:startId};
+   const opened=await request('POST',route,owner,startBody);
+   assert.equal(opened.status,200,JSON.stringify(opened.body));
+   assert.equal(opened.body!.phase,'HOME');
+   assert.equal(opened.body!.branch,branch);
+   assert.equal(opened.body!.outcome,outcome);
+   assert.equal(opened.body!.homeId,'starter-rented-room');
+   assert.equal(opened.body!.coins,10);
+   assert.equal(opened.body!.rent,150);
+   assert.equal(opened.body!.shortfall,140);
+   assert.equal(opened.body!.noticeText,c.name+', you have to pay 150 coins in rent, or you are out. No discussion.');
+   assert.equal((await request('POST',route,owner,startBody)).body!.revision,0,
+     'Duplicate start returns exact prior receipt');
+   assert.equal((await request('GET',route,stranger)).status,404);
+   assert.equal((await request('GET',route,null)).status,401);
+   const spoof=await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:0,
+     action:'finish',rent:0
+   });
+   assert.equal(spoof.status,400,'No client-defined rent or action shortcut');
+   assert.equal((await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:0,action:'finish'
+   })).status,409,'Cannot skip straight to completion');
+   let state=opened.body!;
+   for(const retired of ['travel','enter']){
+     assert.equal((await request('POST',route,owner,{
+       kind:'action',requestId:randomUUID(),expectedRevision:0,action:retired
+     })).status,400,'Removed city/door actions cannot be invoked by clients');
+   }
+   for(const [action,phase] of [
+     ['read_notice','NOTICE'],['put_down','SPEECH'],['finish','COMPLETE']
+   ]){
+     const requestId=randomUUID();
+     const body={kind:'action',requestId,expectedRevision:state.revision,action};
+     const advanced=await request('POST',route,owner,body);
+     assert.equal(advanced.status,200,JSON.stringify(advanced.body));
+     state=advanced.body!;
+     assert.equal(state.phase,phase);
+     assert.equal((await request('POST',route,owner,body)).body!.revision,state.revision,
+       'Same request does not advance twice');
+     assert.equal((await request('GET',route)).body!.phase,phase,
+       'Phase must survive server reload');
+     assert.equal((await request('POST',route,owner,{
+       kind:'action',requestId:randomUUID(),expectedRevision:state.revision-1,action
+     })).status,409,'Stale revision cannot advance');
+   }
+   assert.equal(state.completed,true);
+   assert.equal(state.revision,3);
+   assert.equal((await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:state.revision,action:'finish'
+   })).status,409,'Cannot complete again');
+   const finalChar=await db.query<{
+     tutorial_stage:number;tutorial_status:string;coins:string|number;
+     major_skill_bonuses:Record<string,number>;current_health:number
+   }>('SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses,current_health FROM player_characters WHERE id=$1',[c.id]);
+   assert.equal(finalChar.rows[0].tutorial_stage,8);
+   assert.equal(finalChar.rows[0].tutorial_status,'COMPLETED');
+   assert.equal(Number(finalChar.rows[0].coins),10,'Home makes no coin transaction');
+   assert.deepEqual(finalChar.rows[0].major_skill_bonuses,{Craftsmanship:3,Industry:1});
+   assert.equal(finalChar.rows[0].current_health,50,'No second healing');
+   const savedClinic=await db.query<{state:Record<string,any>}>(
+     'SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
+   assert.equal(savedClinic.rows[0].state.outcome,outcome,'Clinic history is untouched');
+  }
+ }
+});
+
+test('Stage 8 bed Rest is persistent, replay-safe, and available after tutorial completion',async()=>{
+ const c=await character();
+ const route=base+c.id+'/tutorial/home';
+ const discharge={hp:43,hpMax:50,stamina:12,composure:7,fatigue:94,
+   stress:68,momentum:5,bleed:2,wounds:[{type:'cut',zone:'limbs'}]};
+ await db.query(
+   "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED',coins=10,current_health=43 WHERE id=$1",
+   [c.id]
+ );
+ await db.query(
+   'INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,1,$2::jsonb)',
+   [c.id,JSON.stringify({phase:'SELECTED',branch:'restamp'})]
+ );
+ await db.query(
+   'INSERT INTO player_character_clinic(character_id,revision,state) VALUES($1,5,$2::jsonb)',
+   [c.id,JSON.stringify({phase:'LEFT',revision:5,paid:true,
+     outcome:'player_victory',after:discharge})]
+ );
+ const started=await request('POST',route,owner,{kind:'start',requestId:randomUUID()});
+ assert.equal(started.status,200,JSON.stringify(started.body));
+ assert.equal(started.body!.phase,'HOME');
+ assert.deepEqual(started.body!.condition,
+   {stamina:12,composure:7,fatigue:94,stress:68},
+   'Real clinic discharge, not a fabricated reset, starts home resources');
+ const spoof=await request('POST',route,owner,{
+   kind:'action',requestId:randomUUID(),action:'rest',expectedRevision:0,
+   stamina:999,health:999
+ });
+ assert.equal(spoof.status,400,'Client cannot set resource amounts');
+ const key=randomUUID();
+ const command={kind:'action',requestId:key,action:'rest',expectedRevision:0};
+ const rested=await request('POST',route,owner,command);
+ assert.equal(rested.status,200,JSON.stringify(rested.body));
+ assert.deepEqual(rested.body!.condition,
+   {stamina:100,composure:100,fatigue:0,stress:0});
+ assert.equal(rested.body!.phase,'HOME');
+ assert.equal(rested.body!.revision,1);
+ assert.equal((await request('POST',route,owner,command)).body!.revision,1,
+   'A replay of the same Rest request must not create an extra turn');
+ assert.equal((await request('POST',route,owner,{
+   ...command,requestId:randomUUID()
+ })).status,409,'A stale request must never mutate saved Rest');
+ assert.deepEqual((await request('GET',route)).body!.condition,
+   {stamina:100,composure:100,fatigue:0,stress:0},
+   'Rest must survive reload from PostgreSQL');
+ assert.equal((await request('POST',route,stranger,{
+   kind:'action',requestId:randomUUID(),expectedRevision:1,action:'rest'
+ })).status,404,'Another account cannot rest this character');
+ let rev=1;
+ for(const action of ['read_notice','put_down','finish']){
+   const reply=await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),action,expectedRevision:rev
+   });
+   assert.equal(reply.status,200,JSON.stringify(reply.body));
+   rev=reply.body!.revision;
+ }
+ assert.equal(rev,4);
+ assert.equal((await request('GET',route)).body!.completed,true);
+ const afterComplete=await request('POST',route,owner,{
+   kind:'action',requestId:randomUUID(),expectedRevision:rev,action:'rest'
+ });
+ assert.equal(afterComplete.status,200,JSON.stringify(afterComplete.body));
+ assert.equal(afterComplete.body!.phase,'COMPLETE');
+ assert.equal(afterComplete.body!.completed,true);
+ assert.equal(afterComplete.body!.revision,5);
+ assert.deepEqual(afterComplete.body!.condition,
+   {stamina:100,composure:100,fatigue:0,stress:0});
+ assert.equal((await request('POST',route,owner,{
+   kind:'action',requestId:randomUUID(),expectedRevision:5,action:'finish'
+ })).status,409,'Bed rest never reopens an already completed tutorial');
+ const char=await db.query<{current_health:number;coins:string|number;
+   tutorial_status:string;tutorial_stage:number}>(
+   'SELECT current_health,coins,tutorial_status,tutorial_stage FROM player_characters WHERE id=$1',
+   [c.id]
+ );
+ assert.equal(char.rows[0].current_health,43,'Rest is not Health healing');
+ assert.equal(Number(char.rows[0].coins),10,'Rest has no coin side effect');
+ assert.equal(char.rows[0].tutorial_status,'COMPLETED');
+ assert.equal(char.rows[0].tutorial_stage,8);
+ const clinic=await db.query<{state:{after:typeof discharge}}>(
+   'SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]
+ );
+ assert.deepEqual(clinic.rows[0].state.after,discharge,
+   'Rest cannot alter injuries or Stage 7 clinic history');
+});
+
+test('Stage 8 refuses entry without completed clinic or earlier tutorial state',async()=>{
+ const c=await character();
+ const route=base+c.id+'/tutorial/home';
+ assert.equal((await request('GET',route)).status,409);
+ await db.query(
+   "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED' WHERE id=$1",[c.id]);
+ assert.equal((await request('POST',route,owner,{kind:'start',requestId:randomUUID()})).status,409);
+ assert.equal((await request('GET',route)).status,409);
+});
 
 test('Welcome is persisted per character and never unlocks tutorial gameplay itself',async()=>{
   const first=await character(owner);
@@ -826,7 +1012,16 @@ test('Stage 7 rewind blocks inconsistent character Health without partial deleti
 });
 
 
-test('After leaving the clinic, Back to Stage 6 remains available until Stage 8 begins',async()=>{
+async function seedStageThreeRouteForHome(c:{id:string}){
+  // The generic Stage 6 combat fixture starts at combat and has no genuine
+  // Stage 3 investigation; the home API correctly requires a saved choice.
+  await db.query(
+    'INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,1,$2::jsonb)',
+    [c.id,JSON.stringify({phase:'SELECTED',branch:'restamp'})]
+  );
+}
+
+test('Back to Stage 7 preserves the 10-coin clinic fee and Flint fight',async()=>{
   const {c}=await outcomeWith(()=>({type:'guard'}));
   const priced=await completeExamination(c);
   const paid=await clinicAdvance(c,priced,'pay');
@@ -836,44 +1031,55 @@ test('After leaving the clinic, Back to Stage 6 remains available until Stage 8 
   const options=await request('GET',endpoint);
   assert.equal(options.status,200);
   assert.deepEqual(options.body,{
-    enabled:true,canRewind:true,stage:8,targetStage:6
+    enabled:true,canRewind:true,stage:8,targetStage:7
   });
   assert.equal((await devRewind(c,7)).status,409,
     'An outdated Stage 7 request cannot bypass the completed clinic boundary');
   const rewind=await devRewind(c,8);
   assert.equal(rewind.status,200,JSON.stringify(rewind.body));
-  assert.equal(rewind.body!.stage,6);
-  assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/combat');
-  assert.equal(rewind.body!.coinDelta,10,'Stage 8 review reports real paid refund');
-  assert.equal((await devRewind(c,8)).status,409,'Completed visit cannot refund twice');
-  const char=await db.query<{coins:string;current_health:number;tutorial_status:string}>(
-    'SELECT coins,current_health,tutorial_status FROM player_characters WHERE id=$1',[c.id]
+  assert.equal(rewind.body!.stage,7);
+  assert.equal(rewind.body!.route,'/characters/'+c.id+'/millhand/clinic');
+  assert.equal(rewind.body!.coinDelta,0,'A paid clinic must not be refunded');
+  assert.equal((await devRewind(c,8)).status,409,'Rewinding cannot happen twice');
+  const char=await db.query<{coins:string;current_health:number;tutorial_status:string;tutorial_stage:number}>(
+    'SELECT coins,current_health,tutorial_status,tutorial_stage FROM player_characters WHERE id=$1',[c.id]
   );
-  assert.equal(Number(char.rows[0].coins),20);
+  assert.equal(Number(char.rows[0].coins),10);
   assert.equal(char.rows[0].current_health,50);
-  assert.equal(char.rows[0].tutorial_status,'NOT_STARTED');
-  const startAgain=await start(c);
-  assert.equal(startAgain.status,'active');
-  assert.equal(startAgain.revision,0);
+  assert.equal(char.rows[0].tutorial_status,'IN_PROGRESS');
+  assert.equal(char.rows[0].tutorial_stage,7);
+  assert.equal((await request('GET',c.path)).body!.status,'finished',
+    'Flint combat remains immutable');
+  const clinic=await request('GET',base+c.id+'/millhand/clinic');
+  assert.equal(clinic.status,200);
+  assert.equal(clinic.body!.phase,'PAID','Travel Home must be available again');
+  assert.equal(clinic.body!.paid,true);
+  assert.equal(clinic.body!.coins,10);
+  const travel=await clinicAdvance(c,clinic.body!,'leave');
+  assert.equal(travel.phase,'LEFT');
+  await seedStageThreeRouteForHome(c);
+  const home=await request('POST',base+c.id+'/tutorial/home',owner,{
+    kind:'start',requestId:randomUUID()
+  });
+  assert.equal(home.status,200,JSON.stringify(home.body));
+  assert.equal(home.body!.phase,'HOME','Home always opens directly in the room');
 });
 
-test('Completed-clinic rewind is disabled after Stage 8 starts or if clinic state diverges',async()=>{
+test('Stage 8 rewind blocks mismatched progress or clinic records without changing coins',async()=>{
   const {c}=await outcomeWith(()=>({type:'guard'}));
-  let priced=await completeExamination(c);
-  let paid=await clinicAdvance(c,priced,'pay');
+  const priced=await completeExamination(c);
+  const paid=await clinicAdvance(c,priced,'pay');
   await clinicAdvance(c,paid,'leave');
   const endpoint=base+c.id+'/dev/rewind-stage';
+  // Missing Stage 8 state cannot be presented as an in-progress scene.
   await db.query(
     "UPDATE player_characters SET tutorial_status='IN_PROGRESS' WHERE id=$1",[c.id]
   );
-  assert.equal((await request('GET',endpoint)).body!.canRewind,false);
-  const playing=await devRewind(c,8);
-  assert.equal(playing.status,409);
-  assert.equal(playing.body?.error,'unsafe_clinic_state');
-  const coins=await db.query<{coins:string}>(
-    'SELECT coins FROM player_characters WHERE id=$1',[c.id]
-  );
-  assert.equal(Number(coins.rows[0].coins),10);
+  assert.equal((await request('GET',endpoint)).body!.canRewind,true,
+    'Capability is visible but actual saved-state consistency is checked under the transaction lock');
+  const invalid=await devRewind(c,8);
+  assert.equal(invalid.status,409);
+  assert.equal(invalid.body?.error,'unsafe_home_state');
   await db.query(
     "UPDATE player_characters SET tutorial_status='NOT_STARTED' WHERE id=$1",[c.id]
   );
@@ -882,9 +1088,52 @@ test('Completed-clinic rewind is disabled after Stage 8 starts or if clinic stat
     [c.id]
   );
   assert.equal((await request('GET',endpoint)).body!.canRewind,false);
-  const invalid=await devRewind(c,8);
-  assert.equal(invalid.status,409);
-  assert.equal(invalid.body?.error,'unsafe_clinic_state');
+  const blocked=await devRewind(c,8);
+  assert.equal(blocked.status,409);
+  assert.equal(blocked.body?.error,'unsafe_clinic_state');
   assert.equal((await request('GET',c.path)).body!.status,'finished');
   assert.equal((await request('GET',base+c.id+'/millhand/clinic')).body!.coins,10);
+});
+
+test('Stage 8 Back to Stage 7 works during notice reading and after completion',async()=>{
+ for(const complete of [false,true]){
+   const {c}=await outcomeWith(()=>({type:'guard'}));
+   const priced=await completeExamination(c);
+   const paid=await clinicAdvance(c,priced,'pay');
+   await clinicAdvance(c,paid,'leave');
+   const route=base+c.id+'/tutorial/home';
+   await seedStageThreeRouteForHome(c);
+   const initial=await request('POST',route,owner,{kind:'start',requestId:randomUUID()});
+   assert.equal(initial.status,200);
+   const noticed=await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:0,action:'read_notice'
+   });
+   assert.equal(noticed.body!.phase,'NOTICE');
+   if(complete){
+     const spoken=await request('POST',route,owner,{
+       kind:'action',requestId:randomUUID(),expectedRevision:1,action:'put_down'
+     });
+     assert.equal(spoken.body!.phase,'SPEECH');
+     const finished=await request('POST',route,owner,{
+       kind:'action',requestId:randomUUID(),expectedRevision:2,action:'finish'
+     });
+     assert.equal(finished.body!.phase,'COMPLETE');
+   }
+   const cap=await request('GET',base+c.id+'/dev/rewind-stage');
+   assert.equal(cap.body!.targetStage,7);
+   assert.equal(cap.body!.canRewind,true);
+   const res=await devRewind(c,8);
+   assert.equal(res.status,200,JSON.stringify(res.body));
+   assert.equal(res.body!.stage,7);
+   const char=await db.query<{coins:string;tutorial_status:string}>(
+     'SELECT coins,tutorial_status FROM player_characters WHERE id=$1',[c.id]
+   );
+   assert.equal(Number(char.rows[0].coins),10);
+   assert.equal(char.rows[0].tutorial_status,'IN_PROGRESS');
+   assert.equal((await request('GET',c.path)).body!.status,'finished');
+   const fromClinic=await request('GET',base+c.id+'/millhand/clinic');
+   assert.equal(fromClinic.body!.phase,'PAID');
+   assert.equal((await request('GET',route)).status,409,
+     'Old completed Stage 8 is erased and inaccessible until clinic departure');
+ }
 });

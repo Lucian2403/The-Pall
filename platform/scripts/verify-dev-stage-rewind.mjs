@@ -27,6 +27,8 @@ assert.ok(core.includes('if(sorted({...bonuses})!==sorted(expected))'),'Unexpect
 assert.ok(core.includes('Craftsmanship:APPROVED_STARTING_FACTS.originMajorSkillBonusLevels'),'Starting bonuses must remain intact');
 assert.ok(ui.includes('dev/rewind-stage'),'Control must query the server capability');
 assert.ok(ui.includes('window.confirm('),'Rewind must require player confirmation');
-assert.ok(ui.includes("'← Back to Stage '+(rewindFromStage-1)"),'Button must target previous stage');
+assert.ok(ui.includes("'← Back to Stage '+rewindTargetStage"),'Button must use verified server-provided target stage');
+assert.ok(api.includes('targetStage:canReturnToClinic?7') && api.includes("if(expectedStage===8)"),
+  'Stage 8 must rewind to Stage 7 instead of resetting combat and clinic fee');
 assert.ok(ui.includes('await goto(data.route,{replaceState:true,invalidateAll:true})'),'Reload target scene from server after saved rewind');
 console.log('PASS: Local-only Milhand stage rewind checks and skill/receipt safeguards.');
