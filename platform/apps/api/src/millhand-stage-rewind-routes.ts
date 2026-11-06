@@ -138,6 +138,13 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           'DELETE FROM player_character_tutorial_home WHERE character_id=$1',
           [req.params.id]
         );
+        // Invalidate only the previously saved departure receipt: replaying
+        // it after rewind must not yield an obsolete LEFT success response.
+        // Keep paid examination receipts and the single fee intact.
+        await client.query(
+          "DELETE FROM player_character_clinic_receipts WHERE character_id=$1 AND response->>'phase'='LEFT'",
+          [req.params.id]
+        );
         const reopened={...visit,phase:'PAID',revision:visit.revision+1};
         await client.query(
           'UPDATE player_character_clinic SET state=$2::jsonb,revision=$3,updated_at=NOW() WHERE character_id=$1',
