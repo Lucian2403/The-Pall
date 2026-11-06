@@ -25,7 +25,8 @@ const selectRows=String.raw`SELECT i.id,i.item_code,i.location,i.equipment_slot,
  i.quality_tier,i.current_durability,i.max_durability,i.grant_key,
  d.name,d.category,d.description,d.stackable,d.max_stack,d.weight_kg,
  d.volume_l,d.carry_volume_bonus_l,d.carry_slots_bonus,d.equip_slot,
- d.rarity_label,d.armour_rating,d.design_status
+ d.rarity_label,d.armour_rating,d.design_status,
+ d.damage_rating,d.pall_protection,d.ash_protection,d.carry_weight_bonus_kg
  FROM player_character_item_instances i
  JOIN pall_item_definitions d ON d.code=i.item_code
  WHERE i.character_id=$1 ORDER BY i.created_at,i.id`;
