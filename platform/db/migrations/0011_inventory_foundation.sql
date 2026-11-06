@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS player_character_item_instances(
   grant_key TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CHECK((current_durability IS NULL AND max_durability IS NULL) OR
-        (current_durability BETWEEN 0 AND max_durability AND max_durability>0))
+        (current_durability IS NOT NULL AND max_durability IS NOT NULL AND
+         current_durability BETWEEN 0 AND max_durability AND max_durability>0))
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_pall_inventory_starter_grant
  ON player_character_item_instances(character_id,grant_key)
