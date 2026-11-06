@@ -186,7 +186,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           return reply.code(409).send({error:'unsafe_clinic_state'});
         }
         const wasPaid=saved.paid===true;
-        if(wasPaid !== (saved.phase==='PAID'||saved.phase==='LEFT')||
+        if(wasPaid !== (saved.phase==='PAID')||
           (wasPaid?(!saved.after||
             saved.after.hp!==c.rows[0].current_health||
             saved.after.hp!==c.rows[0].max_health)
