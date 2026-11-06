@@ -50,10 +50,27 @@
     loading=true;error='';
     try{
       const response=await fetch(url,{cache:'no-store'});
-      const body=await response.json();
-      if(!response.ok)throw Error(response.status===503
-        ?'Inventory schema missing. Run npm run inventory:migrate.'
-        :response.status===401?'Sign in is required.':'Inventory is unavailable.');
+      // A stale API process can return 404, while database faults return 500.
+      // Read errors defensively: a proxy may send HTML instead of JSON.
+      const body:unknown=await response.json().catch(()=>null);
+      if(!response.ok){
+        const code=body&&typeof body==='object'&&'error' in body&&
+          typeof body.error==='string'?body.error:null;
+        if(response.status===503&&
+          (code==='inventory_schema_missing'||code==='inventory_not_initialized'))
+          throw Error('Inventory database needs setup (HTTP 503). Run npm run inventory:migrate from platform.');
+        if(response.status===404)
+          throw Error('Inventory endpoint missing (HTTP 404). Restart the API server from the inventory branch.');
+        if(response.status===401)
+          throw Error('Inventory sign-in required (HTTP 401).');
+        if(response.status===500)
+          throw Error('Inventory server error (HTTP 500). Check the API terminal for details.');
+        if(response.status===502||response.status===503||response.status===504)
+          throw Error('Inventory API is unreachable (HTTP '+response.status+'). Check the API server.');
+        throw Error('Inventory request failed (HTTP '+response.status+(code?'; '+code:'')+').');
+      }
+      if(!body||typeof body!=='object'||!('pack' in body)||!('chest' in body))
+        throw Error('Inventory returned an invalid response. Check the API terminal.');
       const next=body as Snapshot;
       snapshot=next;
       syncSelection(next);
