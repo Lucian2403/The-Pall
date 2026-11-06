@@ -44,7 +44,12 @@ function parseCommand(body:unknown):Command{
  if(!Number.isSafeInteger(v.quantity)||(v.quantity as number)<=0)
    throw Error('invalid_quantity');
  if(v.to!=='pack'&&v.to!=='home_chest')throw Error('invalid_location');
- return body as Command;
+ return {
+  kind:'transfer',requestId:v.requestId as string,
+  expectedRevision:v.expectedRevision as number,
+  itemInstanceId:v.itemInstanceId as string,
+  quantity:v.quantity as number,to:v.to as ItemLocation
+ };
 }
 function schemaMissing(error:unknown){return (error as {code?:string})?.code==='42P01';}
 const allowedOrigin=(h:IncomingHttpHeaders)=>!h.origin||
