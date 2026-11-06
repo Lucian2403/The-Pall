@@ -20,10 +20,13 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
   character receives the universal starter kit inside its creation transaction.
   Existing characters are backfilled without affecting saved states.
 - Pack and chest **grid-slot capacity** in addition to weight and volume.
-  The inventory starts with **16 base slots** and the carried Simple Bag
-  grants **8 more** (24 total). Putting it in the chest removes those eight.
-  The starter rented-home chest has 24 provisional slots.
-  The carried bag also grants provisional volume, never lifting strength.
+  The inventory now starts with **4 base slots**. A Simple Bag in the
+  **Back / Backpack equipment slot** grants **6 more**, totaling **10**.
+  Merely carrying the bag in inventory or chest grants nothing. Unequipping
+  it removes the bonus and is rejected if the now-four-slot pack would
+  overflow. The rented-home chest retains 24 provisional slots.
+  Worn clothing/bags count toward carried mass, not pack-square or bag volume.
+  The equipped bag grants provisional volume, never lifting strength.
 - Authenticated item reads; POST transfers are atomic under the character and
   inventory locks, checked against optimistic revision and request receipts.
   Quantities can be split and compatible stacks merged without duplication.
@@ -35,8 +38,13 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
   the unchanged room. The existing Journal hotspot uses the same overlay
   mechanism, preserving the branch-specific journal content. Small screens
   scroll within the modal instead of extending the home-page document.
-- Each grid has up to 24 visible slots with a separate selected-item description
-  panel. Selected details show the approved item text, Common category,
+- An **Equipment** panel now presents the canonical anatomical sockets
+  around a faint human silhouette: Head, Face, Torso, Hands, Pants, Feet,
+  Back/Backpack, Primary/Secondary Weapon, Respiratory Filter and accessory
+  sockets. The universal starter outfit occupies Torso as one composite item
+  and Simple Bag occupies Back. Other slots are unoccupied, not free items.
+  The carried-item grid has 4–10 cells; the chest grid has 24 cells.
+  Selected details show the approved item text, Common category,
   0 Armour or 8 Slots as applicable, quantity, condition, weight and volume.
 - The owner's `ItemEq_SimpleBag.png` and `ItemEq_BasicClothes.png` are the
   source of the two transparent 128×128 WebP integration cutouts at
@@ -55,9 +63,9 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
 | Daily Worker Clothes armour | 0 (owner-defined) |
 | Simple Bag weight | 0.8 kg |
 | Simple Bag occupied volume | 2 L |
-| Simple Bag added inventory slots | 8 (owner-defined) |
-| Base inventory slots without the bag | 16 (provisional) |
-| Total inventory slots with the bag | 24 |
+| Simple Bag added inventory slots when equipped | 6 (owner-defined) |
+| Base inventory slots without equipped bag | 4 (owner-defined) |
+| Total inventory slots with equipped bag | 10 |
 | Home Chest storage slots | 24 (provisional) |
 | Simple Bag added carry volume (when carried) | 12 L (provisional) |
 | Base pack carrying weight | 20 kg |
@@ -67,13 +75,18 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
 | Starter quality tier | 1, Crude (technical placeholder) |
 | Starter durability | 100/100 (technical placeholder) |
 
-No persistent equipment slot is yet assigned to Daily Worker Clothes or
-Simple Bag. The catalogue preserves the old stable item codes
-`basic_clothes` and `crude_small_bag` so existing owned instances survive
-the name change. The additive migration also updates old starter-kit display
-names without changing quantities. The bag's slot allowance while carried
-is explicitly transitional; the equipment milestone will determine how
-equipped bags grant carrying space.
+The additive `0012_equipment_slots.sql` migration assigns persistent slots
+to both starter items and updates the server-side creation trigger. It equips
+only starter grants still in the pack, leaving intentionally stored items in
+the chest untouched. Existing instance IDs, quantities and ownership remain
+unchanged; migrated characters receive one inventory revision increment.
+Rerunning the migration never duplicates gear. Item definitions retain the
+stable codes `basic_clothes` and `crude_small_bag`.
+
+The current equipment milestone covers **equip, unequip and bag slot capacity**,
+not combat protection, visibility, slot layers, weapons, repairs or wear.
+The owner-approved zero armour for the outfit remains descriptive/recorded
+rather than creating a new combat effect.
 
 ## Security and invariants
 - A caller cannot choose an item code, owner, quality tier, durability, money,
@@ -89,9 +102,10 @@ equipped bags grant carrying space.
   coins, applies weapon damage, or opens post-tutorial gameplay.
 
 ## Excluded from this checkpoint
-**Equipment** (slots, equip/unequip, weapon/armour modifiers, visibility),
-durability degradation and repairs, trading, loot, crafting, and final
-inventory visual styling and art assets. These remain separate milestones, not implicit features.
+**Full equipment mechanics** (weapon/armour modifiers, layering, visible
+character rendering), durability degradation and repairs, trading, loot,
+crafting and final balancing. Only starter wearable slots and bag storage
+are implemented in this milestone.
 
 ## Installation
 From \`platform\`, after the existing character migrations:
@@ -127,3 +141,26 @@ HTTP status rather than the unhelpful generic "Inventory is unavailable."
 The existing Stage 8 home being visible verifies the page loaded, not that
 the newly added inventory endpoint and tables are available. Successful GitHub
 CI runs do not migrate or restart the owner's local PostgreSQL/API processes.
+
+## Owner interaction pass: Shift-click, dragging, equipment and bed Rest
+
+- Click an item or occupied equipment socket to inspect it; nothing moves.
+- Shift-click a pack item to place it in the home chest; Shift-click a chest
+  item to retrieve it; Shift-click equipped gear to unequip to the pack.
+- Drag a pack/chest item onto an empty compatible equipment socket to equip it.
+  Drag a equipped item into inventory or chest to unequip/store it. Drag between
+  the two storage grids to transfer. The selected inspector retains native
+  buttons for the same operations (also usable with keyboard), including
+  quantity input for partial stacks.
+- All actions use authenticated, receipt-idempotent, revision-locked server
+  transactions. No drag payload can change an item definition, its owner or
+  bypass capacity constraints. Equipment slots are checked by item definition
+  rather than by client labels.
+- The bed uses a one-second visual black fade restricted to the room illustration,
+  not the whole UI, and presents server-confirmed Rest effects in the **same
+  approved framed dialogue** used elsewhere in Stage 8. A failed server request
+  never displays false healing; reduced-motion users see no flashing fade.
+
+**Migration needed for existing local databases:**
+`cd platform; npm run inventory:migrate` (runs both 0011 and 0012).
+Keep Docker volumes intact; restart the API afterward.
