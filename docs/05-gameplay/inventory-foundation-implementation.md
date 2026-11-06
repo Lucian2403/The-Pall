@@ -90,3 +90,28 @@ npm run verify:inventory
 
 The migration uses \`platform/.env\` and the API's **same DATABASE_URL**. It is
 additive and safe to rerun; do not reset Docker volumes.
+
+
+## Local Stage 8 troubleshooting
+
+The Inventory panel calls `GET /api/characters/:id/inventory` on the same
+local API as the Stage 8 home scene. If it fails, the panel now displays the
+HTTP status rather than the unhelpful generic "Inventory is unavailable."
+
+- **HTTP 404 — Inventory endpoint missing:** the web bundle has the new panel
+  but the API process may still be running older code. Check out this PR branch
+  and restart the existing API terminal from `platform` using `npm run dev:api`.
+  Do not create a second API process on port 8788.
+- **HTTP 503 — Inventory schema missing or uninitialized:** from `platform`,
+  run `npm run inventory:migrate` with the same `.env` / `DATABASE_URL` as the
+  running API. The migration is additive and backfills existing characters.
+  Refresh the inventory after a successful migration.
+- **HTTP 500 — Inventory server error:** inspect the output of the API terminal
+  for the actual PostgreSQL or route error. Do not reset the database or delete
+  Docker volumes; a 500 does not, by itself, identify a migration problem.
+- **HTTP 502/503/504 — API unreachable:** verify the API server is running at
+  `127.0.0.1:8788`; the Vite dev server proxies `/api` there.
+
+The existing Stage 8 home being visible verifies the page loaded, not that
+the newly added inventory endpoint and tables are available. Successful GitHub
+CI runs do not migrate or restart the owner's local PostgreSQL/API processes.
