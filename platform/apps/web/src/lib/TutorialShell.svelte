@@ -185,7 +185,9 @@
   async function rewindOneStage(){
     if(!canRewind||rewinding||rewindFromStage===null)return;
     const fromStage=rewindFromStage;
-    const warning=(fromStage===7||fromStage===8)
+    const warning=fromStage===8
+      ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
+      :fromStage===7
       ?'TESTING ONLY: Replay the fight in Stage 6? This clears the clinic visit and the completed Flint fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Earlier jobs, equipment and skill awards remain saved.'
       :fromStage===6
         ?'TESTING ONLY: Return to Stage 5 stance selection? This discards Flint combat turns and Chronicle, restores the Health saved at the start of the fight, and keeps the character, rewards and earlier jobs.'
@@ -208,6 +210,10 @@
           rewindError='Stage 6 database setup is missing. Run npm run combat:migrate from platform, then restart the API.';
         }else if(response.status===503 && data.error==='clinic_schema_missing'){
           rewindError='Stage 7 database setup is missing. Run npm run clinic:migrate from platform, then restart the API.';
+        }else if(response.status===503 && data.error==='home_schema_missing'){
+          rewindError='Stage 8 database setup is missing. Run npm run home:migrate from platform, then restart the API.';
+        }else if(response.status===409 && data.error==='unsafe_home_state'){
+          rewindError='The saved home ending is inconsistent with tutorial progress. Rewind was blocked without changing the clinic or coins.';
         }else if(response.status===409 && data.error==='unsafe_clinic_state'){
           rewindError='Clinic and saved combat records disagree. Rewind was blocked; no progress or coins were changed.';
         }else if(response.status===409 && data.error==='unsafe_clinic_health_state'){
