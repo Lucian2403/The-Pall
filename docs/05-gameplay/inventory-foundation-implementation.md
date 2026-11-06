@@ -29,11 +29,23 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
   Quantities can be split and compatible stacks merged without duplication.
 - Chest transfers require the saved shared Stage 8 home; earlier tutorial stages
   may view possessions but may not teleport items to a locked home.
-- The Stage 8 chest hotspot opens a working **two-grid inventory/storage UI**,
-  each with up to 24 visible slots and a separate selected-item description
+- The Stage 8 chest hotspot opens a working **two-grid inventory/storage UI**
+  in a native, keyboard-accessible modal over the rented-room scene, rather
+  than adding a panel beneath the illustration. Escape and Close return to
+  the unchanged room. The existing Journal hotspot uses the same overlay
+  mechanism, preserving the branch-specific journal content. Small screens
+  scroll within the modal instead of extending the home-page document.
+- Each grid has up to 24 visible slots with a separate selected-item description
   panel. Selected details show the approved item text, Common category,
   0 Armour or 8 Slots as applicable, quantity, condition, weight and volume.
-  Placeholder typographic initials stand in for future inventory item icons.
+- The owner's `ItemEq_SimpleBag.png` and `ItemEq_BasicClothes.png` are the
+  source of the two transparent 128×128 WebP integration cutouts at
+  `platform/apps/web/static/items/simple-bag.webp` and
+  `platform/apps/web/static/items/daily-worker-clothes.webp`. Item grid slots
+  and the selected-item inspector display these images; any unillustrated
+  future items retain typographic fallback initials. The original full-resolution
+  uploads are not overwritten. No item identity, rules or attributes changed.
+  These compact images are for small interface slots, not full-screen artwork.
 
 ## First-pass numerical fixtures (NOT FINAL)
 | Property | Playtest value |
