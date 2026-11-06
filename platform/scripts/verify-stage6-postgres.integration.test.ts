@@ -17,6 +17,7 @@ import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
+import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
@@ -32,7 +33,7 @@ const schema=[
   '0004_millhand_missing_stamp.sql','0005_millhand_second_job.sql',
   '0006_character_portraits.sql','0006_millhand_wage_claim.sql',
   '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql',
-  '0009_character_welcome.sql'
+  '0009_character_welcome.sql','0010_tutorial_home.sql'
 ];
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
   // This resolver is injected only via register*Routes options in this
@@ -45,6 +46,7 @@ const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
+registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 
 async function request(
@@ -156,6 +158,100 @@ before(async()=>{
   await app.ready();
 });
 after(async()=>{await app.close();await db.end();});
+
+test('Stage 8 shared home: six Millhand route/outcome combinations complete once with no rewards',async()=>{
+ for(const branch of ['restamp','contracts','records']){
+  for(const outcome of ['player_victory','player_defeat']){
+   const c=await character();
+   const route=base+c.id+'/tutorial/home';
+   await db.query(
+     "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED',coins=10,current_health=50 WHERE id=$1",
+     [c.id]
+   );
+   await db.query(
+     'INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,1,$2::jsonb)',
+     [c.id,JSON.stringify({phase:'SELECTED',branch})]
+   );
+   await db.query(
+     'INSERT INTO player_character_clinic(character_id,revision,state) VALUES($1,5,$2::jsonb)',
+     [c.id,JSON.stringify({phase:'LEFT',revision:5,paid:true,outcome})]
+   );
+   const first=await request('GET',route);
+   assert.equal(first.status,200,JSON.stringify(first.body));
+   assert.equal(first.body!.needsStart,true);
+   const startId=randomUUID();
+   const startBody={kind:'start',requestId:startId};
+   const opened=await request('POST',route,owner,startBody);
+   assert.equal(opened.status,200,JSON.stringify(opened.body));
+   assert.equal(opened.body!.phase,'JOURNEY');
+   assert.equal(opened.body!.branch,branch);
+   assert.equal(opened.body!.outcome,outcome);
+   assert.equal(opened.body!.homeId,'starter-rented-room');
+   assert.equal(opened.body!.coins,10);
+   assert.equal(opened.body!.rent,150);
+   assert.equal(opened.body!.shortfall,140);
+   assert.equal(opened.body!.noticeText,c.name+', you have to pay 150 coins in rent, or you are out. No discussion.');
+   assert.equal((await request('POST',route,owner,startBody)).body!.revision,0,
+     'Duplicate start returns exact prior receipt');
+   assert.equal((await request('GET',route,stranger)).status,404);
+   assert.equal((await request('GET',route,null)).status,401);
+   const spoof=await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:0,
+     action:'finish',rent:0
+   });
+   assert.equal(spoof.status,400,'No client-defined rent or action shortcut');
+   assert.equal((await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:0,action:'finish'
+   })).status,409,'Cannot skip straight to completion');
+   let state=opened.body!;
+   for(const [action,phase] of [
+     ['travel','DOOR'],['enter','HOME'],['read_notice','NOTICE'],
+     ['put_down','SPEECH'],['finish','COMPLETE']
+   ]){
+     const requestId=randomUUID();
+     const body={kind:'action',requestId,expectedRevision:state.revision,action};
+     const advanced=await request('POST',route,owner,body);
+     assert.equal(advanced.status,200,JSON.stringify(advanced.body));
+     state=advanced.body!;
+     assert.equal(state.phase,phase);
+     assert.equal((await request('POST',route,owner,body)).body!.revision,state.revision,
+       'Same request does not advance twice');
+     assert.equal((await request('GET',route)).body!.phase,phase,
+       'Phase must survive server reload');
+     assert.equal((await request('POST',route,owner,{
+       kind:'action',requestId:randomUUID(),expectedRevision:state.revision-1,action
+     })).status,409,'Stale revision cannot advance');
+   }
+   assert.equal(state.completed,true);
+   assert.equal(state.revision,5);
+   assert.equal((await request('POST',route,owner,{
+     kind:'action',requestId:randomUUID(),expectedRevision:state.revision,action:'finish'
+   })).status,409,'Cannot complete again');
+   const finalChar=await db.query<{
+     tutorial_stage:number;tutorial_status:string;coins:string|number;
+     major_skill_bonuses:Record<string,number>;current_health:number
+   }>('SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses,current_health FROM player_characters WHERE id=$1',[c.id]);
+   assert.equal(finalChar.rows[0].tutorial_stage,8);
+   assert.equal(finalChar.rows[0].tutorial_status,'COMPLETED');
+   assert.equal(Number(finalChar.rows[0].coins),10,'Home makes no coin transaction');
+   assert.deepEqual(finalChar.rows[0].major_skill_bonuses,{Craftsmanship:3,Industry:1});
+   assert.equal(finalChar.rows[0].current_health,50,'No second healing');
+   const savedClinic=await db.query<{state:Record<string,any>}>(
+     'SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
+   assert.equal(savedClinic.rows[0].state.outcome,outcome,'Clinic history is untouched');
+  }
+ }
+});
+
+test('Stage 8 refuses entry without completed clinic or earlier tutorial state',async()=>{
+ const c=await character();
+ const route=base+c.id+'/tutorial/home';
+ assert.equal((await request('GET',route)).status,409);
+ await db.query(
+   "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED' WHERE id=$1",[c.id]);
+ assert.equal((await request('POST',route,owner,{kind:'start',requestId:randomUUID()})).status,409);
+ assert.equal((await request('GET',route)).status,409);
+});
 
 test('Welcome is persisted per character and never unlocks tutorial gameplay itself',async()=>{
   const first=await character(owner);
