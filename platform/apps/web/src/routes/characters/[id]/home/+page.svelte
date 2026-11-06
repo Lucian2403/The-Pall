@@ -4,8 +4,8 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
 
-  type Phase='JOURNEY'|'DOOR'|'HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
-  type Action='travel'|'enter'|'read_notice'|'put_down'|'finish';
+  type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
+  type Action='read_notice'|'put_down'|'finish';
   type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:string;
     branch:'restamp'|'contracts'|'records';outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
@@ -101,8 +101,7 @@
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home">
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <div class="home-scene" aria-label="A modest rented room in Grand Cylinder City">
-        {#if !['JOURNEY','DOOR'].includes(home.phase)}
-          <button type="button" class="hotspot chest" aria-label="Inspect chest" title="Chest"
+        <button type="button" class="hotspot chest" aria-label="Inspect chest" title="Chest"
             onclick={()=>chestMessage='Storage will be added with the Inventory and Equipment system.'}>
             <span>Chest</span>
           </button>
@@ -112,29 +111,16 @@
             data-pall-sfx="paper" onclick={interactNotice}>
             <span class="paper-object" aria-hidden="true">RENT</span><span class="object-caption">Rent notice</span>
           </button>
-        {/if}
-        {#if home.phase==='JOURNEY'}
-          <div class="parchment journey">
-            <p class="eyebrow">STAGE VIII · RETURN HOME</p><h1>Return Home</h1>
-            <p>You leave the clinic and make your way back through Grand Cylinder City.</p>
-            <p>You have {home.coins} coins.</p>
-            <button type="button" class="pall-framed-button" disabled={pending}
-              onclick={()=>{void perform('travel');}}>Travel home</button>
-          </div>
-        {:else if home.phase==='DOOR'}
-          <div class="parchment journey">
-            <p class="eyebrow">THE RENTED ROOM</p><h1>Home</h1>
-            <p>You reach the rented room after leaving the clinic.</p>
-            <button type="button" class="pall-framed-button" disabled={pending}
-              onclick={()=>{void perform('enter');}}>Enter home</button>
-          </div>
-        {:else if home.phase==='HOME'}
-          <div class="parchment small">
-            <p>You return to your rented home. Inside, you find a rent notice.</p>
-            <p><strong>Read the notice on the table.</strong></p>
-          </div>
+        {#if home.phase==='HOME'}
+          <aside class="home-dialogue" aria-label="Return home dialogue">
+            <p class="eyebrow">RETURN HOME · STAGE VIII</p>
+            <h1>Home</h1>
+            <p class="narration">You return to your rented home. Inside, you find a rent notice.</p>
+            <p class="instruction">Read the notice on the table.</p>
+          </aside>
         {:else if noticeExpanded}
-          <div class="parchment notice" aria-label="Rent notice">
+          <aside class="home-dialogue notice" aria-label="Rent notice">
+            <p class="eyebrow">RENT NOTICE · STAGE VIII</p>
             <h1>{home.noticeTitle}</h1><p class="notice-text">{home.noticeText}</p>
             {#if home.phase==='NOTICE'}
               <button type="button" class="pall-framed-button" disabled={pending}
@@ -143,24 +129,24 @@
               <button type="button" class="pall-framed-button"
                 onclick={()=>noticeExpanded=false}>Close notice</button>
             {/if}
-          </div>
+          </aside>
         {:else if home.phase==='SPEECH'}
-          <div class="parchment speech-panel">
-            <p class="narration">You put the notice down.</p>
-            <p class="eyebrow">YOU</p><p class="speech">“{home.closingSpeech}”</p>
+          <aside class="home-dialogue speech-panel" aria-label="Closing dialogue">
+            <p class="eyebrow">RETURN HOME · STAGE VIII</p>
+            <p class="narration stage-direction">You put the notice down.</p>
+            <p class="speaker">YOU</p><p class="speech">“{home.closingSpeech}”</p>
             <button type="button" class="pall-framed-button" disabled={pending}
               onclick={()=>{void perform('finish');}}>Continue</button>
-          </div>
+          </aside>
         {:else if home.phase==='COMPLETE'}
-          <div class="parchment completion">
+          <aside class="home-dialogue completion" aria-label="Stage eight completion">
             <p class="eyebrow">STAGE VIII · COMPLETE</p><h1>Millhand opening complete.</h1>
             <p>The council has not paid for the plate lot. The dispute over the worker number remains unresolved.</p>
             <p><strong>{home.coins} coins remaining. Rent notice: {home.rent} coins.</strong></p>
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
-          </div>
+          </aside>
         {/if}
       </div>
-      {#if !['JOURNEY','DOOR'].includes(home.phase)}
         <div class="rent-status">
           <span>Coins: <strong>{home.coins}</strong></span>
           {#if home.phase!=='HOME'}
@@ -169,7 +155,6 @@
           {/if}
           <span class="no-payment">Rent cannot be paid during this tutorial.</span>
         </div>
-      {/if}
       {#if chestMessage}<p role="status" class="status-message">{chestMessage}</p>{/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if journalOpen}
@@ -207,21 +192,34 @@
     background:#352d29 url('/locations/home/rented-room.webp') center/100% 100% no-repeat}
   .home-scene::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
-  .parchment{position:absolute;right:2.5%;top:3.5%;z-index:8;box-sizing:border-box;
-    width:min(43%,520px);max-height:92%;overflow:auto;padding:21px 27px;color:#2b1a0e;
-    background:#e9d7b9;border:solid transparent;border-width:20px 25px 19px;
+  /* Exact dialogue-frame slices, inner spacing, typeface and hierarchy from
+     Stage 7 clinic and Stage 5 wage-claim, not a new oversized parchment UI. */
+  .home-dialogue{position:absolute;z-index:8;top:3.5%;right:2.4%;
+    box-sizing:border-box;width:min(46%,650px);max-height:91%;overflow-y:auto;
+    background:transparent;color:#2b1c11;
+    border:solid transparent;border-width:21px 25px 20px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
-    border-image-slice:50 180 45 180 fill;border-image-width:20px 25px 19px;
-    font:600 clamp(14px,1vw,17px)/1.5 Georgia,serif}
-  .parchment h1{font:700 clamp(23px,2vw,34px)/1.13 Georgia,serif;margin:4px 0 14px}
-  .parchment p{margin:0 0 13px}
-  .parchment .eyebrow{font:700 11px Arial,sans-serif;letter-spacing:.13em;color:#82512d}
-  .parchment .notice-text{font-size:clamp(16px,1.3vw,21px);line-height:1.55}
-  .parchment .speech{font:italic 600 clamp(16px,1.25vw,20px)/1.6 Georgia,serif}
-  .parchment .narration{font-style:italic}
-  .parchment .prototype-note{font-size:12px;color:#654a38}
-  .parchment .pall-framed-button{display:block;margin-top:13px;min-height:42px}
-  .journey{top:13%}
+    border-image-slice:145 190 125 190 fill;
+    border-image-width:21px 25px 20px;border-image-repeat:stretch;
+    margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)}
+  .home-dialogue .eyebrow,.home-dialogue .speaker{
+    font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.065em;color:#382416;margin:0 0 10px}
+  .home-dialogue h1{margin:0 0 12px;
+    font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);color:#2b1b12}
+  .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
+  .home-dialogue .notice-text,.home-dialogue .completion-copy{
+    font:16px/1.45 var(--pall-font-reading,Georgia,serif);
+    color:#21150e;margin:0 0 13px}
+  .home-dialogue .speech{font-weight:600}
+  .home-dialogue .narration{color:#302016}
+  .home-dialogue .stage-direction{font-style:italic}
+  .home-dialogue .instruction{font-weight:700}
+  .home-dialogue .speaker{margin:10px 0 5px}
+  .home-dialogue .prototype-note{font:12px/1.45 var(--pall-font-reading,Georgia,serif);
+    color:#654a38;margin:0 0 13px}
+  .home-dialogue .pall-framed-button{display:inline-flex;margin:3px 0 8px;
+    min-height:42px;align-items:center;justify-content:center}
   .hotspot{position:absolute;z-index:5;cursor:pointer;background:transparent;
     border:1px solid transparent;color:#e9d0a4;padding:0}
   .hotspot:is(:hover,:focus-visible){outline:2px solid #eccc85;outline-offset:1px;
@@ -249,12 +247,22 @@
   .journal-body{max-width:960px;margin:auto;font:600 16px/1.55 Georgia,serif}
   .journal-body p{margin:0 0 12px}
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
-  @media(max-width:900px){.parchment{width:min(60%,430px);padding:13px 16px;border-width:14px 17px}}
+  @media(max-width:950px){
+    .home-scene{aspect-ratio:auto;min-height:660px;display:flex;
+      flex-direction:column;gap:14px;padding:22px 14px;align-items:flex-end;
+      background-position:center;background-size:cover}
+    .home-dialogue{position:relative;top:auto;right:auto;bottom:auto;
+      left:auto;width:min(100%,590px);max-height:none;overflow:visible}
+  }
   @media(max-width:650px){
-    .home-scene{aspect-ratio:auto;min-height:0;background-size:100% auto;background-position:top;
-      padding-top:56.28%;background-repeat:no-repeat}
-    .parchment{position:relative;top:auto;right:auto;width:100%;max-height:none;
-      border-width:12px 15px;padding:16px 19px;background-color:#e9d7b9}
+    .home-scene{min-height:620px;padding:12px 8px;align-items:stretch;
+      background-size:cover;background-position:48% center}
+    .home-dialogue{width:100%;border-width:17px 18px 17px;
+      border-image-width:17px 18px 17px;padding:8px 11px}
+    .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
+    .home-dialogue .notice-text{font-size:14px}
+    .home-dialogue .eyebrow,.home-dialogue .speaker{font-size:12px}
+    .home-dialogue h1{font-size:22px}
     .hotspot > span:not(.paper-object){font-size:9px;padding:1px 3px}
     .no-payment{margin-left:0}
   }
