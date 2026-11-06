@@ -7,23 +7,24 @@ import {fromNodeHeaders} from 'better-auth/node';
 import {createHash,randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {auth} from './auth.js';
-import {inventoryView,planTransfer,InventoryInvalidAction} from './inventory-model.js';
-import type {InventoryRow,ItemLocation} from './inventory-model.js';
+import {inventoryView,planTransfer,planEquip,InventoryInvalidAction,EQUIPMENT_SLOTS} from './inventory-model.js';
+import type {InventoryRow,StorageLocation,EquipmentSlot} from './inventory-model.js';
 
 type Session={user:{id:string;emailVerified:boolean}}|null;
 type ResolveSession=(headers:IncomingHttpHeaders)=>Promise<Session>;
 type Character={id:string;origin:string;tutorial_stage:number;tutorial_status:string};
 type InventoryState={revision:string|number};
-type Command={
- kind:'transfer';requestId:string;expectedRevision:number;
- itemInstanceId:string;quantity:number;to:ItemLocation
-};
+type Command=
+ |{kind:'transfer';requestId:string;expectedRevision:number;
+   itemInstanceId:string;quantity:number;to:StorageLocation}
+ |{kind:'equip';requestId:string;expectedRevision:number;
+   itemInstanceId:string;slot:EquipmentSlot};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const base='/api/characters/:id/inventory';
-const selectRows=String.raw`SELECT i.id,i.item_code,i.location,i.quantity,
+const selectRows=String.raw`SELECT i.id,i.item_code,i.location,i.equipment_slot,i.quantity,
  i.quality_tier,i.current_durability,i.max_durability,i.grant_key,
  d.name,d.category,d.description,d.stackable,d.max_stack,d.weight_kg,
- d.volume_l,d.carry_volume_bonus_l,d.carry_slots_bonus,
+ d.volume_l,d.carry_volume_bonus_l,d.carry_slots_bonus,d.equip_slot,
  d.rarity_label,d.armour_rating,d.design_status
  FROM player_character_item_instances i
  JOIN pall_item_definitions d ON d.code=i.item_code
@@ -33,26 +34,30 @@ const verifiedHome=String.raw`SELECT 1 FROM player_character_tutorial_home
 function parseCommand(body:unknown):Command{
  if(!body||typeof body!=='object'||Array.isArray(body))throw Error('invalid_body');
  const v=body as Record<string,unknown>;
- if(Object.keys(v).sort().join(',')!==
-    'expectedRevision,itemInstanceId,kind,quantity,requestId,to')
-   throw Error('invalid_fields');
- if(v.kind!=='transfer'||typeof v.requestId!=='string'||!UUID.test(v.requestId))
-   throw Error('invalid_command');
+ if(v.kind!=='transfer'&&v.kind!=='equip')throw Error('invalid_command');
+ const expected=v.kind==='transfer'
+   ?'expectedRevision,itemInstanceId,kind,quantity,requestId,to'
+   :'expectedRevision,itemInstanceId,kind,requestId,slot';
+ if(Object.keys(v).sort().join(',')!==expected)throw Error('invalid_fields');
+ if(typeof v.requestId!=='string'||!UUID.test(v.requestId))throw Error('invalid_command');
  if(typeof v.itemInstanceId!=='string'||!UUID.test(v.itemInstanceId))
    throw Error('invalid_item_id');
  if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)
    throw Error('invalid_revision');
+ const common={requestId:v.requestId as string,
+   expectedRevision:v.expectedRevision as number,itemInstanceId:v.itemInstanceId as string};
+ if(v.kind==='equip'){
+   if(typeof v.slot!=='string'||!EQUIPMENT_SLOTS.some(s=>s===v.slot))
+     throw Error('invalid_equipment_slot');
+   return {kind:'equip',...common,slot:v.slot as EquipmentSlot};
+ }
  if(!Number.isSafeInteger(v.quantity)||(v.quantity as number)<=0)
    throw Error('invalid_quantity');
  if(v.to!=='pack'&&v.to!=='home_chest')throw Error('invalid_location');
- return {
-  kind:'transfer',requestId:v.requestId as string,
-  expectedRevision:v.expectedRevision as number,
-  itemInstanceId:v.itemInstanceId as string,
-  quantity:v.quantity as number,to:v.to as ItemLocation
- };
+ return {kind:'transfer',...common,quantity:v.quantity as number,
+   to:v.to as StorageLocation};
 }
-function schemaMissing(error:unknown){return (error as {code?:string})?.code==='42P01';}
+function schemaMissing(error:unknown){return ['42P01','42703'].includes((error as {code?:string})?.code??'');}
 const allowedOrigin=(h:IncomingHttpHeaders)=>!h.origin||
  h.origin===(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173');
 export function registerInventoryRoutes(app:FastifyInstance,options:{
@@ -146,7 +151,9 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
     return reply.code(409).send({error:'storage_not_unlocked'});}
    const before=await db.query<InventoryRow>(selectRows+' FOR UPDATE OF i',[req.params.id]);
    let planned:ReturnType<typeof planTransfer>;
-   try{planned=planTransfer(before.rows,cmd.itemInstanceId,cmd.quantity,cmd.to,randomUUID());}
+   try{planned=cmd.kind==='equip'
+     ?planEquip(before.rows,cmd.itemInstanceId,cmd.slot)
+     :planTransfer(before.rows,cmd.itemInstanceId,cmd.quantity,cmd.to,randomUUID());}
    catch(error){
     if(!(error instanceof InventoryInvalidAction))throw error;
     await db.query('ROLLBACK');open=false;
@@ -155,8 +162,8 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
    for(const edit of planned.edits){
     if(edit.kind==='update'){
      await db.query(
-      'UPDATE player_character_item_instances SET quantity=$3,location=$4 WHERE character_id=$1 AND id=$2',
-      [req.params.id,edit.id,edit.quantity,edit.location]);
+      'UPDATE player_character_item_instances SET quantity=$3,location=$4,equipment_slot=$5 WHERE character_id=$1 AND id=$2',
+      [req.params.id,edit.id,edit.quantity,edit.location,edit.equipmentSlot]);
     }else if(edit.kind==='remove'){
      await db.query('DELETE FROM player_character_item_instances WHERE character_id=$1 AND id=$2',
       [req.params.id,edit.id]);
