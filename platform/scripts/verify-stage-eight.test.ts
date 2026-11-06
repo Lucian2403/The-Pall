@@ -283,6 +283,12 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- assert.ok(web.includes('max-width:1120px;margin-inline:auto;aspect-ratio:1672/941'),
-  'The Stage 8 room must not expand to the full ultrawide screen');
+ assert.ok(web.includes('max-width:1080px'),
+  'The central room is shorter than the old full-width illustration');
+ assert.ok(web.includes('aspect-ratio:1672/941'),
+  'Do not stretch or distort the interactive painting');
+ assert.ok(web.includes('.stage8::before')&&
+  web.includes("background:url('/locations/home/rented-room.webp') center/cover no-repeat")&&
+  web.includes('filter:blur(19px) brightness(.53)'),
+  'Fill empty side gutters with the same painted scene, not black bars');
 });
