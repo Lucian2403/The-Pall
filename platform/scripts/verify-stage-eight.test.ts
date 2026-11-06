@@ -266,7 +266,9 @@ test('Rented-room chest and Journal open over the environment, not below it',()=
  assert.ok(web.includes('<InventoryPanel characterId={id} onClose={closeRoomOverlay}/>'));
  assert.ok(web.includes('class="journal" aria-label="Personal Journal"'));
  assert.ok(web.includes('.room-overlay::backdrop'));
- assert.ok(web.includes('max-height:90dvh'));
+ assert.ok(web.includes('max-height:calc(100dvh - 16px)'));
+ assert.ok(web.includes('scrollbar-width:none'));
+ assert.ok(web.includes('.room-overlay::-webkit-scrollbar{display:none}'));
  assert.ok(!web.includes('<InventoryPanel characterId={id} onClose={()=>storageOpen=false}/>'));
  assert.ok(!web.includes('bind:this={journalElement}'),
    'Journal should remain in the modal rather than scrolling below the room');
@@ -283,12 +285,17 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- assert.ok(web.includes('max-width:1080px'),
-  'The central room is shorter than the old full-width illustration');
- assert.ok(web.includes('aspect-ratio:1672/941'),
-  'Do not stretch or distort the interactive painting');
- assert.ok(web.includes('.stage8::before')&&
-  web.includes("background:url('/locations/home/rented-room.webp') center/cover no-repeat")&&
-  web.includes('filter:blur(19px) brightness(.53)'),
-  'Fill empty side gutters with the same painted scene, not black bars');
+ assert.ok(web.includes('height:clamp(515px,44vw,620px)'),
+  'The room must use a shorter, bounded stage height');
+ assert.ok(web.includes('width:100%')&&
+  web.includes("center/100% 100% no-repeat"),
+  'Show the whole original painting without zooming away edge objects');
+ assert.ok(!web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
+  'Never duplicate or blur the room artwork in side gutters');
+ assert.ok(web.includes('background-size:100% 100%'),
+  'Keep all room hotspots visible at narrow widths');
+ assert.ok(web.includes('max-height:calc(100dvh - 16px)')&&
+  web.includes('scrollbar-width:none')&&
+  web.includes('.room-overlay::-webkit-scrollbar{display:none}'),
+  'Storage overlay must not show an internal scrollbar');
 });
