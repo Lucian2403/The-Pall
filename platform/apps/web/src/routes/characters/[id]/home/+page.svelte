@@ -251,8 +251,16 @@
 {/if}
 <style>
   :global(body){background:#151515;color:#f2e1c9}
-  .stage8{min-width:0;background:#1a1816}
-  .home-scene{position:relative;width:100%;max-width:1120px;margin-inline:auto;aspect-ratio:1672/941;isolation:isolate;
+  /* Extend the painted room into the letterbox gutters without distorting
+     the central scene or moving any of its object hotspots. */
+  .stage8{position:relative;isolation:isolate;overflow:hidden;
+    min-width:0;background:#1a1816}
+  .stage8::before{content:'';position:absolute;inset:-18px;
+    background:url('/locations/home/rented-room.webp') center/cover no-repeat;
+    filter:blur(19px) brightness(.53);pointer-events:none}
+  .home-scene{position:relative;z-index:1;width:100%;max-width:1080px;
+    margin-inline:auto;aspect-ratio:1672/941;isolation:isolate;
+    box-shadow:0 0 38px #100d0c7a;
     background:#352d29 url('/locations/home/rented-room.webp') center/100% 100% no-repeat}
   .home-scene::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
