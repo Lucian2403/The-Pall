@@ -29,7 +29,7 @@
     {id:'face',label:'Face',x:68,y:0},
     {id:'respiratory_filter',label:'Filter',x:2,y:0},
     {id:'hands',label:'Hands',x:2,y:24},
-    {id:'torso',label:'Clothing · Torso & Legs',x:35,y:24},
+    {id:'torso',label:'Body',x:35,y:24},
     {id:'back',label:'Back / Bag',x:68,y:24},
     {id:'primary_weapon',label:'Primary',x:2,y:48},
     {id:'secondary_weapon',label:'Secondary',x:68,y:48},
@@ -190,10 +190,9 @@
   {#if loading}
     <p class="loading" role="status">Reading your possessions…</p>
   {:else if snapshot}
-    <p class="interaction-hint">Click to inspect · Shift-click to quick-move · Drag items between equipment, bag and chest.</p>
     <div class="inventory-layout">
       <section class="grid-card equipment-card" aria-label="Equipped gear">
-        <header class="grid-heading"><h3>Equipment</h3><span>Worn and ready</span></header>
+        <header class="grid-heading"><h3>Equipment</h3></header>
         <div class="equipment-stage" role="group" aria-label="Human-shaped equipment layout">
           <svg class="equipment-silhouette" viewBox="0 0 240 360" aria-hidden="true">
             <circle cx="120" cy="37" r="23"/>
@@ -214,6 +213,7 @@
                 class:outfit={slot.id==='torso'}
                 aria-label={'Select equipped '+item.name+' in '+slot.label+' (Shift-click to unequip)'}
                 aria-pressed={selectedId===item.id}
+                title={'Click to inspect · Shift-click to unequip '+item.name}
                 onclick={event=>selectItem(event,item,'equipped')}>
                 <span class="socket-label">{slot.label}</span>
                 {#if itemImage(item)}
@@ -239,20 +239,18 @@
             {/if}
           {/each}
         </div>
-        <p class="equipment-footnote">Worn gear counts toward carrying weight. Only the equipped bag adds inventory slots.</p>
         <div class="equipment-bonuses" aria-label="Equipment-derived character stats">
           <h4>Equipment Stats</h4>
           <dl class="bonus-grid">
-            <div><dt>Armor</dt><dd>{snapshot.bonuses.armour}</dd></div>
-            <div><dt>Damage</dt><dd>{snapshot.bonuses.weaponDamage===null
+            <div class="stat-tile"><dt>Armor</dt><dd>{snapshot.bonuses.armour}</dd></div>
+            <div class="stat-tile"><dt>Damage</dt><dd>{snapshot.bonuses.weaponDamage===null
               ?'—':snapshot.bonuses.weaponDamage}</dd></div>
-            <div><dt>Pall Protection</dt><dd>{snapshot.bonuses.pallProtection}</dd></div>
-            <div><dt>Ash Protection</dt><dd>{snapshot.bonuses.ashProtection}</dd></div>
-            <div><dt>Max Weight</dt><dd>{measure(snapshot.bonuses.maxWeightKg)} kg</dd></div>
-            <div><dt>Inventory Slots</dt><dd>{snapshot.bonuses.inventorySlots}</dd></div>
-            <div><dt>Bag Volume</dt><dd>{measure(snapshot.bonuses.maxVolumeL)} L</dd></div>
+            <div class="stat-tile"><dt>Pall Protection</dt><dd>{snapshot.bonuses.pallProtection}</dd></div>
+            <div class="stat-tile"><dt>Ash Protection</dt><dd>{snapshot.bonuses.ashProtection}</dd></div>
+            <div class="stat-tile"><dt>Max Weight</dt><dd>{measure(snapshot.bonuses.maxWeightKg)} kg</dd></div>
+            <div class="stat-tile"><dt>Inventory Slots</dt><dd>{snapshot.bonuses.inventorySlots}</dd></div>
+            <div class="stat-tile"><dt>Bag Volume</dt><dd>{measure(snapshot.bonuses.maxVolumeL)} L</dd></div>
           </dl>
-          <p class="bonus-note">Live equipment totals; damage and environmental mitigation remain future combat mechanics.</p>
         </div>
       </section>
 
@@ -273,6 +271,7 @@
                 ondragstart={event=>startDrag(event,item)}
                 aria-label={'Select '+item.name+(item.quantity>1?' quantity '+item.quantity:'')}
                 aria-pressed={selectedId===item.id}
+                title={'Click to inspect · Shift-click to store '+item.name}
                 onclick={event=>selectItem(event,item,'pack')}>
                 {#if itemImage(item)}
                   <img class="item-art" src={itemImage(item)!} alt=""
@@ -311,7 +310,7 @@
           <div class="item-statistics">
             <div><span>Location</span><strong>{selectedPlace==='equipped'
               ?'Equipped · '+(selected.equipmentSlot==='torso'
-                ?'Clothing (Torso & Legs)':titleCase(selected.equipmentSlot??''))
+                ?'Body':titleCase(selected.equipmentSlot??''))
               :selectedPlace==='pack'?'Inventory':'Home Chest'}</strong></div>
             <div><span>Weight</span><strong>{measure(selected.weightKg)} kg</strong></div>
             <div><span>Volume</span><strong>{measure(selected.volumeL)} L</strong></div>
@@ -375,6 +374,7 @@
                 ondragstart={event=>startDrag(event,item)}
                 aria-label={'Select '+item.name+(item.quantity>1?' quantity '+item.quantity:'')}
                 aria-pressed={selectedId===item.id}
+                title={'Click to inspect · Shift-click to retrieve '+item.name}
                 onclick={event=>selectItem(event,item,'home_chest')}>
                 {#if itemImage(item)}
                   <img class="item-art" src={itemImage(item)!} alt=""
@@ -396,27 +396,24 @@
         </p>
       </section>
     </div>
-    <p class="provisional">Carrying weight and chest balance remain provisional. Item bonuses do not yet alter combat or environmental damage.</p>
   {/if}
   {#if error}<p class="inventory-error" role="alert">{error}</p>
     <button type="button" class="reload" onclick={()=>{void reload();}}>Reload inventory</button>{/if}
 </section>
 
 <style>
-  .inventory-panel{padding:20px clamp(12px,2.5vw,36px) 18px;
+  .inventory-panel{padding:12px clamp(10px,1.2vw,20px) 12px;
     background:#211c19;border:1px solid #745333;border-radius:9px;
     color:#edd9b7;font:14px/1.45 Georgia,serif}
   .inventory-heading{display:flex;align-items:center;justify-content:space-between;
-    max-width:1450px;margin:0 auto 17px;gap:15px}
+    max-width:1580px;margin:0 auto 10px;gap:15px}
   .inventory-heading h2{margin:2px 0 0;font:600 26px Georgia,serif;color:#efd2a3}
   .overline{margin:0;color:#b5a18a;letter-spacing:.1em;font:700 11px Arial,sans-serif}
   .inventory-layout{max-width:1580px;margin:auto;display:grid;
-    grid-template-columns:minmax(252px,1.06fr) minmax(170px,.76fr) minmax(230px,.96fr) minmax(210px,.91fr);
-    align-items:start;gap:12px}
-  .interaction-hint{max-width:1580px;margin:0 auto 12px;color:#bca487;
-    font:12px/1.45 var(--pall-font-reading,Georgia,serif)}
-  .equipment-card{min-height:420px;align-self:stretch}
-  .equipment-stage{height:308px;position:relative;min-width:0;margin:4px 0 10px;
+    grid-template-columns:minmax(240px,1fr) minmax(155px,.68fr) minmax(220px,.94fr) minmax(215px,.88fr);
+    align-items:start;gap:10px}
+  .equipment-card{min-width:0;align-self:start}
+  .equipment-stage{height:clamp(226px,33dvh,294px);position:relative;min-width:0;margin:4px 0 9px;
     border:1px solid #4e4035;background:radial-gradient(ellipse at 50% 44%,#53433533,transparent 70%)}
   .equipment-silhouette{position:absolute;left:8%;width:84%;height:96%;
     top:2%;fill:#77685640;stroke:#ac93704d;stroke-width:2;
@@ -435,18 +432,23 @@
   .socket-empty{font:22px Georgia,serif;opacity:.55}
   .socket-art{width:100%;height:67%;object-fit:contain;
     pointer-events:none;filter:drop-shadow(0 2px 2px #000b)}
-  .equipment-footnote{margin:8px 0 12px;color:#af9b82;font:11px/1.4 Georgia,serif}
-  .equipment-bonuses{padding:12px 10px 10px;border-top:1px solid #705945;
-    background:linear-gradient(180deg,#32281f,#26211d);border-radius:3px}
-  .equipment-bonuses h4{margin:0 0 10px;color:#ecd0a0;font:600 16px Georgia,serif}
-  .bonus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;
-    margin:0}
-  .bonus-grid div{min-width:0;display:flex;align-items:baseline;justify-content:space-between;
-    gap:6px;border-bottom:1px solid #574636;padding-bottom:4px}
-  .bonus-grid dt{font:11px/1.25 Georgia,serif;color:#c8b395}
-  .bonus-grid dd{margin:0;font:700 12px/1.25 Georgia,serif;
-    color:#f3d6a4;white-space:nowrap;text-align:right}
-  .bonus-note{margin:10px 0 0;color:#9e8b78;font:11px/1.4 Georgia,serif}
+  .equipment-bonuses{padding:9px;border:2px ridge #926c40;border-radius:4px;
+    background:linear-gradient(145deg,#35281e,#231c17 68%);
+    box-shadow:inset 0 0 0 2px #231b17,inset 0 0 15px #0005,0 3px 9px #0004}
+  .equipment-bonuses h4{margin:0 0 9px;text-align:center;
+    color:#eacc92;font:600 17px Georgia,serif}
+  .bonus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;margin:0}
+  .bonus-grid .stat-tile{min-width:0;min-height:42px;box-sizing:border-box;
+    padding:6px 8px;display:flex;flex-direction:column;justify-content:space-between;
+    align-items:stretch;gap:2px;border:1px solid #76583a;border-radius:3px;
+    background:linear-gradient(160deg,#433227,#29211b);
+    box-shadow:inset 0 0 0 1px #2e231c,0 2px 4px #0005}
+  .bonus-grid .stat-tile:last-child{grid-column:1/-1;flex-direction:row;
+    align-items:center;min-height:33px}
+  .bonus-grid dt{font:600 10px/1.25 Georgia,serif;color:#c8b091}
+  .bonus-grid dd{margin:0;font:700 15px/1.2 Georgia,serif;
+    color:#f4d59d;text-align:right;white-space:nowrap}
 
   .grid-card{min-width:0;border:1px solid #6d5544;background:#282320;padding:12px;
     border-radius:4px}
@@ -503,10 +505,9 @@
   .transfer-button:disabled{opacity:.45;cursor:default}
   .inspection-actions{display:flex;gap:7px;flex-wrap:wrap}
   .transfer-button.secondary{background:#3d3129;border-color:#83684e}
-  .provisional{max-width:1450px;margin:12px auto 0;color:#99887a;font:12px Georgia,serif}
   .inventory-error{max-width:1450px;margin:12px auto;color:#f0a9a0;font-weight:700}
   .loading{margin:30px 0;color:#e4cfb5}
-  @media(max-width:1350px){
+  @media(max-width:1020px){
     .inventory-layout{grid-template-columns:minmax(250px,1fr) minmax(230px,1fr)}
     .equipment-card{grid-column:1;grid-row:1}
     .pack-card{grid-column:2;grid-row:1}
