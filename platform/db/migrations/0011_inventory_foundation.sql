@@ -11,23 +11,43 @@ CREATE TABLE IF NOT EXISTS pall_item_definitions(
   weight_kg NUMERIC(10,3) NOT NULL CHECK(weight_kg>=0),
   volume_l NUMERIC(10,3) NOT NULL CHECK(volume_l>=0),
   carry_volume_bonus_l NUMERIC(10,3) NOT NULL DEFAULT 0 CHECK(carry_volume_bonus_l>=0),
+  carry_slots_bonus INTEGER NOT NULL DEFAULT 0 CHECK(carry_slots_bonus BETWEEN 0 AND 1000),
+  rarity_label TEXT NOT NULL DEFAULT 'Common',
+  armour_rating INTEGER NOT NULL DEFAULT 0 CHECK(armour_rating BETWEEN 0 AND 100000),
   quality_min INTEGER NOT NULL DEFAULT 1 CHECK(quality_min BETWEEN 1 AND 5),
   quality_max INTEGER NOT NULL DEFAULT 1 CHECK(quality_max BETWEEN quality_min AND 5),
   base_durability INTEGER CHECK(base_durability BETWEEN 1 AND 100000),
   design_status TEXT NOT NULL DEFAULT 'PROVISIONAL',
   CHECK(stackable OR max_stack=1)
 );
+-- Existing installations of the first inventory draft are upgraded in-place.
+ALTER TABLE pall_item_definitions
+ ADD COLUMN IF NOT EXISTS carry_slots_bonus INTEGER NOT NULL DEFAULT 0
+   CHECK(carry_slots_bonus BETWEEN 0 AND 1000);
+ALTER TABLE pall_item_definitions
+ ADD COLUMN IF NOT EXISTS rarity_label TEXT NOT NULL DEFAULT 'Common';
+ALTER TABLE pall_item_definitions
+ ADD COLUMN IF NOT EXISTS armour_rating INTEGER NOT NULL DEFAULT 0
+   CHECK(armour_rating BETWEEN 0 AND 100000);
+
 INSERT INTO pall_item_definitions
   (code,name,category,description,stackable,max_stack,weight_kg,volume_l,
-   carry_volume_bonus_l,quality_min,quality_max,base_durability)
+   carry_volume_bonus_l,carry_slots_bonus,rarity_label,armour_rating,
+   quality_min,quality_max,base_durability)
 VALUES
- ('basic_clothes','Basic Clothes','clothing',
-  'Universal starting clothes. Equipment effects are not yet active.',
-  FALSE,1,1.200,2.000,0,1,1,100),
- ('crude_small_bag','Crude Small Bag','container',
-  'Universal starting bag. Playtest volume allowance; equip slots follow later.',
-  FALSE,1,0.800,2.000,12.000,1,1,100)
-ON CONFLICT(code) DO NOTHING;
+ ('basic_clothes','Daily Worker Clothes','clothing',
+  'A sweat-stained shirt, rough trousers and boots worn thin at the soles. The cloth''s stiff with old grime, the seams barely holding. They''ve seen too many long shifts and too few washes. Won''t stop a blade or a club, but they''ll keep the cold off. Mostly.',
+  FALSE,1,1.200,2.000,0,0,'Common',0,1,1,100),
+ ('crude_small_bag','Simple Bag','bag',
+  'A battered canvas bag with a cracked leather strap and stitching that''s coming apart. Smells of damp cloth, dust and old sweat. Holds a few tools, scraps or whatever else you''ve managed to get your hands on. Just don''t trust it with anything too heavy.',
+  FALSE,1,0.800,2.000,12.000,8,'Common',0,1,1,100)
+ON CONFLICT(code) DO UPDATE SET
+ name=EXCLUDED.name,
+ category=EXCLUDED.category,
+ description=EXCLUDED.description,
+ carry_slots_bonus=EXCLUDED.carry_slots_bonus,
+ rarity_label=EXCLUDED.rarity_label,
+ armour_rating=EXCLUDED.armour_rating;
 
 CREATE TABLE IF NOT EXISTS player_character_inventory_state(
   character_id UUID PRIMARY KEY REFERENCES player_characters(id) ON DELETE CASCADE,
