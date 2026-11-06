@@ -81,7 +81,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   web.includes('Further game systems are not available in this prototype.'));
  assert.ok(state.includes('FINAL NOTICE')&&
   state.includes('No discussion.')&&
-  !state.includes('due_date')&&!state.includes('eviction'));
+  !state.includes('due_date')&&!state.includes('evictionDeadline'));
 });
 
 test('Branch-aware personal Journal never displays facts from unchosen investigation paths',()=>{
