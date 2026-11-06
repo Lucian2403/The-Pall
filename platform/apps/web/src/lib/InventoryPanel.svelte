@@ -170,10 +170,12 @@
     if(destination==='equipped'){
       if(slot&&item.equipSlot===slot)void equip(item,slot);
       else error='This item does not fit that equipment slot.';
-    }else if(item.equipmentSlot||selectedPlace!=='equipped'){
-      // Transfers are still validated by the server; never trust drag data.
+    }else{
+      if(destination==='pack'&&snapshot.pack.items.some(x=>x.id===item.id))return;
+      if(destination==='home_chest'&&snapshot.chest.items.some(x=>x.id===item.id))return;
+      // The server still validates owner, capacity, slot and revision.
       void transfer(item,destination);
-    }else void transfer(item,destination);
+    }
   }
 </script>
 <section class="inventory-panel" aria-label="Equipment, inventory and home storage">
@@ -220,7 +222,7 @@
             {:else}
               <button type="button" class="equip-socket empty"
                 style={'left:'+slot.x+'%;top:'+slot.y+'%'}
-                disabled={pending||!snapshot.storageEnabled}
+                aria-disabled={pending||!snapshot.storageEnabled}
                 ondragover={allowDrop}
                 ondrop={event=>onDrop(event,'equipped',slot.id)}
                 aria-label={'Empty '+slot.label+' equipment slot. Drop compatible gear here.'}
@@ -388,9 +390,31 @@
     max-width:1450px;margin:0 auto 17px;gap:15px}
   .inventory-heading h2{margin:2px 0 0;font:600 26px Georgia,serif;color:#efd2a3}
   .overline{margin:0;color:#b5a18a;letter-spacing:.1em;font:700 11px Arial,sans-serif}
-  .inventory-layout{max-width:1450px;margin:auto;display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(235px,.66fr) minmax(0,1fr);
-    align-items:start;gap:14px}
+  .inventory-layout{max-width:1580px;margin:auto;display:grid;
+    grid-template-columns:minmax(252px,1.06fr) minmax(170px,.76fr) minmax(230px,.96fr) minmax(210px,.91fr);
+    align-items:start;gap:12px}
+  .interaction-hint{max-width:1580px;margin:0 auto 12px;color:#bca487;
+    font:12px/1.45 var(--pall-font-reading,Georgia,serif)}
+  .equipment-card{min-height:420px}
+  .equipment-stage{height:347px;position:relative;min-width:0;margin:4px 0 10px;
+    border:1px solid #4e4035;background:radial-gradient(ellipse at 50% 44%,#53433533,transparent 70%)}
+  .equipment-silhouette{position:absolute;left:8%;width:84%;height:96%;
+    top:2%;fill:#77685640;stroke:#ac93704d;stroke-width:2;
+    pointer-events:none}
+  .equip-socket{position:absolute;box-sizing:border-box;width:30%;height:21%;
+    padding:2px 3px;display:flex;flex-direction:column;justify-content:center;
+    align-items:center;gap:2px;border:1px solid #7b6250;border-radius:3px;
+    background:#2d241fc9;color:#d6bd97;min-width:0;cursor:pointer}
+  .equip-socket.empty{background:#29231eab;border-style:dashed;color:#a99580}
+  .equip-socket:focus-visible,.equip-socket.selected,.equip-socket:hover{
+    outline:1px solid #dfb876;border-color:#d3a776}
+  .socket-label{font:700 clamp(8px,.62vw,10px)/1.1 Arial,sans-serif;
+    color:#d9c09f;text-align:center;white-space:normal;letter-spacing:.02em}
+  .socket-empty{font:22px Georgia,serif;opacity:.55}
+  .socket-art{width:100%;height:67%;object-fit:contain;
+    pointer-events:none;filter:drop-shadow(0 2px 2px #000b)}
+  .equipment-footnote{margin:8px 0 0;color:#af9b82;font:11px/1.4 Georgia,serif}
+
   .grid-card{min-width:0;border:1px solid #6d5544;background:#282320;padding:12px;
     border-radius:4px}
   .grid-heading{display:flex;justify-content:space-between;align-items:baseline;
@@ -398,6 +422,7 @@
   .grid-heading h3{margin:0;font:600 19px Georgia,serif;color:#e8c594}
   .grid-heading span{font:12px Georgia,serif;color:#c1a589;text-align:right}
   .item-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+  .pack-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
   .item-slot{position:relative;aspect-ratio:1;min-width:0;overflow:hidden;
     border-radius:3px;border:1px solid #5c5046;background:#302a26;
     padding:3px;color:#dfc9a5}
@@ -443,17 +468,22 @@
     color:#f2d7ac;padding:9px 13px;font:700 13px Georgia,serif;cursor:pointer}
   .transfer-button:hover:not(:disabled),.reload:hover{background:#69472c}
   .transfer-button:disabled{opacity:.45;cursor:default}
+  .inspection-actions{display:flex;gap:7px;flex-wrap:wrap}
+  .transfer-button.secondary{background:#3d3129;border-color:#83684e}
   .provisional{max-width:1450px;margin:12px auto 0;color:#99887a;font:12px Georgia,serif}
   .inventory-error{max-width:1450px;margin:12px auto;color:#f0a9a0;font-weight:700}
   .loading{margin:30px 0;color:#e4cfb5}
-  @media(max-width:1200px){
-    .inventory-layout{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .inspection{grid-column:1 / -1;grid-row:2}
-    .chest-card{grid-column:2;grid-row:1}
+  @media(max-width:1350px){
+    .inventory-layout{grid-template-columns:minmax(250px,1fr) minmax(230px,1fr)}
+    .equipment-card{grid-column:1;grid-row:1}
+    .pack-card{grid-column:2;grid-row:1}
+    .inspection{grid-column:1;grid-row:2}
+    .chest-card{grid-column:2;grid-row:2}
   }
   @media(max-width:750px){
     .inventory-layout{grid-template-columns:minmax(0,1fr)}
-    .inspection,.chest-card{grid-column:auto;grid-row:auto}
+    .equipment-card,.pack-card,.inspection,.chest-card{grid-column:auto;grid-row:auto}
+    .equipment-stage{max-width:390px;margin:8px auto}
     .inventory-heading{align-items:flex-start;flex-wrap:wrap}
   }
 </style>
