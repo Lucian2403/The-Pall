@@ -31,6 +31,10 @@
   const measure=(value:number)=>value.toFixed(1);
   const titleCase=(value:string)=>value.replace(/_/g,' ')
     .replace(/\b\w/g,letter=>letter.toUpperCase());
+  // Owner-supplied cutouts are display assets; item identity stays server-owned.
+  const itemImage=(item:Item)=>item.code==='basic_clothes'
+    ?'/items/daily-worker-clothes.webp'
+    :item.code==='crude_small_bag'?'/items/simple-bag.webp':null;
   const itemMark=(item:Item)=>item.code==='basic_clothes'?'WC'
     :item.code==='crude_small_bag'?'SB'
     :item.name.split(/\s+/).map(word=>word[0]).join('').slice(0,3).toUpperCase();
@@ -140,7 +144,12 @@
                 aria-label={'Select '+item.name+(item.quantity>1?' quantity '+item.quantity:'')}
                 aria-pressed={selectedId===item.id}
                 onclick={()=>selectedId=item.id}>
-                <span class="item-mark" aria-hidden="true">{itemMark(item)}</span>
+                {#if itemImage(item)}
+                  <img class="item-art" src={itemImage(item)!} alt=""
+                    loading="lazy" decoding="async" draggable="false" />
+                {:else}
+                  <span class="item-mark" aria-hidden="true">{itemMark(item)}</span>
+                {/if}
                 <span class="item-short-name">{item.name}</span>
                 {#if item.quantity>1}<span class="stack-count">{item.quantity}</span>{/if}
               </button>
@@ -158,7 +167,12 @@
       <aside class="inspection" aria-label="Selected item description">
         <p class="overline">ITEM INSPECTION</p>
         {#if selected}
-          <div class="inspection-mark" aria-hidden="true">{itemMark(selected)}</div>
+          {#if itemImage(selected)}
+            <img class="inspection-art" src={itemImage(selected)!} alt=""
+              decoding="async" draggable="false" />
+          {:else}
+            <div class="inspection-mark" aria-hidden="true">{itemMark(selected)}</div>
+          {/if}
           <h3>{selected.name}</h3>
           <p class="item-class">{itemType(selected)}
             {#if itemBenefit(selected)} <span>·</span> {itemBenefit(selected)}{/if}
@@ -210,7 +224,12 @@
                 aria-label={'Select '+item.name+(item.quantity>1?' quantity '+item.quantity:'')}
                 aria-pressed={selectedId===item.id}
                 onclick={()=>selectedId=item.id}>
-                <span class="item-mark" aria-hidden="true">{itemMark(item)}</span>
+                {#if itemImage(item)}
+                  <img class="item-art" src={itemImage(item)!} alt=""
+                    loading="lazy" decoding="async" draggable="false" />
+                {:else}
+                  <span class="item-mark" aria-hidden="true">{itemMark(item)}</span>
+                {/if}
                 <span class="item-short-name">{item.name}</span>
                 {#if item.quantity>1}<span class="stack-count">{item.quantity}</span>{/if}
               </button>
@@ -258,6 +277,8 @@
   .occupied:hover{border-color:#c19b64;background:#51402f}
   .occupied.selected,.occupied:focus-visible{border:2px solid #dbb478;
     background:#4e3b2a;outline:1px solid #d4a96a;outline-offset:-4px}
+  .item-art{width:88%;height:74%;max-height:72px;flex-shrink:1;
+    object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 2px #0008)}
   .item-mark{font:700 clamp(12px,1.6vw,20px)/1 Georgia,serif;
     color:#f1cc92;text-shadow:0 1px 2px #000}
   .item-short-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
@@ -269,6 +290,8 @@
   .inspection{min-width:0;border:1px solid #7f6043;border-radius:4px;
     background:linear-gradient(180deg,#342920,#28211d);padding:15px;
     min-height:260px;box-sizing:border-box}
+  .inspection-art{display:block;width:116px;height:116px;max-width:100%;
+    object-fit:contain;margin:4px auto 12px;filter:drop-shadow(0 5px 5px #0009)}
   .inspection-mark{display:grid;place-items:center;width:62px;height:62px;
     margin:12px 0;border:1px solid #96754c;background:#4b3627;
     color:#f4d49e;font:700 22px Georgia,serif}
