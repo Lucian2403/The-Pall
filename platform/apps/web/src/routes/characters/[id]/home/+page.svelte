@@ -251,16 +251,12 @@
 {/if}
 <style>
   :global(body){background:#151515;color:#f2e1c9}
-  /* Extend the painted room into the letterbox gutters without distorting
-     the central scene or moving any of its object hotspots. */
-  .stage8{position:relative;isolation:isolate;overflow:hidden;
-    min-width:0;background:#1a1816}
-  .stage8::before{content:'';position:absolute;inset:-18px;
-    background:url('/locations/home/rented-room.webp') center/cover no-repeat;
-    filter:blur(19px) brightness(.53);pointer-events:none}
-  .home-scene{position:relative;z-index:1;width:100%;max-width:1080px;
-    margin-inline:auto;aspect-ratio:1672/941;isolation:isolate;
-    box-shadow:0 0 38px #100d0c7a;
+  /* Show the *entire* original painting edge to edge. No duplicate side
+     wallpaper, zoom/crop or empty letterbox gutters. The fixed-height display
+     keeps every interactive object mapped to its original image coordinates. */
+  .stage8{min-width:0;background:#1a1816}
+  .home-scene{position:relative;box-sizing:border-box;width:100%;
+    height:clamp(515px,44vw,620px);margin:0;isolation:isolate;
     background:#352d29 url('/locations/home/rented-room.webp') center/100% 100% no-repeat}
   .home-scene::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
@@ -338,10 +334,15 @@
   .status-message,.error{margin:0;padding:10px 15px;background:#362b1d;color:#e7d3b3}
   .error{color:#efaaa2;background:#472222}
   .room-overlay{position:fixed;inset:0;margin:auto;
-    box-sizing:border-box;width:min(94vw,1380px);max-width:1380px;
-    max-height:90dvh;min-width:0;padding:0;border:1px solid #aa8355;
+    box-sizing:border-box;width:min(98vw,1580px);max-width:1580px;
+    max-height:calc(100dvh - 16px);min-width:0;padding:0;border:1px solid #aa8355;
     border-radius:7px;background:#241e1a;color:#edd9b7;
-    box-shadow:0 18px 70px #000d;overflow:auto;overscroll-behavior:contain}
+    box-shadow:0 18px 70px #000d;
+    /* Desktop fits without internal scrolling; on small viewports retain
+       wheel/touch access to all actions, but do not draw a scrollbar. */
+    overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+    scrollbar-width:none;-ms-overflow-style:none}
+  .room-overlay::-webkit-scrollbar{display:none}
   .room-overlay::backdrop{background:rgba(11,8,6,.58);backdrop-filter:blur(1.5px)}
   .journal{padding:25px clamp(18px,4vw,54px);
     background:#e6d5b5;color:#24160e;border:1px solid #94704a}
@@ -355,13 +356,13 @@
   @media(max-width:950px){
     .home-scene{aspect-ratio:auto;min-height:660px;display:flex;
       flex-direction:column;gap:14px;padding:22px 14px;align-items:flex-end;
-      background-position:center;background-size:cover}
+      background-position:center;background-size:100% 100%}
     .home-dialogue{position:relative;top:auto;right:auto;bottom:auto;
       left:auto;width:min(100%,590px);max-height:none;overflow:visible}
   }
   @media(max-width:650px){
     .home-scene{min-height:620px;padding:12px 8px;align-items:stretch;
-      background-size:cover;background-position:48% center}
+      background-size:100% 100%;background-position:center}
     .home-dialogue{width:100%;border-width:17px 18px 17px;
       border-image-width:17px 18px 17px;padding:8px 11px}
     .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
@@ -369,7 +370,7 @@
     .home-dialogue .eyebrow,.home-dialogue .speaker{font-size:12px}
     .home-dialogue h1{font-size:22px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
-    .room-overlay{width:calc(100vw - 18px);max-height:calc(100dvh - 22px)}
+    .room-overlay{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
     .journal{padding:18px 16px}
     .journal-heading{align-items:flex-start;flex-wrap:wrap}
   }
