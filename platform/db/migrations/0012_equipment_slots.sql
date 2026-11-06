@@ -41,18 +41,24 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_pall_equipment_owner_slot
 
 -- Preserve intentional transfers to the chest. Equip only starter grants
 -- still in the pack and only when the corresponding slot is vacant.
-UPDATE player_character_item_instances i
-SET location='equipped',equipment_slot=d.equip_slot
-FROM pall_item_definitions d
-WHERE i.item_code=d.code
- AND i.location='pack'
- AND i.grant_key IN ('universal_starter_basic_clothes','universal_starter_crude_small_bag')
- AND d.equip_slot IS NOT NULL
- AND NOT EXISTS(
-  SELECT 1 FROM player_character_item_instances occupied
-  WHERE occupied.character_id=i.character_id
-  AND occupied.equipment_slot=d.equip_slot
- );
+WITH moved AS (
+ UPDATE player_character_item_instances i
+ SET location='equipped',equipment_slot=d.equip_slot
+ FROM pall_item_definitions d
+ WHERE i.item_code=d.code
+  AND i.location='pack'
+  AND i.grant_key IN ('universal_starter_basic_clothes','universal_starter_crude_small_bag')
+  AND d.equip_slot IS NOT NULL
+  AND NOT EXISTS(
+   SELECT 1 FROM player_character_item_instances occupied
+   WHERE occupied.character_id=i.character_id
+   AND occupied.equipment_slot=d.equip_slot
+  )
+ RETURNING i.character_id
+)
+UPDATE player_character_inventory_state s
+SET revision=revision+1,updated_at=NOW()
+WHERE s.character_id IN (SELECT DISTINCT character_id FROM moved);
 -- New characters receive their starter outfit and bag already equipped.
 -- ON CONFLICT keeps existing item IDs, even if a player stored a starter.
 CREATE OR REPLACE FUNCTION pall_seed_character_inventory(p_character UUID)
