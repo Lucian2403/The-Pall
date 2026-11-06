@@ -2,7 +2,7 @@
  * Mass/volume allowances remain playtest values. No combat modifiers yet.
  */
 export const EQUIPMENT_SLOTS=[
- 'head','face','torso','hands','pants','feet','back','primary_weapon',
+ 'head','face','torso','hands','feet','back','primary_weapon',
  'secondary_weapon','respiratory_filter','accessory_1','accessory_2'
 ] as const;
 export type EquipmentSlot=typeof EQUIPMENT_SLOTS[number];
@@ -17,6 +17,8 @@ export type InventoryRow={
  max_stack:number;weight_kg:string|number;volume_l:string|number;
  carry_volume_bonus_l:string|number;carry_slots_bonus:number;
  rarity_label:string;armour_rating:number;design_status:string;
+ damage_rating:string|number;pall_protection:string|number;
+ ash_protection:string|number;carry_weight_bonus_kg:string|number;
 };
 export type Edit=
   |{kind:'update';id:string;quantity:number;location:ItemLocation;equipmentSlot:EquipmentSlot|null}
@@ -41,7 +43,10 @@ export function locationSummary(rows:InventoryRow[],location:StorageLocation){
  const weightKg=round([...selected,...(location==='pack'?equipped:[])]
    .reduce((t,x)=>t+mass(x.weight_kg)*x.quantity,0));
  const volumeL=round(selected.reduce((t,x)=>t+mass(x.volume_l)*x.quantity,0));
- const maxWeightKg=location==='pack'?PLAYTEST_CAPACITY.packBaseKg:PLAYTEST_CAPACITY.chestKg;
+ const maxWeightKg=location==='pack'
+   ?round(PLAYTEST_CAPACITY.packBaseKg+
+     equipped.reduce((t,x)=>t+mass(x.carry_weight_bonus_kg)*x.quantity,0))
+   :PLAYTEST_CAPACITY.chestKg;
  const maxVolumeL=location==='pack'
    ?round(PLAYTEST_CAPACITY.packBaseL+
       equipped.reduce((t,x)=>t+mass(x.carry_volume_bonus_l)*x.quantity,0))
@@ -60,10 +65,29 @@ export function inventoryView(rows:InventoryRow[],revision:number,storageEnabled
   carrySlotsBonus:x.carry_slots_bonus,equipSlot:x.equip_slot,
   equipmentSlot:x.equipment_slot,
   rarity:x.rarity_label,armour:x.armour_rating,
+  damageRating:mass(x.damage_rating),pallProtection:mass(x.pall_protection),
+  ashProtection:mass(x.ash_protection),carryWeightBonusKg:mass(x.carry_weight_bonus_kg),
   currentDurability:x.current_durability,maxDurability:x.max_durability,
   designStatus:x.design_status
  });
+ const equipped=rows.filter(x=>x.location==='equipped');
+ const sum=(fn:(item:InventoryRow)=>number)=>round(equipped.reduce(
+   (total,item)=>total+fn(item)*item.quantity,0));
+ const weapons=equipped.filter(x=>x.equipment_slot==='primary_weapon'||
+   x.equipment_slot==='secondary_weapon');
  return {revision,storageEnabled,
+  bonuses:{
+    armour:sum(item=>item.armour_rating),
+    // Null is intentional: no weapon equipped; unarmed combat has independent rules.
+    weaponDamage:weapons.length
+      ?round(weapons.reduce((n,item)=>n+mass(item.damage_rating)*item.quantity,0))
+      :null,
+    pallProtection:sum(item=>mass(item.pall_protection)),
+    ashProtection:sum(item=>mass(item.ash_protection)),
+    maxWeightKg:locationSummary(rows,'pack').maxWeightKg,
+    inventorySlots:locationSummary(rows,'pack').maxSlots,
+    maxVolumeL:locationSummary(rows,'pack').maxVolumeL
+  },
   pack:{...locationSummary(rows,'pack'),
     items:rows.filter(x=>x.location==='pack').map(mapRow)},
   chest:{...locationSummary(rows,'home_chest'),
