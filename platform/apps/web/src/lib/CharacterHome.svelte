@@ -68,10 +68,12 @@
       href:base+'/millhand/clinic'
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===8) return {
-      title:'Return Home',
-      description:'The clinic is complete. The final home chapter is awaiting playable integration.',
-      label:'Review the completed clinic visit',
-      href:base+'/millhand/clinic'
+      title:character.tutorial.status==='COMPLETED'?'Your rented home':'Return Home',
+      description:character.tutorial.status==='COMPLETED'
+        ?'Your introduction is complete. Your rent notice and Journal remain available.'
+        :'The clinic is complete. Return to the shared rented room to finish your introduction.',
+      label:character.tutorial.status==='COMPLETED'?'Return to rented home':'Travel home',
+      href:base+'/home'
     };
     return null;
   });

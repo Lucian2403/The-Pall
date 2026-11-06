@@ -43,21 +43,21 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
     if(!result.rowCount||result.rows[0].origin!=='Millhand')
       return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
-    let completedClinic=false;
-    if(stage===8&&result.rows[0].tutorial_status==='NOT_STARTED'){
+    let canReturnToClinic=false;
+    if(stage===8){
       const visit=await db.query<{state:ClinicState}>(
         'SELECT state FROM player_character_clinic WHERE character_id=$1',
         [req.params.id]
       );
-      completedClinic=visit.rows[0]?.state.phase==='LEFT' &&
+      canReturnToClinic=visit.rows[0]?.state.phase==='LEFT' &&
         visit.rows[0].state.paid===true;
     }
-    const canRewind=stage>=2&&stage<=7||completedClinic;
+    const canRewind=stage>=2&&stage<=7||canReturnToClinic;
     return {
       enabled:true,canRewind,stage,
-      // Stage 8 is only a completed Stage 7 review at this boundary,
-      // not a playable Stage 8 chapter; replay the Flint fight from here.
-      targetStage:completedClinic?6:stage>1&&stage<=7?stage-1:null
+      // Stage 8 now rewinds to the paid Stage 7 clinic. It never discards
+      // the fight or silently charges/refunds the clinic fee again.
+      targetStage:canReturnToClinic?7:stage>1&&stage<=7?stage-1:null
     };
   });
 
@@ -98,10 +98,71 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       }
 
 
-      if(expectedStage===7||expectedStage===8){
-        // A Stage 8 rewind is allowed only from an already LEFT clinic,
-        // before Stage 8 itself has begun; no future Stage 8 progress is lost.
-        const completedClinic=expectedStage===8;
+      if(expectedStage===8){
+        // Developer-only replay of the final home scene. Restore the already
+        // PAID clinic interaction without refunding its fee or touching combat.
+        // The character lock serializes this with the Stage 8 action API.
+        const clinic=await client.query<{revision:number;state:ClinicState}>(
+          'SELECT revision,state FROM player_character_clinic WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        const visit=clinic.rows[0]?.state;
+        const currentStatus=c.rows[0].tutorial_status;
+        if(!visit||visit.phase!=='LEFT'||visit.paid!==true||
+           !visit.after||visit.after.hp!==c.rows[0].current_health||
+           visit.after.hp!==c.rows[0].max_health){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_clinic_state'});
+        }
+        const saved=await client.query<{state:{phase:string;outcome:string;origin:string}}>(
+          'SELECT state FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        const prior=saved.rows[0]?.state;
+        const validProgress=prior
+          ?prior.origin==='Millhand'&&prior.outcome===visit.outcome&&
+             ((prior.phase==='COMPLETE'&&currentStatus==='COMPLETED')||
+               (prior.phase!=='COMPLETE'&&currentStatus==='IN_PROGRESS'))
+          :currentStatus==='NOT_STARTED';
+        if(!validProgress){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_home_state'});
+        }
+        // Delete receipts before their FK parent. Revision changes prevent
+        // stale in-flight clinic/home commands from replaying old transitions.
+        await client.query(
+          'DELETE FROM player_character_tutorial_home_receipts WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_tutorial_home WHERE character_id=$1',
+          [req.params.id]
+        );
+        // Invalidate only the previously saved departure receipt: replaying
+        // it after rewind must not yield an obsolete LEFT success response.
+        // Keep paid examination receipts and the single fee intact.
+        await client.query(
+          "DELETE FROM player_character_clinic_receipts WHERE character_id=$1 AND response->>'phase'='LEFT'",
+          [req.params.id]
+        );
+        const reopened={...visit,phase:'PAID',revision:visit.revision+1};
+        await client.query(
+          'UPDATE player_character_clinic SET state=$2::jsonb,revision=$3,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,JSON.stringify(reopened),reopened.revision]
+        );
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
+          [req.params.id]
+        );
+        await client.query('COMMIT');transaction=false;
+        return {
+          stage:7,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/millhand/clinic',
+          coinDelta:0
+        };
+      }
+
+      if(expectedStage===7){
         // Developer replay from the paid or unpaid clinic must start a fresh
         // Stage 6 encounter, not reopen an already-finished Flint fight.
         // The character row lock serializes this with clinic payment/turns.
@@ -120,16 +181,12 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           saved.outcome!==fight.state.outcome||
           saved.before.hp!==fight.state.player.hp||
           saved.before.hpMax!==fight.state.player.hpMax||
-          (completedClinic
-            ?saved.phase!=='LEFT'||!saved.paid||
-              c.rows[0].tutorial_status!=='NOT_STARTED'
-            :saved.phase==='LEFT'||
-              c.rows[0].tutorial_status!=='IN_PROGRESS')){
+          (saved.phase==='LEFT'||c.rows[0].tutorial_status!=='IN_PROGRESS')){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_clinic_state'});
         }
         const wasPaid=saved.paid===true;
-        if(wasPaid !== (saved.phase==='PAID'||saved.phase==='LEFT')||
+        if(wasPaid !== (saved.phase==='PAID')||
           (wasPaid?(!saved.after||
             saved.after.hp!==c.rows[0].current_health||
             saved.after.hp!==c.rows[0].max_health)
@@ -343,8 +400,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
       if((e as {code?:string})?.code==='42P01')
         return reply.code(503).send({
-          error:expectedStage===7||expectedStage===8?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
-          setup:expectedStage===7||expectedStage===8?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
+          error:expectedStage===8?'home_schema_missing':expectedStage===7?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
+          setup:expectedStage===8?'npm run home:migrate':expectedStage===7?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
         });
       throw e;
     } finally {client.release();}
