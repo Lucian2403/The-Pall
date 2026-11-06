@@ -26,7 +26,7 @@ for (const [origin, skill] of expected) {
       assert.deepEqual(preview.attributes, {STR:5,DEX:5,INT:5,RES:5});
       assert.equal(preview.maximumHealth, 50);
       assert.equal(preview.coins, 20);
-      assert.deepEqual(preview.starterItemDisplayNames, ['Basic Clothes','Crude Small Bag']);
+      assert.deepEqual(preview.starterItemDisplayNames, ['Daily Worker Clothes','Simple Bag']);
       assert.deepEqual(preview.originMajorSkillBonus, {majorSkill:skill,levels:3});
       assert.deepEqual(preview.portraitSelection, {origin,sex});
       assert.equal('itemId' in preview, false, 'TBD item schema must not be invented');
@@ -44,5 +44,5 @@ test('read-only preview returns independent mutable copies', () => {
   one.attributes.STR = 999;
   one.starterItemDisplayNames.push('Unapproved');
   assert.equal(two.attributes.STR, APPROVED_STARTING_FACTS.attributes.STR);
-  assert.deepEqual(two.starterItemDisplayNames, ['Basic Clothes','Crude Small Bag']);
+  assert.deepEqual(two.starterItemDisplayNames, ['Daily Worker Clothes','Simple Bag']);
 });
