@@ -16,7 +16,9 @@ const sample=(overrides:Partial<InventoryRow>={}):InventoryRow=>({
  name:'Simple Bag',category:'bag',description:'Test fixture',
  stackable:false,max_stack:1,weight_kg:'.800',volume_l:'2',
  carry_volume_bonus_l:'12',carry_slots_bonus:6,
- rarity_label:'Common',armour_rating:0,design_status:'PROVISIONAL',...overrides
+ rarity_label:'Common',armour_rating:0,design_status:'PROVISIONAL',
+ damage_rating:0,pall_protection:0,ash_protection:0,carry_weight_bonus_kg:0,
+ ...overrides
 });
 const clothes=()=>sample({
  item_code:'basic_clothes',name:'Daily Worker Clothes',category:'clothing',
@@ -69,6 +71,8 @@ test('Equip checks compatible sockets, slot ownership and quantity',()=>{
  assert.throws(()=>planEquip([crafted],crafted.id,'back'),/slot_incompatible/);
  assert.throws(()=>planEquip([bag],randomUUID(),'back'),/item_not_owned/);
  assert.ok(EQUIPMENT_SLOTS.includes('respiratory_filter'));
+ assert.ok(!EQUIPMENT_SLOTS.some(slot=>slot==='pants'),
+  'Clothing is one torso-and-legs socket, never a separate pants socket');
 });
 test('Equipped bag cannot be taken off when new four-slot limit would overflow',()=>{
  const bag=sample(),outfit=clothes();
@@ -113,10 +117,42 @@ test('Physical limits still apply when slots are free',()=>{
  assert.throws(()=>planTransfer([huge],huge.id,1,'pack',randomUUID()),
   /pack_capacity_exceeded/);
 });
+test('Equipment bonuses follow worn items; carried and chest gear contribute nothing',()=>{
+ const worn=[sample({carry_weight_bonus_kg:2,pall_protection:3,ash_protection:1}),
+  clothes({armour_rating:4,damage_rating:0}),sample({
+    item_code:'test_sword',category:'weapon',equipment_slot:'primary_weapon',
+    equip_slot:'primary_weapon',damage_rating:9,carry_slots_bonus:0,
+    carry_volume_bonus_l:0,weight_kg:1,pall_protection:2,ash_protection:0
+  })];
+ const inactive=sample({location:'home_chest',equipment_slot:null,
+  armour_rating:90,damage_rating:99,pall_protection:99,ash_protection:99});
+ const before=inventoryView([...worn,inactive],4,true);
+ assert.deepEqual(before.bonuses,{
+  armour:4,weaponDamage:9,pallProtection:5,ashProtection:1,
+  maxWeightKg:22,inventorySlots:10,maxVolumeL:17
+ });
+ const after=planTransfer([...worn,inactive],worn[0].id,1,'home_chest',randomUUID());
+ assert.deepEqual(inventoryView(after.after,5,true).bonuses,{
+  armour:4,weaponDamage:9,pallProtection:2,ashProtection:0,
+  maxWeightKg:20,inventorySlots:4,maxVolumeL:5
+ });
+ assert.equal(inventoryView([clothes()],0,true).bonuses.weaponDamage,null,
+  'Unarmed damage must never be fabricated from the equipment panel');
+});
 test('UI provides equipped silhouette, clickable inspection, Shift-click and drag targets',()=>{
  const ui=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/InventoryPanel.svelte'),'utf8');
  assert.ok(ui.includes('class="equipment-silhouette"'));
  assert.ok(ui.includes('equipmentSlots'));
+ assert.ok(ui.includes("label:'Clothing · Torso & Legs'"));
+ assert.ok(!ui.includes("label:'Pants'"));
+ assert.ok(ui.includes("class:outfit={slot.id==='torso'}"));
+ assert.ok(ui.includes('class="equipment-bonuses"'));
+ for(const label of ['Armor','Damage','Pall Protection','Ash Protection','Max Weight',
+   'Inventory Slots','Bag Volume'])assert.ok(ui.includes(label));
+ assert.ok(ui.includes('snapshot.bonuses.weaponDamage'));
+ assert.ok(ui.includes('snapshot.bonuses.maxWeightKg'));
+ assert.ok(ui.includes('Live equipment totals'));
+ 
  assert.ok(ui.includes('class="equip-socket filled"'));
  assert.ok(ui.includes('class="equip-socket empty"'));
  assert.ok(ui.includes('class="item-slot occupied"'));
@@ -163,6 +199,14 @@ test('Catalogue uses exact approved copy; new migration respects owner 4+6 rule'
  assert.ok(sql.includes('idx_pall_equipment_owner_slot'));
  const migrate=readFileSync(resolve(import.meta.dirname,'inventory-migrate.mjs'),'utf8');
  assert.ok(migrate.includes('0012_equipment_slots.sql'));
+ assert.ok(migrate.includes('0013_equipment_stats_and_clothing.sql'));
+ const derived=readFileSync(resolve(import.meta.dirname,'../db/migrations/0013_equipment_stats_and_clothing.sql'),'utf8');
+ assert.ok(derived.includes('ADD COLUMN IF NOT EXISTS pall_protection'));
+ assert.ok(derived.includes('ADD COLUMN IF NOT EXISTS ash_protection'));
+ assert.ok(derived.includes('ADD COLUMN IF NOT EXISTS damage_rating'));
+ assert.ok(derived.includes('ADD COLUMN IF NOT EXISTS carry_weight_bonus_kg'));
+ assert.ok(derived.includes("equip_slot='pants'"),'Do not silently discard historic pants gear');
+ assert.ok(!derived.includes("'torso','hands','pants','feet'"));
 });
 test('Owner starter illustrations remain genuine optimized WebP assets',()=>{
  const ui=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/InventoryPanel.svelte'),'utf8');
