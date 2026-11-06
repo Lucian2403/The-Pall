@@ -4,7 +4,7 @@
 durability values below are **provisional playtest values**, not locked game balance.
 
 ## Already agreed canon
-All six backgrounds receive Basic Clothes, one Crude Small Bag, and **20 coins**.
+All six backgrounds receive Daily Worker Clothes, one Simple Bag, and **20 coins**.
 Coins remain a currency field, never a physical inventory item. The tutorial's
 10-coin clinic cost is unchanged; no new item rewards or background advantages
 are granted. Item definitions and item *instances* are separate, as required by
