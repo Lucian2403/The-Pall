@@ -23,7 +23,7 @@ function parse(input:unknown):Command{
  if(v.kind==='start'&&keys==='kind,requestId')return {kind:'start',requestId:v.requestId};
  if(v.kind!=='action'||keys!=='action,expectedRevision,kind,requestId')throw Error('invalid_fields');
  if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)throw Error('invalid_revision');
- if(!['read_notice','put_down','finish'].includes(String(v.action)))throw Error('invalid_action');
+ if(!['read_notice','put_down','finish','rest'].includes(String(v.action)))throw Error('invalid_action');
  return {kind:'action',requestId:v.requestId,expectedRevision:v.expectedRevision as number,action:v.action as Action};
 }
 const missing=(e:unknown)=>(e as {code?:string})?.code==='42P01';
@@ -113,13 +113,17 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
      if(branchRows.rows[0]?.state.phase!=='SELECTED'||!['restamp','contracts','records'].includes(String(branch))){
       await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'route_not_saved'});
      }
-     state=initial(c.origin,branch as Branch,clinic.rows[0].state.outcome as Outcome);
+     state=initial(c.origin,branch as Branch,clinic.rows[0].state.outcome as Outcome,
+       clinic.rows[0].state.after);
      await db.query('INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',
       [c.id,JSON.stringify(state)]);
      await db.query("UPDATE player_characters SET tutorial_status='IN_PROGRESS' WHERE id=$1",[c.id]);
     }
    }else{
-    if(!saved.rowCount||c.tutorial_status!=='IN_PROGRESS'){
+    if(!saved.rowCount||
+       !(c.tutorial_status==='IN_PROGRESS'||
+         (cmd.action==='rest'&&c.tutorial_status==='COMPLETED'&&
+          saved.rows[0].state.phase==='COMPLETE'))){
      await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'home_not_started'});
     }
     const old=saved.rows[0].state;
