@@ -156,7 +156,7 @@ before(async()=>{
       // Simulate an account created before inventory tables existed.
       legacyInventoryId=randomUUID();
       await db.query(
-        "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location) VALUES($1,$2,'Legacy Owner',$3,'Male','Millhand','{}'::jsonb,'[]'::jsonb,'Smithing workshop')",
+        "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location) VALUES($1,$2,'Legacy Owner',$3,'Male','Millhand','{}'::jsonb,'[{\"name\":\"Basic Clothes\",\"quantity\":1},{\"name\":\"Crude Small Bag\",\"quantity\":1}]'::jsonb,'Smithing workshop')",
         [legacyInventoryId,owner,'legacy-'+legacyInventoryId]
       );
     }
@@ -184,8 +184,12 @@ test('Inventory migration backfills existing characters and never duplicates uni
   'SELECT count(*)::int AS count FROM player_character_item_instances WHERE character_id=$1',
   [legacyInventoryId]);
  assert.equal(repeated.rows[0].count,2);
- const char=await db.query('SELECT coins FROM player_characters WHERE id=$1',[legacyInventoryId]);
+ const char=await db.query<{coins:string;starter_item_requirements:{name:string;quantity:number}[]}>(
+  'SELECT coins,starter_item_requirements FROM player_characters WHERE id=$1',[legacyInventoryId]);
  assert.equal(Number(char.rows[0].coins),20,'Migration must preserve coins');
+ assert.deepEqual(char.rows[0].starter_item_requirements,[
+  {name:'Daily Worker Clothes',quantity:1},{name:'Simple Bag',quantity:1}
+ ],'Existing character creation history updates only the starter display labels');
 });
 test('New characters of all six origins receive exactly the same owned starter kit',async()=>{
  for(const origin of ['Millhand','Bellrunner','Squatter','Stitcher','Scrapper','Inkbound']){
