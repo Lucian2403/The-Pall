@@ -21,9 +21,10 @@
   let home=$state<Home|null>(null);
   let status=$state<'loading'|'ready'|'unauthorized'|'missing'|'prerequisite'|'schema'|'error'>('loading');
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
-  let storageOpen=$state(false);
-  let noticeExpanded=$state(false),journalOpen=$state(false);
-  let journalElement:HTMLElement|undefined;
+  let noticeExpanded=$state(false);
+  let overlayKind=$state<'storage'|'journal'|null>(null);
+  let overlayDialog:HTMLDialogElement|undefined;
+  const journalOpen=$derived(overlayKind==='journal');
   let retryKey:string|null=null,retryId:string|null=null;
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
@@ -40,9 +41,20 @@
     ?'Flint backed away from the passage after our fight.'
     :home?.outcome==='player_defeat'
       ?'Flint beat me. Another worker helped me get to the clinic.':null);
-  async function toggleJournal(){
-    journalOpen=!journalOpen;await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
+  // A native modal remains above the rented-room artwork, never below it.
+  // showModal handles focus, keyboard trapping and Escape without moving the scene.
+  async function openRoomOverlay(kind:'storage'|'journal'){
+    overlayKind=kind;
+    await tick();
+    if(!overlayDialog?.open)overlayDialog?.showModal();
+  }
+  function closeRoomOverlay(){
+    overlayDialog?.close();
+    overlayKind=null;
+  }
+  function toggleJournal(){
+    if(journalOpen)closeRoomOverlay();
+    else void openRoomOverlay('journal');
   }
   async function refresh(){
     status='loading';errorMessage='';restMessage='';
@@ -108,7 +120,7 @@
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <div class="home-scene" aria-label="A modest rented room in Grand Cylinder City">
         <button type="button" class="hotspot chest" aria-label="Storage"
-          title="Storage" onclick={()=>storageOpen=!storageOpen}>
+          title="Storage" onclick={()=>{void openRoomOverlay('storage');}}>
           <span class="object-caption">Storage</span>
         </button>
         <button type="button" class="hotspot book" aria-label="Read journal"
@@ -163,26 +175,28 @@
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
           </aside>
         {/if}
+        <dialog bind:this={overlayDialog} class="room-overlay"
+          aria-label={overlayKind==='storage'?'Inventory and Home Chest':'Personal Journal'}
+          onclose={()=>overlayKind=null}>
+          {#if overlayKind==='storage'}
+            <InventoryPanel characterId={id} onClose={closeRoomOverlay}/>
+          {:else if overlayKind==='journal'}
+            <section id="home-journal" class="journal" aria-label="Personal Journal">
+              <header class="journal-heading">
+                <div><small>YOUR RECORD</small><h2>Personal Journal</h2></div>
+                <button class="pall-framed-button" type="button" data-pall-sfx="paper"
+                  onclick={closeRoomOverlay}>Close journal</button>
+              </header>
+              <div class="journal-body">
+                <p>Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.</p>
+                {#if routeEntry}<p>{routeEntry}</p>{/if}
+                {#if combatEntry}<p>{combatEntry}</p>{/if}
+              </div>
+            </section>
+          {/if}
+        </dialog>
       </div>
-
-      {#if storageOpen}
-        <InventoryPanel characterId={id} onClose={()=>storageOpen=false}/>
-      {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
-      {#if journalOpen}
-        <section id="home-journal" bind:this={journalElement} class="journal"
-          aria-label="Personal Journal">
-          <header class="journal-heading"><div><small>YOUR RECORD</small><h2>Personal Journal</h2></div>
-            <button class="pall-framed-button" type="button" data-pall-sfx="paper"
-              onclick={()=>{void toggleJournal();}}>Close journal</button>
-          </header>
-          <div class="journal-body">
-            <p>Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.</p>
-            {#if routeEntry}<p>{routeEntry}</p>{/if}
-            {#if combatEntry}<p>{combatEntry}</p>{/if}
-          </div>
-        </section>
-      {/if}
     </section>
   </TutorialShell>
 {:else}
@@ -273,8 +287,14 @@
     font:600 13px/1.4 Georgia,serif;box-shadow:0 4px 12px #000a}
   .status-message,.error{margin:0;padding:10px 15px;background:#362b1d;color:#e7d3b3}
   .error{color:#efaaa2;background:#472222}
-  .journal{padding:20px clamp(15px,3vw,44px);scroll-margin-top:65px;
-    background:#e6d5b5;color:#24160e;border-top:2px solid #94704a}
+  .room-overlay{position:fixed;inset:0;margin:auto;
+    box-sizing:border-box;width:min(94vw,1380px);max-width:1380px;
+    max-height:90dvh;min-width:0;padding:0;border:1px solid #aa8355;
+    border-radius:7px;background:#241e1a;color:#edd9b7;
+    box-shadow:0 18px 70px #000d;overflow:auto;overscroll-behavior:contain}
+  .room-overlay::backdrop{background:rgba(11,8,6,.58);backdrop-filter:blur(1.5px)}
+  .journal{padding:25px clamp(18px,4vw,54px);
+    background:#e6d5b5;color:#24160e;border:1px solid #94704a}
   .journal-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;
     margin:0 auto 15px;max-width:960px}
   .journal-heading h2{font:600 24px Georgia,serif;margin:5px 0}
@@ -300,5 +320,8 @@
     .home-dialogue h1{font-size:22px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
     .rest-message{bottom:2%;max-width:90%;font-size:11px}
+    .room-overlay{width:calc(100vw - 18px);max-height:calc(100dvh - 22px)}
+    .journal{padding:18px 16px}
+    .journal-heading{align-items:flex-start;flex-wrap:wrap}
   }
 </style>
