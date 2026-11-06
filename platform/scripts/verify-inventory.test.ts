@@ -159,6 +159,14 @@ test('Grid UI shows 6-column carried and chest slots with a selected-item descri
  assert.ok(ui.includes('Items carried: {snapshot.pack.slotsUsed} / {snapshot.pack.maxSlots}'));
  assert.ok(ui.includes('Stored: {snapshot.chest.slotsUsed} / {snapshot.chest.maxSlots}'));
  assert.ok(!ui.includes('class="item-list"'),'Item presentation must not fall back to a list layout');
+ assert.ok(ui.includes('Inventory endpoint missing (HTTP 404)'));
+ assert.ok(ui.includes('Inventory server error (HTTP 500)'));
+ assert.ok(ui.includes('inventory_schema_missing'));
+ assert.ok(ui.includes('inventory_not_initialized'));
+ assert.ok(ui.includes('Inventory API is unreachable (HTTP '));
+ assert.ok(ui.includes('Inventory returned an invalid response'));
+ assert.ok(!ui.includes("'Inventory is unavailable.'"),
+   'A generic error must not hide missing API routes or failed database queries');
 });
 test('Item catalogue persists exact approved names, descriptive copy and bonuses',()=>{
  const sql=readFileSync(resolve(import.meta.dirname,'../db/migrations/0011_inventory_foundation.sql'),'utf8');
