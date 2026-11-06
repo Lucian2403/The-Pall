@@ -38,7 +38,7 @@
   const itemBenefit=(item:Item)=>item.category==='clothing'
     ?item.armour+' Armour'
     :item.carrySlotsBonus>0
-      ?'+'+item.carrySlotsBonus+' Slots'
+      ?item.carrySlotsBonus+' Slots'
       :null;
 
   function syncSelection(next:Snapshot){
