@@ -167,12 +167,13 @@ Keep Docker volumes intact; restart the API afterward.
 
 ## Owner visual and derived-stat revision — Stage 8
 
-- The home illustration keeps its native 1672:941 proportions and exact
-  interactive hotspot geometry, now at a 1080 px maximum width (approximately
-  608 px tall). The surrounding stage uses a blurred/darkened extension of
-  the same painted room rather than blank side gutters. This is not a stretched
-  wallpaper nor a cropped interactive image.
-- Torso and Pants are **one Clothing (Torso & Legs) socket**. The persisted
+- The home scene now uses the **entire source painting edge to edge**, with
+  its display height bounded between 515 and 620 px. No side gutters, blurred
+  duplicate wallpaper, or cropped objects; the image is fitted to the scene's
+  responsive width and height, which may slightly change its displayed aspect
+  ratio. Bed, windows, kitchen, table, and chest remain visible with their
+  original image-relative interactive targets.
+- Torso and Pants are **one Body socket**. The persisted
   database key remains `torso` to preserve the equipped universal outfit
   and its instance UUID. The separate `pants` slot is retired from the
   available socket list and constrained out by the additive
@@ -202,3 +203,23 @@ Keep Docker volumes intact; restart the API afterward.
 
 Existing local databases need `npm run inventory:migrate` to apply 0013,
 followed by an API restart. Character progress and possessions remain intact.
+
+## Owner polish pass — clean equipment screen
+
+- The equipped composite outfit socket's **visible name is Body**, a single
+  word; the stable DB key is still `torso`. No separate Pants socket.
+- Removed all provisional/debug commentary from the visible storage page:
+  equipment carrying explanation, stat caveat, global provisional footer,
+  and the text-only interaction legend. Shift-click help remains available
+  as item hover titles and accessibility descriptions.
+- Seven server-derived values use individual bronze-rimmed, inset dark tiles
+  within a matching framed **Equipment Stats** card; no fake equipment bonus
+  was added. These are display totals, not new combat rules.
+- The desktop modal is wider and the character silhouette/stat card more
+  compact to fit typical viewports. No visible inner scrollbar; shorter and
+  narrow screens still support mouse-wheel, keyboard or touch scrolling to
+  reach every action instead of clipping controls. The Journal retains its
+  existing modal and content.
+- The Stage 8 scene now displays the whole painting at a short height with
+  no blurred gutter extensions. This favors visibility and accurate hotspots;
+  aspect ratio can vary slightly with viewport dimensions.
