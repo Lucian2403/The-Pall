@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {
@@ -163,7 +163,6 @@ test('Grid UI shows 6-column carried and chest slots with a selected-item descri
    const image=readFileSync(resolve(import.meta.dirname,'../apps/web/static/items',name));
    assert.equal(image.subarray(0,4).toString(),'RIFF','Image must be real WebP');
    assert.equal(image.subarray(8,12).toString(),'WEBP','Image must be real WebP');
-   const {createHash}=await import('node:crypto');
    assert.equal(createHash('sha256').update(image).digest('hex'),expected,
      'Starter cutouts must match the owner-supplied optimized artwork');
  }
