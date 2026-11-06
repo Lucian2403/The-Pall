@@ -72,7 +72,7 @@ Three layers:
 
 - Head
 - Face
-- Clothing (Torso & Legs), one outfit slot
+- Body (one clothing outfit covering torso and legs)
 - Hands
 - Feet
 - Back / Backpack
@@ -82,6 +82,6 @@ Three layers:
 - Accessory Slots
 
 
-The Clothing slot covers torso and legs as a single wearable outfit; separate Pants equipment is retired from the initial equipment system. The stable internal slot key remains `torso` for compatibility with existing character saves.
+The Body slot covers torso and legs as a single wearable outfit; separate Pants equipment is retired from the initial equipment system. The stable internal slot key remains `torso` for compatibility with existing character saves.
 
 Animals such as horses are deferred because they imply their own feeding, disease, injury, Pall exposure and logistics systems.
