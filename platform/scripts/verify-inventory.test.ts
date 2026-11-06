@@ -11,34 +11,40 @@ const sample=(overrides:Partial<InventoryRow>={}):InventoryRow=>({
  quality_tier:1,current_durability:100,max_durability:100,grant_key:null,
  name:'Crude Small Bag',category:'container',description:'Test fixture',
  stackable:false,max_stack:1,weight_kg:'0.800',volume_l:'2.000',
- carry_volume_bonus_l:'12.000',design_status:'PROVISIONAL',...overrides
+ carry_volume_bonus_l:'12.000',carry_slots_bonus:8,
+ rarity_label:'Common',armour_rating:0,design_status:'PROVISIONAL',...overrides
 });
 test('Shared starter bag grants volume, not unexplained strength',()=>{
  const bag=sample(),clothes=sample({
-  item_code:'basic_clothes',name:'Basic Clothes',category:'clothing',
-  weight_kg:'1.200',volume_l:'2.000',carry_volume_bonus_l:'0'
+  item_code:'basic_clothes',name:'Daily Worker Clothes',category:'clothing',
+  weight_kg:'1.200',volume_l:'2.000',carry_volume_bonus_l:'0',carry_slots_bonus:0
  });
  const pack=locationSummary([bag,clothes],'pack');
  assert.deepEqual(pack,{
-  weightKg:2,volumeL:4,maxWeightKg:20,maxVolumeL:17,overCapacity:false
+  slotsUsed:2,maxSlots:24,weightKg:2,volumeL:4,
+  maxWeightKg:20,maxVolumeL:17,overCapacity:false
  });
  const view=inventoryView([bag,clothes],0,false);
  assert.equal(view.storageEnabled,false);
  assert.equal(view.pack.items.length,2);
  assert.equal(view.chest.items.length,0);
  assert.equal(view.pack.items[0].designStatus,'PROVISIONAL');
+ assert.equal(view.pack.items[0].carrySlotsBonus,8);
+ assert.equal(view.pack.items[0].rarity,'Common');
+ assert.equal(view.pack.items[0].armour,0);
 });
 test('Moving the starter bag to chest removes its capacity bonus and preserves identity',()=>{
  const bag=sample();
  const clothes=sample({
   item_code:'basic_clothes',weight_kg:'1.200',volume_l:'2.000',
-  carry_volume_bonus_l:0
+  carry_volume_bonus_l:0,carry_slots_bonus:0
  });
  const planned=planTransfer([bag,clothes],bag.id,1,'home_chest',randomUUID());
  assert.deepEqual(planned.edits,[{
   kind:'update',id:bag.id,quantity:1,location:'home_chest'
  }]);
  assert.equal(locationSummary(planned.after,'pack').maxVolumeL,5);
+ assert.equal(locationSummary(planned.after,'pack').maxSlots,16);
  assert.equal(locationSummary(planned.after,'home_chest').volumeL,2);
  assert.equal(bag.location,'pack','Plan never mutates the original');
 });
@@ -46,7 +52,7 @@ test('Reject over-capacity transfers, wrong quantities and false item IDs',()=>{
  const bag=sample({location:'home_chest'});
  const bulky=sample({id:randomUUID(),item_code:'test_box',name:'Box',
   category:'misc',location:'home_chest',weight_kg:1,volume_l:7,
-  carry_volume_bonus_l:0,grant_key:null});
+  carry_volume_bonus_l:0,carry_slots_bonus:0,grant_key:null});
  assert.throws(()=>planTransfer([bag,bulky],bulky.id,1,'pack',randomUUID()),
   /pack_capacity_exceeded/);
  assert.throws(()=>planTransfer([bag],bag.id,2,'pack',randomUUID()),
@@ -61,7 +67,7 @@ test('Reject over-capacity transfers, wrong quantities and false item IDs',()=>{
 test('Partial stack movement preserves quantity and creates exactly one new stack',()=>{
  const ore=sample({item_code:'test_ore',name:'Test Ore',category:'test',
   stackable:true,max_stack:10,quantity:7,location:'home_chest',
-  weight_kg:'.100',volume_l:'.050',carry_volume_bonus_l:0,
+  weight_kg:'.100',volume_l:'.050',carry_volume_bonus_l:0,carry_slots_bonus:0,
   current_durability:null,max_durability:null});
  const newId=randomUUID();
  const plan=planTransfer([ore],ore.id,3,'pack',newId);
@@ -75,7 +81,7 @@ test('Partial stack movement preserves quantity and creates exactly one new stac
 test('Merging stacks never exceeds max_stack or duplicates quantities',()=>{
  const a=sample({item_code:'test_salt',name:'Salt',category:'test',
   stackable:true,max_stack:10,quantity:6,weight_kg:'.100',volume_l:'.020',
-  carry_volume_bonus_l:0,current_durability:null,max_durability:null,
+  carry_volume_bonus_l:0,carry_slots_bonus:0,current_durability:null,max_durability:null,
   location:'home_chest'});
  const b={...a,id:randomUUID(),quantity:8,location:'pack' as const};
  const plan=planTransfer([a,b],a.id,6,'pack',randomUUID());
@@ -93,4 +99,42 @@ test('Existing quantities and data quality are not treated as economy rarity',()
  assert.equal(view.pack.items[0].maxDurability,100);
  assert.equal(view.revision,3);
  assert.equal(view.chest.maxWeightKg,120);
+ assert.equal(view.chest.maxSlots,24);
+});
+
+test('Bag grants exactly eight carried slots and chest retains 24 slots',()=>{
+ const bag=sample(),clothes=sample({
+  item_code:'basic_clothes',name:'Daily Worker Clothes',category:'clothing',
+  carry_volume_bonus_l:0,carry_slots_bonus:0
+ });
+ const carried=locationSummary([bag,clothes],'pack');
+ assert.equal(carried.slotsUsed,2);
+ assert.equal(carried.maxSlots,24);
+ const stored=planTransfer([bag,clothes],bag.id,1,'home_chest',randomUUID());
+ assert.equal(locationSummary(stored.after,'pack').maxSlots,16);
+ assert.equal(locationSummary(stored.after,'home_chest').maxSlots,24);
+ const recovered=planTransfer(stored.after,bag.id,1,'pack',randomUUID());
+ assert.equal(locationSummary(recovered.after,'pack').maxSlots,24);
+});
+
+test('Slot limits are enforced independently of generous weight/volume capacity',()=>{
+ const packed=Array.from({length:16},()=>sample({
+  item_code:'test_scrap',name:'Scrap',category:'misc',
+  weight_kg:.001,volume_l:.001,carry_volume_bonus_l:0,carry_slots_bonus:0
+ }));
+ const chestItem=sample({id:randomUUID(),item_code:'test_wire',
+  location:'home_chest',weight_kg:.001,volume_l:.001,
+  carry_volume_bonus_l:0,carry_slots_bonus:0});
+ assert.equal(locationSummary(packed,'pack').maxSlots,16);
+ assert.throws(()=>planTransfer([...packed,chestItem],chestItem.id,1,
+  'pack',randomUUID()),/pack_slots_exceeded/);
+ const filledChest=Array.from({length:24},()=>sample({
+  item_code:'test_scrap',location:'home_chest',weight_kg:.001,volume_l:.001,
+  carry_volume_bonus_l:0,carry_slots_bonus:0
+ }));
+ const carry=sample({item_code:'test_cord',weight_kg:.001,volume_l:.001,
+  carry_volume_bonus_l:0,carry_slots_bonus:0});
+ assert.equal(locationSummary(filledChest,'home_chest').maxSlots,24);
+ assert.throws(()=>planTransfer([...filledChest,carry],carry.id,1,
+  'home_chest',randomUUID()),/chest_slots_exceeded/);
 });
