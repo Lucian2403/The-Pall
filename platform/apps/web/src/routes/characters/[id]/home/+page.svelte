@@ -5,11 +5,12 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
-  type Action='read_notice'|'put_down'|'finish';
+  type Action='read_notice'|'put_down'|'finish'|'rest';
   type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:string;
     branch:'restamp'|'contracts'|'records';outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
-    noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean};
+    noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
+    condition:{stamina:number;composure:number;fatigue:number;stress:number}};
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
     coins:number;health:{current:number;maximum:number};startingLocation:string;
     tutorial:{stage:number;status:string}};
@@ -18,7 +19,7 @@
   let character=$state<Character|null>(null);
   let home=$state<Home|null>(null);
   let status=$state<'loading'|'ready'|'unauthorized'|'missing'|'prerequisite'|'schema'|'error'>('loading');
-  let pending=$state(false),errorMessage=$state(''),chestMessage=$state('');
+  let pending=$state(false),errorMessage=$state(''),chestMessage=$state(''),restMessage=$state('');
   let noticeExpanded=$state(false),journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
   let retryKey:string|null=null,retryId:string|null=null;
@@ -42,7 +43,7 @@
     if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
   }
   async function refresh(){
-    status='loading';errorMessage='';
+    status='loading';errorMessage='';restMessage='';
     try{
       const [c,r]=await Promise.all([
         fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
@@ -68,7 +69,7 @@
   }
   onMount(()=>{void refresh();});
   async function perform(action:Action){
-    if(pending||!home||home.completed)return;
+    if(pending||!home||(home.completed&&action!=='rest'))return;
     const key=home.revision+':'+action;
     if(key!==retryKey||!retryId){retryKey=key;retryId=crypto.randomUUID();}
     pending=true;errorMessage='';
@@ -85,6 +86,9 @@
       if(!response.ok)throw Error('home_action_failed');
       home=await response.json() as Home;
       noticeExpanded=home.phase==='NOTICE';
+      restMessage=action==='rest'
+        ?'Rested. Stamina and Composure are full; Fatigue and Stress cleared.'
+        :'';
       retryId=null;retryKey=null;
       if(character)character={...character,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
     }catch{errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';}
@@ -101,26 +105,37 @@
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home">
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <div class="home-scene" aria-label="A modest rented room in Grand Cylinder City">
-        <button type="button" class="hotspot chest" aria-label="Inspect chest" title="Chest"
-            onclick={()=>chestMessage='Storage will be added with the Inventory and Equipment system.'}>
-            <span>Chest</span>
-          </button>
-          <button type="button" class="hotspot book" aria-label="Read journal" title="Journal"
-            data-pall-sfx="paper" onclick={()=>{void toggleJournal();}}><span>Journal</span></button>
-          <button type="button" class="hotspot rent" aria-label="Read rent notice" title="Rent notice"
-            data-pall-sfx="paper" onclick={interactNotice}>
-            <span class="paper-object" aria-hidden="true">RENT</span><span class="object-caption">Rent notice</span>
-          </button>
+        <button type="button" class="hotspot chest" aria-label="Storage"
+          title="Storage" onclick={()=>chestMessage='Storage will be added with the Inventory and Equipment system.'}>
+          <span class="object-caption">Storage</span>
+        </button>
+        <button type="button" class="hotspot book" aria-label="Read journal"
+          title="Journal" data-pall-sfx="paper"
+          onclick={()=>{void toggleJournal();}}>
+          <span class="object-caption">Journal</span>
+        </button>
+        <button type="button" class="hotspot notice-object" aria-label="Read notice"
+          title="Notice" data-pall-sfx="paper" onclick={interactNotice}>
+          <img src="/locations/home/notice.webp" alt="" width="150" height="100"
+            draggable="false" />
+          <span class="object-caption">Notice</span>
+        </button>
+        <button type="button" class="hotspot bed" aria-label="Rest in bed"
+          title="Rest — restore Stamina and Composure, clear Fatigue and Stress"
+          disabled={pending} onclick={()=>{void perform('rest');}}>
+          <span class="object-caption">Rest</span>
+        </button>
+        {#if restMessage}<p class="rest-message" role="status">{restMessage}</p>{/if}
         {#if home.phase==='HOME'}
           <aside class="home-dialogue" aria-label="Return home dialogue">
             <p class="eyebrow">RETURN HOME · STAGE VIII</p>
             <h1>Home</h1>
-            <p class="narration">You return to your rented home. Inside, you find a rent notice.</p>
+            <p class="narration">You return to your rented home. A notice lies on the table.</p>
             <p class="instruction">Read the notice on the table.</p>
           </aside>
         {:else if noticeExpanded}
-          <aside class="home-dialogue notice" aria-label="Rent notice">
-            <p class="eyebrow">RENT NOTICE · STAGE VIII</p>
+          <aside class="home-dialogue notice" aria-label="Notice">
+            <p class="eyebrow">NOTICE · STAGE VIII</p>
             <h1>{home.noticeTitle}</h1><p class="notice-text">{home.noticeText}</p>
             {#if home.phase==='NOTICE'}
               <button type="button" class="pall-framed-button" disabled={pending}
@@ -147,14 +162,7 @@
           </aside>
         {/if}
       </div>
-        <div class="rent-status">
-          <span>Coins: <strong>{home.coins}</strong></span>
-          {#if home.phase!=='HOME'}
-            <span>Rent: <strong>{home.rent}</strong></span>
-            <span>Still needed: <strong>{home.shortfall}</strong></span>
-          {/if}
-          <span class="no-payment">Rent cannot be paid during this tutorial.</span>
-        </div>
+
       {#if chestMessage}<p role="status" class="status-message">{chestMessage}</p>{/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if journalOpen}
@@ -220,22 +228,45 @@
     color:#654a38;margin:0 0 13px}
   .home-dialogue .pall-framed-button{display:inline-flex;margin:3px 0 8px;
     min-height:42px;align-items:center;justify-content:center}
+  /* The objects are the targets. No debug-style coloured hitbox appears on
+     hover: a small amber point and an unobtrusive name identify interaction. */
   .hotspot{position:absolute;z-index:5;cursor:pointer;background:transparent;
-    border:1px solid transparent;color:#e9d0a4;padding:0}
-  .hotspot:is(:hover,:focus-visible){outline:2px solid #eccc85;outline-offset:1px;
-    background:#f5d18b24;border-color:#eccc85}
-  .hotspot > span:not(.paper-object){position:absolute;bottom:0;left:50%;transform:translate(-50%,110%);
-    padding:2px 7px;background:#241b14ed;color:#f1d5a6;border:1px solid #9e754e;
-    white-space:nowrap;font:700 clamp(10px,.85vw,12px)/1.2 Georgia,serif}
+    border:0;outline:0;color:#e9d0a4;padding:0;isolation:isolate}
+  .hotspot:disabled{opacity:.5;cursor:wait}
+  .hotspot:not(.notice-object)::after{content:'';position:absolute;top:52%;left:50%;
+    width:21px;height:21px;border:1px solid #f0ce8c;border-radius:50%;
+    background:radial-gradient(circle,#f4d9a799 0 17%,#f4d9a844 24%,transparent 65%);
+    box-shadow:0 0 10px #f1c77a88;pointer-events:none;opacity:0;
+    transform:translate(-50%,-50%) scale(.65);
+    transition:opacity .16s ease,transform .16s ease}
+  .hotspot:not(.notice-object):is(:hover,:focus-visible)::after{
+    opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .hotspot .object-caption{position:absolute;z-index:3;bottom:-25px;left:50%;
+    transform:translate(-50%,4px);pointer-events:none;opacity:0;
+    padding:3px 9px;border:1px solid #ad814c;border-radius:2px;
+    background:#241b14f2;color:#f0d5a4;white-space:nowrap;
+    font:700 clamp(11px,.87vw,13px)/1.15 Georgia,serif;
+    box-shadow:0 2px 7px #0008;
+    transition:opacity .16s ease,transform .16s ease}
+  .hotspot:is(:hover,:focus-visible) .object-caption{
+    opacity:1;transform:translate(-50%,0)}
+  .hotspot:focus-visible .object-caption{outline:2px solid #f3d18a;outline-offset:2px}
   .chest{left:1%;top:64%;width:19%;height:25%}
   .book{left:63%;top:68%;width:11%;height:11%}
-  .rent{left:51%;top:65%;width:11%;height:14%;display:grid;place-items:center}
-  .paper-object{display:grid;place-items:center;width:74%;height:80%;box-sizing:border-box;
-    transform:rotate(-5deg);background:#ead4ac;color:#56321d;box-shadow:0 5px 13px #000a;
-    border:2px solid #99704b;font:700 11px Georgia,serif}
-  .rent-status{display:flex;gap:9px 18px;flex-wrap:wrap;background:#2b241e;color:#ead2b0;
-    padding:10px 15px;border-top:1px solid #8c6d4c;font:600 13px Georgia,serif}
-  .no-payment{margin-left:auto;color:#b6a28d;font-size:11px}
+  .bed{left:14%;top:39%;width:31%;height:25%}
+  .notice-object{left:50%;top:65%;width:12%;height:15%;
+    display:grid;place-items:center}
+  .notice-object img{width:100%;height:100%;object-fit:contain;
+    transform:rotate(-5deg) scale(1);filter:drop-shadow(0 5px 5px #0008);
+    transition:transform .16s ease,filter .16s ease;pointer-events:none}
+  .notice-object:is(:hover,:focus-visible) img{
+    transform:rotate(-5deg) scale(1.085);
+    filter:brightness(1.1) drop-shadow(0 0 7px #e4bc7488) drop-shadow(0 5px 5px #0008)}
+  .rest-message{position:absolute;bottom:3%;left:2%;z-index:9;
+    max-width:min(60%,450px);box-sizing:border-box;margin:0;
+    padding:9px 13px;border:1px solid #97734a;border-radius:2px;
+    background:#251c17eb;color:#edd9b7;
+    font:600 13px/1.4 Georgia,serif;box-shadow:0 4px 12px #000a}
   .status-message,.error{margin:0;padding:10px 15px;background:#362b1d;color:#e7d3b3}
   .error{color:#efaaa2;background:#472222}
   .journal{padding:20px clamp(15px,3vw,44px);scroll-margin-top:65px;
@@ -263,7 +294,7 @@
     .home-dialogue .notice-text{font-size:14px}
     .home-dialogue .eyebrow,.home-dialogue .speaker{font-size:12px}
     .home-dialogue h1{font-size:22px}
-    .hotspot > span:not(.paper-object){font-size:9px;padding:1px 3px}
-    .no-payment{margin-left:0}
+    .hotspot .object-caption{font-size:11px;padding:2px 5px}
+    .rest-message{bottom:2%;max-width:90%;font-size:11px}
   }
 </style>
