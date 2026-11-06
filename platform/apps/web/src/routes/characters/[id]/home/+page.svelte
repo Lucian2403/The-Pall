@@ -21,6 +21,7 @@
   let home=$state<Home|null>(null);
   let status=$state<'loading'|'ready'|'unauthorized'|'missing'|'prerequisite'|'schema'|'error'>('loading');
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
+  let restAnimating=$state(false);
   let noticeExpanded=$state(false);
   let overlayKind=$state<'storage'|'journal'|null>(null);
   let overlayDialog:HTMLDialogElement|undefined;
@@ -82,8 +83,8 @@
     }catch(e){errorMessage=e instanceof Error?e.message:'Home unavailable';status='error';}
   }
   onMount(()=>{void refresh();});
-  async function perform(action:Action){
-    if(pending||!home||(home.completed&&action!=='rest'))return;
+  async function perform(action:Action):Promise<boolean>{
+    if(pending||!home||(home.completed&&action!=='rest'))return false;
     const key=home.revision+':'+action;
     if(key!==retryKey||!retryId){retryKey=key;retryId=crypto.randomUUID();}
     pending=true;errorMessage='';
@@ -95,18 +96,29 @@
         const latest=await fetch(api,{cache:'no-store'});
         if(latest.ok){home=await latest.json() as Home;noticeExpanded=home.phase==='NOTICE';}
         errorMessage='The saved scene changed. Current progress has been reloaded.';
-        return;
+        return false;
       }
       if(!response.ok)throw Error('home_action_failed');
       home=await response.json() as Home;
       noticeExpanded=home.phase==='NOTICE';
-      restMessage=action==='rest'
-        ?'Rested. Stamina and Composure are full; Fatigue and Stress cleared.'
-        :'';
       retryId=null;retryKey=null;
       if(character)character={...character,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
-    }catch{errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';}
+      return true;
+    }catch{
+      errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';
+      return false;
+    }
     finally{pending=false;}
+  }
+  async function restInBed(){
+    if(restAnimating||pending||!home)return;
+    restAnimating=true;restMessage='';
+    // This is only a one-second visual transition; the server still owns Rest.
+    const fade=new Promise<void>(resolve=>setTimeout(resolve,1000));
+    const saved=await perform('rest');
+    await fade;
+    restAnimating=false;
+    if(saved)restMessage='Rested. Stamina and Composure are full; Fatigue and Stress cleared.';
   }
   function interactNotice(){
     if(pending||!home)return;
@@ -136,11 +148,20 @@
         </button>
         <button type="button" class="hotspot bed" aria-label="Rest in bed"
           title="Rest — restore Stamina and Composure, clear Fatigue and Stress"
-          disabled={pending} onclick={()=>{void perform('rest');}}>
+          disabled={pending||restAnimating} onclick={()=>{void restInBed();}}>
           <span class="object-caption">Rest</span>
         </button>
-        {#if restMessage}<p class="rest-message" role="status">{restMessage}</p>{/if}
-        {#if home.phase==='HOME'}
+        {#if restAnimating}<div class="rest-fade" aria-hidden="true"></div>{/if}
+        {#if restMessage}
+          <aside class="home-dialogue rest-dialogue" aria-label="Rest result" role="status">
+            <p class="eyebrow">BED · REST</p>
+            <h1>A moment of quiet</h1>
+            <p class="narration">You lie down. For a little while, the racket of the city falls away.</p>
+            <p class="instruction">{restMessage}</p>
+            <button type="button" class="pall-framed-button"
+              onclick={()=>restMessage=''}>Continue</button>
+          </aside>
+        {:else if home.phase==='HOME'}
           <aside class="home-dialogue" aria-label="Return home dialogue">
             <p class="eyebrow">RETURN HOME · STAGE VIII</p>
             <h1>Home</h1>
@@ -280,11 +301,15 @@
   .notice-object:is(:hover,:focus-visible) img{
     transform:rotate(-5deg) scale(1.085);
     filter:brightness(1.1) drop-shadow(0 0 7px #e4bc7488) drop-shadow(0 5px 5px #0008)}
-  .rest-message{position:absolute;bottom:3%;left:2%;z-index:9;
-    max-width:min(60%,450px);box-sizing:border-box;margin:0;
-    padding:9px 13px;border:1px solid #97734a;border-radius:2px;
-    background:#251c17eb;color:#edd9b7;
-    font:600 13px/1.4 Georgia,serif;box-shadow:0 4px 12px #000a}
+  .rest-fade{position:absolute;inset:0;z-index:15;pointer-events:none;
+    background:#000;animation:rest-room-fade 1s ease-in-out both}
+  @keyframes rest-room-fade{
+    0%{opacity:0}48%{opacity:1}100%{opacity:0}
+  }
+  .home-dialogue.rest-dialogue{z-index:9}
+  @media(prefers-reduced-motion:reduce){
+    .rest-fade{animation:none;opacity:0}
+  }
   .status-message,.error{margin:0;padding:10px 15px;background:#362b1d;color:#e7d3b3}
   .error{color:#efaaa2;background:#472222}
   .room-overlay{position:fixed;inset:0;margin:auto;
@@ -319,7 +344,6 @@
     .home-dialogue .eyebrow,.home-dialogue .speaker{font-size:12px}
     .home-dialogue h1{font-size:22px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
-    .rest-message{bottom:2%;max-width:90%;font-size:11px}
     .room-overlay{width:calc(100vw - 18px);max-height:calc(100dvh - 22px)}
     .journal{padding:18px 16px}
     .journal-heading{align-items:flex-start;flex-wrap:wrap}
