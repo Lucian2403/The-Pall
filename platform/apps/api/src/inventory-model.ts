@@ -9,7 +9,8 @@ export type InventoryRow={
  grant_key:string|null;
  name:string;category:string;description:string;stackable:boolean;
  max_stack:number;weight_kg:string|number;volume_l:string|number;
- carry_volume_bonus_l:string|number;design_status:string;
+ carry_volume_bonus_l:string|number;carry_slots_bonus:number;
+ rarity_label:string;armour_rating:number;design_status:string;
 };
 type Edit=
   |{kind:'update';id:string;quantity:number;location:ItemLocation}
@@ -19,10 +20,16 @@ export class InventoryInvalidAction extends Error{}
 const round=(n:number)=>Math.round((n+Number.EPSILON)*1000)/1000;
 const mass=(v:string|number)=>Number(v);
 export const PLAYTEST_CAPACITY={
- packBaseKg:20,packBaseL:5,chestKg:120,chestL:200
+ packBaseKg:20,packBaseL:5,packBaseSlots:16,
+ chestKg:120,chestL:200,chestSlots:24
 } as const;
 export function locationSummary(rows:InventoryRow[],location:ItemLocation){
  const selected=rows.filter(x=>x.location===location);
+ const slotsUsed=selected.length;
+ const maxSlots=location==='pack'
+   ?PLAYTEST_CAPACITY.packBaseSlots+
+       selected.reduce((t,x)=>t+x.carry_slots_bonus*x.quantity,0)
+   :PLAYTEST_CAPACITY.chestSlots;
  const weightKg=round(selected.reduce((t,x)=>t+mass(x.weight_kg)*x.quantity,0));
  const volumeL=round(selected.reduce((t,x)=>t+mass(x.volume_l)*x.quantity,0));
  const maxWeightKg=location==='pack'?PLAYTEST_CAPACITY.packBaseKg:PLAYTEST_CAPACITY.chestKg;
@@ -30,8 +37,9 @@ export function locationSummary(rows:InventoryRow[],location:ItemLocation){
    ?round(PLAYTEST_CAPACITY.packBaseL+
       selected.reduce((t,x)=>t+mass(x.carry_volume_bonus_l)*x.quantity,0))
    :PLAYTEST_CAPACITY.chestL;
- return {weightKg,volumeL,maxWeightKg,maxVolumeL,
-   overCapacity:weightKg>maxWeightKg+.00001||volumeL>maxVolumeL+.00001};
+ return {slotsUsed,maxSlots,weightKg,volumeL,maxWeightKg,maxVolumeL,
+   overCapacity:slotsUsed>maxSlots||
+     weightKg>maxWeightKg+.00001||volumeL>maxVolumeL+.00001};
 }
 export function inventoryView(rows:InventoryRow[],revision:number,storageEnabled:boolean){
  const mapRow=(x:InventoryRow)=>({
@@ -40,6 +48,8 @@ export function inventoryView(rows:InventoryRow[],revision:number,storageEnabled
   maxStack:x.max_stack,qualityTier:x.quality_tier,
   weightKg:mass(x.weight_kg),volumeL:mass(x.volume_l),
   carryVolumeBonusL:mass(x.carry_volume_bonus_l),
+  carrySlotsBonus:x.carry_slots_bonus,
+  rarity:x.rarity_label,armour:x.armour_rating,
   currentDurability:x.current_durability,maxDurability:x.max_durability,
   designStatus:x.design_status
  });
@@ -97,9 +107,13 @@ export function planTransfer(rows:InventoryRow[],id:string,quantity:number,
   after.push({...source,id:newId,grant_key:null,location:to,quantity:outstanding});
   edits.push({kind:'insert',id:newId,sourceId:source.id,quantity:outstanding,location:to});
  }
- if(locationSummary(after,'pack').overCapacity)
-   throw new InventoryInvalidAction('pack_capacity_exceeded');
- if(locationSummary(after,'home_chest').overCapacity)
-   throw new InventoryInvalidAction('chest_capacity_exceeded');
+ const pack=locationSummary(after,'pack');
+ const chest=locationSummary(after,'home_chest');
+ if(pack.slotsUsed>pack.maxSlots)
+   throw new InventoryInvalidAction('pack_slots_exceeded');
+ if(chest.slotsUsed>chest.maxSlots)
+   throw new InventoryInvalidAction('chest_slots_exceeded');
+ if(pack.overCapacity)throw new InventoryInvalidAction('pack_capacity_exceeded');
+ if(chest.overCapacity)throw new InventoryInvalidAction('chest_capacity_exceeded');
  return {edits,after};
 }
