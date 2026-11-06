@@ -105,7 +105,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !web.includes("perform('travel')")&&
   !web.includes("perform('enter')")&&
   web.includes("url('/locations/home/rented-room.webp')")&&
-  web.includes('aria-label="Inspect chest"')&&
+  web.includes('aria-label="Storage"')&&
   web.includes('aria-label="Read journal"')&&
   web.includes('aria-label="Read notice"')&&
   web.includes('class="hotspot notice-object"')&&
