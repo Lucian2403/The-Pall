@@ -14,7 +14,7 @@ type Session={user:{id:string;emailVerified:boolean}}|null;
 type Resolver=(headers:IncomingHttpHeaders)=>Promise<Session>;
 type Character={id:string;name:string;origin:string;tutorial_stage:number;tutorial_status:string;coins:string|number};
 type Command={kind:'start';requestId:string}|{kind:'action';requestId:string;expectedRevision:number;action:Action};
-const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i;
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function parse(input:unknown):Command{
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('invalid_body');
  const v=input as Record<string,unknown>;
