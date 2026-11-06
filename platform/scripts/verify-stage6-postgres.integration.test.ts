@@ -926,6 +926,15 @@ test('Stage 7 rewind blocks inconsistent character Health without partial deleti
 });
 
 
+async function seedStageThreeRouteForHome(c:{id:string}){
+  // The generic Stage 6 combat fixture starts at combat and has no genuine
+  // Stage 3 investigation; the home API correctly requires a saved choice.
+  await db.query(
+    'INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,1,$2::jsonb)',
+    [c.id,JSON.stringify({phase:'SELECTED',branch:'restamp'})]
+  );
+}
+
 test('Back to Stage 7 preserves the 10-coin clinic fee and Flint fight',async()=>{
   const {c}=await outcomeWith(()=>({type:'guard'}));
   const priced=await completeExamination(c);
@@ -962,6 +971,7 @@ test('Back to Stage 7 preserves the 10-coin clinic fee and Flint fight',async()=
   assert.equal(clinic.body!.coins,10);
   const travel=await clinicAdvance(c,clinic.body!,'leave');
   assert.equal(travel.phase,'LEFT');
+  await seedStageThreeRouteForHome(c);
   const home=await request('POST',base+c.id+'/tutorial/home',owner,{
     kind:'start',requestId:randomUUID()
   });
@@ -1006,6 +1016,7 @@ test('Stage 8 Back to Stage 7 works during notice reading and after completion',
    const paid=await clinicAdvance(c,priced,'pay');
    await clinicAdvance(c,paid,'leave');
    const route=base+c.id+'/tutorial/home';
+   await seedStageThreeRouteForHome(c);
    const initial=await request('POST',route,owner,{kind:'start',requestId:randomUUID()});
    assert.equal(initial.status,200);
    const noticed=await request('POST',route,owner,{
