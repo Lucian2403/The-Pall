@@ -43,12 +43,13 @@
           itemInstanceId:item.id,quantity,to})});
       if(response.status===409){
         const body=await response.json() as {error?:string};
-        error=body.error==='pack_capacity_exceeded'?'Too much weight or volume to carry.'
+        const message=body.error==='pack_capacity_exceeded'?'Too much weight or volume to carry.'
           :body.error==='chest_capacity_exceeded'?'The chest has insufficient space.'
           :body.error==='stale_revision'?'Inventory changed. Current contents reloaded.'
           :body.error==='storage_not_unlocked'?'Home storage is not yet unlocked.'
           :'Item transfer could not be completed.';
         await reload();
+        error=message;
         return;
       }
       if(!response.ok)throw Error('Transfer failed. Inventory was not changed.');
