@@ -193,8 +193,8 @@ test('New characters of all six origins receive exactly the same owned starter k
   await db.query(
    'INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9)',
    [id,owner,'Inventory '+origin,'inventory-'+id,'Female',origin,
-    JSON.stringify({}),JSON.stringify([{name:'Basic Clothes',quantity:1},
-     {name:'Crude Small Bag',quantity:1}]),'Origin tutorial']
+    JSON.stringify({}),JSON.stringify([{name:'Daily Worker Clothes',quantity:1},
+     {name:'Simple Bag',quantity:1}]),'Origin tutorial']
   );
   const grants=await db.query<{item_code:string;quantity:number}>(
    'SELECT item_code,quantity FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code',[id]);
@@ -219,7 +219,23 @@ test('Inventory API restricts ownership and keeps chest closed before shared hom
  assert.equal(response.body!.pack.items.length,2);
  assert.equal(response.body!.pack.maxWeightKg,20);
  assert.equal(response.body!.pack.maxVolumeL,17);
+ assert.equal(response.body!.pack.maxSlots,24,'16 base + eight slots from the carried Simple Bag');
+ assert.equal(response.body!.pack.slotsUsed,2);
+ assert.equal(response.body!.chest.maxSlots,24);
  assert.equal(response.body!.chest.items.length,0);
+ const clothes=response.body!.pack.items.find((x:any)=>x.code==='basic_clothes');
+ const bag=response.body!.pack.items.find((x:any)=>x.code==='crude_small_bag');
+ assert.equal(clothes.name,'Daily Worker Clothes');
+ assert.equal(clothes.rarity,'Common');
+ assert.equal(clothes.armour,0);
+ assert.equal(clothes.description,
+  "A sweat-stained shirt, rough trousers and boots worn thin at the soles. The cloth's stiff with old grime, the seams barely holding. They've seen too many long shifts and too few washes. Won't stop a blade or a club, but they'll keep the cold off. Mostly.");
+ assert.equal(bag.name,'Simple Bag');
+ assert.equal(bag.category,'bag');
+ assert.equal(bag.rarity,'Common');
+ assert.equal(bag.carrySlotsBonus,8);
+ assert.equal(bag.description,
+  "A battered canvas bag with a cracked leather strap and stitching that's coming apart. Smells of damp cloth, dust and old sweat. Holds a few tools, scraps or whatever else you've managed to get your hands on. Just don't trust it with anything too heavy.");
  assert.equal((await request('GET',path,stranger)).status,404);
  assert.equal((await request('GET',path,null)).status,401);
  const item=response.body!.pack.items[0];
@@ -252,6 +268,7 @@ test('Home chest saves real transfers and blocks double-clicks, capacity, spoofi
  assert.equal(moved.status,200,JSON.stringify(moved.body));
  assert.equal(moved.body!.revision,1);
  assert.equal(moved.body!.pack.maxVolumeL,5);
+ assert.equal(moved.body!.pack.maxSlots,16,'Removing the bag removes its eight extra slots');
  assert.equal(moved.body!.chest.items[0].id,bag.id);
  assert.deepEqual((await request('POST',path,owner,cmd)).body,moved.body,
   'Idempotent request must replay original receipt without a second transfer');
@@ -275,6 +292,7 @@ test('Home chest saves real transfers and blocks double-clicks, capacity, spoofi
  assert.equal(taken.status,200,JSON.stringify(taken.body));
  assert.equal(taken.body!.revision,2);
  assert.equal(taken.body!.pack.maxVolumeL,17);
+ assert.equal(taken.body!.pack.maxSlots,24);
  assert.equal(taken.body!.pack.items.length,2);
  assert.equal(taken.body!.chest.items.length,0);
  // Two independent tabs submit the same revision with distinct IDs.
@@ -292,6 +310,60 @@ test('Home chest saves real transfers and blocks double-clicks, capacity, spoofi
  const storedCoins=await db.query('SELECT coins FROM player_characters WHERE id=$1',[c.id]);
  assert.equal(Number(storedCoins.rows[0].coins),20,'No money changed through storage');
 });
+test('PostgreSQL slot rules block full inventory and chest even at negligible weight',async()=>{
+ const c=await character();
+ const path=base+c.id+'/inventory';
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",[c.id]);
+ await db.query(
+  'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',
+  [c.id,JSON.stringify({phase:'COMPLETE',revision:3})]);
+ await db.query(
+  "INSERT INTO pall_item_definitions(code,name,category,stackable,max_stack,weight_kg,volume_l,quality_min,quality_max) VALUES('test_needle','Test Needle','component',FALSE,1,.001,.001,1,1) ON CONFLICT DO NOTHING");
+ // Two starter slots + 22 separate stacks fill all 24 slots while the bag is carried.
+ for(let i=0;i<22;i++){
+  await db.query(
+   "INSERT INTO player_character_item_instances(character_id,item_code,location) VALUES($1,'test_needle','pack')",[c.id]);
+ }
+ const waiting=randomUUID();
+ await db.query(
+  "INSERT INTO player_character_item_instances(id,character_id,item_code,location) VALUES($1,$2,'test_needle','home_chest')",
+  [waiting,c.id]);
+ let state=(await request('GET',path)).body!;
+ assert.equal(state.pack.slotsUsed,24);
+ assert.equal(state.pack.maxSlots,24);
+ assert.equal(state.chest.slotsUsed,1);
+ const denied=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:waiting,quantity:1,to:'pack'
+ });
+ assert.equal(denied.status,409);
+ assert.equal(denied.body!.error,'pack_slots_exceeded');
+ assert.equal((await request('GET',path)).body!.revision,0);
+ // The bag cannot be moved to chest while 23 other items would exceed
+ // the 16-slot unbagged inventory allowance.
+ const bag=state.pack.items.find((x:any)=>x.code==='crude_small_bag');
+ const blocked=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:bag.id,quantity:1,to:'home_chest'
+ });
+ assert.equal(blocked.status,409);
+ assert.equal(blocked.body!.error,'pack_slots_exceeded');
+ const chestFull=await db.query(
+  "INSERT INTO player_character_item_instances(character_id,item_code,location) SELECT $1,'test_needle','home_chest' FROM generate_series(1,23)",
+  [c.id]
+ );
+ assert.equal(chestFull.rowCount,23);
+ const clothes=state.pack.items.find((x:any)=>x.code==='basic_clothes');
+ const chestBlocked=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:clothes.id,quantity:1,to:'home_chest'
+ });
+ assert.equal(chestBlocked.status,409);
+ assert.equal(chestBlocked.body!.error,'chest_slots_exceeded');
+ assert.equal((await request('GET',path)).body!.revision,0);
+});
+
 test('Stacked generic items split and merge without minting quantities or bypassing capacity',async()=>{
  const c=await character();
  const path=base+c.id+'/inventory';
