@@ -164,3 +164,41 @@ CI runs do not migrate or restart the owner's local PostgreSQL/API processes.
 **Migration needed for existing local databases:**
 `cd platform; npm run inventory:migrate` (runs both 0011 and 0012).
 Keep Docker volumes intact; restart the API afterward.
+
+## Owner visual and derived-stat revision — Stage 8
+
+- The home illustration keeps its native 1672:941 proportions and exact
+  interactive hotspot geometry, now at a 1080 px maximum width (approximately
+  608 px tall). The surrounding stage uses a blurred/darkened extension of
+  the same painted room rather than blank side gutters. This is not a stretched
+  wallpaper nor a cropped interactive image.
+- Torso and Pants are **one Clothing (Torso & Legs) socket**. The persisted
+  database key remains `torso` to preserve the equipped universal outfit
+  and its instance UUID. The separate `pants` slot is retired from the
+  available socket list and constrained out by the additive
+  `0013_equipment_stats_and_clothing.sql` migration. If historical custom
+  Pants equipment exists, the migration stops explicitly rather than silently
+  replacing or discarding it.
+- The lower part of the Equipment card now has a server-derived summary:
+  **Armor**, **equipped weapon Damage**, **Pall Protection**,
+  **Ash Protection**, **Max Weight**, **Inventory Slots** and
+  **Bag Volume**. Only `location='equipped'` instances contribute.
+  Without an equipped weapon, Damage is displayed as an em dash rather
+  than presenting fictitious unarmed damage.
+- The stat columns on item definitions are `damage_rating`,
+  `pall_protection`, `ash_protection` and `carry_weight_bonus_kg`.
+  They default to zero and do not grant starter equipment fabricated benefits.
+  Existing `armour_rating` and equipped bag storage bonuses are reused.
+  `maxWeightKg` and capacities are calculated by the server; no client-side
+  trust in drag/drop events or item text.
+- This is an **equipment readout**, not a new combat balance pass:
+  Pall/Ash mitigation, weapon combat damage, and armour calculations
+  have not been connected to combat resolution by this display.
+  Equipment provides its recorded values only. Future supported properties
+  in the item schema include physical/ballistic/chemical/heat protection,
+  toxins and infection resistance, weapon accuracy, movement penalties,
+  noise, seal/filtration ratings, and condition-dependent effects. These
+  are not silently treated as implemented gameplay.
+
+Existing local databases need `npm run inventory:migrate` to apply 0013,
+followed by an API restart. Character progress and possessions remain intact.
