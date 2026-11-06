@@ -26,9 +26,9 @@
   let overlayKind=$state<'storage'|'journal'|null>(null);
   let overlayDialog:HTMLDialogElement|undefined;
   let nextOpenSound=0;
-  const chestOpenSounds=['/audio/chest/PersonalChest_Open1.mp3',
-    '/audio/chest/PersonalChest_Open2.mp3'];
-  const chestCloseSound='/audio/chest/PersonalChest_Close.mp3';
+  const chestOpenSounds=['/audio/chest/PersonalChest_Open1.wav',
+    '/audio/chest/PersonalChest_Open2.wav'];
+  const chestCloseSound='/audio/chest/PersonalChest_Close.wav';
   function playChestSound(kind:'open'|'close'){
     const source=kind==='close'?chestCloseSound:
       chestOpenSounds[(nextOpenSound++)%chestOpenSounds.length];
@@ -252,7 +252,7 @@
 <style>
   :global(body){background:#151515;color:#f2e1c9}
   .stage8{min-width:0;background:#1a1816}
-  .home-scene{position:relative;width:100%;max-width:1320px;margin-inline:auto;aspect-ratio:1672/941;isolation:isolate;
+  .home-scene{position:relative;width:100%;max-width:1120px;margin-inline:auto;aspect-ratio:1672/941;isolation:isolate;
     background:#352d29 url('/locations/home/rented-room.webp') center/100% 100% no-repeat}
   .home-scene::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
