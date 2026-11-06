@@ -259,7 +259,7 @@ test('Rented-room chest and Journal open over the environment, not below it',()=
  assert.ok(web.includes("let overlayKind=$state<'storage'|'journal'|null>(null);"));
  assert.ok(web.includes('overlayDialog?.showModal()'));
  assert.ok(web.includes('overlayDialog?.close()'));
- assert.ok(web.includes('onclose={()=>overlayKind=null}'));
+ assert.ok(web.includes('onclose={handleRoomOverlayClose}'));
  assert.ok(web.includes("onclick={()=>{void openRoomOverlay('storage');}}"));
  assert.ok(web.includes("openRoomOverlay('journal')"));
  assert.ok(web.includes('class="room-overlay"'));
@@ -274,15 +274,15 @@ test('Rented-room chest and Journal open over the environment, not below it',()=
 
 test('Storage uses the owner chest sounds and the home background stays room-sized',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
- for(const name of ['PersonalChest_Open1.mp3','PersonalChest_Open2.mp3','PersonalChest_Close.mp3']){
+ for(const name of ['PersonalChest_Open1.wav','PersonalChest_Open2.wav','PersonalChest_Close.wav']){
   assert.ok(web.includes('/audio/chest/'+name),'Missing chest SFX hookup: '+name);
   const bytes=readFileSync(resolve(import.meta.dirname,'../apps/web/static/audio/chest',name));
   assert.ok(bytes.byteLength>1500,'Chest audio missing or truncated: '+name);
-  assert.ok(bytes.subarray(0,3).toString()==='ID3'||
-    (bytes[0]===0xff&&(bytes[1]&0xe0)===0xe0),'Chest sound must be an MP3: '+name);
+  assert.equal(bytes.subarray(0,4).toString(),'RIFF','Chest SFX RIFF header: '+name);
+  assert.equal(bytes.subarray(8,12).toString(),'WAVE','Chest SFX WAV header: '+name);
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- assert.ok(web.includes('max-width:1320px;margin-inline:auto;aspect-ratio:1672/941'),
+ assert.ok(web.includes('max-width:1120px;margin-inline:auto;aspect-ratio:1672/941'),
   'The Stage 8 room must not expand to the full ultrawide screen');
 });
