@@ -30,13 +30,13 @@ VALUES
 ON CONFLICT(code) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS player_character_inventory_state(
-  character_id UUID PRIMARY KEY REFERENCES player_characters(id) ON DELETE RESTRICT,
+  character_id UUID PRIMARY KEY REFERENCES player_characters(id) ON DELETE CASCADE,
   revision BIGINT NOT NULL DEFAULT 0 CHECK(revision>=0),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE TABLE IF NOT EXISTS player_character_item_instances(
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  character_id UUID NOT NULL REFERENCES player_characters(id) ON DELETE RESTRICT,
+  character_id UUID NOT NULL REFERENCES player_characters(id) ON DELETE CASCADE,
   item_code TEXT NOT NULL REFERENCES pall_item_definitions(code) ON DELETE RESTRICT,
   location TEXT NOT NULL DEFAULT 'pack' CHECK(location IN ('pack','home_chest')),
   quantity INTEGER NOT NULL DEFAULT 1 CHECK(quantity BETWEEN 1 AND 100000),
@@ -54,7 +54,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_pall_inventory_starter_grant
 CREATE INDEX IF NOT EXISTS idx_pall_inventory_owner_location
  ON player_character_item_instances(character_id,location,id);
 CREATE TABLE IF NOT EXISTS player_character_inventory_receipts(
-  character_id UUID NOT NULL REFERENCES player_characters(id) ON DELETE RESTRICT,
+  character_id UUID NOT NULL REFERENCES player_characters(id) ON DELETE CASCADE,
   request_id UUID NOT NULL,
   request_hash TEXT NOT NULL,
   response JSONB NOT NULL,
