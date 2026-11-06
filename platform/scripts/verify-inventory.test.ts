@@ -80,7 +80,7 @@ test('Merging stacks never exceeds max_stack or duplicates quantities',()=>{
  const b={...a,id:randomUUID(),quantity:8,location:'pack' as const};
  const plan=planTransfer([a,b],a.id,6,'pack',randomUUID());
  assert.deepEqual(plan.after.map(x=>[x.id,x.location,x.quantity]),[
-  [b.id,'pack',10],[a.id,'pack',4]
+  [a.id,'pack',4],[b.id,'pack',10]
  ]);
  assert.equal(plan.after.reduce((sum,x)=>sum+x.quantity,0),14);
  assert.equal(plan.edits[0].kind,'update');
