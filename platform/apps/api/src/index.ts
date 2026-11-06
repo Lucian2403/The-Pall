@@ -30,6 +30,7 @@ registerMillhandWageClaimRoutes(api);
 registerMillhandCombatRoutes(api);
 registerMillhandClinicRoutes(api);
 registerTutorialHomeRoutes(api);
+registerInventoryRoutes(api);
 registerMillhandStageRewindRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {
