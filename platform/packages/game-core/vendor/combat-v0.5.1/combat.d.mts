@@ -3,7 +3,7 @@ export type CombatOutcome = 'player_victory' | 'player_defeat' | 'player_escaped
 export type CombatZone = 'head' | 'torso' | 'limbs';
 export type CombatAction =
   | {type:'attack'|'technique';zone:CombatZone}
-  | {type:'guard'}
+  | {type:'guard'|'focus'}
   | {type:'move';to:'side'|'close'|'cover'|'back'}
   | {type:'recover';mode:'breath'|'nerves'}
   | {type:'use';item:'bandage'}
@@ -17,6 +17,7 @@ export type CombatEvent = {
 export type CombatActor = {
   name:string; hp:number;hpMax:number;ceiling:number;stamina:number;
   composure:number;fatigue:number;stress:number;momentum:number;
+  focusedUntilRound?:number;
   wounds:Array<{type:string;zone?:CombatZone;severity:string;[key:string]:unknown}>;
   bleed:number;bandages:number;guard:boolean;readiness:number;
   armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
@@ -34,9 +35,19 @@ export type CombatState = {
   [extra:string]:unknown;
 };
 export declare function isUnarmedWeapon(weapon:CombatActor['weapon']):boolean;
+export declare function canActAtFatigue(actor:Pick<CombatActor,'fatigue'>,actionType?:string):boolean;
+export declare function fatigueAccuracyPenalty(actor:Pick<CombatActor,'fatigue'>):number;
+export declare function focusedStanceTurns(input:CombatState,who?:'player'|'enemy'):number;
 export declare const TEST_CONFIG:Readonly<{
   strikeCost:number;repeatedStrikeSurcharge:number;guardCost:number;moveCost:number;
-  recoverGain:number;mentalRecoverGain:number;aim:Record<CombatZone,number>;
+  recoverGain:number;exhaustedRecoverGain:number;
+  mentalRecoverGain:number;lowReserve:number;
+  fatigueLowGain:number;fatigueExhaustedDefenseGain:number;fatigueExhaustedAttackGain:number;
+  fatigueRecovery:number;exhaustedFatigueRecovery:number;
+  highFatigueRecoverThreshold:number;fatigueCap:number;fatigueAttackLock:number;
+  fatigueAccuracyStep:number;fatigueAccuracyPenaltyPerStep:number;
+  focusedStanceComposureCost:number;focusedStanceAccuracyBonus:number;focusedStanceDuration:number;
+  aim:Record<CombatZone,number>;
   strikeMomentum:number;guardMomentum:number;moveMomentum:number;
   guardReduction:Readonly<{min:number;max:number}>;
   dodgeChance:Readonly<{side:number;cover:number;back:number;close:number}>;

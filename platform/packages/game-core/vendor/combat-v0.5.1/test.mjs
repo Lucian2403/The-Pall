@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {newEncounter,step,CombatError} from './combat.mjs';
+import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,focusedStanceTurns,TEST_CONFIG} from './combat.mjs';
 const act=(s,a,id='a')=>step(s,a,{requestId:id,expectedRevision:s.revision});
 const is = (s,t) => s.events.some(e=>e.text.includes(t));
 
@@ -105,10 +105,236 @@ test('Chronicle separates base hit damage, Opening bonus and damage after Guard'
   assert.ok(normalHits>10,'Cover unguarded Opening hits');
 });
 
-test('Stamina is persistent, Fatigue only at/below 20 from physical exertion',()=>{
- let s=newEncounter('flint',{seed:1,player:{stamina:27}});
- s=act(s,{type:'attack'});assert.equal(s.player.stamina,17);assert.equal(s.player.fatigue,5);
- let fresh=newEncounter('flint',{seed:1});fresh=act(fresh,{type:'guard'});assert.equal(fresh.player.fatigue,0);
+test('Focused Stance costs one unguarded action and 10 Composure, with no Stamina drain',()=>{
+ const s=newEncounter('flint',{seed:1,player:{
+   hp:300,hpMax:300,ceiling:300,composure:15}});
+ const after=act(s,{type:'focus'});
+ assert.equal(s.player.composure,15,'Never mutate caller state');
+ assert.equal(after.player.composure,5);
+ assert.equal(after.player.stamina,90);
+ assert.equal(after.player.fatigue,0);
+ assert.equal(after.player.momentum,0);
+ assert.equal(focusedStanceTurns(after,'player'),3);
+ assert.equal(after.lastPlayerActions.at(-1),'focus');
+ assert.equal(after.revision,s.revision+1,'Focused Stance consumes one complete combat turn');
+ assert.ok(after.events.some(e=>e.kind==='focus'&&e.actor==='player'&&
+   e.composureCost===10&&e.accuracyBonusPercent===10&&e.duration===3));
+ const blow=after.events.find(e=>e.kind==='damage'&&e.actor==='enemy');
+ if(blow)assert.equal(blow.guarded,false,'Focused Stance never supplies Guard');
+});
+test('Focused Stance lasts three subsequent turns independent of attack attempts',()=>{
+ let s=newEncounter('flint',{seed:13,player:{
+   hp:500,hpMax:500,ceiling:500,composure:80},
+   enemy:{hp:500,hpMax:500,ceiling:500,
+     weapon:{damage:1,minDamage:1,maxDamage:1,accuracy:.05,type:'blunt',reach:'contact'}}});
+ s=act(s,{type:'focus'},'focus');
+ assert.equal(s.round,2);assert.equal(focusedStanceTurns(s),3);
+ assert.throws(()=>act(s,{type:'focus'},'stack'),/already active/);
+ const copy=JSON.parse(JSON.stringify(s));
+ assert.equal(focusedStanceTurns(copy),3,'Persisted focus survives reload');
+ s=act(copy,{type:'attack',zone:'torso'},'turn1');
+ assert.equal(focusedStanceTurns(s),2);
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,10);
+ s=act(s,{type:'guard'},'turn2');
+ assert.equal(focusedStanceTurns(s),1,'Guard still consumes one buff turn');
+ s=act(s,{type:'attack',zone:'torso'},'turn3');
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,10);
+ assert.equal(focusedStanceTurns(s),0,'Three-turn buff expires after third subsequent turn');
+ s=act(s,{type:'attack',zone:'torso'},'turn4');
+ assert.equal(s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='player')
+   ?.focusedBonusPercent,0);
+ assert.equal(s.player.composure,70,'No Composure spent by later attacks');
+});
+test('Focused Stance cannot bypass Fatigue lock or inadequate Composure',()=>{
+ for(const composure of [0,5,9]){
+   const before=newEncounter('flint',{player:{composure}});
+   assert.throws(()=>act(before,{type:'focus'}),/Insufficient Composure/);
+   assert.equal(before.revision,0);
+ }
+ for(const fatigue of [70,99,100]){
+   const before=newEncounter('flint',{player:{composure:80,fatigue}});
+   assert.throws(()=>act(before,{type:'focus'}),/Fatigue/);
+   assert.equal(before.revision,0);
+ }
+});
+test('Focused Stance also works on NPCs through the shared action resolver',()=>{
+ const state=newEncounter('flint',{seed:5,enemy:{
+   hp:500,hpMax:500,ceiling:500,composure:25}});
+ state.intent={type:'focus',speed:2,signal:'concentrating',
+   tell:'Flint studies the distance and steadies his grip.'};
+ let s=act(state,{type:'guard'},'enemy-focus');
+ assert.equal(s.enemy.composure,15);
+ assert.equal(focusedStanceTurns(s,'enemy'),3);
+ assert.ok(s.events.some(e=>e.kind==='focus'&&e.actor==='enemy'));
+ s.intent={type:'attack',zone:'torso',speed:1,
+   signal:'committed',tell:'Flint commits to a swing.'};
+ s=act(s,{type:'guard'},'enemy-hit');
+ const strike=s.events.find(e=>(e.kind==='miss'||e.kind==='damage')&&e.actor==='enemy');
+ assert.equal(strike?.focusedBonusPercent,10);
+ assert.equal(focusedStanceTurns(s,'enemy'),2);
+});
+test('Stamina 1–20 adds 3 Fatigue, including the spend that reaches zero',()=>{
+ const actor={hp:240,hpMax:240,ceiling:240};
+ let s=newEncounter('flint',{seed:1,player:{...actor,stamina:27}});
+ s=act(s,{type:'attack'});assert.equal(s.player.stamina,17);assert.equal(s.player.fatigue,3);
+ s=act(s,{type:'attack'},'low-again');assert.equal(s.player.stamina,7);
+ assert.equal(s.player.fatigue,6);
+ const last=newEncounter('flint',{seed:1,player:{...actor,stamina:5}});
+ const reached=act(last,{type:'attack'});assert.equal(reached.player.stamina,0);
+ assert.equal(reached.player.fatigue,3,'5 → 0 first costs only 3 Fatigue');
+ const pastZero=act(reached,{type:'attack'},'at-zero');
+ assert.equal(pastZero.player.stamina,0);
+ assert.equal(pastZero.player.fatigue,13,'next attack from zero costs 10 Fatigue');
+ const fresh=act(newEncounter('flint',{seed:1}),{type:'guard'});
+ assert.equal(fresh.player.fatigue,0,'No Fatigue above 20 Stamina');
+});
+test('Exhausted Guard and Reposition add 5, attacks and specials add 10',()=>{
+ const player={hp:240,hpMax:240,ceiling:240,stamina:0,momentum:40};
+ for(const [action,expected] of [
+  [{type:'guard'},5],
+  [{type:'move',to:'side'},5],
+  [{type:'attack',zone:'torso'},10],
+  [{type:'technique',zone:'torso'},10]
+ ]){
+  const s=act(newEncounter('flint',{seed:7,player}),action);
+  assert.equal(s.player.stamina,0);
+  assert.equal(s.player.fatigue,expected,JSON.stringify(action));
+ }
+ const atFive=act(newEncounter('flint',{seed:7,player:{...player,stamina:5}}),{type:'guard'});
+ assert.equal(atFive.player.fatigue,3,'An incomplete Guard payment still uses the 1–20 band');
+});
+test('Each complete 10 Fatigue causes −3 percentage points attack accuracy',()=>{
+ for(const [fatigue,penalty] of [
+  [0,0],[9,0],[10,3],[19,3],[20,6],[29,6],[30,9],
+  [60,18],[69,18],[70,21],[99,27],[100,30]
+ ]){
+  assert.equal(Math.round(100*fatigueAccuracyPenalty({fatigue})),penalty,
+    'Unexpected Fatigue accuracy penalty at '+fatigue);
+ }
+ assert.equal(TEST_CONFIG.fatigueAccuracyStep,10);
+ assert.equal(TEST_CONFIG.fatigueAccuracyPenaltyPerStep,.03);
+});
+test('Fatigue 70–99 permits only Move and Recover, at 100 only Recover',()=>{
+ for(const fatigue of [70,75,99]){
+  const p={fatigue};
+  for(const action of ['attack','technique','guard','use','withdraw'])
+    assert.equal(canActAtFatigue(p,action),false,action+' at '+fatigue);
+  assert.equal(canActAtFatigue(p,'move'),true);
+  assert.equal(canActAtFatigue(p,'recover'),true);
+ }
+ const exhausted={fatigue:100};
+ for(const action of ['attack','technique','guard','move','use','withdraw'])
+  assert.equal(canActAtFatigue(exhausted,action),false,action+' at 100');
+ assert.equal(canActAtFatigue(exhausted,'recover'),true);
+ const start=newEncounter('flint',{seed:1,player:{fatigue:70,stamina:0,momentum:50}});
+ assert.throws(()=>act(start,{type:'attack',zone:'torso'}),/At 70 Fatigue/);
+ assert.throws(()=>act(start,{type:'guard'}),/At 70 Fatigue/);
+ assert.throws(()=>act(start,{type:'technique',zone:'head'}),/At 70 Fatigue/);
+ assert.throws(()=>act(start,{type:'withdraw'}),/At 70 Fatigue/);
+ assert.equal(start.revision,0,'Invalid action cannot spend a turn or modify the input');
+ const capped=act(newEncounter('flint',{seed:1,player:{fatigue:95,stamina:0}}),
+   {type:'move',to:'side'});
+ assert.equal(capped.player.fatigue,100,'Fatigue stops at exactly 100');
+ assert.throws(()=>act(capped,{type:'move',to:'back'},'forbidden'),/only Recover/);
+ const recovered=act(capped,{type:'recover',mode:'breath'},'recover');
+ assert.equal(recovered.player.fatigue,70);
+ assert.equal(recovered.player.stamina,10);
+ assert.equal(canActAtFatigue(recovered.player,'move'),true);
+ assert.equal(canActAtFatigue(recovered.player,'guard'),false);
+});
+test('Both Recover modes use exactly the pre-action 50-Fatigue boundary',()=>{
+ const cases=[
+   {before:0,fatigueAfter:0,staminaGain:20,removed:0},
+   {before:10,fatigueAfter:0,staminaGain:20,removed:10},
+   {before:49,fatigueAfter:34,staminaGain:20,removed:15},
+   {before:50,fatigueAfter:20,staminaGain:10,removed:30},
+   {before:69,fatigueAfter:39,staminaGain:10,removed:30},
+   {before:75,fatigueAfter:45,staminaGain:10,removed:30},
+   {before:100,fatigueAfter:70,staminaGain:10,removed:30}
+ ];
+ for(const c of cases)for(const mode of ['breath','nerves']){
+   const initial=newEncounter('flint',{seed:7,
+     player:{fatigue:c.before,stamina:0,composure:50,
+       hp:240,hpMax:240,ceiling:240}});
+   const next=act(initial,{type:'recover',mode});
+   assert.equal(next.player.fatigue,c.fatigueAfter,`Fatigue ${c.before}, ${mode}`);
+   assert.equal(next.player.stamina,mode==='breath'?c.staminaGain:0,
+     `Stamina gain at Fatigue ${c.before}, ${mode}`);
+   assert.equal(next.player.composure,mode==='nerves'?62:50);
+   const event=next.events.find(e=>e.kind==='recovery'&&e.actor==='player');
+   assert.equal(event?.fatigueRemoved,c.removed);
+   assert.equal(event?.fatigueBefore,c.before);
+   assert.equal(event?.fatigueAfter,c.fatigueAfter);
+   assert.equal(event?.staminaRestored,mode==='breath'?c.staminaGain:undefined);
+   assert.equal(event?.composureRestored,mode==='nerves'?12:undefined);
+   assert.ok(next.player.hp<=240,'Recover cannot heal Health');
+ }
+ const maxed=newEncounter('flint',{seed:7,
+   player:{fatigue:100,stamina:100,composure:100}});
+ const after=act(maxed,{type:'recover',mode:'nerves'});
+ assert.equal(after.player.fatigue,70,'Fatigue still drops when reserve is full');
+ assert.equal(after.player.composure,100,'Composure remains capped');
+ const staminaFull=act(newEncounter('flint',{seed:7,
+   player:{fatigue:49,stamina:99}}),{type:'recover',mode:'breath'});
+ assert.equal(staminaFull.player.stamina,100);
+ assert.equal(staminaFull.player.fatigue,34);
+});
+test('Recover at 100 Fatigue is two turns from combat eligibility, not four',()=>{
+ let s=newEncounter('flint',{seed:7,player:{
+   fatigue:100,stamina:0,hp:240,hpMax:240,ceiling:240
+ }});
+ s=act(s,{type:'recover',mode:'breath'});
+ assert.equal(s.player.fatigue,70);
+ assert.equal(s.player.stamina,10);
+ assert.equal(canActAtFatigue(s.player,'attack'),false);
+ s=act(s,{type:'recover',mode:'breath'},'second');
+ assert.equal(s.player.fatigue,40);
+ assert.equal(s.player.stamina,20);
+ assert.equal(canActAtFatigue(s.player,'attack'),true);
+});
+test('Recover is unguarded in Flint contact range; repositioning preserves distance',()=>{
+ let vulnerableHits=0;
+ for(let seed=1;seed<=80;seed++){
+   const initial=newEncounter('flint',{
+     seed:Math.imul(seed,2654435761)>>>0,
+     player:{hp:240,hpMax:240,ceiling:240,stamina:0,fatigue:50}
+   });
+   if(initial.intent.type!=='attack'&&initial.intent.type!=='technique')continue;
+   const recovered=act(initial,{type:'recover',mode:'breath'});
+   const blow=recovered.events.find(e=>e.kind==='damage'&&e.actor==='enemy');
+   if(!blow)continue;
+   vulnerableHits++;
+   assert.equal(blow.guarded,false,'Recover never activates Guard');
+   assert.equal(blow.guardReductionPercent,0,'No hidden defensive reduction');
+   assert.equal(blow.damage,blow.raw,'Full club damage applies while recovering');
+   assert.ok(recovered.player.hp<240,'Recover does not prevent a contact hit');
+ }
+ assert.ok(vulnerableHits>=8,'Seeded opponents should hit exposed recovery turns');
+ const initial=newEncounter('flint',{seed:7,
+   player:{hp:240,hpMax:240,ceiling:240,stamina:40,fatigue:50}});
+ initial.distance='far';
+ initial.intent={type:'attack',zone:'torso',speed:4,signal:'watchful',tell:'Flint swings.'};
+ const recovered=act(initial,{type:'recover',mode:'breath'});
+ assert.equal(recovered.player.hp,240,'Out-of-contact attack cannot hit a distant Recover');
+ assert.equal(recovered.player.fatigue,20,'Distance does not change recovery tier');
+});
+test('NPC exhaustion never issues illegal intent or continues a legacy attack',()=>{
+ for(const fatigue of [70,99,100]){
+  const start=newEncounter('flint',{seed:31,enemy:{fatigue,stamina:0}});
+  assert.equal(start.intent.type,'recover');
+  const next=act(start,{type:'recover',mode:'breath'});
+  assert.equal(next.enemy.fatigue,fatigue-30);
+  assert.equal(next.enemy.stamina,10);
+ }
+ const previous=newEncounter('flint',{seed:31,enemy:{fatigue:90,stamina:0}});
+ previous.intent={type:'attack',zone:'torso',speed:1,
+   signal:'watchful',tell:'Old queued strike'};
+ const next=act(previous,{type:'recover',mode:'breath'});
+ assert.ok(!next.events.some(e=>e.actor==='enemy'&&e.kind==='damage'),
+   'Saved illegal enemy intent cannot strike through the Fatigue lock');
+ assert.ok(next.events.some(e=>e.actor==='enemy'&&e.kind==='recovery'));
 });
 test('bandage must be held and consume action; can control bleeding only',()=>{
  let s=newEncounter('silas',{seed:1});
@@ -136,10 +362,10 @@ test('Downed is a real defeat, not permadeath or forced victory',()=>{
  s=act(s,{type:'recover',mode:'breath'});
  assert.equal(s.outcome,'player_defeat');assert.equal(s.player.hp,0);
 });
-test('recover does not restore Health, clear fatigue, or give Momentum',()=>{
+test('recover restores reserve and removes Fatigue, but not Health or Momentum',()=>{
  let s=newEncounter('flint',{seed:1,player:{stamina:32,hp:40,fatigue:10}});
  s=act(s,{type:'recover',mode:'breath'});
- assert.equal(s.player.stamina,57);assert.equal(s.player.fatigue,10);assert.equal(s.player.momentum,0);
+ assert.equal(s.player.stamina,52);assert.equal(s.player.fatigue,0);assert.equal(s.player.momentum,0);
  assert.ok(s.player.hp<=40);
 });
 test('trained opponent can Guard; its own Momentum rises only on real mitigation',()=>{
@@ -148,10 +374,10 @@ test('trained opponent can Guard; its own Momentum rises only on real mitigation
  s=act(s,{type:'attack',zone:'torso'});
  assert.equal(s.enemy.momentum,8);assert.equal(s.player.momentum,28);
 });
-test('no passive Fatigue or Stress merely from low reserves',()=>{
+test('no passive Fatigue or Stress; Recover deliberately clears Fatigue',()=>{
  let s=newEncounter('flint',{seed:1,player:{stamina:19,composure:12,stress:3,fatigue:5}});
  s=act(s,{type:'recover',mode:'nerves'});
- assert.equal(s.player.fatigue,5);assert.equal(s.player.stress,3);
+ assert.equal(s.player.fatigue,0);assert.equal(s.player.stress,3);
  assert.equal(s.player.composure,24);
 });
 test('an avoided enemy committed attack still consumes enemy physical Stamina',()=>{
@@ -420,6 +646,53 @@ test('human opponent at clear advantage does not surrender; same for Silas',()=>
       assert.notEqual(s.intent.type,'withdraw',`${scene} surrendered with 21 versus 6, seed ${seed}`);
     }
   }
+});
+test('Flint does not surrender at 24/50 HP with 50 Stamina despite player Momentum and openings',()=>{
+  for(let seed=1;seed<=400;seed++){
+    const initial=newEncounter('flint',{seed,
+      player:{hp:36,stamina:55,momentum:30},
+      enemy:{hp:24,stamina:50,momentum:10}});
+    assert.notEqual(initial.intent.type,'withdraw',
+      `Flint prematurely yielded at seed ${seed} while 24/50 HP, 50 Stamina`);
+    // Reproduce the reported round-five situation: sustained player attacks,
+    // an exploitable Opening and a healthy, energetic enemy.
+    const roundFive=newEncounter('flint',{seed,
+      player:{hp:120,hpMax:120,ceiling:120,stamina:55,momentum:30},
+      enemy:{hp:24,stamina:50,momentum:10}});
+    roundFive.round=5;
+    roundFive.lastPlayerActions=['attack','attack'];
+    roundFive.openings.player={expires:6,reason:'the swing runs past your guard'};
+    const next=act(roundFive,{type:'guard'},`round5-${seed}`);
+    assert.notEqual(next.intent?.type,'withdraw',
+      `Flint generated an early surrender for the next round at seed ${seed}`);
+  }
+});
+test('Healthy reserve blocks early human withdrawal until serious harm or exhaustion',()=>{
+ for(const scene of ['flint','silas']){
+   for(let seed=1;seed<=200;seed++){
+     for(const [hp,stamina] of [[24,50],[21,12],[20,50]]){
+       const state=newEncounter(scene,{seed,
+         player:{hp:45,stamina:75,momentum:50},
+         enemy:{hp,stamina}});
+       assert.notEqual(state.intent.type,'withdraw',
+         `${scene} yielded with HP=${hp}, Stamina=${stamina}, seed=${seed}`);
+     }
+   }
+ }
+});
+test('A genuinely worn down human opponent can still concede before 30% HP',()=>{
+ for(const scene of ['flint','silas']){
+   let retreats=0;
+   for(let seed=1;seed<=240;seed++){
+     const variedSeed=Math.imul(seed,2654435761)>>>0;
+     const s=newEncounter(scene,{seed:variedSeed,
+       player:{hp:43,stamina:65,momentum:25},
+       enemy:{hp:20,stamina:12}});
+     if(s.intent.type==='withdraw')retreats++;
+   }
+   assert.ok(retreats>0,`${scene} should sometimes withdraw at 40% HP and 12 Stamina`);
+   assert.ok(retreats<240,`${scene} surrender must remain probabilistic`);
+ }
 });
 test('genuine nonlethal retreat still possible when a human opponent is actually outmatched',()=>{
   for(const scene of ['flint','silas']){
