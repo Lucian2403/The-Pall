@@ -176,32 +176,83 @@
     }else void transfer(item,destination);
   }
 </script>
-
-<section class="inventory-panel" aria-label="Inventory and home storage">
+<section class="inventory-panel" aria-label="Equipment, inventory and home storage">
   <header class="inventory-heading">
-    <div><p class="overline">YOUR POSSESSIONS</p><h2>Inventory &amp; Storage</h2></div>
+    <div><p class="overline">YOUR POSSESSIONS</p><h2>Equipment &amp; Inventory</h2></div>
     <button type="button" class="pall-framed-button" onclick={onClose}>Close storage</button>
   </header>
 
   {#if loading}
     <p class="loading" role="status">Reading your possessions…</p>
   {:else if snapshot}
+    <p class="interaction-hint">Click to inspect · Shift-click to quick-move · Drag items between equipment, bag and chest.</p>
     <div class="inventory-layout">
-      <section class="grid-card pack-card" aria-label="Inventory">
+      <section class="grid-card equipment-card" aria-label="Equipped gear">
+        <header class="grid-heading"><h3>Equipment</h3><span>Worn and ready</span></header>
+        <div class="equipment-stage" role="group" aria-label="Human-shaped equipment layout">
+          <svg class="equipment-silhouette" viewBox="0 0 240 360" aria-hidden="true">
+            <circle cx="120" cy="37" r="23"/>
+            <path d="M106 66 L82 81 L58 146 L72 159 L92 121 L94 208 L145 208 L146 121 L169 159 L181 146 L158 81 L134 66 Z"/>
+            <path d="M94 211 L91 324 L107 332 L122 242 L132 332 L149 324 L145 211 Z"/>
+            <path d="M91 325 L87 343 L110 343 L107 332 M132 332 L129 343 L153 343 L149 325"/>
+          </svg>
+          {#each equipmentSlots as slot (slot.id)}
+            {@const item=snapshot.equipment.items.find(x=>x.equipmentSlot===slot.id)}
+            {#if item}
+              <button type="button" class="equip-socket filled"
+                style={'left:'+slot.x+'%;top:'+slot.y+'%'}
+                draggable={snapshot.storageEnabled&&!pending}
+                ondragstart={event=>startDrag(event,item)}
+                ondragover={allowDrop}
+                ondrop={event=>onDrop(event,'equipped',slot.id)}
+                class:selected={selectedId===item.id}
+                aria-label={'Select equipped '+item.name+' in '+slot.label+' (Shift-click to unequip)'}
+                aria-pressed={selectedId===item.id}
+                onclick={event=>selectItem(event,item,'equipped')}>
+                <span class="socket-label">{slot.label}</span>
+                {#if itemImage(item)}
+                  <img class="socket-art" src={itemImage(item)!} alt=""
+                    draggable="false" decoding="async" />
+                {:else}
+                  <span class="item-mark" aria-hidden="true">{itemMark(item)}</span>
+                {/if}
+              </button>
+            {:else}
+              <button type="button" class="equip-socket empty"
+                style={'left:'+slot.x+'%;top:'+slot.y+'%'}
+                disabled={pending||!snapshot.storageEnabled}
+                ondragover={allowDrop}
+                ondrop={event=>onDrop(event,'equipped',slot.id)}
+                aria-label={'Empty '+slot.label+' equipment slot. Drop compatible gear here.'}
+                title={'Empty '+slot.label}
+                onclick={()=>{if(selected?.equipSlot===slot.id)void equip(selected,slot.id);}}>
+                <span class="socket-label">{slot.label}</span>
+                <span class="socket-empty" aria-hidden="true">+</span>
+              </button>
+            {/if}
+          {/each}
+        </div>
+        <p class="equipment-footnote">Equipped items do not occupy pack squares. Only a worn bag expands capacity.</p>
+      </section>
+
+      <section class="grid-card pack-card" aria-label="Inventory"
+        ondragover={allowDrop} ondrop={event=>onDrop(event,'pack')}>
         <header class="grid-heading">
           <h3>Inventory</h3>
-          <span>{snapshot.pack.items.some(item=>item.code==='crude_small_bag')
-            ?'Simple Bag':'No bag carried'}</span>
+          <span>{snapshot.equipment.items.some(item=>item.equipmentSlot==='back'&&item.carrySlotsBonus>0)
+            ?'Simple Bag · +6':'No bag equipped'}</span>
         </header>
-        <div class="item-grid" role="group" aria-label="Carried item slots">
+        <div class="item-grid pack-grid" role="group" aria-label="Carried item slots">
           {#each Array.from({length:snapshot.pack.maxSlots},(_,index)=>index) as index (index)}
             {@const item=snapshot.pack.items[index]}
             {#if item}
               <button type="button" class="item-slot occupied"
                 class:selected={selectedId===item.id}
+                draggable={snapshot.storageEnabled&&!pending}
+                ondragstart={event=>startDrag(event,item)}
                 aria-label={'Select '+item.name+(item.quantity>1?' quantity '+item.quantity:'')}
                 aria-pressed={selectedId===item.id}
-                onclick={()=>selectedId=item.id}>
+                onclick={event=>selectItem(event,item,'pack')}>
                 {#if itemImage(item)}
                   <img class="item-art" src={itemImage(item)!} alt=""
                     loading="lazy" decoding="async" draggable="false" />
@@ -237,7 +288,9 @@
           </p>
           <p class="item-description">{selected.description}</p>
           <div class="item-statistics">
-            <div><span>Location</span><strong>{selectedPlace==='pack'?'Inventory':'Home Chest'}</strong></div>
+            <div><span>Location</span><strong>{selectedPlace==='equipped'
+              ?'Equipped · '+titleCase(selected.equipmentSlot??'')
+              :selectedPlace==='pack'?'Inventory':'Home Chest'}</strong></div>
             <div><span>Weight</span><strong>{measure(selected.weightKg)} kg</strong></div>
             <div><span>Volume</span><strong>{measure(selected.volumeL)} L</strong></div>
             {#if selected.currentDurability!==null && selected.maxDurability!==null}
@@ -255,33 +308,52 @@
                 oninput={event=>amounts[selected.id]=Number(event.currentTarget.value)}/>
             </label>
           {/if}
-          <button type="button" class="transfer-button"
-            disabled={pending||!snapshot.storageEnabled}
-            onclick={()=>{if(selected)void transfer(selected,selectedPlace==='pack'?'home_chest':'pack');}}>
-            {selectedPlace==='pack'?'Store in chest':'Take into inventory'}
-          </button>
+          <div class="inspection-actions">
+            {#if selectedPlace==='equipped'}
+              <button type="button" class="transfer-button"
+                disabled={pending||!snapshot.storageEnabled}
+                onclick={()=>{void transfer(selected,'pack');}}>Unequip to inventory</button>
+              <button type="button" class="transfer-button secondary"
+                disabled={pending||!snapshot.storageEnabled}
+                onclick={()=>{void transfer(selected,'home_chest');}}>Store in chest</button>
+            {:else}
+              {#if selected.equipSlot}
+                <button type="button" class="transfer-button"
+                  disabled={pending||!snapshot.storageEnabled||
+                    snapshot.equipment.items.some(x=>x.equipmentSlot===selected.equipSlot)}
+                  onclick={()=>{if(selected.equipSlot)void equip(selected,selected.equipSlot);}}>
+                  Equip · {titleCase(selected.equipSlot)}
+                </button>
+              {/if}
+              <button type="button" class="transfer-button secondary"
+                disabled={pending||!snapshot.storageEnabled}
+                onclick={()=>{void transfer(selected,selectedPlace==='pack'?'home_chest':'pack');}}>
+                {selectedPlace==='pack'?'Store in chest':'Take into inventory'}
+              </button>
+            {/if}
+          </div>
         {:else}
-          <p class="selection-empty">Select an item from either grid to read its description and examine its condition.</p>
+          <p class="selection-empty">Select an equipped item or a square to examine its description.</p>
         {/if}
         {#if !snapshot.storageEnabled}
           <p class="note">Storage becomes available upon reaching the shared rented home.</p>
         {/if}
       </aside>
 
-      <section class="grid-card chest-card" aria-label="Home Chest">
-        <header class="grid-heading">
-          <h3>Home Chest</h3>
-          <span>Rented room</span>
-        </header>
+      <section class="grid-card chest-card" aria-label="Home Chest"
+        ondragover={allowDrop} ondrop={event=>onDrop(event,'home_chest')}>
+        <header class="grid-heading"><h3>Home Chest</h3><span>Rented room</span></header>
         <div class="item-grid" role="group" aria-label="Home storage slots">
           {#each Array.from({length:snapshot.chest.maxSlots},(_,index)=>index) as index (index)}
             {@const item=snapshot.chest.items[index]}
             {#if item}
               <button type="button" class="item-slot occupied"
                 class:selected={selectedId===item.id}
+                draggable={snapshot.storageEnabled&&!pending}
+                ondragstart={event=>startDrag(event,item)}
                 aria-label={'Select '+item.name+(item.quantity>1?' quantity '+item.quantity:'')}
                 aria-pressed={selectedId===item.id}
-                onclick={()=>selectedId=item.id}>
+                onclick={event=>selectItem(event,item,'home_chest')}>
                 {#if itemImage(item)}
                   <img class="item-art" src={itemImage(item)!} alt=""
                     loading="lazy" decoding="async" draggable="false" />
@@ -302,7 +374,7 @@
         </p>
       </section>
     </div>
-    <p class="provisional">The grid is functional; item icons and final carrying-weight and chest balance remain provisional.</p>
+    <p class="provisional">The equipment arrangement and final carrying-weight and chest balance remain provisional.</p>
   {/if}
   {#if error}<p class="inventory-error" role="alert">{error}</p>
     <button type="button" class="reload" onclick={()=>{void reload();}}>Reload inventory</button>{/if}
