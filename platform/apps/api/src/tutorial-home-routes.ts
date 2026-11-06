@@ -23,7 +23,7 @@ function parse(input:unknown):Command{
  if(v.kind==='start'&&keys==='kind,requestId')return {kind:'start',requestId:v.requestId};
  if(v.kind!=='action'||keys!=='action,expectedRevision,kind,requestId')throw Error('invalid_fields');
  if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)throw Error('invalid_revision');
- if(!['travel','enter','read_notice','put_down','finish'].includes(String(v.action)))throw Error('invalid_action');
+ if(!['read_notice','put_down','finish'].includes(String(v.action)))throw Error('invalid_action');
  return {kind:'action',requestId:v.requestId,expectedRevision:v.expectedRevision as number,action:v.action as Action};
 }
 const missing=(e:unknown)=>(e as {code?:string})?.code==='42P01';
