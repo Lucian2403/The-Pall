@@ -18,6 +18,7 @@ import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-rout
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
+import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
@@ -33,8 +34,10 @@ const schema=[
   '0004_millhand_missing_stamp.sql','0005_millhand_second_job.sql',
   '0006_character_portraits.sql','0006_millhand_wage_claim.sql',
   '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql',
-  '0009_character_welcome.sql','0010_tutorial_home.sql'
+  '0009_character_welcome.sql','0010_tutorial_home.sql',
+  '0011_inventory_foundation.sql'
 ];
+let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
   // This resolver is injected only via register*Routes options in this
   // in-process test; production uses Better Auth, not x-test-principal.
@@ -47,6 +50,7 @@ registerCharacterRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
+registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 
 async function request(
@@ -148,6 +152,14 @@ before(async()=>{
   await db.query('CREATE TABLE "user" (id TEXT PRIMARY KEY)');
   await db.query('INSERT INTO "user"(id) VALUES($1),($2)',[owner,stranger]);
   for(const filename of schema){
+    if(filename==='0011_inventory_foundation.sql'){
+      // Simulate an account created before inventory tables existed.
+      legacyInventoryId=randomUUID();
+      await db.query(
+        "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location) VALUES($1,$2,'Legacy Owner',$3,'Male','Millhand','{}'::jsonb,'[]'::jsonb,'Smithing workshop')",
+        [legacyInventoryId,owner,'legacy-'+legacyInventoryId]
+      );
+    }
     const sql=readFileSync(resolve(root,'db/migrations',filename),'utf8');
     await db.query(sql);
   }
@@ -158,6 +170,166 @@ before(async()=>{
   await app.ready();
 });
 after(async()=>{await app.close();await db.end();});
+
+test('Inventory migration backfills existing characters and never duplicates universal grants',async()=>{
+ const rows=await db.query<{item_code:string;quantity:number;location:string}>(
+  'SELECT item_code,quantity,location FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code',
+  [legacyInventoryId]);
+ assert.deepEqual(rows.rows.map(x=>[x.item_code,x.quantity,x.location]),[
+  ['basic_clothes',1,'pack'],['crude_small_bag',1,'pack']
+ ]);
+ await db.query('SELECT pall_seed_character_inventory($1)',[legacyInventoryId]);
+ await db.query('SELECT pall_seed_character_inventory($1)',[legacyInventoryId]);
+ const repeated=await db.query(
+  'SELECT count(*)::int AS count FROM player_character_item_instances WHERE character_id=$1',
+  [legacyInventoryId]);
+ assert.equal(repeated.rows[0].count,2);
+ const char=await db.query('SELECT coins FROM player_characters WHERE id=$1',[legacyInventoryId]);
+ assert.equal(Number(char.rows[0].coins),20,'Migration must preserve coins');
+});
+test('New characters of all six origins receive exactly the same owned starter kit',async()=>{
+ for(const origin of ['Millhand','Bellrunner','Squatter','Stitcher','Scrapper','Inkbound']){
+  const id=randomUUID();
+  await db.query(
+   'INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9)',
+   [id,owner,'Inventory '+origin,'inventory-'+id,'Female',origin,
+    JSON.stringify({}),JSON.stringify([{name:'Basic Clothes',quantity:1},
+     {name:'Crude Small Bag',quantity:1}]),'Origin tutorial']
+  );
+  const grants=await db.query<{item_code:string;quantity:number}>(
+   'SELECT item_code,quantity FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code',[id]);
+  assert.deepEqual(grants.rows.map(x=>[x.item_code,x.quantity]),[
+   ['basic_clothes',1],['crude_small_bag',1]
+  ]);
+  const state=await db.query('SELECT revision FROM player_character_inventory_state WHERE character_id=$1',[id]);
+  assert.equal(Number(state.rows[0].revision),0);
+  await db.query('DELETE FROM player_characters WHERE id=$1',[id]);
+  assert.equal((await db.query(
+    'SELECT 1 FROM player_character_item_instances WHERE character_id=$1',[id])).rowCount,0,
+    'Deleting a character deletes their owned items, not other accounts');
+ }
+});
+test('Inventory API restricts ownership and keeps chest closed before shared home',async()=>{
+ const c=await character();
+ const path=base+c.id+'/inventory';
+ const response=await request('GET',path);
+ assert.equal(response.status,200,JSON.stringify(response.body));
+ assert.equal(response.body!.revision,0);
+ assert.equal(response.body!.storageEnabled,false);
+ assert.equal(response.body!.pack.items.length,2);
+ assert.equal(response.body!.pack.maxWeightKg,20);
+ assert.equal(response.body!.pack.maxVolumeL,17);
+ assert.equal(response.body!.chest.items.length,0);
+ assert.equal((await request('GET',path,stranger)).status,404);
+ assert.equal((await request('GET',path,null)).status,401);
+ const item=response.body!.pack.items[0];
+ assert.equal((await request('POST',path,stranger,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:item.id,quantity:1,to:'home_chest'
+ })).status,404);
+ assert.equal((await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:item.id,quantity:1,to:'home_chest'
+ })).body!.error,'storage_not_unlocked');
+ assert.equal((await request('GET',path)).body!.revision,0);
+});
+test('Home chest saves real transfers and blocks double-clicks, capacity, spoofing and stale revisions',async()=>{
+ const c=await character();
+ const path=base+c.id+'/inventory';
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='IN_PROGRESS' WHERE id=$1",
+  [c.id]);
+ await db.query(
+  "INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)",
+  [c.id,JSON.stringify({phase:'HOME',revision:0})]);
+ let snapshot=(await request('GET',path)).body!;
+ assert.equal(snapshot.storageEnabled,true);
+ const bag=snapshot.pack.items.find((x:any)=>x.code==='crude_small_bag');
+ const key=randomUUID();
+ const cmd={kind:'transfer',requestId:key,expectedRevision:0,
+   itemInstanceId:bag.id,quantity:1,to:'home_chest'};
+ const moved=await request('POST',path,owner,cmd);
+ assert.equal(moved.status,200,JSON.stringify(moved.body));
+ assert.equal(moved.body!.revision,1);
+ assert.equal(moved.body!.pack.maxVolumeL,5);
+ assert.equal(moved.body!.chest.items[0].id,bag.id);
+ assert.deepEqual((await request('POST',path,owner,cmd)).body,moved.body,
+  'Idempotent request must replay original receipt without a second transfer');
+ assert.equal((await request('GET',path)).body!.chest.items.length,1,
+  'Stored items survive API reload');
+ assert.equal((await request('POST',path,owner,{
+  ...cmd,requestId:key,to:'pack'
+ })).body!.error,'idempotency_key_reuse');
+ assert.equal((await request('POST',path,owner,{
+  ...cmd,requestId:randomUUID()
+ })).body!.error,'stale_revision');
+ assert.equal((await request('POST',path,owner,{
+  ...cmd,requestId:randomUUID(),expectedRevision:1,qualityTier:5
+ })).status,400,'Client cannot forge item quality or grant new items');
+ assert.equal((await request('POST',path,owner,{
+  ...cmd,requestId:randomUUID(),expectedRevision:1,quantity:10
+ })).body!.error,'insufficient_quantity');
+ const taken=await request('POST',path,owner,{
+  ...cmd,requestId:randomUUID(),expectedRevision:1,to:'pack'
+ });
+ assert.equal(taken.status,200,JSON.stringify(taken.body));
+ assert.equal(taken.body!.revision,2);
+ assert.equal(taken.body!.pack.maxVolumeL,17);
+ assert.equal(taken.body!.pack.items.length,2);
+ assert.equal(taken.body!.chest.items.length,0);
+ const storedCoins=await db.query('SELECT coins FROM player_characters WHERE id=$1',[c.id]);
+ assert.equal(Number(storedCoins.rows[0].coins),20,'No money changed through storage');
+});
+test('Stacked generic items split and merge without minting quantities or bypassing capacity',async()=>{
+ const c=await character();
+ const path=base+c.id+'/inventory';
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",
+  [c.id]);
+ await db.query(
+  'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',
+  [c.id,JSON.stringify({phase:'COMPLETE',revision:3})]);
+ await db.query(
+  "INSERT INTO pall_item_definitions(code,name,category,stackable,max_stack,weight_kg,volume_l,quality_min,quality_max) VALUES('test_rivet','Test Rivet','component',TRUE,10,.100,.020,1,1) ON CONFLICT DO NOTHING");
+ const itemId=randomUUID();
+ await db.query(
+  "INSERT INTO player_character_item_instances(id,character_id,item_code,location,quantity) VALUES($1,$2,'test_rivet','home_chest',8)",
+  [itemId,c.id]);
+ let state=(await request('GET',path)).body!;
+ assert.equal(state.chest.items.find((x:any)=>x.id===itemId).quantity,8);
+ const part=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:itemId,quantity:3,to:'pack'
+ });
+ assert.equal(part.status,200,JSON.stringify(part.body));
+ assert.equal(part.body!.revision,1);
+ assert.equal(part.body!.chest.items.find((x:any)=>x.id===itemId).quantity,5);
+ let carry=part.body!.pack.items.find((x:any)=>x.code==='test_rivet');
+ assert.equal(carry.quantity,3);
+ const second=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:1,
+  itemInstanceId:itemId,quantity:5,to:'pack'
+ });
+ assert.equal(second.status,200,JSON.stringify(second.body));
+ assert.equal(second.body!.pack.items.find((x:any)=>x.code==='test_rivet').quantity,8);
+ assert.equal(second.body!.chest.items.filter((x:any)=>x.code==='test_rivet').length,0);
+ assert.equal((await db.query(
+  "SELECT sum(quantity)::int AS total FROM player_character_item_instances WHERE character_id=$1 AND item_code='test_rivet'",
+  [c.id])).rows[0].total,8);
+ await db.query(
+  "INSERT INTO pall_item_definitions(code,name,category,stackable,max_stack,weight_kg,volume_l,quality_min,quality_max) VALUES('test_anvil','Test Anvil','component',FALSE,1,25,1,1,1) ON CONFLICT DO NOTHING");
+ const heavyId=randomUUID();
+ await db.query(
+  "INSERT INTO player_character_item_instances(id,character_id,item_code,location,quantity) VALUES($1,$2,'test_anvil','home_chest',1)",
+  [heavyId,c.id]);
+ const blocked=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:2,
+  itemInstanceId:heavyId,quantity:1,to:'pack'
+ });
+ assert.equal(blocked.status,409);
+ assert.equal(blocked.body!.error,'pack_capacity_exceeded');
+ assert.equal((await request('GET',path)).body!.revision,2);
+});
 
 test('Stage 8 shared home: six Millhand route/outcome combinations complete once with no rewards',async()=>{
  for(const branch of ['restamp','contracts','records']){
