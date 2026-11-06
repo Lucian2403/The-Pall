@@ -277,6 +277,18 @@ test('Home chest saves real transfers and blocks double-clicks, capacity, spoofi
  assert.equal(taken.body!.pack.maxVolumeL,17);
  assert.equal(taken.body!.pack.items.length,2);
  assert.equal(taken.body!.chest.items.length,0);
+ // Two independent tabs submit the same revision with distinct IDs.
+ const concurrent=(await Promise.all([randomUUID(),randomUUID()].map(requestId=>
+   request('POST',path,owner,{
+     ...cmd,requestId,expectedRevision:2,to:'home_chest'
+   })
+ ))).sort((a,b)=>a.status-b.status);
+ assert.deepEqual(concurrent.map(x=>x.status),[200,409],
+   'Only one simultaneous transfer may commit');
+ const afterRace=(await request('GET',path)).body!;
+ assert.equal(afterRace.revision,3);
+ assert.equal(afterRace.chest.items.length,1);
+ assert.equal(afterRace.pack.items.length,1);
  const storedCoins=await db.query('SELECT coins FROM player_characters WHERE id=$1',[c.id]);
  assert.equal(Number(storedCoins.rows[0].coins),20,'No money changed through storage');
 });
