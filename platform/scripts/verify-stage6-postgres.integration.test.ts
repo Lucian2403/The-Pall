@@ -267,7 +267,7 @@ test('Home chest saves real transfers and blocks double-clicks, capacity, spoofi
   ...cmd,requestId:randomUUID(),expectedRevision:1,qualityTier:5
  })).status,400,'Client cannot forge item quality or grant new items');
  assert.equal((await request('POST',path,owner,{
-  ...cmd,requestId:randomUUID(),expectedRevision:1,quantity:10
+  ...cmd,requestId:randomUUID(),expectedRevision:1,quantity:10,to:'pack'
  })).body!.error,'insufficient_quantity');
  const taken=await request('POST',path,owner,{
   ...cmd,requestId:randomUUID(),expectedRevision:1,to:'pack'
