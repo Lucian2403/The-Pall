@@ -275,7 +275,8 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     rewind.includes('wasPaid?10:0') &&
     rewind.includes('tutorial_stage=6,tutorial_status=\'NOT_STARTED\'') &&
     shell.includes('Back to Stage ') &&
-    shell.includes('fromStage===7||fromStage===8') &&
+    shell.includes('fromStage===7') &&
+    shell.includes('fromStage===8') &&
     shell.includes('rewindTargetStage') &&
     rewind.includes('if(expectedStage===7)') &&
     rewind.includes('if(expectedStage===8)') &&
