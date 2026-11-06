@@ -35,7 +35,8 @@ const schema=[
   '0006_character_portraits.sql','0006_millhand_wage_claim.sql',
   '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql',
   '0009_character_welcome.sql','0010_tutorial_home.sql',
-  '0011_inventory_foundation.sql','0012_equipment_slots.sql'
+  '0011_inventory_foundation.sql','0012_equipment_slots.sql',
+  '0013_equipment_stats_and_clothing.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -184,8 +185,10 @@ test('Equipment migration backfills existing starter items without duplicating o
  assert.equal(Number(original),1,'Migrating equipped items invalidates stale inventory tabs');
  await db.query('SELECT pall_seed_character_inventory($1)',[legacyInventoryId]);
  await db.query('SELECT pall_seed_character_inventory($1)',[legacyInventoryId]);
- const sql=readFileSync(resolve(root,'db/migrations','0012_equipment_slots.sql'),'utf8');
- await db.query(sql);
+ for(const name of ['0012_equipment_slots.sql','0013_equipment_stats_and_clothing.sql']){
+   const sql=readFileSync(resolve(root,'db/migrations',name),'utf8');
+   await db.query(sql);
+ }
  const again=await db.query(
   'SELECT revision FROM player_character_inventory_state WHERE character_id=$1',
   [legacyInventoryId]);
@@ -410,6 +413,65 @@ test('Stacking still splits and merges without duplication under equipment schem
  assert.equal((await request('GET',path)).body!.revision,2);
 });
 
+test('Equipment protection, weapon damage and maximum weight derive from equipped records',async()=>{
+ const c=await character();
+ const path=base+c.id+'/inventory';
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='IN_PROGRESS' WHERE id=$1",[c.id]);
+ await db.query(
+  'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',
+  [c.id,JSON.stringify({phase:'HOME',revision:0})]);
+ const first=(await request('GET',path)).body!;
+ assert.deepEqual(first.bonuses,{
+  armour:0,weaponDamage:null,pallProtection:0,ashProtection:0,
+  maxWeightKg:20,inventorySlots:10,maxVolumeL:17
+ });
+ await db.query(
+  `INSERT INTO pall_item_definitions(code,name,category,equip_slot,stackable,max_stack,
+      weight_kg,volume_l,armour_rating,damage_rating,pall_protection,ash_protection,
+      carry_weight_bonus_kg)
+   VALUES('test_protective_mask','Protective Mask','equipment','face',FALSE,1,
+      .4,.2,2,0,4,3,2) ON CONFLICT DO NOTHING`);
+ await db.query(
+  `INSERT INTO pall_item_definitions(code,name,category,equip_slot,stackable,max_stack,
+      weight_kg,volume_l,damage_rating)
+   VALUES('test_short_blade','Short Blade','weapon','primary_weapon',FALSE,1,
+      .5,.2,9) ON CONFLICT DO NOTHING`);
+ const mask=randomUUID(),weapon=randomUUID();
+ await db.query(
+  "INSERT INTO player_character_item_instances(id,character_id,item_code,location) VALUES($1,$3,'test_protective_mask','home_chest'),($2,$3,'test_short_blade','home_chest')",
+  [mask,weapon,c.id]);
+ const worn=await request('POST',path,owner,{
+  kind:'equip',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:mask,slot:'face'
+ });
+ assert.equal(worn.status,200,JSON.stringify(worn.body));
+ assert.deepEqual(worn.body!.bonuses,{
+  armour:2,weaponDamage:null,pallProtection:4,ashProtection:3,
+  maxWeightKg:22,inventorySlots:10,maxVolumeL:17
+ });
+ const armed=await request('POST',path,owner,{
+  kind:'equip',requestId:randomUUID(),expectedRevision:1,
+  itemInstanceId:weapon,slot:'primary_weapon'
+ });
+ assert.equal(armed.status,200,JSON.stringify(armed.body));
+ assert.equal(armed.body!.bonuses.weaponDamage,9);
+ assert.equal((await request('GET',path)).body!.bonuses.weaponDamage,9);
+ const removed=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:2,
+  itemInstanceId:mask,quantity:1,to:'home_chest'
+ });
+ assert.equal(removed.status,200,JSON.stringify(removed.body));
+ assert.deepEqual(removed.body!.bonuses,{
+  armour:0,weaponDamage:9,pallProtection:0,ashProtection:0,
+  maxWeightKg:20,inventorySlots:10,maxVolumeL:17
+ });
+ const refused=await request('POST',path,owner,{
+  kind:'equip',requestId:randomUUID(),expectedRevision:3,
+  itemInstanceId:mask,slot:'pants'
+ });
+ assert.equal(refused.status,400,'Composite clothing no longer exposes separate pants slot');
+});
 test('Stage 8 shared home: six Millhand route/outcome combinations complete once with no rewards',async()=>{
  for(const branch of ['restamp','contracts','records']){
   for(const outcome of ['player_victory','player_defeat']){
