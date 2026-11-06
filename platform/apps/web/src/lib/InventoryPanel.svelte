@@ -54,8 +54,9 @@
       if(!response.ok)throw Error(response.status===503
         ?'Inventory schema missing. Run npm run inventory:migrate.'
         :response.status===401?'Sign in is required.':'Inventory is unavailable.');
-      snapshot=body as Snapshot;
-      syncSelection(snapshot);
+      const next=body as Snapshot;
+      snapshot=next;
+      syncSelection(next);
     }catch(cause){error=cause instanceof Error?cause.message:'Inventory unavailable';}
     finally{loading=false;}
   }
@@ -86,9 +87,10 @@
         await reload();error=message;return;
       }
       if(!response.ok)throw Error('Transfer failed. Inventory was not changed.');
-      snapshot=await response.json() as Snapshot;
+      const next=await response.json() as Snapshot;
+      snapshot=next;
       delete amounts[item.id];
-      syncSelection(snapshot);
+      syncSelection(next);
     }catch(cause){
       error=cause instanceof Error?cause.message:'Connection interrupted. Reopen storage to check saved items.';
       // Avoid silently retrying with a different request ID after network failure.
@@ -166,7 +168,7 @@
           {/if}
           <button type="button" class="transfer-button"
             disabled={pending||!snapshot.storageEnabled}
-            onclick={()=>{void transfer(selected,selectedPlace==='pack'?'home_chest':'pack');}}>
+            onclick={()=>{if(selected)void transfer(selected,selectedPlace==='pack'?'home_chest':'pack');}}>
             {selectedPlace==='pack'?'Store in chest':'Take into inventory'}
           </button>
         {:else}
