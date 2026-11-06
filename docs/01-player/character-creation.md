@@ -9,7 +9,7 @@ Status: Partially agreed, updated 2026-10-13. Explicitly locked decisions are se
 - Six **locked** background/origin names and social roles. Every chosen background grants **+3 levels in its associated Major Skill at character creation**, and provides **one small background-related tutorial quest**. Unique starter items are not required or defined yet.
 - **All attributes fixed at STR 5, DEX 5, INT 5, RES 5 for every background.** No point distribution or background-based attribute changes (LOCKED).
 - No age selection.
-- **Global starter kit (LOCKED for all six backgrounds): Basic Clothes + 1 Crude Small Bag + 20 coins.** These are the same for male and female characters and for every background. Exact item IDs, mass/capacity and condition values remain TBD.
+- **Global starter kit (LOCKED for all six backgrounds): Daily Worker Clothes + 1 Simple Bag + 20 coins.** These are the same for male and female characters and for every background. Exact item IDs, mass/capacity and condition values remain TBD.
 - **All six backgrounds return after medical treatment to one identical shared starter rented home** (same location/interior/functions/rent, no origin-specific hut). The rent notice appears there and does **not** initiate the overarching main storyline. **150 coins rent is provisional**; rent deadline, recurring frequency and penalties remain TBD. The character already knows their circumstances; these events teach the player.
 
 ## Portrait system — locked starter implementation

@@ -11,6 +11,7 @@ import {registerMillhandWageClaimRoutes} from './millhand-wage-claim-routes.js';
 import {registerMillhandCombatRoutes} from './millhand-combat-routes.js';
 import {registerMillhandClinicRoutes} from './millhand-clinic-routes.js';
 import {registerTutorialHomeRoutes} from './tutorial-home-routes.js';
+import {registerInventoryRoutes} from './inventory-routes.js';
 import {registerMillhandStageRewindRoutes} from './millhand-stage-rewind-routes.js';
 import {parseFixtureAction} from '@the-pall/contracts';
 import {advanceFixture} from '@the-pall/game-core';
@@ -29,6 +30,7 @@ registerMillhandWageClaimRoutes(api);
 registerMillhandCombatRoutes(api);
 registerMillhandClinicRoutes(api);
 registerTutorialHomeRoutes(api);
+registerInventoryRoutes(api);
 registerMillhandStageRewindRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {

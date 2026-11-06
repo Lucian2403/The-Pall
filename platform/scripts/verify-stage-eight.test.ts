@@ -181,7 +181,14 @@ test('Stage 8 hotspots never paint a rectangular debug hover and bed is clickabl
   web.includes('class="hotspot bed"')&&web.includes('Rest in bed')&&
   web.includes('class="hotspot notice-object"')&&
   web.includes('>Notice</span>')&&
-  web.includes("restMessage=action==='rest'")&&
+  web.includes('restAnimating=true')&&
+  web.includes("perform('rest')")&&
+  web.includes('await fade')&&
+  web.includes('if(saved)restMessage=')&&
+  web.includes('class="rest-fade"')&&
+  web.includes('class="home-dialogue rest-dialogue"')&&
+  web.includes('BED · REST')&&
+  web.includes('@keyframes rest-room-fade')&&
   web.includes("home.completed&&action!=='rest'")&&
   web.includes('.hotspot:not(.notice-object)::after')&&
   !web.includes('background:#f5d18b24')&&
@@ -244,4 +251,51 @@ test('Branch-aware personal Journal never displays facts from unchosen investiga
   web.includes("home?.outcome==='player_defeat'"));
  assert.ok(web.includes('Home at last. Ten coins left after the clinic,')&&
   web.includes('The council has not paid for the plate lot.'));
+});
+
+
+test('Rented-room chest and Journal open over the environment, not below it',()=>{
+ const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ assert.ok(web.includes("let overlayKind=$state<'storage'|'journal'|null>(null);"));
+ assert.ok(web.includes('overlayDialog?.showModal()'));
+ assert.ok(web.includes('overlayDialog?.close()'));
+ assert.ok(web.includes('onclose={handleRoomOverlayClose}'));
+ assert.ok(web.includes("onclick={()=>{void openRoomOverlay('storage');}}"));
+ assert.ok(web.includes("openRoomOverlay('journal')"));
+ assert.ok(web.includes('class="room-overlay"'));
+ assert.ok(web.includes('<InventoryPanel characterId={id} onClose={closeRoomOverlay}/>'));
+ assert.ok(web.includes('class="journal" aria-label="Personal Journal"'));
+ assert.ok(web.includes('.room-overlay::backdrop'));
+ assert.ok(web.includes('max-height:calc(100dvh - 16px)'));
+ assert.ok(web.includes('scrollbar-width:none'));
+ assert.ok(web.includes('.room-overlay::-webkit-scrollbar{display:none}'));
+ assert.ok(!web.includes('<InventoryPanel characterId={id} onClose={()=>storageOpen=false}/>'));
+ assert.ok(!web.includes('bind:this={journalElement}'),
+   'Journal should remain in the modal rather than scrolling below the room');
+});
+
+test('Storage uses the owner chest sounds and the home background stays room-sized',()=>{
+ const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ for(const name of ['PersonalChest_Open1.wav','PersonalChest_Open2.wav','PersonalChest_Close.wav']){
+  assert.ok(web.includes('/audio/chest/'+name),'Missing chest SFX hookup: '+name);
+  const bytes=readFileSync(resolve(import.meta.dirname,'../apps/web/static/audio/chest',name));
+  assert.ok(bytes.byteLength>1500,'Chest audio missing or truncated: '+name);
+  assert.equal(bytes.subarray(0,4).toString(),'RIFF','Chest SFX RIFF header: '+name);
+  assert.equal(bytes.subarray(8,12).toString(),'WAVE','Chest SFX WAV header: '+name);
+ }
+ assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
+ assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
+ assert.ok(web.includes('height:clamp(515px,44vw,620px)'),
+  'The room must use a shorter, bounded stage height');
+ assert.ok(web.includes('width:100%')&&
+  web.includes("center/100% 100% no-repeat"),
+  'Show the whole original painting without zooming away edge objects');
+ assert.ok(!web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
+  'Never duplicate or blur the room artwork in side gutters');
+ assert.ok(web.includes('background-size:100% 100%'),
+  'Keep all room hotspots visible at narrow widths');
+ assert.ok(web.includes('max-height:calc(100dvh - 16px)')&&
+  web.includes('scrollbar-width:none')&&
+  web.includes('.room-overlay::-webkit-scrollbar{display:none}'),
+  'Storage overlay must not show an internal scrollbar');
 });
