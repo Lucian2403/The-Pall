@@ -181,7 +181,14 @@ test('Stage 8 hotspots never paint a rectangular debug hover and bed is clickabl
   web.includes('class="hotspot bed"')&&web.includes('Rest in bed')&&
   web.includes('class="hotspot notice-object"')&&
   web.includes('>Notice</span>')&&
-  web.includes("restMessage=action==='rest'")&&
+  web.includes('restAnimating=true')&&
+  web.includes("perform('rest')")&&
+  web.includes('await fade')&&
+  web.includes('if(saved)restMessage=')&&
+  web.includes('class="rest-fade"')&&
+  web.includes('class="home-dialogue rest-dialogue"')&&
+  web.includes('BED · REST')&&
+  web.includes('@keyframes rest-room-fade')&&
   web.includes("home.completed&&action!=='rest'")&&
   web.includes('.hotspot:not(.notice-object)::after')&&
   !web.includes('background:#f5d18b24')&&
