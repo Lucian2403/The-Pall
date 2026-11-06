@@ -23,7 +23,8 @@ const base='/api/characters/:id/inventory';
 const selectRows=String.raw`SELECT i.id,i.item_code,i.location,i.quantity,
  i.quality_tier,i.current_durability,i.max_durability,i.grant_key,
  d.name,d.category,d.description,d.stackable,d.max_stack,d.weight_kg,
- d.volume_l,d.carry_volume_bonus_l,d.design_status
+ d.volume_l,d.carry_volume_bonus_l,d.carry_slots_bonus,
+ d.rarity_label,d.armour_rating,d.design_status
  FROM player_character_item_instances i
  JOIN pall_item_definitions d ON d.code=i.item_code
  WHERE i.character_id=$1 ORDER BY i.created_at,i.id`;
