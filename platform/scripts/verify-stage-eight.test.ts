@@ -245,3 +245,22 @@ test('Branch-aware personal Journal never displays facts from unchosen investiga
  assert.ok(web.includes('Home at last. Ten coins left after the clinic,')&&
   web.includes('The council has not paid for the plate lot.'));
 });
+
+
+test('Rented-room chest and Journal open over the environment, not below it',()=>{
+ const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ assert.ok(web.includes("let overlayKind=$state<'storage'|'journal'|null>(null);"));
+ assert.ok(web.includes('overlayDialog?.showModal()'));
+ assert.ok(web.includes('overlayDialog?.close()'));
+ assert.ok(web.includes('onclose={()=>overlayKind=null}'));
+ assert.ok(web.includes("onclick={()=>{void openRoomOverlay('storage');}}"));
+ assert.ok(web.includes("openRoomOverlay('journal')"));
+ assert.ok(web.includes('class="room-overlay"'));
+ assert.ok(web.includes('<InventoryPanel characterId={id} onClose={closeRoomOverlay}/>'));
+ assert.ok(web.includes('class="journal" aria-label="Personal Journal"'));
+ assert.ok(web.includes('.room-overlay::backdrop'));
+ assert.ok(web.includes('max-height:90dvh'));
+ assert.ok(!web.includes('<InventoryPanel characterId={id} onClose={()=>storageOpen=false}/>'));
+ assert.ok(!web.includes('bind:this={journalElement}'),
+   'Journal should remain in the modal rather than scrolling below the room');
+});
