@@ -152,6 +152,21 @@ test('Grid UI shows 6-column carried and chest slots with a selected-item descri
  assert.ok(ui.includes('aria-pressed={selectedId===item.id}'));
  assert.ok(ui.includes('aria-label="Selected item description"'));
  assert.ok(ui.includes('{selected.description}'));
+ assert.ok(ui.includes("'/items/daily-worker-clothes.webp'"));
+ assert.ok(ui.includes("'/items/simple-bag.webp'"));
+ assert.ok(ui.includes('class="item-art"'));
+ assert.ok(ui.includes('class="inspection-art"'));
+ for(const [name,expected] of [
+  ['simple-bag.webp','fcfff89beb0ae01b16945bb87df1c8ddc92f4c8608769ac121566515e9ff999b'],
+  ['daily-worker-clothes.webp','f3fe0210b9d6317d15752c5785c0fb6f6eac2e863eac54a8dfe3f2c9c25c0bc5']
+ ] as const){
+   const image=readFileSync(resolve(import.meta.dirname,'../apps/web/static/items',name));
+   assert.equal(image.subarray(0,4).toString(),'RIFF','Image must be real WebP');
+   assert.equal(image.subarray(8,12).toString(),'WEBP','Image must be real WebP');
+   const {createHash}=await import('node:crypto');
+   assert.equal(createHash('sha256').update(image).digest('hex'),expected,
+     'Starter cutouts must match the owner-supplied optimized artwork');
+ }
  assert.ok(ui.includes('{itemType(selected)}'));
  assert.ok(ui.includes('{itemBenefit(selected)}'));
  assert.ok(ui.includes('Store in chest'));
