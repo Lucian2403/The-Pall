@@ -179,7 +179,8 @@ assert.ok(audio.includes("document.addEventListener('pointerdown',gesture,true)"
   audio.includes("document.removeEventListener('keydown',gesture,true)") &&
   audio.includes("track.volume=clamp(settings.ambienceVolume,0,1)") &&
   audio.includes("music.volume=canPlayMusic()?clamp(settings.musicVolume,0,MAX_MUSIC_VOLUME)*envelope:0") &&
-  audio.includes("volume.gain.value=clamp(settings.sfxVolume*gain,0,1)") &&
+  audio.includes(":clamp(settings.sfxVolume*gain,0,1)") &&
+  audio.includes("volume.connect(combat?combatDestination(context):context.destination)") &&
   audio.split('ambience.load()').length===2 &&
   audio.includes('export const pallAudioPlayback=writable') &&
   audio.includes('export async function previewPallEffect()') &&

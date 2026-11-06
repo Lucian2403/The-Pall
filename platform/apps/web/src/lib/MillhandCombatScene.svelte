@@ -7,9 +7,12 @@
   import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
 
-  let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
+  type EnemyHudCard={id:string;name:string;actor:CombatActorView};
+  let {snapshot, feedback, pending, errorMessage, perform, characterId, opponents}: {
     snapshot: CombatSnapshot;
     characterId: string;
+    /** HUD-only provision for up to three opponents; combat engine still owns targeting. */
+    opponents?:EnemyHudCard[];
     feedback: CombatFloatingFeedback[];
     pending: boolean;
     errorMessage: string;
@@ -19,6 +22,8 @@
   // The server determines every value, legal action, and actual result.
   const ended = $derived(snapshot.status === 'finished');
   const flintDefeated = $derived(ended && snapshot.outcome === 'player_victory');
+  const extraOpponents=$derived((opponents??[]).slice(0,3));
+  const enemyHudCount=$derived(extraOpponents.length||1);
 
   let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'|'focus'>('guard');
   let detailsOpen=$state(false);
@@ -195,7 +200,7 @@
 {/snippet}
 
 <section class="battle" aria-label="Stage 6, the fight with Flint">
-  <div class="alley">
+  <div class="alley" class:triple-enemy={enemyHudCount===3}>
     <div class="stage-scenery">
       <div class="flint" role="img"
         aria-label={flintDefeated ? 'Flint defeated in the passage' : 'Flint holding his club'}>
@@ -230,9 +235,22 @@
       </aside>
     </div>
 
-    <!-- Enemy status belongs to Flint and stays near him on wide screens. -->
-    <section class="enemy-status" aria-label="Flint combat condition">
-      {@render combatant(snapshot.enemy, 'Flint', true)}
+    <!-- A dedicated enemy HUD lane reserves separate, readable cards for up
+         to three opponents. The current fight supplies Flint only; no extra
+         combatants or target logic are fabricated here. -->
+    <section class="enemy-status" data-count={enemyHudCount}
+      aria-label={enemyHudCount===1?'Flint combat condition':'Enemy combat conditions'}>
+      {#if extraOpponents.length>0}
+        {#each extraOpponents as opponent (opponent.id)}
+          <div class="enemy-hud-card">
+            {@render combatant(opponent.actor,opponent.name,true)}
+          </div>
+        {/each}
+      {:else}
+        <div class="enemy-hud-card">
+          {@render combatant(snapshot.enemy, 'Flint', true)}
+        </div>
+      {/if}
     </section>
 
     {#if !ended}
@@ -541,6 +559,7 @@
   .battle{min-width:0;background:#1b1815;color:#eed8b5;font-family:var(--pall-font-reading,Georgia,serif)}
   .alley{position:relative;min-height:clamp(505px,36vw,625px);isolation:isolate;overflow:hidden;
     background:#1b222b url('/locations/alley/alley-background.webp') center/cover no-repeat}
+  .alley.triple-enemy{min-height:clamp(725px,55vw,920px)}
   .alley::after{content:'';position:absolute;inset:auto 0 0;height:235px;
     background:linear-gradient(transparent,#161410aa 65%,#181512f0);pointer-events:none;z-index:1}
   /* Scenery remains non-interactive; its framed outcome card must receive
@@ -578,7 +597,27 @@
   .heavy{color:#8b2a1f;font-weight:700}
 
   /* Enemy condition is physically linked to Flint, not the player controls. */
-  .enemy-status{position:absolute;z-index:3;top:30px;left:31%;width:min(25%,380px);min-width:260px}
+  /* Enemy roster lives in a reserved lane between actor art and telegraph.
+     Two resource columns prevent three-digit values and Fatigue info from
+     ever colliding. Three foes stack vertically rather than overlaying. */
+  .enemy-status{position:absolute;z-index:3;top:24px;left:30%;width:min(31%,480px);
+    min-width:360px;display:grid;grid-template-columns:minmax(0,1fr);
+    gap:8px;align-content:start;max-width:100%;box-sizing:border-box}
+  .enemy-hud-card{min-width:0}
+  .enemy-status .fighter{padding:10px 13px 11px}
+  .enemy-status .fighter h3{font-size:clamp(18px,1.3vw,22px)}
+  .enemy-status .fighter .hp-value{font-size:clamp(18px,1.35vw,22px)}
+  .enemy-status .fighter .hp-track{margin:7px 0 9px}
+  .enemy-status .resources{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}
+  .enemy-status .resource{padding:0;min-width:0;border:0}
+  .enemy-status .resource:nth-child(even){padding-left:10px;border-left:1px solid #866447}
+  .enemy-status .resource-top{align-items:center;gap:6px}
+  .enemy-status .resource-top dt{font-size:12px}
+  .enemy-status .resource-top dd{font-size:14px;flex:none}
+  .enemy-status .mini-track{margin-top:4px}
+  .enemy-status .secondary-stats{margin-top:8px;padding-top:4px}
+  .enemy-status .secondary-stats summary{font-size:10px}
+  .enemy-status[data-count="3"]{gap:6px}
   .recover-tiers{margin:2px 0 0;padding:0 0 0 19px;color:#50331c;
     font:600 12px/1.45 Georgia,serif}
   .recover-tiers li{margin:2px 0}
@@ -713,9 +752,9 @@
   .resources{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;gap:6px}
   .resource{min-width:0}
   .resource+.resource{border-left:1px solid #866447;padding-left:8px}
-  .resource-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;min-width:0}
+  .resource-top{display:flex;justify-content:space-between;align-items:center;gap:6px;min-width:0}
   .resource-top dt{color:#d3b182;font:11px/1.25 Georgia,serif}
-  .resource-label{display:flex;align-items:center;gap:5px;min-width:0}
+  .resource-label{display:flex;align-items:center;gap:5px;min-width:0;white-space:nowrap}
   .fatigue-info-trigger{display:inline-grid;place-items:center;flex:none;
     box-sizing:border-box;width:19px;height:19px;padding:0;border:1px solid #bfa478;
     border-radius:50%;color:#f1d3a4;background:#30271f;
@@ -798,7 +837,7 @@
     color:#24160e}
 
   @media(max-width:1220px){
-    .enemy-status{left:29%;width:27%;min-width:230px}
+    .enemy-status{left:30%;width:34%;min-width:325px}
     .action-zone{right:1.7%;width:77%}
     .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .resource{padding-left:0}
@@ -810,7 +849,10 @@
     .flint{width:43%;height:89%;bottom:0;left:1%}
     .parchment{width:54%;right:2%;top:15px}
     .cart-marker{top:68%}
-    .enemy-status{position:relative;left:auto;top:auto;width:auto;min-width:0;margin:0 12px 8px}
+    .enemy-status{position:relative;left:auto;top:auto;width:auto;min-width:0;
+      margin:0 12px 8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,275px),1fr))}
+    .enemy-status[data-count="1"]{grid-template-columns:minmax(0,1fr)}
+    .alley.triple-enemy{min-height:0}
     .action-zone{position:relative;left:auto;right:auto;bottom:auto;width:auto;
       justify-items:center;padding:9px 10px;background:#211b17ef}
     .actions-row{margin:0 auto}
@@ -818,6 +860,8 @@
     .combat-console{grid-template-columns:1fr}
     .resources{grid-template-columns:repeat(4,minmax(0,1fr))}
     .resource+.resource{border-left:1px solid #866447;padding-left:8px}
+    .enemy-status .resource{border:0;padding:0}
+    .enemy-status .resource:nth-child(even){border-left:1px solid #866447;padding-left:10px}
   }
   @media(max-width:640px){
     .stage-scenery{min-height:360px}
@@ -842,12 +886,15 @@
     .target-line span+span{border:0;padding:0}
     .stat-line span+span{border:0;padding:0}
     .combat-console{padding:9px;gap:9px}
+    .enemy-status{grid-template-columns:minmax(0,1fr)}
     .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .resource:nth-child(3){border-left:0;padding-left:0}
   }
   @media(max-width:370px){
-    .resources{grid-template-columns:1fr}
+    .player-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .resource+.resource{border-left:0;padding-left:0}
+    .enemy-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .enemy-status .resource:nth-child(even){border-left:1px solid #866447;padding-left:8px}
   }
   @media(prefers-reduced-motion:reduce){
     .hp-fill,.mini-fill,.action-tile{transition:none}
