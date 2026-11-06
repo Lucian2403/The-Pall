@@ -12,32 +12,42 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
 
 ## Implemented
 - Normalized item definitions: stable code, family, description, weight, volume,
-  stackability, stack limit, permitted quality range, baseline durability, and
-  container volume bonus. These are records, not bespoke item-class branches.
+  stackability, stack limit, permitted quality range, baseline durability,
+  common-item subtitle, armour rating, and the bag's eight-slot bonus. These are records, not bespoke item-class branches.
 - Runtime owned instances: unique UUID, owning character, pack/home-chest
   location, quantity, quality tier, durability and one-time starter-grant key.
 - Idempotent SQL migration/backfill; character-insert trigger ensures every new
   character receives the universal starter kit inside its creation transaction.
   Existing characters are backfilled without affecting saved states.
-- Pack weight and volume capacity. The carried bag grants usable **volume**
-  rather than secretly increasing lifting strength; putting it in the chest
-  removes its allowance. The chest has independent storage limits.
+- Pack and chest **grid-slot capacity** in addition to weight and volume.
+  The inventory starts with **16 base slots** and the carried Simple Bag
+  grants **8 more** (24 total). Putting it in the chest removes those eight.
+  The starter rented-home chest has 24 provisional slots.
+  The carried bag also grants provisional volume, never lifting strength.
 - Authenticated item reads; POST transfers are atomic under the character and
   inventory locks, checked against optimistic revision and request receipts.
   Quantities can be split and compatible stacks merged without duplication.
 - Chest transfers require the saved shared Stage 8 home; earlier tutorial stages
   may view possessions but may not teleport items to a locked home.
-- The Stage 8 chest hotspot opens a working pack/chest interface. No extra art
-  is necessary; the current UI is provisional.
+- The Stage 8 chest hotspot opens a working **two-grid inventory/storage UI**,
+  each with up to 24 visible slots and a separate selected-item description
+  panel. Selected details show the approved item text, Common category,
+  0 Armour or 8 Slots as applicable, quantity, condition, weight and volume.
+  Placeholder typographic initials stand in for future inventory item icons.
 
 ## First-pass numerical fixtures (NOT FINAL)
 | Property | Playtest value |
 | --- | ---: |
-| Basic Clothes weight | 1.2 kg |
-| Basic Clothes occupied volume | 2 L |
-| Crude Small Bag weight | 0.8 kg |
-| Crude Small Bag occupied volume | 2 L |
-| Crude Small Bag added carry volume (when carried) | 12 L |
+| Daily Worker Clothes weight | 1.2 kg |
+| Daily Worker Clothes occupied volume | 2 L |
+| Daily Worker Clothes armour | 0 (owner-defined) |
+| Simple Bag weight | 0.8 kg |
+| Simple Bag occupied volume | 2 L |
+| Simple Bag added inventory slots | 8 (owner-defined) |
+| Base inventory slots without the bag | 16 (provisional) |
+| Total inventory slots with the bag | 24 |
+| Home Chest storage slots | 24 (provisional) |
+| Simple Bag added carry volume (when carried) | 12 L (provisional) |
 | Base pack carrying weight | 20 kg |
 | Base pack volume without bag | 5 L |
 | Chest weight limit | 120 kg |
@@ -45,16 +55,20 @@ the [Item Data Schema](../04-equipment/data/item-data-schema.md).
 | Starter quality tier | 1, Crude (technical placeholder) |
 | Starter durability | 100/100 (technical placeholder) |
 
-No persistent equipment slot is yet assigned to Basic Clothes or Crude Small
-Bag. The bag's allowance while carried is explicitly transitional; the next
-equipment milestone will determine how equipped bags grant carrying space.
+No persistent equipment slot is yet assigned to Daily Worker Clothes or
+Simple Bag. The catalogue preserves the old stable item codes
+`basic_clothes` and `crude_small_bag` so existing owned instances survive
+the name change. The additive migration also updates old starter-kit display
+names without changing quantities. The bag's slot allowance while carried
+is explicitly transitional; the equipment milestone will determine how
+equipped bags grant carrying space.
 
 ## Security and invariants
 - A caller cannot choose an item code, owner, quality tier, durability, money,
   or server-generated instance ID when transferring.
 - Cross-account reads/writes return 404; unauthenticated requests return 401.
-- Wrong revision, non-owned item, insufficient quantity, over-capacity and
-  locked-home transfers fail without mutating the state.
+- Wrong revision, non-owned item, insufficient quantity, full pack/chest
+  grids, overweight/overvolume and locked-home transfers fail without mutation.
 - Identical request-id retries return the stored response once; the same
   request ID with altered parameters is rejected.
 - Item quantities and ownership are conserved by all storage operations.
@@ -64,8 +78,8 @@ equipment milestone will determine how equipped bags grant carrying space.
 
 ## Excluded from this checkpoint
 **Equipment** (slots, equip/unequip, weapon/armour modifiers, visibility),
-durability degradation and repairs, trading, loot, crafting, and a finished
-inventory visual design. These remain separate milestones, not implicit features.
+durability degradation and repairs, trading, loot, crafting, and final
+inventory visual styling and art assets. These remain separate milestones, not implicit features.
 
 ## Installation
 From \`platform\`, after the existing character migrations:
