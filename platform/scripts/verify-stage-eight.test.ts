@@ -285,21 +285,29 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- assert.ok(web.includes('width:min(100%,1100px)')&&
+ assert.ok(web.includes('height:clamp(650px,65vw,820px)')&&
+  web.includes('container-type:size')&&
+  web.includes('width:100%'),
+  'Stage 8 should fill the chapter width at the same scene height as Stage 7');
+ assert.ok(web.includes('width:max(100cqw,177.683cqh)')&&
   web.includes('aspect-ratio:1672/941')&&
-  web.includes("center/contain no-repeat"),
-  'The entire original painting must retain its dimensions and never stretch');
- assert.ok(web.includes('class="home-artwork"')&&
-  web.includes('.home-artwork{position:relative')&&
-  web.includes('.home-artwork::after')&&
-  web.includes('class="hotspot chest"')&&web.includes('class="hotspot bed"'),
-  'Painted room and all object hotspots share one aspect-ratio coordinate space');
- assert.ok(web.includes('margin:14px auto 0')&&
+  web.includes("center/100% 100% no-repeat"),
+  'The image layer must preserve its source ratio and scale to cover, not distort');
+ const artwork=web.indexOf('class="home-artwork"');
+ const roomActions=web.indexOf('class="hotspot chest"');
+ const artworkEnd=web.indexOf('{#if restMessage}');
+ assert.ok(artwork>=0&&roomActions>artwork&&artworkEnd>roomActions&&
+  web.includes('.home-artwork::after')&&web.includes('class="hotspot bed"')&&
+  web.includes('class="hotspot book"')&&web.includes('class="hotspot notice-object"'),
+  'All room hotspots and the rest fade must stay inside the cover-scaled art');
+ assert.ok(web.includes('.home-scene{height:auto;overflow:visible;container-type:normal}')&&
+  web.includes('background-size:contain')&&
+  web.includes('margin:14px auto 0')&&
   web.includes('.home-dialogue{position:relative'),
-  'On smaller screens the dialogue must flow below the uncut painting');
- assert.ok(!web.includes('100% 100%')&&!web.includes('background-size:cover')&&
+  'Small screens retain the full room and put dialogue below it');
+ assert.ok(!web.includes('width:min(100%,1100px)')&&
   !web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
-  'No stretched wallpaper, cropped art, or blurred duplicate side gutters');
+  'No letterboxed desktop image, blurred duplicate painting or side wallpaper');
  assert.ok(web.includes('max-height:calc(100dvh - 16px)')&&
   web.includes('scrollbar-width:none')&&
   web.includes('.room-overlay::-webkit-scrollbar{display:none}'),
