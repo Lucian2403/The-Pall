@@ -72,6 +72,8 @@
     "combat:migrate": "node --env-file=.env scripts/combat-migrate.mjs",
     "clinic:migrate": "node --env-file=.env scripts/clinic-migrate.mjs",
     "home:migrate": "node --env-file=.env scripts/tutorial-home-migrate.mjs",
+    "inventory:migrate": "node --env-file=.env scripts/inventory-migrate.mjs",
+    "verify:inventory": "node --import tsx --test scripts/verify-inventory.test.ts",
     "verify:stage-six": "node scripts/verify-stage-six.mjs",
     "verify:stage-seven": "node --import tsx --test scripts/verify-stage-seven.test.ts",
     "verify:stage-eight": "node --import tsx --test scripts/verify-stage-eight.test.ts"
