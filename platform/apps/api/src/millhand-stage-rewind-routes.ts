@@ -124,6 +124,9 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           return reply.code(409).send({error:'unsafe_dispatch_state'});
         }
         await client.query(
+          'DELETE FROM player_character_bellrunner_dispatch_work_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
           'DELETE FROM player_character_bellrunner_dispatch_receipts WHERE character_id=$1',
           [req.params.id]);
         await client.query(
