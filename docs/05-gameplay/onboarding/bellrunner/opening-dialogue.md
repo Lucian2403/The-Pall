@@ -1,70 +1,121 @@
-# Bellrunner — Hector D. Smoke, Stage 1 Opening Conversation (APPROVED)
+# Bellrunner — Hector D. Smoke, Stage 1 opening and optional conversations
 
-**STATUS: APPROVED AND LOCKED (2026-10-15).** The user approved the exact Stage 1 opening exchange, optional objection and reply, spoken direction, route-sheet handoff, and Stage 1 payment-state presentation. Later-stage mechanics, timings and wages remain separately undecided. The Dispatch House, **Hector D. Smoke (Dispatch Master)**, first **Industry / Hauling** job *Shift Dispatch*, council shift notices, generic courier hub, *The Wrong Bell* incident after ordinary work, all three second Major Skills and **Dogman** are already locked in [Bellrunner](README.md). Apply the [game-wide spoken dialogue standard](../../interactions/dialogue-style-guide.md) and the approved [Millhand Guther opening](../millhand/opening-dialogue.md) as a calibration point **without copying Guther's character or structure**.
+**STATUS: OWNER-APPROVED REPLACEMENT (2026-11-09).** This document supersedes the old 2026-10-15 four-line Hector opening. Do not silently reintroduce its optional objection/skip alternative. The new exchange is sequential, with an explicit player speech turn. The six optional topics below are approved verbatim.
 
-## Scene B01 — Dispatch House, First Assignment (APPROVED)
+## Scene B01 — The Dispatch House
 
-*Hector takes a bundle of council shift notices from the sorting shelf. A duty bell sounds across the hall.*
+*The Dispatch House is busy. Runners come and go, papers pile up on the counter, and a bell rings somewhere at the far end of the hall. Hector sorts through a stack of notices, then looks up at you.*
 
-**HECTOR:** “Council notices. That round should've gone with the last runners.”
+**Hector:** “There you are. Got another round for you. Council notices. Should've gone out with the last lot, but here they are.”
 
-**PLAYER (optional):** “So they'll say I'm late.”
+**You:** “So they'll say I'm late, then.”
 
-**HECTOR (optional reply):** “I wrote down when you got them. They can come here if they want to argue.”
+**Hector:** “Let 'em. I've written down when I gave you the bloody things. They want to complain, they know where to find me.”
 
-**HECTOR (convergence; also when player skips optional response):** “Take the route sheet. Bring back the marks from whoever takes them.”
+*He pulls a sheet from under the stack and puts it on the counter.*
 
-**Interface action:** **[Take the round]** → open the standard **Industry / Hauling — Shift Dispatch** preparation screen. The player inspects the assigned route, notices/delivery count, carried load and expected job time, then proceeds to normal courier mechanics. This is one ordinary paid-job family, with a scripted onboarding exception.
+**Hector:** “Here's your route. Get a mark from whoever takes each notice. And don't lose the sheet. I need it back.”
 
-## Why these lines (design notes, not extra dialogue)
+**Choice menu:** Take the round / Ask Hector something.
 
-- **Hector has a different authority style from Guther.** He runs the sorting floor, acknowledges his late dispatch and has already noted when the runner received the bundle. He's brisk and willing to answer complaints from those higher up rather than making a junior messenger defend the office's delay. **This is the approved Stage 1 characterization**, not an invented biography or guarantee of later protection.
-- The optional player objection is **about being blamed for late delivery**, not a decorative “What is my job?” questionnaire. Hector answers the real concern. The optional lines don't alter rewards, work terms or story route.
-- The bell is an **ordinary duty bell within the working Dispatch House**. This is NOT the later condemned worksite's bell and does not reveal or prefigure the unsafe site in dialogue.
-- Hector's words use ordinary work vocabulary: council notices, route sheet, receiving marks. No modern bureaucratic formula or theatrical period accent; no forced bell-related joke or clever proverb.
-- “Take the round” is the action to receive task-related papers; **no special inventory loot** is granted.
-- The scene is short deliberately. The player learns the actual route selection and delivery verification through the **job UI**, not through instructional monologue.
+### Take the round
 
-## Stage 1 interface and ordinary first-job handoff (APPROVED; numerical details TBD)
+*Hector pushes the bundle across the counter.*
 
-**Job panel — Shift Dispatch** (Stage 1 handoff approved; remaining exact copy and numerical parameters TBD):
+Council shift notices. Route sheet. Receiving marks required.
 
-| Field | Display direction |
-| --- | --- |
-| Workplace | **Dispatch House** (LOCKED hub) |
-| Supervisor | **Hector D. Smoke — Dispatch Master** (LOCKED NPC) |
-| Work | Deliver a municipal **shift-notice bundle** by ordinary courier route |
-| Family | **Industry → Hauling** |
-| What to inspect first | Route sheet, number of stops, bundle condition/weight, job duration and delivery acceptance instructions |
-| Payment | **Not yet cleared.** The payment outcome belongs to this scripted disputed route; show no promised payout. Exact explanation for **why** the work is eventually rejected/unpaid is **not settled at Stage 1** and must be established credibly after the later Wrong Bell discrepancy. |
-| Trigger | **[Take the round]** → ordinary work preparation. No mystery event in this screen. |
-| Work skill | The character already received **Industry +3 Major Skill** from background choice; no bonus or job XP is earned from the scripted opening task. |
+**Payment: Not yet cleared.**
 
-**Next UI actions after acceptance ([Stage 2 APPROVED AND LOCKED](shift-dispatch-interaction.md)):**
-1. **[Inspect route and notices]** — check bundle count and marked destinations.
-2. **[Choose the route]** — ordinary comparison of shorter/busier path versus longer/easier path (premise direction already in master outline; exact options/consequences must be separately approved).
-3. **[Make deliveries / record receipts]** — a reusable receiver/delivery verification work interaction.
-4. Only **after normal courier task mechanics resolve**, trigger the one-time **The Wrong Bell** discovery ([Stage 3 APPROVED](wrong-bell-discovery.md)): a worksite closed after harmful fumes is still calling workers in. Do NOT mention that closure or the supposed warning bell in Scene B01.
+**Action: Inspect route and notices** — opens the approved Stage 2 Shift Dispatch work. Taking the round commits Stage 1→2 once. The documents are task props, not inventory gifts.
 
-**Economy and system guardrails (LOCKED globally):**
-- The **two scripted work tasks** in Bellrunner's onboarding, and the fight, award **0 coins, 0 ordinary XP and no loot**. Ordinary repeatable dispatch rounds outside the onboarding pay coins/XP. Do not present a definite wage then silently confiscate it.
-- +3 Industry was already granted at character creation; the +1 in another Major Skill comes once on selecting one of the later **Commerce / Medicine / Mechanics** branch tasks. No early bonus in this scene.
-- Starting inventory is **Basic Clothes + Crude Small Bag + 20 coins**. No free special satchel, rifle, extra medicine or dispatch tools.
-- Mandatory prompts belong near start of activities under [Jobs and Time](../../jobs/jobs-and-time.md), not at a surprise later timer.
-- Use the ordinary courier/Hauling mechanics wherever possible. Do not create a one-time “ring a bell at the right instant” minigame.
+## Six optional, repeatable Hector conversations
 
-## Critical narrative point to resolve in later scenes
+The player may open these from **Ask Hector something** or by clicking Hector's illustration. Each topic opens on its first spoken turn. Clicking **Continue** advances exactly one turn (including player lines); no selected line is duplicated or automatically skipped.
 
-The user has insisted that an onboarding task's lack of wages should **make sense as an exceptional event** rather than falsely teaching players that normal courier work is unpaid.
+### 1. About the work
 
-Scene B01 avoids claiming normal nonpayment and avoids promising money. **A concrete causal explanation must be authored in the Wrong Bell scene**—for example, a route whose council accounting or receiving authority later refuses to validate the closed-site notice. This explanation is **not locked yet** and must not be inferred simply from “not yet cleared” on the draft UI. The second chosen task should follow from resolving that contested round and have its own credible nonpayment context.
+**You:** “Always this much running about?”
 
-## Approval boundary
+**Hector:** “Some days worse. Half the city can't start a shift till somebody hands them a piece of paper.”
 
-**LOCKED earlier:** location, Hector's role/name, shift-notice job family, later *Wrong Bell* premise, +3 Industry, shared kit/reward sequence and future Dogman encounter.
+**You:** “And they can't send it themselves?”
 
-**APPROVED on 2026-10-15:** exact Hector dialogue, optional blame exchange, opening stage direction, route-sheet handoff and payment-state UI language. Stage 2 and later stages require separate approval.
+**Hector:** “They could. But then what would they need us for?”
 
-**Approved next step:** [Stage 2 ordinary courier interaction](shift-dispatch-interaction.md) (approved 2026-10-15). **Stage 3 APPROVED:** [The Wrong Bell discovery](wrong-bell-discovery.md). **Stage 4 APPROVED:** [Three second-skill tasks](second-task-branches.md). **Stage 5 PROPOSED:** [Dogman: Show Your Papers and Gate Barred](dogman-confrontation.md). **Remaining:** Dogman Stage 5 approval, fight, clinician/home adaptation.
+### 2. About the receiving marks
 
-Related: [Bellrunner overview](README.md), [game-wide dialogue guide](../../interactions/dialogue-style-guide.md), [shared onboarding](../shared-structure.md), [Jobs and Time](../../jobs/jobs-and-time.md).
+**You:** “What if somebody won't sign for it?”
+
+**Hector:** “Then you write down where you went and who took it. Don't go making marks yourself.”
+
+**You:** “And if they give me trouble?”
+
+**Hector:** “Bring it back to me. I'll deal with the paperwork.”
+
+### 3. About the routes
+
+**You:** “Which way's quicker today?”
+
+**Hector:** “Short road's usually packed with carts. Other way takes longer, but you'll have more room.”
+
+**You:** “So which one?”
+
+**Hector:** “Up to you. You're the one walking it.”
+
+### 4. About the payment
+
+**You:** “When's this round getting paid?”
+
+**Hector:** “When the council clears it. They want every stop accounted for first.”
+
+**You:** “So nothing till then?”
+
+**Hector:** “That's how they do it. I send the work out. I don't hold the purse.”
+
+### 5. About Grand Cylinder City
+
+**You:** “Does this city ever get a quiet day?”
+
+**Hector:** “Quiet? With that great Cylinder burning day and night? Not a chance. Heat, power, factories going day and night. Always somebody working”
+
+**You:** “Suppose it keeps the city alive.”
+
+**Hector:** “Aye, it does. Heat, power, work for half the city. Trouble is, some folk get rich off it, and the rest get up before dawn to keep the damn thing running.”
+
+**You:** “Sounds about right.”
+
+**Hector:** “Been that way longer than you or me. Don't see it changing by supper.”
+
+### 6. About the Plume and the Pall
+
+**You:** “You ever send runners beyond the walls?”
+
+**Hector:** “Outskirts, sure. Grey Marches, very rarely. But the Pall? No. I've enough trouble getting letters across this city without sending poor sods into that mess.”
+
+**You:** “What's it actually like out there?”
+
+**Hector:** “Bad ground, strange growth, things you don't want to meet on a lonely road. Been like that since the Plume, near a hundred years now.”
+
+**You:** “What do you reckon caused it?”
+
+**Hector:** “Ah, heard the lot. Earth splitting open, something men dug up, punishment from above. Every old fool's got a different story.”
+
+**You:** “And yours?”
+
+**Hector:** “Mine? Haven't got one. Nobody knows what happened, and I'm not about to pretend I do. I've got enough trouble with places that are still on the bloody map.”
+
+## Navigation and rules
+
+- **Opening work menu:** Take the round / Ask Hector something.
+- **Ask Hector something:** six topic labels and Return to the round.
+- **After the final line in a topic:** Ask something else / Return to the round.
+- **Ask something else** returns directly to the six-topic list without replaying the opening. **Return to the round** restores the active work-assignment panel or the exact point previously reached in the opening.
+- Optional topics are local, repeatable dialogue. They do not call gameplay APIs, advance stages, award skills, grant gear, set flags, or alter coins.
+- The duty bell is the ordinary working Dispatch House cue, played once when the scene is explicitly entered. It is distinct from the later condemned-site night bell. The existing Depot ambience continues through the scene's shared audio ownership.
+
+## Canon and economy boundaries
+
+- Hector D. Smoke is the Dispatch Master at the recurring Dispatch House hub. Bellrunner starts with Industry +3, Basic Clothes, Crude Small Bag and 20 coins.
+- Stage 2 is a normal Industry / Hauling courier-family demonstration: notice check, optional sort, two roads, spoiled receipt and an ordinary-work summary. No fabricated destinations, duration estimates or wage values. Its final sealed order remains unopened.
+- This exceptional onboarding round pays zero coins and ordinary XP and grants no loot, but its reason for nonpayment belongs to Stage 3; it is not a rule for normal paid courier jobs. Do not promise a wage then arbitrarily withhold it.
+- The closed worksite, strange bell, harmful fumes, watchman and branching second jobs remain Stage 3–4 material. Hector's optional lore does not identify the final delivery destination or reveal the Wrong Bell incident.
