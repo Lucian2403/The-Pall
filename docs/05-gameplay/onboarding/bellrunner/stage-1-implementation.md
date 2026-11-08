@@ -38,14 +38,18 @@ player's own response and Hector's reply. All beats require Continue
 or a real action: no automatic skips, repeated selected lines, or
 spontaneously generated dialogue.
 
-Clicking Hector or choosing **Ask Hector something** shows six topics:
+Clicking Hector or choosing **Ask Hector something** shows six topics
+in both Stage 1 and the saved Stage 2 Dispatch House:
 work, receiving marks, routes, payment, Grand Cylinder City, and
 the Plume/Pall. The verbatim owner lines are stored in
 `approved-bellrunner-hector.ts`. Each turn appears once and progresses
 only when the player clicks Continue. After each topic, **Ask something
 else** returns directly to the topic list and **Return to the round**
 returns to the preserved main assignment state. These topics are
-client-only; they never write progress or grant rewards.
+client-only; they never write progress or grant rewards. The
+`BellrunnerHectorConversation.svelte` component is shared between
+both scenes, and returning to the work panel never resets the
+current dispatch revision or route choice.
 
 **Take the round** calls `POST /api/characters/:id/bellrunner/dispatch`
 with owner authentication, transaction-locked character row, origin
