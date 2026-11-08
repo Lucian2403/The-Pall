@@ -4,14 +4,16 @@ import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 
 if(!process.env.DATABASE_URL)throw new Error('DATABASE_URL required. Run npm run bellrunner:migrate from platform.');
-const sql=readFileSync(resolve(import.meta.dirname,'../db/migrations/0014_bellrunner_stage1.sql'),'utf8');
+const migrations=['0014_bellrunner_stage1.sql','0015_bellrunner_dispatch_work.sql'];
 const client=new pg.Client({connectionString:process.env.DATABASE_URL});
 await client.connect();
 try{
   await client.query('BEGIN');
-  await client.query(sql);
+  for(const name of migrations){
+    await client.query(readFileSync(resolve(import.meta.dirname,'../db/migrations',name),'utf8'));
+  }
   await client.query('COMMIT');
-  console.log('PASS: Bellrunner acceptance tables initialized; existing character progress is unchanged.');
+  console.log('PASS: Bellrunner Stage 1 acceptance and Stage 2 courier work initialized; existing character progress is unchanged.');
 }catch(e){
   await client.query('ROLLBACK');
   throw e;
