@@ -44,7 +44,7 @@
 
 <svelte:head><title>The Pall — Shift Dispatch</title></svelte:head>
 {#if status==='ready'&&character&&round}
-  <TutorialShell {character} sceneLocation="Dispatch House">
+  <TutorialShell {character} sceneLocation="Dispatch House" depotBackdrop>
     <section class="dispatch" aria-label="Saved Bellrunner Shift Dispatch">
       <div class="background" aria-hidden="true"></div>
       <div class="docket">
