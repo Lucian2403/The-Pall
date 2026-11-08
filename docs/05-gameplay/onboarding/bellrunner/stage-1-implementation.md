@@ -25,9 +25,21 @@ by this patch. Do not describe this as a complete Bellrunner tutorial.
   - `/locations/bellrunner/sealed-order.webp`
   - `/locations/bellrunner/route-sheet.webp`
 - All three paper illustrations are inspectable, with content descriptions.
+  Both Stages 1 and the saved Stage 2 handoff use the **existing Millhand UI
+  components**, not another visual treatment: `WorkshopItemPopover` for
+  paper inspections, `workshop-object-labels.css` for frame-plaque names,
+  and `pall-owner-ui.css` for the dialogue parchment and choice buttons.
+  Hector is partly hidden by a second, lower-only mask of the original depot
+  image, using the same foreground layering as Guther's workbench.
   Neither the sealed order nor the still-unfilled route sheet reveals the
   Stage 3 closure, working night bell or branch choices. These are **job
   papers**, never inventory item grants or permanent personal possessions.
+- **Depot ambience:** the already-committed `depot-ambience.mp3` is reused
+  through `TutorialShell`'s existing `depotBackdrop` scene ownership for
+  Stage 1 and the Stage 2 accepted-round view. No new or duplicate ambient
+  recording is needed. It respects the game's audio control/unlock rules,
+  stops outside Depot scenes and must not drown out the separate one-shot
+  duty-bell SFX.
 
 ## Persistence and safety
 
@@ -43,7 +55,13 @@ item, equipment or permanent quest prop is granted by this action.
 
 The accepted round is visible at
 `/characters/:id/bellrunner/dispatch`, and can be revisited from the
-character detail screen. The next implementation will add Stage 2's
+character detail screen. The owner-approved **← Back to Stage 1** control
+is also available on that page **only for local development** through
+the shared `/dev/rewind-stage` API. With a confirmation and the owner
+character row locked, it deletes only the accepted round and its stale
+receipts before restoring Stage 1. Coins, saved starter gear and Major
+Skills do not change. This button is never enabled on a production or
+non-loopback API. The next implementation will add Stage 2's
 normal route/check/delivery/receiving-mark state machine to that page.
 Do not simulate completion, payment, delivery timers or the Stage 3
 revelation before then.
