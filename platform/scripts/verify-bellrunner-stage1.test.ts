@@ -58,6 +58,18 @@ test('Bellrunner uses the approved Stage 1 exchange without inventing mystery or
  assert.ok(sourceText.includes('bell.pause()'));
  assert.ok(sourceText.includes('scene-action" onclick={begin}'));
  assert.ok(sourceText.includes('data-pall-sfx="paper"'));
+ assert.ok(sourceText.includes('WorkshopItemPopover')&&
+  sourceText.includes("import '$lib/workshop-object-labels.css'"));
+ assert.ok(sourceText.includes('class="workshop bellrunner"')&&
+  sourceText.includes('class="work-card dispatch-dialogue"')&&
+  sourceText.includes('workshop-object-label')&&
+  sourceText.includes('workshop-npc-label'));
+ assert.ok(sourceText.includes('depot-foreground')&&
+  sourceText.includes('clip-path:inset(70% 0 0 0)'),
+  'Hector must be occluded by the original environment, like Guther');
+ assert.ok(!sourceText.includes('paper-inspection')&&
+  !sourceText.includes('object-label">'),
+  'Bellrunner must not introduce its own popup or simple label style');
  for(const item of ['hector-d-smoke.webp','council-work.webp','sealed-order.webp','route-sheet.webp'])
   assert.ok(sourceText.includes(item));
  assert.ok(!sourceText.includes('NpcConversation')&&!sourceText.includes('Stage 3'));
@@ -76,6 +88,14 @@ test('Stage 1 accept action is server-owned and Stage 2 is not silently simulate
  const pkg=source('package.json');
  assert.ok(opening.includes('<BellrunnerOpeningScene')&&
   opening.includes('takeRound={takeBellrunnerRound}'));
+ assert.ok(opening.includes("depotBackdrop={character.origin==='Bellrunner'}"),
+  'Dispatch House uses existing Depot ambience');
+ assert.ok(stageTwo.includes('sceneLocation="Dispatch House" depotBackdrop'),
+  'The accepted round keeps the same soundscape');
+ assert.ok(stageTwo.includes('WorkshopItemPopover')&&
+  stageTwo.includes('workshop-object-label')&&
+  stageTwo.includes('class="work-card docket"'),
+  'Stage 2 handoff must not invent another UI presentation');
  assert.ok(opening.includes("action:'take_round',expectedRevision:0"));
  assert.ok(opening.includes('pendingTakeRequestId??=crypto.randomUUID()'));
  assert.ok(api.includes('FOR UPDATE')&&
@@ -92,6 +112,14 @@ test('Stage 1 accept action is server-owned and Stage 2 is not silently simulate
  assert.ok(pkg.includes('"bellrunner:migrate"'));
  assert.ok(home.includes("href:base+'/bellrunner/dispatch'"));
  assert.ok(shell.includes("'/bellrunner/dispatch'"));
+ assert.ok(shell.includes("character.origin!=='Millhand'&&character.origin!=='Bellrunner'"));
+ assert.ok(shell.includes('Back to Stage '));
+ const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
+ assert.ok(rewind.includes("result.rows[0].origin==='Bellrunner'"));
+ assert.ok(rewind.includes("if(bellrunner){"));
+ assert.ok(rewind.includes('DELETE FROM player_character_bellrunner_dispatch_receipts'));
+ assert.ok(rewind.includes("tutorial_stage=1,tutorial_status='NOT_STARTED'"));
+ assert.ok(rewind.includes("route:'/characters/'+req.params.id+'/opening'"));
  assert.ok(stageTwo.includes('round.stage!==2||!round.accepted'));
  assert.ok(stageTwo.includes('are not implemented in this pass'));
  assert.ok(stageTwo.includes('No money, XP or equipment has been awarded.'));
