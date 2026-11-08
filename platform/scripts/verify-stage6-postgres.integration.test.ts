@@ -246,6 +246,12 @@ test('Bellrunner Back to Stage 1 is loopback-only, owner-scoped and preserves be
  const taken=await request('POST',path,owner,{
   action:'take_round',requestId:randomUUID(),expectedRevision:0});
  assert.equal(taken.status,200,JSON.stringify(taken.body));
+ for(const [action,revision] of [['check_round',0],['take_quieter_road',1],['deliver_notices',2]] as const){
+  const progressed=await request('POST',path+'/work',owner,{
+   action,requestId:randomUUID(),expectedRevision:revision});
+  assert.equal(progressed.status,200,action+': '+JSON.stringify(progressed.body));
+ }
+ assert.equal((await request('GET',path)).body?.workState?.phase,'spoiled_mark');
  const button=await request('GET',rewind);
  assert.equal(button.status,200,JSON.stringify(button.body));
  assert.deepEqual(button.body,{
@@ -274,10 +280,16 @@ test('Bellrunner Back to Stage 1 is loopback-only, owner-scoped and preserves be
  const receipts=await db.query(
   'SELECT count(*)::int AS n FROM player_character_bellrunner_dispatch_receipts WHERE character_id=$1',[id]);
  assert.equal(receipts.rows[0].n,0,'No stale receipt may falsely accept the round again');
+ const workReceipts=await db.query(
+  'SELECT count(*)::int AS n FROM player_character_bellrunner_dispatch_work_receipts WHERE character_id=$1',[id]);
+ assert.equal(workReceipts.rows[0].n,0,'Rewind must erase Stage 2 work receipts too');
  const replay=await request('POST',path,owner,{
   action:'take_round',requestId:randomUUID(),expectedRevision:0});
  assert.equal(replay.status,200,'The re-played opening can accept a fresh round exactly once');
  assert.equal(replay.body?.stage,2);
+ assert.equal(replay.body?.workState?.phase,'issued',
+  'Replay starts a fresh work round, not a stale spoiled receipt');
+ assert.equal(replay.body?.revision,0);
 });
 
 test('Bellrunner Stage 2 courier round persists choices and receiving proof without creating rewards',async()=>{
