@@ -1,7 +1,7 @@
 <script lang="ts">
   import {onDestroy} from 'svelte';
   import type {StageOneBeat} from '$lib/approved-stage-one';
-  import {APPROVED_HECTOR_TOPICS,type HectorTopicId} from '$lib/approved-bellrunner-hector';
+  import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import '$lib/workshop-object-labels.css';
 
@@ -28,11 +28,7 @@
   }=$props();
   let entered=$state(false);
   let selected=$state<PropKey|null>(null);
-  let talking=$state<'assignment'|'topics'|'lines'>('assignment');
-  let activeTopic=$state<HectorTopicId|null>(null);
-  let lineIndex=$state(0);
-  const currentTopic=$derived(APPROVED_HECTOR_TOPICS.find(x=>x.id===activeTopic)??null);
-  const currentLine=$derived(currentTopic?.lines[lineIndex]??null);
+  let talking=$state(false);
   let bell:HTMLAudioElement|null=null;
   function begin(){
     if(entered)return;
@@ -52,17 +48,9 @@
   function askHector(){
     selected=null;
     if(!entered)begin();
-    activeTopic=null;lineIndex=0;talking='topics';
+    talking=true;
   }
-  function openTopic(id:HectorTopicId){
-    activeTopic=id;lineIndex=0;talking='lines';
-  }
-  function askAnother(){
-    activeTopic=null;lineIndex=0;talking='topics';
-  }
-  function returnToRound(){
-    activeTopic=null;lineIndex=0;talking='assignment';
-  }
+  function returnToRound(){talking=false;}
   function next(nextId:string,fromChoice=false){
     selected=null;
     advance(nextId,fromChoice);
@@ -102,26 +90,8 @@
     </div>
 
     <aside class="work-card dispatch-dialogue" aria-label="Hector D. Smoke conversation">
-      {#if talking==='topics'}
-        <p class="eyebrow">HECTOR D. SMOKE · DISPATCH MASTER</p>
-        <h2>Ask Hector something</h2>
-        <div class="responses" aria-label="Optional Hector conversation topics">
-          {#each APPROVED_HECTOR_TOPICS as option (option.id)}
-            <button type="button" onclick={()=>openTopic(option.id)}>{option.label}</button>
-          {/each}
-          <button type="button" onclick={returnToRound}>Return to the round</button>
-        </div>
-      {:else if talking==='lines' && currentTopic && currentLine}
-        <p class="eyebrow">{currentLine.speaker==='Player'?characterName:'HECTOR D. SMOKE'}</p>
-        <p class="speech">“{currentLine.text}”</p>
-        <div class="responses">
-          {#if lineIndex<currentTopic.lines.length-1}
-            <button type="button" onclick={()=>{lineIndex+=1;}}>Continue</button>
-          {:else}
-            <button type="button" onclick={askAnother}>Ask something else</button>
-            <button type="button" onclick={returnToRound}>Return to the round</button>
-          {/if}
-        </div>
+      {#if talking}
+        <BellrunnerHectorConversation {characterName} {returnToRound}/>
       {:else if !entered}
         <p class="eyebrow">DISPATCH HOUSE · STAGE I</p>
         <h2>Hector D. Smoke</h2>
