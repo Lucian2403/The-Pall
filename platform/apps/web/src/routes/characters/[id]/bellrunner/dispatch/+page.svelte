@@ -3,6 +3,8 @@
   import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import '$lib/workshop-object-labels.css';
 
   type Character={
     id:string;name:string;origin:string;sex:string;coins:number;
@@ -14,6 +16,17 @@
     revision:number;work:string;skill:string;payment:string;
     tutorialPayout:{coins:number;ordinaryXp:number;items:number}
   };
+  type PaperKey='route'|'notices'|'sealed';
+  const documents:Record<PaperKey,{name:string;src:string;description:string}>={
+    route:{name:'Route sheet',src:'/locations/bellrunner/route-sheet.webp',
+      description:'Places for destinations and receiving marks. Route checks and deliveries begin with the next work interaction.'},
+    notices:{name:'Council notices',src:'/locations/bellrunner/council-work.webp',
+      description:'Council shift notices issued to the courier for delivery.'},
+    sealed:{name:'Sealed council order',src:'/locations/bellrunner/sealed-order.webp',
+      description:'The final council order remains sealed until the assigned route reaches its marked address.'}
+  };
+  const keys=['route','notices','sealed'] as const;
+  let selected=$state<PaperKey|null>(null);
   const id=$derived(page.params.id);
   let character=$state<Character|null>(null);
   let round=$state<Round|null>(null);
@@ -45,9 +58,9 @@
 <svelte:head><title>The Pall — Shift Dispatch</title></svelte:head>
 {#if status==='ready'&&character&&round}
   <TutorialShell {character} sceneLocation="Dispatch House" depotBackdrop>
-    <section class="dispatch" aria-label="Saved Bellrunner Shift Dispatch">
+    <section class="workshop dispatch" aria-label="Saved Bellrunner Shift Dispatch">
       <div class="background" aria-hidden="true"></div>
-      <div class="docket">
+      <div class="work-card docket">
         <p class="eyebrow">BELLRUNNER · STAGE II</p>
         <h1>Shift Dispatch</h1>
         <p>Hector D. Smoke has issued the council notice round. Your acceptance is saved.</p>
@@ -57,13 +70,25 @@
           <div><dt>Payment</dt><dd>{round.payment}</dd></div>
         </dl>
         <p class="status-note">The route-check, delivery and receipt interactions belong to Stage 2 and are not implemented in this pass. The notices and sealed order are task papers, not inventory items. No money, XP or equipment has been awarded.</p>
-        <a href={'/characters/'+encodeURIComponent(id)} class="back">Return to character</a>
+        <a href={'/characters/'+encodeURIComponent(id)} class="pall-framed-button back">Return to character</a>
       </div>
-      <div class="documents">
-        <img src="/locations/bellrunner/route-sheet.webp" alt="Route sheet awaiting delivery marks" draggable="false"/>
-        <img src="/locations/bellrunner/council-work.webp" alt="Council notice papers" draggable="false"/>
-        <img src="/locations/bellrunner/sealed-order.webp" alt="Sealed council order, still unopened" draggable="false"/>
+      <div class="documents" aria-label="Issued dispatch papers">
+        {#each keys as key}
+          <div class="document {key}">
+            <img src={documents[key].src} alt="" aria-hidden="true" draggable="false"/>
+            <button type="button" class="document-target" data-workshop-object
+              data-pall-sfx="paper" aria-pressed={selected===key}
+              aria-label={'Inspect '+documents[key].name}
+              onclick={()=>{selected=selected===key?null:key;}}>
+              <span class="workshop-object-label">{documents[key].name}</span>
+            </button>
+          </div>
+        {/each}
       </div>
+      {#if selected}
+        <WorkshopItemPopover itemKey={selected} title={documents[selected].name}
+          description={documents[selected].description} onClose={()=>{selected=null;}} />
+      {/if}
     </section>
   </TutorialShell>
 {:else}
@@ -99,16 +124,25 @@
   dt{font-weight:700}
   dd{margin:0;text-align:right}
   .status-note{font-size:13px;color:#60452e}
-  .back{display:inline-block;padding:10px 14px;margin-top:10px;
-    background:#33271d;color:#f1d7ad;border:1px solid #9b7951;text-decoration:none}
-  .back:focus-visible{outline:2px solid #f3cc89}
-  .documents{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:center}
-  .documents img{width:100%;max-height:320px;object-fit:contain;filter:drop-shadow(0 8px 9px #0008)}
-  .documents img:first-child{grid-row:span 2;max-height:530px}
+  .back{margin-top:10px}
+  .documents{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;align-items:end;min-width:0}
+  .document{position:relative;display:flex;align-items:center;justify-content:center;
+    min-width:0;min-height:190px;padding-bottom:35px}
+  .document.route{grid-row:span 2;min-height:425px}
+  .document img{width:100%;max-height:240px;object-fit:contain;
+    pointer-events:none;filter:drop-shadow(0 8px 9px #0008)}
+  .document.route img{max-height:380px}
+  .document-target{position:absolute;inset:0;display:flex;align-items:end;
+    justify-content:center;cursor:pointer;padding:0;border:0;background:transparent}
+  .document-target:focus-visible{outline:2px solid #f3cc89}
+  .document-target .workshop-object-label{pointer-events:none}
   .fallback{padding:40px;color:#e3d0af;background:#25211e}
   @media(max-width:900px){
     .dispatch{grid-template-columns:minmax(0,1fr);min-height:unset;padding:16px;gap:8px}
-    .documents img{max-height:180px}
-    .documents img:first-child{max-height:310px}
+    .document{min-height:140px}
+    .document.route{min-height:260px}
+    .document img{max-height:155px}
+    .document.route img{max-height:240px}
   }
 </style>
