@@ -16,6 +16,7 @@ import Fastify from 'fastify';
 import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
+import {registerBellrunnerDispatchRoutes} from '../apps/api/src/bellrunner-dispatch-routes.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
@@ -36,7 +37,7 @@ const schema=[
   '0007_millhand_flint_combat.sql','0008_millhand_clinic.sql',
   '0009_character_welcome.sql','0010_tutorial_home.sql',
   '0011_inventory_foundation.sql','0012_equipment_slots.sql',
-  '0013_equipment_stats_and_clothing.sql'
+  '0013_equipment_stats_and_clothing.sql','0014_bellrunner_stage1.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -48,6 +49,7 @@ const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
 };
 const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
+registerBellrunnerDispatchRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
@@ -171,6 +173,61 @@ before(async()=>{
   await app.ready();
 });
 after(async()=>{await app.close();await db.end();});
+
+test('Bellrunner Stage 1 acceptance is owned, persistent, atomic, and awards no equipment or wages',async()=>{
+ const id=randomUUID(),name='Bellrunner '+id.slice(0,8);
+ await db.query(
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',1,'NOT_STARTED')",
+  [id,owner,name,'bellrunner-'+id,JSON.stringify({Industry:3})]
+ );
+ const path=base+id+'/bellrunner/dispatch';
+ assert.equal((await request('GET',path,null)).status,401);
+ assert.equal((await request('GET',path,stranger)).status,404);
+ const untouched=await request('GET',path);
+ assert.equal(untouched.status,200);
+ assert.equal(untouched.body?.accepted,false);
+ assert.equal(untouched.body?.stage,1);
+ assert.equal((await request('POST',path,owner,{
+  action:'invent_stage_three',requestId:randomUUID(),expectedRevision:0
+ })).status,400);
+ const invalid=await request('POST',path,owner,{
+  action:'take_round',requestId:randomUUID(),expectedRevision:1
+ });
+ assert.equal(invalid.status,400);
+ const attack=await request('POST',path,stranger,{
+  action:'take_round',requestId:randomUUID(),expectedRevision:0
+ });
+ assert.equal(attack.status,404);
+ const requestId=randomUUID();
+ const accepted=await request('POST',path,owner,{action:'take_round',requestId,expectedRevision:0});
+ assert.equal(accepted.status,200,JSON.stringify(accepted.body));
+ assert.deepEqual(accepted.body?.tutorialPayout,{coins:0,ordinaryXp:0,items:0});
+ assert.equal(accepted.body?.stage,2);
+ assert.equal(accepted.body?.accepted,true);
+ assert.equal(accepted.body?.payment,'Not yet cleared');
+ const duplicate=await request('POST',path,owner,{action:'take_round',requestId,expectedRevision:0});
+ assert.equal(duplicate.status,200);
+ assert.deepEqual(duplicate.body,accepted.body,'A retry with the same ID returns the saved result');
+ const rejected=await request('POST',path,owner,{
+  action:'take_round',requestId:randomUUID(),expectedRevision:0
+ });
+ assert.equal(rejected.status,409,'A new request must not issue the same work twice');
+ const stored=await db.query(
+  'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',[id]);
+ assert.equal(stored.rows[0].tutorial_stage,2);
+ assert.equal(stored.rows[0].tutorial_status,'IN_PROGRESS');
+ assert.equal(Number(stored.rows[0].coins),20);
+ assert.deepEqual(stored.rows[0].major_skill_bonuses,{Industry:3});
+ assert.equal((await request('GET',path)).body?.accepted,true);
+ const grants=await db.query(
+  "SELECT item_code,quantity FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code",[id]);
+ assert.deepEqual(grants.rows.map(x=>[x.item_code,x.quantity]),[
+  ['basic_clothes',1],['crude_small_bag',1]
+ ]);
+ assert.equal(Number((await db.query(
+  'SELECT count(*) AS n FROM player_character_bellrunner_dispatch_receipts WHERE character_id=$1',[id]
+ )).rows[0].n),1);
+});
 
 test('Equipment migration backfills existing starter items without duplicating or losing coins',async()=>{
  const rows=await db.query<{item_code:string;quantity:number;location:string;equipment_slot:string}>(
