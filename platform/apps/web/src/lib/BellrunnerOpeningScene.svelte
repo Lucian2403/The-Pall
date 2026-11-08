@@ -1,6 +1,7 @@
 <script lang="ts">
   import {onDestroy} from 'svelte';
   import type {StageOneBeat} from '$lib/approved-stage-one';
+  import {APPROVED_HECTOR_TOPICS,type HectorTopicId} from '$lib/approved-bellrunner-hector';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import '$lib/workshop-object-labels.css';
 
@@ -27,6 +28,11 @@
   }=$props();
   let entered=$state(false);
   let selected=$state<PropKey|null>(null);
+  let talking=$state<'assignment'|'topics'|'lines'>('assignment');
+  let activeTopic=$state<HectorTopicId|null>(null);
+  let lineIndex=$state(0);
+  const currentTopic=$derived(APPROVED_HECTOR_TOPICS.find(x=>x.id===activeTopic)??null);
+  const currentLine=$derived(currentTopic?.lines[lineIndex]??null);
   let bell:HTMLAudioElement|null=null;
   function begin(){
     if(entered)return;
@@ -43,6 +49,20 @@
   function inspect(item:PropKey){
     selected=selected===item?null:item;
   }
+  function askHector(){
+    selected=null;
+    if(!entered)begin();
+    activeTopic=null;lineIndex=0;talking='topics';
+  }
+  function openTopic(id:HectorTopicId){
+    activeTopic=id;lineIndex=0;talking='lines';
+  }
+  function askAnother(){
+    activeTopic=null;lineIndex=0;talking='topics';
+  }
+  function returnToRound(){
+    activeTopic=null;lineIndex=0;talking='assignment';
+  }
   function next(nextId:string,fromChoice=false){
     selected=null;
     advance(nextId,fromChoice);
@@ -58,8 +78,8 @@
     <div class="scene-shade" aria-hidden="true"></div>
     <img class="hector" src="/characters/hector/hector-d-smoke.webp"
       alt="Hector D. Smoke, the Dispatch Master with a pipe and work clipboard" draggable="false"/>
-    <!-- Reuse the original scene over the lower foreground, exactly as Guther's bench.
-         The object props remain in front and Hector's lower legs are occluded. -->
+    <!-- Only the lowest edge of the wooden counter covers Hector's boots.
+         The former 70% foreground mask hid half his body in mid-air. -->
     <img class="depot depot-foreground" src="/locations/origins/bellrunner-depot.webp"
       alt="" aria-hidden="true" draggable="false"/>
     {#each paperKeys as key}
@@ -72,7 +92,7 @@
     {/each}
     <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
       aria-label="Talk to Hector D. Smoke"
-      onclick={()=>{selected=null;begin();}}>
+      onclick={askHector}>
       <span class="workshop-npc-label">Hector D. Smoke</span>
     </button>
     {#if selected}
@@ -81,13 +101,34 @@
     {/if}
     </div>
 
-    <aside class="work-card dispatch-dialogue" aria-label="Hector's approved opening">
-      {#if !entered}
+    <aside class="work-card dispatch-dialogue" aria-label="Hector D. Smoke conversation">
+      {#if talking==='topics'}
+        <p class="eyebrow">HECTOR D. SMOKE · DISPATCH MASTER</p>
+        <h2>Ask Hector something</h2>
+        <div class="responses" aria-label="Optional Hector conversation topics">
+          {#each APPROVED_HECTOR_TOPICS as option (option.id)}
+            <button type="button" onclick={()=>openTopic(option.id)}>{option.label}</button>
+          {/each}
+          <button type="button" onclick={returnToRound}>Return to the round</button>
+        </div>
+      {:else if talking==='lines' && currentTopic && currentLine}
+        <p class="eyebrow">{currentLine.speaker==='Player'?characterName:'HECTOR D. SMOKE'}</p>
+        <p class="speech">“{currentLine.text}”</p>
+        <div class="responses">
+          {#if lineIndex<currentTopic.lines.length-1}
+            <button type="button" onclick={()=>{lineIndex+=1;}}>Continue</button>
+          {:else}
+            <button type="button" onclick={askAnother}>Ask something else</button>
+            <button type="button" onclick={returnToRound}>Return to the round</button>
+          {/if}
+        </div>
+      {:else if !entered}
         <p class="eyebrow">DISPATCH HOUSE · STAGE I</p>
         <h2>Hector D. Smoke</h2>
         <p class="speech">Dispatch Master</p>
         <div class="responses">
-          <button type="button" class="scene-action" onclick={begin}>Begin the round</button>
+          <button type="button" onclick={begin}>Begin the round</button>
+          <button type="button" onclick={askHector}>Ask Hector something</button>
         </div>
       {:else}
         {#if beat.kind==='narration'}
@@ -96,31 +137,23 @@
         {:else if beat.kind==='speech'}
           <p class="eyebrow">{beat.speaker==='Player'?characterName:'HECTOR D. SMOKE'}</p>
           <p class="speech">“{say}”</p>
-        {:else if beat.kind==='choice'}
-          <p class="eyebrow">YOUR RESPONSE</p>
-        {:else}
+        {:else if beat.kind==='handoff'}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
           <h2>Take the round</h2>
-          <p class="work-description">Council shift notices. Route sheet. Receiving marks.</p>
-          <p class="payment">Payment not yet cleared.</p>
+          <p class="work-description">Council shift notices. Route sheet. Receiving marks required.</p>
+          <p class="payment">Payment: Not yet cleared.</p>
         {/if}
 
         <div class="responses">
-          {#if beat.kind==='choice'&&beat.choices}
-            {#each beat.choices as choice}
-              <button type="button" class="scene-action"
-                onclick={()=>next(choice.next,true)}>{choice.label}</button>
-            {/each}
-          {:else if beat.next}
-            <button type="button" class="scene-action" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
+          {#if beat.next}
+            <button type="button" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
           {:else if beat.kind==='handoff'}
-            <button type="button" class="scene-action" data-pall-sfx="paper"
-              disabled={takingRound} onclick={()=>{void takeRound();}}>
-              {takingRound?'Saving…':'Take the round'}
-            </button>
+            <button type="button" data-pall-sfx="paper" disabled={takingRound}
+              onclick={()=>{void takeRound();}}>{takingRound?'Saving…':'Take the round'}</button>
           {/if}
+          <button type="button" onclick={askHector}>Ask Hector something</button>
           {#if canGoBack}
-            <button type="button" class="secondary" onclick={()=>{selected=null;goBack();}}>Previous line</button>
+            <button type="button" onclick={()=>{selected=null;goBack();}}>Previous line</button>
           {/if}
           {#if handoffError}<p class="error" role="alert">{handoffError}</p>{/if}
         </div>
@@ -143,10 +176,10 @@
     object-fit:cover;pointer-events:none}
   .scene-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:linear-gradient(90deg,#100e0c29,transparent 52%,#0c0a092c)}
-  .hector{position:absolute;z-index:1;top:6%;left:10%;height:112%;
+  .hector{position:absolute;z-index:1;top:5%;left:10%;height:103%;
     width:auto;max-width:36%;object-fit:contain;object-position:bottom center;
     pointer-events:none;filter:drop-shadow(1px 5px 6px #0a080555)}
-  .depot-foreground{z-index:2;clip-path:inset(70% 0 0 0)}
+  .depot-foreground{z-index:2;clip-path:inset(93% 0 0 0)}
   .npc-hotspot{position:absolute;z-index:4;top:12%;left:10%;
     width:27%;height:56%;display:flex;align-items:flex-end;justify-content:center;
     padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
@@ -185,7 +218,7 @@
     .dispatch-scene{display:flex;flex-direction:column;height:auto;min-height:0}
     .scene-illustration{position:relative;inset:auto;width:100%;aspect-ratio:4/3}
     .depot{object-position:39% center}
-    .hector{height:88%;max-width:42%;left:-2%;top:2%}
+    .hector{height:94%;max-width:42%;left:-2%;top:2%}
     .depot-foreground{object-position:39% center}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
     .paper-art{bottom:9%;height:25%;width:20%}
