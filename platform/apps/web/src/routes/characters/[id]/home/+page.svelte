@@ -148,6 +148,7 @@
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home">
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <div class="home-scene" aria-label="A modest rented room in Grand Cylinder City">
+        <div class="home-artwork" aria-label="The complete rented room illustration">
         <button type="button" class="hotspot chest" aria-label="Storage"
           title="Storage" onclick={()=>{void openRoomOverlay('storage');}}>
           <span class="object-caption">Storage</span>
@@ -169,6 +170,7 @@
           <span class="object-caption">Rest</span>
         </button>
         {#if restAnimating}<div class="rest-fade" aria-hidden="true"></div>{/if}
+        </div>
         {#if restMessage}
           <aside class="home-dialogue rest-dialogue" aria-label="Rest result" role="status">
             <p class="eyebrow">BED · REST</p>
@@ -251,14 +253,16 @@
 {/if}
 <style>
   :global(body){background:#151515;color:#f2e1c9}
-  /* Show the *entire* original painting edge to edge. No duplicate side
-     wallpaper, zoom/crop or empty letterbox gutters. The fixed-height display
-     keeps every interactive object mapped to its original image coordinates. */
+  /* Keep the full 1672:941 painting and hotspots in the same coordinate
+     space. At large desktop widths, dark margins are preferable to scaling
+     the image horizontally or cropping away the bed, window or chest. */
   .stage8{min-width:0;background:#1a1816}
-  .home-scene{position:relative;box-sizing:border-box;width:100%;
-    height:clamp(515px,44vw,620px);margin:0;isolation:isolate;
-    background:#352d29 url('/locations/home/rented-room.webp') center/100% 100% no-repeat}
-  .home-scene::after{content:'';position:absolute;inset:0;pointer-events:none;
+  .home-scene{position:relative;box-sizing:border-box;
+    width:min(100%,1100px);margin-inline:auto;isolation:isolate}
+  .home-artwork{position:relative;isolation:isolate;width:100%;
+    aspect-ratio:1672/941;
+    background:#352d29 url('/locations/home/rented-room.webp') center/contain no-repeat}
+  .home-artwork::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
   /* Exact dialogue-frame slices, inner spacing, typeface and hierarchy from
      Stage 7 clinic and Stage 5 wage-claim, not a new oversized parchment UI. */
@@ -354,16 +358,16 @@
   .journal-body p{margin:0 0 12px}
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
   @media(max-width:950px){
-    .home-scene{aspect-ratio:auto;min-height:660px;display:flex;
-      flex-direction:column;gap:14px;padding:22px 14px;align-items:flex-end;
-      background-position:center;background-size:100% 100%}
+    /* The artwork still scales proportionately; the dialogue flows beneath
+       it instead of obstructing every object on a narrow viewport. */
     .home-dialogue{position:relative;top:auto;right:auto;bottom:auto;
-      left:auto;width:min(100%,590px);max-height:none;overflow:visible}
+      left:auto;width:min(100%,590px);max-height:none;overflow:visible;
+      margin:14px auto 0}
+    .book{min-height:36px}
+    .notice-object{min-height:36px}
   }
   @media(max-width:650px){
-    .home-scene{min-height:620px;padding:12px 8px;align-items:stretch;
-      background-size:100% 100%;background-position:center}
-    .home-dialogue{width:100%;border-width:17px 18px 17px;
+    .home-dialogue{width:calc(100% - 16px);border-width:17px 18px 17px;
       border-image-width:17px 18px 17px;padding:8px 11px}
     .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
     .home-dialogue .notice-text{font-size:14px}
