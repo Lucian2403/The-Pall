@@ -133,45 +133,35 @@ export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
     "start": "setting",
     "nodes": {
       "setting": {
-        "text": "Hector takes a bundle of council shift notices from the sorting shelf. A duty bell sounds across the hall.",
+        "text": "The Dispatch House is busy. Runners come and go, papers pile up on the counter, and a bell rings somewhere at the far end of the hall. Hector sorts through a stack of notices, then looks up at you.",
         "next": "opening",
         "kind": "narration"
       },
       "opening": {
-        "text": "Council notices. That round should've gone with the last runners.",
-        "next": "objection",
+        "text": "There you are. Got another round for you. Council notices. Should've gone out with the last lot, but here they are.",
+        "next": "playerObjection",
         "kind": "speech",
         "speaker": "Hector"
       },
-      "objection": {
-        "text": "Your response",
-        "kind": "choice",
-        "choices": [
-          {
-            "label": "So they'll say I'm late.",
-            "next": "playerObjection"
-          },
-          {
-            "label": "Continue",
-            "next": "instructions",
-            "ui": true
-          }
-        ]
-      },
       "playerObjection": {
-        "text": "So they'll say I'm late.",
+        "text": "So they'll say I'm late, then.",
         "next": "hectorReply",
         "kind": "speech",
         "speaker": "Player"
       },
       "hectorReply": {
-        "text": "I wrote down when you got them. They can come here if they want to argue.",
-        "next": "instructions",
+        "text": "Let 'em. I've written down when I gave you the bloody things. They want to complain, they know where to find me.",
+        "next": "routeNarration",
         "kind": "speech",
         "speaker": "Hector"
       },
+      "routeNarration": {
+        "text": "He pulls a sheet from under the stack and puts it on the counter.",
+        "next": "instructions",
+        "kind": "narration"
+      },
       "instructions": {
-        "text": "Take the route sheet. Bring back the marks from whoever takes them.",
+        "text": "Here's your route. Get a mark from whoever takes each notice. And don't lose the sheet. I need it back.",
         "next": "take",
         "kind": "speech",
         "speaker": "Hector"
