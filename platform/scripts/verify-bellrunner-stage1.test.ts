@@ -77,19 +77,21 @@ test('All six optional topics preserve every spoken turn and never grant rewards
   }
  }
  const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
- assert.ok(scene.includes("talking='topics'"));
- assert.ok(scene.includes("talking='lines'"));
- assert.ok(scene.includes('currentTopic?.lines[lineIndex]'));
- assert.ok(scene.includes('onclick={()=>{lineIndex+=1;}}'));
- assert.ok(scene.includes('lineIndex<currentTopic.lines.length-1'));
- assert.ok(scene.includes('Ask something else'));
- assert.ok(scene.includes('Return to the round'));
+ const conversation=source('apps/web/src/lib/BellrunnerHectorConversation.svelte');
+ assert.ok(scene.includes('<BellrunnerHectorConversation'));
  assert.ok(scene.includes('onclick={askHector}'));
- assert.ok(scene.includes('onclick={returnToRound}'));
- assert.ok(scene.includes('“{currentLine.text}”'));
- assert.equal((scene.match(/“\{currentLine.text\}”/g)??[]).length,1,
+ assert.ok(scene.includes('function returnToRound(){talking=false;}'));
+ assert.ok(conversation.includes('currentTopic?.lines[lineIndex]'));
+ assert.ok(conversation.includes('onclick={()=>{lineIndex+=1;}}'));
+ assert.ok(conversation.includes('lineIndex<currentTopic.lines.length-1'));
+ assert.ok(conversation.includes('Ask something else'));
+ assert.ok(conversation.includes('Return to the round'));
+ assert.ok(conversation.includes('onclick={returnToRound}'));
+ assert.ok(conversation.includes('“{currentLine.text}”'));
+ assert.equal((conversation.match(/“\{currentLine.text\}”/g)??[]).length,1,
   'Every selected topic turn is rendered once, not duplicated or skipped');
- assert.ok(!scene.includes("skipToWork")&&!scene.includes('rewardXp('));
+ assert.ok(!conversation.includes('takeRound(')&&!conversation.includes('fetch('));
+ assert.ok(!scene.includes('skipToWork')&&!conversation.includes('rewardXp('));
 });
 
 test('Hector framing, inspection and audio reuse owner-approved workshop UI',()=>{
@@ -109,6 +111,10 @@ test('Hector framing, inspection and audio reuse owner-approved workshop UI',()=
   'The foreground must cover only Hector\'s boots, not cut him across the waist');
  assert.ok(stage2.includes('clip-path:inset(93% 0 0 0)'));
  assert.ok(stage2.includes('WorkshopItemPopover')&&stage2.includes('class="work-card"'));
+ assert.ok(stage2.includes('<BellrunnerHectorConversation characterName={character.name}'));
+ assert.ok(stage2.includes('talkingToHector=true'));
+ assert.ok(stage2.includes('talkingToHector=false'),
+  'Returning to the active dispatch must preserve saved work and its revision');
  assert.ok(opening.includes("depotBackdrop={character.origin==='Bellrunner'}"));
  assert.ok(stage2.includes('sceneLocation="Dispatch House" depotBackdrop'));
  assert.ok(shell.includes("character.origin!=='Millhand'&&character.origin!=='Bellrunner'"));
