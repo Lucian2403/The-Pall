@@ -285,15 +285,21 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- assert.ok(web.includes('height:clamp(515px,44vw,620px)'),
-  'The room must use a shorter, bounded stage height');
- assert.ok(web.includes('width:100%')&&
-  web.includes("center/100% 100% no-repeat"),
-  'Show the whole original painting without zooming away edge objects');
- assert.ok(!web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
-  'Never duplicate or blur the room artwork in side gutters');
- assert.ok(web.includes('background-size:100% 100%'),
-  'Keep all room hotspots visible at narrow widths');
+ assert.ok(web.includes('width:min(100%,1100px)')&&
+  web.includes('aspect-ratio:1672/941')&&
+  web.includes("center/contain no-repeat"),
+  'The entire original painting must retain its dimensions and never stretch');
+ assert.ok(web.includes('class="home-artwork"')&&
+  web.includes('.home-artwork{position:relative')&&
+  web.includes('.home-artwork::after')&&
+  web.includes('class="hotspot chest"')&&web.includes('class="hotspot bed"'),
+  'Painted room and all object hotspots share one aspect-ratio coordinate space');
+ assert.ok(web.includes('margin:14px auto 0')&&
+  web.includes('.home-dialogue{position:relative'),
+  'On smaller screens the dialogue must flow below the uncut painting');
+ assert.ok(!web.includes('100% 100%')&&!web.includes('background-size:cover')&&
+  !web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
+  'No stretched wallpaper, cropped art, or blurred duplicate side gutters');
  assert.ok(web.includes('max-height:calc(100dvh - 16px)')&&
   web.includes('scrollbar-width:none')&&
   web.includes('.room-overlay::-webkit-scrollbar{display:none}'),
