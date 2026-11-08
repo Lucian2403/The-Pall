@@ -253,15 +253,18 @@
 {/if}
 <style>
   :global(body){background:#151515;color:#f2e1c9}
-  /* Keep the full 1672:941 painting and hotspots in the same coordinate
-     space. At large desktop widths, dark margins are preferable to scaling
-     the image horizontally or cropping away the bed, window or chest. */
+  /* Match Stage 7's full-width scene rather than letterboxing the room.
+     The art layer is sized to the native 1672:941 ratio at "cover" scale;
+     its percentage-based chest, bed, journal and notice targets then stay
+     registered to the same pixel-space as the painted objects. */
   .stage8{min-width:0;background:#1a1816}
-  .home-scene{position:relative;box-sizing:border-box;
-    width:min(100%,1100px);margin-inline:auto;isolation:isolate}
-  .home-artwork{position:relative;isolation:isolate;width:100%;
-    aspect-ratio:1672/941;
-    background:#352d29 url('/locations/home/rented-room.webp') center/contain no-repeat}
+  .home-scene{position:relative;box-sizing:border-box;width:100%;
+    height:clamp(650px,65vw,820px);overflow:hidden;
+    container-type:size;isolation:isolate;background:#352d29}
+  .home-artwork{position:absolute;left:50%;top:50%;isolation:isolate;
+    transform:translate(-50%,-50%);
+    width:max(100cqw,177.683cqh);aspect-ratio:1672/941;
+    background:#352d29 url('/locations/home/rented-room.webp') center/100% 100% no-repeat}
   .home-artwork::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
   /* Exact dialogue-frame slices, inner spacing, typeface and hierarchy from
@@ -358,8 +361,12 @@
   .journal-body p{margin:0 0 12px}
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
   @media(max-width:950px){
-    /* The artwork still scales proportionately; the dialogue flows beneath
-       it instead of obstructing every object on a narrow viewport. */
+    /* A small viewport shows the full art and places the dialogue below.
+       Don't use cover crop here: the touch targets must stay reachable. */
+    .home-scene{height:auto;overflow:visible;container-type:normal}
+    .home-artwork{position:relative;left:auto;top:auto;transform:none;
+      width:100%;aspect-ratio:1672/941;
+      background-size:contain}
     .home-dialogue{position:relative;top:auto;right:auto;bottom:auto;
       left:auto;width:min(100%,590px);max-height:none;overflow:visible;
       margin:14px auto 0}
