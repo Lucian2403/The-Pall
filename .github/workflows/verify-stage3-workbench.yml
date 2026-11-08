@@ -76,6 +76,8 @@ jobs:
         run: npm run verify:stage-eight
       - name: Inventory weights, stack merging and capacity unit tests
         run: npm run verify:inventory
+      - name: Bellrunner Stage 1 art, dialogue and handoff contract
+        run: npm run verify:bellrunner-stage1
       - name: PostgreSQL Stage 6–8 combat, clinic, final home and character lifecycle integration
         env:
           STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
