@@ -4,6 +4,7 @@
   import {goto} from '$app/navigation';
   import {APPROVED_STAGE_ONE, resolveStageOneChoice, type StageOneScene} from '$lib/approved-stage-one';
   import WorkshopScene from '$lib/WorkshopScene.svelte';
+  import BellrunnerOpeningScene from '$lib/BellrunnerOpeningScene.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import NpcConversation from '$lib/NpcConversation.svelte';
 
@@ -48,6 +49,37 @@
       handoffError = 'The API could not be reached. Retry this handoff; it will not duplicate the work.';
     } finally {takingWork = false;}
   }
+  async function takeBellrunnerRound(){
+    if(takingWork||!character||character.origin!=='Bellrunner'||beat?.kind!=='handoff')return;
+    takingWork=true;handoffError='';
+    pendingTakeRequestId??=crypto.randomUUID();
+    const url='/api/characters/'+encodeURIComponent(character.id)+'/bellrunner/dispatch';
+    try{
+      const response=await fetch(url,{
+        method:'POST',headers:{'content-type':'application/json'},
+        body:JSON.stringify({action:'take_round',expectedRevision:0,requestId:pendingTakeRequestId})
+      });
+      if(response.ok){
+        pendingTakeRequestId=null;
+        await goto('/characters/'+encodeURIComponent(character.id)+'/bellrunner/dispatch');
+        return;
+      }
+      const payload=await response.json() as {error?:string};
+      if(response.status===409&&payload.error==='wrong_work_phase'){
+        const latest=await fetch(url,{cache:'no-store'});
+        if(latest.ok&&(await latest.json() as {accepted:boolean}).accepted){
+          pendingTakeRequestId=null;
+          await goto('/characters/'+encodeURIComponent(character.id)+'/bellrunner/dispatch');
+          return;
+        }
+      }
+      handoffError=payload.error==='bellrunner_migration_required'
+        ?'Bellrunner database migration missing: npm run bellrunner:migrate.'
+        :'Could not accept the round: '+(payload.error??response.status);
+    }catch{
+      handoffError='Connection interrupted. Retry the same action; it cannot accept the round twice.';
+    }finally{takingWork=false;}
+  }
   let status = $state<'checking' | 'ready' | 'login' | 'missing' | 'not-ready' | 'unavailable'>('checking');
 
   const beat = $derived(scene?.nodes[nodeId] ?? null);
@@ -86,6 +118,10 @@
           await goto('/characters/' + character.id + '/millhand/work');
           return;
         }
+        if (character.origin === 'Bellrunner' && character.tutorial.stage === 2) {
+          await goto('/characters/' + character.id + '/bellrunner/dispatch');
+          return;
+        }
         const originScene = APPROVED_STAGE_ONE[body.character.origin];
         if (!originScene || body.character.tutorial.stage !== 1 || body.character.tutorial.status !== 'NOT_STARTED') {
           status = 'not-ready';
@@ -120,6 +156,17 @@
         {takeWorkPaper}
         skipToWork={skipMillhandConversation}
         {takingWork}
+        {handoffError}
+      />
+    {:else if character.origin === 'Bellrunner'}
+      <BellrunnerOpeningScene
+        characterName={character.name}
+        {beat}
+        {advance}
+        goBack={back}
+        canGoBack={visited.length > 0}
+        takeRound={takeBellrunnerRound}
+        takingRound={takingWork}
         {handoffError}
       />
     {:else}
@@ -159,7 +206,9 @@
         {/if}
       </section>
     {/if}
-    <p class="preview-note">Dialogue choices advance only when clicked. {character.origin === 'Millhand' ? 'Taking the work paper commits Stage 2 to your saved character.' : 'This opening remains a read-only preview.'}</p>
+    {#if character.origin!=='Bellrunner'}
+      <p class="preview-note">Dialogue choices advance only when clicked. {character.origin === 'Millhand' ? 'Taking the work paper commits Stage 2 to your saved character.' : 'This opening remains a read-only preview.'}</p>
+    {/if}
   </TutorialShell>
 {:else}
   <main class="fallback">
