@@ -46,6 +46,7 @@
     "verify:workshop-assets": "node scripts/verify-workshop-assets.mjs",
     "verify:workshop-inspections": "node scripts/verify-workshop-inspections.mjs",
     "platework:migrate": "node --env-file=.env scripts/platework-migrate.mjs",
+    "bellrunner:migrate": "node --env-file=.env scripts/bellrunner-migrate.mjs",
     "missing-stamp:migrate": "node --env-file=.env scripts/missing-stamp-migrate.mjs",
     "second-job:migrate": "node --env-file=.env scripts/second-job-migrate.mjs",
     "wage-claim:migrate": "node --env-file=.env scripts/wage-claim-migrate.mjs",
