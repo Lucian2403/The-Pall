@@ -50,6 +50,8 @@
   }=$props();
   const chapter = $derived(character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
+    : character.origin === 'Bellrunner' && character.tutorial.stage === 2
+    ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/dispatch'
     : character.origin === 'Millhand' && character.tutorial.stage >= 7
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/clinic'
     : character.origin === 'Millhand' && character.tutorial.stage === 6
