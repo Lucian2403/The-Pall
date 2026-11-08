@@ -167,14 +167,15 @@ Keep Docker volumes intact; restart the API afterward.
 
 ## Owner visual and derived-stat revision — Stage 8
 
-- The rented-room painting keeps its original **1672:941 aspect ratio**
-  at every viewport width, with a maximum image width of 1100 px
-  (approximately 619 px tall). Wide monitors show plain dark side margins;
-  these are intentional, to avoid cropping or distorting the bed, window,
-  kitchen, table and chest. The room's interactive hotspots occupy the same
-  aspect-ratio container as the image so they remain aligned. On narrow
-  screens, the framed dialogue flows below the painting rather than covering
-  all its objects.
+- Stage 8 follows the same full-width, height-bounded chapter presentation
+  as the clinic: a 650–820 px scene with native-ratio **1672:941** artwork
+  scaled to *cover* the screen. No side gutters or geometric stretching.
+  Unlike a bare CSS background, the artwork and bed/chest/notice/Journal
+  hotspots use the same cover-scaled coordinate space, so click regions
+  stay aligned while the viewport changes. Wide/ultrawide ratios can crop
+  some top/bottom scenery, as in other full-width chapter backgrounds.
+  At widths <=950 px, the artwork becomes a full-image `contain` view and
+  the framed dialogue flows underneath it so all objects remain reachable.
 - Torso and Pants are **one Body socket**. The persisted
   database key remains `torso` to preserve the equipped universal outfit
   and its instance UUID. The separate `pants` slot is retired from the
@@ -222,6 +223,7 @@ followed by an API restart. Character progress and possessions remain intact.
   narrow screens still support mouse-wheel, keyboard or touch scrolling to
   reach every action instead of clipping controls. The Journal retains its
   existing modal and content.
-- The Stage 8 scene keeps the full artwork at native proportions, with
-  a 1100 px maximum width, no blur/zoom, and correctly scaled hotspots. The
-  smaller screens stack scene dialogue below the artwork.
+- The Stage 8 scene now fills the chapter width using the same bounded
+  cover presentation as Stage 7, without distortion, fake blurred extensions
+  or isolated artwork margins. The scene may crop top/bottom on extreme
+  desktop ratios; smaller screens show the entire image and stack dialogue.
