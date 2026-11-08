@@ -50,6 +50,7 @@
 
 <section class="bellrunner" aria-label="Bellrunner Stage 1 — Dispatch House">
   <div class="dispatch-scene">
+    <div class="scene-illustration">
     <img class="depot" src="/locations/origins/bellrunner-depot.webp"
       alt="Grand Cylinder City Dispatch House, a working industrial courier depot" draggable="false"/>
     <div class="scene-shade" aria-hidden="true"></div>
@@ -64,6 +65,7 @@
       </button>
     {/each}
     <div class="hector-label" aria-hidden="true">Hector D. Smoke</div>
+    </div>
 
     <div class="dispatch-dialogue" aria-label="Hector's approved opening">
       {#if !entered}
@@ -128,6 +130,7 @@
   .bellrunner{min-width:0;width:100%;color:#eee0c7;font-family:var(--pall-font-reading,Georgia,serif)}
   .dispatch-scene{position:relative;isolation:isolate;min-width:0;overflow:hidden;
     width:100%;height:clamp(555px,58vw,720px);background:#29231d}
+  .scene-illustration{position:absolute;inset:0;overflow:hidden}
   .depot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .scene-shade{position:absolute;inset:0;pointer-events:none;z-index:1;
     background:linear-gradient(90deg,#100e0c24 0%,transparent 48%,#09080738 100%),
@@ -188,13 +191,11 @@
   .inspection-text p{margin:0 0 14px;font:15px/1.42 Georgia,serif}
   @media(max-width:950px){
     .dispatch-scene{height:auto;overflow:visible}
-    .depot{height:auto;aspect-ratio:1672/941;position:relative;display:block;object-fit:cover}
-    .scene-shade{height:auto;aspect-ratio:1672/941;bottom:auto}
-    .hector{height:auto;width:38%;max-width:none;bottom:auto;top:2%;
-      aspect-ratio:1122/1402;object-fit:contain}
-    .paper-art{bottom:auto;top:28%;width:19%;height:16%}
-    .paper-target{bottom:auto;top:28%;width:19%;height:17%}
-    .hector-label{bottom:auto;top:37%}
+    .scene-illustration{position:relative;inset:auto;aspect-ratio:1672/941}
+    .hector{height:102%;max-width:50%;left:3%;bottom:-2%}
+    .paper-art{bottom:2%;height:30%;width:19%}
+    .paper-target{bottom:2%;height:31%;width:19%}
+    .hector-label{bottom:26%;left:3%}
     .dispatch-dialogue{position:relative;top:auto;right:auto;max-height:none;
       width:min(100%,650px);margin:0 auto;overflow:visible}
     .paper-inspection{position:relative;right:auto;bottom:auto;
