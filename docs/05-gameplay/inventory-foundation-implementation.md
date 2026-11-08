@@ -167,12 +167,14 @@ Keep Docker volumes intact; restart the API afterward.
 
 ## Owner visual and derived-stat revision — Stage 8
 
-- The home scene now uses the **entire source painting edge to edge**, with
-  its display height bounded between 515 and 620 px. No side gutters, blurred
-  duplicate wallpaper, or cropped objects; the image is fitted to the scene's
-  responsive width and height, which may slightly change its displayed aspect
-  ratio. Bed, windows, kitchen, table, and chest remain visible with their
-  original image-relative interactive targets.
+- The rented-room painting keeps its original **1672:941 aspect ratio**
+  at every viewport width, with a maximum image width of 1100 px
+  (approximately 619 px tall). Wide monitors show plain dark side margins;
+  these are intentional, to avoid cropping or distorting the bed, window,
+  kitchen, table and chest. The room's interactive hotspots occupy the same
+  aspect-ratio container as the image so they remain aligned. On narrow
+  screens, the framed dialogue flows below the painting rather than covering
+  all its objects.
 - Torso and Pants are **one Body socket**. The persisted
   database key remains `torso` to preserve the equipped universal outfit
   and its instance UUID. The separate `pants` slot is retired from the
@@ -220,6 +222,6 @@ followed by an API restart. Character progress and possessions remain intact.
   narrow screens still support mouse-wheel, keyboard or touch scrolling to
   reach every action instead of clipping controls. The Journal retains its
   existing modal and content.
-- The Stage 8 scene now displays the whole painting at a short height with
-  no blurred gutter extensions. This favors visibility and accurate hotspots;
-  aspect ratio can vary slightly with viewport dimensions.
+- The Stage 8 scene keeps the full artwork at native proportions, with
+  a 1100 px maximum width, no blur/zoom, and correctly scaled hotspots. The
+  smaller screens stack scene dialogue below the artwork.
