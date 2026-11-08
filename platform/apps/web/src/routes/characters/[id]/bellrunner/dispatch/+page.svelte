@@ -4,6 +4,7 @@
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import '$lib/workshop-object-labels.css';
 
   type Character={
@@ -42,6 +43,7 @@
   let round=$state<Round|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'schema'|'unavailable'>('loading');
   let selected=$state<PaperKey|null>(null);
+  let talkingToHector=$state(false);
   let busy=$state(false);
   let workError=$state('');
   let pendingId:string|null=null;
@@ -129,13 +131,18 @@
             alt="Hector D. Smoke by the dispatch counter" draggable="false"/>
           <img class="environment foreground" src="/locations/origins/bellrunner-depot.webp"
             alt="" aria-hidden="true" draggable="false"/>
+          <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
+            aria-label="Talk to Hector D. Smoke"
+            onclick={()=>{selected=null;talkingToHector=true;}}>
+            <span class="workshop-npc-label">Hector D. Smoke</span>
+          </button>
           {#each paperKeys as key}
             <img class="paper-art {key}" src={docs[key].src}
               alt="" aria-hidden="true" draggable="false"/>
             <button type="button" class="paper-target {key}" data-workshop-object
               data-pall-sfx="paper" aria-label={'Inspect '+docs[key].label}
               aria-pressed={selected===key}
-              onclick={()=>{selected=selected===key?null:key;}}>
+              onclick={()=>{talkingToHector=false;selected=selected===key?null:key;}}>
               <span class="workshop-object-label">{docs[key].label}</span>
             </button>
           {/each}
@@ -145,7 +152,11 @@
           {/if}
         </div>
 
-        <aside class="work-card" aria-label="Shift Dispatch work">
+        <aside class="work-card" aria-label={talkingToHector?'Hector D. Smoke conversation':'Shift Dispatch work'}>
+          {#if talkingToHector}
+            <BellrunnerHectorConversation characterName={character.name}
+              returnToRound={()=>{talkingToHector=false;}}/>
+          {:else}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
           {#if phase==='issued'}
             <h1>Check the round</h1>
@@ -240,6 +251,7 @@
             <p class="payment">Payment: {round.payment}.</p>
             <p class="small">The next scene begins at the order's marked address.</p>
           {/if}
+          {/if}
           {#if workError}<p class="error" role="alert">{workError}</p>{/if}
           {#if busy}<p class="small" role="status">Recording…</p>{/if}
         </aside>
@@ -271,6 +283,10 @@
     width:auto;object-fit:contain;object-position:bottom center;
     z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
   .foreground{z-index:2;clip-path:inset(93% 0 0 0)}
+  .npc-hotspot{position:absolute;z-index:4;top:12%;left:10%;width:27%;height:56%;
+    display:flex;align-items:end;justify-content:center;padding:0 0 10px;
+    border:0;background:transparent;cursor:pointer}
+  .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .paper-art{position:absolute;z-index:3;bottom:5%;height:30%;width:18%;
     object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0806069c)}
   .paper-art.notices{left:43%}.paper-art.sealed{left:62%}.paper-art.route{left:81%}
@@ -310,6 +326,7 @@
     .illustration{position:relative;width:100%;aspect-ratio:4/3}
     .environment{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
+    .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
     .foreground{object-position:39% center}
     .paper-art{bottom:9%;height:25%;width:20%}
     .paper-target{bottom:2%;height:35%;width:20%}
