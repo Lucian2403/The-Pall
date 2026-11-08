@@ -68,7 +68,7 @@ test('Bellrunner uses the approved Stage 1 exchange without inventing mystery or
   sourceText.includes('clip-path:inset(70% 0 0 0)'),
   'Hector must be occluded by the original environment, like Guther');
  assert.ok(!sourceText.includes('paper-inspection')&&
-  !sourceText.includes('object-label">'),
+  !sourceText.includes('class="object-label"'),
   'Bellrunner must not introduce its own popup or simple label style');
  for(const item of ['hector-d-smoke.webp','council-work.webp','sealed-order.webp','route-sheet.webp'])
   assert.ok(sourceText.includes(item));
