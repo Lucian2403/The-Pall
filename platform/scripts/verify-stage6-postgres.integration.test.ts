@@ -229,6 +229,56 @@ test('Bellrunner Stage 1 acceptance is owned, persistent, atomic, and awards no 
  )).rows[0].n),1);
 });
 
+test('Bellrunner Back to Stage 1 is loopback-only, owner-scoped and preserves belongings',async()=>{
+ const id=randomUUID(),name='QA Replay '+id.slice(0,8);
+ await db.query(
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Female','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',1,'NOT_STARTED')",
+  [id,owner,name,'replay-'+id,JSON.stringify({Industry:3})]);
+ const path=base+id+'/bellrunner/dispatch';
+ const rewind=base+id+'/dev/rewind-stage';
+ const before=await request('GET',rewind);
+ assert.equal(before.status,200,JSON.stringify(before.body));
+ assert.equal(before.body?.canRewind,false);
+ assert.equal((await request('GET',rewind,null)).status,401);
+ assert.equal((await request('GET',rewind,stranger)).status,404);
+ assert.equal((await request('POST',rewind,stranger,{expectedStage:2})).status,404);
+ const taken=await request('POST',path,owner,{
+  action:'take_round',requestId:randomUUID(),expectedRevision:0});
+ assert.equal(taken.status,200,JSON.stringify(taken.body));
+ const button=await request('GET',rewind);
+ assert.equal(button.status,200,JSON.stringify(button.body));
+ assert.deepEqual(button.body,{
+  enabled:true,canRewind:true,stage:2,targetStage:1});
+ const invalid=await request('POST',rewind,owner,{expectedStage:3});
+ assert.equal(invalid.status,409,'Wrong stage cannot rewind');
+ const returned=await request('POST',rewind,owner,{expectedStage:2});
+ assert.equal(returned.status,200,JSON.stringify(returned.body));
+ assert.equal(returned.body?.stage,1);
+ assert.equal(returned.body?.route,'/characters/'+id+'/opening');
+ assert.equal(returned.body?.coinDelta,0);
+ assert.equal((await request('GET',path)).body?.accepted,false);
+ assert.equal((await request('GET',rewind)).body?.canRewind,false);
+ assert.equal((await request('POST',rewind,owner,{expectedStage:2})).status,409,
+  'Repeat rewind must never delete or recreate a round');
+ const saved=await db.query(
+  'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',[id]);
+ assert.equal(saved.rows[0].tutorial_stage,1);
+ assert.equal(saved.rows[0].tutorial_status,'NOT_STARTED');
+ assert.equal(Number(saved.rows[0].coins),20);
+ assert.deepEqual(saved.rows[0].major_skill_bonuses,{Industry:3});
+ const items=await db.query(
+  'SELECT item_code,quantity,equipment_slot FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code',[id]);
+ assert.deepEqual(items.rows.map(x=>[x.item_code,x.quantity,x.equipment_slot]),[
+  ['basic_clothes',1,'torso'],['crude_small_bag',1,'back']]);
+ const receipts=await db.query(
+  'SELECT count(*)::int AS n FROM player_character_bellrunner_dispatch_receipts WHERE character_id=$1',[id]);
+ assert.equal(receipts.rows[0].n,0,'No stale receipt may falsely accept the round again');
+ const replay=await request('POST',path,owner,{
+  action:'take_round',requestId:randomUUID(),expectedRevision:0});
+ assert.equal(replay.status,200,'The re-played opening can accept a fresh round exactly once');
+ assert.equal(replay.body?.stage,2);
+});
+
 test('Equipment migration backfills existing starter items without duplicating or losing coins',async()=>{
  const rows=await db.query<{item_code:string;quantity:number;location:string;equipment_slot:string}>(
   'SELECT item_code,quantity,location,equipment_slot FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code',
