@@ -145,7 +145,8 @@
 <svelte:head><title>The Pall — Origin Opening</title></svelte:head>
 
 {#if status === 'ready' && scene && character && beat}
-  <TutorialShell {character} smithingBackdrop={character.origin==='Millhand'}>
+  <TutorialShell {character} smithingBackdrop={character.origin==='Millhand'}
+    depotBackdrop={character.origin==='Bellrunner'}>
     {#if character.origin === 'Millhand'}
       <WorkshopScene
         characterName={character.name}
