@@ -83,7 +83,8 @@
   .document-image img{max-width:100%;width:100%;height:100%;
     object-fit:contain;filter:drop-shadow(0 3px 4px #080503a8)}
   .document-label{flex:0 0 auto;width:100%;max-width:none;
-    min-height:36px;text-transform:capitalize;line-height:1.1}
+    min-height:36px;text-transform:capitalize;line-height:1.12;
+    font-size:clamp(13px,1vw,17px)}
   .document-action{display:flex;justify-content:center;align-items:center;
     gap:5px;min-height:32px;font:600 clamp(12px,1vw,15px)/1.2
     var(--pall-font-reading,Georgia,serif);color:#dcbc7f}
