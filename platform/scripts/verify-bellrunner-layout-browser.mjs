@@ -160,9 +160,12 @@ try{
       const visuals=stack?.querySelector(':scope > .pall-story-visuals');
       const art=visuals?.querySelector(':scope > .pall-story-landscape');
       const tray=visuals?.querySelector('.round-documents');
+      const banner=document.querySelector('.city-banner');
       const dialogue=stack?.querySelector(':scope > .pall-story-dialogue-section');
       const frame=dialogue?.querySelector('.work-card');
       const image=art?.querySelector('img.depot, img.environment');
+      const secondary=dialogue?.querySelector('button.secondary-choice');
+      const primary=dialogue?.querySelector('button.primary-choice');
       if(!stack||!art||!dialogue||!frame||!image)return null;
       const rect=x=>{
         const r=x.getBoundingClientRect();
@@ -177,7 +180,18 @@ try{
         loaded:image.complete&&image.naturalWidth>100,
         scrollHeight:document.documentElement.scrollHeight,
         viewport:window.innerHeight,top:window.scrollY,
-        cityBannerVisible:!!document.querySelector('.city-banner'),
+        cityBanner:banner?{...rect(banner),title:banner.textContent.trim(),
+          display:getComputedStyle(banner).display}:null,
+        secondary:secondary?{
+          label:secondary.textContent.trim(),
+          background:getComputedStyle(secondary).backgroundImage,
+          borderImage:getComputedStyle(secondary).borderImageSource,
+          icon:!!secondary.querySelector('svg'),
+          minHeight:parseFloat(getComputedStyle(secondary).minHeight)
+        }:null,
+        primary:primary?{label:primary.textContent.trim(),
+          background:getComputedStyle(primary).backgroundImage,
+          color:getComputedStyle(primary).color}:null,
         text:frame.textContent.slice(0,160),width:window.innerWidth};
     })()`);
   }
@@ -234,11 +248,23 @@ try{
         assert.equal(m.tray,null,
           'No redundant paper tray at a street or the Receiving Desk: '+suffix);
       }
-      assert.equal(m.cityBannerVisible,false,
-        'Bellrunner work screens must prioritize the NPC/documents over the redundant city hero: '+suffix);
-      if(width>=1272){
-        assert.ok(m.stack.top<300,
-          'Workstation must be near the top of the playable screen: '+suffix);
+      assert.ok(m.cityBanner&&m.cityBanner.h>=150&&
+        m.cityBanner.title.includes('Grand Cylinder City')&&
+        m.cityBanner.display!=='none',
+        'Keep the shared Grand Cylinder City header on every Bellrunner scene: '+suffix);
+      assert.ok(m.stack.top>=m.cityBanner.bottom-2,
+        'City header must lead into the workstation, without overlapping it: '+suffix);
+      if(['stage1','stage2-depot','receiving-desk'].includes(scene)){
+        assert.ok(m.secondary&&m.secondary.icon&&m.secondary.minHeight>=52,
+          'Reference-style icon-led secondary choice must be visible: '+suffix);
+        assert.ok(m.secondary.background.includes('linear-gradient')&&
+          m.secondary.borderImage==='none',
+          'Secondary choice must use cream/parchment surface and a real framed border: '+suffix);
+      }
+      if(m.primary){
+        assert.ok(m.primary.background.includes('linear-gradient')&&
+          m.primary.color.includes('rgb('),
+          'Progression should retain a visually distinct dark-brass primary choice: '+suffix);
       }
       assert.equal(m.fit,'contain','Full image must not be cover-cropped: '+suffix);
       assert.equal(m.frameOverflow,'visible','No internal frame scrollbar: '+suffix);
