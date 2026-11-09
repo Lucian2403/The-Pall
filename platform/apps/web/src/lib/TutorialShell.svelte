@@ -27,7 +27,7 @@
   };
 
   let {
-    character,children,activePage = 'scene',sceneLocation,smithingBackdrop = false,
+    character,children,activePage = 'scene',sceneLocation,compactBanner = false,smithingBackdrop = false,
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = ''
   }:{
@@ -35,6 +35,8 @@
     children:Snippet;
     activePage?:'scene'|'character';
     sceneLocation?:string;
+    /** Hide the redundant city panorama on NPC/item-led workstations only. */
+    compactBanner?:boolean;
     smithingBackdrop?:boolean;
     councilBackdrop?:boolean;
     alleyBackdrop?:boolean;
@@ -343,6 +345,7 @@
       </div>
     </header>
 
+    {#if !compactBanner}
     <div class="city-banner" aria-label="Grand Cylinder City">
       <div class="banner-copy">
         <span class="banner-overline">THE PALL</span>
@@ -350,6 +353,7 @@
         <small>Guided introduction · {character.origin}</small>
       </div>
     </div>
+    {/if}
 
     <div class="chapter-bar">
       <div class="chapter-label">
