@@ -1,25 +1,45 @@
-/* Shared Bellrunner scene geometry for the Dispatch House, street routes
-   and municipal receiving desk. All owner paintings use approximately
-   1672:941 art; scene height follows width rather than a fixed 640px
-   letterbox. If the browser is shorter than the painting, the PAGE may
-   scroll, but no part of the art is clipped or stretched.
-   Apply to the whole illustrated scene, not just its background layer,
-   so NPC art, object hitboxes and parchment retain their alignment.
-*/
-.pall-story-landscape{
-  position:relative;
-  box-sizing:border-box;
+/* The Pall / Bellrunner: illustrated scene and parchment dialogue live in
+   TWO vertical sections. Apply .pall-story-sections to their parent,
+   .pall-story-landscape only to the image/NPC/object section and
+   .pall-story-dialogue-section to the following dialogue section.
+   Never give the parent a 16:9 aspect ratio; that causes the frame to
+   overlap the painting. Keep all stage-specific hotspots inside artwork.
+ */
+.pall-story-sections{
+  display:flex;
+  flex-direction:column;
+  flex:0 0 auto;
   width:100%;
   min-width:0;
   height:auto;
   min-height:0;
-  aspect-ratio:1672 / 941;
+  overflow:visible;
+  background:#1d1916;
+}
+.pall-story-landscape{
+  position:relative;
   flex:0 0 auto;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  aspect-ratio:1672 / 941;
   overflow:hidden;
   isolation:isolate;
 }
+.pall-story-dialogue-section{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  padding:clamp(16px,2.4vw,35px) clamp(10px,3.5vw,45px);
+  border-top:2px solid #765537;
+  background:linear-gradient(180deg,#2a211a,#1b1815 85%);
+  scroll-margin-top:55px;
+}
 @media(max-width:700px){
-  /* On phones, the image occupies its full native ratio above the
-     dialogue panel; do not force a tall empty 16:9 outer frame. */
-  .pall-story-landscape{aspect-ratio:auto;overflow:visible}
+  .pall-story-landscape{aspect-ratio:1672 / 941}
+  .pall-story-dialogue-section{padding:12px 8px 20px}
 }
