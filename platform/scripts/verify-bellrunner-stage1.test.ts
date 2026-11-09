@@ -102,8 +102,10 @@ test('Receiving Desk art remains bottom-aligned with no overlaid interactive ass
   'Preserve the receiving desk and counter on short wide monitors');
  assert.ok(ui.includes('.scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}'),
   'Mobile shows the entire background');
- const room=ui.slice(ui.indexOf('{:else}\n            <!-- A proportionate cover-scaled painting:'),
-  ui.indexOf('</div>\n\n        <aside class="work-card"'));
+ const from=ui.indexOf('<!-- Proportionate, cover-scaled location painting.');
+ const to=ui.indexOf('</div>\n\n        <aside class="work-card"',from);
+ assert.ok(from>=0&&to>from,'Receiving Desk scene markup exists');
+ const room=ui.slice(from,to);
  assert.ok(room.includes('src={HAULING_SCENES[sceneKey].src}'));
  assert.ok(!room.includes('data-workshop-object')&&
   !room.includes('onclick=')&&
