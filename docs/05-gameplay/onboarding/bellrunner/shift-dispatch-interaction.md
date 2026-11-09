@@ -59,14 +59,18 @@ presses a receiving mark onto your route sheet.*
 
 *The ink smears across two lines as the clerk slides the paper back.*
 
+**Step 1 — Arrival narration:** Display only the two narrative paragraphs above, with one **Continue** button. This avoids crowding the parchment frame and gives the player time to understand what happened.
+
+**Step 2 — Receiver conversation:**
+
 **Receiver:**
 
 "There. That's yours."
 
 "Ah, damn it. Ink's gone everywhere. Well, you've seen me take the notice."
 
-**Choice:** Ask for a fresh mark / Check their receiving book /
-Note the spoiled mark and go on.
+Only here display **Ask for a fresh mark / Check their receiving book /
+Note the spoiled mark and go on**.
 
 The player must know where they are and what went wrong before
 making that choice. No named clerk, fabricated street address,
@@ -114,32 +118,47 @@ tutorial reputation adjustment.
 
 ## Interaction and persistence contract
 
-After one of the three choices, the game saves its receipt proof
-and enters a two-beat RP exchange:
+The delivery incident is saved as two distinct phases:
+`receiving_arrival` displays the spoiled-mark narration and
+**Continue**; `spoiled_mark` then displays the receiver's two lines
+and three choices. The player cannot select a receipt response before
+the Continue action is committed.
+
+After making a choice, the server saves the receipt proof and enters
+two more RP beats:
 
 1. **Player's spoken line** — Continue.
-2. **Receiver's response and narrated consequence** — Continue to
-   the round report. The receiving-book branch additionally shows
-   the player's concluding notation in that second panel.
+2. **Receiver's response and narrated consequence** — Continue to the
+   final notice. The receiving-book branch additionally shows the
+   player's concluding notation in the second beat.
 
-Only then does **The round report** show the saved road and receipt
-condition; no fake duration or sorting score appears. **Finish the
-ordinary circuit** presents the final sealed council order.
-**Take the final notice** saves the handoff boundary; it does *not*
-silently advance to the unimplemented Stage 3. The sealed document
-stays unread until the Wrong Bell scene actually exists.
+The previous compulsory **round report** added no new narrative event
+or mechanical consequence; route and receipt were already saved and
+visible. It has been removed from the normal tutorial progression.
+When repeatable paid Hauling is implemented, a real work ledger may
+show actual travel time, wages and reputation outcomes. Do not display
+a mandatory empty audit in this introductory story.
 
-The current work phases are `issued` (route choice), `checked`
-(legacy route choice), `road_chosen` (first-person journey),
-`spoiled_mark` (receiver incident), `receiver_reply` (player line),
-`receiver_result` (receiver line and consequence),
-`round_report`, `final_notice`, and `final_notice_taken`.
-`book_checked` remains supported for previously saved rounds,
-but new players selecting the receiving book go directly to RP.
-Previous `sort_notices` and `check_round` API actions remain
-accepted only for older in-flight clients; no new UI offers those
-actions. Existing receipt values and internal route keys are not
-rewritten or discarded.
+**The final notice** presents the last sealed council order, which
+is still unread. After **Take the final notice**, the completion panel
+uses this exact owner-revised text:
+
+> The usual deliveries are done, and the receiving marks are recorded.
+>
+> One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.
+
+No silent Stage 3 progression occurs before *The Wrong Bell* exists.
+
+The saved work phases are `issued` (route choice), `checked`
+(legacy route choice), `road_chosen` (journey), `receiving_arrival`
+(new incident narration), `spoiled_mark` (receiver's lines and
+choices), `receiver_reply` (player line), `receiver_result`
+(receiver line and result), `final_notice` and
+`final_notice_taken`. Existing `book_checked` and `round_report`
+states can still finish safely, but the new flow never enters them.
+Older API action `continue_to_report` resolves to the final notice
+rather than recreating the removed report screen. Request receipts
+and recorded route/proof values remain intact across updates.
 
 All state transitions run through authenticated,
 owner-scoped, phase-checked, revision-checked and idempotent
