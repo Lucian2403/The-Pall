@@ -24,7 +24,7 @@
     <p class="speech">“{currentLine.text}”</p>
     <div class="responses">
       {#if lineIndex<currentTopic.lines.length-1}
-        <button type="button" onclick={()=>{lineIndex+=1;}}>Continue</button>
+        <button type="button" class="primary-choice" onclick={()=>{lineIndex+=1;}}>Continue</button>
       {:else}
         <button type="button" onclick={askSomethingElse}>Ask something else</button>
         <button type="button" onclick={returnToRound}>Return to the round</button>
