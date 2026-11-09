@@ -44,18 +44,24 @@
 
 <style>
   .hector-conversation{min-width:0;color:#251910}
-  .eyebrow{font:600 11px/1.3 sans-serif;letter-spacing:.12em;
-    color:#614029;margin:0 0 12px}
+  .eyebrow{font:600 clamp(15px,1.2vw,20px)/1.25
+    var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.11em;
+    color:#614029;margin:0 0 18px;padding-bottom:11px;
+    border-bottom:1px solid #9e815955}
   h2{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
     color:#25170f}
-  .speech{margin:0 0 12px;font:600 clamp(13px,1.2vw,17px)/1.5
+  .speech{margin:0 0 18px;font:600 clamp(18px,1.35vw,23px)/1.55
     var(--pall-font-reading,Georgia,serif);color:#251910}
-  .responses{display:flex;flex-direction:column;gap:6px;margin-top:3px}
-  .responses>button{display:block;width:100%;min-height:42px;
+  .responses{display:flex;flex-direction:column;gap:9px;margin-top:clamp(18px,2vw,30px)}
+  .responses>button{display:block;width:100%;min-height:52px;
     border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    text-align:left;padding:10px 12px;
-    font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
+    text-align:left;padding:10px 13px;
+    font:600 clamp(15px,1.16vw,18px)/1.35
+    var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .responses>button:hover,.responses>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}
-  @media(max-width:700px){.speech{font-size:16px}}
+  @media(max-width:700px){
+    .speech{font-size:17px}
+    .responses>button{font-size:16px;min-height:47px}
+  }
 </style>
