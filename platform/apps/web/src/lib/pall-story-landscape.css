@@ -1,53 +1,61 @@
-/* Bellrunner scene template: the location and the framed dialogue are
-   independent columns on desktop. Only the location column contains the
-   painting, NPC silhouettes, object props and their click regions.
-   The dialogue column contains all writing and choices. Neither overlaps.
-   On narrow screens they stack, image first and dialogue second. */
+/* The Pall / Bellrunner interaction layout.
+   A compact illustrated workstation (left) and a readable parchment
+   (right). The room is atmosphere; the NPC and task papers are the
+   actual interaction surface. Reuse across Stage 1 and Stage 2.
+   No dialogue overlaps the painting. On small screens use source order:
+   NPC/art, papers (when applicable), then conversation. */
 .pall-story-sections{
   display:grid;
-  grid-template-columns:minmax(0,60%) minmax(0,40%);
-  align-items:start;
+  grid-template-columns:minmax(0,52fr) minmax(0,48fr);
+  align-items:stretch;
+  gap:clamp(6px,.7vw,12px);
   width:100%;
   min-width:0;
   height:auto;
   min-height:0;
+  padding:clamp(5px,.65vw,10px);
+  box-sizing:border-box;
   overflow:visible;
-  background:#201a15;
+  background:#13100e;
+}
+.pall-story-visuals{
+  display:flex;
+  flex-direction:column;
+  box-sizing:border-box;
+  align-self:stretch;
+  min-width:0;
+  min-height:0;
+  border:1px solid #63452f;
+  background:linear-gradient(180deg,#211911,#15110e);
+  box-shadow:inset 0 1px #bd875633;
 }
 .pall-story-landscape{
   position:relative;
+  flex:0 0 auto;
   box-sizing:border-box;
   width:100%;
   min-width:0;
   aspect-ratio:1672 / 941;
-  align-self:start;
   overflow:hidden;
   isolation:isolate;
 }
 .pall-story-dialogue-section{
   position:relative;
   display:flex;
-  justify-content:center;
-  align-items:flex-start;
+  justify-content:stretch;
+  align-items:stretch;
   box-sizing:border-box;
   width:100%;
   min-width:0;
-  align-self:stretch;
-  padding:clamp(12px,1.7vw,28px) clamp(9px,1.7vw,27px);
-  border-left:2px solid #765537;
-  background:linear-gradient(180deg,#2a211a,#1b1815 85%);
+  min-height:0;
+  padding:0;
+  background:#241b14;
 }
-/* A narrow play area (including its left navigation rail) requires
-   vertical stacking; a desktop monitor always uses the right column. */
-@media(max-width:1080px){
-  .pall-story-sections{grid-template-columns:minmax(0,1fr)}
-  .pall-story-dialogue-section{
-    min-height:0;
-    border-left:0;
-    border-top:2px solid #765537;
-    padding:14px 12px 24px;
-  }
+@media(max-width:1160px){
+  .pall-story-sections{grid-template-columns:minmax(0,1fr);gap:8px}
+  .pall-story-visuals{width:100%}
+  .pall-story-dialogue-section{min-height:0}
 }
 @media(max-width:700px){
-  .pall-story-dialogue-section{padding:12px 8px 20px}
+  .pall-story-sections{padding:4px;gap:6px}
 }
