@@ -12,6 +12,7 @@ on:
       - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/scripts/verify-stage-six.mjs'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
+      - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-stage-seven.test.ts'
       - 'platform/scripts/verify-stage-eight.test.ts'
       - 'platform/apps/web/static/locations/home/**'
@@ -89,3 +90,6 @@ jobs:
       - name: Real Chromium Stage 6 outcome CTA click and keyboard navigation
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-combat-cta-browser.mjs
+      - name: Real Chromium Bellrunner Stage 1 and 2 separate-scene geometry
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
