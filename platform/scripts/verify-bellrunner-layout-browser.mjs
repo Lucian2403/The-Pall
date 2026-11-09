@@ -17,7 +17,12 @@ if(!chrome)throw Error('Chromium required for Bellrunner scene geometry.');
 const profile=mkdtempSync(join(tmpdir(),'pall-bellrunner-layout-'));
 // Start the npm/Vite process tree in its own group, so cleanup can
 // terminate Vite itself rather than only its npm parent.
-const server=spawn('npm',['run','dev:web'],{
+// The existing combat-browser check can leave Vite on 5173 behind.
+ // Use a dedicated strict port so the Bellrunner test always exercises
+ // THIS checkout and never a stale server from another fixture.
+const server=spawn('npm',[
+  'run','dev','-w','@the-pall/web','--','--port','5187','--strictPort'
+],{
   cwd:root,stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32'
 });
 let output='';
@@ -49,7 +54,7 @@ async function until(fn,ms=18000,label='condition'){
     (last?': '+last.message:'')+' Vite: '+output.slice(-2500));
 }
 try{
-  const origin='http://127.0.0.1:5173';
+  const origin='http://127.0.0.1:5187';
   await until(async()=>{
     const r=await fetch(origin+'/characters/qa-bellrunner/opening');
     return r.ok;
