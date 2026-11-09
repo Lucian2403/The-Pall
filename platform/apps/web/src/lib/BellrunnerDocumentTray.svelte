@@ -4,8 +4,8 @@
    * give the Route Sheet its one canonical server-backed take_round action;
    * Stage 2 keeps all three available for optional inspection only.
    */
-  export type PaperKey='notices'|'sealed'|'route';
-  type Paper={label:string;src:string;description:string};
+  type PaperKey='notices'|'sealed'|'route';
+  type Paper={label:string;src:string};
   let {papers,onChoose,selected=null,routeReady=false,busy=false}:{
     papers:Record<PaperKey,Paper>;
     onChoose:(key:PaperKey)=>void;
