@@ -29,6 +29,16 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   than new styling. Hector's original artwork is not cut across the
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
+- **Full-art framing shared by Stages 1–2:** the owner Depot image,
+  both street paintings and the Receiving Desk now use the
+  `pall-story-landscape.css` intrinsic 1672:941 layout. No fixed
+  scene height, forced cover crop or stretched street perspective.
+  Stage 1's Hector, papers and Route Sheet click targets continue
+  scaling within the same painting coordinates. On wide/short browser
+  windows, the document scrolls vertically to show the entire
+  full-width artwork; on phones the image sits above the dialogue.
+  This explicitly supersedes the earlier 640px and viewport-cover
+  sizing attempts.
 
 ## Stage 1 dialogue
 
