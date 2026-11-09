@@ -163,13 +163,29 @@ test('Receiving desk incident and three choices lead to authored, unskipped RP',
  assert.ok(BELLRUNNER_RECEIVER_RESOLUTIONS.book_confirmed.extraPlayer?.includes('note the book entry'));
  assert.ok(BELLRUNNER_RECEIVER_RESOLUTIONS.noted_unclear.outcome.includes('unclear'));
  const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(ui.includes("phase==='receiving_arrival'"));
+ assert.ok(ui.includes("perform('continue_to_receiver')"));
  assert.ok(ui.includes("phase==='spoiled_mark'"));
+ const arrival=ui.slice(ui.indexOf("phase==='receiving_arrival'"),ui.indexOf("phase==='spoiled_mark'"));
+ assert.ok(arrival.includes('BELLRUNNER_RECEIVING_ARRIVAL'));
+ assert.ok(arrival.includes('>Continue</button>'));
+ assert.ok(!arrival.includes('BELLRUNNER_RECEIVER_OPENING'));
+ assert.ok(!arrival.includes('Ask for a fresh mark'));
+ const receiver=ui.slice(ui.indexOf("phase==='spoiled_mark'"),ui.indexOf("phase==='book_checked'"));
+ assert.ok(receiver.includes('BELLRUNNER_RECEIVER_OPENING'));
+ assert.ok(receiver.includes('Ask for a fresh mark'));
+ assert.ok(receiver.includes('Check their receiving book'));
+ assert.ok(receiver.includes('Note the spoiled mark and go on'));
  assert.ok(ui.includes("phase==='receiver_reply'&&receiverDialogue"));
  assert.ok(ui.includes("phase==='receiver_result'&&receiverDialogue"));
  assert.ok(ui.includes('“{receiverDialogue.player}”'));
  assert.ok(ui.includes('“{receiverDialogue.receiver}”'));
  assert.ok(ui.includes("perform('continue_receiver_dialogue')"));
- assert.ok(ui.includes("perform('continue_to_report')"));
+ assert.ok(ui.includes("perform('continue_to_final_notice')"));
+ assert.ok(!ui.includes('The round report</h1>'),
+  'The tutorial no longer forces a summary-only screen');
+ assert.ok(ui.includes('The usual deliveries are done, and the receiving marks are recorded.'));
+ assert.ok(ui.includes('One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.'));
  assert.ok(!ui.includes('not implemented in this pass'));
 });
 
@@ -200,7 +216,11 @@ test('New rounds choose a road immediately; every receipt resolves through two s
   const chosen=apply([road]);
   assert.equal(chosen.phase,'road_chosen');
   assert.equal(chosen.route,road==='take_direct_road'?'direct':'quieter');
-  const delivered=applyDispatchAction(chosen,'deliver_notices');
+  const arrived=applyDispatchAction(chosen,'deliver_notices');
+  assert.equal(arrived.phase,'receiving_arrival');
+  assert.throws(()=>applyDispatchAction(arrived,'ask_fresh_mark'),InvalidDispatchAction,
+   'Receiver choices remain locked until the arrival Continue');
+  const delivered=applyDispatchAction(arrived,'continue_to_receiver');
   assert.equal(delivered.phase,'spoiled_mark');
   for(const [resolution,receipt] of [
     ['ask_fresh_mark','clear'],
@@ -213,10 +233,10 @@ test('New rounds choose a road immediately; every receipt resolves through two s
    assert.throws(()=>applyDispatchAction(reply,'finish_round'),InvalidDispatchAction);
    const result=applyDispatchAction(reply,'continue_receiver_dialogue');
    assert.equal(result.phase,'receiver_result');
-   const report=applyDispatchAction(result,'continue_to_report');
-   assert.equal(report.phase,'round_report');
-   const finished=applyDispatchAction(
-    applyDispatchAction(report,'finish_round'),'take_final_notice');
+   assert.throws(()=>applyDispatchAction(result,'take_final_notice'),InvalidDispatchAction);
+   const ready=applyDispatchAction(result,'continue_to_final_notice');
+   assert.equal(ready.phase,'final_notice');
+   const finished=applyDispatchAction(ready,'take_final_notice');
    assert.equal(finished.phase,'final_notice_taken');
    assert.equal(finished.route,chosen.route);
    assert.equal(finished.receipt,receipt);
@@ -231,7 +251,8 @@ test('Earlier saved dispatch phases and recorded sorting remain playable',()=>{
  assert.equal(legacySorted.noticesOrdered,true);
  const road=applyDispatchAction(legacySorted,'take_direct_road');
  assert.equal(road.phase,'road_chosen');
- const spoiled=applyDispatchAction(road,'deliver_notices');
+ const arrival=applyDispatchAction(road,'deliver_notices');
+ const spoiled=applyDispatchAction(arrival,'continue_to_receiver');
  const legacyBookChecked={...spoiled,phase:'book_checked' as const};
  const bookReply=applyDispatchAction(legacyBookChecked,'confirm_book');
  assert.equal(bookReply.phase,'receiver_reply');
@@ -239,6 +260,9 @@ test('Earlier saved dispatch phases and recorded sorting remain playable',()=>{
  const olderReport={...spoiled,phase:'round_report' as const,
   receipt:'noted_unclear' as const};
  assert.equal(applyDispatchAction(olderReport,'finish_round').phase,'final_notice');
+ const oldResponse={...spoiled,phase:'receiver_result' as const,receipt:'clear' as const};
+ assert.equal(applyDispatchAction(oldResponse,'continue_to_report').phase,'final_notice',
+  'Old API command must no longer insert the removed report panel');
 });
 
 test('Stage 1 still accepts the round exactly once, without mutating starter items',()=>{
