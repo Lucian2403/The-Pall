@@ -62,51 +62,43 @@ remain fully visible on wide monitors. The player's starting Route
 Sheet object in Stage 1 is the deliberate interactive prop that accepts
 the round, unlike the static destination setting.
 
-## Two-section scene and conversation layout (owner revision, November 9)
+## Bellrunner scene layout — artwork left, dialogue right (owner revision)
 
-Both Bellrunner stages now render **two independent vertical sections**.
-The previous approach placed dialogue on top of the illustration, so
-a larger monitor either cropped the source painting or stretched its
-layout, and dialogue covered architecture and task props.
+**Desktop screens have two side-by-side sections, not a vertical stack.**
+The prior implementation misunderstood the request and placed the
+dialogue below an enormous full-width painting. That layout is
+superseded by the current one shared across Stages 1 and 2:
 
-**Section 1 — illustrated location only.** A complete, uncropped
-`1672:941` image at the current chapter width. Stage 1's Dispatch
-House keeps Hector, his clickable NPC nameplate, council notices,
-sealed order and Route Sheet, with only their visual labels/hitboxes.
-Clicking an item opens its inspection text in the **lower parchment
-section**, never as a popup over the painted Depot. Stage 2 displays the current location: Dispatch House (while
-choosing a road), Short Route, Long Route or Municipal Receiving Desk.
-The latter three have **no overlaid NPC or object interaction**.
-Art, object coordinates and mouse/keyboard targets share one image
-coordinate system. No `cover` crop, arbitrary 640px scene height,
-artificial side gutters or image stretching.
+- **Left — 60% illustrated scene.** A complete 1672:941 painting,
+  aspect-preserved and free of dialogue overlays. At the Depot this
+  also contains Hector's portrait and click area, the paper assets,
+  their nameplates, and the route-sheet assignment control.
+  The two street scenes and Municipal Receiving Desk contain
+  only their location painting. No receiver portrait or floating
+  documents are added at the Receiving Desk.
+- **Right — 40% framed dialogue.** The owner's original nine-slice
+  parchment is centered in a dark second column, with the complete
+  authored narrative, conversation, inspection descriptions and
+  choices. Its height grows naturally without a forced internal
+  scrollbar. All paper/NPC clicks update this adjacent panel rather
+  than scrolling the player below the image.
+- **At narrow widths (1080px viewport or less)** the two areas stack:
+  full image first, parchment below. There is no scene stretching
+  or image cropping. On desktop, the two columns stay side by side
+  even on large monitors.
 
-**Section 2 — dialogue only.** Immediately **below** the entire
-painting, a distinct dark wood/charcoal strip carries a centered,
-up-to-980px-width parchment frame and the approved choice buttons.
-The frame is **not absolutely positioned**, does not overlap the
-image, has no forced-height internal scrollbar, and expands with the
-number of dialogue lines. These sections share
-`pall-story-landscape.css`, `pall-owner-ui.css` and
-`workshop-object-labels.css`, rather than inventing a new panel
-design for each background.
+The shared layout is `pall-story-landscape.css`; both stage
+components use it. The existing `pall-owner-ui.css` frame art
+and `workshop-object-labels.css` nameplates are unchanged.
+Scene props keep coordinates relative to the left painting,
+so the interaction hitboxes cannot drift independently.
 
-At desktop and ultrawide widths, the page itself can scroll from
-the full illustration to the dialogue; an uncropped image cannot
-physically occupy an extra-wide viewport at full width *and* show
-the whole dialogue above the fold. This is a conscious design
-trade-off: artwork and actions remain intact, with **no overlap**.
-Clicking Hector's art/label or selecting an inspectable paper
-scrolls the player to its now-separate conversation or inspection
-frame. Stage 1's Route Sheet still accepts the round from
-its image section and saves the same idempotent Stage 2 handoff.
-On mobile, the same two sections stack naturally.
-
-The real Chromium layout check opens both actual Bellrunner pages
-with isolated API snapshots at several screen sizes, confirming the
-entire image, non-overlapping dialogue, readable frame width and
-scroll access. No quest, payment, scene audio or database state
-changes are coupled to this layout revision.
+The real-Chromium CI test loads Stage 1 and all Stage 2
+backgrounds at 1272px, 1920px, 2048px, 3440px and mobile widths;
+it checks that the right frame never overlaps the scene and that
+clicking Hector/papers changes the dialogue panel on the right.
+Only presentation code changes; no gameplay, money, audio or
+saved-state adjustments accompany the layout correction.
 
 ## Choose the road
 
