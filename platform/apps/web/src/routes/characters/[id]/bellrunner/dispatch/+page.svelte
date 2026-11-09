@@ -338,7 +338,7 @@
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .work-card{position:relative;z-index:1;box-sizing:border-box;
     display:flex;flex-direction:column;flex:1;align-self:stretch;
-    width:100%;min-width:0;min-height:100%;margin:0;max-height:none;overflow:visible;
+    width:100%;max-width:980px;min-width:0;min-height:100%;margin:0 auto;max-height:none;overflow:visible;
     padding:clamp(20px,2.3vw,39px) clamp(19px,2.35vw,40px) 25px;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
