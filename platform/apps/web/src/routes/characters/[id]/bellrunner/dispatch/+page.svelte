@@ -3,7 +3,6 @@
   import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
-  import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import {HAULING_SCENES} from '$lib/hauling-scenes';
   import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
@@ -167,14 +166,14 @@
               <button type="button" class="paper-target {key}" data-workshop-object
                 data-pall-sfx="paper" aria-label={'Inspect '+docs[key].label}
                 aria-pressed={selected===key}
-                onclick={()=>{talkingToHector=false;selected=selected===key?null:key;}}>
+                onclick={()=>{
+                  talkingToHector=false;
+                  selected=selected===key?null:key;
+                  if(selected)dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
+                }}>
                 <span class="workshop-object-label">{docs[key].label}</span>
               </button>
             {/each}
-            {#if selected}
-              <WorkshopItemPopover itemKey={selected} title={docs[selected].label}
-                description={docs[selected].description} onClose={()=>{selected=null;}}/>
-            {/if}
           {:else}
             <!-- Complete original painting, fitted to the native-ratio scene.
                  Streets and reception have no interactive overlays. -->
@@ -189,8 +188,16 @@
 
         <section class="dialogue-section pall-story-dialogue-section" bind:this={dialogueSection}
           aria-label="Shift Dispatch dialogue and choices">
-        <aside class="work-card" aria-label={talkingToHector?'Hector D. Smoke conversation':'Shift Dispatch work'}>
-          {#if talkingToHector&&sceneKey==='depot'}
+        <aside class="work-card" aria-label={selected?'Dispatch paper inspection':
+          talkingToHector?'Hector D. Smoke conversation':'Shift Dispatch work'}>
+          {#if selected&&sceneKey==='depot'}
+            <p class="eyebrow">DISPATCH HOUSE · PAPER INSPECTION</p>
+            <h1>{docs[selected].label}</h1>
+            <p class="story">{docs[selected].description}</p>
+            <div class="actions">
+              <button type="button" onclick={()=>{selected=null;}}>Return to the round</button>
+            </div>
+          {:else if talkingToHector&&sceneKey==='depot'}
             <BellrunnerHectorConversation characterName={character.name}
               returnToRound={()=>{talkingToHector=false;}}/>
           {:else}
