@@ -71,6 +71,18 @@ without altering the originals. The painted scene is never stretched
 out of its native proportions, and receipt/ledger hotspots scale with
 that same painting, not independent window percentages.
 
+**Wide-screen receiving-counter fix (November 9):** The receiving-desk
+painting contains a large wooden counter along the source's bottom edge.
+Centering a 16:9 painting inside a much wider and shorter scene had
+cropped the desk and pushed the floating documents and labels below
+the visible stage. The receiving scene now uses a **bottom-aligned,
+aspect-preserving cover**; street scenes retain their existing centered
+framing. The Council notice, Route sheet and Sealed council order
+appear safely above the counter edge, clear of the ledger hotspot.
+At mobile widths the full source painting is shown without a forced
+cover crop. All changes are CSS only; existing saved routes, receipt
+states and ledger actions are unaffected.
+
 ## Choose the road
 
 The route sheet offers two paths that reach the same routine
