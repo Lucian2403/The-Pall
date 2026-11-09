@@ -49,7 +49,6 @@
   let status=$state<'loading'|'ready'|'login'|'missing'|'schema'|'unavailable'>('loading');
   let selected=$state<PaperKey|null>(null);
   let talkingToHector=$state(false);
-  let dialogueSection:HTMLElement|undefined;
   let busy=$state(false);
   let workError=$state('');
   let pendingId:string|null=null;
@@ -154,10 +153,7 @@
               alt="" aria-hidden="true" draggable="false"/>
             <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
               aria-label="Talk to Hector D. Smoke"
-              onclick={()=>{
-                selected=null;talkingToHector=true;
-                dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
-              }}>
+              onclick={()=>{selected=null;talkingToHector=true;}}>
               <span class="workshop-npc-label">Hector D. Smoke</span>
             </button>
             {#each paperKeys as key}
@@ -169,7 +165,6 @@
                 onclick={()=>{
                   talkingToHector=false;
                   selected=selected===key?null:key;
-                  if(selected)dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
                 }}>
                 <span class="workshop-object-label">{docs[key].label}</span>
               </button>
@@ -186,7 +181,7 @@
           {/if}
         </section>
 
-        <section class="dialogue-section pall-story-dialogue-section" bind:this={dialogueSection}
+        <section class="dialogue-section pall-story-dialogue-section"
           aria-label="Shift Dispatch dialogue and choices">
         <aside class="work-card" aria-label={selected?'Dispatch paper inspection':
           talkingToHector?'Hector D. Smoke conversation':'Shift Dispatch work'}>
@@ -329,8 +324,8 @@
 <style>
   .dispatch{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  /* The artwork and text are siblings, never a grid overlay.
-     The native image ratio applies to .illustration alone. */
+  /* Separate desktop columns: original artwork and hotspots at left,
+     all dialogue and inspection writing at right; stack on narrow screens. */
   .scene{width:100%;min-width:0}
   .illustration{position:relative;width:100%;aspect-ratio:1672/941;
     overflow:hidden;container-type:size}
