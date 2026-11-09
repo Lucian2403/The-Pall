@@ -6,7 +6,7 @@ export type DispatchRoute='direct'|'quieter';
 export type ReceiptProof='clear'|'book_confirmed'|'noted_unclear';
 export type DispatchPhase=
   'issued'|'checked'|'road_chosen'|'spoiled_mark'|'book_checked'|
-  'round_report'|'final_notice'|'final_notice_taken';
+  'receiver_reply'|'receiver_result'|'round_report'|'final_notice'|'final_notice_taken';
 export type DispatchState={
   phase:DispatchPhase;
   route:DispatchRoute|null;
@@ -16,11 +16,13 @@ export type DispatchState={
 export type DispatchWorkAction=
   'check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
   'deliver_notices'|'ask_fresh_mark'|'check_receiving_book'|
-  'confirm_book'|'note_spoiled_mark'|'finish_round'|'take_final_notice';
+  'confirm_book'|'note_spoiled_mark'|'continue_receiver_dialogue'|
+  'continue_to_report'|'finish_round'|'take_final_notice';
 export const DISPATCH_ACTIONS:ReadonlyArray<DispatchWorkAction>=[
   'check_round','sort_notices','take_direct_road','take_quieter_road',
   'deliver_notices','ask_fresh_mark','check_receiving_book','confirm_book',
-  'note_spoiled_mark','finish_round','take_final_notice'
+  'note_spoiled_mark','continue_receiver_dialogue','continue_to_report',
+  'finish_round','take_final_notice'
 ];
 export const INITIAL_DISPATCH_STATE:DispatchState={
   phase:'issued',route:null,noticesOrdered:false,receipt:null
@@ -33,6 +35,8 @@ export function applyDispatchAction(
 ):DispatchState{
  const reject=():never=>{throw new InvalidDispatchAction();};
  switch(action){
+  // Retain the previous check/sort commands for older in-flight clients.
+  // New players choose their road immediately; no redundant checklist.
   case 'check_round':
    if(state.phase!=='issued')return reject();
    return {...state,phase:'checked'};
@@ -41,7 +45,7 @@ export function applyDispatchAction(
    return {...state,noticesOrdered:true};
   case 'take_direct_road':
   case 'take_quieter_road':
-   if(state.phase!=='checked')return reject();
+   if(state.phase!=='issued'&&state.phase!=='checked')return reject();
    return {...state,phase:'road_chosen',
      route:action==='take_direct_road'?'direct':'quieter'};
   case 'deliver_notices':
@@ -49,16 +53,26 @@ export function applyDispatchAction(
    return {...state,phase:'spoiled_mark'};
   case 'check_receiving_book':
    if(state.phase!=='spoiled_mark')return reject();
-   return {...state,phase:'book_checked'};
+   // The scripted receiving-book entry matches. No extra confirmation
+   // button: the two spoken turns supply the result and explanation.
+   return {...state,phase:'receiver_reply',receipt:'book_confirmed'};
   case 'ask_fresh_mark':
    if(state.phase!=='spoiled_mark'&&state.phase!=='book_checked')return reject();
-   return {...state,phase:'round_report',receipt:'clear'};
+   return {...state,phase:'receiver_reply',receipt:'clear'};
   case 'confirm_book':
+   // Pre-update saves could already be in book_checked. Preserve their
+   // ability to finish while routing to the same new dialogue.
    if(state.phase!=='book_checked')return reject();
-   return {...state,phase:'round_report',receipt:'book_confirmed'};
+   return {...state,phase:'receiver_reply',receipt:'book_confirmed'};
   case 'note_spoiled_mark':
    if(state.phase!=='spoiled_mark'&&state.phase!=='book_checked')return reject();
-   return {...state,phase:'round_report',receipt:'noted_unclear'};
+   return {...state,phase:'receiver_reply',receipt:'noted_unclear'};
+  case 'continue_receiver_dialogue':
+   if(state.phase!=='receiver_reply'||!state.receipt)return reject();
+   return {...state,phase:'receiver_result'};
+  case 'continue_to_report':
+   if(state.phase!=='receiver_result'||!state.receipt)return reject();
+   return {...state,phase:'round_report'};
   case 'finish_round':
    if(state.phase!=='round_report'||!state.receipt)return reject();
    return {...state,phase:'final_notice'};
