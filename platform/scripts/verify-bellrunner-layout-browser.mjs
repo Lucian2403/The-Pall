@@ -7,8 +7,9 @@ import {tmpdir} from 'node:os';
 
 /* REAL Svelte pages, not duplicated mock UI. Stub only the API response so
  * protected character pages can be rendered in isolated Chromium QA.
- * Checks the precise failure seen at 2048px: a full-width image and a
- * parchment frame must occupy different vertical sections.
+ * Checks the requested desktop split: scene artwork LEFT and framed
+ * dialogue RIGHT; never a parchment overlay or a panel underneath.
+ * Narrow screens may stack the two independent sections.
  */
 const root=resolve(import.meta.dirname,'..');
 const chrome=['google-chrome','chromium','chromium-browser'].find(x=>
@@ -177,7 +178,7 @@ try{
     })()`);
   }
   for(const [width,height] of [
-    [1920,1080],[2048,821],[3440,1440],[390,844]
+    [1272,850],[1920,1080],[2048,821],[3440,1440],[390,844]
   ]){
     await cmd('Emulation.setDeviceMetricsOverride',{
       width,height,deviceScaleFactor:1,mobile:false
@@ -197,8 +198,21 @@ try{
       const suffix=scene+' '+width+'×'+height+' '+JSON.stringify(m);
       assert.ok(Math.abs(m.art.h-m.art.w*941/1672)<2.5,
         'Full original aspect: '+suffix);
-      assert.ok(m.dialogue.top>=m.art.bottom-2,
-        'Dialogue is visibly BELOW the image, never on top: '+suffix);
+      if(width>1080){
+        assert.ok(Math.abs(m.dialogue.top-m.art.top)<=2,
+          'Desktop dialogue must START beside the scene: '+suffix);
+        assert.ok(m.dialogue.left>=m.art.right-2,
+          'Desktop dialogue must be to the RIGHT of the artwork: '+suffix);
+        assert.ok(m.frame.left>=m.art.right-1,
+          'Parchment may not overlap the LEFT scene: '+suffix);
+        assert.ok(Math.abs(m.art.w/m.stack.w-.6)<.025,
+          'The scene owns ~60% of available content width: '+suffix);
+        assert.ok(Math.abs(m.dialogue.w/m.stack.w-.4)<.025,
+          'The right dialogue owns ~40% of available content width: '+suffix);
+      }else{
+        assert.ok(m.dialogue.top>=m.art.bottom-2,
+          'Narrow-screen dialogue stacks BELOW the artwork: '+suffix);
+      }
       assert.ok(m.frame.top>=m.dialogue.top-1 &&
         m.frame.bottom<=m.dialogue.bottom+2,
         'Parchment fits inside dialogue section: '+suffix);
@@ -216,11 +230,12 @@ try{
       assert.ok(scrolled.top>=0&&scrolled.frame.w>100,'Dialogue must be reachable: '+suffix);
       console.log('PASS: '+scene+' '+width+'×'+height+
         ' artwork '+Math.round(m.art.w)+'×'+Math.round(m.art.h)+
-        ' dialogue below at '+Math.round(m.dialogue.top));
+        (width>1080?' dialogue RIGHT x='+Math.round(m.dialogue.left):
+          ' dialogue BELOW y='+Math.round(m.dialogue.top)));
     }
   }
   // Real pointer interactions: the artwork itself only hosts the NPC and
-  // paper assets, while the response/inspection text appears in Section 2.
+  // paper assets, while the response/inspection text appears to the RIGHT.
   await cmd('Emulation.setDeviceMetricsOverride',{
     width:1920,height:1080,deviceScaleFactor:1,mobile:false
   });
@@ -250,7 +265,7 @@ try{
     return m?.text.includes('Council notices')?m:false;
   },8000,'Paper inspection text in the lower section');
   assert.equal(await evalJS("document.querySelector('.scene-illustration .workshop-inspection')===null"),true);
-  console.log('PASS: clicking Stage 1 NPC and paper reveals text BELOW the image');
+  console.log('PASS: clicking Stage 1 NPC and paper reveals text RIGHT of the image');
 
   await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/bellrunner/dispatch?scene=depot'});
   await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 2 Depot paper targets');
@@ -260,8 +275,8 @@ try{
     return m?.text.includes('Council notices')?m:false;
   },8000,'Stage 2 Depot paper inspection below art');
   assert.equal(await evalJS("document.querySelector('.illustration .workshop-inspection')===null"),true);
-  console.log('PASS: clicking Stage 2 Depot paper reveals the lower dialogue section');
-  console.log('PASS: 20 real Bellrunner page/viewport combinations render as separate sections');
+  console.log('PASS: clicking Stage 2 Depot paper updates the right dialogue');
+  console.log('PASS: 25 real Bellrunner page/viewport combinations use LEFT art / RIGHT dialogue on desktop and stack on mobile');
 }catch(error){
   console.error(error);
   process.exitCode=1;
