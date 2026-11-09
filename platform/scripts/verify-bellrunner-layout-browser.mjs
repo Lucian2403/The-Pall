@@ -305,6 +305,55 @@ try{
   assert.equal(await evalJS("document.querySelector('.scene-illustration .workshop-inspection')===null"),true);
   console.log('PASS: Stage 1 Hector and the document card update the adjacent parchment');
 
+  // Verify the actual opening beats rather than only initial/static props:
+  // each line is shown once, and only the Route Sheet acquires the
+  // actionable stage handoff when Hector finishes instructing the player.
+  await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/opening'});
+  await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 1 story opening');
+  await clickArtwork('button.primary-choice'); // Begin the round.
+  await until(async()=>await evalJS(
+    "document.querySelector('.dispatch-dialogue button.primary-choice')?.textContent.includes('Continue')"
+  ),6000,'The first narration Continue');
+  await clickArtwork('button.primary-choice'); // Setting → Hector's first line.
+  await until(async()=>{
+    const m=await sceneMetrics();
+    return m?.text.includes('There you are.')?m:false;
+  },6000,'Hector speaks the approved opening');
+  {
+    const folder=resolve(root,'test-artifacts','bellrunner-visuals');
+    mkdirSync(folder,{recursive:true});
+    const shot=await cmd('Page.captureScreenshot',{format:'png',
+      fromSurface:true,captureBeyondViewport:false});
+    writeFileSync(join(folder,'stage1-hector-speech-1920.png'),
+      Buffer.from(shot.data,'base64'));
+  }
+  for(let i=0;i<5;i++){
+    const previous=await evalJS(
+      "document.querySelector('.dispatch-dialogue')?.textContent"
+    );
+    await clickArtwork('button.primary-choice');
+    await until(async()=>{
+      const next=await evalJS(
+        "document.querySelector('.dispatch-dialogue')?.textContent"
+      );
+      return next!==previous;
+    },6000,'Advance through Hector speech beat '+(i+1));
+  }
+  assert.equal(await evalJS(
+    "!!document.querySelector('button.document-card[aria-label=\\\"Take the Route Sheet to begin Shift Dispatch\\\"]')"
+  ),true,'Only the Route Sheet becomes a real progression control');
+  assert.equal(await evalJS(
+    "document.querySelector('.dispatch-dialogue')?.textContent.includes('Previous line')"
+  ),true,'Handoff offers Previous line, not a duplicate Take button');
+  {
+    const folder=resolve(root,'test-artifacts','bellrunner-visuals');
+    const shot=await cmd('Page.captureScreenshot',{format:'png',
+      fromSurface:true,captureBeyondViewport:false});
+    writeFileSync(join(folder,'stage1-route-handoff-1920.png'),
+      Buffer.from(shot.data,'base64'));
+  }
+  console.log('PASS: owner-verbatim opening sequence and Route Sheet handoff render correctly');
+
   await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/bellrunner/dispatch?scene=depot'});
   await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 2 Depot paper targets');
   await clickArtwork('button.document-card[aria-label="Inspect Council notices"]');
