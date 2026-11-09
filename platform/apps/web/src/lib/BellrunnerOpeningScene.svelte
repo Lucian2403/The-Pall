@@ -3,6 +3,7 @@
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import BellrunnerDocumentTray from '$lib/BellrunnerDocumentTray.svelte';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import '$lib/workshop-object-labels.css';
   import '$lib/pall-story-landscape.css';
 
@@ -103,7 +104,9 @@
         <h2>{papers[selected].label}</h2>
         <p class="work-description">{papers[selected].observation}</p>
         <div class="responses">
-          <button type="button" onclick={()=>{selected=null;}}>Return to the dialogue</button>
+          <button type="button" class="secondary-choice" onclick={()=>{selected=null;}}>
+            <BellrunnerChoiceIcon kind="back"/>Return to the dialogue
+          </button>
         </div>
       {:else if talking}
         <BellrunnerHectorConversation {characterName} {returnToRound}/>
@@ -113,7 +116,9 @@
         <p class="speech">Dispatch Master</p>
         <div class="responses">
           <button type="button" class="primary-choice" onclick={begin}>Begin the round</button>
-          <button type="button" onclick={askHector}>Ask Hector something</button>
+          <button type="button" class="secondary-choice" onclick={askHector}>
+            <BellrunnerChoiceIcon kind="chat"/>Ask Hector something
+          </button>
         </div>
       {:else}
         {#if beat.kind==='narration'}
@@ -139,7 +144,9 @@
             <button type="button" class="primary-choice" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
           {/if}
           {#if beat.kind!=='handoff'}
-            <button type="button" onclick={askHector}>Ask Hector something</button>
+            <button type="button" class="secondary-choice" onclick={askHector}>
+            <BellrunnerChoiceIcon kind="chat"/>Ask Hector something
+          </button>
           {/if}
           {#if handoffError}<p class="error" role="alert">{handoffError}</p>{/if}
         </div>
