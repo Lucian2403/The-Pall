@@ -174,8 +174,8 @@
     padding:0 0 6px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .dispatch-dialogue{position:relative;z-index:1;display:flex;flex-direction:column;
-    flex:1;align-self:stretch;box-sizing:border-box;width:100%;min-width:0;
-    min-height:100%;max-height:none;overflow:visible;margin:0;
+    flex:1;align-self:stretch;box-sizing:border-box;width:100%;max-width:980px;min-width:0;
+    min-height:100%;max-height:none;overflow:visible;margin:0 auto;
     padding:clamp(20px,2.3vw,39px) clamp(19px,2.35vw,40px) 25px;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
