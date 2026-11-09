@@ -248,10 +248,10 @@ try{
         assert.equal(m.tray,null,
           'No redundant paper tray at a street or the Receiving Desk: '+suffix);
       }
-      assert.ok(m.cityBanner&&m.cityBanner.h>=150&&
+      assert.ok(m.cityBanner&&m.cityBanner.h>=100&&m.cityBanner.h<=170&&
         m.cityBanner.title.includes('Grand Cylinder City')&&
         m.cityBanner.display!=='none',
-        'Keep the shared Grand Cylinder City header on every Bellrunner scene: '+suffix);
+        'Keep a visible compact City header without displacing Hector and the job papers: '+suffix);
       assert.ok(m.stack.top>=m.cityBanner.bottom-2,
         'City header must lead into the workstation, without overlapping it: '+suffix);
       if(['stage1','stage2-depot','receiving-desk'].includes(scene)){
