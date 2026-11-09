@@ -329,20 +329,22 @@ test('Bellrunner Stage 2 records the route and two receiver RP beats without rew
  assert.equal((await command('deliver_notices',0)).status,409,
   'A stale tab cannot skip the narrated journey');
  let state=(await command('deliver_notices',1)).body!;
+ assert.equal(state.workState.phase,'receiving_arrival');
+ assert.equal((await command('check_receiving_book',2)).status,409,
+  'Receiver choices must be unavailable before the arrival Continue');
+ state=(await command('continue_to_receiver',2)).body!;
  assert.equal(state.workState.phase,'spoiled_mark');
- assert.equal((await command('finish_round',2)).status,409);
- state=(await command('check_receiving_book',2)).body!;
+ assert.equal((await command('finish_round',3)).status,409);
+ state=(await command('check_receiving_book',3)).body!;
  assert.equal(state.workState.phase,'receiver_reply');
  assert.equal(state.workState.receipt,'book_confirmed');
- assert.equal((await command('finish_round',3)).status,409,
-  'The receiver conversation cannot be skipped');
- state=(await command('continue_receiver_dialogue',3)).body!;
- assert.equal(state.workState.phase,'receiver_result');
  assert.equal((await command('finish_round',4)).status,409,
-  'The round cannot complete before the receiver answer');
- state=(await command('continue_to_report',4)).body!;
- assert.equal(state.workState.phase,'round_report');
- state=(await command('finish_round',5)).body!;
+  'The receiver conversation cannot be skipped');
+ state=(await command('continue_receiver_dialogue',4)).body!;
+ assert.equal(state.workState.phase,'receiver_result');
+ assert.equal((await command('finish_round',5)).status,409,
+  'The final notice cannot be reached before the receiver answer');
+ state=(await command('continue_to_final_notice',5)).body!;
  assert.equal(state.workState.phase,'final_notice');
  state=(await command('take_final_notice',6)).body!;
  assert.equal(state.workState.phase,'final_notice_taken');
@@ -380,9 +382,10 @@ test('Both roads and the other receipt choices preserve the complete RP sequence
    action:'take_round',requestId:randomUUID(),expectedRevision:0})).status,200);
   let revision=0;
   const transitions=[
-   [road,'road_chosen'],['deliver_notices','spoiled_mark'],
-   [remedy,'receiver_reply'],['continue_receiver_dialogue','receiver_result'],
-   ['continue_to_report','round_report'],['finish_round','final_notice'],
+   [road,'road_chosen'],['deliver_notices','receiving_arrival'],
+   ['continue_to_receiver','spoiled_mark'],[remedy,'receiver_reply'],
+   ['continue_receiver_dialogue','receiver_result'],
+   ['continue_to_final_notice','final_notice'],
    ['take_final_notice','final_notice_taken']
   ] as const;
   for(const [action,phase] of transitions){
