@@ -197,6 +197,9 @@ test('Stage 1 Route Sheet remains the sole authenticated handoff action',()=>{
  assert.ok(tray.includes('Take the Route Sheet to begin Shift Dispatch'));
  assert.ok(tray.includes('Take Route Sheet'));
  assert.ok(scene.includes('<h2>Take the Route Sheet</h2>'));
+ assert.ok(scene.includes('The Route Sheet is ready with the round documents.'));
+ assert.ok(!scene.includes('Click it on the counter'),
+  'Guidance must refer to the document tray, not the old floating counter prop');
  assert.ok(opening.includes('takeRound={takeBellrunnerRound}'));
  assert.ok(opening.includes("action:'take_round',expectedRevision:0"));
  assert.ok(!scene.includes('onclick={()=>{void takeRound();}}'));
