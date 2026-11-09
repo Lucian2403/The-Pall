@@ -164,9 +164,7 @@ test('The full original street picture is rendered; the document cannot be trunc
 
 test('Receiving Desk has no overlaid props, hitboxes, or letterbox crop',()=>{
  const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
- const from=ui.indexOf('<!-- Proportionate, cover-scaled location painting.');
- const to=ui.indexOf('</div>\\n\\n        <aside class="work-card"',from);
- // Parser-safe check: the static art is a single image inside a wrapper.
+ // The static art is a single image inside the full-aspect wrapper.
  assert.ok(ui.includes('class="art-scaled"'));
  assert.ok(ui.includes('src={HAULING_SCENES[sceneKey].src}'));
  assert.ok(!ui.includes('counter-target')&&!ui.includes('counter-prop'));
