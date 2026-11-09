@@ -16,11 +16,11 @@
     tutorial:{stage:number;status:string}
   };
   type PaperKey='notices'|'sealed'|'route';
-  type Phase='issued'|'checked'|'road_chosen'|'spoiled_mark'|'book_checked'|
+  type Phase='issued'|'checked'|'road_chosen'|'receiving_arrival'|'spoiled_mark'|'book_checked'|
     'receiver_reply'|'receiver_result'|'round_report'|'final_notice'|'final_notice_taken';
   type WorkAction='check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
-    'deliver_notices'|'ask_fresh_mark'|'check_receiving_book'|'confirm_book'|
-    'note_spoiled_mark'|'continue_receiver_dialogue'|'continue_to_report'|
+    'deliver_notices'|'continue_to_receiver'|'ask_fresh_mark'|'check_receiving_book'|'confirm_book'|
+    'note_spoiled_mark'|'continue_receiver_dialogue'|'continue_to_final_notice'|'continue_to_report'|
     'finish_round'|'take_final_notice';
   type WorkState={phase:Phase;route:'direct'|'quieter'|null;
     noticesOrdered:boolean;receipt:'clear'|'book_confirmed'|'noted_unclear'|null};
@@ -193,11 +193,16 @@
               <button type="button" disabled={busy}
                 onclick={()=>{void perform('deliver_notices');}}>Continue to the delivery</button>
             </div>
-          {:else if phase==='spoiled_mark'}
+          {:else if phase==='receiving_arrival'}
             <h1>A spoiled mark</h1>
             {#each BELLRUNNER_RECEIVING_ARRIVAL as paragraph,i (i)}
               <p class="story">{paragraph}</p>
             {/each}
+            <div class="actions">
+              <button type="button" disabled={busy}
+                onclick={()=>{void perform('continue_to_receiver');}}>Continue</button>
+            </div>
+          {:else if phase==='spoiled_mark'}
             <p class="speaker">RECEIVER</p>
             {#each BELLRUNNER_RECEIVER_OPENING as line,i (i)}
               <p class="spoken">“{line}”</p>
@@ -241,20 +246,16 @@
             {/if}
             <div class="actions">
               <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('continue_to_report');}}>Continue to the round report</button>
+                onclick={()=>{void perform('continue_to_final_notice');}}>Continue to the final notice</button>
             </div>
           {:else if phase==='round_report'}
-            <h1>The round report</h1>
-            <p class="story">The routine stops are attended. The route sheet
-              records how you got there and what happened at the receiving desk.</p>
-            <dl class="round-summary">
-              <div><dt>Road</dt><dd>{routeCopy}</dd></div>
-              <div><dt>Receiving mark</dt><dd>{receiptCopy}</dd></div>
-              <div><dt>Payment</dt><dd>{round.payment}</dd></div>
-            </dl>
+            <!-- A saved legacy report does not require the old extra screen. -->
+            <h1>The final notice</h1>
+            <p class="story">The ordinary deliveries are finished.
+              One sealed council order still needs to reach the address on your route sheet.</p>
             <div class="actions">
               <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('finish_round');}}>Finish the ordinary circuit</button>
+                onclick={()=>{void perform('finish_round');}}>Continue to the final notice</button>
             </div>
           {:else if phase==='final_notice'}
             <h1>The final notice</h1>
@@ -267,8 +268,8 @@
             </div>
           {:else}
             <h1>Final notice in hand</h1>
-            <p class="story">The route sheet and ordinary receiving marks are recorded.
-              The sealed council order awaits its final destination.</p>
+            <p class="story">The usual deliveries are done, and the receiving marks are recorded.
+              One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.</p>
             <p class="payment">Payment: {round.payment}.</p>
             <p class="small">The next scene begins at the order's marked address.</p>
           {/if}
