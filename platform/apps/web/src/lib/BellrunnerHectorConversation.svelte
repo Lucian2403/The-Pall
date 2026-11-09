@@ -1,5 +1,6 @@
 <script lang="ts">
   import {APPROVED_HECTOR_TOPICS,type HectorTopicId} from '$lib/approved-bellrunner-hector';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
 
   // Local conversation state only. No character writes or stage transitions.
   let {characterName,returnToRound}:{
@@ -30,8 +31,12 @@
       {#if lineIndex<currentTopic.lines.length-1}
         <button type="button" class="primary-choice" onclick={()=>{lineIndex+=1;}}>Continue</button>
       {:else}
-        <button type="button" onclick={askSomethingElse}>Ask something else</button>
-        <button type="button" onclick={returnToRound}>Return to the round</button>
+        <button type="button" class="secondary-choice" onclick={askSomethingElse}>
+          <BellrunnerChoiceIcon kind="chat"/>Ask something else
+        </button>
+        <button type="button" class="secondary-choice" onclick={returnToRound}>
+          <BellrunnerChoiceIcon kind="back"/>Return to the round
+        </button>
       {/if}
     </div>
   {:else}
@@ -39,9 +44,14 @@
     <h2>Ask Hector something</h2>
     <div class="responses" aria-label="Optional Hector conversation topics">
       {#each APPROVED_HECTOR_TOPICS as option (option.id)}
-        <button type="button" onclick={()=>beginTopic(option.id)}>{option.label}</button>
+        <button type="button" class="secondary-choice" onclick={()=>beginTopic(option.id)}>
+          <BellrunnerChoiceIcon kind={option.id==='routes'?'route':option.id==='marks'?'mark':'chat'}/>
+          {option.label}
+        </button>
       {/each}
-      <button type="button" onclick={returnToRound}>Return to the round</button>
+      <button type="button" class="secondary-choice" onclick={returnToRound}>
+          <BellrunnerChoiceIcon kind="back"/>Return to the round
+        </button>
     </div>
   {/if}
 </section>
