@@ -101,10 +101,12 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
  const openingRoute=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
  assert.ok(shell.includes('compactBanner = false'));
  assert.ok(shell.includes('{#if !compactBanner}'));
- assert.ok(openingRoute.includes("compactBanner={character.origin==='Bellrunner'}"),
-  'Only Bellrunner Stage 1 hides the redundant city panorama');
- assert.ok(second.includes('compactBanner>'),
-  'Bellrunner Stage 2 keeps the NPC and documents above the fold');
+ assert.ok(!openingRoute.includes("compactBanner={character.origin==='Bellrunner'}"),
+  'Bellrunner Stage 1 must show the shared Grand Cylinder City header');
+ assert.ok(!second.includes('compactBanner>'),
+  'Bellrunner Stage 2 must preserve the city header on streets and receiving scenes');
+ assert.ok(shell.includes('<div class="city-banner" aria-label="Grand Cylinder City">'),
+  'Use the existing shared city vista rather than inventing a separate banner');
 
  assert.ok(!shared.includes('grid-template-columns:minmax(0,60%)'));
  assert.ok(!shared.includes('flex-direction:column;\n  flex:0 0 auto;\n  width:100%'),
@@ -114,6 +116,34 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
  assert.ok(tray.includes('Round Documents'));
  assert.ok(tray.includes('document-grid'));
  assert.ok(tray.includes('class="document-card"'));
+});
+
+test('Bellrunner secondary parchment buttons follow the reference with icon and accessible text',()=>{
+ const css=source('apps/web/src/lib/pall-story-landscape.css');
+ const icon=source('apps/web/src/lib/BellrunnerChoiceIcon.svelte');
+ const opening=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+ const hector=source('apps/web/src/lib/BellrunnerHectorConversation.svelte');
+ const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(css.includes('button.secondary-choice'));
+ assert.ok(css.includes('background:linear-gradient(180deg,#fff1d6'));
+ assert.ok(css.includes('border-color:#684323'));
+ assert.ok(css.includes('button.primary-choice'));
+ assert.ok(css.includes('background:linear-gradient(180deg,#654427'));
+ assert.ok(css.includes('outline:3px solid #f1c27b'));
+ assert.ok(css.includes('@media(prefers-reduced-motion:reduce)'));
+ for(const scene of [opening,stage2,hector]){
+  assert.ok(scene.includes('BellrunnerChoiceIcon'));
+  assert.ok(scene.includes('class="secondary-choice"'));
+  assert.ok(scene.includes('class="primary-choice"'));
+ }
+ assert.ok(opening.includes('<BellrunnerChoiceIcon kind="chat"/>Ask Hector something'));
+ assert.ok(hector.includes("option.id==='routes'?'route'"));
+ assert.ok(stage2.includes('<BellrunnerChoiceIcon kind="route"/>Take the Short Route'));
+ assert.ok(stage2.includes('<BellrunnerChoiceIcon kind="route"/>Take the Long Route'));
+ assert.ok(stage2.includes('<BellrunnerChoiceIcon kind="book"/>Check their receiving book'));
+ assert.ok(icon.includes('aria-hidden="true"')&&icon.includes('focusable="false"'));
+ assert.ok(!css.includes('pointer-events:none;\n  background:#fff1d6'),
+  'Button surface must remain a real interactive element');
 });
 
 test('Three owner document assets are complete native click targets, not decorative overlays',()=>{
