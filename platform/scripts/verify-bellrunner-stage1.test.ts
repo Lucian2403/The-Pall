@@ -38,6 +38,61 @@ test('Original owner artwork and duty-bell binary remain unchanged',()=>{
   '542de89f165f46417023664b91d17a5eb2e535aaf48941b582d4e0984cd355e6');
 });
 
+test('Owner-provided multi-purpose Hauling scenes keep their source art and use one reusable book hotspot',()=>{
+ const scenes=[
+  ['apps/web/static/locations/hauling/grand-cylinder-main-street.webp',191450,
+   '1a873065050d48188cdac727ce8eb6f0f415ebd22b49ef12215cd261eb6d037d'],
+  ['apps/web/static/locations/hauling/freight-yard-backstreet.webp',215132,
+   '873aa02b31dc70b3330cae3c81e327e1b11e2ce5e3bd6728cc30581de33ff7a3'],
+  ['apps/web/static/locations/hauling/municipal-receiving-desk.webp',184528,
+   '0aff66e035e13f39a3787c97ae7739cdc6b3f9267d7d816fd6a07c50cad4ca5d']
+ ] as const;
+ for(const [path,size,hash] of scenes){
+  const bytes=readFileSync(resolve(root,path));
+  assert.equal(bytes.length,size,path);
+  assert.equal(bytes.toString('ascii',0,4),'RIFF',path);
+  assert.equal(bytes.toString('ascii',8,12),'WEBP',path);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),hash,path);
+ }
+ const mapping=source('apps/web/src/lib/hauling-scenes.ts');
+ for(const id of ['depot','short_route','long_route','receiving_desk'])
+  assert.ok(mapping.includes('  '+id+':{'),id);
+ assert.ok(mapping.includes('municipal-receiving-desk.webp'));
+ assert.ok(mapping.includes('RECEIVING_BOOK_HOTSPOT'));
+ const book=source('apps/web/src/lib/HaulingReceivingBookHotspot.svelte');
+ assert.ok(book.includes('RECEIVING_BOOK_HOTSPOT'));
+ assert.ok(book.includes('data-workshop-object'));
+ assert.ok(book.includes('workshop-object-label'));
+ assert.ok(book.includes('onInspect'));
+ assert.ok(!book.includes('fetch('),'Book is an interaction prop, not a job-specific API');
+ assert.ok(!book.includes('<img'),'The receiving book is already painted into the office');
+});
+
+test('Hauling stages use the correct background, contextual paper props and audio lifetime',()=>{
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(ui.includes("?'depot'".replace('?','?'))||
+  ui.includes("? 'depot'")||ui.includes("?'depot'"));
+ assert.ok(ui.includes("'short_route'")&&ui.includes("'long_route'"));
+ assert.ok(ui.includes(":'receiving_desk'"));
+ assert.ok(ui.includes('src={HAULING_SCENES[sceneKey].src}'));
+ assert.ok(ui.includes("depotBackdrop={sceneKey==='depot'}"),
+  'Depot ambience must end when traveling into the streets');
+ assert.ok(ui.includes("sceneLocation={HAULING_SCENES[sceneKey].label}"));
+ assert.ok(ui.includes("{#if sceneKey==='depot'}"));
+ assert.ok(ui.includes("{#if sceneKey==='receiving_desk'}"));
+ assert.ok(ui.includes('<HaulingReceivingBookHotspot disabled={busy}'));
+ assert.ok(ui.includes("perform(phase==='book_checked'?'confirm_book':'check_receiving_book')"));
+ assert.ok(ui.includes("phase==='receiving_arrival'"));
+ assert.ok(ui.includes("perform('continue_to_receiver')"));
+ assert.ok(ui.includes('Hand over council notice'));
+ assert.ok(ui.includes("perform('take_final_notice')"));
+ assert.ok(ui.includes('.art-scaled{position:absolute;left:50%;top:50%'));
+ assert.ok(ui.includes('width:max(100cqw,177.7cqh)'));
+ assert.ok(ui.includes('aspect-ratio:1672/941'));
+ assert.ok(ui.includes('.scene.receiving .work-card{grid-column:1'));
+ assert.ok(!ui.includes('src="/characters/receiver'));
+});
+
 test('The exact owner-replaced opening is sequential and canon-matched',()=>{
  const scene=APPROVED_STAGE_ONE.Bellrunner;
  const doc=source('../docs/05-gameplay/onboarding/bellrunner/opening-dialogue.md');
