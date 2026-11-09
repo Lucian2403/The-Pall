@@ -10,8 +10,9 @@ idempotent work records and sealed-notice handoff.
 
 The ordinary Dispatch House courier assignment is the first example
 of the future repeatable **Industry / Hauling** job family. Stage 1
-Hector conversation ends with **Take the round**. That acceptance
-commits Stage 2 exactly once and immediately offers a road choice.
+Hector's conversation ends at **Take the Route Sheet**. Clicking the
+Route Sheet object on the Depot counter, rather than another dialogue
+button, commits Stage 2 exactly once and immediately offers a road choice.
 No redundant second "check the round" or sorting button appears.
 
 Quantified travel time, reputation currency, total wages and the
@@ -46,25 +47,20 @@ display URLs:
   text dialogue; no character portrait or Receiver NPC sprite is
   required or generated.
 
-**Receiving Book:** The source Receiving Desk painting already
-contains a dark bound ledger on the near counter. The reusable
-`HaulingReceivingBookHotspot.svelte` attaches an accessible clickable
-object label to that book, aligned through a common cover-scaled art
-coordinate space, and delegates its action to the current job.
-In this tutorial, clicking it during the spoiled-mark choice checks
-the office's receiving entry, saving `book_confirmed`. In later
-dynamic Hauling or other document-handling jobs, that same book could
-verify disputed signatures, cross-check handover records or support
-audit tasks. **It is a stationary office record, not another
-carryable inventory item.** Do not generate a duplicate book illustration.
+**Receiving Desk is dialogue-only.** This tutorial does not overlay
+any floating paper cutouts, framed object labels or clickable hotspots
+on the destination painting. The receiver remains an off-screen speaker;
+all actions, including **Check their receiving book** and taking the
+final sealed order, are offered in the parchment dialogue. The ledger
+painted into the background is scenery, not an extra click target.
 
-The council notices remain clickable to hand them over at the arrival;
-the route sheet provides inspectable proof during the receiving phase;
-the final sealed council order becomes a clickable prop only when the
-ordinary round is complete. The task papers are never transferred into
-personal pack or chest. No additional scenic sound has been fabricated
-for streets or reception: the Depot ambience stops on departure and
-the player's audio controls continue to apply.
+The existing `HaulingReceivingBookHotspot.svelte` and painting-coordinate
+metadata remain as unused reusable library resources for possible future
+dynamic Hauling or record-verification jobs. They are **not mounted in
+this tutorial's Receiving Desk**. The painting and its bottom counter
+remain fully visible on wide monitors. The player's starting Route
+Sheet object in Stage 1 is the deliberate interactive prop that accepts
+the round, unlike the static destination setting.
 
 All supplied images have been converted into lightweight WebP derivatives
 without altering the originals. The painted scene is never stretched
@@ -77,8 +73,8 @@ Centering a 16:9 painting inside a much wider and shorter scene had
 cropped the desk and pushed the floating documents and labels below
 the visible stage. The receiving scene now uses a **bottom-aligned,
 aspect-preserving cover**; street scenes retain their existing centered
-framing. The Council notice, Route sheet and Sealed council order
-appear safely above the counter edge, clear of the ledger hotspot.
+framing. No separate task paper cutouts or hotspots appear here; all interactions
+are accessible in the dialogue panel.
 At mobile widths the full source painting is shown without a forced
 cover crop. All changes are CSS only; existing saved routes, receipt
 states and ledger actions are unaffected.
