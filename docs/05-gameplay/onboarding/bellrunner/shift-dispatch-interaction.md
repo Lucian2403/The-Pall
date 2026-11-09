@@ -79,6 +79,23 @@ At mobile widths the full source painting is shown without a forced
 cover crop. All changes are CSS only; existing saved routes, receipt
 states and ledger actions are unaffected.
 
+**Full-viewport landscape scene scaling (November 9):** Stage 2 formerly
+used `height:clamp(535px,62vh,640px)` as a fixed scene height. The main
+game shell itself fills the browser height; on larger displays that left
+a distracting strip of empty background underneath both street routes
+and the reception. The Stage 2 scene now uses a flexible height with
+that same clamp as its **minimum**, occupying the remaining height of
+the HUD rather than ending at 640px. The existing 1672:941 source-art
+cover scaling expands with the scene and **never distorts the image**:
+Short and Long Route remain centered; the Receiving Desk continues to
+anchor its counter to the lower edge. On unusually wide displays some
+edge cropping is unavoidable without adding letterboxes or stretching
+the paintings. The original WebP assets are reused unchanged.
+
+The fix is shared across **both routes, the Receiving Desk and the
+stage's Depot view**. It does not modify dialogue, object interactions,
+the scene audio lifecycle, saved progress or database migrations.
+
 ## Choose the road
 
 The route sheet offers two paths that reach the same routine
