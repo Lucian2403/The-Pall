@@ -2,7 +2,6 @@
   import {onDestroy} from 'svelte';
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
-  import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import '$lib/workshop-object-labels.css';
   import '$lib/pall-story-landscape.css';
 
@@ -46,6 +45,7 @@
   });
   function inspect(item:PropKey){
     selected=selected===item?null:item;
+    if(selected)dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
   }
   // The Route Sheet is the Stage 1 handoff object, not another
   // decorative inspection. The existing owner-checked take_round API
@@ -106,16 +106,19 @@
       onclick={askHector}>
       <span class="workshop-npc-label">Hector D. Smoke</span>
     </button>
-    {#if selected}
-      <WorkshopItemPopover itemKey={selected} title={papers[selected].label}
-        description={papers[selected].observation} onClose={()=>{selected=null;}} />
-    {/if}
     </section>
 
     <section class="dialogue-section pall-story-dialogue-section" bind:this={dialogueSection}
       aria-label="Dispatch House dialogue">
-    <aside class="work-card dispatch-dialogue" aria-label="Hector D. Smoke conversation">
-      {#if talking}
+    <aside class="work-card dispatch-dialogue" aria-label="Dispatch House conversation and paper inspection">
+      {#if selected}
+        <p class="eyebrow">DISPATCH HOUSE · PAPER INSPECTION</p>
+        <h2>{papers[selected].label}</h2>
+        <p class="work-description">{papers[selected].observation}</p>
+        <div class="responses">
+          <button type="button" onclick={()=>{selected=null;}}>Return to the dialogue</button>
+        </div>
+      {:else if talking}
         <BellrunnerHectorConversation {characterName} {returnToRound}/>
       {:else if !entered}
         <p class="eyebrow">DISPATCH HOUSE · STAGE I</p>
@@ -159,8 +162,8 @@
 </section>
 
 <style>
-  /* The Bellrunner stage reuses Millhand's exact nine-slice frame, choice buttons,
-     inspect popover and object labels from pall-owner-ui.css and workshop-object-labels.css. */
+  /* All text, including paper inspections, uses the approved nine-slice
+     parchment in the separate second section; the first shows art only. */
   .bellrunner{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
   /* Shared .pall-story-sections now stacks the illustration and dialogue.
