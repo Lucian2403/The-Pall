@@ -50,6 +50,7 @@
   let status=$state<'loading'|'ready'|'login'|'missing'|'schema'|'unavailable'>('loading');
   let selected=$state<PaperKey|null>(null);
   let talkingToHector=$state(false);
+  let dialogueSection:HTMLElement|undefined;
   let busy=$state(false);
   let workError=$state('');
   let pendingId:string|null=null;
@@ -141,8 +142,9 @@
   <TutorialShell {character} sceneLocation={HAULING_SCENES[sceneKey].label}
     depotBackdrop={sceneKey==='depot'}>
     <section class="workshop dispatch" aria-label="Bellrunner Stage 2 Shift Dispatch">
-      <div class="scene pall-story-landscape" class:receiving={sceneKey==='receiving_desk'}>
-        <div class="illustration">
+      <div class="scene pall-story-sections" class:receiving={sceneKey==='receiving_desk'}>
+        <section class="illustration pall-story-landscape"
+          aria-label={HAULING_SCENES[sceneKey].label+' illustrated location'}>
           {#if sceneKey==='depot'}
             <!-- The original working Depot and its foreground stay together. -->
             <img class="environment" src={HAULING_SCENES.depot.src}
@@ -153,7 +155,10 @@
               alt="" aria-hidden="true" draggable="false"/>
             <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
               aria-label="Talk to Hector D. Smoke"
-              onclick={()=>{selected=null;talkingToHector=true;}}>
+              onclick={()=>{
+                selected=null;talkingToHector=true;
+                dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
+              }}>
               <span class="workshop-npc-label">Hector D. Smoke</span>
             </button>
             {#each paperKeys as key}
@@ -180,8 +185,10 @@
                    Every delivery and receiving-book choice stays in dialogue. -->
             </div>
           {/if}
-        </div>
+        </section>
 
+        <section class="dialogue-section pall-story-dialogue-section" bind:this={dialogueSection}
+          aria-label="Shift Dispatch dialogue and choices">
         <aside class="work-card" aria-label={talkingToHector?'Hector D. Smoke conversation':'Shift Dispatch work'}>
           {#if talkingToHector&&sceneKey==='depot'}
             <BellrunnerHectorConversation characterName={character.name}
@@ -297,6 +304,7 @@
           {#if workError}<p class="error" role="alert">{workError}</p>{/if}
           {#if busy}<p class="small" role="status">Recording…</p>{/if}
         </aside>
+        </section>
       </div>
     </section>
   </TutorialShell>
@@ -314,25 +322,17 @@
 <style>
   .dispatch{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  .scene{position:relative;display:grid;
-    grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);
-    grid-template-rows:minmax(0,1fr);align-content:start;box-sizing:border-box;
-    /* Shared intrinsic image ratio controls height; the page scrolls on
-       short viewports instead of trimming away the street or the desk. */
-    width:100%;background:#291d15}
-  .illustration{position:absolute;inset:0;overflow:hidden;container-type:size}
-  /* One native-ratio art surface across both routes and reception.
-     There are no scene objects to justify a larger, cover-cropped layer. */
+  /* The artwork and text are siblings, never a grid overlay.
+     The native image ratio applies to .illustration alone. */
+  .scene{width:100%;min-width:0}
+  .illustration{position:relative;width:100%;aspect-ratio:1672/941;
+    overflow:hidden;container-type:size}
   .art-scaled{position:absolute;inset:0;width:100%;height:100%}
   .environment{position:absolute;inset:0;width:100%;height:100%;
     object-fit:contain;pointer-events:none}
   /* Source paintings vary by two pixels in size. Contain shows every
      street/counter edge; the remaining subpixel margin is negligible. */
   .art-scaled>.environment{object-fit:contain}
-  /* Place dialogue on the left of the static receiving-office scene.
-     No counter props, hotspots, or receiver portrait are overlaid. */
-  .scene.receiving .work-card{grid-column:1;
-    margin-left:clamp(12px,2vw,35px);margin-right:0}
   .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
     width:auto;object-fit:contain;object-position:bottom center;
     z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
@@ -349,9 +349,9 @@
     background:transparent;border:0;color:#f3e6d1;cursor:pointer}
   .paper-target.notices{left:43%}.paper-target.sealed{left:62%}.paper-target.route{left:81%}
   .paper-target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
-  .work-card{position:relative;grid-column:2;z-index:6;align-self:start;
-    box-sizing:border-box;width:100%;min-width:0;margin:clamp(24px,3vw,50px) 0 24px;
-    max-height:calc(100% - 48px);overflow-y:auto;overscroll-behavior:contain;
+  .work-card{position:relative;z-index:1;align-self:stretch;
+    box-sizing:border-box;width:min(100%,980px);min-width:0;margin:0;
+    max-height:none;overflow:visible;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;padding:15px 18px;box-shadow:0 7px 15px #0008}
   .eyebrow{font:700 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
@@ -384,8 +384,8 @@
   .error{font:13px/1.45 sans-serif;color:#873523}
   .fallback{padding:40px;color:#e3d0af;background:#25211e}
   @media(max-width:700px){
-    .scene{display:flex;flex-direction:column;height:auto;min-height:0;flex:none}
-    .illustration{position:relative;width:100%;aspect-ratio:1672/941;container-type:normal}
+    .scene{height:auto;min-height:0}
+    .illustration{width:100%;aspect-ratio:1672/941;container-type:normal}
     .art-scaled{inset:0;width:100%;height:100%}
     .environment{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
@@ -396,8 +396,7 @@
     .paper-art.notices,.paper-target.notices{left:39%}
     .paper-art.sealed,.paper-target.sealed{left:59%}
     .paper-art.route,.paper-target.route{left:79%}
-    .work-card,.scene.receiving .work-card{width:100%;margin:0;padding:14px;
-      border-radius:0;max-height:none;overflow:visible}
+    .work-card{width:100%;margin:0;padding:14px;max-height:none;overflow:visible}
     .story,.instruction{font-size:16px}
   }
 </style>
