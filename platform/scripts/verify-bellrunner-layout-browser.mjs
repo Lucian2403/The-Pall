@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {spawn,spawnSync} from 'node:child_process';
 import {setTimeout as delay} from 'node:timers/promises';
 import {resolve,join} from 'node:path';
-import {mkdtempSync,rmSync} from 'node:fs';
+import {mkdtempSync,rmSync,mkdirSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 
 /* REAL Svelte pages, not duplicated mock UI. Stub only the API response so
@@ -241,6 +241,23 @@ try{
         await evalJS("document.querySelector('.pall-story-dialogue-section')?.scrollIntoView({block:'start',behavior:'instant'});true");
         const scrolled=await sceneMetrics();
         assert.ok(scrolled.frame.w>100,'Stacked dialogue must be reachable: '+suffix);
+      }
+      // Preserve screenshots of actual rendered Svelte pages for human
+      // visual review. The API mock uses only a synthetic QA character.
+      // Layout geometry assertions alone cannot prove the composition
+      // matches the owner's desired NPC/document/text hierarchy.
+      if((width===1272||width===1920)&&
+        ['stage1','stage2-depot','receiving-desk'].includes(scene)){
+        const folder=resolve(root,'test-artifacts','bellrunner-visuals');
+        mkdirSync(folder,{recursive:true});
+        await delay(120);
+        const shot=await cmd('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        });
+        assert.ok(typeof shot.data==='string'&&shot.data.length>1000,
+          'Chromium visual QA screenshot missing for '+scene);
+        writeFileSync(join(folder,scene+'-'+width+'.png'),
+          Buffer.from(shot.data,'base64'));
       }
       console.log('PASS: '+scene+' '+width+'×'+height+
         ' artwork '+Math.round(m.art.w)+'×'+Math.round(m.art.h)+
