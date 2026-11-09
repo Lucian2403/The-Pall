@@ -63,25 +63,40 @@ Major Skill levels are awarded.
 Source: `shift-dispatch-interaction.md` (approved) and the pure
 transition module `bellrunner-dispatch-work.ts`.
 
-The Stage 2 page is now ordinary interactive work, not a placeholder
-gallery. Its sequence is:
+The Stage 2 page follows the revised owner-approved **roleplay**
+sequence, with no repeated "check the bundle", sorting or "make the
+deliveries" confirmation panels:
 
-1. **Inspect route and notices**: verify the notice bundle against the
-   sheet. Optionally put notices in destination order.
-2. **Take the direct road / Take the quieter road**: one saved choice;
-   shorter/crowded versus longer/less crowded. Durations, street names,
-   weights, probabilities and skill thresholds remain unspecified,
-   rather than being fabricated to fill UI fields.
-3. **Make deliveries and record marks**: the tutorial's representative
-   mundane smudged-mark event.
-4. **Ask for a fresh mark / Check their receiving book / Note the
-   spoiled mark and go on**: all three truthful routes save distinct
-   receipt outcomes. Checking the book exposes an additional
-   confirm-or-correct action; no forged mark or unapproved punishment.
-5. **Round report / Finish the ordinary circuit / Take the final
-   notice**: show chosen road, sorting and receipt state. The final
-   sealed council order remains unread; Stage 3's closed worksite
-   cannot be revealed ahead of the playable next scene.
+1. **Choose the road immediately** after accepting Hector's round.
+   The Short Route (internal `direct`) passes through the tight
+   freight-yard backstreets and suggests possible thieves; the Long
+   Route (internal `quieter`) takes the busy but more visible main
+   roads. Neither currently rolls for threats, charges time, changes
+   reputation or calculates travel rewards.
+2. **One authored first-person journey scene** follows selection,
+   preserving the owner's six route paragraphs *verbatim* in
+   `bellrunner-stage2-narrative.ts`. **Continue to the delivery**
+   moves directly to the scripted ordinary receiving incident.
+3. **At the receiving desk**, narration establishes that the clerk
+   accepted a council notice and smeared its mark across two address
+   lines. The receiver acknowledges the bad ink *before* any choice.
+   Select a fresh mark, cross-check the office book or record the
+   unclear mark honestly; all three are legitimate.
+4. **Two saved dialogue beats** follow the receipt choice: the
+   player's spoken request, then the receiver's reply and the
+   consequence. The book-check path includes the player's final
+   ledger notation. Only after both steps can the round report open.
+5. **Round report and final sealed order** retain the saved route
+   and proof condition (`clear`, `book_confirmed` or
+   `noted_unclear`). The sealed order remains unread, and Stage 3
+   cannot start before its own implementation.
+
+Historical `checked` and `book_checked` saves are still handled;
+older API commands `check_round` and `sort_notices` remain
+compatible but are not exposed to new players. New receipt-dialogue
+phases are `receiver_reply` and `receiver_result`. These are
+written to the existing `0015` JSONB work state, so this revision
+needs no new schema migration.
 
 Each command is `POST /api/characters/:id/bellrunner/dispatch/work`
 with action, UUID request ID and expected current revision.
