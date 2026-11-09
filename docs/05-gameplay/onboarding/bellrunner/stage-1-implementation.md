@@ -30,23 +30,21 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   original style rather than generating extra scenic overlays. Hector's original artwork is not cut across the
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
-- **Artwork/dialogue separation shared by Stages 1–2:** the
-  Dispatch House, both routes and the Receiving Desk use the exact
-  same stacked two-section layout. The first section contains the
-  full, uncropped, aspect-preserved artwork and only its relevant
-  NPC and interactive objects; the second is a separate parchment
-  dialogue section beneath the image, constrained to a readable
-  980px maximum width. No dialogue obscures the painted Depot,
-  street or counter, and no internal dialogue scrollbar is forced.
-  Clicking Hector in the first section reveals his conversation
-  in the second via normal page scroll. The Stage 1 Route Sheet
-  hitbox remains registered to the unchanged Depot painting.
-  The shared geometry lives in `pall-story-landscape.css`, while
-  the approved decorative borders and buttons stay in
-  `pall-owner-ui.css`. On tall or wide displays the page can scroll
-  vertically; phones retain the same artwork-then-dialogue order.
-  Automated headless Chromium checks cover Stage 1, Stage 2 Depot,
-  both streets and the Receiving Desk on desktop and mobile.
+- **Side-by-side artwork/dialogue layout shared by Stages 1–2:**
+  at desktop widths, Section 1 is the **left 60%**: complete,
+  aspect-preserved Depot, street or Receiving Desk artwork and
+  only the relevant NPC/item click targets; Section 2 is the
+  **right 40%**: the approved nine-slice parchment containing
+  all dialogue, choices and paper inspection text.
+  Neither section overlays the other. Hector and props retain
+  their coordinates relative to the left illustration; clicking
+  them updates text on the right without a page-scroll jump.
+  On narrow displays (1080px or below) the two sections stack
+  with the image first. `pall-story-landscape.css` owns this
+  reusable column layout. The old full-width image plus
+  **dialogue below** implementation was rejected and superseded.
+  Chromium CI checks this arrangement at 1272px, 1920px,
+  2048px, 3440px and mobile screen widths.
 
 ## Stage 1 dialogue
 
