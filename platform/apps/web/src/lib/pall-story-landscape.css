@@ -1,0 +1,53 @@
+/* Bellrunner scene template: the location and the framed dialogue are
+   independent columns on desktop. Only the location column contains the
+   painting, NPC silhouettes, object props and their click regions.
+   The dialogue column contains all writing and choices. Neither overlaps.
+   On narrow screens they stack, image first and dialogue second. */
+.pall-story-sections{
+  display:grid;
+  grid-template-columns:minmax(0,60%) minmax(0,40%);
+  align-items:start;
+  width:100%;
+  min-width:0;
+  height:auto;
+  min-height:0;
+  overflow:visible;
+  background:#201a15;
+}
+.pall-story-landscape{
+  position:relative;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  aspect-ratio:1672 / 941;
+  align-self:start;
+  overflow:hidden;
+  isolation:isolate;
+}
+.pall-story-dialogue-section{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  align-self:stretch;
+  padding:clamp(12px,1.7vw,28px) clamp(9px,1.7vw,27px);
+  border-left:2px solid #765537;
+  background:linear-gradient(180deg,#2a211a,#1b1815 85%);
+}
+/* A narrow play area (including its left navigation rail) requires
+   vertical stacking; a desktop monitor always uses the right column. */
+@media(max-width:1080px){
+  .pall-story-sections{grid-template-columns:minmax(0,1fr)}
+  .pall-story-dialogue-section{
+    min-height:0;
+    border-left:0;
+    border-top:2px solid #765537;
+    padding:14px 12px 24px;
+  }
+}
+@media(max-width:700px){
+  .pall-story-dialogue-section{padding:12px 8px 20px}
+}

@@ -1,0 +1,20 @@
+// Additive Bellrunner Stage 1 acceptance migration; never resets characters.
+import pg from 'pg';
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+
+if(!process.env.DATABASE_URL)throw new Error('DATABASE_URL required. Run npm run bellrunner:migrate from platform.');
+const migrations=['0014_bellrunner_stage1.sql','0015_bellrunner_dispatch_work.sql'];
+const client=new pg.Client({connectionString:process.env.DATABASE_URL});
+await client.connect();
+try{
+  await client.query('BEGIN');
+  for(const name of migrations){
+    await client.query(readFileSync(resolve(import.meta.dirname,'../db/migrations',name),'utf8'));
+  }
+  await client.query('COMMIT');
+  console.log('PASS: Bellrunner Stage 1 acceptance and Stage 2 courier work initialized; existing character progress is unchanged.');
+}catch(e){
+  await client.query('ROLLBACK');
+  throw e;
+}finally{await client.end();}

@@ -1,98 +1,255 @@
-# Bellrunner — Shift Dispatch Courier Work (Stage 2 — APPROVED)
+# Bellrunner — Shift Dispatch courier work (Stage 2)
 
-**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the Stage 2 ordinary Industry / Hauling work between the [approved Hector opening](opening-dialogue.md) and the future *Wrong Bell* discovery: bundle check, two route choices, spoiled receiving mark and three responses, routine round closure and the final sealed-notice handoff. Exact quantitative values, technical IDs, probabilities and balance remain TBD. The Dispatch House, Hector D. Smoke, the council-notice round, the later sealed unsafe-site order, the three second-skill branches and Dogman were already locked in the [Bellrunner master](README.md).
+**Owner-approved Stage 2 narrative revision: 2026-11-09.** This
+supersedes the redundant bundle-check, sorting and separate "Make
+deliveries" panels of the initial implementation. It keeps the
+established Bellrunner quest, honest receiving-mark incident,
+idempotent work records and sealed-notice handoff.
 
-## Design boundary
+## Work and boundaries
 
-- A Bellrunner is an experienced city courier. The screen offers actual work choices, not a tutorial speech explaining the job to their own character.
-- The work is **ordinary Shift Dispatch**, a reusable courier/Hauling job family available through the persistent Dispatch House. Do not build a one-off Bellrunner-only delivery minigame.
-- The sealed order is simply one of the round's ordinary-looking pieces of council paper at this stage. **Do not disclose the condemned block, harmful fumes, anomalous bell or official closure until Stage 3**, after ordinary route work.
-- Council notice bundle, route sheet and receipt marks are **job/quest props**, not tradeable inventory or permanent starter tools. Basic Clothes, one Crude Small Bag and 20 coins remain the only universal starting inventory.
-- The scripted task is ultimately worth **0 coins, 0 ordinary XP and no loot**; Industry +3 was granted at creation. Its **credible cause of nonpayment belongs to Stage 3**. Do not announce a false guaranteed wage in Stage 2. The eventual different-Major-Skill +1 grant belongs only to branch commitment later.
+The ordinary Dispatch House courier assignment is the first example
+of the future repeatable **Industry / Hauling** job family. Stage 1
+Hector's conversation ends at **Take the Route Sheet**. Clicking the
+Route Sheet object on the Depot counter, rather than another dialogue
+button, commits Stage 2 exactly once and immediately offers a road choice.
+No redundant second "check the round" or sorting button appears.
 
-## S02-A — Check the round (ordinary preparation)
+Quantified travel time, reputation currency, total wages and the
+possibility of theft/bandit encounters on a shorter route are planned
+for ordinary Hauling jobs **after the tutorials**. Here both roads
+have only scripted RP and a saved route choice. Do not simulate or
+invent numerical costs, combat, hidden reputation or wages. The
+tutorial round gives zero coins, ordinary XP and loot; its disputed
+payment is explained only by Stage 3. The universal starter
+equipment, bag, coins, and Industry +3 remain unchanged.
 
-After Hector's approved **[Take the round]**, the normal **Shift Dispatch** work panel opens.
+## Painted locations and reusable Hauling props
 
-**Panel fields (numerical values TBD):**
+The courier now travels through **three different real scenes**, using
+the owner-supplied location backgrounds rather than remaining at Hector's
+counter throughout the delivery. Scenes are selected from shared
+`apps/web/src/lib/hauling-scenes.ts`, not hard-coded Bellrunner-only
+display URLs:
 
-| Field | Player sees |
-| --- | --- |
-| Work / source | Shift Dispatch / Dispatch House — Hector D. Smoke |
-| Skill family | Industry → Hauling |
-| Load | A bundle of council shift notices, with count, recorded destination order and carried weight displayed from the job data |
-| Documentation | Route sheet with addresses and spaces for receiving marks |
-| Travel | Route alternatives with estimated duration and handling conditions (exact values TBD) |
-| Wages | **Not yet cleared** — the already-approved Stage 1 payment-state wording; no numeric promise |
-| Required preparation | **[Check the round]** to compare the physical bundle against the addresses marked on the sheet |
+- **Dispatch House:** the existing depot artwork, Hector and all issued
+  papers. Here the player accepts the round and selects a road. Existing
+  Depot ambience is only active while this location is visible.
+- **Short Route:** `/locations/hauling/freight-yard-backstreet.webp`
+  illustrates the industrial backstreets during the owner's exact
+  first-person journey monologue.
+- **Long Route:** `/locations/hauling/grand-cylinder-main-street.webp`
+  illustrates carts and crowds along the main roads. Short and Long
+  remain aliases of saved `direct` and `quieter` work values.
+- **Receiving Desk:** `/locations/hauling/municipal-receiving-desk.webp`
+  is a **shared Hauling destination background**, including future
+  paid deliveries. The receiver speaks through the existing framed
+  text dialogue; no character portrait or Receiver NPC sprite is
+  required or generated.
 
-**Action: [Check the round].** The player is shown a straightforward comparison of notices and address lines. If work order is disturbed or a count needs correcting, the player can **[Put the notices in route order]** before leaving. This must be visible, recoverable bookkeeping, not a hidden-number puzzle. One representative preparation action covers the bundle rather than making the player click once per letter.
+**Receiving Desk is dialogue-only.** This tutorial does not overlay
+any floating paper cutouts, framed object labels or clickable hotspots
+on the destination painting. The receiver remains an off-screen speaker;
+all actions, including **Check their receiving book** and taking the
+final sealed order, are offered in the parchment dialogue. The ledger
+painted into the background is scenery, not an extra click target.
 
-**Outcome:** the parcel set is ready, no equipment is awarded, and the player proceeds to ordinary route selection. A clean count does not reveal what any sealed council order contains.
+The existing `HaulingReceivingBookHotspot.svelte` and painting-coordinate
+metadata remain as unused reusable library resources for possible future
+dynamic Hauling or record-verification jobs. They are **not mounted in
+this tutorial's Receiving Desk**. The painting and its bottom counter
+remain fully visible on wide monitors. The player's starting Route
+Sheet object in Stage 1 is the deliberate interactive prop that accepts
+the round, unlike the static destination setting.
 
-**Reusable module (working name):** courier_bundle_check — compare job cargo count/condition against a dispatch sheet; reorder/reconcile if required. ID and exact condition variants TBD.
+## Bellrunner scene layout — artwork left, dialogue right (owner revision)
 
-## S02-B — Choose the road (ordinary Hauling route choice)
+**Desktop screens have two side-by-side sections, not a vertical stack.**
+The prior implementation misunderstood the request and placed the
+dialogue below an enormous full-width painting. That layout is
+superseded by the current one shared across Stages 1 and 2:
 
-The route sheet offers two plausible ways to cover the same stops. Neither changes which sealed document will later produce the tutorial incident.
+- **Left — 60% illustrated scene.** A complete 1672:941 painting,
+  aspect-preserved and free of dialogue overlays. At the Depot this
+  also contains Hector's portrait and click area, the paper assets,
+  their nameplates, and the route-sheet assignment control.
+  The two street scenes and Municipal Receiving Desk contain
+  only their location painting. No receiver portrait or floating
+  documents are added at the Receiving Desk.
+- **Right — 40% framed dialogue.** The owner's original nine-slice
+  parchment is centered in a dark second column, with the complete
+  authored narrative, conversation, inspection descriptions and
+  choices. Its height grows naturally without a forced internal
+  scrollbar. All paper/NPC clicks update this adjacent panel rather
+  than scrolling the player below the image.
+- **At narrow widths (1080px viewport or less)** the two areas stack:
+  full image first, parchment below. There is no scene stretching
+  or image cropping. On desktop, the two columns stay side by side
+  even on large monitors.
 
-| Choice | Practical distinction | Possible work consequence |
-| --- | --- | --- |
-| **[Take the direct road]** | Shorter distance through busier streets, among carts and other couriers | Lower base travel time; higher likelihood of crowd delay or jostled papers; no forced injury or automatic lost notice |
-| **[Take the quieter road]** | Longer circuit with more room to carry the bundle undisturbed | Longer base time; fewer crowd-handling complications |
+The shared layout is `pall-story-landscape.css`; both stage
+components use it. The existing `pall-owner-ui.css` frame art
+and `workshop-object-labels.css` nameplates are unchanged.
+Scene props keep coordinates relative to the left painting,
+so the interaction hitboxes cannot drift independently.
 
-This is a real **time/handling trade-off**, not a moral choice or a hidden reward test. Show both estimates and their qualitative risks before selection. The two options should be viable with the universal starter kit. No cart, horse, weapon or paid upgrade is required.
+The real-Chromium CI test loads Stage 1 and all Stage 2
+backgrounds at 1272px, 1920px, 2048px, 3440px and mobile widths;
+it checks that the right frame never overlaps the scene and that
+clicking Hector/papers changes the dialogue panel on the right.
+Only presentation code changes; no gameplay, money, audio or
+saved-state adjustments accompany the layout correction.
 
-**Reusable module (working name):** hauling_route_choice — path duration against congestion, load-handling exposure and incident weighting. The numerical travel model, exact street geometry and probability weights remain TBD.
+## Choose the road
 
-World and travel timers follow [Jobs and Time](../../jobs/jobs-and-time.md). No late mandatory route prompt should appear near the end of a timer; ordinary required interactions are front-loaded.
+The route sheet offers two paths that reach the same routine
+receiving desk. Labels visible to the player are **Take the Short
+Route** and **Take the Long Route**. The stable saved internal keys
+remain `direct` and `quieter` to preserve existing character data.
 
-## S02-C — A receiving mark is spoiled (ordinary delivery discrepancy)
+### After selecting: Take the Short Route
 
-At a **routine** receiving point, after a notice has been handed over, the inked receiving mark drags into an adjacent line of the route sheet. The courier knows a hand took the paper, but the sheet no longer clearly proves **which stop** acknowledged it.
+I slip through the back streets behind the freight yards. Saves me a good bit of walking, though these alleys aren't exactly pleasant.
 
-**Proposed UI description:**
+Tight corners, barely room for two men to pass. And there's always some bastard looking for an easy bag to snatch.
 
-> The receiving mark has smeared across two lines. You saw the notice taken, but the sheet won't show it plainly.
+Better keep moving. Got enough trouble without losing the council's papers.
 
-**Choose one ordinary work response:**
+### After selecting: Take the Long Route
 
-| Player action | Result | Meaningful trade-off |
-| --- | --- | --- |
-| **[Ask for a fresh mark]** | Have the receiver mark the correct line again. The receipt is clear. | Some additional work time, strongest direct proof of delivery |
-| **[Check their receiving book]** | Compare the office's entry with the route sheet. If it agrees, note that confirmation; if it does not, the courier can still request a fresh mark. | Extra inspection/time, alternative documentary proof; not an instant free solution |
-| **[Note the spoiled mark and go on]** | Record that the notice was handed over but the mark cannot be read; carry that uncertainty back on the sheet. | Quicker departure, but the ordinary work report records an unresolved receipt rather than pretending it is valid |
+I stick to the main roads. Takes longer, sure, but there's people about, carts passing, and enough light to see where I'm going.
 
-All three choices are *honest* work methods. None requires forgery, invents a named clerk, causes a permanent disciplinary flag, blocks the job, deducts starter coins, or creates special loot. The game should preserve the visible receipt condition for the round's later report. The tutorial's eventual exceptional nonpayment must not depend on the player deliberately picking the poorest receipt option.
+Trouble is, half the city's out here. Carts blocking the way, workers crossing everywhere. Hard to get anywhere quickly.
 
-A smudged receiving mark is a **reusable mundane courier incident**; it does not reveal the sealed-site secret, supply a clue about the Shift Marshal, or change which of the three later Major Skills can be chosen.
+Still, I'd rather lose a little time than have someone make off with my notices.
 
-**Reusable module (working name):** hauling_receipt_verification — receiving proof, spoiled documentation, an office-book cross-check, and truthful annotation if still unresolved. Future ordinary Hauling jobs can parameterize the type of discrepancy and its normal wage/quality effects.
+**Action:** Continue to the delivery. This is the one deliberate
+narrative step after choosing a route, not a duplicate "Start the
+journey?" confirmation. It takes the player to the same routine
+receiving incident, independent of road choice.
 
-## S02-D — Finish the ordinary circuit; hand off to Stage 3
+## Receiving desk: a spoiled mark
 
-The player completes the route's **routine** notice stops and receives a normal courier-work summary: addresses attended, bundle/receipt condition, route choice and elapsed time. Do not place separate compulsory puzzles at every door.
+*After completing the routine stops, you reach another receiving
+desk. The clerk takes the council notice, checks its heading and
+presses a receiving mark onto your route sheet.*
 
-A **sealed council order still requires final presentation at its marked address**. The script offers **[Take the final notice]** as the intentional handoff into the unique *Wrong Bell* scene. Nothing in the Stage 2 summary tells the player that its destination is officially closed. The abnormal bell, closure evidence, night-shift summons, watchman and moral branch choice all belong to **Stage 3, not here**.
+*The ink smears across two lines as the clerk slides the paper back.*
 
-**Resolution presentation:** ordinary work performed; receipt verification outcome visible; **payment not yet cleared**. No wage, ordinary skill XP, loot or second-skill level is delivered in Stage 2. Stage 3 must resolve the exceptional disputed round and establish a concrete reason why this particular council job pays nothing. Standard future Shift Dispatch rounds still use ordinary wages and skill XP.
+**Step 1 — Arrival narration:** Display only the two narrative paragraphs above, with one **Continue** button. This avoids crowding the parchment frame and gives the player time to understand what happened.
 
-## Work invariants, resilience and implementation
+**Step 2 — Receiver conversation:**
 
-- **Fixed tutorial interaction:** one useful inspection/preparation, a two-route choice and one ordinary receiving-mark complication. In general repeatable jobs, the incident should be conditional and repetition-managed, with occasional uneventful rounds.
-- **Timing:** preparation and mandatory interactive checkpoints appear near the beginning of the activity, within the first-two-minute guidance. Timers continue while a prompt is open; a finished timer never bypasses unresolved input. The later *Wrong Bell* handoff is a deliberate action after the ordinary circuit, not an unexpected late timer pop-up.
-- **Failure/recovery:** unclear papers may require more time, a second mark or an honest notation. No single work action can erase the scripted sealed order, lose the quest beyond recovery or force a failed tutorial restart. Actual roll formulae, skill-dependent options and elapsed-time modifiers are TBD.
-- **Skill:** Industry +3 is already present. Do not assume a Hauling subskill tier or invent an Industry skill threshold. Any future Hauling expertise bonus must fit the general progression and inspection systems. One +1 in Commerce / Medicine / Mechanics belongs to the selected later route.
-- **State (working identifiers, NOT canon IDs):** chosen_route; notice_count_verified; receipt_status = clear / book_confirmed / noted_unclear; ordinary_dispatch_work_complete; final_sealed_notice_pending; wrong_bell_event_fired. Only the first four describe this reusable job; the last two are tutorial story gates.
-- **No new permanence:** no special reputation, guilt, crime, story faction, money or permanent gear consequences have been approved for these ordinary choices. Later branch and Dogman motivations depend on the Stage 3 choice, not on how the player handled a smudged mark.
-- **Shared game architecture:** implement with authored data and known outcomes; do not use runtime freeform AI to adjudicate the job.
+**Receiver:**
 
-## Approval boundary (approved narrative and interaction structure; numeric implementation TBD)
+"There. That's yours."
 
-**Already LOCKED elsewhere:** Bellrunner Industry +3; Hector, Dispatch House and the approved spoken opening; Industry/Hauling Shift Dispatch as first job; hidden *Wrong Bell* discovery only after ordinary work; the three later Commerce/Medicine/Mechanics tasks; Dogman; no tutorial wages/XP/loot; common clinic/home/rent path.
+"Ah, damn it. Ink's gone everywhere. Well, you've seen me take the notice."
 
-**APPROVED IN STAGE 2 (2026-10-15):** bundle-check screen and optional reordering; direct-versus-quieter road trade-off; spoiled receiving mark and its three handling choices; the round-summary presentation and explicit final-notice handoff. **Working data identifiers are illustrative; not frozen as production IDs.**
+Only here display **Ask for a fresh mark / Check their receiving book /
+Note the spoiled mark and go on**.
 
-**TBD / later stage:** number of notices, destination labels, site location, duration, weights, threshold/percentage formulas, final UI prose, the closed-site reveal, Hector's post-round response and the exact nonpayment cause. Do not canonize these still-undecided details by writing them into a LOCKED summary.
+The player must know where they are and what went wrong before
+making that choice. No named clerk, fabricated street address,
+compulsory fight or missing inventory is involved.
 
-Related: [Bellrunner background](README.md), [Approved Hector Stage 1](opening-dialogue.md), [Shared onboarding structure](../shared-structure.md), [Jobs and Time](../../jobs/jobs-and-time.md), [Interaction architecture](../../interactions/interaction-generation.md), [Spoken dialogue standard](../../interactions/dialogue-style-guide.md).
+### Ask for a fresh mark
+
+**You:** "That mark's no good. Mind putting another one beside it?"
+
+**Receiver:** "Aye, give it here. Ink's still wet, that's all. Hold it steady this time."
+
+*The clerk makes a second, clear mark. You check the address against
+the route sheet before putting it away.*
+
+**Recorded proof:** `clear`. Future paid jobs may spend more time
+here, but the tutorial does not calculate a cost.
+
+### Check their receiving book
+
+**You:** "Could I see your receiving book? Need something to confirm the delivery."
+
+**Receiver:** "It's here. Look under today's entries. My name's beside the notice."
+
+*You find the entry and compare its details with your route sheet.
+The record matches.*
+
+**You:** "Right. I'll note the book entry beside the spoiled mark."
+
+**Recorded proof:** `book_confirmed`. The entry matches in this
+scripted teaching encounter; do not introduce an unsupported
+extra success roll or another redundant confirmation button.
+
+### Note the spoiled mark and go on
+
+**You:** "I'll note the delivery myself. Just need your name for the sheet."
+
+**Receiver:** "Fair enough. It's on the desk ledger. And don't go writing that I refused it. I took the bloody thing."
+
+*You record the recipient and note that the receiving mark was
+unclear. The notice was delivered, but Hector will have to make do
+with your written account.*
+
+**Recorded proof:** `noted_unclear`. No faked mark or punitive
+tutorial reputation adjustment.
+
+## Interaction and persistence contract
+
+The delivery incident is saved as two distinct phases:
+`receiving_arrival` displays the spoiled-mark narration and
+**Continue**; `spoiled_mark` then displays the receiver's two lines
+and three choices. The player cannot select a receipt response before
+the Continue action is committed.
+
+After making a choice, the server saves the receipt proof and enters
+two more RP beats:
+
+1. **Player's spoken line** — Continue.
+2. **Receiver's response and narrated consequence** — Continue to the
+   final notice. The receiving-book branch additionally shows the
+   player's concluding notation in the second beat.
+
+The previous compulsory **round report** added no new narrative event
+or mechanical consequence; route and receipt were already saved and
+visible. It has been removed from the normal tutorial progression.
+When repeatable paid Hauling is implemented, a real work ledger may
+show actual travel time, wages and reputation outcomes. Do not display
+a mandatory empty audit in this introductory story.
+
+**The final notice** presents the last sealed council order, which
+is still unread. After **Take the final notice**, the completion panel
+uses this exact owner-revised text:
+
+> The usual deliveries are done, and the receiving marks are recorded.
+>
+> One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.
+
+No silent Stage 3 progression occurs before *The Wrong Bell* exists.
+
+The saved work phases are `issued` (route choice), `checked`
+(legacy route choice), `road_chosen` (journey), `receiving_arrival`
+(new incident narration), `spoiled_mark` (receiver's lines and
+choices), `receiver_reply` (player line), `receiver_result`
+(receiver line and result), `final_notice` and
+`final_notice_taken`. Existing `book_checked` and `round_report`
+states can still finish safely, but the new flow never enters them.
+Older API action `continue_to_report` resolves to the final notice
+rather than recreating the removed report screen. Request receipts
+and recorded route/proof values remain intact across updates.
+
+All state transitions run through authenticated,
+owner-scoped, phase-checked, revision-checked and idempotent
+`/api/characters/:id/bellrunner/dispatch/work` commands.
+Narrative choices persist across refresh, logout, server restart
+and developer rewind/replay. No migration beyond the already
+installed `0014` and `0015` schema is needed for this revision.
+
+Future hauling jobs may use clock time, road risk, weather,
+congestion, thievery, combat, wages and reputation. Those features
+must be implemented and balanced separately, not implied by
+the current tutorial roleplay.
+
+Related: [Bellrunner overview](README.md),
+[Hector opening](opening-dialogue.md),
+[implementation](stage-1-implementation.md),
+[Jobs and Time](../../jobs/jobs-and-time.md).
