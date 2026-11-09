@@ -177,6 +177,7 @@ try{
         loaded:image.complete&&image.naturalWidth>100,
         scrollHeight:document.documentElement.scrollHeight,
         viewport:window.innerHeight,top:window.scrollY,
+        cityBannerVisible:!!document.querySelector('.city-banner'),
         text:frame.textContent.slice(0,160),width:window.innerWidth};
     })()`);
   }
@@ -232,6 +233,12 @@ try{
       }else{
         assert.equal(m.tray,null,
           'No redundant paper tray at a street or the Receiving Desk: '+suffix);
+      }
+      assert.equal(m.cityBannerVisible,false,
+        'Bellrunner work screens must prioritize the NPC/documents over the redundant city hero: '+suffix);
+      if(width>=1272){
+        assert.ok(m.stack.top<300,
+          'Workstation must be near the top of the playable screen: '+suffix);
       }
       assert.equal(m.fit,'contain','Full image must not be cover-cropped: '+suffix);
       assert.equal(m.frameOverflow,'visible','No internal frame scrollbar: '+suffix);
