@@ -5,6 +5,8 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
+  import HaulingReceivingBookHotspot from '$lib/HaulingReceivingBookHotspot.svelte';
+  import {HAULING_SCENES} from '$lib/hauling-scenes';
   import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
     BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
     from '$lib/bellrunner-stage2-narrative';
@@ -53,6 +55,13 @@
   let pendingId:string|null=null;
   let pendingAction:WorkAction|null=null;
   const phase=$derived(round?.workState?.phase??'issued');
+  // Use one reusable Hauling location at a time. Hector and the Depot
+  // paperwork never follow the character into the street or receiving desk.
+  const sceneKey=$derived(phase==='issued'||phase==='checked'
+    ?'depot'
+    :phase==='road_chosen'
+      ?(round?.workState?.route==='direct'?'short_route':'long_route')
+      :'receiving_desk');
   const routeCopy=$derived(round?.workState?.route==='direct'
     ?'Short Route — the freight-yard back streets'
     :round?.workState?.route==='quieter'
@@ -129,39 +138,96 @@
 
 <svelte:head><title>The Pall — Shift Dispatch</title></svelte:head>
 {#if status==='ready'&&character&&round&&round.workState}
-  <TutorialShell {character} sceneLocation="Dispatch House" depotBackdrop>
+  <TutorialShell {character} sceneLocation={HAULING_SCENES[sceneKey].label}
+    depotBackdrop={sceneKey==='depot'}>
     <section class="workshop dispatch" aria-label="Bellrunner Stage 2 Shift Dispatch">
-      <div class="scene">
+      <div class="scene" class:receiving={sceneKey==='receiving_desk'}>
         <div class="illustration">
-          <img class="environment" src="/locations/origins/bellrunner-depot.webp"
-            alt="Dispatch House, council papers on the sorting counter" draggable="false"/>
-          <img class="hector" src="/characters/hector/hector-d-smoke.webp"
-            alt="Hector D. Smoke by the dispatch counter" draggable="false"/>
-          <img class="environment foreground" src="/locations/origins/bellrunner-depot.webp"
-            alt="" aria-hidden="true" draggable="false"/>
-          <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
-            aria-label="Talk to Hector D. Smoke"
-            onclick={()=>{selected=null;talkingToHector=true;}}>
-            <span class="workshop-npc-label">Hector D. Smoke</span>
-          </button>
-          {#each paperKeys as key}
-            <img class="paper-art {key}" src={docs[key].src}
+          {#if sceneKey==='depot'}
+            <!-- The original working Depot and its foreground stay together. -->
+            <img class="environment" src={HAULING_SCENES.depot.src}
+              alt={HAULING_SCENES.depot.alt} draggable="false"/>
+            <img class="hector" src="/characters/hector/hector-d-smoke.webp"
+              alt="Hector D. Smoke by the dispatch counter" draggable="false"/>
+            <img class="environment foreground" src={HAULING_SCENES.depot.src}
               alt="" aria-hidden="true" draggable="false"/>
-            <button type="button" class="paper-target {key}" data-workshop-object
-              data-pall-sfx="paper" aria-label={'Inspect '+docs[key].label}
-              aria-pressed={selected===key}
-              onclick={()=>{talkingToHector=false;selected=selected===key?null:key;}}>
-              <span class="workshop-object-label">{docs[key].label}</span>
+            <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
+              aria-label="Talk to Hector D. Smoke"
+              onclick={()=>{selected=null;talkingToHector=true;}}>
+              <span class="workshop-npc-label">Hector D. Smoke</span>
             </button>
-          {/each}
-          {#if selected}
-            <WorkshopItemPopover itemKey={selected} title={docs[selected].label}
-              description={docs[selected].description} onClose={()=>{selected=null;}}/>
+            {#each paperKeys as key}
+              <img class="paper-art {key}" src={docs[key].src}
+                alt="" aria-hidden="true" draggable="false"/>
+              <button type="button" class="paper-target {key}" data-workshop-object
+                data-pall-sfx="paper" aria-label={'Inspect '+docs[key].label}
+                aria-pressed={selected===key}
+                onclick={()=>{talkingToHector=false;selected=selected===key?null:key;}}>
+                <span class="workshop-object-label">{docs[key].label}</span>
+              </button>
+            {/each}
+            {#if selected}
+              <WorkshopItemPopover itemKey={selected} title={docs[selected].label}
+                description={docs[selected].description} onClose={()=>{selected=null;}}/>
+            {/if}
+          {:else}
+            <!-- A proportionate cover-scaled painting: background and ledger
+                 hotspot share coordinates on every monitor aspect ratio. -->
+            <div class="art-scaled">
+              <img class="environment" src={HAULING_SCENES[sceneKey].src}
+                alt={HAULING_SCENES[sceneKey].alt} draggable="false"/>
+              {#if sceneKey==='receiving_desk'}
+                {#if phase==='receiving_arrival'}
+                  <img class="counter-prop notices-prop" src={docs.notices.src}
+                    alt="" aria-hidden="true" draggable="false"/>
+                  <button type="button" class="counter-target notices-target"
+                    data-workshop-object data-pall-sfx="paper"
+                    disabled={busy} aria-label="Hand over council notice"
+                    onclick={()=>{void perform('continue_to_receiver');}}>
+                    <span class="workshop-object-label">Council notice</span>
+                  </button>
+                {:else if phase==='final_notice'||phase==='final_notice_taken'}
+                  <img class="counter-prop sealed-prop" src={docs.sealed.src}
+                    alt="" aria-hidden="true" draggable="false"/>
+                  <button type="button" class="counter-target sealed-target"
+                    data-workshop-object data-pall-sfx="paper"
+                    disabled={busy} aria-label={phase==='final_notice'
+                      ?'Take final sealed council order':'Inspect sealed council order'}
+                    onclick={()=>{
+                      if(phase==='final_notice'){void perform('take_final_notice');}
+                      else selected=selected==='sealed'?null:'sealed';
+                    }}>
+                    <span class="workshop-object-label">Sealed council order</span>
+                  </button>
+                {:else}
+                  <img class="counter-prop route-prop" src={docs.route.src}
+                    alt="" aria-hidden="true" draggable="false"/>
+                  <button type="button" class="counter-target route-target"
+                    data-workshop-object data-pall-sfx="paper"
+                    aria-label="Inspect route sheet" aria-pressed={selected==='route'}
+                    onclick={()=>{selected=selected==='route'?null:'route';}}>
+                    <span class="workshop-object-label">Route sheet</span>
+                  </button>
+                {/if}
+                {#if phase==='spoiled_mark'||phase==='book_checked'}
+                  <HaulingReceivingBookHotspot {busy}
+                    disabled={busy}
+                    onInspect={()=>{
+                      void perform(phase==='book_checked'?'confirm_book':'check_receiving_book');
+                    }}/>
+                {/if}
+                {#if selected}
+                  <WorkshopItemPopover itemKey={selected} title={docs[selected].label}
+                    description={docs[selected].description}
+                    onClose={()=>{selected=null;}}/>
+                {/if}
+              {/if}
+            </div>
           {/if}
         </div>
 
         <aside class="work-card" aria-label={talkingToHector?'Hector D. Smoke conversation':'Shift Dispatch work'}>
-          {#if talkingToHector}
+          {#if talkingToHector&&sceneKey==='depot'}
             <BellrunnerHectorConversation characterName={character.name}
               returnToRound={()=>{talkingToHector=false;}}/>
           {:else}
@@ -298,9 +364,27 @@
     grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);
     grid-template-rows:minmax(0,1fr);align-content:start;box-sizing:border-box;
     width:100%;height:clamp(535px,62vh,640px);background:#291d15}
-  .illustration{position:absolute;inset:0;overflow:hidden}
+  .illustration{position:absolute;inset:0;overflow:hidden;container-type:size}
+  .art-scaled{position:absolute;left:50%;top:50%;
+    width:max(100cqw,177.7cqh);aspect-ratio:1672/941;
+    transform:translate(-50%,-50%)}
   .environment{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;pointer-events:none}
+  .art-scaled>.environment{object-fit:fill}
+  /* At a receiving desk, keep the book in view and place the conversation
+     on the opposite side. No painted-on character/NPC overlay is added. */
+  .scene.receiving .work-card{grid-column:1;
+    margin-left:clamp(12px,2vw,35px);margin-right:0}
+  .counter-prop{position:absolute;z-index:3;pointer-events:none;
+    object-fit:contain;filter:drop-shadow(0 5px 5px #0009)}
+  .counter-target{position:absolute;z-index:5;display:flex;
+    align-items:flex-end;justify-content:center;padding:0;
+    background:transparent;border:0;cursor:pointer;color:#f3e6d1}
+  .counter-target:focus-visible{outline:2px solid #f3d299;outline-offset:2px}
+  .counter-target:disabled{cursor:wait;opacity:.6}
+  .notices-prop,.notices-target{left:24%;bottom:7%;width:19%;height:23%}
+  .route-prop,.route-target{left:26%;bottom:6%;width:17%;height:23%}
+  .sealed-prop,.sealed-target{left:62%;bottom:7%;width:19%;height:25%}
   .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
     width:auto;object-fit:contain;object-position:bottom center;
     z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
@@ -353,7 +437,8 @@
   .fallback{padding:40px;color:#e3d0af;background:#25211e}
   @media(max-width:700px){
     .scene{display:flex;flex-direction:column;height:auto;min-height:0}
-    .illustration{position:relative;width:100%;aspect-ratio:4/3}
+    .illustration{position:relative;width:100%;aspect-ratio:1672/941;container-type:normal}
+    .art-scaled{left:0;top:0;transform:none;width:100%;height:100%}
     .environment{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
@@ -363,8 +448,11 @@
     .paper-art.notices,.paper-target.notices{left:39%}
     .paper-art.sealed,.paper-target.sealed{left:59%}
     .paper-art.route,.paper-target.route{left:79%}
-    .work-card{width:100%;margin:0;padding:14px;border-radius:0;
-      max-height:none;overflow:visible}
+    .work-card,.scene.receiving .work-card{width:100%;margin:0;padding:14px;
+      border-radius:0;max-height:none;overflow:visible}
+    .notices-prop,.notices-target{left:13%;width:25%}
+    .route-prop,.route-target{left:13%;width:25%}
+    .sealed-prop,.sealed-target{left:62%;width:25%}
     .story,.instruction,.payment{font-size:16px}
   }
 </style>
