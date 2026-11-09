@@ -7,6 +7,9 @@ import {APPROVED_STAGE_ONE} from '../apps/web/src/lib/approved-stage-one.ts';
 import {APPROVED_HECTOR_TOPICS} from '../apps/web/src/lib/approved-bellrunner-hector.ts';
 import {INITIAL_DISPATCH_STATE,applyDispatchAction,InvalidDispatchAction,
   type DispatchState,type DispatchWorkAction} from '../apps/api/src/bellrunner-dispatch-work.ts';
+import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
+  BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
+  from '../apps/web/src/lib/bellrunner-stage2-narrative.ts';
 
 const root=resolve(import.meta.dirname,'..');
 const source=(path:string)=>readFileSync(resolve(root,path),'utf8');
@@ -124,19 +127,59 @@ test('Hector framing, inspection and audio reuse owner-approved workshop UI',()=
  assert.ok(!scene.includes('class="paper-inspection"'));
 });
 
-test('Approved Stage 2 is actual saved courier work, without made-up reward values',()=>{
- const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+test('The two player-written route monologues are reproduced verbatim',()=>{
+ assert.deepEqual([...BELLRUNNER_ROUTE_NARRATION.direct],[
+  "I slip through the back streets behind the freight yards. Saves me a good bit of walking, though these alleys aren't exactly pleasant.",
+  "Tight corners, barely room for two men to pass. And there's always some bastard looking for an easy bag to snatch.",
+  "Better keep moving. Got enough trouble without losing the council's papers."
+ ]);
+ assert.deepEqual([...BELLRUNNER_ROUTE_NARRATION.quieter],[
+  "I stick to the main roads. Takes longer, sure, but there's people about, carts passing, and enough light to see where I'm going.",
+  "Trouble is, half the city's out here. Carts blocking the way, workers crossing everywhere. Hard to get anywhere quickly.",
+  "Still, I'd rather lose a little time than have someone make off with my notices."
+ ]);
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(ui.includes('BELLRUNNER_ROUTE_NARRATION[round.workState.route]'));
+ assert.ok(ui.includes('Take the Short Route')&&ui.includes('Take the Long Route'));
+ assert.ok(ui.includes('Continue to the delivery'));
+ assert.ok(!ui.includes('Inspect route and notices'));
+ assert.ok(!ui.includes('Put the notices in route order'));
+ assert.ok(!ui.includes('Make deliveries and record marks'));
+ assert.ok(!ui.includes('Notice order</dt>'));
+});
+
+test('Receiving desk incident and three choices lead to authored, unskipped RP',()=>{
+ assert.equal(BELLRUNNER_RECEIVING_ARRIVAL.length,2);
+ assert.equal(BELLRUNNER_RECEIVER_OPENING.length,2);
+ assert.ok(BELLRUNNER_RECEIVING_ARRIVAL[0].includes('clerk takes the council notice'));
+ assert.ok(BELLRUNNER_RECEIVING_ARRIVAL[1].includes('ink smears across two lines'));
+ assert.deepEqual(Object.keys(BELLRUNNER_RECEIVER_RESOLUTIONS).sort(),
+  ['book_confirmed','clear','noted_unclear']);
+ for(const value of Object.values(BELLRUNNER_RECEIVER_RESOLUTIONS)){
+  assert.ok(value.player.length>15&&value.receiver.length>15);
+  assert.ok(value.outcome.length>25);
+ }
+ assert.ok(BELLRUNNER_RECEIVER_RESOLUTIONS.clear.receiver.includes('Hold it steady this time.'));
+ assert.ok(BELLRUNNER_RECEIVER_RESOLUTIONS.book_confirmed.extraPlayer?.includes('note the book entry'));
+ assert.ok(BELLRUNNER_RECEIVER_RESOLUTIONS.noted_unclear.outcome.includes('unclear'));
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(ui.includes("phase==='spoiled_mark'"));
+ assert.ok(ui.includes("phase==='receiver_reply'&&receiverDialogue"));
+ assert.ok(ui.includes("phase==='receiver_result'&&receiverDialogue"));
+ assert.ok(ui.includes('“{receiverDialogue.player}”'));
+ assert.ok(ui.includes('“{receiverDialogue.receiver}”'));
+ assert.ok(ui.includes("perform('continue_receiver_dialogue')"));
+ assert.ok(ui.includes("perform('continue_to_report')"));
+ assert.ok(!ui.includes('not implemented in this pass'));
+});
+
+test('Stage 2 retains owner-checked, retry-safe work and no fabricated payouts',()=>{
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const route=source('apps/api/src/bellrunner-dispatch-routes.ts');
  const schema=source('db/migrations/0015_bellrunner_dispatch_work.sql');
  const migrate=source('scripts/bellrunner-migrate.mjs');
  const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
- for(const label of ['Inspect route and notices','Put the notices in route order',
-   'Take the direct road','Take the quieter road','Make deliveries and record marks',
-   'Ask for a fresh mark','Check their receiving book',
-   'Note the spoiled mark and go on','Finish the ordinary circuit','Take the final notice']){
-  assert.ok(stage2.includes(label),label);
- }
- assert.ok(stage2.includes('round.workState')&&stage2.includes('expectedRevision:round.revision'));
+ assert.ok(ui.includes('round.workState')&&ui.includes('expectedRevision:round.revision'));
  assert.ok(route.includes("app.post<{Params:Params}>('/api/characters/:id/bellrunner/dispatch/work'"));
  assert.ok(route.includes('FOR UPDATE')&&route.includes('idempotency_key_reuse'));
  assert.ok(route.includes("ch.rows[0].origin!=='Bellrunner'"));
@@ -144,36 +187,58 @@ test('Approved Stage 2 is actual saved courier work, without made-up reward valu
  assert.ok(schema.includes('player_character_bellrunner_dispatch_work_receipts'));
  assert.ok(migrate.includes('0015_bellrunner_dispatch_work.sql'));
  assert.ok(rewind.includes('DELETE FROM player_character_bellrunner_dispatch_work_receipts'));
- assert.ok(!stage2.includes('not implemented in this pass'));
- assert.ok(!stage2.includes('No money, XP or equipment has been awarded.'));
- assert.ok(!stage2.includes('coins+'));
+ assert.ok(!ui.includes('No money, XP or equipment has been awarded.'));
+ assert.ok(!ui.includes('coins+'));
 });
 
-test('Courier actions retain every approved route and receiving-mark resolution',()=>{
- function apply(actions:DispatchWorkAction[]):DispatchState{
-  return actions.reduce<DispatchState>((s,a)=>applyDispatchAction(s,a),INITIAL_DISPATCH_STATE);
- }
- assert.throws(()=>applyDispatchAction(INITIAL_DISPATCH_STATE,'take_direct_road'),
-  InvalidDispatchAction);
+test('New rounds choose a road immediately; every receipt resolves through two saved RP beats',()=>{
+ const apply=(actions:DispatchWorkAction[],initial:DispatchState=INITIAL_DISPATCH_STATE)=>
+  actions.reduce<DispatchState>((s,a)=>applyDispatchAction(s,a),initial);
  assert.throws(()=>applyDispatchAction(INITIAL_DISPATCH_STATE,'take_final_notice'),
   InvalidDispatchAction);
- const checked=apply(['check_round']);
- assert.equal(checked.phase,'checked');
- assert.equal(checked.noticesOrdered,false);
- assert.equal(apply(['check_round','sort_notices']).noticesOrdered,true);
  for(const road of ['take_direct_road','take_quieter_road'] as const){
-  const basic=['check_round',road,'deliver_notices'] as DispatchWorkAction[];
-  for(const remedy of ['ask_fresh_mark','note_spoiled_mark'] as const){
-    const ended=apply([...basic,remedy,'finish_round','take_final_notice']);
-    assert.equal(ended.phase,'final_notice_taken');
-    assert.equal(ended.route,road==='take_direct_road'?'direct':'quieter');
-    assert.equal(ended.receipt,remedy==='ask_fresh_mark'?'clear':'noted_unclear');
+  const chosen=apply([road]);
+  assert.equal(chosen.phase,'road_chosen');
+  assert.equal(chosen.route,road==='take_direct_road'?'direct':'quieter');
+  const delivered=applyDispatchAction(chosen,'deliver_notices');
+  assert.equal(delivered.phase,'spoiled_mark');
+  for(const [resolution,receipt] of [
+    ['ask_fresh_mark','clear'],
+    ['check_receiving_book','book_confirmed'],
+    ['note_spoiled_mark','noted_unclear']
+  ] as const){
+   const reply=applyDispatchAction(delivered,resolution);
+   assert.equal(reply.phase,'receiver_reply');
+   assert.equal(reply.receipt,receipt);
+   assert.throws(()=>applyDispatchAction(reply,'finish_round'),InvalidDispatchAction);
+   const result=applyDispatchAction(reply,'continue_receiver_dialogue');
+   assert.equal(result.phase,'receiver_result');
+   const report=applyDispatchAction(result,'continue_to_report');
+   assert.equal(report.phase,'round_report');
+   const finished=applyDispatchAction(
+    applyDispatchAction(report,'finish_round'),'take_final_notice');
+   assert.equal(finished.phase,'final_notice_taken');
+   assert.equal(finished.route,chosen.route);
+   assert.equal(finished.receipt,receipt);
   }
-  const confirmed=apply([...basic,'check_receiving_book','confirm_book','finish_round']);
-  assert.equal(confirmed.receipt,'book_confirmed');
-  assert.equal(confirmed.phase,'final_notice');
-  assert.throws(()=>applyDispatchAction(confirmed,'confirm_book'),InvalidDispatchAction);
  }
+});
+
+test('Earlier saved dispatch phases and recorded sorting remain playable',()=>{
+ const legacyChecked=applyDispatchAction(INITIAL_DISPATCH_STATE,'check_round');
+ assert.equal(legacyChecked.phase,'checked');
+ const legacySorted=applyDispatchAction(legacyChecked,'sort_notices');
+ assert.equal(legacySorted.noticesOrdered,true);
+ const road=applyDispatchAction(legacySorted,'take_direct_road');
+ assert.equal(road.phase,'road_chosen');
+ const spoiled=applyDispatchAction(road,'deliver_notices');
+ const legacyBookChecked={...spoiled,phase:'book_checked' as const};
+ const bookReply=applyDispatchAction(legacyBookChecked,'confirm_book');
+ assert.equal(bookReply.phase,'receiver_reply');
+ assert.equal(bookReply.receipt,'book_confirmed');
+ const olderReport={...spoiled,phase:'round_report' as const,
+  receipt:'noted_unclear' as const};
+ assert.equal(applyDispatchAction(olderReport,'finish_round').phase,'final_notice');
 });
 
 test('Stage 1 still accepts the round exactly once, without mutating starter items',()=>{
