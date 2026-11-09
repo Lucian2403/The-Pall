@@ -214,6 +214,48 @@ try{
         ' dialogue below at '+Math.round(m.dialogue.top));
     }
   }
+  // Real pointer interactions: the artwork itself only hosts the NPC and
+  // paper assets, while the response/inspection text appears in Section 2.
+  await cmd('Emulation.setDeviceMetricsOverride',{
+    width:1920,height:1080,deviceScaleFactor:1,mobile:false
+  });
+  async function clickArtwork(selector){
+    const pos=await evalJS('(()=>{const b=document.querySelector('+
+      JSON.stringify(selector)+');if(!b)return null;'+
+      'b.scrollIntoView({block:"center",behavior:"instant"});'+
+      'const r=b.getBoundingClientRect();'+
+      'return {x:r.x+r.width/2,y:r.y+r.height/2};})()');
+    assert.ok(pos,'Artwork target must exist: '+selector);
+    await cmd('Input.dispatchMouseEvent',{type:'mousePressed',
+      x:pos.x,y:pos.y,button:'left',clickCount:1});
+    await cmd('Input.dispatchMouseEvent',{type:'mouseReleased',
+      x:pos.x,y:pos.y,button:'left',clickCount:1});
+  }
+  await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/opening'});
+  await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 1 paper targets');
+  await clickArtwork('button.npc-hotspot');
+  await until(async()=>{
+    const m=await sceneMetrics();
+    return m?.text.includes('Ask Hector something')?m:false;
+  },8000,'Hector text in the lower section');
+  assert.equal(await evalJS("document.querySelector('.scene-illustration .work-card, .scene-illustration .workshop-inspection')===null"),true);
+  await clickArtwork('button.paper-target.notices');
+  await until(async()=>{
+    const m=await sceneMetrics();
+    return m?.text.includes('Council notices')?m:false;
+  },8000,'Paper inspection text in the lower section');
+  assert.equal(await evalJS("document.querySelector('.scene-illustration .workshop-inspection')===null"),true);
+  console.log('PASS: clicking Stage 1 NPC and paper reveals text BELOW the image');
+
+  await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/bellrunner/dispatch?scene=depot'});
+  await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 2 Depot paper targets');
+  await clickArtwork('button.paper-target.notices');
+  await until(async()=>{
+    const m=await sceneMetrics();
+    return m?.text.includes('Council notices')?m:false;
+  },8000,'Stage 2 Depot paper inspection below art');
+  assert.equal(await evalJS("document.querySelector('.illustration .workshop-inspection')===null"),true);
+  console.log('PASS: clicking Stage 2 Depot paper reveals the lower dialogue section');
   console.log('PASS: 20 real Bellrunner page/viewport combinations render as separate sections');
 }catch(error){
   console.error(error);
