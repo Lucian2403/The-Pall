@@ -292,7 +292,7 @@ test('Bellrunner Back to Stage 1 is loopback-only, owner-scoped and preserves be
  assert.equal(replay.body?.revision,0);
 });
 
-test('Bellrunner Stage 2 courier round persists choices and receiving proof without creating rewards',async()=>{
+test('Bellrunner Stage 2 records the route and two receiver RP beats without rewards',async()=>{
  const id=randomUUID(),name='Courier '+id.slice(0,8);
  await db.query(
   "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',1,'NOT_STARTED')",
@@ -301,56 +301,54 @@ test('Bellrunner Stage 2 courier round persists choices and receiving proof with
  const work=path+'/work';
  assert.equal((await request('GET',work,stranger)).status,404,
   'GET work is not exposed as a separate read route');
- assert.equal((await request('POST',work,null,{action:'check_round',expectedRevision:0,requestId:randomUUID()})).status,401);
- assert.equal((await request('POST',work,stranger,{action:'check_round',expectedRevision:0,requestId:randomUUID()})).status,404);
- assert.equal((await request('POST',work,owner,{action:'check_round',expectedRevision:0,requestId:randomUUID()})).status,409,
+ assert.equal((await request('POST',work,null,{action:'take_direct_road',expectedRevision:0,requestId:randomUUID()})).status,401);
+ assert.equal((await request('POST',work,stranger,{action:'take_direct_road',expectedRevision:0,requestId:randomUUID()})).status,404);
+ assert.equal((await request('POST',work,owner,{action:'take_direct_road',expectedRevision:0,requestId:randomUUID()})).status,409,
   'Cannot begin work before receiving Hector\'s task');
  const accepted=await request('POST',path,owner,{action:'take_round',requestId:randomUUID(),expectedRevision:0});
  assert.equal(accepted.status,200,JSON.stringify(accepted.body));
  assert.equal(accepted.body?.workState?.phase,'issued');
  assert.equal(accepted.body?.revision,0);
  assert.equal((await request('GET',path)).body?.workState?.phase,'issued');
- const invalid=await request('POST',work,owner,{
-  action:'take_final_notice',expectedRevision:0,requestId:randomUUID()});
- assert.equal(invalid.status,409,'Must not bypass the approved ordinary work');
+ assert.equal((await request('POST',work,owner,{
+  action:'take_final_notice',expectedRevision:0,requestId:randomUUID()})).status,409);
  assert.equal((await request('POST',work,owner,{
   action:'secret_delivery',expectedRevision:0,requestId:randomUUID()})).status,400);
  async function command(action:string,expectedRevision:number,requestId=randomUUID()){
   return request('POST',work,owner,{action,expectedRevision,requestId});
  }
- const idempotentId=randomUUID();
- const check=await command('check_round',0,idempotentId);
- assert.equal(check.status,200,JSON.stringify(check.body));
- assert.equal(check.body?.revision,1);
- assert.equal(check.body?.workState?.phase,'checked');
- const replay=await command('check_round',0,idempotentId);
- assert.equal(replay.status,200);
- assert.deepEqual(replay.body,check.body);
- assert.equal((await command('sort_notices',0,idempotentId)).status,409,
-  'Cannot reuse a successful request ID for a different command');
- assert.equal((await command('take_direct_road',0)).status,409,
-  'Optimistic revision rejects a stale tab');
- let state=(await command('sort_notices',1)).body!;
- assert.equal(state.revision,2);
- assert.equal(state.workState.noticesOrdered,true);
- state=(await command('take_direct_road',2)).body!;
- assert.equal(state.workState.route,'direct');
- assert.equal(state.workState.phase,'road_chosen');
- state=(await command('deliver_notices',3)).body!;
+ const requestId=randomUUID();
+ const chosen=await command('take_direct_road',0,requestId);
+ assert.equal(chosen.status,200,JSON.stringify(chosen.body));
+ assert.equal(chosen.body?.revision,1);
+ assert.equal(chosen.body?.workState?.phase,'road_chosen');
+ assert.equal(chosen.body?.workState?.route,'direct');
+ assert.deepEqual((await command('take_direct_road',0,requestId)).body,chosen.body);
+ assert.equal((await command('take_quieter_road',0,requestId)).status,409,
+  'A request ID cannot be reused for a different road');
+ assert.equal((await command('deliver_notices',0)).status,409,
+  'A stale tab cannot skip the narrated journey');
+ let state=(await command('deliver_notices',1)).body!;
  assert.equal(state.workState.phase,'spoiled_mark');
- assert.equal((await command('finish_round',4)).status,409);
- state=(await command('check_receiving_book',4)).body!;
- assert.equal(state.workState.phase,'book_checked');
- state=(await command('confirm_book',5)).body!;
+ assert.equal((await command('finish_round',2)).status,409);
+ state=(await command('check_receiving_book',2)).body!;
+ assert.equal(state.workState.phase,'receiver_reply');
  assert.equal(state.workState.receipt,'book_confirmed');
- state=(await command('finish_round',6)).body!;
+ assert.equal((await command('finish_round',3)).status,409,
+  'The receiver conversation cannot be skipped');
+ state=(await command('continue_receiver_dialogue',3)).body!;
+ assert.equal(state.workState.phase,'receiver_result');
+ assert.equal((await command('finish_round',4)).status,409,
+  'The round cannot complete before the receiver answer');
+ state=(await command('continue_to_report',4)).body!;
+ assert.equal(state.workState.phase,'round_report');
+ state=(await command('finish_round',5)).body!;
  assert.equal(state.workState.phase,'final_notice');
- state=(await command('take_final_notice',7)).body!;
+ state=(await command('take_final_notice',6)).body!;
  assert.equal(state.workState.phase,'final_notice_taken');
- assert.equal(state.revision,8);
- assert.equal(state.stage,2,'No Stage 3 transition until that scene actually exists');
- assert.equal((await command('take_final_notice',8)).status,409,
-  'One sealed order cannot be taken twice');
+ assert.equal(state.revision,7);
+ assert.equal(state.stage,2,'Stage 3 cannot start before its scene is implemented');
+ assert.equal((await command('take_final_notice',7)).status,409);
  const latest=(await request('GET',path)).body!;
  assert.deepEqual(latest.workState,state.workState);
  assert.deepEqual(latest.tutorialPayout,{coins:0,ordinaryXp:0,items:0});
@@ -365,10 +363,10 @@ test('Bellrunner Stage 2 courier round persists choices and receiving proof with
   ['basic_clothes',1,'torso'],['crude_small_bag',1,'back']]);
  const receipts=await db.query<{n:number}>(
   'SELECT count(*)::int AS n FROM player_character_bellrunner_dispatch_work_receipts WHERE character_id=$1',[id]);
- assert.equal(receipts.rows[0].n,8);
+ assert.equal(receipts.rows[0].n,7);
 });
 
-test('Bellrunner direct and quieter roads allow honest clear or unclear receipt reports',async()=>{
+test('Both roads and the other receipt choices preserve the complete RP sequence',async()=>{
  for(const [road,remedy,receipt] of [
   ['take_quieter_road','note_spoiled_mark','noted_unclear'],
   ['take_direct_road','ask_fresh_mark','clear']
@@ -381,16 +379,23 @@ test('Bellrunner direct and quieter roads allow honest clear or unclear receipt 
   assert.equal((await request('POST',path,owner,{
    action:'take_round',requestId:randomUUID(),expectedRevision:0})).status,200);
   let revision=0;
-  for(const action of ['check_round',road,'deliver_notices',remedy,'finish_round','take_final_notice']){
+  const transitions=[
+   [road,'road_chosen'],['deliver_notices','spoiled_mark'],
+   [remedy,'receiver_reply'],['continue_receiver_dialogue','receiver_result'],
+   ['continue_to_report','round_report'],['finish_round','final_notice'],
+   ['take_final_notice','final_notice_taken']
+  ] as const;
+  for(const [action,phase] of transitions){
    const result=await request('POST',path+'/work',owner,{
     action,requestId:randomUUID(),expectedRevision:revision});
    assert.equal(result.status,200,action+': '+JSON.stringify(result.body));
    assert.equal(result.body?.revision,++revision);
+   assert.equal(result.body?.workState?.phase,phase);
   }
   const result=(await request('GET',path)).body!;
   assert.equal(result.workState.route,road==='take_quieter_road'?'quieter':'direct');
   assert.equal(result.workState.receipt,receipt);
-  assert.equal(result.workState.noticesOrdered,false,'Sorting remains optional');
+  assert.equal(result.workState.noticesOrdered,false,'No compulsory sorting on new routes');
   assert.equal(result.workState.phase,'final_notice_taken');
  }
 });
