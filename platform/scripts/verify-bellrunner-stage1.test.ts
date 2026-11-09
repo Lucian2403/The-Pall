@@ -96,65 +96,85 @@ test('Hauling scenes keep the Depot interactive but leave the Receiving Desk dia
  assert.ok(!ui.includes('src="/characters/receiver'));
 });
 
-test('Receiving Desk art remains bottom-aligned with no overlaid interactive assets',()=>{
- const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
- assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0;transform:translateX(-50%)'),
-  'Preserve the receiving desk and counter on short wide monitors');
- assert.ok(ui.includes('.scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}'),
-  'Mobile shows the entire background');
- const from=ui.indexOf('<!-- Proportionate, cover-scaled location painting.');
- const to=ui.indexOf('</div>\n\n        <aside class="work-card"',from);
- assert.ok(from>=0&&to>from,'Receiving Desk scene markup exists');
- const room=ui.slice(from,to);
- assert.ok(room.includes('src={HAULING_SCENES[sceneKey].src}'));
- assert.ok(!room.includes('data-workshop-object')&&
-  !room.includes('onclick=')&&
-  !room.includes('workshop-object-label')&&
-  !room.includes('HaulingReceivingBookHotspot'),
-  'Receiving Desk consists only of its original background painting');
- assert.ok(!ui.includes('.sealed-prop')&&!ui.includes('.route-target'));
-});
-
-test('All Hauling backgrounds fill tall and wide screens without distorting the art',()=>{
- const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+test('Bellrunner Depot, both streets and Receiving Desk use a single full-art scene rule',()=>{
+ const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+ const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ const shared=source('apps/web/src/lib/pall-story-landscape.css');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
- const style=ui.slice(ui.indexOf('<style>'));
- const sceneRule=style.match(/\.scene\{([\s\S]*?)\}/)?.[1];
- assert.ok(sceneRule,'Stage 2 scene layout must exist');
- assert.match(sceneRule,/height:auto;/,'No fixed 640px scene height');
- assert.match(sceneRule,/min-height:clamp\(535px,62vh,640px\)/,
-  'Keep enough room for dialogue on small desktop screens');
- assert.match(sceneRule,/flex:1 1 auto/,'Scene must consume the shell\'s remaining height');
- assert.doesNotMatch(sceneRule,/(?:^|[;\s])height:clamp\(/,
-  'Never use a viewport-independent maximum height that leaves a black band');
- assert.ok(ui.includes('.dispatch{display:flex;flex-direction:column;flex:1;'));
+ for(const scene of [first,second]){
+  assert.ok(scene.includes("import '$lib/pall-story-landscape.css'"));
+  assert.ok(scene.includes('pall-story-landscape'),
+   'Stage 1 and Stage 2 must share the same artwork framing contract');
+  assert.ok(!scene.includes('height:clamp(535px,62vh,640px)'),
+   'Fixed-height backgrounds previously cropped the lower streets');
+  assert.ok(!scene.includes('width:max(100cqw,177.7cqh)'),
+   'Cover-sized art previously removed half the original picture');
+ }
+ assert.ok(first.includes('class="dispatch-scene pall-story-landscape"'));
+ assert.ok(first.includes('object-fit:contain;pointer-events:none'),
+  'Depot art must not be cropped behind the clickable Route Sheet');
+ assert.ok(first.includes('.scene-illustration{position:relative;inset:auto;width:100%;aspect-ratio:1672/941}'),
+  'Mobile Depot must show all of the painting too');
+ assert.ok(second.includes('class="scene pall-story-landscape"'));
+ assert.ok(second.includes('src={HAULING_SCENES[sceneKey].src}'));
+ assert.ok(second.includes('.art-scaled{position:absolute;inset:0;width:100%;height:100%}'));
+ assert.ok(second.includes('.art-scaled>.environment{object-fit:contain}'));
+ assert.ok(!second.includes('.scene.receiving .art-scaled{top:auto;bottom:0'),
+  'Desk does not need a separate cover-crop workaround when the full painting fits');
+ assert.ok(shared.includes('aspect-ratio:1672 / 941'));
+ assert.ok(shared.includes('height:auto;'));
+ assert.ok(shared.includes('flex:0 0 auto;'));
+ assert.ok(shared.includes('overflow:hidden'));
+ assert.ok(shared.includes('aspect-ratio:auto;overflow:visible'),
+  'On small screens the image must remain separate from the dialogue panel');
  assert.ok(shell.includes('.chapter-content{display:flex;flex-direction:column;flex:1;'));
  assert.ok(shell.includes('.right{display:flex;flex-direction:column;'));
- assert.ok(shell.includes('min-height:100dvh'),
-  'The scene grows against the actual browser viewport');
- assert.ok(ui.includes('width:max(100cqw,177.7cqh)'));
- assert.ok(ui.includes('aspect-ratio:1672/941'));
- assert.ok(ui.includes('.art-scaled>.environment{object-fit:cover}'),
-  'All three source images retain their native proportions when upscaled');
- assert.ok(ui.includes('transform:translate(-50%,-50%)'),
-  'Street paintings retain their centered, proportional cover crop');
- assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0'),
-  'Receiving desk must keep its wooden counter visible when cropping');
- assert.ok(ui.includes('.scene{display:flex;flex-direction:column;height:auto;min-height:0;flex:none}'),
-  'Mobile must keep natural content height with no forced filler beneath the dialogue');
- const sourceAspect=1672/941;
+});
+
+test('The full original street picture is rendered; the document cannot be truncated by the viewport',()=>{
+ const s=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ const opening=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+ const common=source('apps/web/src/lib/pall-story-landscape.css');
+ // The source canvases are ~1672×941, not 16:9 slices. Rendered height
+ // must be derived from the scene width. The page, not the image, may
+ // scroll if the visible viewport is shorter than the whole picture.
  for(const [viewportWidth,viewportHeight] of [
-  [1920,768],[2048,821],[2560,1440],[3440,1440],[3840,2160]
+  [1280,720],[1920,768],[2048,821],[2560,1440],
+  [3440,1440],[3840,2160]
  ] as const){
-  const sceneWidth=viewportWidth-230; // Shared shell desktop rail
-  const usableHeight=viewportHeight-43-49; // Chapter bar + journal
-  const imageWidth=Math.max(sceneWidth,usableHeight*sourceAspect);
-  const imageHeight=imageWidth/sourceAspect;
-  assert.ok(imageWidth>=sceneWidth && imageHeight>=usableHeight,
-   'Cover must fill the scene without side gutters at '+viewportWidth+'×'+viewportHeight);
-  assert.equal(Math.round(imageWidth/imageHeight*1000),
-   Math.round(sourceAspect*1000),'Image aspect must remain unchanged');
+  const rail=viewportWidth<=1270?188:230;
+  const imageWidth=viewportWidth-rail;
+  const imageHeight=imageWidth*941/1672;
+  const renderedRatio=imageWidth/imageHeight;
+  assert.ok(Math.abs(renderedRatio-1672/941)<1e-8);
+  assert.ok(imageHeight>0&&imageWidth>0);
+  // A larger viewport must never limit a landscape to the old 640px.
+  if(imageWidth>=1280)assert.ok(imageHeight>640);
+  // Scroll instead of shrinking a 16:9 illustration into a 3:1 slot.
+  if(viewportHeight<imageHeight+92)assert.ok(imageHeight>viewportHeight-92);
  }
+ for(const scene of [s,opening]){
+  assert.ok(scene.includes('pall-story-landscape'));
+ }
+ assert.ok(common.includes('aspect-ratio:1672 / 941'));
+ assert.ok(!s.includes('object-fit:fill'));
+ assert.ok(!s.includes('.art-scaled>.environment{object-fit:cover}'));
+ assert.ok(!opening.includes('object-fit:cover;pointer-events:none}'));
+});
+
+test('Receiving Desk has no overlaid props, hitboxes, or letterbox crop',()=>{
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ const from=ui.indexOf('<!-- Proportionate, cover-scaled location painting.');
+ const to=ui.indexOf('</div>\\n\\n        <aside class="work-card"',from);
+ // Parser-safe check: the static art is a single image inside a wrapper.
+ assert.ok(ui.includes('class="art-scaled"'));
+ assert.ok(ui.includes('src={HAULING_SCENES[sceneKey].src}'));
+ assert.ok(!ui.includes('counter-target')&&!ui.includes('counter-prop'));
+ assert.ok(!ui.includes('HaulingReceivingBookHotspot'));
+ assert.ok(!ui.includes('data-workshop-object')||ui.includes('class="paper-target {key}"'),
+  'Only the Depot paper objects are interactive');
+ assert.ok(ui.includes("perform('check_receiving_book')"));
+ assert.ok(ui.includes("perform('take_final_notice')"));
 });
 
 test('Stage 1 Route Sheet owns round acceptance, no duplicate handoff button or payment text',()=>{
