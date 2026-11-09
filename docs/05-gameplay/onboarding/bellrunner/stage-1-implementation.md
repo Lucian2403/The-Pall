@@ -54,7 +54,11 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   dialogue-only controls. `pall-story-landscape.css` owns the common
   grid and `BellrunnerDocumentTray.svelte` owns the shared cards.
   New Chromium QA checks the actual responsive positions and
-  NPC/paper interactions.
+  NPC/paper interactions. The large city panorama above the chapter
+  is suppressed for these two Bellrunner interaction stages only:
+  location and origin remain in the existing header, while giving
+  Hector, the papers and the dialogue a practical above-the-fold
+  workspace. Other origin introductions retain their normal hero.
 
 ## Stage 1 dialogue
 
