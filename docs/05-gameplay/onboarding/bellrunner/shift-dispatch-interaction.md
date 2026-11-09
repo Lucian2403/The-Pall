@@ -97,12 +97,15 @@ action sequence, receipt proof and all previously approved text
 remain in the right-hand dialogue. Backgrounds keep their full
 source aspect ratio and never overlap the parchment.
 
-The **Grand Cylinder City panorama remains visible above the stage
-header** on both Bellrunner stages, exactly as elsewhere in the
-introduction. It was mistakenly hidden to save screen height in an
-earlier iteration; this was rejected. The illustrated workstation
-and dialogue follow the city header and use normal page scrolling
-rather than erasing shared location context.
+The **Grand Cylinder City panorama and title remain visible above
+the stage header** on both Bellrunner stages, using the same artwork
+as elsewhere in the introduction. It was mistakenly hidden to save
+screen height in an earlier iteration; this was rejected. To keep
+the NPC and three working papers useful on smaller monitors, the
+Bellrunner view uses a **shorter version of that same banner**
+(`compactCityVista`) rather than deleting it. The illustrated
+workstation and dialogue follow the header, and the page scrolls
+normally if necessary.
 
 The reference's secondary choice treatment is also implemented:
 pale parchment-like buttons, dark carved edges and restrained
