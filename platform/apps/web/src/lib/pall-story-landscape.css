@@ -51,6 +51,18 @@
   padding:0;
   background:#241b14;
 }
+/* Reuse the owner's existing highlighted metal/button state for an actual
+   continuation action. Equal game choices (roads, mark remedies, topics)
+   deliberately remain neutral—no implied mechanically "correct" answer. */
+.frame .chapter-content .workshop :is(.responses,.actions) > button.primary-choice{
+  border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
+  color:#26170e;
+  font-weight:700;
+  min-height:55px;
+}
+.frame .chapter-content .workshop :is(.responses,.actions) > button.primary-choice:is(:hover,:focus-visible){
+  filter:brightness(1.07);
+}
 @media(max-width:1160px){
   .pall-story-sections{grid-template-columns:minmax(0,1fr);gap:8px}
   .pall-story-visuals{width:100%}
