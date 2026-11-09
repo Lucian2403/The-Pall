@@ -62,39 +62,42 @@ remain fully visible on wide monitors. The player's starting Route
 Sheet object in Stage 1 is the deliberate interactive prop that accepts
 the round, unlike the static destination setting.
 
-All supplied images have been converted into lightweight WebP derivatives
-without altering the originals. The painted scene is never stretched
-out of its native proportions, and receipt/ledger hotspots scale with
-that same painting, not independent window percentages.
+## Consistent scene framing on every screen
 
-**Wide-screen receiving-counter fix (November 9):** The receiving-desk
-painting contains a large wooden counter along the source's bottom edge.
-Centering a 16:9 painting inside a much wider and shorter scene had
-cropped the desk and pushed the floating documents and labels below
-the visible stage. The receiving scene now uses a **bottom-aligned,
-aspect-preserving cover**; street scenes retain their existing centered
-framing. No separate task paper cutouts or hotspots appear here; all interactions
-are accessible in the dialogue panel.
-At mobile widths the full source painting is shown without a forced
-cover crop. All changes are CSS only; existing saved routes, receipt
-states and ledger actions are unaffected.
+All owner illustrations are preserved as optimized WebP derivatives,
+with their full source compositions still intact. The older Stage 1
+Dispatch House scene remained locked to a height between 535 and
+640 pixels, leaving dead space underneath; meanwhile the previous
+attempt to make Stage 2's artwork fill that space used `cover`
+on a short, extra-wide container and cropped much of the street.
 
-**Full-viewport landscape scene scaling (November 9):** Stage 2 formerly
-used `height:clamp(535px,62vh,640px)` as a fixed scene height. The main
-game shell itself fills the browser height; on larger displays that left
-a distracting strip of empty background underneath both street routes
-and the reception. The Stage 2 scene now uses a flexible height with
-that same clamp as its **minimum**, occupying the remaining height of
-the HUD rather than ending at 640px. The existing 1672:941 source-art
-cover scaling expands with the scene and **never distorts the image**:
-Short and Long Route remain centered; the Receiving Desk continues to
-anchor its counter to the lower edge. On unusually wide displays some
-edge cropping is unavoidable without adding letterboxes or stretching
-the paintings. The original WebP assets are reused unchanged.
+**Approved layout rule (November 9):** Both Bellrunner Stage 1 and
+Stage 2 now use the same reusable
+`apps/web/src/lib/pall-story-landscape.css` contract:
 
-The fix is shared across **both routes, the Receiving Desk and the
-stage's Depot view**. It does not modify dialogue, object interactions,
-the scene audio lifecycle, saved progress or database migrations.
+- Every desktop background—Dispatch House, Short Route, Long Route,
+  and Receiving Desk—sits in a **1672:941 intrinsic-ratio scene**,
+  sized to the available chapter **width**.
+- The background uses aspect-preserving `object-fit:contain` inside
+  that matching scene. Nothing is independently zoomed to `cover`
+  a shorter viewport; neither the freight-yard street nor the
+  receiving counter is cropped.
+- Hector, route sheet, papers, dialogue and click hitboxes share the
+  same coordinate space at the Depot; no interaction zones drift when
+  the window gets wider.
+- A short or ultrawide browser window **scrolls the page vertically**
+  to show the rest of the full painting. This is necessary to keep
+  both full-width art **and** its original proportions with no
+  fabricated side extensions or distorted perspective.
+- On narrow mobile screens the artwork keeps its complete 1672:941
+  aspect above the stacked dialogue, with no forced blank height.
+
+The previous bottom-aligned receiving-art-only crop and the
+viewport-expanding `height:auto; min-height:clamp(...); flex:1`
+workarounds are superseded. The destination painting remains a
+pure background, with no interactive assets or receiver portrait.
+No story, audio, character, receipt or database changes result from
+scene-framing work.
 
 ## Choose the road
 
