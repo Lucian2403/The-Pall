@@ -120,7 +120,11 @@
           <p class="eyebrow">DISPATCH HOUSE</p>
           <p class="narration">{say}</p>
         {:else if beat.kind==='speech'}
-          <p class="eyebrow">{beat.speaker==='Player'?characterName:'HECTOR D. SMOKE'}</p>
+          {#if beat.speaker==='Player'}
+            <p class="eyebrow">{characterName}</p>
+          {:else}
+            <h2 class="speaker-heading">HECTOR D. SMOKE</h2>
+          {/if}
           <p class="speech">“{say}”</p>
         {:else if beat.kind==='handoff'}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
@@ -195,9 +199,14 @@
     border-bottom:1px solid #9e815955}
   h2{margin:0 0 16px;font:600 clamp(23px,1.8vw,30px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
+  .speaker-heading{margin:0 0 24px;padding:0 0 13px;
+    border-bottom:1px solid #9e815955;text-transform:uppercase;
+    font:600 clamp(21px,1.4vw,27px)/1.25
+    var(--pall-font-reading,Georgia,serif);letter-spacing:.08em;color:#302012}
   .speech,.narration,.work-description{margin:0 0 17px;
-    font:600 clamp(17px,1.35vw,23px)/1.55 var(--pall-font-reading,Georgia,serif);
+    font:600 clamp(19px,1.7vw,30px)/1.48 var(--pall-font-reading,Georgia,serif);
     color:#251910}
+  .narration,.work-description{font-size:clamp(17px,1.23vw,21px);line-height:1.56}
   .narration{font-style:italic}
   .responses{display:flex;flex-direction:column;gap:9px;margin-top:clamp(18px,3vw,35px)}
   .responses>button{display:block;width:100%;text-align:left;
@@ -211,7 +220,8 @@
   .error{margin:4px 0 0;color:#873523;font:13px/1.45 Georgia,serif}
   @media(max-width:1160px){
     .dispatch-dialogue{min-height:0;padding:23px 24px}
-    .speech,.narration,.work-description{font-size:19px}
+    .speech{font-size:24px}
+    .narration,.work-description{font-size:19px}
   }
   @media(max-width:700px){
     .dispatch-scene{height:auto;min-height:0}
@@ -220,7 +230,8 @@
     .hector{top:0;height:100%;max-width:43%;left:2%}
     .npc-hotspot{left:0;top:6%;width:47%;height:87%;padding-bottom:0}
     .dispatch-dialogue{min-height:0;padding:19px 14px}
-    .speech,.narration,.work-description{font-size:17px;line-height:1.55}
+    .speech{font-size:20px;line-height:1.5}
+    .narration,.work-description{font-size:17px;line-height:1.55}
     .responses>button{font-size:16px;min-height:47px}
   }
 </style>
