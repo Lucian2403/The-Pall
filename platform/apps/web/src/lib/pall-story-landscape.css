@@ -32,7 +32,7 @@
   box-sizing:border-box;
   width:100%;
   min-width:0;
-  min-height:100%;
+  align-self:stretch;
   padding:clamp(12px,1.7vw,28px) clamp(9px,1.7vw,27px);
   border-left:2px solid #765537;
   background:linear-gradient(180deg,#2a211a,#1b1815 85%);
