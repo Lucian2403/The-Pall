@@ -10,6 +10,7 @@
     BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
     from '$lib/bellrunner-stage2-narrative';
   import '$lib/workshop-object-labels.css';
+  import '$lib/pall-story-landscape.css';
 
   type Character={
     id:string;name:string;origin:string;sex:string;coins:number;
@@ -140,7 +141,7 @@
   <TutorialShell {character} sceneLocation={HAULING_SCENES[sceneKey].label}
     depotBackdrop={sceneKey==='depot'}>
     <section class="workshop dispatch" aria-label="Bellrunner Stage 2 Shift Dispatch">
-      <div class="scene" class:receiving={sceneKey==='receiving_desk'}>
+      <div class="scene pall-story-landscape" class:receiving={sceneKey==='receiving_desk'}>
         <div class="illustration">
           {#if sceneKey==='depot'}
             <!-- The original working Depot and its foreground stay together. -->
@@ -316,27 +317,18 @@
   .scene{position:relative;display:grid;
     grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);
     grid-template-rows:minmax(0,1fr);align-content:start;box-sizing:border-box;
-    /* The parent game shell grows to the viewport. Grow with it instead
-       of ending at 640px and leaving an empty charcoal strip on tall or
-       wide monitors. Keep a floor for readable dialogue on short screens. */
-    width:100%;height:auto;min-height:clamp(535px,62vh,640px);
-    flex:1 1 auto;background:#291d15}
+    /* Shared intrinsic image ratio controls height; the page scrolls on
+       short viewports instead of trimming away the street or the desk. */
+    width:100%;background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden;container-type:size}
-  .art-scaled{position:absolute;left:50%;top:50%;
-    width:max(100cqw,177.7cqh);aspect-ratio:1672/941;
-    transform:translate(-50%,-50%)}
-  /* The receiving desk's task surface is painted at the bottom of
-     its 16:9 source. Center-cover discarded that lower part on wide
-     screens, cutting off the counter and every interactive paper.
-     Align the painting AND its absolute-positioned hotspots to the
-     scene's bottom edge, keeping the art's true aspect ratio. */
-  .scene.receiving .art-scaled{top:auto;bottom:0;transform:translateX(-50%)}
+  /* One native-ratio art surface across both routes and reception.
+     There are no scene objects to justify a larger, cover-cropped layer. */
+  .art-scaled{position:absolute;inset:0;width:100%;height:100%}
   .environment{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;pointer-events:none}
-  /* The three owner paintings have slightly different native ratios.
-     Cover preserves each image's proportions instead of distorting it
-     to the shared 1672:941 frame (crop is at most a few pixels). */
-  .art-scaled>.environment{object-fit:cover}
+  /* Source paintings vary by two pixels in size. Contain shows every
+     street/counter edge; the remaining subpixel margin is negligible. */
+  .art-scaled>.environment{object-fit:contain}
   /* At a receiving desk, keep the book in view and place the conversation
      on the opposite side. No painted-on character/NPC overlay is added. */
   .scene.receiving .work-card{grid-column:1;
@@ -394,8 +386,7 @@
   @media(max-width:700px){
     .scene{display:flex;flex-direction:column;height:auto;min-height:0;flex:none}
     .illustration{position:relative;width:100%;aspect-ratio:1672/941;container-type:normal}
-    .art-scaled{left:0;top:0;transform:none;width:100%;height:100%}
-    .scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}
+    .art-scaled{inset:0;width:100%;height:100%}
     .environment{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
