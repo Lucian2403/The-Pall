@@ -367,6 +367,12 @@
   .art-scaled{position:absolute;left:50%;top:50%;
     width:max(100cqw,177.7cqh);aspect-ratio:1672/941;
     transform:translate(-50%,-50%)}
+  /* The receiving desk's task surface is painted at the bottom of
+     its 16:9 source. Center-cover discarded that lower part on wide
+     screens, cutting off the counter and every interactive paper.
+     Align the painting AND its absolute-positioned hotspots to the
+     scene's bottom edge, keeping the art's true aspect ratio. */
+  .scene.receiving .art-scaled{top:auto;bottom:0;transform:translateX(-50%)}
   .environment{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;pointer-events:none}
   .art-scaled>.environment{object-fit:fill}
@@ -381,9 +387,11 @@
     background:transparent;border:0;cursor:pointer;color:#f3e6d1}
   .counter-target:focus-visible{outline:2px solid #f3d299;outline-offset:2px}
   .counter-target:disabled{cursor:wait;opacity:.6}
-  .notices-prop,.notices-target{left:74%;bottom:7%;width:19%;height:23%}
-  .route-prop,.route-target{left:78%;bottom:6%;width:17%;height:23%}
-  .sealed-prop,.sealed-target{left:62%;bottom:7%;width:19%;height:25%}
+  /* All props remain comfortably ABOVE the lower clipping edge,
+     on the right of the desk and away from the built-in ledger. */
+  .notices-prop,.notices-target{left:76%;bottom:11%;width:18%;height:20%}
+  .route-prop,.route-target{left:78%;bottom:11%;width:17%;height:20%}
+  .sealed-prop,.sealed-target{left:76%;bottom:11%;width:18%;height:22%}
   .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
     width:auto;object-fit:contain;object-position:bottom center;
     z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
@@ -438,6 +446,7 @@
     .scene{display:flex;flex-direction:column;height:auto;min-height:0}
     .illustration{position:relative;width:100%;aspect-ratio:1672/941;container-type:normal}
     .art-scaled{left:0;top:0;transform:none;width:100%;height:100%}
+    .scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}
     .environment{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
@@ -449,9 +458,9 @@
     .paper-art.route,.paper-target.route{left:79%}
     .work-card,.scene.receiving .work-card{width:100%;margin:0;padding:14px;
       border-radius:0;max-height:none;overflow:visible}
-    .notices-prop,.notices-target{left:72%;width:25%}
-    .route-prop,.route-target{left:74%;width:24%}
-    .sealed-prop,.sealed-target{left:62%;width:25%}
+    .notices-prop,.notices-target{left:70%;width:26%;height:27%;bottom:10%}
+    .route-prop,.route-target{left:70%;width:26%;height:27%;bottom:10%}
+    .sealed-prop,.sealed-target{left:70%;width:26%;height:27%;bottom:10%}
     .story,.instruction,.payment{font-size:16px}
   }
 </style>
