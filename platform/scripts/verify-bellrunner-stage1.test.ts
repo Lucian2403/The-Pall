@@ -68,161 +68,139 @@ test('Owner-provided multi-purpose Hauling scenes keep their source art and use 
  assert.ok(!book.includes('<img'),'The receiving book is already painted into the office');
 });
 
-test('Bellrunner Stages 1–2 show painted locations LEFT of dialogue on desktop',()=>{
+test('Bellrunner workstation uses left NPC and documents, right readable parchment',()=>{
  const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const shared=source('apps/web/src/lib/pall-story-landscape.css');
- const shell=source('apps/web/src/lib/TutorialShell.svelte');
- for(const scene of [first,second]){
-  assert.ok(scene.includes("import '$lib/pall-story-landscape.css'"));
-  assert.ok(scene.includes('pall-story-sections'));
-  assert.ok(scene.includes('pall-story-landscape'));
-  assert.ok(scene.includes('pall-story-dialogue-section'));
-  assert.ok(!scene.includes('height:clamp(535px,62vh,640px)'));
-  assert.ok(!scene.includes('width:max(100cqw,177.7cqh)'));
-  assert.ok(scene.indexOf('pall-story-landscape') <
-    scene.indexOf('pall-story-dialogue-section'));
-  assert.ok(scene.includes('</section>\n\n    <section class="dialogue-section')||
-    scene.includes('</section>\n\n        <section class="dialogue-section'),
-    'The image and dialogue must be sibling sections, not overlapping siblings inside one ratio-constrained frame');
+ const tray=source('apps/web/src/lib/BellrunnerDocumentTray.svelte');
+ for(const component of [first,second]){
+  assert.ok(component.includes("import '$lib/pall-story-landscape.css'"));
+  assert.ok(component.includes('pall-story-sections'));
+  assert.ok(component.includes('pall-story-visuals'));
+  assert.ok(component.includes('pall-story-landscape'));
+  assert.ok(component.includes('pall-story-dialogue-section'));
+  assert.ok(component.includes('BellrunnerDocumentTray'));
+  assert.ok(!component.includes('height:clamp(535px,62vh,640px)'));
+  assert.ok(!component.includes('width:max(100cqw,177.7cqh)'));
+  assert.ok(!component.includes('WorkshopItemPopover'),
+   'Inspection descriptions belong in the right-hand parchment');
  }
- assert.ok(first.includes('class="dispatch-scene pall-story-sections"'));
+ assert.ok(first.includes('class="scene-visuals pall-story-visuals"'));
  assert.ok(first.includes('class="scene-illustration pall-story-landscape"'));
- assert.ok(first.includes('class="dialogue-section pall-story-dialogue-section"'));
- assert.ok(!first.includes('scrollIntoView('),
-  'The dialogue is already visible to the right when an NPC or paper is clicked');
- assert.ok(second.includes('class="scene pall-story-sections"'));
+ assert.ok(first.includes('<BellrunnerDocumentTray {papers} onChoose={usePaper}'));
+ assert.ok(first.includes('routeReady={beat.kind===\'handoff\'}'));
+ assert.ok(second.includes('class="scene-visuals pall-story-visuals"'));
+ assert.ok(second.includes('<BellrunnerDocumentTray papers={docs}'));
+ assert.ok(second.includes("{#if sceneKey==='depot'}"));
  assert.ok(second.includes('class="illustration pall-story-landscape"'));
- assert.ok(second.includes('class="dialogue-section pall-story-dialogue-section"'));
- assert.ok(!second.includes('scrollIntoView('),
-  'Stage 2 NPC and paper clicks must not shift the page from side-by-side composition');
- assert.ok(shared.includes('.pall-story-sections{'));
  assert.ok(shared.includes('display:grid'));
- assert.ok(shared.includes('grid-template-columns:minmax(0,60%) minmax(0,40%)'),
-  'On desktop place 60% scene at LEFT and 40% dialogue at RIGHT');
- assert.ok(shared.includes('.pall-story-landscape{'));
- assert.ok(shared.includes('aspect-ratio:1672 / 941'));
+ assert.ok(shared.includes('grid-template-columns:minmax(0,52fr) minmax(0,48fr)'));
+ assert.ok(shared.includes('.pall-story-visuals{'));
  assert.ok(shared.includes('.pall-story-dialogue-section{'));
- assert.ok(shared.includes('border-left:2px solid'));
- assert.ok(shared.includes('@media(max-width:1080px)'));
- assert.ok(shared.includes('.pall-story-sections{grid-template-columns:minmax(0,1fr)}'),
-  'Only narrow screens should stack the dialogue below artwork');
- assert.ok(!shared.includes('aspect-ratio:auto;overflow:visible'),
-  'Mobile image should retain its ratio while the dialogue stacks below');
- assert.ok(shell.includes('.chapter-content{display:flex;flex-direction:column;flex:1;'));
+ assert.ok(!shared.includes('grid-template-columns:minmax(0,60%)'));
+ assert.ok(!shared.includes('flex-direction:column;\n  flex:0 0 auto;\n  width:100%'),
+  'The entire desktop work area must not become one tall column');
+ assert.ok(shared.includes('@media(max-width:1160px)'));
+ assert.ok(shared.includes('.pall-story-sections{grid-template-columns:minmax(0,1fr);gap:8px}'));
+ assert.ok(tray.includes('Round Documents'));
+ assert.ok(tray.includes('document-grid'));
+ assert.ok(tray.includes('class="document-card"'));
 });
 
-test('Stage 1 left painting retains NPC/object actions, right frame shows inspection text',()=>{
- const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
- const start=first.indexOf('<section class="scene-illustration pall-story-landscape"');
- const end=first.indexOf('</section>',start);
- const art=first.slice(start,end);
- assert.ok(art.includes('class="npc-hotspot"'));
- assert.ok(art.includes('class="paper-target {key}"'));
- assert.ok(art.includes('class:route-ready={key===\'route\'&&beat.kind===\'handoff\'}'));
- assert.ok(art.includes('onclick={()=>usePaper(key)}'));
- assert.ok(!art.includes('WorkshopItemPopover'));
- assert.ok(!art.includes('class="work-card'));
- assert.ok(first.includes('{#if selected}')&&first.includes('DISPATCH HOUSE · PAPER INSPECTION'));
- assert.ok(first.includes('{papers[selected].observation}'));
- assert.ok(first.includes('Return to the dialogue'));
- assert.ok(!first.includes('dialogueSection?.scrollIntoView('),
-  'Selecting a paper must update visible right-hand text, not scroll away');
- assert.ok(!art.includes('class="work-card'));
- const frame=first.slice(end);
- assert.ok(frame.includes('<aside class="work-card dispatch-dialogue"'));
- assert.ok(frame.includes('<BellrunnerHectorConversation'));
- assert.ok(frame.includes('Take the Route Sheet</h2>'));
- assert.ok(first.includes('.dispatch-dialogue{position:relative;z-index:1;align-self:stretch;'));
- assert.ok(first.includes('width:min(100%,980px);margin:0'));
- assert.ok(first.includes('max-height:none;overflow:visible'));
- assert.ok(first.includes('object-fit:contain;pointer-events:none'));
-});
-
-test('Stage 2 routes and Receiving Desk show painting left and text right, without extra objects',()=>{
- const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
- const start=second.indexOf('<section class="illustration pall-story-landscape"');
- const end=second.indexOf('</section>',start);
- const art=second.slice(start,end);
- const text=second.slice(end);
- assert.ok(art.includes('HAULING_SCENES[sceneKey].src'));
- assert.ok(art.includes("sceneKey==='depot'"));
- assert.ok(art.includes('class="npc-hotspot"'));
- assert.ok(art.includes('class="paper-target {key}"'));
- assert.ok(!art.includes('class="work-card"'));
- assert.ok(text.includes('<aside class="work-card"'));
- assert.ok(text.includes("phase==='road_chosen'"));
- assert.ok(text.includes("phase==='receiving_arrival'"));
- assert.ok(text.includes("perform('check_receiving_book')"));
- assert.ok(text.includes("perform('take_final_notice')"));
- assert.ok(second.includes('.art-scaled>.environment{object-fit:contain}'));
- assert.ok(second.includes('max-height:none;overflow:visible'));
- assert.ok(!second.includes('counter-target')&&!second.includes('counter-prop'));
- assert.ok(!second.includes('HaulingReceivingBookHotspot'));
- assert.ok(!second.includes('.scene.receiving .work-card{grid-column:1'));
- assert.ok(!second.includes('src="/characters/receiver'));
- assert.ok(second.includes("depotBackdrop={sceneKey==='depot'}"),
-  'Street and office scenes stop the Depot audio');
-});
-
-test('Full artwork ratio and separate right-side dialogue hold across desktop and mobile',()=>{
- const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
- const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
- const shared=source('apps/web/src/lib/pall-story-landscape.css');
- assert.ok(shared.includes('width:100%;'));
- assert.ok(shared.includes('grid-template-columns:minmax(0,60%) minmax(0,40%)'));
- assert.ok(shared.includes('overflow:hidden;'));
- assert.ok(shared.includes('aspect-ratio:1672 / 941'));
- assert.ok(shared.includes('.pall-story-dialogue-section{'));
- assert.ok(shared.includes('width:100%;'));
- assert.ok(first.includes('.scene-illustration{position:relative;width:100%;aspect-ratio:1672/941}'));
- assert.ok(second.includes('.illustration{position:relative;width:100%;aspect-ratio:1672/941;'));
- for(const [screenW,screenH] of [[1280,720],[1920,768],[2048,821],
-   [2560,1440],[3440,1440],[3840,2160]]){
-  const rail=screenW<=1270?188:230;
-  const width=screenW-rail;
-  const artworkHeight=width*941/1672;
-  assert.ok(artworkHeight>0);
-  const sceneWidth=width*.6;
-  const artHeight=sceneWidth*941/1672;
-  assert.ok(artHeight>0);
-  assert.ok(sceneWidth+width*.4-width<.01);
-  // The dialogue occupies the remaining 40% beside the painting,
-  // not an additional giant strip below an image of full page width.
-  if(screenW>1080)assert.ok(artHeight<artworkHeight);
-  assert.ok(screenH>0);
- }
- assert.ok(shared.includes('@media(max-width:700px)'));
- assert.ok(shared.includes('pall-story-dialogue-section{padding:12px 8px 20px}'));
- assert.ok(first.includes('.dispatch-dialogue{width:100%;margin:0;padding:14px;'));
- assert.ok(second.includes('.work-card{width:100%;margin:0;padding:14px;'));
-});
-
-test('Stage 1 Route Sheet owns round acceptance, no duplicate handoff button or payment text',()=>{
- const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+test('Three owner document assets are complete native click targets, not decorative overlays',()=>{
+ const tray=source('apps/web/src/lib/BellrunnerDocumentTray.svelte');
+ const opening=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(tray.includes("const keys=['notices','sealed','route']"));
+ assert.ok(tray.includes('{#each keys as key (key)}'));
+ assert.ok(tray.includes('data-workshop-object data-pall-sfx="paper"'));
+ assert.ok(tray.includes('aria-label={routeReady&&key===\'route\''));
+ assert.ok(tray.includes('aria-pressed={routeReady&&key===\'route\'?undefined:selected===key}'));
+ assert.ok(tray.includes('disabled={busy&&key===\'route\'&&routeReady}'));
+ assert.ok(tray.includes('onclick={()=>onChoose(key)}'));
+ assert.ok(tray.includes('src={papers[key].src}'));
+ assert.ok(tray.includes('workshop-object-label'));
+ assert.ok(tray.includes('Take Route Sheet')&&tray.includes('Inspect'));
+ for(const sourceCode of [opening,stage2]){
+  assert.ok(!sourceCode.includes('paper-art'));
+  assert.ok(!sourceCode.includes('paper-target'));
+  assert.ok(sourceCode.includes('class="npc-hotspot"'),
+   'Hector remains clickable inside the illustrated left panel');
+ }
+ assert.ok(stage2.includes('<BellrunnerDocumentTray papers={docs}'));
+ assert.ok(stage2.includes('onChoose={(key)=>{'));
+ assert.ok(!stage2.includes('counter-target')&&!stage2.includes('counter-prop'));
+ assert.ok(!stage2.includes('HaulingReceivingBookHotspot'));
+});
+
+test('Hector stage has legible dialogue hierarchy, an accessible previous control and no fake rewards',()=>{
+ const opening=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+ const hector=source('apps/web/src/lib/BellrunnerHectorConversation.svelte');
+ const shared=source('apps/web/src/lib/pall-story-landscape.css');
+ assert.ok(opening.includes('<BellrunnerHectorConversation'));
+ assert.ok(opening.includes('{papers[selected].observation}'));
+ assert.ok(opening.includes('class="dialogue-body"'));
+ assert.ok(opening.includes('class="dialogue-navigation"'));
+ assert.ok(opening.includes('Previous line'));
+ assert.ok(opening.includes('margin-top:auto'),
+  'Previous line belongs at the foot of the parchment, not among the main choices');
+ assert.ok(opening.includes('class="primary-choice"'));
+ assert.ok(hector.includes('class="primary-choice"'));
+ assert.ok(shared.includes('button.primary-choice'));
+ assert.ok(shared.includes('button-hover-trim.png'));
+ assert.ok(opening.includes('max-width:980px'));
+ assert.ok(opening.includes('max-height:none;overflow:visible'));
+ assert.ok(!opening.includes('Payment: Not yet cleared'));
+ assert.ok(!hector.includes('rewardXp(')&&!hector.includes('takeRound('));
+ assert.ok(hector.includes('“{currentLine.text}”'),
+  'Preserve the owner-authored Hector lines verbatim');
+});
+
+test('Both road scenes and receiving desk use the same layout without spawning new props or NPCs',()=>{
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ const shared=source('apps/web/src/lib/pall-story-landscape.css');
+ assert.ok(ui.includes("sceneKey==='depot'"));
+ assert.ok(ui.includes('HAULING_SCENES[sceneKey].src'));
+ assert.ok(ui.includes('.art-scaled>.environment{object-fit:contain}'));
+ assert.ok(ui.includes('class="scene-visuals pall-story-visuals"'));
+ assert.ok(ui.includes('class="dialogue-section pall-story-dialogue-section"'));
+ assert.ok(ui.includes('max-width:980px'));
+ assert.ok(ui.includes('max-height:none;overflow:visible'));
+ assert.ok(ui.includes("depotBackdrop={sceneKey==='depot'}"));
+ assert.ok(ui.includes("perform('check_receiving_book')"),
+  'Receipt book remains a dialogue choice, not a scenery hotspot');
+ assert.ok(ui.includes("perform('take_final_notice')"));
+ assert.ok(!ui.includes('WorkshopItemPopover'));
+ assert.ok(!ui.includes('counter-target'));
+ assert.ok(!ui.includes('HaulingReceivingBookHotspot'));
+ assert.ok(!ui.includes('src="/characters/receiver'));
+ assert.ok(shared.includes('aspect-ratio:1672 / 941'));
+});
+
+test('Stage 1 Route Sheet remains the sole authenticated handoff action',()=>{
+ const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+ const tray=source('apps/web/src/lib/BellrunnerDocumentTray.svelte');
  const opening=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
  assert.ok(scene.includes("item==='route'&&beat.kind==='handoff'"));
- assert.ok(scene.includes('onclick={()=>usePaper(key)}'));
  assert.ok(scene.includes('if(!takingRound)void takeRound()'));
- assert.ok(scene.includes('disabled={key===\'route\'&&beat.kind===\'handoff\'&&takingRound}'));
- assert.ok(scene.includes('Take the Route Sheet to begin Shift Dispatch'));
+ assert.ok(scene.includes('onChoose={usePaper}'));
+ assert.ok(scene.includes('routeReady={beat.kind===\'handoff\'}'));
+ assert.ok(tray.includes('Take the Route Sheet to begin Shift Dispatch'));
+ assert.ok(tray.includes('Take Route Sheet'));
  assert.ok(scene.includes('<h2>Take the Route Sheet</h2>'));
+ assert.ok(opening.includes('takeRound={takeBellrunnerRound}'));
+ assert.ok(opening.includes("action:'take_round',expectedRevision:0"));
+ assert.ok(!scene.includes('onclick={()=>{void takeRound();}}'));
+ assert.ok(!scene.includes('>Take the round</button>'));
  const handoff=scene.slice(scene.indexOf("{:else if beat.kind==='handoff'}"),
    scene.indexOf('</aside>'));
- assert.ok(handoff.includes('Previous line'));
  assert.ok(handoff.includes("beat.kind!=='handoff'"));
- assert.ok(!handoff.includes('onclick={()=>{void takeRound();}}'));
- assert.ok(!handoff.includes('>Take the round</button>'));
- assert.ok(!handoff.includes('>Ask Hector something</button>')||
-  handoff.includes("beat.kind!=='handoff'"));
- assert.ok(opening.includes('takeRound={takeBellrunnerRound}'));
- assert.ok(opening.includes("action:'take_round',expectedRevision:0"),
-  'The visual object still commits the owner-checked, idempotent API command');
- for(const text of [scene,stage2]){
-  assert.ok(!text.includes('Payment: Not yet cleared'), 'Remove repeated payment status');
-  assert.ok(!text.includes('Payment: {round.payment}'), 'Remove dynamic payment status');
-  assert.ok(!text.includes('class="payment"'),'No payment paragraph remains');
+ assert.ok(handoff.includes('Previous line'));
+ for(const text of [scene,
+  source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte')]){
+  assert.ok(!text.includes('Payment: Not yet cleared'));
+  assert.ok(!text.includes('Payment: {round.payment}'));
+  assert.ok(!text.includes('class="payment"'));
  }
 });
 
@@ -285,7 +263,7 @@ test('All six optional topics preserve every spoken turn and never grant rewards
  assert.ok(!scene.includes('skipToWork')&&!conversation.includes('rewardXp('));
 });
 
-test('Hector framing, lower-section paper inspection and audio reuse owner-approved workshop UI',()=>{
+test('Hector, document cards and original UI/audio remain consistent',()=>{
  const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const opening=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
@@ -298,7 +276,8 @@ test('Hector framing, lower-section paper inspection and audio reuse owner-appro
   scene.includes("import '$lib/workshop-object-labels.css'"));
  assert.ok(scene.includes('DISPATCH HOUSE · PAPER INSPECTION')&&
   scene.includes('{papers[selected].observation}'));
- assert.ok(scene.includes('workshop-object-label')&&scene.includes('workshop-npc-label'));
+ assert.ok(scene.includes('<BellrunnerDocumentTray')&&scene.includes('workshop-npc-label'));
+ assert.ok(source('apps/web/src/lib/BellrunnerDocumentTray.svelte').includes('workshop-object-label'));
  assert.ok(scene.includes('clip-path:inset(93% 0 0 0)')&&
   !scene.includes('clip-path:inset(70% 0 0 0)'),
   'The foreground must cover only Hector\'s boots, not cut him across the waist');
