@@ -5,7 +5,7 @@
 export type DispatchRoute='direct'|'quieter';
 export type ReceiptProof='clear'|'book_confirmed'|'noted_unclear';
 export type DispatchPhase=
-  'issued'|'checked'|'road_chosen'|'spoiled_mark'|'book_checked'|
+  'issued'|'checked'|'road_chosen'|'receiving_arrival'|'spoiled_mark'|'book_checked'|
   'receiver_reply'|'receiver_result'|'round_report'|'final_notice'|'final_notice_taken';
 export type DispatchState={
   phase:DispatchPhase;
@@ -15,12 +15,12 @@ export type DispatchState={
 };
 export type DispatchWorkAction=
   'check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
-  'deliver_notices'|'ask_fresh_mark'|'check_receiving_book'|
+  'deliver_notices'|'continue_to_receiver'|'ask_fresh_mark'|'check_receiving_book'|
   'confirm_book'|'note_spoiled_mark'|'continue_receiver_dialogue'|
   'continue_to_report'|'finish_round'|'take_final_notice';
 export const DISPATCH_ACTIONS:ReadonlyArray<DispatchWorkAction>=[
   'check_round','sort_notices','take_direct_road','take_quieter_road',
-  'deliver_notices','ask_fresh_mark','check_receiving_book','confirm_book',
+  'deliver_notices','continue_to_receiver','ask_fresh_mark','check_receiving_book','confirm_book',
   'note_spoiled_mark','continue_receiver_dialogue','continue_to_report',
   'finish_round','take_final_notice'
 ];
@@ -50,6 +50,9 @@ export function applyDispatchAction(
      route:action==='take_direct_road'?'direct':'quieter'};
   case 'deliver_notices':
    if(state.phase!=='road_chosen'||!state.route)return reject();
+   return {...state,phase:'receiving_arrival'};
+  case 'continue_to_receiver':
+   if(state.phase!=='receiving_arrival')return reject();
    return {...state,phase:'spoiled_mark'};
   case 'check_receiving_book':
    if(state.phase!=='spoiled_mark')return reject();
@@ -71,8 +74,10 @@ export function applyDispatchAction(
    if(state.phase!=='receiver_reply'||!state.receipt)return reject();
    return {...state,phase:'receiver_result'};
   case 'continue_to_report':
+   // Preserve older in-flight clients, but do not force a redundant
+   // summary page in this tutorial. The work record keeps route/receipt.
    if(state.phase!=='receiver_result'||!state.receipt)return reject();
-   return {...state,phase:'round_report'};
+   return {...state,phase:'final_notice'};
   case 'finish_round':
    if(state.phase!=='round_report'||!state.receipt)return reject();
    return {...state,phase:'final_notice'};
