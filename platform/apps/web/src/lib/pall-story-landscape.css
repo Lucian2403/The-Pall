@@ -1,0 +1,25 @@
+/* Shared Bellrunner scene geometry for the Dispatch House, street routes
+   and municipal receiving desk. All owner paintings use approximately
+   1672:941 art; scene height follows width rather than a fixed 640px
+   letterbox. If the browser is shorter than the painting, the PAGE may
+   scroll, but no part of the art is clipped or stretched.
+   Apply to the whole illustrated scene, not just its background layer,
+   so NPC art, object hitboxes and parchment retain their alignment.
+*/
+.pall-story-landscape{
+  position:relative;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  height:auto;
+  min-height:0;
+  aspect-ratio:1672 / 941;
+  flex:0 0 auto;
+  overflow:hidden;
+  isolation:isolate;
+}
+@media(max-width:700px){
+  /* On phones, the image occupies its full native ratio above the
+     dialogue panel; do not force a tall empty 16:9 outer frame. */
+  .pall-story-landscape{aspect-ratio:auto;overflow:visible}
+}
