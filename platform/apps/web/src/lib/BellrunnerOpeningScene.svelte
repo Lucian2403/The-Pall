@@ -4,6 +4,7 @@
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import '$lib/workshop-object-labels.css';
+  import '$lib/pall-story-landscape.css';
 
   type PropKey='notices'|'sealed'|'route';
   const papers:Record<PropKey,{label:string;src:string;observation:string}>={
@@ -69,7 +70,7 @@
 </script>
 
 <section class="workshop bellrunner" aria-label="Bellrunner Stage 1 — Dispatch House">
-  <div class="dispatch-scene">
+  <div class="dispatch-scene pall-story-landscape">
     <div class="scene-illustration">
     <img class="depot" src="/locations/origins/bellrunner-depot.webp"
       alt="Grand Cylinder City Dispatch House, a working industrial courier depot" draggable="false"/>
@@ -157,10 +158,10 @@
   .dispatch-scene{position:relative;display:grid;
     grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
     align-content:start;grid-template-rows:minmax(0,1fr);
-    width:100%;min-width:0;height:clamp(535px,62vh,640px);background:#291d15}
+    width:100%;min-width:0;background:#291d15}
   .scene-illustration{position:absolute;inset:0;overflow:hidden}
   .depot{position:absolute;inset:0;width:100%;height:100%;
-    object-fit:cover;pointer-events:none}
+    object-fit:contain;pointer-events:none}
   .scene-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:linear-gradient(90deg,#100e0c29,transparent 52%,#0c0a092c)}
   .hector{position:absolute;z-index:1;top:5%;left:10%;height:103%;
@@ -205,7 +206,7 @@
   .error{margin:4px 0 0;color:#873523;font:13px/1.45 Georgia,serif}
   @media(max-width:700px){
     .dispatch-scene{display:flex;flex-direction:column;height:auto;min-height:0}
-    .scene-illustration{position:relative;inset:auto;width:100%;aspect-ratio:4/3}
+    .scene-illustration{position:relative;inset:auto;width:100%;aspect-ratio:1672/941}
     .depot{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
     .depot-foreground{object-position:39% center}
