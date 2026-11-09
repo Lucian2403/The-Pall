@@ -15,7 +15,11 @@ const chrome=['google-chrome','chromium','chromium-browser'].find(x=>
   spawnSync('which',[x],{stdio:'ignore'}).status===0);
 if(!chrome)throw Error('Chromium required for Bellrunner scene geometry.');
 const profile=mkdtempSync(join(tmpdir(),'pall-bellrunner-layout-'));
-const server=spawn('npm',['run','dev:web'],{cwd:root,stdio:['ignore','pipe','pipe']});
+// Start the npm/Vite process tree in its own group, so cleanup can
+// terminate Vite itself rather than only its npm parent.
+const server=spawn('npm',['run','dev:web'],{
+  cwd:root,stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32'
+});
 let output='';
 for(const stream of [server.stdout,server.stderr])stream.on('data',x=>{
   output+=String(x);if(output.length>25000)output=output.slice(-25000);
@@ -24,7 +28,10 @@ let browser,ws;
 const close=()=>{
   try{ws?.close();}catch{}
   try{browser?.kill('SIGKILL');}catch{}
-  try{server.kill('SIGTERM');}catch{}
+  try{
+    if(process.platform!=='win32'&&server.pid)process.kill(-server.pid,'SIGTERM');
+    else server.kill('SIGTERM');
+  }catch{try{server.kill('SIGTERM');}catch{}}
   try{rmSync(profile,{recursive:true,force:true});}catch{}
 };
 const timeout=setTimeout(()=>{
@@ -208,7 +215,15 @@ try{
     }
   }
   console.log('PASS: 20 real Bellrunner page/viewport combinations render as separate sections');
+}catch(error){
+  console.error(error);
+  process.exitCode=1;
 }finally{
   clearTimeout(timeout);
   close();
+  // npm/Vite can keep inherited pipes open after the parent exits.
+  // All assertions have already completed; return a definitive test
+  // result instead of relying on the process tree to end by itself.
+  await delay(140);
+  process.exit(process.exitCode??0);
 }
