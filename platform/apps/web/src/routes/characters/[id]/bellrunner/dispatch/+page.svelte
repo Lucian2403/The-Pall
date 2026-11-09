@@ -5,6 +5,7 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import BellrunnerDocumentTray from '$lib/BellrunnerDocumentTray.svelte';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import {HAULING_SCENES} from '$lib/hauling-scenes';
   import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
     BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
@@ -187,7 +188,9 @@
             <h1>{docs[selected].label}</h1>
             <p class="story">{docs[selected].description}</p>
             <div class="actions">
-              <button type="button" onclick={()=>{selected=null;}}>Return to the round</button>
+              <button type="button" class="secondary-choice" onclick={()=>{selected=null;}}>
+                <BellrunnerChoiceIcon kind="back"/>Return to the round
+              </button>
             </div>
           {:else if talkingToHector&&sceneKey==='depot'}
             <BellrunnerHectorConversation characterName={character.name}
@@ -202,13 +205,13 @@
               <p class="route-note"><strong>Short Route:</strong> Through the narrow
                 back streets behind the freight yards. Less walking, more
                 risk of trouble in the alleys.</p>
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('take_direct_road');}}>Take the Short Route</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('take_direct_road');}}><BellrunnerChoiceIcon kind="route"/>Take the Short Route</button>
               <p class="route-note"><strong>Long Route:</strong> Along the main
                 roads. More walking, traffic and crowds, but more people and
                 better visibility.</p>
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('take_quieter_road');}}>Take the Long Route</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('take_quieter_road');}}><BellrunnerChoiceIcon kind="route"/>Take the Long Route</button>
             </div>
           {:else if phase==='road_chosen'}
             <h1>{round.workState.route==='direct'?'The Short Route':'The Long Route'}</h1>
@@ -236,12 +239,12 @@
               <p class="spoken">“{line}”</p>
             {/each}
             <div class="actions">
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('ask_fresh_mark');}}>Ask for a fresh mark</button>
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('check_receiving_book');}}>Check their receiving book</button>
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('note_spoiled_mark');}}>Note the spoiled mark and go on</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('ask_fresh_mark');}}><BellrunnerChoiceIcon kind="mark"/>Ask for a fresh mark</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('check_receiving_book');}}><BellrunnerChoiceIcon kind="book"/>Check their receiving book</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('note_spoiled_mark');}}><BellrunnerChoiceIcon kind="mark"/>Note the spoiled mark and go on</button>
             </div>
           {:else if phase==='book_checked'}
             <!-- Compatibility for saved rounds from the older Stage 2 design.
@@ -250,12 +253,12 @@
             <p class="story">The entry matches the notice you delivered.
               You can note that confirmation or request a clearer mark.</p>
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('confirm_book');}}>Record the book confirmation</button>
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('ask_fresh_mark');}}>Ask for a fresh mark</button>
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('note_spoiled_mark');}}>Note the unclear mark</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('confirm_book');}}><BellrunnerChoiceIcon kind="mark"/>Record the book confirmation</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('ask_fresh_mark');}}><BellrunnerChoiceIcon kind="mark"/>Ask for a fresh mark</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('note_spoiled_mark');}}><BellrunnerChoiceIcon kind="mark"/>Note the unclear mark</button>
             </div>
           {:else if phase==='receiver_reply'&&receiverDialogue}
             <p class="eyebrow">{character.name.toUpperCase()}</p>
