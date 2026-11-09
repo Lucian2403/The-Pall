@@ -171,8 +171,8 @@
                 description={docs[selected].description} onClose={()=>{selected=null;}}/>
             {/if}
           {:else}
-            <!-- Proportionate, cover-scaled location painting. The street
-                 and receiving scenes contain no interactive overlays. -->
+            <!-- Complete original painting, fitted to the native-ratio scene.
+                 Streets and reception have no interactive overlays. -->
             <div class="art-scaled">
               <img class="environment" src={HAULING_SCENES[sceneKey].src}
                 alt={HAULING_SCENES[sceneKey].alt} draggable="false"/>
@@ -325,12 +325,12 @@
      There are no scene objects to justify a larger, cover-cropped layer. */
   .art-scaled{position:absolute;inset:0;width:100%;height:100%}
   .environment{position:absolute;inset:0;width:100%;height:100%;
-    object-fit:cover;pointer-events:none}
+    object-fit:contain;pointer-events:none}
   /* Source paintings vary by two pixels in size. Contain shows every
      street/counter edge; the remaining subpixel margin is negligible. */
   .art-scaled>.environment{object-fit:contain}
-  /* At a receiving desk, keep the book in view and place the conversation
-     on the opposite side. No painted-on character/NPC overlay is added. */
+  /* Place dialogue on the left of the static receiving-office scene.
+     No counter props, hotspots, or receiver portrait are overlaid. */
   .scene.receiving .work-card{grid-column:1;
     margin-left:clamp(12px,2vw,35px);margin-right:0}
   .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
