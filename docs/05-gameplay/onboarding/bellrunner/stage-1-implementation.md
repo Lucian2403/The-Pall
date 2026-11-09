@@ -30,21 +30,31 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   original style rather than generating extra scenic overlays. Hector's original artwork is not cut across the
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
-- **Side-by-side artwork/dialogue layout shared by Stages 1–2:**
-  at desktop widths, Section 1 is the **left 60%**: complete,
-  aspect-preserved Depot, street or Receiving Desk artwork and
-  only the relevant NPC/item click targets; Section 2 is the
-  **right 40%**: the approved nine-slice parchment containing
-  all dialogue, choices and paper inspection text.
-  Neither section overlays the other. Hector and props retain
-  their coordinates relative to the left illustration; clicking
-  them updates text on the right without a page-scroll jump.
-  On narrow displays (1080px or below) the two sections stack
-  with the image first. `pall-story-landscape.css` owns this
-  reusable column layout. The old full-width image plus
-  **dialogue below** implementation was rejected and superseded.
-  Chromium CI checks this arrangement at 1272px, 1920px,
-  2048px, 3440px and mobile screen widths.
+- **Immersive workstation layout shared by Stages 1–2:** both
+  Bellrunner stages now use the same **52% left / 48% right** grid on
+  desktop. The left workstation emphasizes Hector's existing
+  full-body portrait over the Depot illustration and places the
+  original three job papers in a separate **Round Documents** tray.
+  Each framed card is one keyboard/click target with an Inspect
+  affordance. The Route Sheet card changes to **Take Route Sheet**
+  at the canonical final handoff, continuing through the same
+  authenticated, idempotent `take_round` action. No redundant
+  Review Route button or additional acceptance step is introduced.
+  The right parchment stretches to match the workstation, uses
+  the owner nine-slice framing and button art, increases dialogue
+  readability and anchors **Previous line** at the bottom.
+  Narrative progress actions may use the owner's highlighted button
+  art; the optional topics, route alternatives and receipt choices
+  remain visually neutral. The approved speech is reproduced
+  verbatim, and inspection descriptions are shown in the right-hand
+  frame instead of popups over the painting. At widths up to
+  1160px the two columns stack, left workstation first.
+  During Stage 2, the paper tray appears only at the Depot;
+  street and receiving scenes retain their original art and
+  dialogue-only controls. `pall-story-landscape.css` owns the common
+  grid and `BellrunnerDocumentTray.svelte` owns the shared cards.
+  New Chromium QA checks the actual responsive positions and
+  NPC/paper interactions.
 
 ## Stage 1 dialogue
 
