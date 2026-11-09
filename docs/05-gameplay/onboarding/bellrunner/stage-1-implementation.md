@@ -51,12 +51,17 @@ client-only; they never write progress or grant rewards. The
 both scenes, and returning to the work panel never resets the
 current dispatch revision or route choice.
 
-**Take the round** calls `POST /api/characters/:id/bellrunner/dispatch`
-with owner authentication, transaction-locked character row, origin
-and stage checks and an idempotent request receipt. It permanently
-moves the character from Stage 1 NOT_STARTED to Stage 2 IN_PROGRESS
-until an explicit local-only developer rewind. No money, XP, items or
-Major Skill levels are awarded.
+At the handoff, the dialogue displays **Take the Route Sheet**,
+with **Previous line** as its only button. Clicking the actual Route
+Sheet object—its plaque now reads **Take Route Sheet**—calls
+`POST /api/characters/:id/bellrunner/dispatch` using the existing
+owner-checked, row-locked and idempotent `take_round` operation.
+Other Depot papers remain inspectable but cannot advance the stage.
+This action moves the character from Stage 1 NOT_STARTED to Stage 2
+IN_PROGRESS. No money, XP, items or Major Skill levels are awarded.
+The repetitive “Payment: Not yet cleared” status is never displayed
+in these dialogue panels. Hector's optional, authored conversation
+**About the payment** remains available by clicking the NPC asset.
 
 ## Stage 2 courier activity
 
@@ -77,10 +82,13 @@ deliveries" confirmation panels:
    preserving the owner's six route paragraphs *verbatim* in
    `bellrunner-stage2-narrative.ts`. **Continue to the delivery**
    moves directly to the scripted ordinary receiving incident.
-3. **At the receiving desk**, a short first panel narrates the
-   routine stop and explains how the clerk's mark smears across the
-   route sheet. **Continue** opens a separate receiver conversation
-   panel containing their two lines and the three honest choices.
+3. **At the receiving desk**, the supplied location painting is
+   static and free of floating task props, object nameplates and
+   hotspots. A short first dialogue panel explains how the clerk's
+   mark smears across the route sheet. **Continue** opens the
+   receiver conversation with their two lines and the three honest
+   dialogue choices. Checking the receiving book happens through
+   that dialogue choice, never through an extra click on scenery.
 4. **Two saved dialogue beats** follow the chosen response: the
    player's spoken request, then the receiver's reply and consequence.
    The book-check option includes the player's final ledger notation.
