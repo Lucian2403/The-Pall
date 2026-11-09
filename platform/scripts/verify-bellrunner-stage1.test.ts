@@ -115,6 +115,46 @@ test('Receiving Desk art remains bottom-aligned with no overlaid interactive ass
  assert.ok(!ui.includes('.sealed-prop')&&!ui.includes('.route-target'));
 });
 
+test('All Hauling backgrounds fill tall and wide screens without distorting the art',()=>{
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ const shell=source('apps/web/src/lib/TutorialShell.svelte');
+ const style=ui.slice(ui.indexOf('<style>'));
+ const sceneRule=style.match(/\.scene\{([\s\S]*?)\}/)?.[1];
+ assert.ok(sceneRule,'Stage 2 scene layout must exist');
+ assert.match(sceneRule,/height:auto;/,'No fixed 640px scene height');
+ assert.match(sceneRule,/min-height:clamp\(535px,62vh,640px\)/,
+  'Keep enough room for dialogue on small desktop screens');
+ assert.match(sceneRule,/flex:1 1 auto/,'Scene must consume the shell\'s remaining height');
+ assert.doesNotMatch(sceneRule,/(?:^|[;\s])height:clamp\(/,
+  'Never use a viewport-independent maximum height that leaves a black band');
+ assert.ok(ui.includes('.dispatch{display:flex;flex-direction:column;flex:1;'));
+ assert.ok(shell.includes('.chapter-content{display:flex;flex-direction:column;flex:1;'));
+ assert.ok(shell.includes('.right{display:flex;flex-direction:column;'));
+ assert.ok(shell.includes('min-height:100dvh'),
+  'The scene grows against the actual browser viewport');
+ assert.ok(ui.includes('width:max(100cqw,177.7cqh)'));
+ assert.ok(ui.includes('aspect-ratio:1672/941'));
+ assert.ok(ui.includes('transform:translate(-50%,-50%)'),
+  'Street paintings retain their centered, proportional cover crop');
+ assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0'),
+  'Receiving desk must keep its wooden counter visible when cropping');
+ assert.ok(ui.includes('.scene{display:flex;flex-direction:column;height:auto;min-height:0}'),
+  'The mobile arrangement still stacks the art and dialogue');
+ const sourceAspect=1672/941;
+ for(const [viewportWidth,viewportHeight] of [
+  [1920,768],[2048,821],[2560,1440],[3440,1440],[3840,2160]
+ ] as const){
+  const sceneWidth=viewportWidth-230; // Shared shell desktop rail
+  const usableHeight=viewportHeight-43-49; // Chapter bar + journal
+  const imageWidth=Math.max(sceneWidth,usableHeight*sourceAspect);
+  const imageHeight=imageWidth/sourceAspect;
+  assert.ok(imageWidth>=sceneWidth && imageHeight>=usableHeight,
+   'Cover must fill the scene without side gutters at '+viewportWidth+'×'+viewportHeight);
+  assert.equal(Math.round(imageWidth/imageHeight*1000),
+   Math.round(sourceAspect*1000),'Image aspect must remain unchanged');
+ }
+});
+
 test('Stage 1 Route Sheet owns round acceptance, no duplicate handoff button or payment text',()=>{
  const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
