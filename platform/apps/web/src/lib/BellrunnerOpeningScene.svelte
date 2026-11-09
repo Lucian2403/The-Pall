@@ -112,7 +112,7 @@
         <h2>Hector D. Smoke</h2>
         <p class="speech">Dispatch Master</p>
         <div class="responses">
-          <button type="button" onclick={begin}>Begin the round</button>
+          <button type="button" class="primary-choice" onclick={begin}>Begin the round</button>
           <button type="button" onclick={askHector}>Ask Hector something</button>
         </div>
       {:else}
@@ -132,7 +132,7 @@
 
         <div class="responses">
           {#if beat.next}
-            <button type="button" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
+            <button type="button" class="primary-choice" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
           {/if}
           {#if beat.kind!=='handoff'}
             <button type="button" onclick={askHector}>Ask Hector something</button>
