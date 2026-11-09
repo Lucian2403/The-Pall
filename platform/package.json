@@ -76,6 +76,7 @@
     "inventory:migrate": "node --env-file=.env scripts/inventory-migrate.mjs",
     "verify:inventory": "node --import tsx --test scripts/verify-inventory.test.ts",
     "verify:bellrunner-stage1": "node --import tsx --test scripts/verify-bellrunner-stage1.test.ts",
+    "verify:bellrunner-layout-browser": "node scripts/verify-bellrunner-layout-browser.mjs",
     "verify:stage-six": "node scripts/verify-stage-six.mjs",
     "verify:stage-seven": "node --import tsx --test scripts/verify-stage-seven.test.ts",
     "verify:stage-eight": "node --import tsx --test scripts/verify-stage-eight.test.ts"
