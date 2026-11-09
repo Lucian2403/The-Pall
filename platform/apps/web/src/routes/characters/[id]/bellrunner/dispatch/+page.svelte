@@ -381,8 +381,8 @@
     background:transparent;border:0;cursor:pointer;color:#f3e6d1}
   .counter-target:focus-visible{outline:2px solid #f3d299;outline-offset:2px}
   .counter-target:disabled{cursor:wait;opacity:.6}
-  .notices-prop,.notices-target{left:24%;bottom:7%;width:19%;height:23%}
-  .route-prop,.route-target{left:26%;bottom:6%;width:17%;height:23%}
+  .notices-prop,.notices-target{left:74%;bottom:7%;width:19%;height:23%}
+  .route-prop,.route-target{left:78%;bottom:6%;width:17%;height:23%}
   .sealed-prop,.sealed-target{left:62%;bottom:7%;width:19%;height:25%}
   .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
     width:auto;object-fit:contain;object-position:bottom center;
@@ -449,8 +449,8 @@
     .paper-art.route,.paper-target.route{left:79%}
     .work-card,.scene.receiving .work-card{width:100%;margin:0;padding:14px;
       border-radius:0;max-height:none;overflow:visible}
-    .notices-prop,.notices-target{left:13%;width:25%}
-    .route-prop,.route-target{left:13%;width:25%}
+    .notices-prop,.notices-target{left:72%;width:25%}
+    .route-prop,.route-target{left:74%;width:24%}
     .sealed-prop,.sealed-target{left:62%;width:25%}
     .story,.instruction,.payment{font-size:16px}
   }
