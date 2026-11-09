@@ -16,17 +16,20 @@
 
 **Hector:** “Here's your route. Get a mark from whoever takes each notice. And don't lose the sheet. I need it back.”
 
-**Choice menu:** Take the round / Ask Hector something.
+**Handoff panel: Take the Route Sheet.** Hector has laid out the route
+sheet on the counter. The panel contains a single navigation choice,
+**Previous line**; it does not repeat the work acceptance or payment
+status as a dialogue button.
 
-### Take the round
-
-*Hector pushes the bundle across the counter.*
-
-Council shift notices. Route sheet. Receiving marks required.
-
-**Payment: Not yet cleared.**
-
-**Action: Inspect route and notices** — opens the approved Stage 2 Shift Dispatch work. Taking the round commits Stage 1→2 once. The documents are task props, not inventory gifts.
+**Object action: click the Route Sheet asset.** This is the one and
+only way to accept the assignment at the handoff. The sheet's framed
+label changes to **Take Route Sheet** and the object becomes the
+player's clickable Stage 1→2 transition. The protected, idempotent
+`take_round` API request is unchanged; the item remains a work prop
+and is not added to personal inventory. A server error is shown in
+the frame and the player may retry the sheet without creating a
+second round. Council Notices and the Sealed Council Order remain
+inspectable here, without triggering progress.
 
 ## Six optional, repeatable Hector conversations
 
@@ -106,7 +109,7 @@ The player may open these from **Ask Hector something** or by clicking Hector's 
 
 ## Navigation and rules
 
-- **Opening work menu:** Take the round / Ask Hector something.
+- **Opening handoff:** Take the Route Sheet. Only **Previous line** remains in the dialogue; clicking the actual Route Sheet prop accepts the assignment. Hector remains independently clickable for optional conversations.
 - **Ask Hector something:** six topic labels and Return to the round.
 - **After the final line in a topic:** Ask something else / Return to the round.
 - **Ask something else** returns directly to the six-topic list without replaying the opening. **Return to the round** restores the active work-assignment panel or the exact point previously reached in the opening.
@@ -116,6 +119,6 @@ The player may open these from **Ask Hector something** or by clicking Hector's 
 ## Canon and economy boundaries
 
 - Hector D. Smoke is the Dispatch Master at the recurring Dispatch House hub. Bellrunner starts with Industry +3, Basic Clothes, Crude Small Bag and 20 coins.
-- Stage 2 is a normal Industry / Hauling courier-family demonstration: notice check, optional sort, two roads, spoiled receipt and an ordinary-work summary. No fabricated destinations, duration estimates or wage values. Its final sealed order remains unopened.
+- Stage 2 illustrates Industry / Hauling: road selection, a narrated street journey, the receiving-mark incident with three honest resolutions, and a sealed final order. No fabricated destinations, duration estimates or wage values. The Receiving Desk itself is a noninteractive painting: job choices appear only in the parchment dialogue.
 - This exceptional onboarding round pays zero coins and ordinary XP and grants no loot, but its reason for nonpayment belongs to Stage 3; it is not a rule for normal paid courier jobs. Do not promise a wage then arbitrarily withhold it.
 - The closed worksite, strange bell, harmful fumes, watchman and branching second jobs remain Stage 3–4 material. Hector's optional lore does not identify the final delivery destination or reveal the Wrong Bell incident.
