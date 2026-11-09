@@ -5,7 +5,6 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
-  import HaulingReceivingBookHotspot from '$lib/HaulingReceivingBookHotspot.svelte';
   import {HAULING_SCENES} from '$lib/hauling-scenes';
   import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
     BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
@@ -176,51 +175,8 @@
             <div class="art-scaled">
               <img class="environment" src={HAULING_SCENES[sceneKey].src}
                 alt={HAULING_SCENES[sceneKey].alt} draggable="false"/>
-              {#if sceneKey==='receiving_desk'}
-                {#if phase==='receiving_arrival'}
-                  <img class="counter-prop notices-prop" src={docs.notices.src}
-                    alt="" aria-hidden="true" draggable="false"/>
-                  <button type="button" class="counter-target notices-target"
-                    data-workshop-object data-pall-sfx="paper"
-                    disabled={busy} aria-label="Hand over council notice"
-                    onclick={()=>{void perform('continue_to_receiver');}}>
-                    <span class="workshop-object-label">Council notice</span>
-                  </button>
-                {:else if phase==='final_notice'||phase==='final_notice_taken'}
-                  <img class="counter-prop sealed-prop" src={docs.sealed.src}
-                    alt="" aria-hidden="true" draggable="false"/>
-                  <button type="button" class="counter-target sealed-target"
-                    data-workshop-object data-pall-sfx="paper"
-                    disabled={busy} aria-label={phase==='final_notice'
-                      ?'Take final sealed council order':'Inspect sealed council order'}
-                    onclick={()=>{
-                      if(phase==='final_notice'){void perform('take_final_notice');}
-                      else selected=selected==='sealed'?null:'sealed';
-                    }}>
-                    <span class="workshop-object-label">Sealed council order</span>
-                  </button>
-                {:else}
-                  <img class="counter-prop route-prop" src={docs.route.src}
-                    alt="" aria-hidden="true" draggable="false"/>
-                  <button type="button" class="counter-target route-target"
-                    data-workshop-object data-pall-sfx="paper"
-                    aria-label="Inspect route sheet" aria-pressed={selected==='route'}
-                    onclick={()=>{selected=selected==='route'?null:'route';}}>
-                    <span class="workshop-object-label">Route sheet</span>
-                  </button>
-                {/if}
-                {#if phase==='spoiled_mark'||phase==='book_checked'}
-                  <HaulingReceivingBookHotspot disabled={busy}
-                    onInspect={()=>{
-                      void perform(phase==='book_checked'?'confirm_book':'check_receiving_book');
-                    }}/>
-                {/if}
-                {#if selected}
-                  <WorkshopItemPopover itemKey={selected} title={docs[selected].label}
-                    description={docs[selected].description}
-                    onClose={()=>{selected=null;}}/>
-                {/if}
-              {/if}
+              <!-- Receiver Desk is a location painting, not an object grid.
+                   Every delivery and receiving-book choice stays in dialogue. -->
             </div>
           {/if}
         </div>
@@ -326,7 +282,6 @@
             <h1>The final notice</h1>
             <p class="story">The routine deliveries are recorded. One sealed council
               order remains to be presented at its marked address.</p>
-            <p class="payment">Payment: {round.payment}.</p>
             <div class="actions">
               <button type="button" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('take_final_notice');}}>Take the final notice</button>
@@ -335,7 +290,6 @@
             <h1>Final notice in hand</h1>
             <p class="story">The usual deliveries are done, and the receiving marks are recorded.
               One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.</p>
-            <p class="payment">Payment: {round.payment}.</p>
             <p class="small">The next scene begins at the order's marked address.</p>
           {/if}
           {/if}
@@ -380,18 +334,6 @@
      on the opposite side. No painted-on character/NPC overlay is added. */
   .scene.receiving .work-card{grid-column:1;
     margin-left:clamp(12px,2vw,35px);margin-right:0}
-  .counter-prop{position:absolute;z-index:3;pointer-events:none;
-    object-fit:contain;filter:drop-shadow(0 5px 5px #0009)}
-  .counter-target{position:absolute;z-index:5;display:flex;
-    align-items:flex-end;justify-content:center;padding:0;
-    background:transparent;border:0;cursor:pointer;color:#f3e6d1}
-  .counter-target:focus-visible{outline:2px solid #f3d299;outline-offset:2px}
-  .counter-target:disabled{cursor:wait;opacity:.6}
-  /* All props remain comfortably ABOVE the lower clipping edge,
-     on the right of the desk and away from the built-in ledger. */
-  .notices-prop,.notices-target{left:76%;bottom:11%;width:18%;height:20%}
-  .route-prop,.route-target{left:78%;bottom:11%;width:17%;height:20%}
-  .sealed-prop,.sealed-target{left:76%;bottom:11%;width:18%;height:22%}
   .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
     width:auto;object-fit:contain;object-position:bottom center;
     z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
@@ -415,9 +357,9 @@
     background:#efdfbb;color:#251910;padding:15px 18px;box-shadow:0 7px 15px #0008}
   .eyebrow{font:700 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
   h1{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .story,.instruction,.payment,.route-note{font:600 clamp(13px,1.2vw,17px)/1.5
+  .story,.instruction,.route-note{font:600 clamp(13px,1.2vw,17px)/1.5
     var(--pall-font-reading,Georgia,serif);margin:0 0 12px;color:#251910}
-  .instruction,.payment{font-weight:700}
+  .instruction{font-weight:700}
   .route-note{font-size:14px;margin:9px 0 5px}
   .inner-voice{margin:0 0 13px;font:italic 600 clamp(14px,1.25vw,17px)/1.55
     var(--pall-font-reading,Georgia,serif);color:#322016}
@@ -458,9 +400,6 @@
     .paper-art.route,.paper-target.route{left:79%}
     .work-card,.scene.receiving .work-card{width:100%;margin:0;padding:14px;
       border-radius:0;max-height:none;overflow:visible}
-    .notices-prop,.notices-target{left:70%;width:26%;height:27%;bottom:10%}
-    .route-prop,.route-target{left:70%;width:26%;height:27%;bottom:10%}
-    .sealed-prop,.sealed-target{left:70%;width:26%;height:27%;bottom:10%}
-    .story,.instruction,.payment{font-size:16px}
+    .story,.instruction{font-size:16px}
   }
 </style>
