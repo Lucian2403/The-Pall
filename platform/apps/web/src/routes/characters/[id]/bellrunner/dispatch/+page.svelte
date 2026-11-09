@@ -5,6 +5,9 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
+  import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
+    BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
+    from '$lib/bellrunner-stage2-narrative';
   import '$lib/workshop-object-labels.css';
 
   type Character={
@@ -14,10 +17,11 @@
   };
   type PaperKey='notices'|'sealed'|'route';
   type Phase='issued'|'checked'|'road_chosen'|'spoiled_mark'|'book_checked'|
-    'round_report'|'final_notice'|'final_notice_taken';
+    'receiver_reply'|'receiver_result'|'round_report'|'final_notice'|'final_notice_taken';
   type WorkAction='check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
     'deliver_notices'|'ask_fresh_mark'|'check_receiving_book'|'confirm_book'|
-    'note_spoiled_mark'|'finish_round'|'take_final_notice';
+    'note_spoiled_mark'|'continue_receiver_dialogue'|'continue_to_report'|
+    'finish_round'|'take_final_notice';
   type WorkState={phase:Phase;route:'direct'|'quieter'|null;
     noticesOrdered:boolean;receipt:'clear'|'book_confirmed'|'noted_unclear'|null};
   type Round={stage:number;tutorialStatus:string;accepted:boolean;
@@ -50,9 +54,13 @@
   let pendingAction:WorkAction|null=null;
   const phase=$derived(round?.workState?.phase??'issued');
   const routeCopy=$derived(round?.workState?.route==='direct'
-    ?'Direct road — shorter, busier, more carts'
+    ?'Short Route — the freight-yard back streets'
     :round?.workState?.route==='quieter'
-      ?'Quieter road — longer, less crowded': 'Not chosen');
+      ?'Long Route — the main roads':'Not chosen');
+  const routeNarration=$derived(round?.workState?.route
+    ?BELLRUNNER_ROUTE_NARRATION[round.workState.route]:null);
+  const receiverDialogue=$derived(round?.workState?.receipt
+    ?BELLRUNNER_RECEIVER_RESOLUTIONS[round.workState.receipt]:null);
   const receiptCopy=$derived(round?.workState?.receipt==='clear'
     ?'Clear fresh receiving mark'
     :round?.workState?.receipt==='book_confirmed'
@@ -158,49 +166,42 @@
               returnToRound={()=>{talkingToHector=false;}}/>
           {:else}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
-          {#if phase==='issued'}
-            <h1>Check the round</h1>
-            <p class="story">Hector pushes the bundle across the counter.</p>
-            <p class="instruction">Council shift notices. Route sheet. Receiving marks required.</p>
-            <p class="payment">Payment: {round.payment}.</p>
-            <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('check_round');}}>Inspect route and notices</button>
-            </div>
-          {:else if phase==='checked'}
+          {#if phase==='issued'||phase==='checked'}
             <h1>Choose the road</h1>
-            <p class="story">The bundle is accounted for against the route sheet.
-              You can put the notices in route order before setting off.</p>
-            {#if round.workState.noticesOrdered}
-              <p class="small">Notices sorted by their listed stops.</p>
-            {/if}
+            <p class="story">You've got the route sheet and the notices.
+              The same deliveries lie ahead, whichever way you go.</p>
             <div class="actions">
-              {#if !round.workState.noticesOrdered}
-                <button type="button" disabled={busy} data-pall-sfx="paper"
-                  onclick={()=>{void perform('sort_notices');}}>Put the notices in route order</button>
-              {/if}
-              <p class="route-note"><strong>Direct road:</strong> Shorter, but packed with carts.
-                Greater chance of delays and jostled papers.</p>
+              <p class="route-note"><strong>Short Route:</strong> Through the narrow
+                back streets behind the freight yards. Less walking, more
+                risk of trouble in the alleys.</p>
               <button type="button" disabled={busy}
-                onclick={()=>{void perform('take_direct_road');}}>Take the direct road</button>
-              <p class="route-note"><strong>Quieter road:</strong> Longer circuit, more room
-                to carry the bundle undisturbed.</p>
+                onclick={()=>{void perform('take_direct_road');}}>Take the Short Route</button>
+              <p class="route-note"><strong>Long Route:</strong> Along the main
+                roads. More walking, traffic and crowds, but more people and
+                better visibility.</p>
               <button type="button" disabled={busy}
-                onclick={()=>{void perform('take_quieter_road');}}>Take the quieter road</button>
+                onclick={()=>{void perform('take_quieter_road');}}>Take the Long Route</button>
             </div>
           {:else if phase==='road_chosen'}
-            <h1>Make the deliveries</h1>
-            <p class="story">{routeCopy}.</p>
-            <p class="instruction">The marked routine stops are ahead. Each notice
-              needs a receiving mark from whoever takes it.</p>
+            <h1>{round.workState.route==='direct'?'The Short Route':'The Long Route'}</h1>
+            {#if routeNarration}
+              {#each routeNarration as paragraph,i (i)}
+                <p class="inner-voice">{paragraph}</p>
+              {/each}
+            {/if}
             <div class="actions">
               <button type="button" disabled={busy}
-                onclick={()=>{void perform('deliver_notices');}}>Make deliveries and record marks</button>
+                onclick={()=>{void perform('deliver_notices');}}>Continue to the delivery</button>
             </div>
           {:else if phase==='spoiled_mark'}
             <h1>A spoiled mark</h1>
-            <p class="story">The receiving mark has smeared across two lines.
-              You saw the notice taken, but the sheet won't show it plainly.</p>
+            {#each BELLRUNNER_RECEIVING_ARRIVAL as paragraph,i (i)}
+              <p class="story">{paragraph}</p>
+            {/each}
+            <p class="speaker">RECEIVER</p>
+            {#each BELLRUNNER_RECEIVER_OPENING as line,i (i)}
+              <p class="spoken">“{line}”</p>
+            {/each}
             <div class="actions">
               <button type="button" disabled={busy}
                 onclick={()=>{void perform('ask_fresh_mark');}}>Ask for a fresh mark</button>
@@ -210,9 +211,11 @@
                 onclick={()=>{void perform('note_spoiled_mark');}}>Note the spoiled mark and go on</button>
             </div>
           {:else if phase==='book_checked'}
+            <!-- Compatibility for saved rounds from the older Stage 2 design.
+                 A new player goes straight from the choice to its RP dialogue. -->
             <h1>Receiving book</h1>
-            <p class="story">The office book confirms the notice was taken at this stop.
-              Record the confirmation, or ask for a fresh mark on your own sheet.</p>
+            <p class="story">The entry matches the notice you delivered.
+              You can note that confirmation or request a clearer mark.</p>
             <div class="actions">
               <button type="button" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('confirm_book');}}>Record the book confirmation</button>
@@ -221,14 +224,32 @@
               <button type="button" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('note_spoiled_mark');}}>Note the unclear mark</button>
             </div>
+          {:else if phase==='receiver_reply'&&receiverDialogue}
+            <p class="eyebrow">{character.name.toUpperCase()}</p>
+            <p class="spoken">“{receiverDialogue.player}”</p>
+            <div class="actions">
+              <button type="button" disabled={busy}
+                onclick={()=>{void perform('continue_receiver_dialogue');}}>Continue</button>
+            </div>
+          {:else if phase==='receiver_result'&&receiverDialogue}
+            <p class="speaker">RECEIVER</p>
+            <p class="spoken">“{receiverDialogue.receiver}”</p>
+            <p class="story">{receiverDialogue.outcome}</p>
+            {#if receiverDialogue.extraPlayer}
+              <p class="speaker">{character.name.toUpperCase()}</p>
+              <p class="spoken">“{receiverDialogue.extraPlayer}”</p>
+            {/if}
+            <div class="actions">
+              <button type="button" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('continue_to_report');}}>Continue to the round report</button>
+            </div>
           {:else if phase==='round_report'}
             <h1>The round report</h1>
-            <p class="story">The ordinary stops are attended. Here is the work
-              recorded on the route sheet.</p>
+            <p class="story">The routine stops are attended. The route sheet
+              records how you got there and what happened at the receiving desk.</p>
             <dl class="round-summary">
               <div><dt>Road</dt><dd>{routeCopy}</dd></div>
-              <div><dt>Notice order</dt><dd>{round.workState.noticesOrdered?'Sorted':'As issued'}</dd></div>
-              <div><dt>Receipt proof</dt><dd>{receiptCopy}</dd></div>
+              <div><dt>Receiving mark</dt><dd>{receiptCopy}</dd></div>
               <div><dt>Payment</dt><dd>{round.payment}</dd></div>
             </dl>
             <div class="actions">
@@ -306,6 +327,14 @@
     var(--pall-font-reading,Georgia,serif);margin:0 0 12px;color:#251910}
   .instruction,.payment{font-weight:700}
   .route-note{font-size:14px;margin:9px 0 5px}
+  .inner-voice{margin:0 0 13px;font:italic 600 clamp(14px,1.25vw,17px)/1.55
+    var(--pall-font-reading,Georgia,serif);color:#322016}
+  .speaker{margin:10px 0 5px;color:#5a3d27;
+    font:700 11px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.08em}
+  .spoken{margin:0 0 12px;color:#26180f;
+    font:600 clamp(14px,1.25vw,17px)/1.5
+    var(--pall-font-reading,Georgia,serif)}
   .actions{display:flex;flex-direction:column;gap:6px;margin-top:3px}
   .actions>button{display:block;width:100%;min-height:42px;text-align:left;
     background:#241d16;border:1px solid #6d5235;color:#f7e6c9;
