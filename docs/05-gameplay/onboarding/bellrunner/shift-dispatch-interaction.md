@@ -97,12 +97,21 @@ action sequence, receipt proof and all previously approved text
 remain in the right-hand dialogue. Backgrounds keep their full
 source aspect ratio and never overlap the parchment.
 
-To keep the NPC, documents and dialogue in view together, the
-redundant full-height **Grand Cylinder City panorama** above the
-chapter is hidden for Bellrunner Stages 1 and 2 only. The normal
-HUD, origin/stage readout, navigation, journal and the actual painted
-location remain. Other origins are unaffected. This prioritizes
-the task workspace over a second decorative background.
+The **Grand Cylinder City panorama remains visible above the stage
+header** on both Bellrunner stages, exactly as elsewhere in the
+introduction. It was mistakenly hidden to save screen height in an
+earlier iteration; this was rejected. The illustrated workstation
+and dialogue follow the city header and use normal page scrolling
+rather than erasing shared location context.
+
+The reference's secondary choice treatment is also implemented:
+pale parchment-like buttons, dark carved edges and restrained
+line-icons (conversation, route, receipt, book, back). The Continue
+buttons have a contrasting dark brass finish. These are visual
+states, not mechanical hints: the two roads and three incident
+options retain equal prominence. Keyboard focus, disabled state,
+hover and reduced-motion support are preserved; other jobs'
+button styles are not modified.
 
 At viewport widths of 1160px or less, the left visual column
 (including its cards when present) stacks above the dialogue.
