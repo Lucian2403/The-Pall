@@ -36,7 +36,18 @@
         </span>
         <span class="workshop-object-label document-label">{papers[key].label}</span>
         <span class="document-action">
-          <span class="action-mark" aria-hidden="true">{routeReady&&key==='route'?'↗':'⌕'}</span>
+          {#if routeReady&&key==='route'}
+            <svg class="action-mark" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14m-6-6 6 6-6 6"/>
+            </svg>
+          {:else}
+            <svg class="action-mark" aria-hidden="true" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10.5" cy="10.5" r="6.5"/>
+              <path d="m16 16 5 5"/>
+            </svg>
+          {/if}
           {routeReady&&key==='route'?'Take Route Sheet':'Inspect'}
         </span>
       </button>
@@ -77,7 +88,7 @@
     gap:5px;min-height:32px;font:600 clamp(12px,1vw,15px)/1.2
     var(--pall-font-reading,Georgia,serif);color:#dcbc7f}
   .document-card.ready .document-action{color:#ffe1a3}
-  .action-mark{font:19px/1 Arial,sans-serif}
+  .action-mark{display:block;flex:none;width:16px;height:16px}
   @media(max-width:1180px){
     .document-card{min-height:148px}
     .document-image{height:100px}
@@ -90,7 +101,7 @@
     .document-image{height:clamp(60px,18vw,83px)}
     .document-label{min-height:30px;font-size:10px}
     .document-action{min-height:26px;font-size:11px}
-    .action-mark{font-size:15px}
+    .action-mark{width:13px;height:13px}
   }
   @media(prefers-reduced-motion:no-preference){
     .document-card{transition:border-color .14s,background-color .14s}
