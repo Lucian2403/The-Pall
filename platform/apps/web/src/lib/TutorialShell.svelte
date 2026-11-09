@@ -27,7 +27,8 @@
   };
 
   let {
-    character,children,activePage = 'scene',sceneLocation,compactBanner = false,smithingBackdrop = false,
+    character,children,activePage = 'scene',sceneLocation,compactBanner = false,
+    compactCityVista = false,smithingBackdrop = false,
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = ''
   }:{
@@ -35,8 +36,10 @@
     children:Snippet;
     activePage?:'scene'|'character';
     sceneLocation?:string;
-    /** Hide the redundant city panorama on NPC/item-led workstations only. */
+    /** Deprecated option used by earlier screens to fully hide the panorama. */
     compactBanner?:boolean;
+    /** Keep the City header but reduce its height on NPC/item-led workstations. */
+    compactCityVista?:boolean;
     smithingBackdrop?:boolean;
     councilBackdrop?:boolean;
     alleyBackdrop?:boolean;
@@ -346,7 +349,8 @@
     </header>
 
     {#if !compactBanner}
-    <div class="city-banner" aria-label="Grand Cylinder City">
+    <div class="city-banner" class:city-banner-workstation={compactCityVista}
+      aria-label="Grand Cylinder City">
       <div class="banner-copy">
         <span class="banner-overline">THE PALL</span>
         <strong>Grand Cylinder City</strong>
@@ -527,6 +531,14 @@
     background:linear-gradient(90deg,#11110fb8,#14141223 43%,#1715120a 75%),
       url('/ui-kit/resources/TheCityVista.png') center 12%/cover no-repeat;
     background-color:#222321;display:flex;align-items:end;justify-content:space-between;padding:22px 26px;gap:15px}
+  /* Preserve the shared City identity on Bellrunner, with less
+     decorative vertical space so the actual NPC and papers remain useful
+     at 1080p and 850px. Other origins keep the standard city panorama. */
+  .city-banner.city-banner-workstation{
+    min-height:clamp(105px,8vw,126px);
+    padding:12px 19px;
+    background-position:center,center 18%;
+  }
   .banner-copy{display:flex;flex-direction:column;gap:5px;text-shadow:0 2px 2px #000}
   .banner-overline{font:13px var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.16em;color:#d3ad7c}
   /* The decorative face becomes illegible at banner scale. Prefer a clear
@@ -602,6 +614,9 @@
     .stat img{width:22px;height:22px}
     .account-link{display:flex}
     .city-banner{min-height:152px;padding:16px;background-position:center,center 12%}
+    .city-banner.city-banner-workstation{
+      min-height:104px;padding:10px 14px;background-position:center,center 18%;
+    }
     .banner-copy strong{font-size:23px}
     .chapter-bar{padding:7px 9px;gap:7px}
     .chapter-label{font-size:16px}
