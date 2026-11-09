@@ -62,42 +62,49 @@ remain fully visible on wide monitors. The player's starting Route
 Sheet object in Stage 1 is the deliberate interactive prop that accepts
 the round, unlike the static destination setting.
 
-## Consistent scene framing on every screen
+## Two-section scene and conversation layout (owner revision, November 9)
 
-All owner illustrations are preserved as optimized WebP derivatives,
-with their full source compositions still intact. The older Stage 1
-Dispatch House scene remained locked to a height between 535 and
-640 pixels, leaving dead space underneath; meanwhile the previous
-attempt to make Stage 2's artwork fill that space used `cover`
-on a short, extra-wide container and cropped much of the street.
+Both Bellrunner stages now render **two independent vertical sections**.
+The previous approach placed dialogue on top of the illustration, so
+a larger monitor either cropped the source painting or stretched its
+layout, and dialogue covered architecture and task props.
 
-**Approved layout rule (November 9):** Both Bellrunner Stage 1 and
-Stage 2 now use the same reusable
-`apps/web/src/lib/pall-story-landscape.css` contract:
+**Section 1 — illustrated location only.** A complete, uncropped
+`1672:941` image at the current chapter width. Stage 1's Dispatch
+House keeps Hector, his clickable NPC nameplate, council notices,
+sealed order, Route Sheet and their inspection popovers inside this
+image. Stage 2 displays the current location: Dispatch House (while
+choosing a road), Short Route, Long Route or Municipal Receiving Desk.
+The latter three have **no overlaid NPC or object interaction**.
+Art, object coordinates and mouse/keyboard targets share one image
+coordinate system. No `cover` crop, arbitrary 640px scene height,
+artificial side gutters or image stretching.
 
-- Every desktop background—Dispatch House, Short Route, Long Route,
-  and Receiving Desk—sits in a **1672:941 intrinsic-ratio scene**,
-  sized to the available chapter **width**.
-- The background uses aspect-preserving `object-fit:contain` inside
-  that matching scene. Nothing is independently zoomed to `cover`
-  a shorter viewport; neither the freight-yard street nor the
-  receiving counter is cropped.
-- Hector, route sheet, papers, dialogue and click hitboxes share the
-  same coordinate space at the Depot; no interaction zones drift when
-  the window gets wider.
-- A short or ultrawide browser window **scrolls the page vertically**
-  to show the rest of the full painting. This is necessary to keep
-  both full-width art **and** its original proportions with no
-  fabricated side extensions or distorted perspective.
-- On narrow mobile screens the artwork keeps its complete 1672:941
-  aspect above the stacked dialogue, with no forced blank height.
+**Section 2 — dialogue only.** Immediately **below** the entire
+painting, a distinct dark wood/charcoal strip carries a centered,
+up-to-980px-width parchment frame and the approved choice buttons.
+The frame is **not absolutely positioned**, does not overlap the
+image, has no forced-height internal scrollbar, and expands with the
+number of dialogue lines. These sections share
+`pall-story-landscape.css`, `pall-owner-ui.css` and
+`workshop-object-labels.css`, rather than inventing a new panel
+design for each background.
 
-The previous bottom-aligned receiving-art-only crop and the
-viewport-expanding `height:auto; min-height:clamp(...); flex:1`
-workarounds are superseded. The destination painting remains a
-pure background, with no interactive assets or receiver portrait.
-No story, audio, character, receipt or database changes result from
-scene-framing work.
+At desktop and ultrawide widths, the page itself can scroll from
+the full illustration to the dialogue; an uncropped image cannot
+physically occupy an extra-wide viewport at full width *and* show
+the whole dialogue above the fold. This is a conscious design
+trade-off: artwork and actions remain intact, with **no overlap**.
+Clicking Hector's art/label scrolls the player to his now-separate
+conversation. Stage 1's Route Sheet still accepts the round from
+its image section and saves the same idempotent Stage 2 handoff.
+On mobile, the same two sections stack naturally.
+
+The real Chromium layout check opens both actual Bellrunner pages
+with isolated API snapshots at several screen sizes, confirming the
+entire image, non-overlapping dialogue, readable frame width and
+scroll access. No quest, payment, scene audio or database state
+changes are coupled to this layout revision.
 
 ## Choose the road
 
