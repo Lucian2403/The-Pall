@@ -45,6 +45,16 @@
   function inspect(item:PropKey){
     selected=selected===item?null:item;
   }
+  // The Route Sheet is the Stage 1 handoff object, not another
+  // decorative inspection. The existing owner-checked take_round API
+  // commits Stage 2 once; every other paper retains inspection only.
+  function usePaper(item:PropKey){
+    if(item==='route'&&beat.kind==='handoff'){
+      if(!takingRound)void takeRound();
+      return;
+    }
+    inspect(item);
+  }
   function askHector(){
     selected=null;
     if(!entered)begin();
@@ -73,9 +83,16 @@
     {#each paperKeys as key}
       <img class="paper-art {key}" src={papers[key].src} alt="" aria-hidden="true" draggable="false"/>
       <button type="button" class="paper-target {key}" data-workshop-object
-        aria-label={'Inspect '+papers[key].label} aria-pressed={selected===key}
-        data-pall-sfx="paper" onclick={()=>inspect(key)}>
-        <span class="workshop-object-label">{papers[key].label}</span>
+        class:route-ready={key==='route'&&beat.kind==='handoff'}
+        aria-label={key==='route'&&beat.kind==='handoff'
+          ?'Take the Route Sheet to begin Shift Dispatch'
+          :'Inspect '+papers[key].label}
+        aria-pressed={key==='route'&&beat.kind==='handoff'?undefined:selected===key}
+        disabled={key==='route'&&beat.kind==='handoff'&&takingRound}
+        data-pall-sfx="paper" onclick={()=>usePaper(key)}>
+        <span class="workshop-object-label">
+          {key==='route'&&beat.kind==='handoff'?'Take Route Sheet':papers[key].label}
+        </span>
       </button>
     {/each}
     <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
@@ -109,19 +126,19 @@
           <p class="speech">“{say}”</p>
         {:else if beat.kind==='handoff'}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
-          <h2>Take the round</h2>
-          <p class="work-description">Council shift notices. Route sheet. Receiving marks required.</p>
-          <p class="payment">Payment: Not yet cleared.</p>
+          <h2>Take the Route Sheet</h2>
+          <p class="work-description">Hector has laid out the route sheet.
+            Click it on the counter to begin the deliveries.</p>
+          {#if takingRound}<p class="work-description" role="status">Taking the route sheet…</p>{/if}
         {/if}
 
         <div class="responses">
           {#if beat.next}
             <button type="button" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
-          {:else if beat.kind==='handoff'}
-            <button type="button" data-pall-sfx="paper" disabled={takingRound}
-              onclick={()=>{void takeRound();}}>{takingRound?'Saving…':'Take the round'}</button>
           {/if}
-          <button type="button" onclick={askHector}>Ask Hector something</button>
+          {#if beat.kind!=='handoff'}
+            <button type="button" onclick={askHector}>Ask Hector something</button>
+          {/if}
           {#if canGoBack}
             <button type="button" onclick={()=>{selected=null;goBack();}}>Previous line</button>
           {/if}
@@ -162,6 +179,9 @@
     padding:0;background:transparent;border:0;color:#f3e6d1;cursor:pointer}
   .paper-target.notices{left:43%}.paper-target.sealed{left:62%}.paper-target.route{left:81%}
   .paper-target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
+  .paper-target:disabled{cursor:wait}
+  .paper-target.route-ready .workshop-object-label{
+    filter:brightness(1.1) drop-shadow(0 0 6px #f5d08591)}
   .paper-target:hover~.paper-art{filter:brightness(1.05)}
   .dispatch-dialogue{position:relative;grid-column:2;z-index:6;align-self:start;
     width:100%;margin:clamp(24px,3vw,50px) 0 24px;box-sizing:border-box;
@@ -171,11 +191,10 @@
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .eyebrow{font:600 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
   h2{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .speech,.narration,.work-description,.payment{margin:0 0 12px;
+  .speech,.narration,.work-description{margin:0 0 12px;
     font:600 clamp(13px,1.2vw,17px)/1.5 var(--pall-font-reading,Georgia,serif);color:#251910}
   .narration{font-style:italic}
-  .payment{font-weight:700}
-  .responses{display:flex;flex-direction:column;gap:6px;margin-top:3px}
+   .responses{display:flex;flex-direction:column;gap:6px;margin-top:3px}
   .responses>button{display:block;width:100%;text-align:left;
     border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
     padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);
@@ -198,6 +217,6 @@
     .paper-art.route,.paper-target.route{left:79%}
     .dispatch-dialogue{width:100%;margin:0;padding:14px;border-radius:0;
       max-height:none;overflow:visible}
-    .speech,.narration,.work-description,.payment{font-size:16px;line-height:1.5}
+    .speech,.narration,.work-description{font-size:16px;line-height:1.5}
   }
 </style>
