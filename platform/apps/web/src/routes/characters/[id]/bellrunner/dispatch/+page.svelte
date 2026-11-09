@@ -210,8 +210,7 @@
                   </button>
                 {/if}
                 {#if phase==='spoiled_mark'||phase==='book_checked'}
-                  <HaulingReceivingBookHotspot {busy}
-                    disabled={busy}
+                  <HaulingReceivingBookHotspot disabled={busy}
                     onInspect={()=>{
                       void perform(phase==='book_checked'?'confirm_book':'check_receiving_book');
                     }}/>
