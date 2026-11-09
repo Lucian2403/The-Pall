@@ -333,7 +333,10 @@
   .scene.receiving .art-scaled{top:auto;bottom:0;transform:translateX(-50%)}
   .environment{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;pointer-events:none}
-  .art-scaled>.environment{object-fit:fill}
+  /* The three owner paintings have slightly different native ratios.
+     Cover preserves each image's proportions instead of distorting it
+     to the shared 1672:941 frame (crop is at most a few pixels). */
+  .art-scaled>.environment{object-fit:cover}
   /* At a receiving desk, keep the book in view and place the conversation
      on the opposite side. No painted-on character/NPC overlay is added. */
   .scene.receiving .work-card{grid-column:1;
