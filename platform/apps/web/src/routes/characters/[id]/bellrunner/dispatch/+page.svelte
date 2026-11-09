@@ -138,7 +138,7 @@
 <svelte:head><title>The Pall — Shift Dispatch</title></svelte:head>
 {#if status==='ready'&&character&&round&&round.workState}
   <TutorialShell {character} sceneLocation={HAULING_SCENES[sceneKey].label}
-    depotBackdrop={sceneKey==='depot'} compactBanner>
+    depotBackdrop={sceneKey==='depot'}>
     <section class="workshop dispatch" aria-label="Bellrunner Stage 2 Shift Dispatch">
       <div class="scene pall-story-sections" class:receiving={sceneKey==='receiving_desk'}>
         <section class="scene-visuals pall-story-visuals"
