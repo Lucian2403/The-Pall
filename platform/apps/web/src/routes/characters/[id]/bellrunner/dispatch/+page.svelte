@@ -218,7 +218,7 @@
               {/each}
             {/if}
             <div class="actions">
-              <button type="button" disabled={busy}
+              <button type="button" class="primary-choice" disabled={busy}
                 onclick={()=>{void perform('deliver_notices');}}>Continue to the delivery</button>
             </div>
           {:else if phase==='receiving_arrival'}
@@ -227,7 +227,7 @@
               <p class="story">{paragraph}</p>
             {/each}
             <div class="actions">
-              <button type="button" disabled={busy}
+              <button type="button" class="primary-choice" disabled={busy}
                 onclick={()=>{void perform('continue_to_receiver');}}>Continue</button>
             </div>
           {:else if phase==='spoiled_mark'}
@@ -261,7 +261,7 @@
             <p class="eyebrow">{character.name.toUpperCase()}</p>
             <p class="spoken">“{receiverDialogue.player}”</p>
             <div class="actions">
-              <button type="button" disabled={busy}
+              <button type="button" class="primary-choice" disabled={busy}
                 onclick={()=>{void perform('continue_receiver_dialogue');}}>Continue</button>
             </div>
           {:else if phase==='receiver_result'&&receiverDialogue}
@@ -273,7 +273,7 @@
               <p class="spoken">“{receiverDialogue.extraPlayer}”</p>
             {/if}
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
+              <button type="button" class="primary-choice" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('continue_to_final_notice');}}>Continue to the final notice</button>
             </div>
           {:else if phase==='round_report'}
@@ -282,7 +282,7 @@
             <p class="story">The ordinary deliveries are finished.
               One sealed council order still needs to reach the address on your route sheet.</p>
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
+              <button type="button" class="primary-choice" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('finish_round');}}>Continue to the final notice</button>
             </div>
           {:else if phase==='final_notice'}
@@ -290,7 +290,7 @@
             <p class="story">The routine deliveries are recorded. One sealed council
               order remains to be presented at its marked address.</p>
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
+              <button type="button" class="primary-choice" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('take_final_notice');}}>Take the final notice</button>
             </div>
           {:else}
