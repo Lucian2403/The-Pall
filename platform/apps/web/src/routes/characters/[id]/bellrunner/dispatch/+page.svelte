@@ -316,7 +316,11 @@
   .scene{position:relative;display:grid;
     grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);
     grid-template-rows:minmax(0,1fr);align-content:start;box-sizing:border-box;
-    width:100%;height:clamp(535px,62vh,640px);background:#291d15}
+    /* The parent game shell grows to the viewport. Grow with it instead
+       of ending at 640px and leaving an empty charcoal strip on tall or
+       wide monitors. Keep a floor for readable dialogue on short screens. */
+    width:100%;height:auto;min-height:clamp(535px,62vh,640px);
+    flex:1 1 auto;background:#291d15}
   .illustration{position:absolute;inset:0;overflow:hidden;container-type:size}
   .art-scaled{position:absolute;left:50%;top:50%;
     width:max(100cqw,177.7cqh);aspect-ratio:1672/941;
