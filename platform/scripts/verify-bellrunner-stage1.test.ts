@@ -174,7 +174,8 @@ test('Hector framing, inspection and audio reuse owner-approved workshop UI',()=
  assert.ok(stage2.includes('talkingToHector=false'),
   'Returning to the active dispatch must preserve saved work and its revision');
  assert.ok(opening.includes("depotBackdrop={character.origin==='Bellrunner'}"));
- assert.ok(stage2.includes('sceneLocation="Dispatch House" depotBackdrop'));
+ assert.ok(stage2.includes('sceneLocation={HAULING_SCENES[sceneKey].label}'));
+ assert.ok(stage2.includes("depotBackdrop={sceneKey==='depot'}"));
  assert.ok(shell.includes("character.origin!=='Millhand'&&character.origin!=='Bellrunner'"));
  assert.ok(shell.includes('Back to Stage '));
  for(const item of ['hector-d-smoke.webp','council-work.webp','sealed-order.webp','route-sheet.webp'])
@@ -221,12 +222,14 @@ test('Receiving desk incident and three choices lead to authored, unskipped RP',
  assert.ok(ui.includes("phase==='receiving_arrival'"));
  assert.ok(ui.includes("perform('continue_to_receiver')"));
  assert.ok(ui.includes("phase==='spoiled_mark'"));
- const arrival=ui.slice(ui.indexOf("phase==='receiving_arrival'"),ui.indexOf("phase==='spoiled_mark'"));
+ const arrival=ui.slice(ui.indexOf("{:else if phase==='receiving_arrival'}"),
+  ui.indexOf("{:else if phase==='spoiled_mark'}"));
  assert.ok(arrival.includes('BELLRUNNER_RECEIVING_ARRIVAL'));
  assert.ok(arrival.includes('>Continue</button>'));
  assert.ok(!arrival.includes('BELLRUNNER_RECEIVER_OPENING'));
  assert.ok(!arrival.includes('Ask for a fresh mark'));
- const receiver=ui.slice(ui.indexOf("phase==='spoiled_mark'"),ui.indexOf("phase==='book_checked'"));
+ const receiver=ui.slice(ui.indexOf("{:else if phase==='spoiled_mark'}"),
+  ui.indexOf("{:else if phase==='book_checked'}"));
  assert.ok(receiver.includes('BELLRUNNER_RECEIVER_OPENING'));
  assert.ok(receiver.includes('Ask for a fresh mark'));
  assert.ok(receiver.includes('Check their receiving book'));
