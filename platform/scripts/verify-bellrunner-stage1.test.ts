@@ -93,6 +93,39 @@ test('Hauling stages use the correct background, contextual paper props and audi
  assert.ok(!ui.includes('src="/characters/receiver'));
 });
 
+test('Receiving Desk preserves its bottom counter and clickable props on wide screens',()=>{
+ const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0;transform:translateX(-50%)'),
+  'The reception painting must bottom-align; centered cover clips its desk');
+ assert.ok(ui.includes('.scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}'),
+  'Mobile full-painting layout must override the desktop bottom-anchoring');
+ assert.ok(ui.includes('.sealed-prop,.sealed-target{left:76%;bottom:11%;width:18%;height:22%}'));
+ assert.ok(ui.includes('.notices-prop,.notices-target{left:76%;bottom:11%;width:18%;height:20%}'));
+ assert.ok(ui.includes('.route-prop,.route-target{left:78%;bottom:11%;width:17%;height:20%}'));
+ assert.ok(ui.includes('aspect-ratio:1672/941'));
+ assert.ok(ui.includes('class="counter-prop sealed-prop"')&&ui.includes('class="counter-target sealed-target"'));
+ assert.ok(ui.includes("phase==='final_notice'||phase==='final_notice_taken'"));
+ // The shared cover-scaled source is 1672×941. The whole interactive
+ // order, including its label, must be inside even a short, wide viewport.
+ const aspect=1672/941;
+ for(const [width,height] of [[2048,640],[1920,535],[1440,600],[1280,720]]){
+  const artWidth=Math.max(width, height*aspect);
+  const artHeight=artWidth/aspect;
+  for(const [bottom,size] of [[.11,.22],[.11,.20]]){
+   const propTop=height-(bottom+size)*artHeight;
+   const propBottom=height-bottom*artHeight;
+   assert.ok(propTop>=0 && propBottom<=height,
+    'Order must remain visible in '+width+'x'+height);
+  }
+  // The real book, on the same coordinate system, must also remain
+  // reachable on a wide desktop without being pushed below the scene.
+  const ledgerTop=height-(1-.61)*artHeight;
+  const ledgerBottom=height-(1-.82)*artHeight;
+  assert.ok(ledgerTop>=0&&ledgerBottom<=height,
+   'Painted receiving book must remain visible in '+width+'x'+height);
+ }
+});
+
 test('The exact owner-replaced opening is sequential and canon-matched',()=>{
  const scene=APPROVED_STAGE_ONE.Bellrunner;
  const doc=source('../docs/05-gameplay/onboarding/bellrunner/opening-dialogue.md');
