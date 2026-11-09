@@ -68,7 +68,7 @@ test('Owner-provided multi-purpose Hauling scenes keep their source art and use 
  assert.ok(!book.includes('<img'),'The receiving book is already painted into the office');
 });
 
-test('Stage 1 and 2 physically separate painted location from framed conversation',()=>{
+test('Bellrunner Stages 1–2 show painted locations LEFT of dialogue on desktop',()=>{
  const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const shared=source('apps/web/src/lib/pall-story-landscape.css');
@@ -89,25 +89,30 @@ test('Stage 1 and 2 physically separate painted location from framed conversatio
  assert.ok(first.includes('class="dispatch-scene pall-story-sections"'));
  assert.ok(first.includes('class="scene-illustration pall-story-landscape"'));
  assert.ok(first.includes('class="dialogue-section pall-story-dialogue-section"'));
- assert.ok(first.includes('bind:this={dialogueSection}'));
- assert.ok(first.includes('dialogueSection?.scrollIntoView({behavior:\'smooth\',block:\'start\'})'),
-  'Clicking Hector above must reveal the conversation below');
+ assert.ok(!first.includes('scrollIntoView('),
+  'The dialogue is already visible to the right when an NPC or paper is clicked');
  assert.ok(second.includes('class="scene pall-story-sections"'));
  assert.ok(second.includes('class="illustration pall-story-landscape"'));
  assert.ok(second.includes('class="dialogue-section pall-story-dialogue-section"'));
- assert.ok(second.includes('bind:this={dialogueSection}'));
+ assert.ok(!second.includes('scrollIntoView('),
+  'Stage 2 NPC and paper clicks must not shift the page from side-by-side composition');
  assert.ok(shared.includes('.pall-story-sections{'));
- assert.ok(shared.includes('flex-direction:column'));
+ assert.ok(shared.includes('display:grid'));
+ assert.ok(shared.includes('grid-template-columns:minmax(0,60%) minmax(0,40%)'),
+  'On desktop place 60% scene at LEFT and 40% dialogue at RIGHT');
  assert.ok(shared.includes('.pall-story-landscape{'));
  assert.ok(shared.includes('aspect-ratio:1672 / 941'));
  assert.ok(shared.includes('.pall-story-dialogue-section{'));
- assert.ok(shared.includes('border-top:2px solid'));
+ assert.ok(shared.includes('border-left:2px solid'));
+ assert.ok(shared.includes('@media(max-width:1080px)'));
+ assert.ok(shared.includes('.pall-story-sections{grid-template-columns:minmax(0,1fr)}'),
+  'Only narrow screens should stack the dialogue below artwork');
  assert.ok(!shared.includes('aspect-ratio:auto;overflow:visible'),
   'Mobile image should retain its ratio while the dialogue stacks below');
  assert.ok(shell.includes('.chapter-content{display:flex;flex-direction:column;flex:1;'));
 });
 
-test('Stage 1 illustrated area retains NPC and object actions, dialogue gets full-width parchment',()=>{
+test('Stage 1 left painting retains NPC/object actions, right frame shows inspection text',()=>{
  const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const start=first.indexOf('<section class="scene-illustration pall-story-landscape"');
  const end=first.indexOf('</section>',start);
@@ -121,8 +126,8 @@ test('Stage 1 illustrated area retains NPC and object actions, dialogue gets ful
  assert.ok(first.includes('{#if selected}')&&first.includes('DISPATCH HOUSE · PAPER INSPECTION'));
  assert.ok(first.includes('{papers[selected].observation}'));
  assert.ok(first.includes('Return to the dialogue'));
- assert.ok(first.includes("if(selected)dialogueSection?.scrollIntoView("),
-  'Selecting a paper must bring its text into the lower section');
+ assert.ok(!first.includes('dialogueSection?.scrollIntoView('),
+  'Selecting a paper must update visible right-hand text, not scroll away');
  assert.ok(!art.includes('class="work-card'));
  const frame=first.slice(end);
  assert.ok(frame.includes('<aside class="work-card dispatch-dialogue"'));
@@ -134,7 +139,7 @@ test('Stage 1 illustrated area retains NPC and object actions, dialogue gets ful
  assert.ok(first.includes('object-fit:contain;pointer-events:none'));
 });
 
-test('Both routes and Receiving Desk show full art first and dialogue after without extra objects',()=>{
+test('Stage 2 routes and Receiving Desk show painting left and text right, without extra objects',()=>{
  const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const start=second.indexOf('<section class="illustration pall-story-landscape"');
  const end=second.indexOf('</section>',start);
@@ -160,12 +165,12 @@ test('Both routes and Receiving Desk show full art first and dialogue after with
   'Street and office scenes stop the Depot audio');
 });
 
-test('Full artwork ratios are stable, with no frame overlap on desktop and phones',()=>{
+test('Full artwork ratio and separate right-side dialogue hold across desktop and mobile',()=>{
  const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const shared=source('apps/web/src/lib/pall-story-landscape.css');
  assert.ok(shared.includes('width:100%;'));
- assert.ok(shared.includes('flex:0 0 auto;'));
+ assert.ok(shared.includes('grid-template-columns:minmax(0,60%) minmax(0,40%)'));
  assert.ok(shared.includes('overflow:hidden;'));
  assert.ok(shared.includes('aspect-ratio:1672 / 941'));
  assert.ok(shared.includes('.pall-story-dialogue-section{'));
@@ -178,10 +183,14 @@ test('Full artwork ratios are stable, with no frame overlap on desktop and phone
   const width=screenW-rail;
   const artworkHeight=width*941/1672;
   assert.ok(artworkHeight>0);
-  // The page may scroll, but the text section is placed after the full image.
-  const dialogueTop=artworkHeight;
-  assert.ok(dialogueTop>=artworkHeight);
-  if(screenH<artworkHeight+100)assert.ok(artworkHeight>screenH-100);
+  const sceneWidth=width*.6;
+  const artHeight=sceneWidth*941/1672;
+  assert.ok(artHeight>0);
+  assert.ok(sceneWidth+width*.4-width<.01);
+  // The dialogue occupies the remaining 40% beside the painting,
+  // not an additional giant strip below an image of full page width.
+  if(screenW>1080)assert.ok(artHeight<artworkHeight);
+  assert.ok(screenH>0);
  }
  assert.ok(shared.includes('@media(max-width:700px)'));
  assert.ok(shared.includes('pall-story-dialogue-section{padding:12px 8px 20px}'));
