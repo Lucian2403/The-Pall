@@ -170,8 +170,8 @@
                 description={docs[selected].description} onClose={()=>{selected=null;}}/>
             {/if}
           {:else}
-            <!-- A proportionate cover-scaled painting: background and ledger
-                 hotspot share coordinates on every monitor aspect ratio. -->
+            <!-- Proportionate, cover-scaled location painting. The street
+                 and receiving scenes contain no interactive overlays. -->
             <div class="art-scaled">
               <img class="environment" src={HAULING_SCENES[sceneKey].src}
                 alt={HAULING_SCENES[sceneKey].alt} draggable="false"/>
