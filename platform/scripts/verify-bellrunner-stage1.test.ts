@@ -116,7 +116,13 @@ test('Stage 1 illustrated area retains NPC and object actions, dialogue gets ful
  assert.ok(art.includes('class="paper-target {key}"'));
  assert.ok(art.includes('class:route-ready={key===\'route\'&&beat.kind===\'handoff\'}'));
  assert.ok(art.includes('onclick={()=>usePaper(key)}'));
- assert.ok(art.includes('WorkshopItemPopover'));
+ assert.ok(!art.includes('WorkshopItemPopover'));
+ assert.ok(!art.includes('class="work-card'));
+ assert.ok(first.includes('{#if selected}')&&first.includes('DISPATCH HOUSE · PAPER INSPECTION'));
+ assert.ok(first.includes('{papers[selected].observation}'));
+ assert.ok(first.includes('Return to the dialogue'));
+ assert.ok(first.includes("if(selected)dialogueSection?.scrollIntoView("),
+  'Selecting a paper must bring its text into the lower section');
  assert.ok(!art.includes('class="work-card'));
  const frame=first.slice(end);
  assert.ok(frame.includes('<aside class="work-card dispatch-dialogue"'));
@@ -270,7 +276,7 @@ test('All six optional topics preserve every spoken turn and never grant rewards
  assert.ok(!scene.includes('skipToWork')&&!conversation.includes('rewardXp('));
 });
 
-test('Hector framing, inspection and audio reuse owner-approved workshop UI',()=>{
+test('Hector framing, lower-section paper inspection and audio reuse owner-approved workshop UI',()=>{
  const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const opening=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
@@ -279,14 +285,18 @@ test('Hector framing, inspection and audio reuse owner-approved workshop UI',()=
  assert.ok(scene.includes('if(entered)return;')&&scene.includes('bell.pause()'));
  assert.ok(scene.includes('class="workshop bellrunner"'));
  assert.ok(scene.includes('class="work-card dispatch-dialogue"'));
- assert.ok(scene.includes('WorkshopItemPopover')&&
+ assert.ok(!scene.includes('WorkshopItemPopover')&&
   scene.includes("import '$lib/workshop-object-labels.css'"));
+ assert.ok(scene.includes('DISPATCH HOUSE · PAPER INSPECTION')&&
+  scene.includes('{papers[selected].observation}'));
  assert.ok(scene.includes('workshop-object-label')&&scene.includes('workshop-npc-label'));
  assert.ok(scene.includes('clip-path:inset(93% 0 0 0)')&&
   !scene.includes('clip-path:inset(70% 0 0 0)'),
   'The foreground must cover only Hector\'s boots, not cut him across the waist');
  assert.ok(stage2.includes('clip-path:inset(93% 0 0 0)'));
- assert.ok(stage2.includes('WorkshopItemPopover')&&stage2.includes('class="work-card"'));
+ assert.ok(!stage2.includes('WorkshopItemPopover')&&stage2.includes('class="work-card"'));
+ assert.ok(stage2.includes('DISPATCH HOUSE · PAPER INSPECTION')&&
+  stage2.includes('{docs[selected].description}'));
  assert.ok(stage2.includes('<BellrunnerHectorConversation characterName={character.name}'));
  assert.ok(stage2.includes('talkingToHector=true'));
  assert.ok(stage2.includes('talkingToHector=false'),
