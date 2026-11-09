@@ -389,7 +389,7 @@
   .error{font:13px/1.45 sans-serif;color:#873523}
   .fallback{padding:40px;color:#e3d0af;background:#25211e}
   @media(max-width:700px){
-    .scene{display:flex;flex-direction:column;height:auto;min-height:0}
+    .scene{display:flex;flex-direction:column;height:auto;min-height:0;flex:none}
     .illustration{position:relative;width:100%;aspect-ratio:1672/941;container-type:normal}
     .art-scaled{left:0;top:0;transform:none;width:100%;height:100%}
     .scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}
