@@ -56,10 +56,12 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   New Chromium QA checks the actual responsive positions and
   NPC/paper interactions. The owner requested that the original
   **Grand Cylinder City header remain visible**. Both Bellrunner
-  stages therefore use the same city panorama and location header as
-  other introductions; no `compactBanner` prop hides it. The scene
-  below keeps the 52/48 workstation/dialogue layout and scrolls with
-  the document if the entire composition exceeds viewport height.
+  stages retain the same city panorama/title as the other introductions,
+  but use a **shorter banner height** via `compactCityVista`: NPCs,
+  paper cards and dialogue are more likely to be visible together on
+  1080p and 850px windows. The earlier `compactBanner` suppression is
+  not used. The scene below retains the 52/48 workstation/dialogue
+  layout and scrolls if the whole composition exceeds viewport height.
   Bellrunner secondary choices now use pale framed parchment with
   ink-line icons; Continue uses a distinct dark-brass primary style.
   These button styles apply only to Bellrunner, leaving Millhand and
