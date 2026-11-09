@@ -2,6 +2,7 @@
   import {onDestroy} from 'svelte';
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
+  import BellrunnerDocumentTray from '$lib/BellrunnerDocumentTray.svelte';
   import '$lib/workshop-object-labels.css';
   import '$lib/pall-story-landscape.css';
 
@@ -20,7 +21,6 @@
       observation:'A courier route sheet with places for receiving marks. The assigned stops and load are checked when the round begins.'
     }
   };
-  const paperKeys=['notices','sealed','route'] as const;
   let {characterName,beat,advance,goBack,canGoBack,takeRound,takingRound=false,handoffError=''}:{
     characterName:string;beat:StageOneBeat;advance:(next:string,fromChoice?:boolean)=>void;
     goBack:()=>void;canGoBack:boolean;takeRound:()=>Promise<void>;
@@ -72,8 +72,9 @@
 
 <section class="workshop bellrunner" aria-label="Bellrunner Stage 1 — Dispatch House">
   <div class="dispatch-scene pall-story-sections">
-    <section class="scene-illustration pall-story-landscape"
-      aria-label="Dispatch House scenery and interactive objects">
+    <section class="scene-visuals pall-story-visuals" aria-label="Dispatch House and round documents">
+      <div class="scene-illustration pall-story-landscape"
+        aria-label="Dispatch House with Hector D. Smoke">
     <img class="depot" src="/locations/origins/bellrunner-depot.webp"
       alt="Grand Cylinder City Dispatch House, a working industrial courier depot" draggable="false"/>
     <div class="scene-shade" aria-hidden="true"></div>
@@ -83,31 +84,20 @@
          The former 70% foreground mask hid half his body in mid-air. -->
     <img class="depot depot-foreground" src="/locations/origins/bellrunner-depot.webp"
       alt="" aria-hidden="true" draggable="false"/>
-    {#each paperKeys as key}
-      <img class="paper-art {key}" src={papers[key].src} alt="" aria-hidden="true" draggable="false"/>
-      <button type="button" class="paper-target {key}" data-workshop-object
-        class:route-ready={key==='route'&&beat.kind==='handoff'}
-        aria-label={key==='route'&&beat.kind==='handoff'
-          ?'Take the Route Sheet to begin Shift Dispatch'
-          :'Inspect '+papers[key].label}
-        aria-pressed={key==='route'&&beat.kind==='handoff'?undefined:selected===key}
-        disabled={key==='route'&&beat.kind==='handoff'&&takingRound}
-        data-pall-sfx="paper" onclick={()=>usePaper(key)}>
-        <span class="workshop-object-label">
-          {key==='route'&&beat.kind==='handoff'?'Take Route Sheet':papers[key].label}
-        </span>
-      </button>
-    {/each}
     <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
       aria-label="Talk to Hector D. Smoke"
       onclick={askHector}>
       <span class="workshop-npc-label">Hector D. Smoke</span>
     </button>
+      </div>
+      <BellrunnerDocumentTray {papers} onChoose={usePaper} {selected}
+        routeReady={beat.kind==='handoff'} busy={takingRound}/>
     </section>
 
     <section class="dialogue-section pall-story-dialogue-section"
       aria-label="Dispatch House dialogue">
     <aside class="work-card dispatch-dialogue" aria-label="Dispatch House conversation and paper inspection">
+      <div class="dialogue-body">
       {#if selected}
         <p class="eyebrow">DISPATCH HOUSE · PAPER INSPECTION</p>
         <h2>{papers[selected].label}</h2>
@@ -147,10 +137,15 @@
           {#if beat.kind!=='handoff'}
             <button type="button" onclick={askHector}>Ask Hector something</button>
           {/if}
-          {#if canGoBack}
-            <button type="button" onclick={()=>{selected=null;goBack();}}>Previous line</button>
-          {/if}
           {#if handoffError}<p class="error" role="alert">{handoffError}</p>{/if}
+        </div>
+      {/if}
+      </div>
+      {#if entered&&!selected&&!talking&&canGoBack}
+        <div class="dialogue-navigation">
+          <button type="button" onclick={()=>{selected=null;goBack();}}>
+            <span aria-hidden="true">‹</span> Previous line
+          </button>
         </div>
       {/if}
     </aside>
@@ -159,70 +154,73 @@
 </section>
 
 <style>
-  /* Scenery and clickable props stay on the left; all text and inspections
-     use the approved nine-slice parchment in the right-hand column. */
+  /* The NPC is the scene's primary figure; the actual job papers sit in
+     a distinct reusable tray beneath him. Text and choices stay at right. */
   .bellrunner{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
-  /* Shared .pall-story-sections places artwork left of dialogue on desktop.
-     The intrinsic 1672:941 ratio belongs ONLY to the illustrated column. */
   .dispatch-scene{width:100%;min-width:0}
+  .scene-visuals{min-width:0}
   .scene-illustration{position:relative;width:100%;aspect-ratio:1672/941}
   .depot{position:absolute;inset:0;width:100%;height:100%;
     object-fit:contain;pointer-events:none}
   .scene-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(90deg,#100e0c29,transparent 52%,#0c0a092c)}
-  .hector{position:absolute;z-index:1;top:5%;left:10%;height:103%;
-    width:auto;max-width:36%;object-fit:contain;object-position:bottom center;
-    pointer-events:none;filter:drop-shadow(1px 5px 6px #0a080555)}
-  .depot-foreground{z-index:2;clip-path:inset(93% 0 0 0)}
-  .npc-hotspot{position:absolute;z-index:4;top:12%;left:10%;
-    width:27%;height:56%;display:flex;align-items:flex-end;justify-content:center;
-    padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
+    background:linear-gradient(90deg,#100e0c3d,transparent 65%,#0c0a0925)}
+  .hector{position:absolute;z-index:2;top:3%;left:7%;height:103%;
+    width:auto;max-width:43%;object-fit:contain;object-position:bottom center;
+    pointer-events:none;filter:drop-shadow(1px 6px 7px #0a080577)}
+  .depot-foreground{z-index:3;clip-path:inset(93% 0 0 0)}
+  .npc-hotspot{position:absolute;z-index:4;top:7%;left:6%;width:41%;
+    height:86%;display:flex;align-items:flex-end;justify-content:center;
+    padding:0 0 6px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
-  .paper-art{position:absolute;z-index:3;bottom:5%;height:30%;width:18%;
-    object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0806069c)}
-  .paper-art.notices{left:43%}.paper-art.sealed{left:62%}.paper-art.route{left:81%}
-  .paper-target{position:absolute;z-index:5;bottom:1%;height:36%;width:18%;
-    display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
-    padding:0;background:transparent;border:0;color:#f3e6d1;cursor:pointer}
-  .paper-target.notices{left:43%}.paper-target.sealed{left:62%}.paper-target.route{left:81%}
-  .paper-target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
-  .paper-target:disabled{cursor:wait}
-  .paper-target.route-ready .workshop-object-label{
-    filter:brightness(1.1) drop-shadow(0 0 6px #f5d08591)}
-  .paper-target:hover~.paper-art{filter:brightness(1.05)}
-  .dispatch-dialogue{position:relative;z-index:1;align-self:stretch;
-    width:min(100%,980px);margin:0;box-sizing:border-box;
-    min-width:0;max-height:none;overflow:visible;padding:15px 18px;
+  .dispatch-dialogue{position:relative;z-index:1;display:flex;flex-direction:column;
+    flex:1;align-self:stretch;box-sizing:border-box;width:100%;min-width:0;
+    min-height:100%;max-height:none;overflow:visible;margin:0;
+    padding:clamp(20px,2.3vw,39px) clamp(19px,2.35vw,40px) 25px;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
-  .eyebrow{font:600 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
-  h2{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .speech,.narration,.work-description{margin:0 0 12px;
-    font:600 clamp(13px,1.2vw,17px)/1.5 var(--pall-font-reading,Georgia,serif);color:#251910}
+  .dialogue-body{min-width:0}
+  .dialogue-navigation{border-top:1px solid #9e8159;margin-top:auto;
+    padding-top:16px;min-width:0}
+  .dialogue-navigation>button{appearance:none;display:inline-flex;align-items:center;
+    gap:10px;min-height:44px;padding:5px 2px;border:0;background:transparent;
+    color:#543820;cursor:pointer;text-align:left;font:600 16px/1.3
+    var(--pall-font-reading,Georgia,serif)}
+  .dialogue-navigation>button span{font:26px/1 Georgia,serif}
+  .dialogue-navigation>button:is(:hover,:focus-visible){color:#24140b;
+    text-decoration:underline}
+  .dialogue-navigation>button:focus-visible{outline:2px solid #b58e59;outline-offset:2px}
+  .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.12em;color:#614029;margin:0 0 19px;padding-bottom:11px;
+    border-bottom:1px solid #9e815955}
+  h2{margin:0 0 16px;font:600 clamp(23px,1.8vw,30px)/1.3
+    var(--pall-font-reading,Georgia,serif);color:#25170f}
+  .speech,.narration,.work-description{margin:0 0 17px;
+    font:600 clamp(17px,1.35vw,23px)/1.55 var(--pall-font-reading,Georgia,serif);
+    color:#251910}
   .narration{font-style:italic}
-   .responses{display:flex;flex-direction:column;gap:6px;margin-top:3px}
+  .responses{display:flex;flex-direction:column;gap:9px;margin-top:clamp(18px,3vw,35px)}
   .responses>button{display:block;width:100%;text-align:left;
     border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);
-    cursor:pointer;min-height:42px}
+    padding:10px 13px;font:600 clamp(15px,1.18vw,18px)/1.35
+    var(--pall-font-reading,Georgia,serif);
+    cursor:pointer;min-height:52px}
   .responses>button:hover,.responses>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}
   .responses>button:disabled{opacity:.55;cursor:wait}
   .error{margin:4px 0 0;color:#873523;font:13px/1.45 Georgia,serif}
+  @media(max-width:1160px){
+    .dispatch-dialogue{min-height:0;padding:23px 24px}
+    .speech,.narration,.work-description{font-size:19px}
+  }
   @media(max-width:700px){
     .dispatch-scene{height:auto;min-height:0}
-    .scene-illustration{width:100%;aspect-ratio:1672/941}
-    .depot{object-position:39% center}
-    .hector{height:94%;max-width:42%;left:-2%;top:2%}
-    .depot-foreground{object-position:39% center}
-    .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
-    .paper-art{bottom:9%;height:25%;width:20%}
-    .paper-target{bottom:2%;height:35%;width:20%}
-    .paper-art.notices,.paper-target.notices{left:39%}
-    .paper-art.sealed,.paper-target.sealed{left:59%}
-    .paper-art.route,.paper-target.route{left:79%}
-    .dispatch-dialogue{width:100%;margin:0;padding:14px;max-height:none;overflow:visible}
-    .speech,.narration,.work-description{font-size:16px;line-height:1.5}
+    .scene-illustration{aspect-ratio:1672/941}
+    .depot{object-position:center}
+    .hector{top:0;height:100%;max-width:43%;left:2%}
+    .npc-hotspot{left:0;top:6%;width:47%;height:87%;padding-bottom:0}
+    .dispatch-dialogue{min-height:0;padding:19px 14px}
+    .speech,.narration,.work-description{font-size:17px;line-height:1.55}
+    .responses>button{font-size:16px;min-height:47px}
   }
 </style>
