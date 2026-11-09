@@ -138,8 +138,8 @@ test('All Hauling backgrounds fill tall and wide screens without distorting the 
   'Street paintings retain their centered, proportional cover crop');
  assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0'),
   'Receiving desk must keep its wooden counter visible when cropping');
- assert.ok(ui.includes('.scene{display:flex;flex-direction:column;height:auto;min-height:0}'),
-  'The mobile arrangement still stacks the art and dialogue');
+ assert.ok(ui.includes('.scene{display:flex;flex-direction:column;height:auto;min-height:0;flex:none}'),
+  'Mobile must keep natural content height with no forced filler beneath the dialogue');
  const sourceAspect=1672/941;
  for(const [viewportWidth,viewportHeight] of [
   [1920,768],[2048,821],[2560,1440],[3440,1440],[3840,2160]
