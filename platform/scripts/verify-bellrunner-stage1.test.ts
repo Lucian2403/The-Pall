@@ -134,6 +134,8 @@ test('All Hauling backgrounds fill tall and wide screens without distorting the 
   'The scene grows against the actual browser viewport');
  assert.ok(ui.includes('width:max(100cqw,177.7cqh)'));
  assert.ok(ui.includes('aspect-ratio:1672/941'));
+ assert.ok(ui.includes('.art-scaled>.environment{object-fit:cover}'),
+  'All three source images retain their native proportions when upscaled');
  assert.ok(ui.includes('transform:translate(-50%,-50%)'),
   'Street paintings retain their centered, proportional cover crop');
  assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0'),
