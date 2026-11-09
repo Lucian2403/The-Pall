@@ -21,7 +21,7 @@ export const APPROVED_STARTING_FACTS = {
   maximumHealth: 50,
   startingCoins: 20,
   // Display names only. Final item IDs, weights, slots and conditions are not approved.
-  starterItemDisplayNames: ['Basic Clothes', 'Crude Small Bag'],
+  starterItemDisplayNames: ['Daily Worker Clothes', 'Simple Bag'],
   originMajorSkillBonusLevels: 3
 } as const;
 
