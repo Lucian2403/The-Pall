@@ -1,5 +1,5 @@
 /**
- * Local developer tool for replaying Millhand introduction stages with one
+ * Local developer tool for replaying Millhand and Bellrunner introduction stages with one
  * existing character. Registered only when the API binds to loopback AND
  * NODE_ENV is not production. This is not a normal gameplay capability.
  */
@@ -40,9 +40,18 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2',
       [req.params.id,session.user.id]
     );
-    if(!result.rowCount||result.rows[0].origin!=='Millhand')
-      return reply.code(404).send({error:'not_found'});
+    if(!result.rowCount)return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
+    if(result.rows[0].origin==='Bellrunner'){
+      const active=await db.query(
+        'SELECT 1 FROM player_character_bellrunner_dispatch WHERE character_id=$1',
+        [req.params.id]);
+      const canRewind=stage===2&&result.rows[0].tutorial_status==='IN_PROGRESS'&&
+        !!active.rowCount;
+      return {enabled:true,canRewind,stage,targetStage:canRewind?1:null};
+    }
+    if(result.rows[0].origin!=='Millhand')
+      return reply.code(404).send({error:'not_found'});
     let canReturnToClinic=false;
     if(stage===8){
       const visit=await db.query<{state:ClinicState}>(
@@ -80,6 +89,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
 
     const client=await db.connect();
     let transaction=false;
+    let bellrunner=false;
     try {
       await client.query('BEGIN');transaction=true;
       // Serialise against BOTH Stage 2 and Stage 3 gameplay commands by
@@ -88,15 +98,47 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
         [req.params.id,session.user.id]
       );
-      if(!c.rowCount||c.rows[0].origin!=='Millhand'){
+      if(!c.rowCount||!['Millhand','Bellrunner'].includes(c.rows[0].origin)){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(404).send({error:'not_found'});
       }
+      bellrunner=c.rows[0].origin==='Bellrunner';
       if(c.rows[0].tutorial_stage!==expectedStage){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'stale_stage',stage:c.rows[0].tutorial_stage});
       }
 
+      if(bellrunner){
+        // The same developer-only Back to Stage 1 control as Millhand.
+        // No quest reward exists yet. Clear only the dispatch acceptance and
+        // its receipts, atomically under the already locked owner character.
+        if(expectedStage!==2||c.rows[0].tutorial_status!=='IN_PROGRESS'){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'wrong_work_phase'});
+        }
+        const accepted=await client.query(
+          'SELECT revision FROM player_character_bellrunner_dispatch WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        if(!accepted.rowCount){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_dispatch_state'});
+        }
+        await client.query(
+          'DELETE FROM player_character_bellrunner_dispatch_work_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'DELETE FROM player_character_bellrunner_dispatch_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'DELETE FROM player_character_bellrunner_dispatch WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=1,tutorial_status='NOT_STARTED' WHERE id=$1",
+          [req.params.id]);
+        await client.query('COMMIT');transaction=false;
+        return {stage:1,tutorialStatus:'NOT_STARTED',
+          route:'/characters/'+req.params.id+'/opening',coinDelta:0};
+      }
 
       if(expectedStage===8){
         // Developer-only replay of the final home scene. Restore the already
@@ -400,8 +442,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       if(transaction){try{await client.query('ROLLBACK');}catch{/* keep original error */}}
       if((e as {code?:string})?.code==='42P01')
         return reply.code(503).send({
-          error:expectedStage===8?'home_schema_missing':expectedStage===7?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
-          setup:expectedStage===8?'npm run home:migrate':expectedStage===7?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
+          error:bellrunner?'bellrunner_migration_required':expectedStage===8?'home_schema_missing':expectedStage===7?'clinic_schema_missing':expectedStage===6?'combat_schema_missing':'second_job_schema_missing',
+          setup:bellrunner?'npm run bellrunner:migrate':expectedStage===8?'npm run home:migrate':expectedStage===7?'npm run clinic:migrate':expectedStage===6?'npm run combat:migrate':'npm run second-job:migrate'
         });
       throw e;
     } finally {client.release();}

@@ -24,12 +24,21 @@
   const artwork=$derived(originVisual(character.origin));
   const work=$derived.by(():WorkAction|null=>{
     if(newArrival) return {
-      title:character.origin==='Millhand'?'The Smithing Workshop':'Your first work',
+      title:character.origin==='Millhand'?'The Smithing Workshop':
+        character.origin==='Bellrunner'?'The Dispatch House':'Your first work',
       description:character.origin==='Millhand'
         ?'Report to Guther Anvil at the bench to begin your first shift.'
-        :'Your introduction begins at '+character.startingLocation+'.',
+        :character.origin==='Bellrunner'
+          ?'Report to Hector D. Smoke for the council notice round.'
+          :'Your introduction begins at '+character.startingLocation+'.',
       label:'Enter '+character.startingLocation,
       href:base+'/opening'
+    };
+    if(character.origin==='Bellrunner'&&character.tutorial.stage===2) return {
+      title:'Shift Dispatch',
+      description:'Hector has issued the council notices. The saved round is ready for route preparation.',
+      label:'Continue Shift Dispatch',
+      href:base+'/bellrunner/dispatch'
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===2) return {
       title:'Marking the Plates',
