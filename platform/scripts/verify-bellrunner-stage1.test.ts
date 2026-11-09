@@ -102,11 +102,17 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
  assert.ok(shell.includes('compactBanner = false'));
  assert.ok(shell.includes('{#if !compactBanner}'));
  assert.ok(!openingRoute.includes("compactBanner={character.origin==='Bellrunner'}"),
-  'Bellrunner Stage 1 must show the shared Grand Cylinder City header');
+  'Do not hide the Bellrunner City header');
  assert.ok(!second.includes('compactBanner>'),
-  'Bellrunner Stage 2 must preserve the city header on streets and receiving scenes');
- assert.ok(shell.includes('<div class="city-banner" aria-label="Grand Cylinder City">'),
-  'Use the existing shared city vista rather than inventing a separate banner');
+  'Do not hide the City header at the Receiving Desk');
+ assert.ok(openingRoute.includes("compactCityVista={character.origin==='Bellrunner'}"),
+  'Stage 1 must preserve a slim City header above the working scene');
+ assert.ok(second.includes('compactCityVista>'),
+  'Stage 2 must preserve the same slim City header on all locations');
+ assert.ok(shell.includes('compactCityVista = false'));
+ assert.ok(shell.includes('class:city-banner-workstation={compactCityVista}'));
+ assert.ok(shell.includes('.city-banner.city-banner-workstation{'),
+  'Reuse the original city skyline at reduced height, not a replacement graphic');
 
  assert.ok(!shared.includes('grid-template-columns:minmax(0,60%)'));
  assert.ok(!shared.includes('flex-direction:column;\n  flex:0 0 auto;\n  width:100%'),
