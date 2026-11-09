@@ -251,7 +251,7 @@ test('Bellrunner Back to Stage 1 is loopback-only, owner-scoped and preserves be
    action,requestId:randomUUID(),expectedRevision:revision});
   assert.equal(progressed.status,200,action+': '+JSON.stringify(progressed.body));
  }
- assert.equal((await request('GET',path)).body?.workState?.phase,'spoiled_mark');
+ assert.equal((await request('GET',path)).body?.workState?.phase,'receiving_arrival');
  const button=await request('GET',rewind);
  assert.equal(button.status,200,JSON.stringify(button.body));
  assert.deepEqual(button.body,{
