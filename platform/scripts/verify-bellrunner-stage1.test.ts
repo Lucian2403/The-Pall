@@ -186,7 +186,8 @@ test('Hector stage has legible dialogue hierarchy, an accessible previous contro
  assert.ok(opening.includes('class="primary-choice"'));
  assert.ok(hector.includes('class="primary-choice"'));
  assert.ok(shared.includes('button.primary-choice'));
- assert.ok(shared.includes('button-hover-trim.png'));
+ assert.ok(shared.includes('background:linear-gradient(180deg,#654427'),
+  'Primary continuation actions retain the darker brass emphasis');
  assert.ok(opening.includes('max-width:980px'));
  assert.ok(opening.includes('max-height:none;overflow:visible'));
  assert.ok(!opening.includes('Payment: Not yet cleared'));
