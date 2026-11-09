@@ -20,7 +20,11 @@
 
 <section class="hector-conversation" aria-label="Optional conversation with Hector D. Smoke">
   {#if currentTopic && currentLine}
-    <p class="eyebrow">{currentLine.speaker==='Player'?characterName:'HECTOR D. SMOKE'}</p>
+    {#if currentLine.speaker==='Player'}
+      <p class="eyebrow">{characterName}</p>
+    {:else}
+      <h2 class="speaker-heading">HECTOR D. SMOKE</h2>
+    {/if}
     <p class="speech">“{currentLine.text}”</p>
     <div class="responses">
       {#if lineIndex<currentTopic.lines.length-1}
@@ -50,7 +54,11 @@
     border-bottom:1px solid #9e815955}
   h2{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
     color:#25170f}
-  .speech{margin:0 0 18px;font:600 clamp(18px,1.35vw,23px)/1.55
+  .speaker-heading{margin:0 0 24px;padding:0 0 13px;
+    border-bottom:1px solid #9e815955;text-transform:uppercase;
+    font:600 clamp(21px,1.4vw,27px)/1.25
+    var(--pall-font-reading,Georgia,serif);letter-spacing:.08em;color:#302012}
+  .speech{margin:0 0 18px;font:600 clamp(19px,1.7vw,30px)/1.48
     var(--pall-font-reading,Georgia,serif);color:#251910}
   .responses{display:flex;flex-direction:column;gap:9px;margin-top:clamp(18px,2vw,30px)}
   .responses>button{display:block;width:100%;min-height:52px;
@@ -61,7 +69,7 @@
   .responses>button:hover,.responses>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}
   @media(max-width:700px){
-    .speech{font-size:17px}
+    .speech{font-size:20px}
     .responses>button{font-size:16px;min-height:47px}
   }
 </style>
