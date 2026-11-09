@@ -129,8 +129,8 @@
         {:else if beat.kind==='handoff'}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
           <h2>Take the Route Sheet</h2>
-          <p class="work-description">Hector has laid out the route sheet.
-            Click it on the counter to begin the deliveries.</p>
+          <p class="work-description">The Route Sheet is ready with the round documents.
+            Take it before you set off.</p>
           {#if takingRound}<p class="work-description" role="status">Taking the route sheet…</p>{/if}
         {/if}
 
