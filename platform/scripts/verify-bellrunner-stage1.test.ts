@@ -97,6 +97,15 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
  assert.ok(shared.includes('grid-template-columns:minmax(0,52fr) minmax(0,48fr)'));
  assert.ok(shared.includes('.pall-story-visuals{'));
  assert.ok(shared.includes('.pall-story-dialogue-section{'));
+ const shell=source('apps/web/src/lib/TutorialShell.svelte');
+ const openingRoute=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
+ assert.ok(shell.includes('compactBanner = false'));
+ assert.ok(shell.includes('{#if !compactBanner}'));
+ assert.ok(openingRoute.includes("compactBanner={character.origin==='Bellrunner'}"),
+  'Only Bellrunner Stage 1 hides the redundant city panorama');
+ assert.ok(second.includes('compactBanner>'),
+  'Bellrunner Stage 2 keeps the NPC and documents above the fold');
+
  assert.ok(!shared.includes('grid-template-columns:minmax(0,60%)'));
  assert.ok(!shared.includes('flex-direction:column;\n  flex:0 0 auto;\n  width:100%'),
   'The entire desktop work area must not become one tall column');
