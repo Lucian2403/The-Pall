@@ -29,7 +29,6 @@
   let entered=$state(false);
   let selected=$state<PropKey|null>(null);
   let talking=$state(false);
-  let dialogueSection:HTMLElement|undefined;
   let bell:HTMLAudioElement|null=null;
   function begin(){
     if(entered)return;
@@ -45,7 +44,6 @@
   });
   function inspect(item:PropKey){
     selected=selected===item?null:item;
-    if(selected)dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
   }
   // The Route Sheet is the Stage 1 handoff object, not another
   // decorative inspection. The existing owner-checked take_round API
@@ -61,9 +59,8 @@
     selected=null;
     if(!entered)begin();
     talking=true;
-    // NPC art stays above; clicking Hector opens his text in the distinct
-    // dialogue section, not over the painted Depot or its task objects.
-    dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
+    // Hector remains on the left; the conversation appears immediately
+    // to his right in the independent dialogue panel.
   }
   function returnToRound(){talking=false;}
   function next(nextId:string,fromChoice=false){
@@ -108,7 +105,7 @@
     </button>
     </section>
 
-    <section class="dialogue-section pall-story-dialogue-section" bind:this={dialogueSection}
+    <section class="dialogue-section pall-story-dialogue-section"
       aria-label="Dispatch House dialogue">
     <aside class="work-card dispatch-dialogue" aria-label="Dispatch House conversation and paper inspection">
       {#if selected}
@@ -162,12 +159,12 @@
 </section>
 
 <style>
-  /* All text, including paper inspections, uses the approved nine-slice
-     parchment in the separate second section; the first shows art only. */
+  /* Scenery and clickable props stay on the left; all text and inspections
+     use the approved nine-slice parchment in the right-hand column. */
   .bellrunner{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
-  /* Shared .pall-story-sections now stacks the illustration and dialogue.
-     The intrinsic 1672:941 ratio belongs ONLY to the illustrated section. */
+  /* Shared .pall-story-sections places artwork left of dialogue on desktop.
+     The intrinsic 1672:941 ratio belongs ONLY to the illustrated column. */
   .dispatch-scene{width:100%;min-width:0}
   .scene-illustration{position:relative;width:100%;aspect-ratio:1672/941}
   .depot{position:absolute;inset:0;width:100%;height:100%;
