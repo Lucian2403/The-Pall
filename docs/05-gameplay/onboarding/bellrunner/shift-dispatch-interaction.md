@@ -72,8 +72,9 @@ layout, and dialogue covered architecture and task props.
 **Section 1 — illustrated location only.** A complete, uncropped
 `1672:941` image at the current chapter width. Stage 1's Dispatch
 House keeps Hector, his clickable NPC nameplate, council notices,
-sealed order, Route Sheet and their inspection popovers inside this
-image. Stage 2 displays the current location: Dispatch House (while
+sealed order and Route Sheet, with only their visual labels/hitboxes.
+Clicking an item opens its inspection text in the **lower parchment
+section**, never as a popup over the painted Depot. Stage 2 displays the current location: Dispatch House (while
 choosing a road), Short Route, Long Route or Municipal Receiving Desk.
 The latter three have **no overlaid NPC or object interaction**.
 Art, object coordinates and mouse/keyboard targets share one image
@@ -95,8 +96,9 @@ the full illustration to the dialogue; an uncropped image cannot
 physically occupy an extra-wide viewport at full width *and* show
 the whole dialogue above the fold. This is a conscious design
 trade-off: artwork and actions remain intact, with **no overlap**.
-Clicking Hector's art/label scrolls the player to his now-separate
-conversation. Stage 1's Route Sheet still accepts the round from
+Clicking Hector's art/label or selecting an inspectable paper
+scrolls the player to its now-separate conversation or inspection
+frame. Stage 1's Route Sheet still accepts the round from
 its image section and saves the same idempotent Stage 2 handoff.
 On mobile, the same two sections stack naturally.
 
