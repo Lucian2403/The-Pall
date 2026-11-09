@@ -23,6 +23,54 @@ tutorial round gives zero coins, ordinary XP and loot; its disputed
 payment is explained only by Stage 3. The universal starter
 equipment, bag, coins, and Industry +3 remain unchanged.
 
+## Painted locations and reusable Hauling props
+
+The courier now travels through **three different real scenes**, using
+the owner-supplied location backgrounds rather than remaining at Hector's
+counter throughout the delivery. Scenes are selected from shared
+`apps/web/src/lib/hauling-scenes.ts`, not hard-coded Bellrunner-only
+display URLs:
+
+- **Dispatch House:** the existing depot artwork, Hector and all issued
+  papers. Here the player accepts the round and selects a road. Existing
+  Depot ambience is only active while this location is visible.
+- **Short Route:** `/locations/hauling/freight-yard-backstreet.webp`
+  illustrates the industrial backstreets during the owner's exact
+  first-person journey monologue.
+- **Long Route:** `/locations/hauling/grand-cylinder-main-street.webp`
+  illustrates carts and crowds along the main roads. Short and Long
+  remain aliases of saved `direct` and `quieter` work values.
+- **Receiving Desk:** `/locations/hauling/municipal-receiving-desk.webp`
+  is a **shared Hauling destination background**, including future
+  paid deliveries. The receiver speaks through the existing framed
+  text dialogue; no character portrait or Receiver NPC sprite is
+  required or generated.
+
+**Receiving Book:** The source Receiving Desk painting already
+contains a dark bound ledger on the near counter. The reusable
+`HaulingReceivingBookHotspot.svelte` attaches an accessible clickable
+object label to that book, aligned through a common cover-scaled art
+coordinate space, and delegates its action to the current job.
+In this tutorial, clicking it during the spoiled-mark choice checks
+the office's receiving entry, saving `book_confirmed`. In later
+dynamic Hauling or other document-handling jobs, that same book could
+verify disputed signatures, cross-check handover records or support
+audit tasks. **It is a stationary office record, not another
+carryable inventory item.** Do not generate a duplicate book illustration.
+
+The council notices remain clickable to hand them over at the arrival;
+the route sheet provides inspectable proof during the receiving phase;
+the final sealed council order becomes a clickable prop only when the
+ordinary round is complete. The task papers are never transferred into
+personal pack or chest. No additional scenic sound has been fabricated
+for streets or reception: the Depot ambience stops on departure and
+the player's audio controls continue to apply.
+
+All supplied images have been converted into lightweight WebP derivatives
+without altering the originals. The painted scene is never stretched
+out of its native proportions, and receipt/ledger hotspots scale with
+that same painting, not independent window percentages.
+
 ## Choose the road
 
 The route sheet offers two paths that reach the same routine
