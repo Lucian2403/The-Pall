@@ -17,12 +17,12 @@ export type DispatchWorkAction=
   'check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
   'deliver_notices'|'continue_to_receiver'|'ask_fresh_mark'|'check_receiving_book'|
   'confirm_book'|'note_spoiled_mark'|'continue_receiver_dialogue'|
-  'continue_to_report'|'finish_round'|'take_final_notice';
+  'continue_to_final_notice'|'continue_to_report'|'finish_round'|'take_final_notice';
 export const DISPATCH_ACTIONS:ReadonlyArray<DispatchWorkAction>=[
   'check_round','sort_notices','take_direct_road','take_quieter_road',
   'deliver_notices','continue_to_receiver','ask_fresh_mark','check_receiving_book','confirm_book',
-  'note_spoiled_mark','continue_receiver_dialogue','continue_to_report',
-  'finish_round','take_final_notice'
+  'note_spoiled_mark','continue_receiver_dialogue','continue_to_final_notice',
+  'continue_to_report','finish_round','take_final_notice'
 ];
 export const INITIAL_DISPATCH_STATE:DispatchState={
   phase:'issued',route:null,noticesOrdered:false,receipt:null
@@ -73,6 +73,7 @@ export function applyDispatchAction(
   case 'continue_receiver_dialogue':
    if(state.phase!=='receiver_reply'||!state.receipt)return reject();
    return {...state,phase:'receiver_result'};
+  case 'continue_to_final_notice':
   case 'continue_to_report':
    // Preserve older in-flight clients, but do not force a redundant
    // summary page in this tutorial. The work record keeps route/receipt.
