@@ -146,7 +146,8 @@
 
 {#if status === 'ready' && scene && character && beat}
   <TutorialShell {character} smithingBackdrop={character.origin==='Millhand'}
-    depotBackdrop={character.origin==='Bellrunner'}>
+    depotBackdrop={character.origin==='Bellrunner'}
+    compactBanner={character.origin==='Bellrunner'}>
     {#if character.origin === 'Millhand'}
       <WorkshopScene
         characterName={character.name}
