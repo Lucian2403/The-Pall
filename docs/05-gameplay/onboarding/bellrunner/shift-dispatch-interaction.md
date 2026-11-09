@@ -97,6 +97,13 @@ action sequence, receipt proof and all previously approved text
 remain in the right-hand dialogue. Backgrounds keep their full
 source aspect ratio and never overlap the parchment.
 
+To keep the NPC, documents and dialogue in view together, the
+redundant full-height **Grand Cylinder City panorama** above the
+chapter is hidden for Bellrunner Stages 1 and 2 only. The normal
+HUD, origin/stage readout, navigation, journal and the actual painted
+location remain. Other origins are unaffected. This prioritizes
+the task workspace over a second decorative background.
+
 At viewport widths of 1160px or less, the left visual column
 (including its cards when present) stacks above the dialogue.
 There are no forced scrollbars *inside* the parchment; the page
