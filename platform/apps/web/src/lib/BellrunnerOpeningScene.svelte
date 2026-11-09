@@ -30,6 +30,7 @@
   let entered=$state(false);
   let selected=$state<PropKey|null>(null);
   let talking=$state(false);
+  let dialogueSection:HTMLElement|undefined;
   let bell:HTMLAudioElement|null=null;
   function begin(){
     if(entered)return;
@@ -60,6 +61,9 @@
     selected=null;
     if(!entered)begin();
     talking=true;
+    // NPC art stays above; clicking Hector opens his text in the distinct
+    // dialogue section, not over the painted Depot or its task objects.
+    dialogueSection?.scrollIntoView({behavior:'smooth',block:'start'});
   }
   function returnToRound(){talking=false;}
   function next(nextId:string,fromChoice=false){
@@ -70,8 +74,9 @@
 </script>
 
 <section class="workshop bellrunner" aria-label="Bellrunner Stage 1 — Dispatch House">
-  <div class="dispatch-scene pall-story-landscape">
-    <div class="scene-illustration">
+  <div class="dispatch-scene pall-story-sections">
+    <section class="scene-illustration pall-story-landscape"
+      aria-label="Dispatch House scenery and interactive objects">
     <img class="depot" src="/locations/origins/bellrunner-depot.webp"
       alt="Grand Cylinder City Dispatch House, a working industrial courier depot" draggable="false"/>
     <div class="scene-shade" aria-hidden="true"></div>
@@ -105,8 +110,10 @@
       <WorkshopItemPopover itemKey={selected} title={papers[selected].label}
         description={papers[selected].observation} onClose={()=>{selected=null;}} />
     {/if}
-    </div>
+    </section>
 
+    <section class="dialogue-section pall-story-dialogue-section" bind:this={dialogueSection}
+      aria-label="Dispatch House dialogue">
     <aside class="work-card dispatch-dialogue" aria-label="Hector D. Smoke conversation">
       {#if talking}
         <BellrunnerHectorConversation {characterName} {returnToRound}/>
@@ -147,6 +154,7 @@
         </div>
       {/if}
     </aside>
+    </section>
   </div>
 </section>
 
@@ -155,11 +163,10 @@
      inspect popover and object labels from pall-owner-ui.css and workshop-object-labels.css. */
   .bellrunner{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
-  .dispatch-scene{position:relative;display:grid;
-    grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
-    align-content:start;grid-template-rows:minmax(0,1fr);
-    width:100%;min-width:0;background:#291d15}
-  .scene-illustration{position:absolute;inset:0;overflow:hidden}
+  /* Shared .pall-story-sections now stacks the illustration and dialogue.
+     The intrinsic 1672:941 ratio belongs ONLY to the illustrated section. */
+  .dispatch-scene{width:100%;min-width:0}
+  .scene-illustration{position:relative;width:100%;aspect-ratio:1672/941}
   .depot{position:absolute;inset:0;width:100%;height:100%;
     object-fit:contain;pointer-events:none}
   .scene-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
@@ -184,10 +191,9 @@
   .paper-target.route-ready .workshop-object-label{
     filter:brightness(1.1) drop-shadow(0 0 6px #f5d08591)}
   .paper-target:hover~.paper-art{filter:brightness(1.05)}
-  .dispatch-dialogue{position:relative;grid-column:2;z-index:6;align-self:start;
-    width:100%;margin:clamp(24px,3vw,50px) 0 24px;box-sizing:border-box;
-    min-width:0;max-height:calc(100% - 48px);overflow-y:auto;
-    overscroll-behavior:contain;padding:15px 18px;
+  .dispatch-dialogue{position:relative;z-index:1;align-self:stretch;
+    width:min(100%,980px);margin:0;box-sizing:border-box;
+    min-width:0;max-height:none;overflow:visible;padding:15px 18px;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .eyebrow{font:600 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
@@ -205,8 +211,8 @@
   .responses>button:disabled{opacity:.55;cursor:wait}
   .error{margin:4px 0 0;color:#873523;font:13px/1.45 Georgia,serif}
   @media(max-width:700px){
-    .dispatch-scene{display:flex;flex-direction:column;height:auto;min-height:0}
-    .scene-illustration{position:relative;inset:auto;width:100%;aspect-ratio:1672/941}
+    .dispatch-scene{height:auto;min-height:0}
+    .scene-illustration{width:100%;aspect-ratio:1672/941}
     .depot{object-position:39% center}
     .hector{height:94%;max-width:42%;left:-2%;top:2%}
     .depot-foreground{object-position:39% center}
@@ -216,8 +222,7 @@
     .paper-art.notices,.paper-target.notices{left:39%}
     .paper-art.sealed,.paper-target.sealed{left:59%}
     .paper-art.route,.paper-target.route{left:79%}
-    .dispatch-dialogue{width:100%;margin:0;padding:14px;border-radius:0;
-      max-height:none;overflow:visible}
+    .dispatch-dialogue{width:100%;margin:0;padding:14px;max-height:none;overflow:visible}
     .speech,.narration,.work-description{font-size:16px;line-height:1.5}
   }
 </style>
