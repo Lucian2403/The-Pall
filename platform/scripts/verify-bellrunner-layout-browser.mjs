@@ -7,9 +7,9 @@ import {tmpdir} from 'node:os';
 
 /* REAL Svelte pages, not duplicated mock UI. Stub only the API response so
  * protected character pages can be rendered in isolated Chromium QA.
- * Checks the requested desktop split: scene artwork LEFT and framed
- * dialogue RIGHT; never a parchment overlay or a panel underneath.
- * Narrow screens may stack the two independent sections.
+ * Checks the owner-referenced workstation composition: Hector and
+ * three real document-card buttons in the left section, full-height
+ * parchment on the right, no artwork overlays. Narrow screens stack.
  */
 const root=resolve(import.meta.dirname,'..');
 const chrome=['google-chrome','chromium','chromium-browser'].find(x=>
@@ -157,7 +157,9 @@ try{
   function sceneMetrics(){
     return evalJS(String.raw`(()=>{
       const stack=document.querySelector('.pall-story-sections');
-      const art=stack?.querySelector(':scope > .pall-story-landscape');
+      const visuals=stack?.querySelector(':scope > .pall-story-visuals');
+      const art=visuals?.querySelector(':scope > .pall-story-landscape');
+      const tray=visuals?.querySelector('.round-documents');
       const dialogue=stack?.querySelector(':scope > .pall-story-dialogue-section');
       const frame=dialogue?.querySelector('.work-card');
       const image=art?.querySelector('img.depot, img.environment');
@@ -167,7 +169,8 @@ try{
         return {x:r.x,y:r.y,w:r.width,h:r.height,top:r.top,bottom:r.bottom,
           left:r.left,right:r.right};
       };
-      return {art:rect(art),dialogue:rect(dialogue),frame:rect(frame),
+      return {art:rect(art),visuals:rect(visuals),tray:tray?rect(tray):null,
+        dialogue:rect(dialogue),frame:rect(frame),
         stack:rect(stack),img:rect(image),fit:getComputedStyle(image).objectFit,
         artAspect:getComputedStyle(art).aspectRatio,
         frameOverflow:getComputedStyle(frame).overflowY,
@@ -199,19 +202,19 @@ try{
       assert.ok(Math.abs(m.art.h-m.art.w*941/1672)<2.5,
         'Full original aspect: '+suffix);
       if(width>1080){
-        assert.ok(Math.abs(m.dialogue.top-m.art.top)<=2,
-          'Desktop dialogue must START beside the scene: '+suffix);
-        assert.ok(m.dialogue.left>=m.art.right-2,
-          'Desktop dialogue must be to the RIGHT of the artwork: '+suffix);
+        assert.ok(Math.abs(m.dialogue.top-m.visuals.top)<=2,
+          'Desktop dialogue must START beside the workstation: '+suffix);
+        assert.ok(m.dialogue.left>=m.visuals.right-2,
+          'Desktop dialogue must be to the RIGHT of the workstation: '+suffix);
         assert.ok(m.frame.left>=m.art.right-1,
           'Parchment may not overlap the LEFT scene: '+suffix);
-        assert.ok(Math.abs(m.art.w/m.stack.w-.6)<.025,
-          'The scene owns ~60% of available content width: '+suffix);
-        assert.ok(Math.abs(m.dialogue.w/m.stack.w-.4)<.025,
-          'The right dialogue owns ~40% of available content width: '+suffix);
+        assert.ok(Math.abs(m.visuals.w/m.stack.w-.52)<.025,
+          'The illustrated workstation owns roughly 52% of the width: '+suffix);
+        assert.ok(Math.abs(m.dialogue.w/m.stack.w-.48)<.025,
+          'The parchment occupies the remaining 48% at right: '+suffix);
       }else{
-        assert.ok(m.dialogue.top>=m.art.bottom-2,
-          'Narrow-screen dialogue stacks BELOW the artwork: '+suffix);
+        assert.ok(m.dialogue.top>=m.visuals.bottom-2,
+          'Narrow-screen dialogue stacks BELOW the art and document cards: '+suffix);
       }
       assert.ok(m.frame.top>=m.dialogue.top-1 &&
         m.frame.bottom<=m.dialogue.bottom+2,
@@ -221,13 +224,24 @@ try{
         'Frame is horizontally inside its section: '+suffix);
       assert.ok(m.frame.w<=982,
         'Readable parchment cannot span an ultrawide monitor: '+suffix);
+      if(scene==='stage1'||scene==='stage2-depot'){
+        assert.ok(m.tray&&m.tray.h>115,
+          'The Dispatch House MUST show the three document cards: '+suffix);
+        assert.ok(m.tray.top>=m.art.bottom-2,
+          'Document cards belong BELOW the NPC, not over his portrait: '+suffix);
+      }else{
+        assert.equal(m.tray,null,
+          'No redundant paper tray at a street or the Receiving Desk: '+suffix);
+      }
       assert.equal(m.fit,'contain','Full image must not be cover-cropped: '+suffix);
       assert.equal(m.frameOverflow,'visible','No internal frame scrollbar: '+suffix);
       assert.ok(m.art.h>0&&m.dialogue.h>90&&m.stack.bottom>=m.frame.bottom-2,
         'All two-section content must be in page flow: '+suffix);
-      await evalJS("document.querySelector('.pall-story-dialogue-section')?.scrollIntoView({block:'start',behavior:'instant'});true");
-      const scrolled=await sceneMetrics();
-      assert.ok(scrolled.top>=0&&scrolled.frame.w>100,'Dialogue must be reachable: '+suffix);
+      if(width<=1160){
+        await evalJS("document.querySelector('.pall-story-dialogue-section')?.scrollIntoView({block:'start',behavior:'instant'});true");
+        const scrolled=await sceneMetrics();
+        assert.ok(scrolled.frame.w>100,'Stacked dialogue must be reachable: '+suffix);
+      }
       console.log('PASS: '+scene+' '+width+'×'+height+
         ' artwork '+Math.round(m.art.w)+'×'+Math.round(m.art.h)+
         (width>1080?' dialogue RIGHT x='+Math.round(m.dialogue.left):
@@ -259,23 +273,23 @@ try{
     return m?.text.includes('Ask Hector something')?m:false;
   },8000,'Hector text in the lower section');
   assert.equal(await evalJS("document.querySelector('.scene-illustration .work-card, .scene-illustration .workshop-inspection')===null"),true);
-  await clickArtwork('button.paper-target.notices');
+  await clickArtwork('button.document-card[aria-label="Inspect Council notices"]');
   await until(async()=>{
     const m=await sceneMetrics();
     return m?.text.includes('Council notices')?m:false;
   },8000,'Paper inspection text in the lower section');
   assert.equal(await evalJS("document.querySelector('.scene-illustration .workshop-inspection')===null"),true);
-  console.log('PASS: clicking Stage 1 NPC and paper reveals text RIGHT of the image');
+  console.log('PASS: Stage 1 Hector and the document card update the adjacent parchment');
 
   await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/bellrunner/dispatch?scene=depot'});
   await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 2 Depot paper targets');
-  await clickArtwork('button.paper-target.notices');
+  await clickArtwork('button.document-card[aria-label="Inspect Council notices"]');
   await until(async()=>{
     const m=await sceneMetrics();
     return m?.text.includes('Council notices')?m:false;
   },8000,'Stage 2 Depot paper inspection below art');
   assert.equal(await evalJS("document.querySelector('.illustration .workshop-inspection')===null"),true);
-  console.log('PASS: clicking Stage 2 Depot paper updates the right dialogue');
+  console.log('PASS: Stage 2 Depot document card updates the adjacent parchment');
   console.log('PASS: 25 real Bellrunner page/viewport combinations use LEFT art / RIGHT dialogue on desktop and stack on mobile');
 }catch(error){
   console.error(error);
