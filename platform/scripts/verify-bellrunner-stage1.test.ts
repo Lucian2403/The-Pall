@@ -68,61 +68,76 @@ test('Owner-provided multi-purpose Hauling scenes keep their source art and use 
  assert.ok(!book.includes('<img'),'The receiving book is already painted into the office');
 });
 
-test('Hauling stages use the correct background, contextual paper props and audio lifetime',()=>{
+test('Hauling scenes keep the Depot interactive but leave the Receiving Desk dialogue-only',()=>{
  const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
- assert.ok(ui.includes("?'depot'".replace('?','?'))||
-  ui.includes("? 'depot'")||ui.includes("?'depot'"));
  assert.ok(ui.includes("'short_route'")&&ui.includes("'long_route'"));
  assert.ok(ui.includes(":'receiving_desk'"));
  assert.ok(ui.includes('src={HAULING_SCENES[sceneKey].src}'));
  assert.ok(ui.includes("depotBackdrop={sceneKey==='depot'}"),
-  'Depot ambience must end when traveling into the streets');
+  'Depot ambience ends when the player leaves Hector');
  assert.ok(ui.includes("sceneLocation={HAULING_SCENES[sceneKey].label}"));
  assert.ok(ui.includes("{#if sceneKey==='depot'}"));
- assert.ok(ui.includes("{#if sceneKey==='receiving_desk'}"));
- assert.ok(ui.includes('<HaulingReceivingBookHotspot disabled={busy}'));
- assert.ok(ui.includes("perform(phase==='book_checked'?'confirm_book':'check_receiving_book')"));
- assert.ok(ui.includes("phase==='receiving_arrival'"));
+ assert.ok(ui.includes('class="paper-target {key}"'),
+  'Depot papers remain inspectable in the opening job scene');
+ assert.ok(ui.includes('WorkshopItemPopover'),
+  'Depot continues using the shared inspection component');
+ assert.ok(!ui.includes("HaulingReceivingBookHotspot"),
+  'The Receiving Desk must not provide a clickable book in this tutorial');
+ assert.ok(!ui.includes('counter-target')&&!ui.includes('counter-prop'),
+  'No floating task papers or object hitboxes over Receiving Desk');
+ assert.ok(ui.includes("phase==='spoiled_mark'")&&
+  ui.includes("perform('check_receiving_book')"),
+  'Book verification is available through the dialogue choice instead');
  assert.ok(ui.includes("perform('continue_to_receiver')"));
- assert.ok(ui.includes('Hand over council notice'));
- assert.ok(ui.includes("perform('take_final_notice')"));
- assert.ok(ui.includes('.art-scaled{position:absolute;left:50%;top:50%'));
- assert.ok(ui.includes('width:max(100cqw,177.7cqh)'));
+ assert.ok(ui.includes("perform('take_final_notice')"),
+  'Final notice remains a dialogue command');
  assert.ok(ui.includes('aspect-ratio:1672/941'));
  assert.ok(ui.includes('.scene.receiving .work-card{grid-column:1'));
  assert.ok(!ui.includes('src="/characters/receiver'));
 });
 
-test('Receiving Desk preserves its bottom counter and clickable props on wide screens',()=>{
+test('Receiving Desk art remains bottom-aligned with no overlaid interactive assets',()=>{
  const ui=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  assert.ok(ui.includes('.scene.receiving .art-scaled{top:auto;bottom:0;transform:translateX(-50%)'),
-  'The reception painting must bottom-align; centered cover clips its desk');
+  'Preserve the receiving desk and counter on short wide monitors');
  assert.ok(ui.includes('.scene.receiving .art-scaled{left:0;top:0;bottom:auto;transform:none}'),
-  'Mobile full-painting layout must override the desktop bottom-anchoring');
- assert.ok(ui.includes('.sealed-prop,.sealed-target{left:76%;bottom:11%;width:18%;height:22%}'));
- assert.ok(ui.includes('.notices-prop,.notices-target{left:76%;bottom:11%;width:18%;height:20%}'));
- assert.ok(ui.includes('.route-prop,.route-target{left:78%;bottom:11%;width:17%;height:20%}'));
- assert.ok(ui.includes('aspect-ratio:1672/941'));
- assert.ok(ui.includes('class="counter-prop sealed-prop"')&&ui.includes('class="counter-target sealed-target"'));
- assert.ok(ui.includes("phase==='final_notice'||phase==='final_notice_taken'"));
- // The shared cover-scaled source is 1672×941. The whole interactive
- // order, including its label, must be inside even a short, wide viewport.
- const aspect=1672/941;
- for(const [width,height] of [[2048,640],[1920,535],[1440,600],[1280,720]]){
-  const artWidth=Math.max(width, height*aspect);
-  const artHeight=artWidth/aspect;
-  for(const [bottom,size] of [[.11,.22],[.11,.20]]){
-   const propTop=height-(bottom+size)*artHeight;
-   const propBottom=height-bottom*artHeight;
-   assert.ok(propTop>=0 && propBottom<=height,
-    'Order must remain visible in '+width+'x'+height);
-  }
-  // The real book, on the same coordinate system, must also remain
-  // reachable on a wide desktop without being pushed below the scene.
-  const ledgerTop=height-(1-.61)*artHeight;
-  const ledgerBottom=height-(1-.82)*artHeight;
-  assert.ok(ledgerTop>=0&&ledgerBottom<=height,
-   'Painted receiving book must remain visible in '+width+'x'+height);
+  'Mobile shows the entire background');
+ const room=ui.slice(ui.indexOf('{:else}\n            <!-- A proportionate cover-scaled painting:'),
+  ui.indexOf('</div>\n\n        <aside class="work-card"'));
+ assert.ok(room.includes('src={HAULING_SCENES[sceneKey].src}'));
+ assert.ok(!room.includes('data-workshop-object')&&
+  !room.includes('onclick=')&&
+  !room.includes('workshop-object-label')&&
+  !room.includes('HaulingReceivingBookHotspot'),
+  'Receiving Desk consists only of its original background painting');
+ assert.ok(!ui.includes('.sealed-prop')&&!ui.includes('.route-target'));
+});
+
+test('Stage 1 Route Sheet owns round acceptance, no duplicate handoff button or payment text',()=>{
+ const scene=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
+ const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
+ const opening=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
+ assert.ok(scene.includes("item==='route'&&beat.kind==='handoff'"));
+ assert.ok(scene.includes('onclick={()=>usePaper(key)}'));
+ assert.ok(scene.includes('if(!takingRound)void takeRound()'));
+ assert.ok(scene.includes('disabled={key===\'route\'&&beat.kind===\'handoff\'&&takingRound}'));
+ assert.ok(scene.includes('Take the Route Sheet to begin Shift Dispatch'));
+ assert.ok(scene.includes('<h2>Take the Route Sheet</h2>'));
+ const handoff=scene.slice(scene.indexOf("{:else if beat.kind==='handoff'}"),
+   scene.indexOf('</aside>'));
+ assert.ok(handoff.includes('Previous line'));
+ assert.ok(handoff.includes("beat.kind!=='handoff'"));
+ assert.ok(!handoff.includes('onclick={()=>{void takeRound();}}'));
+ assert.ok(!handoff.includes('>Take the round</button>'));
+ assert.ok(!handoff.includes('>Ask Hector something</button>')||
+  handoff.includes("beat.kind!=='handoff'"));
+ assert.ok(opening.includes('takeRound={takeBellrunnerRound}'));
+ assert.ok(opening.includes("action:'take_round',expectedRevision:0"),
+  'The visual object still commits the owner-checked, idempotent API command');
+ for(const text of [scene,stage2]){
+  assert.ok(!text.includes('Payment: Not yet cleared'), 'Remove repeated payment status');
+  assert.ok(!text.includes('Payment: {round.payment}'), 'Remove dynamic payment status');
+  assert.ok(!text.includes('class="payment"'),'No payment paragraph remains');
  }
 });
 
@@ -148,7 +163,7 @@ test('The exact owner-replaced opening is sequential and canon-matched',()=>{
  assert.equal(scene.nodes.instructions.text,
   "Here's your route. Get a mark from whoever takes each notice. And don't lose the sheet. I need it back.");
  assert.equal(scene.nodes.take.kind,'handoff');
- assert.equal(scene.nodes.take.text,'Take the round');
+ assert.equal(scene.nodes.take.text,'Take the Route Sheet');
  assert.ok(!scene.nodes.objection,'Old optional objection is superseded by the new script');
 });
 
