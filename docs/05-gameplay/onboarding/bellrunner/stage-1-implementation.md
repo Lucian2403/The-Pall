@@ -24,9 +24,10 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   on explicit scene entry (button or clicking Hector before entry); it
   stops on unmount. The anomalous night bell belongs only to Stage 3.
 - Shared owner-approved layout: `pall-owner-ui.css` nine-slice dialogue
-  and choice buttons; `workshop-object-labels.css` framed plaques; and
-  `WorkshopItemPopover` inspection cards. Both stages use these rather
-  than new styling. Hector's original artwork is not cut across the
+  and choice buttons and `workshop-object-labels.css` framed plaques.
+  Paper inspections now use the **same lower parchment dialogue frame**
+  instead of popup text over the illustration. Both stages reuse the
+  original style rather than generating extra scenic overlays. Hector's original artwork is not cut across the
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
 - **Artwork/dialogue separation shared by Stages 1–2:** the
