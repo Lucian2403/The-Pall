@@ -77,18 +77,20 @@ deliveries" confirmation panels:
    preserving the owner's six route paragraphs *verbatim* in
    `bellrunner-stage2-narrative.ts`. **Continue to the delivery**
    moves directly to the scripted ordinary receiving incident.
-3. **At the receiving desk**, narration establishes that the clerk
-   accepted a council notice and smeared its mark across two address
-   lines. The receiver acknowledges the bad ink *before* any choice.
-   Select a fresh mark, cross-check the office book or record the
-   unclear mark honestly; all three are legitimate.
-4. **Two saved dialogue beats** follow the receipt choice: the
-   player's spoken request, then the receiver's reply and the
-   consequence. The book-check path includes the player's final
-   ledger notation. Only after both steps can the round report open.
-5. **Round report and final sealed order** retain the saved route
-   and proof condition (`clear`, `book_confirmed` or
-   `noted_unclear`). The sealed order remains unread, and Stage 3
+3. **At the receiving desk**, a short first panel narrates the
+   routine stop and explains how the clerk's mark smears across the
+   route sheet. **Continue** opens a separate receiver conversation
+   panel containing their two lines and the three honest choices.
+4. **Two saved dialogue beats** follow the chosen response: the
+   player's spoken request, then the receiver's reply and consequence.
+   The book-check option includes the player's final ledger notation.
+5. **The final sealed order** follows directly after the receiver
+   responds. The earlier compulsory round-report panel provided no
+   new mechanical or narrative result, so it has been removed from
+   normal progression; the route and receipt proof remain saved for
+   future Hauling reporting. The owner-approved final text states
+   that the usual deliveries and marks are recorded but one sealed
+   order still requires delivery to the marked address. Stage 3
    cannot start before its own implementation.
 
 Historical `checked` and `book_checked` saves are still handled;
