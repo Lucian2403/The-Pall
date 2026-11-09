@@ -167,7 +167,7 @@ export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
         "speaker": "Hector"
       },
       "take": {
-        "text": "Take the round",
+        "text": "Take the Route Sheet",
         "kind": "handoff"
       }
     }
