@@ -29,16 +29,23 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   than new styling. Hector's original artwork is not cut across the
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
-- **Full-art framing shared by Stages 1–2:** the owner Depot image,
-  both street paintings and the Receiving Desk now use the
-  `pall-story-landscape.css` intrinsic 1672:941 layout. No fixed
-  scene height, forced cover crop or stretched street perspective.
-  Stage 1's Hector, papers and Route Sheet click targets continue
-  scaling within the same painting coordinates. On wide/short browser
-  windows, the document scrolls vertically to show the entire
-  full-width artwork; on phones the image sits above the dialogue.
-  This explicitly supersedes the earlier 640px and viewport-cover
-  sizing attempts.
+- **Artwork/dialogue separation shared by Stages 1–2:** the
+  Dispatch House, both routes and the Receiving Desk use the exact
+  same stacked two-section layout. The first section contains the
+  full, uncropped, aspect-preserved artwork and only its relevant
+  NPC and interactive objects; the second is a separate parchment
+  dialogue section beneath the image, constrained to a readable
+  980px maximum width. No dialogue obscures the painted Depot,
+  street or counter, and no internal dialogue scrollbar is forced.
+  Clicking Hector in the first section reveals his conversation
+  in the second via normal page scroll. The Stage 1 Route Sheet
+  hitbox remains registered to the unchanged Depot painting.
+  The shared geometry lives in `pall-story-landscape.css`, while
+  the approved decorative borders and buttons stay in
+  `pall-owner-ui.css`. On tall or wide displays the page can scroll
+  vertically; phones retain the same artwork-then-dialogue order.
+  Automated headless Chromium checks cover Stage 1, Stage 2 Depot,
+  both streets and the Receiving Desk on desktop and mobile.
 
 ## Stage 1 dialogue
 
