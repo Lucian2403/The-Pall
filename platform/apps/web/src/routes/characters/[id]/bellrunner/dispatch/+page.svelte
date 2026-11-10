@@ -363,25 +363,26 @@
   .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.12em;color:#614029;margin:0 0 16px;padding-bottom:10px;
     border-bottom:1px solid #9e815955}
-  /* Reading sizes follow the parchment's own slot width (panel cqi). */
-  h1{margin:0 0 14px;font:600 clamp(22px,4cqi,30px)/1.3
+  /* One fixed reading scale (tokens in pall-story-landscape.css): every
+     route note, journey paragraph, spoken line and choice is the same size. */
+  h1{margin:0 0 12px;font:600 var(--dialogue-title,21px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .story,.instruction,.route-note{font:600 clamp(16px,2.8cqi,20px)/1.55
-    var(--pall-font-reading,Georgia,serif);margin:0 0 15px;color:#251910}
+  .story,.instruction,.route-note{font:600 var(--dialogue-text,17px)/1.55
+    var(--pall-font-reading,Georgia,serif);margin:0 0 14px;color:#251910}
   .instruction{font-weight:700}
-  .route-note{font-size:14px;margin:9px 0 5px}
-  .inner-voice{margin:0 0 15px;font:italic 600 clamp(16px,2.8cqi,20px)/1.6
+  .route-note{margin:9px 0 5px}
+  .inner-voice{margin:0 0 14px;font:italic 600 var(--dialogue-text,17px)/1.6
     var(--pall-font-reading,Georgia,serif);color:#322016}
-  .speaker{margin:10px 0 12px;color:#5a3d27;
-    font:700 11px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.08em}
-  .spoken{margin:0 0 15px;color:#26180f;
-    font:600 clamp(18px,3.1cqi,23px)/1.55
+  .speaker{margin:10px 0 12px;color:#624328;
+    font:normal var(--dialogue-label,15px)/1.15 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.09em}
+  .spoken{margin:0 0 14px;color:#26180f;
+    font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif)}
-  .actions{display:flex;flex-direction:column;gap:9px;margin-top:clamp(14px,3cqi,28px)}
+  .actions{display:flex;flex-direction:column;gap:9px;margin-top:18px}
   .actions>button{display:block;width:100%;min-height:52px;text-align:left;
     background:#241d16;border:1px solid #6d5235;color:#f7e6c9;
-    padding:10px 13px;font:600 clamp(15px,1.16vw,18px)/1.35
+    padding:10px 13px;font:600 var(--dialogue-text,17px)/1.35
     var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .actions>button:hover,.actions>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}

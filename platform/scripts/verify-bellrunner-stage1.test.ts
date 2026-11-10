@@ -133,6 +133,15 @@ test('Bellrunner scenes use the shared container-driven scene layout: art, dialo
   'Reuse the original city skyline at reduced height, not a replacement graphic');
 
  assert.ok(!shared.includes('grid-template-columns:minmax(0,60%)'));
+ assert.ok(shared.includes('--dialogue-text:17px')&&shared.includes('--dialogue-title:21px'),
+  'One fixed Bellrunner reading scale');
+ const hector=source('apps/web/src/lib/BellrunnerHectorConversation.svelte');
+ for(const [name,code] of [['Stage 1',first],['Stage 2',second],['Hector conversation',hector]]){
+  const css=code.slice(code.indexOf('<style>'));
+  assert.ok(css.includes('var(--dialogue-text,17px)'),name+' dialogue uses the shared reading size');
+  assert.ok(!/\.(speech|narration|work-description|story|spoken|inner-voice)[^{]*\{[^}]*clamp\(/.test(css),
+   name+' dialogue text must not scale with the window: every line is the same size');
+ }
  assert.ok(!shared.includes('flex-direction:column;\n  flex:0 0 auto;\n  width:100%'),
   'The entire desktop work area must not become one tall column');
  assert.ok(tray.includes('Round Documents'));

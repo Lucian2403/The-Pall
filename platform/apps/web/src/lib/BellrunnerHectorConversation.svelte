@@ -57,29 +57,28 @@
 </section>
 
 <style>
+  /* Same fixed reading scale as the surrounding Bellrunner dialogue
+     (tokens in pall-story-landscape.css): a topic line is never larger
+     than the round's own lines or its choices. */
   .hector-conversation{min-width:0;color:#251910}
-  .eyebrow{font:600 clamp(15px,1.2vw,20px)/1.25
-    var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.11em;
-    color:#614029;margin:0 0 18px;padding-bottom:11px;
+  .eyebrow{font:normal var(--dialogue-label,15px)/1.15
+    var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;
+    color:#624328;margin:0 0 16px;padding-bottom:10px;
     border-bottom:1px solid #9e815955}
-  h2{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
+  h2{margin:0 0 12px;font:600 var(--dialogue-title,21px)/1.3 var(--pall-font-reading,Georgia,serif);
     color:#25170f}
-  .speaker-heading{margin:0 0 24px;padding:0 0 13px;
+  .speaker-heading{margin:0 0 16px;padding:0 0 10px;
     border-bottom:1px solid #9e815955;text-transform:uppercase;
-    font:600 clamp(21px,1.4vw,27px)/1.25
-    var(--pall-font-reading,Georgia,serif);letter-spacing:.08em;color:#302012}
-  .speech{margin:0 0 18px;font:600 clamp(19px,1.7vw,30px)/1.48
+    font:normal var(--dialogue-label,15px)/1.15
+    var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#624328}
+  .speech{margin:0 0 14px;font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif);color:#251910}
-  .responses{display:flex;flex-direction:column;gap:9px;margin-top:clamp(18px,2vw,30px)}
+  .responses{display:flex;flex-direction:column;gap:9px;margin-top:18px}
   .responses>button{display:block;width:100%;min-height:52px;
     border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
     text-align:left;padding:10px 13px;
-    font:600 clamp(15px,1.16vw,18px)/1.35
+    font:600 var(--dialogue-text,17px)/1.35
     var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .responses>button:hover,.responses>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}
-  @media(max-width:700px){
-    .speech{font-size:20px}
-    .responses>button{font-size:16px;min-height:47px}
-  }
 </style>

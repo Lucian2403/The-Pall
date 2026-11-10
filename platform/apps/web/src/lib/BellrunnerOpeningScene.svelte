@@ -205,31 +205,32 @@
     padding-top:12px;min-width:0}
   .dialogue-navigation>button{appearance:none;display:inline-flex;align-items:center;
     gap:10px;min-height:44px;padding:5px 2px;border:0;background:transparent;
-    color:#543820;cursor:pointer;text-align:left;font:600 16px/1.3
+    color:#543820;cursor:pointer;text-align:left;font:600 var(--dialogue-text,17px)/1.3
     var(--pall-font-reading,Georgia,serif)}
-  .dialogue-navigation>button span{font:26px/1 Georgia,serif}
+  .dialogue-navigation>button span{font:24px/1 Georgia,serif}
   .dialogue-navigation>button:is(:hover,:focus-visible){color:#24140b;
     text-decoration:underline}
   .dialogue-navigation>button:focus-visible{outline:2px solid #b58e59;outline-offset:2px}
   .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.12em;color:#614029;margin:0 0 16px;padding-bottom:10px;
     border-bottom:1px solid #9e815955}
-  /* Reading sizes scale with the parchment's own width (cqi of the panel). */
-  h2{margin:0 0 14px;font:600 clamp(22px,4cqi,30px)/1.3
+  /* One fixed reading scale (tokens in pall-story-landscape.css): every
+     narration, speech, inspection line and choice is the same size. */
+  h2{margin:0 0 12px;font:600 var(--dialogue-title,21px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .speaker-heading{margin:0 0 20px;padding:0 0 12px;
+  /* The speaking NPC is labelled like the player's name: a small caption. */
+  .speaker-heading{margin:0 0 16px;padding:0 0 10px;
     border-bottom:1px solid #9e815955;text-transform:uppercase;
-    font:600 clamp(19px,3.4cqi,26px)/1.25
-    var(--pall-font-reading,Georgia,serif);letter-spacing:.08em;color:#302012}
-  .speech,.narration,.work-description{margin:0 0 15px;
-    font:600 clamp(19px,3.6cqi,28px)/1.48 var(--pall-font-reading,Georgia,serif);
+    font:normal var(--dialogue-label,15px)/1.15
+    var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#624328}
+  .speech,.narration,.work-description{margin:0 0 14px;
+    font:600 var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);
     color:#251910}
-  .narration,.work-description{font-size:clamp(17px,2.9cqi,21px);line-height:1.56}
   .narration{font-style:italic}
-  .responses{display:flex;flex-direction:column;gap:9px;margin-top:clamp(14px,3.5cqi,30px)}
+  .responses{display:flex;flex-direction:column;gap:9px;margin-top:18px}
   .responses>button{display:block;width:100%;text-align:left;
     border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 13px;font:600 clamp(15px,1.18vw,18px)/1.35
+    padding:10px 13px;font:600 var(--dialogue-text,17px)/1.35
     var(--pall-font-reading,Georgia,serif);
     cursor:pointer;min-height:52px}
   .responses>button:hover,.responses>button:focus-visible{
