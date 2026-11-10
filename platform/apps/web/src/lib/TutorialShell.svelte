@@ -50,6 +50,8 @@
   }=$props();
   const chapter = $derived(character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
+    : character.origin === 'Bellrunner' && character.tutorial.stage === 2
+    ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/dispatch'
     : character.origin === 'Millhand' && character.tutorial.stage >= 7
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/clinic'
     : character.origin === 'Millhand' && character.tutorial.stage === 6
@@ -158,10 +160,10 @@
     stopMedicalClinicAmbience();
   });
 
-  // Refresh the local-only replay button when returning to earlier stages
-  // returns this same mounted shell to Stage 5. Do not show stale stage labels.
+  // Read the local-only replay contract for each implemented origin.
+  // Production/non-loopback never exposes this route or its button.
   $effect(()=>{
-    if(character.origin!=='Millhand')return;
+    if(character.origin!=='Millhand'&&character.origin!=='Bellrunner')return;
     const characterId=character.id;
     const currentStage=character.tutorial.stage;
     let stale=false;
@@ -185,7 +187,9 @@
   async function rewindOneStage(){
     if(!canRewind||rewinding||rewindFromStage===null)return;
     const fromStage=rewindFromStage;
-    const warning=fromStage===8
+    const warning=character.origin==='Bellrunner'&&fromStage===2
+      ?'TESTING ONLY: Return to Bellrunner Stage 1? The saved round acceptance and its request receipts will be cleared so you can replay Hector\'s opening. Character items, coins and skills are preserved.'
+      :fromStage===8
       ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
       ?'TESTING ONLY: Replay the fight in Stage 6? This clears the clinic visit and the completed Flint fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Earlier jobs, equipment and skill awards remain saved.'
@@ -204,6 +208,10 @@
         const data=await response.json() as {error?:string};
         if(response.status===409 && data.error==='stale_stage'){
           rewindError='This character moved to another stage. Reload this page before testing again.';
+        }else if(response.status===503 && data.error==='bellrunner_migration_required'){
+          rewindError='Bellrunner schema is missing. Run npm run bellrunner:migrate, then restart the API.';
+        }else if(response.status===409 && data.error==='unsafe_dispatch_state'){
+          rewindError='The accepted Bellrunner round is missing or inconsistent; nothing was reset.';
         }else if(response.status===503 && data.error==='second_job_schema_missing'){
           rewindError='Stage 4 database setup is missing. Run npm run second-job:migrate from platform, then restart the API.';
         }else if(response.status===503 && data.error==='combat_schema_missing'){

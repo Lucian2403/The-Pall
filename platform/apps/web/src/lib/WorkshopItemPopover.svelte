@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import type {Snippet} from 'svelte';
 
-  type WorkshopObjectKey='stamps'|'plates'|'paper'|'hammer';
+  type WorkshopObjectKey='stamps'|'plates'|'paper'|'hammer'|'notices'|'sealed'|'route';
 
   let {itemKey,title,description,onClose,children}:{
     itemKey:WorkshopObjectKey;
@@ -80,6 +80,10 @@
   .workshop-inspection.plates{left:25%}
   .workshop-inspection.paper{right:13%}
   .workshop-inspection.hammer{right:2%;bottom:47%}
+  /* Bellrunner uses the exact same nine-slice inspection component. */
+  .workshop-inspection.notices{right:35%;bottom:34%}
+  .workshop-inspection.sealed{right:16%;bottom:34%}
+  .workshop-inspection.route{right:2%;bottom:34%}
   .inspection-heading{display:flex;align-items:start;justify-content:space-between;gap:8px}
   .inspection-heading strong{
     padding-top:3px;
