@@ -490,11 +490,19 @@
   /* Shell grid: navigation rail | activity column | optional messages dock.
      Rail width is a token so it stays proportionate rather than growing with
      the window. Activity layouts respond to their own container, so a dock
-     column automatically reflows them instead of covering scene targets. */
-  .frame{--pall-rail-w:216px;--pall-dock-w:clamp(280px,22vw,360px);
+     column automatically reflows them instead of covering scene targets.
+     Owner direction (2026-11-10): on wide windows the WHOLE game, sidebar
+     included, is one centred frame with dark gutters on both sides. */
+  .frame{--pall-rail-w:216px;--pall-dock-w:clamp(280px,22vw,360px);--pall-frame-max:1680px;
     display:grid;grid-template-columns:var(--pall-rail-w) minmax(0,1fr);
-    width:100%;max-width:none;min-width:0;min-height:100vh;min-height:100dvh;margin:0;padding:0}
-  .frame.has-dock{grid-template-columns:var(--pall-rail-w) minmax(0,1fr) var(--pall-dock-w)}
+    width:100%;max-width:var(--pall-frame-max);min-width:0;min-height:100vh;min-height:100dvh;
+    margin:0 auto;padding:0}
+  .frame.has-dock{grid-template-columns:var(--pall-rail-w) minmax(0,1fr) var(--pall-dock-w);
+    max-width:calc(var(--pall-frame-max) + var(--pall-dock-w))}
+  /* Once gutters exist, a hairline and soft shadow define the frame edge. */
+  @media(min-width:1681px){
+    .frame{border-inline:1px solid #3a2c20;box-shadow:0 0 56px #000c}
+  }
   .rail{position:sticky;top:0;align-self:start;display:flex;flex-direction:column;min-width:0;
     height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;
     scrollbar-color:#5e4630 #171715;background:#171715;border:0;border-right:1px solid #56412d;border-radius:0}
@@ -603,10 +611,11 @@
   .account-link a:hover,.account-link a:focus-visible{color:#ffe6be;text-decoration:underline}
   .account-link a:focus-visible{outline:2px solid #e9be7e;outline-offset:2px}
 
-  /* City header = future map gateway. Shallow on every scene so the actual
-     gameplay stays in view; the vista keeps the central tower in frame. */
+  /* City header = future map gateway. Taller than the HUD band so the city
+     reads as a place; the scene below is sized from what remains, so the
+     page itself does not grow. The vista keeps the central tower in frame. */
   .city-banner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;
-    height:clamp(68px,6.2cqi,112px);padding:8px clamp(14px,1.6vw,26px);border-bottom:1px solid #5f4935;
+    height:clamp(88px,8.5cqi,136px);padding:10px clamp(14px,1.6vw,26px);border-bottom:1px solid #5f4935;
     background:linear-gradient(90deg,#11110fd0,#14141238 44%,#1715120a 70%,#11110f99),
       url('/ui-kit/resources/TheCityVista.png') center 12%/cover no-repeat;
     background-color:#222321}
@@ -703,7 +712,7 @@
     .stat strong{font-size:15px}
     .stat.stage{padding-left:7px}
     .stat.stage strong{font-size:13px}
-    .city-banner{height:58px;padding:6px 12px;gap:10px}
+    .city-banner{height:66px;padding:6px 12px;gap:10px}
     .banner-overline{display:none}
     .banner-copy small{font-size:12px}
     .gateway-text .gateway-status{display:none}

@@ -119,14 +119,15 @@
      >=380px (measured: nine-slice frame + ~32 characters of 18px text).
      The art spans the left; dialogue and its contextual documents share the
      adjacent reading column, so neither column is padded to match the other.
-     The art grows to the measured first-viewport fit while the reading column
-     keeps a preferred 30% (380–560px) and never exceeds 44%; any width left
-     over (ultrawide, or a short window that limits the art) is split into
+     The art grows toward the measured first-viewport fit, but the reading
+     column keeps a preferred 38% (380–600px) and never exceeds 44%: the
+     scene art supports the dialogue and documents, it does not dominate them.
+     Any width left over (a short window that limits the art) is split into
      symmetrical gutters instead of an empty strip on one side. */
   @container activity (min-width:880px){
     .activity-layout[data-activity-mode="scene"]{
       --stage-min:460px;--panel-min:380px;--panel-max:min(860px,44%);
-      --panel-pref:clamp(var(--panel-min),30%,560px);
+      --panel-pref:clamp(var(--panel-min),38%,600px);
       --stage-w:min(calc(100% - var(--panel-pref) - var(--gap)),
         max(var(--stage-min),var(--stage-fit,62%)));
       grid-template-columns:var(--stage-w) minmax(var(--panel-min),var(--panel-max));
@@ -136,8 +137,9 @@
     }
   }
   /* WORKSPACE: tools move beside the stage only when the stage still keeps
-     >=1000px (the widest geometry existing encounter overlays were tuned at). */
-  @container activity (min-width:1480px){
+     >=1000px (the widest geometry existing encounter overlays were tuned at):
+     1380px = 1000px stage + a 360px tool column + gap. */
+  @container activity (min-width:1380px){
     .activity-layout[data-activity-mode="workspace"]{
       grid-template-columns:minmax(0,1fr) clamp(360px,26%,460px);
       grid-template-areas:"stage panel" "supplement panel";

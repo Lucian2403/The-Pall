@@ -47,8 +47,8 @@ for(const label of ['Stamina','Fatigue','Focus']) assert.ok(source.includes("lab
 assert.ok(source.includes('minorResources.filter(resource=>isMeasured(resource.data))')&&
   source.includes('{#each measuredMinorResources as resource (resource.id)}'),
   'Unauthored resources are never rendered as values: the HUD shows only server-provided extras');
-assert.ok(source.includes('height:clamp(68px,6.2cqi,112px)'),
-  'The Grand Cylinder city vista stays a shallow map-gateway header sized by the activity column');
+assert.ok(source.includes('height:clamp(88px,8.5cqi,136px)'),
+  'The Grand Cylinder city vista is a clearly visible map-gateway header (88–136px) sized by the activity column');
 assert.ok(source.includes('class="city-map-gateway"')&&source.includes('aria-disabled="true"'),
   'The City header is the map gateway, honestly locked until a real map exists');
 assert.ok(source.includes("center 12%/cover no-repeat"),'Vista must show the central tower, not only the city walls');

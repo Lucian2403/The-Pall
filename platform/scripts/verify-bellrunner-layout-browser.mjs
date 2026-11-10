@@ -216,6 +216,8 @@ try{
         scrollWidth:document.documentElement.scrollWidth,
         clientWidth:document.documentElement.clientWidth,
         frameShell:rect(document.querySelector('.frame')),
+        dialogueFonts:[...frame.querySelectorAll('.speech,.narration,.work-description,.story,.spoken,.inner-voice,.responses > button,.actions > button')]
+          .map(e=>getComputedStyle(e).fontSize),
         viewport:window.innerHeight,top:window.scrollY,
         cityBanner:banner?{...rect(banner),title:banner.textContent.trim(),
           display:getComputedStyle(banner).display,mapState:banner.dataset.mapState,
@@ -252,7 +254,7 @@ try{
   // (952px container) keep two columns; 768px tablets and phones stack.
   for(const [width,height] of [
     [1024,768],[1272,850],[1280,720],[1920,1080],[2048,1171],[2048,1279],
-    [3440,1440],[768,1024],[390,844]
+    [2560,1600],[3440,1440],[768,1024],[390,844]
   ]){
     await cmd('Emulation.setDeviceMetricsOverride',{
       width,height,deviceScaleFactor:1,mobile:false
@@ -270,8 +272,10 @@ try{
       const twoColumn=m.host.w>=880;
       assert.equal(m.viteError,false,'No compile overlay: '+suffix);
       assert.ok(m.scrollWidth<=m.clientWidth,'No horizontal scrolling: '+suffix);
-      assert.ok(Math.abs(m.frameShell.w-m.clientWidth)<1,
-        'The shell spans the whole window (no dead strip at either side): '+suffix);
+      // One centred game frame: full width up to 1680px, then equal gutters.
+      const frameGutterL=m.frameShell.left,frameGutterR=m.clientWidth-m.frameShell.right;
+      assert.ok(Math.abs(m.frameShell.w-Math.min(m.clientWidth,1680))<1&&Math.abs(frameGutterL-frameGutterR)<=1,
+        'The game frame fills the window up to 1680px, then is centred with equal side gutters: '+suffix);
       assert.ok(Math.abs(m.art.h-m.art.w*941/1672)<2.5,
         'Full original aspect: '+suffix);
       if(twoColumn){
@@ -286,7 +290,9 @@ try{
         const leftGutter=m.visuals.left-m.inner.left,rightGutter=m.inner.right-m.dialogue.right;
         assert.ok(Math.abs(leftGutter-rightGutter)<=2,
           'Leftover width is split into symmetrical gutters: '+suffix);
-        if(height>=720){
+        // Short opening states must fit; long authored journey narration
+        // may scroll normally (the brief: no internal parchment scrolling).
+        if(height>=720&&['stage1','stage2-depot'].includes(scene)){
           assert.ok(m.firstChoice&&m.firstChoice.bottom<=height,
             'Hector, the parchment and its first choice share the first viewport: '+suffix);
         }
@@ -302,6 +308,8 @@ try{
         'Frame is horizontally inside its section: '+suffix);
       assert.ok(m.frame.w<=982,
         'Readable parchment cannot span an ultrawide monitor: '+suffix);
+      assert.ok(m.dialogueFonts.length>0&&m.dialogueFonts.every(f=>f==='17px'),
+        'Every dialogue line and choice uses the one fixed 17px reading size: '+suffix);
       assert.ok(m.slack<=48,
         'Content-driven parchment: no empty beige below the last line or choice: '+suffix);
       if(scene==='stage1'||scene==='stage2-depot'){
@@ -317,7 +325,7 @@ try{
         assert.equal(m.tray,null,
           'No redundant paper tray at a street or the Receiving Desk: '+suffix);
       }
-      assert.ok(m.cityBanner&&m.cityBanner.h>=56&&m.cityBanner.h<=120&&
+      assert.ok(m.cityBanner&&m.cityBanner.h>=64&&m.cityBanner.h<=140&&
         m.cityBanner.title.includes('Grand Cylinder City')&&
         m.cityBanner.display!=='none',
         'Keep a visible, shallow City header without displacing Hector and the job papers: '+suffix);
@@ -503,7 +511,7 @@ try{
       "document.activeElement?.classList.contains('audio-trigger')"),4000,'Escape closes Sound and restores focus');
     console.log('PASS: Sound settings top layer, anchored and bounded at '+width+'×'+height);
   }
-  console.log('PASS: 45 real Bellrunner page/viewport combinations follow the container-driven scene layout (two columns from an 880px activity container, art → dialogue → documents below it)');
+  console.log('PASS: 50 real Bellrunner page/viewport combinations follow the container-driven scene layout (two columns from an 880px activity container, art → dialogue → documents below it)');
 }catch(error){
   console.error(error);
   process.exitCode=1;

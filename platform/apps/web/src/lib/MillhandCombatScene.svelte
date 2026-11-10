@@ -763,7 +763,7 @@
      only when the console sits BESIDE the battlefield does it become a
      single column with a two-column condition grid. Stacked layouts keep
      their existing viewport rules unchanged. */
-  @container activity (min-width:1480px){
+  @container activity (min-width:1380px){
     .combat-console{grid-template-columns:minmax(0,1fr);align-content:start;
       border-left:1px solid #5b442f}
     .player-status .fighter{height:auto}

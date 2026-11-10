@@ -138,21 +138,21 @@ try{
     ');if(!e)return null;const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};})()');
 
   // WORKSPACE: real combat component, finished-fight fixture.
-  for(const [width,height,beside] of [[1920,1080,true],[2048,1171,true],[1600,900,false],[1280,720,false],[390,844,false]]){
+  // null = either arrangement is valid at this width (it depends on whether the
+  // browser's scrollbar takes layout width); the invariant is still asserted.
+  for(const [width,height,beside] of [[1920,1080,true],[2048,1171,true],[1600,900,null],[1280,720,false],[390,844,false]]){
     await open('/__combat-cta-qa?outcome=victory',width,height,'.battle .alley');
     const alley=await box('.alley'),console_=await box('.combat-console'),host=await box('.activity-host');
     const tag=width+'x'+height+' '+JSON.stringify({alley,console:console_,host});
     assert.equal(await evalJS("document.querySelector('.battle .activity-layout')?.dataset.activityMode"),'workspace',
       'Combat uses the shared workspace layout: '+tag);
-    if(beside){
-      assert.ok(console_.left>=alley.right-1&&Math.abs(console_.top-alley.top)<=1,'Console sits BESIDE the battlefield: '+tag);
-      assert.ok(alley.width>=1000,'Battlefield keeps its tuned width when tools are beside it: '+tag);
-    }else{
-      assert.ok(console_.top>=alley.bottom-1,'Console sits BELOW the battlefield: '+tag);
-    }
+    const isBeside=console_.left>=alley.right-1&&Math.abs(console_.top-alley.top)<=1;
+    if(beside!==null)assert.equal(isBeside,beside,'Console sits '+(beside?'BESIDE':'BELOW')+' the battlefield: '+tag);
+    if(isBeside)assert.ok(alley.width>=1000,'Battlefield keeps its tuned width when tools are beside it: '+tag);
+    else assert.ok(console_.top>=alley.bottom-1,'Otherwise the console sits BELOW the battlefield: '+tag);
     assert.ok(await evalJS("!!document.querySelector('.clinic-link')"),'Combat outcome action remains present: '+tag);
     if(width===1920||width===1280)await shot('combat-'+width+'x'+height);
-    console.log('PASS: workspace (combat) '+width+'×'+height+' console '+(beside?'BESIDE':'BELOW')+' battlefield');
+    console.log('PASS: workspace (combat) '+width+'×'+height+' console '+(isBeside?'BESIDE':'BELOW')+' battlefield');
   }
 
   // MANAGEMENT: Character page attribute sheet + skills ledger.
