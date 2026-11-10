@@ -63,7 +63,7 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   Chromium QA (`verify:bellrunner-layout-browser`) checks the actual
   responsive positions and NPC/paper interactions. The owner requested
   that the original **Grand Cylinder City header remain visible**. It
-  stays, shallow (68–112px), and now also carries the locked City map
+  stays at 88–136px, and now also carries the locked City map
   gateway. The earlier `compactBanner` suppression is not used.
   Bellrunner secondary choices now use pale framed parchment with
   ink-line icons; Continue uses a distinct dark-brass primary style.

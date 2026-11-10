@@ -16,8 +16,9 @@ than redesigning the frame.
 | Region | Contents | Rules |
 | --- | --- | --- |
 | Navigation rail | Logo, current scene, character, roster, locked post-introduction sections | Fixed token width (216px), not a share of the window. 72px icon rail below 1200px; bottom navigation at ≤760px. Sticky, with its own scroll on short windows. |
+| Game frame | The rail, the column and the optional dock | Fills the window up to **1680px**. Wider windows centre the **whole** game (sidebar included) with equal dark gutters (owner direction, 2026-11-10). |
 | HUD (one band) | Avatar, name, origin; Health and Stamina; only the **measured** extra values the server supplies (Fatigue/Focus are hidden when absent, never shown as placeholders); coins; introduction progress; **Notifications**, **Chat**, Sound, Account | Reflows according to the activity column's real width (`@container pall-shell`), so a dock or the rail changes it exactly as a narrower window would. |
-| City header | `TheCityVista.png`, "Grand Cylinder City", context line, **City map gateway** | 68–112px tall (`6.2cqi`). It is the future map entry point, not decoration (§3). |
+| City header | `TheCityVista.png`, "Grand Cylinder City", context line, **City map gateway** | 88–136px tall (`8.5cqi`; 66px on phones). It is the future map entry point, not decoration (§3). |
 | Activity row (sticky) | Location, stage, dev-only rewinds, **Review/Close journal**, Character selection | The only sticky strip. The journal control has the same position on every page. |
 | Activity area | The page's `ActivityLayout` | §2 |
 | Dock column (optional) | `dock` snippet prop | Its own grid column (`clamp(280px,22vw,360px)`). Never rendered on phones. Activities reflow because their layouts are container-driven. |
@@ -41,8 +42,8 @@ so its contents adapt to the slot they get.
 
 | Mode | Two columns when the container is | Wide arrangement | Narrow order | Used by |
 | --- | --- | --- | --- | --- |
-| `scene` | ≥880px (art ≥460, reading ≥380) | Art on the left. Dialogue, then contextual documents, share the reading column (preferred 30%, 380–560px, ≤44%). | art → dialogue → documents | Bellrunner Stage 1 and all Stage 2 locations |
-| `workspace` | ≥1480px (the battlefield keeps ≥1000px, the width its overlays were tuned for) | Encounter/bench on the left; tools, log or abilities in a 360–460px column | stage → tools | Millhand Stage 6 combat |
+| `scene` | ≥880px (art ≥460, reading ≥380) | Art on the left. Dialogue, then contextual documents, share the reading column (preferred 38%, 380–600px, ≤44%). | art → dialogue → documents | Bellrunner Stage 1 and all Stage 2 locations |
+| `workspace` | ≥1380px (the battlefield keeps ≥1000px, the width its overlays were tuned for) | Encounter/bench on the left; tools, log or abilities in a 360–460px column | stage → tools | Millhand Stage 6 combat |
 | `management` | ≥760px | Details/filter panel (230–340px) first, then the dominant list/table/ledger | panel → list | Character record (attributes + skills) |
 
 Scene-mode rules:
@@ -54,6 +55,12 @@ Scene-mode rules:
 - The reading panel is **as tall as its content**. Do not stretch the
   parchment to match the art column. Documents follow the dialogue in the
   same column, so neither column is padded to match the other.
+- **One fixed reading scale** for dialogue (`--dialogue-text` 17px,
+  `--dialogue-title` 21px, `--dialogue-label` 15px in
+  `pall-story-landscape.css`). Every narration, NPC line, player line,
+  inspection and choice is the same size; nothing scales with the window.
+  The scene art supports the text, documents and menus. It is not the
+  focus of the screen.
 - Spacing can be tuned per activity with `--activity-gap` and
   `--activity-padding` on an ancestor (combat uses 0 for a full-bleed
   battlefield).

@@ -104,7 +104,7 @@ The **Grand Cylinder City panorama and title remain visible above
 the stage header** on both Bellrunner stages, using the same artwork
 as elsewhere in the introduction. It was mistakenly hidden to save
 screen height in an earlier iteration; this was rejected. Every
-scene now uses one shallow version of that banner (68–112px), which
+scene now uses one version of that banner (88–136px), which
 also carries the City map gateway (locked during the introduction).
 The workstation is sized from the measured space below it so that
 Hector, the parchment and its first choice share the first screen.
