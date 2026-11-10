@@ -6,6 +6,7 @@
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
 
   let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
     snapshot: CombatSnapshot;
@@ -195,6 +196,8 @@
 {/snippet}
 
 <section class="battle" aria-label="Stage 6, the fight with Flint">
+  <ActivityLayout mode="workspace">
+  {#snippet stage()}
   <div class="alley">
     <div class="stage-scenery">
       <div class="flint" role="img"
@@ -438,8 +441,11 @@
       </section>
     {/if}
   </div>
+  {/snippet}
 
-  <!-- Chronicle on the left, player status beneath the actions on the right. -->
+  {#snippet panel()}
+  <!-- Chronicle and the player's own condition: beside the battlefield when
+       it keeps its tuned width, otherwise directly beneath it. -->
   <div class="combat-console">
     <section class="chronicle" aria-label="Battle Chronicle">
       <div class="chronicle-heading">
@@ -501,6 +507,8 @@
       </section>
     {/if}
   </div>
+  {/snippet}
+  </ActivityLayout>
 </section>
 
 {#if snapshot.rules.fatigue}
@@ -538,7 +546,9 @@
 {/if}
 
 <style>
-  .battle{min-width:0;background:#1b1815;color:#eed8b5;font-family:var(--pall-font-reading,Georgia,serif)}
+  /* Full-bleed battlefield: the workspace layout adds no padding or gutter. */
+  .battle{min-width:0;background:#1b1815;color:#eed8b5;font-family:var(--pall-font-reading,Georgia,serif);
+    --activity-padding:0;--activity-gap:0}
   .alley{position:relative;min-height:clamp(505px,36vw,625px);isolation:isolate;overflow:hidden;
     background:#1b222b url('/locations/alley/alley-background.webp') center/cover no-repeat}
   .alley::after{content:'';position:absolute;inset:auto 0 0;height:235px;
@@ -578,7 +588,14 @@
   .heavy{color:#8b2a1f;font-weight:700}
 
   /* Enemy condition is physically linked to Flint, not the player controls. */
-  .enemy-status{position:absolute;z-index:3;top:30px;left:31%;width:min(25%,380px);min-width:260px}
+  .enemy-status{position:absolute;z-index:3;top:30px;left:31%;width:min(25%,380px);min-width:260px;
+    container:enemy-status / inline-size}
+  /* Flint's four condition tracks need ~85px each; a narrower card (narrow
+     battlefield, whatever caused it) uses two columns instead of overlapping. */
+  @container enemy-status (max-width:349px){
+    .enemy-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .enemy-status .resource+.resource{border-left:0;padding-left:0}
+  }
   .recover-tiers{margin:2px 0 0;padding:0 0 0 19px;color:#50331c;
     font:600 12px/1.45 Georgia,serif}
   .recover-tiers li{margin:2px 0}
@@ -742,6 +759,17 @@
     align-items:stretch;gap:14px;padding:14px 16px;min-width:0}
   .player-status{min-width:0;position:relative}
   .player-status .fighter{height:100%}
+  /* Same condition as ActivityLayout's workspace two-column arrangement:
+     only when the console sits BESIDE the battlefield does it become a
+     single column with a two-column condition grid. Stacked layouts keep
+     their existing viewport rules unchanged. */
+  @container activity (min-width:1480px){
+    .combat-console{grid-template-columns:minmax(0,1fr);align-content:start;
+      border-left:1px solid #5b442f}
+    .player-status .fighter{height:auto}
+    .player-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .player-status .resource+.resource{border-left:0;padding-left:0}
+  }
   .chronicle-heading{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin-bottom:10px}
   .chronicle-heading button{padding:7px 12px;background:#271f19;color:#eed4ae;

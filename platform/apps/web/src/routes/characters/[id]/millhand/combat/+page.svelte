@@ -109,6 +109,7 @@
 <svelte:head><title>The Pall — The Passage, Flint</title></svelte:head>
 {#if status==='ready' && character && battle}
   <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
+    travelLocked={battle.status==='active'}
     combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
     <MillhandCombatScene snapshot={battle} characterId={id} {feedback} {pending} {errorMessage} {perform}/>
   </TutorialShell>
