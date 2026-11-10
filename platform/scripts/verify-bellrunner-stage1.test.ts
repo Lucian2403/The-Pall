@@ -68,11 +68,12 @@ test('Owner-provided multi-purpose Hauling scenes keep their source art and use 
  assert.ok(!book.includes('<img'),'The receiving book is already painted into the office');
 });
 
-test('Bellrunner workstation uses left NPC and documents, right readable parchment',()=>{
+test('Bellrunner scenes use the shared container-driven scene layout: art, dialogue, documents',()=>{
  const first=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const second=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
  const shared=source('apps/web/src/lib/pall-story-landscape.css');
  const tray=source('apps/web/src/lib/BellrunnerDocumentTray.svelte');
+ const layout=source('apps/web/src/lib/ActivityLayout.svelte');
  for(const component of [first,second]){
   assert.ok(component.includes("import '$lib/pall-story-landscape.css'"));
   assert.ok(component.includes('pall-story-sections'));
@@ -80,6 +81,11 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
   assert.ok(component.includes('pall-story-landscape'));
   assert.ok(component.includes('pall-story-dialogue-section'));
   assert.ok(component.includes('BellrunnerDocumentTray'));
+  assert.ok(component.includes('<ActivityLayout mode="scene"')&&
+   component.includes('stageAspect={1672/941}'),
+   'Both Bellrunner stages use the shared scene-mode primitive');
+  assert.ok(!component.includes('min-height:100%'),
+   'The parchment grows with its content instead of stretching to the art column');
   assert.ok(!component.includes('height:clamp(535px,62vh,640px)'));
   assert.ok(!component.includes('width:max(100cqw,177.7cqh)'));
   assert.ok(!component.includes('WorkshopItemPopover'),
@@ -92,11 +98,23 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
  assert.ok(second.includes('class="scene-visuals pall-story-visuals"'));
  assert.ok(second.includes('<BellrunnerDocumentTray papers={docs}'));
  assert.ok(second.includes("{#if sceneKey==='depot'}"));
+ assert.ok(second.includes("supplement={sceneKey==='depot'?depotPapers:undefined}"),
+  'Only the Depot has a document supplement');
  assert.ok(second.includes('class="illustration pall-story-landscape"'));
- assert.ok(shared.includes('display:grid'));
- assert.ok(shared.includes('grid-template-columns:minmax(0,52fr) minmax(0,48fr)'));
+ // Placement is decided by the activity container's measured width.
+ assert.ok(layout.includes('container:activity / inline-size'));
+ assert.ok(layout.includes('@container activity (min-width:880px)'));
+ assert.ok(layout.includes('grid-template-areas:"stage panel" "stage supplement"'),
+  'Wide: art left; dialogue and its documents share the reading column');
+ assert.ok(layout.includes('grid-template-areas:"stage" "panel" "supplement"'),
+  'Narrow: art, then dialogue, then documents');
+ assert.ok(layout.includes('justify-content:center'),
+  'Ultrawide leftovers become symmetrical gutters, not a strip on one side');
  assert.ok(shared.includes('.pall-story-visuals{'));
  assert.ok(shared.includes('.pall-story-dialogue-section{'));
+ assert.ok(!shared.includes('@media(max-width:1160px)')&&
+  !shared.includes('grid-template-columns:minmax(0,52fr) minmax(0,48fr)'),
+  'No window-width stacking breakpoint or fixed 52/48 split');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
  const openingRoute=source('apps/web/src/routes/characters/[id]/opening/+page.svelte');
  assert.ok(shell.includes('compactBanner = false'));
@@ -117,8 +135,6 @@ test('Bellrunner workstation uses left NPC and documents, right readable parchme
  assert.ok(!shared.includes('grid-template-columns:minmax(0,60%)'));
  assert.ok(!shared.includes('flex-direction:column;\n  flex:0 0 auto;\n  width:100%'),
   'The entire desktop work area must not become one tall column');
- assert.ok(shared.includes('@media(max-width:1160px)'));
- assert.ok(shared.includes('.pall-story-sections{grid-template-columns:minmax(0,1fr);gap:8px}'));
  assert.ok(tray.includes('Round Documents'));
  assert.ok(tray.includes('document-grid'));
  assert.ok(tray.includes('class="document-card"'));

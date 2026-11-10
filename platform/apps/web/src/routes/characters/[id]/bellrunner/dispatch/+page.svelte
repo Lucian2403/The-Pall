@@ -6,6 +6,7 @@
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
   import BellrunnerDocumentTray from '$lib/BellrunnerDocumentTray.svelte';
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import {HAULING_SCENES} from '$lib/hauling-scenes';
   import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
     BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
@@ -141,7 +142,10 @@
   <TutorialShell {character} sceneLocation={HAULING_SCENES[sceneKey].label}
     depotBackdrop={sceneKey==='depot'} compactCityVista>
     <section class="workshop dispatch" aria-label="Bellrunner Stage 2 Shift Dispatch">
-      <div class="scene pall-story-sections" class:receiving={sceneKey==='receiving_desk'}>
+      <ActivityLayout mode="scene" stageAspect={1672/941}
+        supplement={sceneKey==='depot'?depotPapers:undefined}
+        class={'scene pall-story-sections'+(sceneKey==='receiving_desk'?' receiving':'')}>
+        {#snippet stage()}
         <section class="scene-visuals pall-story-visuals"
           aria-label={HAULING_SCENES[sceneKey].label+' illustrated scene'}>
           <div class="illustration pall-story-landscape"
@@ -170,15 +174,13 @@
             </div>
           {/if}
           </div>
-          {#if sceneKey==='depot'}
-            <BellrunnerDocumentTray papers={docs}
-              onChoose={(key)=>{
-                talkingToHector=false;
-                selected=selected===key?null:key;
-              }} {selected}/>
-          {/if}
         </section>
+        {/snippet}
 
+        {#snippet panel()}
+        <!-- Snippets do not inherit the outer block's type narrowing; this
+             repeats the same always-true guard for the dialogue panel. -->
+        {#if character&&round&&round.workState}
         <section class="dialogue-section pall-story-dialogue-section"
           aria-label="Shift Dispatch dialogue and choices">
         <aside class="work-card" aria-label={selected?'Dispatch paper inspection':
@@ -307,7 +309,9 @@
           {#if busy}<p class="small" role="status">Recording…</p>{/if}
         </aside>
         </section>
-      </div>
+        {/if}
+        {/snippet}
+      </ActivityLayout>
     </section>
   </TutorialShell>
 {:else}
@@ -321,10 +325,20 @@
   </main>
 {/if}
 
+<!-- The Depot's job papers are the scene supplement; streets and the
+     receiving desk have none. -->
+{#snippet depotPapers()}
+  <BellrunnerDocumentTray papers={docs}
+    onChoose={(key)=>{
+      talkingToHector=false;
+      selected=selected===key?null:key;
+    }} {selected}/>
+{/snippet}
+
 <style>
   .dispatch{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  .scene,.scene-visuals{min-width:0}
+  .scene-visuals{min-width:0}
   .illustration{position:relative;width:100%;aspect-ratio:1672/941;
     overflow:hidden;container-type:size}
   .art-scaled{position:absolute;inset:0;width:100%;height:100%}
@@ -339,30 +353,32 @@
     display:flex;align-items:end;justify-content:center;padding:0 0 6px;
     border:0;background:transparent;cursor:pointer}
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
+  /* Content-driven: never stretched to the artwork column's height. */
   .work-card{position:relative;z-index:1;box-sizing:border-box;
-    display:flex;flex-direction:column;flex:1;align-self:stretch;
-    width:100%;max-width:980px;min-width:0;min-height:100%;margin:0 auto;max-height:none;overflow:visible;
+    display:flex;flex-direction:column;
+    width:100%;max-width:980px;min-width:0;min-height:0;margin:0 auto;max-height:none;overflow:visible;
     padding:clamp(20px,2.3vw,39px) clamp(19px,2.35vw,40px) 25px;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
   .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.12em;color:#614029;margin:0 0 19px;padding-bottom:11px;
+    letter-spacing:.12em;color:#614029;margin:0 0 16px;padding-bottom:10px;
     border-bottom:1px solid #9e815955}
-  h1{margin:0 0 16px;font:600 clamp(23px,1.8vw,30px)/1.3
+  /* Reading sizes follow the parchment's own slot width (panel cqi). */
+  h1{margin:0 0 14px;font:600 clamp(22px,4cqi,30px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .story,.instruction,.route-note{font:600 clamp(16px,1.23vw,20px)/1.55
-    var(--pall-font-reading,Georgia,serif);margin:0 0 17px;color:#251910}
+  .story,.instruction,.route-note{font:600 clamp(16px,2.8cqi,20px)/1.55
+    var(--pall-font-reading,Georgia,serif);margin:0 0 15px;color:#251910}
   .instruction{font-weight:700}
   .route-note{font-size:14px;margin:9px 0 5px}
-  .inner-voice{margin:0 0 17px;font:italic 600 clamp(16px,1.2vw,20px)/1.6
+  .inner-voice{margin:0 0 15px;font:italic 600 clamp(16px,2.8cqi,20px)/1.6
     var(--pall-font-reading,Georgia,serif);color:#322016}
   .speaker{margin:10px 0 12px;color:#5a3d27;
     font:700 11px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.08em}
-  .spoken{margin:0 0 17px;color:#26180f;
-    font:600 clamp(18px,1.35vw,23px)/1.55
+  .spoken{margin:0 0 15px;color:#26180f;
+    font:600 clamp(18px,3.1cqi,23px)/1.55
     var(--pall-font-reading,Georgia,serif)}
-  .actions{display:flex;flex-direction:column;gap:9px;margin-top:clamp(16px,2vw,30px)}
+  .actions{display:flex;flex-direction:column;gap:9px;margin-top:clamp(14px,3cqi,28px)}
   .actions>button{display:block;width:100%;min-height:52px;text-align:left;
     background:#241d16;border:1px solid #6d5235;color:#f7e6c9;
     padding:10px 13px;font:600 clamp(15px,1.16vw,18px)/1.35
@@ -378,18 +394,13 @@
   .small{font:600 12px/1.45 Georgia,serif;color:#58412a}
   .error{font:13px/1.45 sans-serif;color:#873523}
   .fallback{padding:40px;color:#e3d0af;background:#25211e}
-  @media(max-width:1160px){
-    .work-card{min-height:0;padding:23px 24px}
-    .story,.instruction,.inner-voice,.spoken{font-size:18px}
+  @container activity-panel (max-width:560px){
+    .work-card{padding:20px 18px}
   }
-  @media(max-width:700px){
-    .scene{height:auto;min-height:0}
-    .illustration{aspect-ratio:1672/941;container-type:normal}
-    .art-scaled{inset:0;width:100%;height:100%}
+  /* Small rendered artwork: Hector fills the frame height, hotspot follows. */
+  @container activity-stage (max-width:680px){
+    .illustration{container-type:normal}
     .hector{top:0;height:100%;max-width:43%;left:2%}
     .npc-hotspot{left:0;top:6%;width:47%;height:87%;padding-bottom:0}
-    .work-card{min-height:0;padding:19px 14px}
-    .story,.instruction,.inner-voice,.spoken{font-size:17px;line-height:1.55}
-    .actions>button{font-size:16px;min-height:47px}
   }
 </style>

@@ -1,28 +1,20 @@
-/* The Pall / Bellrunner interaction layout.
-   A compact illustrated workstation (left) and a readable parchment
-   (right). The room is atmosphere; the NPC and task papers are the
-   actual interaction surface. Reuse across Stage 1 and Stage 2.
-   No dialogue overlaps the painting. On small screens use source order:
-   NPC/art, papers (when applicable), then conversation. */
+/* The Pall / Bellrunner story-scene surfaces.
+   PLACEMENT is owned by ActivityLayout (mode="scene"): the illustrated
+   workstation is the stage, the parchment the adjacent reading panel and
+   the Round Documents tray the stage supplement. Two columns appear when
+   the activity container (not the window) can hold >=460px of art and a
+   >=380px reading panel; below that the order is art → dialogue → papers.
+   This file keeps only the visual treatment shared by Stages 1 and 2.
+   No dialogue overlaps the painting. */
 .pall-story-sections{
-  display:grid;
-  grid-template-columns:minmax(0,52fr) minmax(0,48fr);
-  align-items:stretch;
-  gap:clamp(6px,.7vw,12px);
   width:100%;
   min-width:0;
-  height:auto;
-  min-height:0;
-  padding:clamp(5px,.65vw,10px);
-  box-sizing:border-box;
-  overflow:visible;
   background:#13100e;
 }
 .pall-story-visuals{
   display:flex;
   flex-direction:column;
   box-sizing:border-box;
-  align-self:stretch;
   min-width:0;
   min-height:0;
   border:1px solid #63452f;
@@ -39,23 +31,23 @@
   overflow:hidden;
   isolation:isolate;
 }
+/* Content-driven: the reading panel is as tall as its text and choices. */
 .pall-story-dialogue-section{
   position:relative;
   display:flex;
   justify-content:stretch;
-  align-items:stretch;
+  align-items:flex-start;
   box-sizing:border-box;
   width:100%;
   min-width:0;
   min-height:0;
   padding:0;
-  background:#241b14;
 }
 /* Larger choice labels within Bellrunner only; the shared Millhand
    frame/button kit retains its own dimensions. */
 .frame .chapter-content .workshop:is(.bellrunner,.dispatch) :is(.responses,.actions) > button{
   min-height:56px;
-  font:600 clamp(16px,1.17vw,21px)/1.3
+  font:600 clamp(16px,2.9cqi,21px)/1.3
     var(--pall-font-reading,Georgia,serif);
 }
 /* Bellrunner's action hierarchy adapts the owner's reference:
@@ -78,7 +70,7 @@
   border-image:none;
   border-radius:7px;
   text-align:left;
-  font:600 clamp(16px,1.17vw,21px)/1.35
+  font:600 clamp(16px,2.9cqi,21px)/1.35
     var(--pall-font-reading,Georgia,serif);
   text-shadow:none;
   cursor:pointer;
@@ -144,12 +136,4 @@
     :is(.responses,.actions) > button:is(.primary-choice,.secondary-choice){
     transition:none;
   }
-}
-@media(max-width:1160px){
-  .pall-story-sections{grid-template-columns:minmax(0,1fr);gap:8px}
-  .pall-story-visuals{width:100%}
-  .pall-story-dialogue-section{min-height:0}
-}
-@media(max-width:700px){
-  .pall-story-sections{padding:4px;gap:6px}
 }
