@@ -31,37 +31,40 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
 - **Immersive workstation layout shared by Stages 1–2:** both
-  Bellrunner stages now use the same **52% left / 48% right** grid on
-  desktop. The left workstation emphasizes Hector's existing
-  full-body portrait over the Depot illustration and places the
-  original three job papers in a separate **Round Documents** tray.
+  Bellrunner stages use the shared **scene** mode of
+  `ActivityLayout.svelte` (see
+  [Game shell and activity layouts](../../../07-technology/game-shell-and-activity-layouts.md)).
+  When the activity container (not the window) is at least 880px wide,
+  Hector's full-body portrait over the Depot illustration is on the
+  left, and the parchment dialogue plus the original three job papers
+  in the **Round Documents** tray share the reading column on the
+  right. Narrower containers stack art → dialogue → documents. The
+  art is sized from the measured space below the HUD so that Hector,
+  the parchment and its first choice share the first screen. Spare
+  ultrawide width becomes symmetrical gutters.
   Each framed card is one keyboard/click target with an Inspect
   affordance. The Route Sheet card changes to **Take Route Sheet**
   at the canonical final handoff, continuing through the same
   authenticated, idempotent `take_round` action. No redundant
   Review Route button or additional acceptance step is introduced.
-  The right parchment stretches to match the workstation, uses
-  the owner nine-slice framing and button art, increases dialogue
-  readability and anchors **Previous line** at the bottom.
+  The parchment is **as tall as its content** (no stretching to the
+  art column). It uses the owner nine-slice framing and button art,
+  and anchors **Previous line** at its foot.
   Narrative progress actions may use the owner's highlighted button
   art; the optional topics, route alternatives and receipt choices
   remain visually neutral. The approved speech is reproduced
-  verbatim, and inspection descriptions are shown in the right-hand
-  frame instead of popups over the painting. At widths up to
-  1160px the two columns stack, left workstation first.
+  verbatim, and inspection descriptions are shown in the parchment
+  instead of popups over the painting.
   During Stage 2, the paper tray appears only at the Depot;
   street and receiving scenes retain their original art and
-  dialogue-only controls. `pall-story-landscape.css` owns the common
-  grid and `BellrunnerDocumentTray.svelte` owns the shared cards.
-  New Chromium QA checks the actual responsive positions and
-  NPC/paper interactions. The owner requested that the original
-  **Grand Cylinder City header remain visible**. Both Bellrunner
-  stages retain the same city panorama/title as the other introductions,
-  but use a **shorter banner height** via `compactCityVista`: NPCs,
-  paper cards and dialogue are more likely to be visible together on
-  1080p and 850px windows. The earlier `compactBanner` suppression is
-  not used. The scene below retains the 52/48 workstation/dialogue
-  layout and scrolls if the whole composition exceeds viewport height.
+  dialogue-only controls. `ActivityLayout.svelte` owns placement,
+  `pall-story-landscape.css` the shared visual treatment, and
+  `BellrunnerDocumentTray.svelte` the shared cards.
+  Chromium QA (`verify:bellrunner-layout-browser`) checks the actual
+  responsive positions and NPC/paper interactions. The owner requested
+  that the original **Grand Cylinder City header remain visible**. It
+  stays, shallow (68–112px), and now also carries the locked City map
+  gateway. The earlier `compactBanner` suppression is not used.
   Bellrunner secondary choices now use pale framed parchment with
   ink-line icons; Continue uses a distinct dark-brass primary style.
   These button styles apply only to Bellrunner, leaving Millhand and

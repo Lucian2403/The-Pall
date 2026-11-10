@@ -65,14 +65,17 @@ the round, unlike the static destination setting.
 ## Immersive Hector workstation and reusable document cards (PR #46)
 
 At desktop widths the Bellrunner UI is organized around **what the
-player can act upon**, not around an oversized backdrop. The two
-sides share one grid, with **52% for the illustrated workstation
-(left)** and **48% for the nine-slice parchment dialogue (right)**.
+player can act upon**, not around an oversized backdrop. Both stages
+use the shared **scene** mode of `ActivityLayout.svelte`
+([Game shell and activity layouts](../../../07-technology/game-shell-and-activity-layouts.md)).
+When the activity container is at least 880px wide, the illustrated
+workstation is on the left. The nine-slice parchment dialogue and, at
+the Depot, the document tray share the reading column on the right.
 
-At the Dispatch House, Hector and his clickable nameplate occupy the
-illustrated upper part of the left side. The three owner-supplied job
-items are in a framed **Round Documents** tray directly below the
-NPC: Council Notices, Sealed Council Order and Route Sheet. Each
+At the Dispatch House, Hector and his clickable nameplate fill the
+illustration. The three owner-supplied job items are in a framed
+**Round Documents** tray directly below the dialogue in the reading
+column: Council Notices, Sealed Council Order and Route Sheet. Each
 card combines the full cutout, framed caption and action label into
 one accessible button. Inspecting an item updates the adjoining
 parchment. The Route Sheet changes from Inspect to **Take Route
@@ -80,32 +83,31 @@ Sheet** only at the canonical Stage 1 handoff, when clicking it
 executes the existing idempotent `take_round` command. No extra
 Review Route button duplicates that object-driven progression.
 
-The right side holds the **owner-approved nine-slice parchment**, with
-more spacious narration, larger legible speech, native metal-framed
-buttons and a bottom Previous line control in Stage 1. The progress
-choice uses the existing highlighted button state. Equal RP choices
-(short/long road, three receipt remedies and Hector's optional
-questions) intentionally remain visually equal; the tutorial
-does not secretly reward a purportedly correct answer.
+The reading column holds the **owner-approved nine-slice parchment**,
+sized to its content. It has more spacious narration, larger legible
+speech, native metal-framed buttons and a bottom Previous line control
+in Stage 1. The progress choice uses the existing highlighted button
+state. Equal RP choices (short/long road, three receipt remedies and
+Hector's optional questions) intentionally remain visually equal; the
+tutorial does not secretly reward a purportedly correct answer.
 
 In Stage 2, the Depot reuses the same Hector-and-paper workstation.
-Once travelling, the left side contains the selected Short/Long
-street artwork only; at the Municipal Receiving Desk, it contains
+Once travelling, the illustration shows the selected Short/Long
+street artwork only; at the Municipal Receiving Desk, it shows
 the office artwork only. **No Receiver sprite, floating task paper,
 separate book hotspot or unnecessary props are generated.** The
 action sequence, receipt proof and all previously approved text
-remain in the right-hand dialogue. Backgrounds keep their full
+remain in the parchment dialogue. Backgrounds keep their full
 source aspect ratio and never overlap the parchment.
 
 The **Grand Cylinder City panorama and title remain visible above
 the stage header** on both Bellrunner stages, using the same artwork
 as elsewhere in the introduction. It was mistakenly hidden to save
-screen height in an earlier iteration; this was rejected. To keep
-the NPC and three working papers useful on smaller monitors, the
-Bellrunner view uses a **shorter version of that same banner**
-(`compactCityVista`) rather than deleting it. The illustrated
-workstation and dialogue follow the header, and the page scrolls
-normally if necessary.
+screen height in an earlier iteration; this was rejected. Every
+scene now uses one shallow version of that banner (68–112px), which
+also carries the City map gateway (locked during the introduction).
+The workstation is sized from the measured space below it so that
+Hector, the parchment and its first choice share the first screen.
 
 The reference's secondary choice treatment is also implemented:
 pale parchment-like buttons, dark carved edges and restrained
@@ -116,16 +118,16 @@ options retain equal prominence. Keyboard focus, disabled state,
 hover and reduced-motion support are preserved; other jobs'
 button styles are not modified.
 
-At viewport widths of 1160px or less, the left visual column
-(including its cards when present) stacks above the dialogue.
-There are no forced scrollbars *inside* the parchment; the page
-scrolls normally if content cannot fit above the fold.
+When the activity container is narrower than 880px (tablets and
+phones, or a narrow window with a dock), the order is illustration →
+dialogue → documents. There are no forced scrollbars *inside* the
+parchment; the page scrolls normally if content cannot fit above the
+fold.
 
-Reusable code: `BellrunnerDocumentTray.svelte`,
+Reusable code: `ActivityLayout.svelte`, `BellrunnerDocumentTray.svelte`,
 `pall-story-landscape.css` and the existing owner frame/button kit.
-The separate PR is stacked on unmerged Bellrunner PR #44; gameplay,
-loot, money, progression, SFX, migrations and art binaries remain
-unchanged.
+Gameplay, loot, money, progression, SFX, migrations and art binaries
+remain unchanged.
 
 ## Choose the road
 
