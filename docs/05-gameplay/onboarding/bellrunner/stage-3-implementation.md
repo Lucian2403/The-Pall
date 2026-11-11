@@ -13,7 +13,8 @@ This is the next implementation after the accepted Stages 1–2, on a dedicated 
 
 At `take_final_notice`, Stage 2 advances to Stage 3 in the same transaction as the final dispatch work-state update. Older saves already at `final_notice_taken` have the `enter_wrong_bell` continuation action.
 
-Stage 3 has independent persistent state and request receipts in migration `0016_bellrunner_wrong_bell.sql`. Two inspections can happen in either order; the watchman sequence precedes branch commitment. The settlement ledger explains zero coins, zero ordinary XP, no items. On confirmation, exactly one Major Skill level is granted: Commerce, Medicine or Mechanics; the branch is locked and saved. No item, wage, medical status, combat or world-time data is invented.
+Stage 3 has independent persistent state and request receipts in migration `0016_bellrunner_wrong_bell.sql`.
+On the local development server, the shared **Back to Stage 2** button safely clears only Stage 3 investigation state, restores Stage 2 to its final-notice handoff, and keeps the completed courier work. Once the route has been committed and the character is at Stage 4, **Back to Stage 3** removes the selected route and reverses only its one-time +1 Major Skill bonus. Both rewinds are transactional and unavailable on production/non-loopback servers. Two inspections can happen in either order; the watchman sequence precedes branch commitment. The settlement ledger explains zero coins, zero ordinary XP, no items. On confirmation, exactly one Major Skill level is granted: Commerce, Medicine or Mechanics; the branch is locked and saved. No item, wage, medical status, combat or world-time data is invented.
 
 The page intentionally stops after the chosen Stage 4 handoff. **Stage 4 branch gameplay and the separate actor sprites are not implemented in this PR.** Hector's deferred optional return conversation is stored as approved copy but is not inserted into the forced Stage 3–4 path.
 
