@@ -66,14 +66,16 @@ assert.ok(ui.includes('secondJobJournal')&&ui.includes("STAGE_FOUR_DIALOGUE"),
   'Stage4 route-specific copy and journal missing');
 assert.ok(stage3Ui.includes('continueToJob'), 'Guther must offer chosen next job after finishing Stage3');
 assert.ok(stage3Route.includes("/millhand/second-job"), 'Stage3 seamless route navigation missing');
-assert.ok(shell.includes("character.tutorial.stage >= 4"), 'Shared navigation must select Stage4');
+// Stage 5 introduced explicit per-stage Millhand routes (stage === 4 -> second-job).
+assert.ok(shell.includes("character.origin === 'Millhand' && character.tutorial.stage === 4") &&
+  shell.includes("/millhand/second-job"), 'Shared navigation must select Stage4');
 assert.ok(planner.includes('removeSecondJob:stage>=4'),'Developer rewind must discard later Stage4 work safely');
 assert.ok(dev.includes('player_character_second_job_receipts'),'Developer rewind must clear Stage4 receipts');
 
 const depotUi=read('apps/web/src/lib/MillhandDepotScene.svelte');
 const stage2Ui=read('apps/web/src/lib/MillhandWorkScene.svelte');
 assert.ok(ui.includes("import MillhandDepotScene from '$lib/MillhandDepotScene.svelte'") &&
-  ui.includes("<MillhandDepotScene {snapshot} {pending} {errorMessage} {perform}/>"),
+  ui.includes("<MillhandDepotScene {snapshot} {pending} {errorMessage} {perform} {travelConfirmed} {confirmTravel}/>"),
   'Industry branch must render the depot scene, leaving Contracts and Scholarship intact');
 assert.ok(depotUi.includes("/locations/depot/depot-background-cold.webp") &&
   depotUi.includes("background-image:url('/workshop/environment.webp')"),
@@ -96,7 +98,11 @@ assert.ok(depotUi.includes('scale(1.018)'),'Depot props must have restrained mic
 assert.ok(stage2Ui.includes('{#if instruction !== result}') &&
   stage2Ui.includes('<p class="story">{result}</p>'),
   'Repeated text must be hidden in the UI without modifying owner-authored Stage2 copy');
-const contractsUi=read('apps/web/src/lib/MillhandContractsScene.svelte');
+// Contracts/Records were later Prettier-formatted (double quotes, wrapped
+// attributes). Compare those sources quote- and whitespace-insensitively.
+const norm=x=>x.replace(/"/g,"'").replace(/\s+/g,'').replace(/;\}/g,'}');
+const normalized=src=>({includes:needle=>norm(src).includes(norm(needle)),raw:src});
+const contractsUi=normalized(read('apps/web/src/lib/MillhandContractsScene.svelte'));
 assert.ok(ui.includes("import MillhandContractsScene from '$lib/MillhandContractsScene.svelte'") &&
   ui.includes("<MillhandContractsScene {snapshot} {pending} {errorMessage} {perform}/>"),
   'Approved Commerce branch must render its own office instead of schematic tiles');
@@ -113,13 +119,13 @@ assert.ok(contractsUi.includes("which==='death' && snapshot.availableActions.inc
   contractsUi.includes("void perform('compare_official_records')"),
   'Commerce must require separate owner book selections for the two existing saved evidence steps');
 assert.ok(contractsUi.includes("state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'") &&
-  contractsUi.includes("{:else if snapshot.availableActions.length>0}"),
+  contractsUi.includes("{:else if workActions.length>0}"),
   'Remove evidence action buttons from dialogue while retaining later Clerk and dispute actions');
 assert.ok(!contractsUi.includes("perform('read_death_register')") &&
   !contractsUi.includes("perform('check_wage_record')") &&
   !contractsUi.includes('class="work-surface"') &&
   !contractsUi.includes('/workshop/council-work.webp'),
-  'Commerce UI must not borrow Investigation's work actions or introduce extra physical props');
+  "Commerce UI must not borrow Investigation's work actions or introduce extra physical props");
 assert.ok(contractsUi.includes('STAGE_FOUR_DIALOGUE.contracts') &&
   contractsUi.includes('STAGE_FOUR_FINAL.contracts') &&
   contractsUi.includes('snapshot.availableActions') &&
@@ -130,7 +136,7 @@ assert.ok(contractsUi.includes('scale(1.018)') &&
   'Book hover must be subtle, and journal should stay outside the CRPG popup');
 console.log('PASS: Contracts requires both book clicks in sequence with no shortcut buttons; Disputed Docket script preserved.');
 
-const recordsUi=read('apps/web/src/lib/MillhandRecordsScene.svelte');
+const recordsUi=normalized(read('apps/web/src/lib/MillhandRecordsScene.svelte'));
 assert.ok(ui.includes("import MillhandRecordsScene from '$lib/MillhandRecordsScene.svelte'") &&
   ui.includes("state.branch==='records'") &&
   ui.includes("<MillhandRecordsScene {snapshot} {pending} {errorMessage} {perform}/>"),
@@ -138,7 +144,7 @@ assert.ok(ui.includes("import MillhandRecordsScene from '$lib/MillhandRecordsSce
 assert.ok(recordsUi.includes('/locations/records/records-room.webp') &&
   recordsUi.includes('/locations/contracts/death-register.webp') &&
   recordsUi.includes('/locations/contracts/wage-record.webp'),
-  'Scholarship must display the owner's records-room background with the existing death/wage books');
+  "Scholarship must display the owner's records-room background with the existing death/wage books");
 for(const [phase,which,action] of [
   ['READ_DEATH_REGISTER','death','read_death_register'],
   ['READ_WAGE_RECORD','wage','check_wage_record'],
@@ -150,7 +156,7 @@ for(const [phase,which,action] of [
     'Scholarship must require the correct physical book for '+phase);
 }
 assert.ok(recordsUi.includes('{#if readingPhase}') &&
-  recordsUi.includes('{:else if snapshot.availableActions.length>0}') &&
+  recordsUi.includes('{:else if workActions.length>0}') &&
   recordsUi.includes('if(pending)return'),
   'Book inspection must not be automated via dialogue buttons, and duplicates must be blocked');
 assert.ok(recordsUi.includes('STAGE_FOUR_DIALOGUE.records') &&
@@ -177,17 +183,18 @@ for(const name of [
   'MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
 ]){
   const scene=read('apps/web/src/lib/'+name);
-  assert.ok(scene.includes("import '$lib/workshop-object-labels.css'") &&
+  assert.ok(scene.replace(/"/g,"'").includes("import '$lib/workshop-object-labels.css'") &&
     scene.includes('workshop-object-label'),
     name+' must use the one framed tabletop label component');
 }
-assert.ok(stage3Ui.includes('height:clamp(132px,13vw,180px)') &&
-  stage3Ui.includes('left:24%;bottom:3%;width:52%'),
+// Stage 3 now sizes its evidence from the 2:1 scene stage (container units).
+assert.ok(norm(stage3Ui).includes(norm('height:clamp(64px,13cqi,180px)')) &&
+  norm(stage3Ui).includes(norm('left:24%;bottom:3%;width:52%')),
   'Stage3 evidence must be enlarged without changing its centred bench arrangement');
 assert.ok(copy.includes('STAGE_FOUR_TRANSPORT_HINTS') &&
   copy.includes('STAGE_FOUR_TRANSPORT_VERIFICATION') &&
   copy.includes('You set the bundle on the receiving counter.') &&
-  copy.includes('You bring the last group to the receiving counter') &&
+  copy.includes('You carry the last stack to the receiving counter') &&
   copy.includes('I secured the plates together and carried them to the depot as one load.') &&
   copy.includes('I carried the plates in smaller groups. It took more trips'),
   'Both transport choices must change the immediate/depot/journal copy');
@@ -210,23 +217,23 @@ const sharedJournalCss=read('apps/web/src/lib/pall-owner-ui.css');
 assert.ok(sharedJournalCss.includes("font:600 16px/1.55 var(--pall-font-reading") &&
   sharedJournalCss.includes("font:600 15px/1.3 var(--pall-font-reading") &&
   sharedJournalCss.includes("color:#24160e"),
-  'Journal body and controls must use the owner's reading face with strong dark-ink contrast');
+  "Journal body and controls must use the owner's reading face with strong dark-ink contrast");
 for(const name of [
   'MillhandDepotScene.svelte','MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
 ]){
   const scene=read('apps/web/src/lib/'+name);
-  assert.ok(scene.includes('font:600 15px/1.3 var(--pall-font-reading') &&
-    scene.includes('font:600 16px/1.55 var(--pall-font-reading') &&
-    scene.includes('color:#24160e'),
+  assert.ok(norm(scene).includes(norm('font:600 15px/1.3 var(--pall-font-reading')) &&
+    norm(scene).includes(norm('font:600 16px/1.55 var(--pall-font-reading')) &&
+    norm(scene).includes('color:#24160e'),
     name+' must style journal buttons and prose with New Standard and high contrast');
-  assert.ok(scene.includes('registerSceneJournal?.({id:') &&
-    scene.includes('void toggleJournal()'),
+  assert.ok(norm(scene).includes(norm('registerSceneJournal?.({id:')) &&
+    norm(scene).includes(norm('void toggleJournal()')),
     name+' must register the existing journal with the shared shell control');
 }
 const missingStampJournal=read('apps/web/src/lib/MillhandMissingStampScene.svelte');
-assert.ok(missingStampJournal.includes('font:600 15px/1.3 var(--pall-font-reading') &&
-  missingStampJournal.includes('font:600 16px/1.55 var(--pall-font-reading') &&
-  missingStampJournal.includes('color:#24160e'),
+assert.ok(norm(missingStampJournal).includes(norm('font:600 15px/1.3 var(--pall-font-reading')) &&
+  norm(missingStampJournal).includes(norm('font:600 16px/1.55 var(--pall-font-reading')) &&
+  norm(missingStampJournal).includes('color:#24160e'),
   'Stage3 journal must match the Stage4 text and button typography');
 console.log('PASS: Stage3 and all Stage4 journals share dark readable text and owner-typeface controls.');
 

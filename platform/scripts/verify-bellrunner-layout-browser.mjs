@@ -2,48 +2,66 @@ import assert from 'node:assert/strict';
 import {spawn,spawnSync} from 'node:child_process';
 import {setTimeout as delay} from 'node:timers/promises';
 import {resolve,join} from 'node:path';
-import {mkdtempSync,rmSync} from 'node:fs';
+import {mkdtempSync,rmSync,mkdirSync,writeFileSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 
 /* REAL Svelte pages, not duplicated mock UI. Stub only the API response so
  * protected character pages can be rendered in isolated Chromium QA.
- * Checks the requested desktop split: scene artwork LEFT and framed
- * dialogue RIGHT; never a parchment overlay or a panel underneath.
- * Narrow screens may stack the two independent sections.
+ * Checks the shared, container-driven scene layout (ActivityLayout
+ * mode="scene"): when the ACTIVITY CONTAINER (not the window) holds >=880px,
+ * Hector's art is on the left and the parchment plus the three real
+ * document-card buttons share the reading column; narrower containers
+ * stack art → dialogue → documents. Also checks the content-height
+ * parchment, symmetrical ultrawide gutters, the honest map gateway and
+ * Chat/Notification entries, and the top-layer Sound settings.
  */
 const root=resolve(import.meta.dirname,'..');
-const chrome=['google-chrome','chromium','chromium-browser'].find(x=>
+const isWindows=process.platform==='win32';
+const chromeCandidates=[process.env.CHROME_PATH,...(isWindows?[
+  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+  process.env.LOCALAPPDATA&&join(process.env.LOCALAPPDATA,'Google','Chrome','Application','chrome.exe'),
+  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+  'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
+]:['google-chrome','chromium','chromium-browser'])].filter(Boolean);
+const chrome=chromeCandidates.find(x=>/[\\/]/.test(x)?existsSync(x):
   spawnSync('which',[x],{stdio:'ignore'}).status===0);
-if(!chrome)throw Error('Chromium required for Bellrunner scene geometry.');
+if(!chrome)throw Error('Chromium required for Bellrunner scene geometry (set CHROME_PATH).');
 const profile=mkdtempSync(join(tmpdir(),'pall-bellrunner-layout-'));
 // Start the npm/Vite process tree in its own group, so cleanup can
 // terminate Vite itself rather than only its npm parent.
 // The existing combat-browser check can leave Vite on 5173 behind.
  // Use a dedicated strict port so the Bellrunner test always exercises
  // THIS checkout and never a stale server from another fixture.
-const server=spawn('npm',[
-  'run','dev','-w','@the-pall/web','--','--port','5187','--strictPort'
-],{
-  cwd:root,stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32'
-});
+const server=isWindows
+  ?spawn('npm run dev -w @the-pall/web -- --port 5187 --strictPort',
+    {cwd:root,stdio:['ignore','pipe','pipe'],shell:true})
+  :spawn('npm',['run','dev','-w','@the-pall/web','--','--port','5187','--strictPort'],
+    {cwd:root,stdio:['ignore','pipe','pipe'],detached:true});
 let output='';
 for(const stream of [server.stdout,server.stderr])stream.on('data',x=>{
   output+=String(x);if(output.length>25000)output=output.slice(-25000);
 });
 let browser,ws;
+// Windows has no process groups: end each tree by its own PID.
+const killTree=child=>{
+  if(!child?.pid)return;
+  if(isWindows)spawnSync('taskkill',['/pid',String(child.pid),'/T','/F'],{stdio:'ignore'});
+  else child.kill('SIGKILL');
+};
 const close=()=>{
   try{ws?.close();}catch{}
-  try{browser?.kill('SIGKILL');}catch{}
+  try{killTree(browser);}catch{}
   try{
-    if(process.platform!=='win32'&&server.pid)process.kill(-server.pid,'SIGTERM');
-    else server.kill('SIGTERM');
+    if(isWindows)killTree(server);
+    else if(server.pid)process.kill(-server.pid,'SIGTERM');
   }catch{try{server.kill('SIGTERM');}catch{}}
   try{rmSync(profile,{recursive:true,force:true});}catch{}
 };
 const timeout=setTimeout(()=>{
   console.error('Bellrunner browser QA timed out: '+output.slice(-2000));
   close();process.exit(124);
-},110000);
+},300000);
 timeout.unref();
 async function until(fn,ms=18000,label='condition'){
   const deadline=Date.now()+ms;let last;
@@ -157,28 +175,86 @@ try{
   function sceneMetrics(){
     return evalJS(String.raw`(()=>{
       const stack=document.querySelector('.pall-story-sections');
-      const art=stack?.querySelector(':scope > .pall-story-landscape');
-      const dialogue=stack?.querySelector(':scope > .pall-story-dialogue-section');
+      const host=stack?.closest('.activity-host');
+      const visuals=stack?.querySelector('.activity-stage > .pall-story-visuals');
+      const art=visuals?.querySelector(':scope > .pall-story-landscape');
+      const tray=stack?.querySelector('.round-documents');
+      const banner=document.querySelector('.city-banner');
+      const gateway=banner?.querySelector('.city-map-gateway');
+      const dialogue=stack?.querySelector('.activity-panel > .pall-story-dialogue-section');
       const frame=dialogue?.querySelector('.work-card');
       const image=art?.querySelector('img.depot, img.environment');
-      if(!stack||!art||!dialogue||!frame||!image)return null;
+      const secondary=dialogue?.querySelector('button.secondary-choice');
+      const primary=dialogue?.querySelector('button.primary-choice');
+      if(!stack||!host||!art||!dialogue||!frame||!image)return null;
       const rect=x=>{
         const r=x.getBoundingClientRect();
         return {x:r.x,y:r.y,w:r.width,h:r.height,top:r.top,bottom:r.bottom,
           left:r.left,right:r.right};
       };
-      return {art:rect(art),dialogue:rect(dialogue),frame:rect(frame),
+      // Content box of the layout grid, for gutter symmetry.
+      const sr=stack.getBoundingClientRect(),ss=getComputedStyle(stack);
+      const inner={left:sr.left+parseFloat(ss.paddingLeft),right:sr.right-parseFloat(ss.paddingRight)};
+      // Parchment slack: frame's inner bottom minus its last visible child.
+      const fs=getComputedStyle(frame),fr=frame.getBoundingClientRect();
+      const kids=[...frame.querySelectorAll(':scope > *')].filter(k=>k.getClientRects().length);
+      const lastKid=kids[kids.length-1];
+      const slack=lastKid?fr.bottom-parseFloat(fs.borderBottomWidth)-parseFloat(fs.paddingBottom)
+        -lastKid.getBoundingClientRect().bottom-parseFloat(getComputedStyle(lastKid).marginBottom):0;
+      const firstChoice=dialogue.querySelector('.responses > button, .actions > button');
+      const services=[...document.querySelectorAll('[data-shell-service]')].map(s=>({
+        kind:s.dataset.shellService,state:s.dataset.serviceState,
+        label:s.querySelector('button')?.getAttribute('aria-label')??''}));
+      return {art:rect(art),visuals:rect(visuals),tray:tray?rect(tray):null,
+        dialogue:rect(dialogue),frame:rect(frame),host:rect(host),inner,slack,
+        firstChoice:firstChoice?rect(firstChoice):null,services,
         stack:rect(stack),img:rect(image),fit:getComputedStyle(image).objectFit,
         artAspect:getComputedStyle(art).aspectRatio,
         frameOverflow:getComputedStyle(frame).overflowY,
         loaded:image.complete&&image.naturalWidth>100,
         scrollHeight:document.documentElement.scrollHeight,
+        scrollWidth:document.documentElement.scrollWidth,
+        clientWidth:document.documentElement.clientWidth,
+        frameShell:rect(document.querySelector('.frame')),
+        dialogueFonts:[...frame.querySelectorAll('.speech,.narration,.work-description,.story,.spoken,.inner-voice,.responses > button,.actions > button')]
+          .map(e=>getComputedStyle(e).fontSize),
         viewport:window.innerHeight,top:window.scrollY,
+        cityBanner:banner?{...rect(banner),title:banner.textContent.trim(),
+          display:getComputedStyle(banner).display,mapState:banner.dataset.mapState,
+          gatewayTag:gateway?.tagName,gatewayDisabled:gateway?.getAttribute('aria-disabled'),
+          gatewayStatus:gateway?.textContent.replace(/\s+/g,' ').trim()}:null,
+        secondary:secondary?{
+          label:secondary.textContent.trim(),
+          background:getComputedStyle(secondary).backgroundImage,
+          borderImage:getComputedStyle(secondary).borderImageSource,
+          icon:!!secondary.querySelector('svg'),
+          minHeight:parseFloat(getComputedStyle(secondary).minHeight)
+        }:null,
+        primary:primary?{label:primary.textContent.trim(),
+          background:getComputedStyle(primary).backgroundImage,
+          color:getComputedStyle(primary).color}:null,
+        viteError:!!document.querySelector('vite-error-overlay'),
         text:frame.textContent.slice(0,160),width:window.innerWidth};
     })()`);
   }
+  // Settle on the measured layout: ActivityLayout refines the stage width
+  // from the real document offset one frame after first paint.
+  async function stableMetrics(label){
+    let last=null;
+    return until(async()=>{
+      const val=await sceneMetrics();
+      if(!val?.loaded||val.frame.w<=100){last=null;return false;}
+      const same=last&&Math.abs(last.art.w-val.art.w)<1&&Math.abs(last.dialogue.top-val.dialogue.top)<1;
+      last=val;
+      return same?val:false;
+    },24000,label);
+  }
+  // Two columns are a property of the ACTIVITY CONTAINER (>=880px after rail,
+  // dock and padding), never of a raw window breakpoint. 1024×768 laptops
+  // (952px container) keep two columns; 768px tablets and phones stack.
   for(const [width,height] of [
-    [1272,850],[1920,1080],[2048,821],[3440,1440],[390,844]
+    [1024,768],[1272,850],[1280,720],[1920,1080],[2048,1171],[2048,1279],
+    [2560,1600],[3440,1440],[768,1024],[390,844]
   ]){
     await cmd('Emulation.setDeviceMetricsOverride',{
       width,height,deviceScaleFactor:1,mobile:false
@@ -191,27 +267,38 @@ try{
       ['bellrunner/dispatch?scene=receiving','receiving-desk']
     ]){
       await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/'+route});
-      const m=await until(async()=>{
-        const val=await sceneMetrics();
-        return val?.loaded&&val.frame.w>100?val:false;
-      },24000,scene+' at '+width+'x'+height);
+      const m=await stableMetrics(scene+' at '+width+'x'+height);
       const suffix=scene+' '+width+'×'+height+' '+JSON.stringify(m);
+      const twoColumn=m.host.w>=880;
+      assert.equal(m.viteError,false,'No compile overlay: '+suffix);
+      assert.ok(m.scrollWidth<=m.clientWidth,'No horizontal scrolling: '+suffix);
+      // One centred game frame: full width up to 1680px, then equal gutters.
+      const frameGutterL=m.frameShell.left,frameGutterR=m.clientWidth-m.frameShell.right;
+      assert.ok(Math.abs(m.frameShell.w-Math.min(m.clientWidth,1680))<1&&Math.abs(frameGutterL-frameGutterR)<=1,
+        'The game frame fills the window up to 1680px, then is centred with equal side gutters: '+suffix);
       assert.ok(Math.abs(m.art.h-m.art.w*941/1672)<2.5,
         'Full original aspect: '+suffix);
-      if(width>1080){
-        assert.ok(Math.abs(m.dialogue.top-m.art.top)<=2,
-          'Desktop dialogue must START beside the scene: '+suffix);
-        assert.ok(m.dialogue.left>=m.art.right-2,
-          'Desktop dialogue must be to the RIGHT of the artwork: '+suffix);
+      if(twoColumn){
+        assert.ok(Math.abs(m.dialogue.top-m.visuals.top)<=2,
+          'Wide container: dialogue must START beside the art: '+suffix);
+        assert.ok(m.dialogue.left>=m.visuals.right-2,
+          'Wide container: dialogue must be to the RIGHT of the art: '+suffix);
         assert.ok(m.frame.left>=m.art.right-1,
           'Parchment may not overlap the LEFT scene: '+suffix);
-        assert.ok(Math.abs(m.art.w/m.stack.w-.6)<.025,
-          'The scene owns ~60% of available content width: '+suffix);
-        assert.ok(Math.abs(m.dialogue.w/m.stack.w-.4)<.025,
-          'The right dialogue owns ~40% of available content width: '+suffix);
+        assert.ok(m.art.w>=459&&m.dialogue.w>=379,
+          'Both columns keep their measured minimums (art 460, reading 380): '+suffix);
+        const leftGutter=m.visuals.left-m.inner.left,rightGutter=m.inner.right-m.dialogue.right;
+        assert.ok(Math.abs(leftGutter-rightGutter)<=2,
+          'Leftover width is split into symmetrical gutters: '+suffix);
+        // Short opening states must fit; long authored journey narration
+        // may scroll normally (the brief: no internal parchment scrolling).
+        if(height>=720&&['stage1','stage2-depot'].includes(scene)){
+          assert.ok(m.firstChoice&&m.firstChoice.bottom<=height,
+            'Hector, the parchment and its first choice share the first viewport: '+suffix);
+        }
       }else{
-        assert.ok(m.dialogue.top>=m.art.bottom-2,
-          'Narrow-screen dialogue stacks BELOW the artwork: '+suffix);
+        assert.ok(m.dialogue.top>=m.visuals.bottom-2,
+          'Narrow container: dialogue stacks directly BELOW the art: '+suffix);
       }
       assert.ok(m.frame.top>=m.dialogue.top-1 &&
         m.frame.bottom<=m.dialogue.bottom+2,
@@ -221,20 +308,81 @@ try{
         'Frame is horizontally inside its section: '+suffix);
       assert.ok(m.frame.w<=982,
         'Readable parchment cannot span an ultrawide monitor: '+suffix);
+      assert.ok(m.dialogueFonts.length>0&&m.dialogueFonts.every(f=>f==='17px'),
+        'Every dialogue line and choice uses the one fixed 17px reading size: '+suffix);
+      assert.ok(m.slack<=48,
+        'Content-driven parchment: no empty beige below the last line or choice: '+suffix);
+      if(scene==='stage1'||scene==='stage2-depot'){
+        assert.ok(m.tray&&m.tray.h>115,
+          'The Dispatch House MUST show the three document cards: '+suffix);
+        assert.ok(m.tray.top>=m.art.bottom-2||m.tray.left>=m.art.right-2,
+          'Document cards never cover Hector or the depot art: '+suffix);
+        assert.ok(m.tray.top>=m.dialogue.bottom-2,
+          'Documents follow the dialogue in the reading column / stacked order: '+suffix);
+        if(twoColumn)assert.ok(m.tray.left>=m.visuals.right-2,
+          'Wide container: documents share the reading column: '+suffix);
+      }else{
+        assert.equal(m.tray,null,
+          'No redundant paper tray at a street or the Receiving Desk: '+suffix);
+      }
+      assert.ok(m.cityBanner&&m.cityBanner.h>=64&&m.cityBanner.h<=140&&
+        m.cityBanner.title.includes('Grand Cylinder City')&&
+        m.cityBanner.display!=='none',
+        'Keep a visible, shallow City header without displacing Hector and the job papers: '+suffix);
+      assert.ok(m.cityBanner.mapState==='introduction'&&m.cityBanner.gatewayTag==='BUTTON'&&
+        m.cityBanner.gatewayDisabled==='true'&&m.cityBanner.gatewayStatus.includes('City map'),
+        'The City header is a locked map gateway during the introduction, with no invented route: '+suffix);
+      assert.ok(['notifications','chat'].every(kind=>m.services.some(s=>s.kind===kind&&
+        s.state==='unavailable'&&s.label.includes('not available yet'))),
+        'Chat and Notifications have stable, honestly unavailable HUD entries: '+suffix);
+      assert.ok(m.stack.top>=m.cityBanner.bottom-2,
+        'City header must lead into the workstation, without overlapping it: '+suffix);
+      if(['stage1','stage2-depot','receiving-desk'].includes(scene)){
+        assert.ok(m.secondary&&m.secondary.icon&&m.secondary.minHeight>=52,
+          'Reference-style icon-led secondary choice must be visible: '+suffix);
+        assert.ok(m.secondary.background.includes('linear-gradient')&&
+          m.secondary.borderImage==='none',
+          'Secondary choice must use cream/parchment surface and a real framed border: '+suffix);
+      }
+      if(m.primary){
+        assert.ok(m.primary.background.includes('linear-gradient')&&
+          m.primary.color.includes('rgb('),
+          'Progression should retain a visually distinct dark-brass primary choice: '+suffix);
+      }
       assert.equal(m.fit,'contain','Full image must not be cover-cropped: '+suffix);
       assert.equal(m.frameOverflow,'visible','No internal frame scrollbar: '+suffix);
       assert.ok(m.art.h>0&&m.dialogue.h>90&&m.stack.bottom>=m.frame.bottom-2,
-        'All two-section content must be in page flow: '+suffix);
-      await evalJS("document.querySelector('.pall-story-dialogue-section')?.scrollIntoView({block:'start',behavior:'instant'});true");
-      const scrolled=await sceneMetrics();
-      assert.ok(scrolled.top>=0&&scrolled.frame.w>100,'Dialogue must be reachable: '+suffix);
+        'All scene regions must be in page flow: '+suffix);
+      if(!twoColumn){
+        await evalJS("document.querySelector('.pall-story-dialogue-section')?.scrollIntoView({block:'start',behavior:'instant'});true");
+        const scrolled=await sceneMetrics();
+        assert.ok(scrolled.frame.w>100,'Stacked dialogue must be reachable: '+suffix);
+      }
+      // Preserve screenshots of actual rendered Svelte pages for human
+      // visual review. The API mock uses only a synthetic QA character.
+      // Layout geometry assertions alone cannot prove the composition
+      // matches the owner's desired NPC/document/text hierarchy.
+      if([1024,1272,1920,2048,390].includes(width)&&
+        ['stage1','stage2-depot','receiving-desk'].includes(scene)){
+        const folder=resolve(root,'test-artifacts','bellrunner-visuals');
+        mkdirSync(folder,{recursive:true});
+        await evalJS('window.scrollTo(0,0);true');
+        await delay(120);
+        const shot=await cmd('Page.captureScreenshot',{
+          format:'png',fromSurface:true,captureBeyondViewport:false
+        });
+        assert.ok(typeof shot.data==='string'&&shot.data.length>1000,
+          'Chromium visual QA screenshot missing for '+scene);
+        writeFileSync(join(folder,scene+'-'+width+'x'+height+'.png'),
+          Buffer.from(shot.data,'base64'));
+      }
       console.log('PASS: '+scene+' '+width+'×'+height+
+        ' container '+Math.round(m.host.w)+
         ' artwork '+Math.round(m.art.w)+'×'+Math.round(m.art.h)+
-        (width>1080?' dialogue RIGHT x='+Math.round(m.dialogue.left):
+        (twoColumn?' dialogue RIGHT x='+Math.round(m.dialogue.left):
           ' dialogue BELOW y='+Math.round(m.dialogue.top)));
     }
-  }
-  // Real pointer interactions: the artwork itself only hosts the NPC and
+  }  // Real pointer interactions: the artwork itself only hosts the NPC and
   // paper assets, while the response/inspection text appears to the RIGHT.
   await cmd('Emulation.setDeviceMetricsOverride',{
     width:1920,height:1080,deviceScaleFactor:1,mobile:false
@@ -259,24 +407,111 @@ try{
     return m?.text.includes('Ask Hector something')?m:false;
   },8000,'Hector text in the lower section');
   assert.equal(await evalJS("document.querySelector('.scene-illustration .work-card, .scene-illustration .workshop-inspection')===null"),true);
-  await clickArtwork('button.paper-target.notices');
+  await clickArtwork('button.document-card[aria-label="Inspect Council notices"]');
   await until(async()=>{
     const m=await sceneMetrics();
     return m?.text.includes('Council notices')?m:false;
   },8000,'Paper inspection text in the lower section');
   assert.equal(await evalJS("document.querySelector('.scene-illustration .workshop-inspection')===null"),true);
-  console.log('PASS: clicking Stage 1 NPC and paper reveals text RIGHT of the image');
+  console.log('PASS: Stage 1 Hector and the document card update the adjacent parchment');
+
+  // Verify the actual opening beats rather than only initial/static props:
+  // each line is shown once, and only the Route Sheet acquires the
+  // actionable stage handoff when Hector finishes instructing the player.
+  await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/opening'});
+  await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 1 story opening');
+  await clickArtwork('button.primary-choice'); // Begin the round.
+  await until(async()=>await evalJS(
+    "document.querySelector('.dispatch-dialogue button.primary-choice')?.textContent.includes('Continue')"
+  ),6000,'The first narration Continue');
+  await clickArtwork('button.primary-choice'); // Setting → Hector's first line.
+  await until(async()=>{
+    const m=await sceneMetrics();
+    return m?.text.includes('There you are.')?m:false;
+  },6000,'Hector speaks the approved opening');
+  {
+    const folder=resolve(root,'test-artifacts','bellrunner-visuals');
+    mkdirSync(folder,{recursive:true});
+    const shot=await cmd('Page.captureScreenshot',{format:'png',
+      fromSurface:true,captureBeyondViewport:false});
+    writeFileSync(join(folder,'stage1-hector-speech-1920.png'),
+      Buffer.from(shot.data,'base64'));
+  }
+  for(let i=0;i<5;i++){
+    const previous=await evalJS(
+      "document.querySelector('.dispatch-dialogue')?.textContent"
+    );
+    await clickArtwork('button.primary-choice');
+    await until(async()=>{
+      const next=await evalJS(
+        "document.querySelector('.dispatch-dialogue')?.textContent"
+      );
+      return next!==previous;
+    },6000,'Advance through Hector speech beat '+(i+1));
+  }
+  assert.equal(await evalJS(
+    "!!document.querySelector('button.document-card[aria-label=\\\"Take the Route Sheet to begin Shift Dispatch\\\"]')"
+  ),true,'Only the Route Sheet becomes a real progression control');
+  assert.equal(await evalJS(
+    "document.querySelector('.dispatch-dialogue')?.textContent.includes('Previous line')"
+  ),true,'Handoff offers Previous line, not a duplicate Take button');
+  {
+    const folder=resolve(root,'test-artifacts','bellrunner-visuals');
+    const shot=await cmd('Page.captureScreenshot',{format:'png',
+      fromSurface:true,captureBeyondViewport:false});
+    writeFileSync(join(folder,'stage1-route-handoff-1920.png'),
+      Buffer.from(shot.data,'base64'));
+  }
+  console.log('PASS: owner-verbatim opening sequence and Route Sheet handoff render correctly');
 
   await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/bellrunner/dispatch?scene=depot'});
   await until(async()=>(await sceneMetrics())?.loaded,12000,'Stage 2 Depot paper targets');
-  await clickArtwork('button.paper-target.notices');
+  await clickArtwork('button.document-card[aria-label="Inspect Council notices"]');
   await until(async()=>{
     const m=await sceneMetrics();
     return m?.text.includes('Council notices')?m:false;
   },8000,'Stage 2 Depot paper inspection below art');
   assert.equal(await evalJS("document.querySelector('.illustration .workshop-inspection')===null"),true);
-  console.log('PASS: clicking Stage 2 Depot paper updates the right dialogue');
-  console.log('PASS: 25 real Bellrunner page/viewport combinations use LEFT art / RIGHT dialogue on desktop and stack on mobile');
+  console.log('PASS: Stage 2 Depot document card updates the adjacent parchment');
+
+  // Sound settings live in the browser top layer: nothing (in particular the
+  // sticky Review journal row) may paint over them, and a short window
+  // bounds the menu with internal scrolling instead of cutting it off.
+  for(const [width,height] of [[1280,720],[1280,575],[390,600]]){
+    await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
+    await cmd('Page.navigate',{url:origin+'/characters/qa-bellrunner/opening'});
+    await until(async()=>await evalJS(
+      "document.querySelector('[data-pall-audio-control]')?.dataset.hydrated==='true'"),12000,'Sound hydration');
+    await clickArtwork('.audio-trigger');
+    const pop=await until(async()=>await evalJS(String.raw`(()=>{
+      const p=document.querySelector('#pall-sound-settings');
+      if(!p||!p.matches(':popover-open'))return null;
+      const b=p.getBoundingClientRect(),j=document.querySelector('.scene-journal-button').getBoundingClientRect();
+      let covered=0;
+      for(let y=b.top+4;y<b.bottom-2;y+=10){
+        const e=document.elementFromPoint(b.left+b.width/2,y);
+        if(!e?.closest('#pall-sound-settings'))covered++;
+      }
+      const overlap=!(j.right<b.left||j.left>b.right||j.bottom<b.top||j.top>b.bottom);
+      const probe=overlap?document.elementFromPoint(
+        Math.max(b.left+3,Math.min((j.left+j.right)/2,b.right-3)),
+        Math.max(b.top+3,Math.min((j.top+j.bottom)/2,b.bottom-3))):null;
+      return {top:b.top,bottom:b.bottom,vh:innerHeight,covered,overlap,
+        overJournal:overlap?!!probe?.closest('#pall-sound-settings'):null,
+        scrolls:p.scrollHeight>p.clientHeight,overflowY:getComputedStyle(p).overflowY};
+    })()`),6000,'Sound settings popover at '+width+'x'+height);
+    const suffix=width+'×'+height+' '+JSON.stringify(pop);
+    assert.equal(pop.covered,0,'Nothing paints over Sound settings: '+suffix);
+    if(pop.overlap)assert.equal(pop.overJournal,true,'Sound settings sit above Review journal: '+suffix);
+    assert.ok(pop.top>=0&&pop.bottom<=pop.vh,'Sound settings stay inside the viewport: '+suffix);
+    if(pop.scrolls)assert.equal(pop.overflowY,'auto','A short window scrolls the menu internally: '+suffix);
+    await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+    await until(async()=>await evalJS("!document.querySelector('#pall-sound-settings')&&"+
+      "document.activeElement?.classList.contains('audio-trigger')"),4000,'Escape closes Sound and restores focus');
+    console.log('PASS: Sound settings top layer, anchored and bounded at '+width+'×'+height);
+  }
+  console.log('PASS: 50 real Bellrunner page/viewport combinations follow the container-driven scene layout (two columns from an 880px activity container, art → dialogue → documents below it)');
 }catch(error){
   console.error(error);
   process.exitCode=1;

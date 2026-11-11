@@ -51,9 +51,11 @@ assert.ok(hud.includes("romanStages=['—','I','II','III','IV','V','VI','VII','V
   hud.includes('<PallAudioControls/>') &&
   hud.includes('class="stat coin-stat"') &&
   hud.includes('class="account-link"') &&
-  hud.includes('@media(max-width:1270px)') &&
+  hud.includes('container:pall-shell / inline-size') &&
+  hud.includes('@container pall-shell (max-width:1039px)') &&
+  hud.includes('@container pall-shell (max-width:599px)') &&
   hud.includes('@media(max-width:760px)'),
-  'Keep original identity, coin, sound, account and Introduction progress in a responsive header');
+  'Keep original identity, coin, sound, account and Introduction progress in a responsive header that reflows by its real width');
 
 // A single explicit shell backdrop contract avoids accidental playback on
 // unrelated character pages. The audio player survives short scene remounts.

@@ -1,6 +1,7 @@
 <script lang="ts">
   import {APPROVED_GUTHER_OPTIONAL_DIALOGUE, GUTHER_WORK_SKIP_LINE, type GutherTopicId} from '$lib/approved-guther-optional';
   import {NPC_DIALOGUE_STATUS, PROPOSED_NPC_DIALOGUE} from '$lib/proposed-npc-dialogue';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
 
   let {origin, close, skipToWork}: {origin:string;close:()=>void;skipToWork?:()=>void} = $props();
   const speaker = $derived(PROPOSED_NPC_DIALOGUE[origin]);
@@ -30,18 +31,18 @@
       <p class="speech">“{gutherExchange.reply}”</p>
       <div class="choices">
         {#if gutherExchange.followUp}
-          <button type="button" onclick={() => {gutherStep += 1;}}>{gutherExchange.followUp}</button>
+          <button type="button" class="primary-choice" onclick={() => {gutherStep += 1;}}>{gutherExchange.followUp}</button>
         {/if}
-        <button type="button" onclick={changeGutherTopic}>Ask something else</button>
-        <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
+        <button type="button" class="secondary-choice" onclick={changeGutherTopic}><BellrunnerChoiceIcon kind="chat"/>Ask something else</button>
+        <button type="button" class="work-skip secondary-choice" onclick={() => (skipToWork ?? close)()}><BellrunnerChoiceIcon kind="route"/>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {:else}
       <p class="instruction">Ask Guther about:</p>
       <div class="choices">
         {#each APPROVED_GUTHER_OPTIONAL_DIALOGUE as option (option.id)}
-          <button type="button" onclick={() => askGuther(option.id)}>{option.prompt}</button>
+          <button type="button" class="secondary-choice" onclick={() => askGuther(option.id)}><BellrunnerChoiceIcon kind="chat"/>{option.prompt}</button>
         {/each}
-        <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
+        <button type="button" class="work-skip secondary-choice" onclick={() => (skipToWork ?? close)()}><BellrunnerChoiceIcon kind="route"/>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {/if}
   {:else if speaker}
@@ -73,8 +74,8 @@
   .review-note{font:10px/1.4 sans-serif;letter-spacing:.06em;color:#855334;margin:0 0 8px}
   .name{font:bold 13px/1.4 sans-serif;color:#523522;margin:0 0 12px}
   .name span{font-weight:normal;color:#674f37}
-  .speech{font-size:clamp(15px,1.35vw,18px);line-height:1.53;margin:7px 0 17px}
-  .instruction{font:14px/1.45 sans-serif;margin:6px 0 12px}
+  .speech{font-size:var(--dialogue-text,17px);line-height:1.55;margin:7px 0 17px}
+  .instruction{font:15px/1.45 sans-serif;margin:6px 0 12px}
   .choices{display:flex;flex-direction:column;gap:6px}
   .choices button{width:100%;border:1px solid #624b35;background:#241d16;color:#f5e3c8;text-align:left;cursor:pointer;
     padding:10px 12px;min-height:40px;font:14px/1.4 var(--pall-font-reading,Georgia,serif)}

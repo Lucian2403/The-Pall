@@ -62,43 +62,72 @@ remain fully visible on wide monitors. The player's starting Route
 Sheet object in Stage 1 is the deliberate interactive prop that accepts
 the round, unlike the static destination setting.
 
-## Bellrunner scene layout — artwork left, dialogue right (owner revision)
+## Immersive Hector workstation and reusable document cards (PR #46)
 
-**Desktop screens have two side-by-side sections, not a vertical stack.**
-The prior implementation misunderstood the request and placed the
-dialogue below an enormous full-width painting. That layout is
-superseded by the current one shared across Stages 1 and 2:
+At desktop widths the Bellrunner UI is organized around **what the
+player can act upon**, not around an oversized backdrop. Both stages
+use the shared **scene** mode of `ActivityLayout.svelte`
+([Game shell and activity layouts](../../../07-technology/game-shell-and-activity-layouts.md)).
+When the activity container is at least 880px wide, the illustrated
+workstation is on the left. The nine-slice parchment dialogue and, at
+the Depot, the document tray share the reading column on the right.
 
-- **Left — 60% illustrated scene.** A complete 1672:941 painting,
-  aspect-preserved and free of dialogue overlays. At the Depot this
-  also contains Hector's portrait and click area, the paper assets,
-  their nameplates, and the route-sheet assignment control.
-  The two street scenes and Municipal Receiving Desk contain
-  only their location painting. No receiver portrait or floating
-  documents are added at the Receiving Desk.
-- **Right — 40% framed dialogue.** The owner's original nine-slice
-  parchment is centered in a dark second column, with the complete
-  authored narrative, conversation, inspection descriptions and
-  choices. Its height grows naturally without a forced internal
-  scrollbar. All paper/NPC clicks update this adjacent panel rather
-  than scrolling the player below the image.
-- **At narrow widths (1080px viewport or less)** the two areas stack:
-  full image first, parchment below. There is no scene stretching
-  or image cropping. On desktop, the two columns stay side by side
-  even on large monitors.
+At the Dispatch House, Hector and his clickable nameplate fill the
+illustration. The three owner-supplied job items are in a framed
+**Round Documents** tray directly below the dialogue in the reading
+column: Council Notices, Sealed Council Order and Route Sheet. Each
+card combines the full cutout, framed caption and action label into
+one accessible button. Inspecting an item updates the adjoining
+parchment. The Route Sheet changes from Inspect to **Take Route
+Sheet** only at the canonical Stage 1 handoff, when clicking it
+executes the existing idempotent `take_round` command. No extra
+Review Route button duplicates that object-driven progression.
 
-The shared layout is `pall-story-landscape.css`; both stage
-components use it. The existing `pall-owner-ui.css` frame art
-and `workshop-object-labels.css` nameplates are unchanged.
-Scene props keep coordinates relative to the left painting,
-so the interaction hitboxes cannot drift independently.
+The reading column holds the **owner-approved nine-slice parchment**,
+sized to its content. It has more spacious narration, larger legible
+speech, native metal-framed buttons and a bottom Previous line control
+in Stage 1. The progress choice uses the existing highlighted button
+state. Equal RP choices (short/long road, three receipt remedies and
+Hector's optional questions) intentionally remain visually equal; the
+tutorial does not secretly reward a purportedly correct answer.
 
-The real-Chromium CI test loads Stage 1 and all Stage 2
-backgrounds at 1272px, 1920px, 2048px, 3440px and mobile widths;
-it checks that the right frame never overlaps the scene and that
-clicking Hector/papers changes the dialogue panel on the right.
-Only presentation code changes; no gameplay, money, audio or
-saved-state adjustments accompany the layout correction.
+In Stage 2, the Depot reuses the same Hector-and-paper workstation.
+Once travelling, the illustration shows the selected Short/Long
+street artwork only; at the Municipal Receiving Desk, it shows
+the office artwork only. **No Receiver sprite, floating task paper,
+separate book hotspot or unnecessary props are generated.** The
+action sequence, receipt proof and all previously approved text
+remain in the parchment dialogue. Backgrounds keep their full
+source aspect ratio and never overlap the parchment.
+
+The **Grand Cylinder City panorama and title remain visible above
+the stage header** on both Bellrunner stages, using the same artwork
+as elsewhere in the introduction. It was mistakenly hidden to save
+screen height in an earlier iteration; this was rejected. Every
+scene now uses one version of that banner (88–136px), which
+also carries the City map gateway (locked during the introduction).
+The workstation is sized from the measured space below it so that
+Hector, the parchment and its first choice share the first screen.
+
+The reference's secondary choice treatment is also implemented:
+pale parchment-like buttons, dark carved edges and restrained
+line-icons (conversation, route, receipt, book, back). The Continue
+buttons have a contrasting dark brass finish. These are visual
+states, not mechanical hints: the two roads and three incident
+options retain equal prominence. Keyboard focus, disabled state,
+hover and reduced-motion support are preserved; other jobs'
+button styles are not modified.
+
+When the activity container is narrower than 880px (tablets and
+phones, or a narrow window with a dock), the order is illustration →
+dialogue → documents. There are no forced scrollbars *inside* the
+parchment; the page scrolls normally if content cannot fit above the
+fold.
+
+Reusable code: `ActivityLayout.svelte`, `BellrunnerDocumentTray.svelte`,
+`pall-story-landscape.css` and the existing owner frame/button kit.
+Gameplay, loot, money, progression, SFX, migrations and art binaries
+remain unchanged.
 
 ## Choose the road
 

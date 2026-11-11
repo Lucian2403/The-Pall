@@ -2,6 +2,9 @@
   import {onDestroy} from 'svelte';
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
+  import BellrunnerDocumentTray from '$lib/BellrunnerDocumentTray.svelte';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/workshop-object-labels.css';
   import '$lib/pall-story-landscape.css';
 
@@ -20,7 +23,6 @@
       observation:'A courier route sheet with places for receiving marks. The assigned stops and load are checked when the round begins.'
     }
   };
-  const paperKeys=['notices','sealed','route'] as const;
   let {characterName,beat,advance,goBack,canGoBack,takeRound,takingRound=false,handoffError=''}:{
     characterName:string;beat:StageOneBeat;advance:(next:string,fromChoice?:boolean)=>void;
     goBack:()=>void;canGoBack:boolean;takeRound:()=>Promise<void>;
@@ -71,9 +73,11 @@
 </script>
 
 <section class="workshop bellrunner" aria-label="Bellrunner Stage 1 — Dispatch House">
-  <div class="dispatch-scene pall-story-sections">
-    <section class="scene-illustration pall-story-landscape"
-      aria-label="Dispatch House scenery and interactive objects">
+  <ActivityLayout mode="scene" class="dispatch-scene pall-story-sections" stageAspect={1672/941}>
+    {#snippet stage()}
+    <section class="scene-visuals pall-story-visuals" aria-label="Dispatch House with Hector D. Smoke">
+      <div class="scene-illustration pall-story-landscape"
+        aria-label="Dispatch House with Hector D. Smoke">
     <img class="depot" src="/locations/origins/bellrunner-depot.webp"
       alt="Grand Cylinder City Dispatch House, a working industrial courier depot" draggable="false"/>
     <div class="scene-shade" aria-hidden="true"></div>
@@ -83,37 +87,32 @@
          The former 70% foreground mask hid half his body in mid-air. -->
     <img class="depot depot-foreground" src="/locations/origins/bellrunner-depot.webp"
       alt="" aria-hidden="true" draggable="false"/>
-    {#each paperKeys as key}
-      <img class="paper-art {key}" src={papers[key].src} alt="" aria-hidden="true" draggable="false"/>
-      <button type="button" class="paper-target {key}" data-workshop-object
-        class:route-ready={key==='route'&&beat.kind==='handoff'}
-        aria-label={key==='route'&&beat.kind==='handoff'
-          ?'Take the Route Sheet to begin Shift Dispatch'
-          :'Inspect '+papers[key].label}
-        aria-pressed={key==='route'&&beat.kind==='handoff'?undefined:selected===key}
-        disabled={key==='route'&&beat.kind==='handoff'&&takingRound}
-        data-pall-sfx="paper" onclick={()=>usePaper(key)}>
-        <span class="workshop-object-label">
-          {key==='route'&&beat.kind==='handoff'?'Take Route Sheet':papers[key].label}
-        </span>
-      </button>
-    {/each}
     <button type="button" class="npc-hotspot" title="Talk to Hector D. Smoke"
       aria-label="Talk to Hector D. Smoke"
       onclick={askHector}>
       <span class="workshop-npc-label">Hector D. Smoke</span>
     </button>
+      </div>
     </section>
+    {/snippet}
+    {#snippet supplement()}
+      <BellrunnerDocumentTray {papers} onChoose={usePaper} {selected}
+        routeReady={beat.kind==='handoff'} busy={takingRound}/>
+    {/snippet}
 
+    {#snippet panel()}
     <section class="dialogue-section pall-story-dialogue-section"
       aria-label="Dispatch House dialogue">
     <aside class="work-card dispatch-dialogue" aria-label="Dispatch House conversation and paper inspection">
+      <div class="dialogue-body">
       {#if selected}
         <p class="eyebrow">DISPATCH HOUSE · PAPER INSPECTION</p>
         <h2>{papers[selected].label}</h2>
         <p class="work-description">{papers[selected].observation}</p>
         <div class="responses">
-          <button type="button" onclick={()=>{selected=null;}}>Return to the dialogue</button>
+          <button type="button" class="secondary-choice" onclick={()=>{selected=null;}}>
+            <BellrunnerChoiceIcon kind="back"/>Return to the dialogue
+          </button>
         </div>
       {:else if talking}
         <BellrunnerHectorConversation {characterName} {returnToRound}/>
@@ -122,107 +121,131 @@
         <h2>Hector D. Smoke</h2>
         <p class="speech">Dispatch Master</p>
         <div class="responses">
-          <button type="button" onclick={begin}>Begin the round</button>
-          <button type="button" onclick={askHector}>Ask Hector something</button>
+          <button type="button" class="primary-choice" onclick={begin}>Begin the round</button>
+          <button type="button" class="secondary-choice" onclick={askHector}>
+            <BellrunnerChoiceIcon kind="chat"/>Ask Hector something
+          </button>
         </div>
       {:else}
         {#if beat.kind==='narration'}
           <p class="eyebrow">DISPATCH HOUSE</p>
           <p class="narration">{say}</p>
         {:else if beat.kind==='speech'}
-          <p class="eyebrow">{beat.speaker==='Player'?characterName:'HECTOR D. SMOKE'}</p>
+          {#if beat.speaker==='Player'}
+            <p class="eyebrow">{characterName}</p>
+          {:else}
+            <h2 class="speaker-heading">HECTOR D. SMOKE</h2>
+          {/if}
           <p class="speech">“{say}”</p>
         {:else if beat.kind==='handoff'}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
           <h2>Take the Route Sheet</h2>
-          <p class="work-description">Hector has laid out the route sheet.
-            Click it on the counter to begin the deliveries.</p>
+          <p class="work-description">The Route Sheet is ready with the round documents.
+            Take it before you set off.</p>
           {#if takingRound}<p class="work-description" role="status">Taking the route sheet…</p>{/if}
         {/if}
 
         <div class="responses">
           {#if beat.next}
-            <button type="button" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
+            <button type="button" class="primary-choice" onclick={()=>{if(beat.next)next(beat.next);}}>Continue</button>
           {/if}
           {#if beat.kind!=='handoff'}
-            <button type="button" onclick={askHector}>Ask Hector something</button>
-          {/if}
-          {#if canGoBack}
-            <button type="button" onclick={()=>{selected=null;goBack();}}>Previous line</button>
+            <button type="button" class="secondary-choice" onclick={askHector}>
+            <BellrunnerChoiceIcon kind="chat"/>Ask Hector something
+          </button>
           {/if}
           {#if handoffError}<p class="error" role="alert">{handoffError}</p>{/if}
         </div>
       {/if}
+      </div>
+      {#if entered&&!selected&&!talking&&canGoBack}
+        <div class="dialogue-navigation">
+          <button type="button" onclick={()=>{selected=null;goBack();}}>
+            <span aria-hidden="true">‹</span> Previous line
+          </button>
+        </div>
+      {/if}
     </aside>
     </section>
-  </div>
+    {/snippet}
+  </ActivityLayout>
 </section>
 
 <style>
-  /* Scenery and clickable props stay on the left; all text and inspections
-     use the approved nine-slice parchment in the right-hand column. */
+  /* Hector and the Depot are the scene anchor; the job papers are the scene
+     supplement and the parchment is the adjacent reading panel. Placement is
+     owned by ActivityLayout (scene mode); sizes follow the slot each region
+     was given, not the window width. */
   .bellrunner{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
-  /* Shared .pall-story-sections places artwork left of dialogue on desktop.
-     The intrinsic 1672:941 ratio belongs ONLY to the illustrated column. */
-  .dispatch-scene{width:100%;min-width:0}
+  .scene-visuals{min-width:0}
   .scene-illustration{position:relative;width:100%;aspect-ratio:1672/941}
   .depot{position:absolute;inset:0;width:100%;height:100%;
     object-fit:contain;pointer-events:none}
   .scene-shade{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(90deg,#100e0c29,transparent 52%,#0c0a092c)}
-  .hector{position:absolute;z-index:1;top:5%;left:10%;height:103%;
-    width:auto;max-width:36%;object-fit:contain;object-position:bottom center;
-    pointer-events:none;filter:drop-shadow(1px 5px 6px #0a080555)}
-  .depot-foreground{z-index:2;clip-path:inset(93% 0 0 0)}
-  .npc-hotspot{position:absolute;z-index:4;top:12%;left:10%;
-    width:27%;height:56%;display:flex;align-items:flex-end;justify-content:center;
-    padding:0 0 10px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
+    background:linear-gradient(90deg,#100e0c3d,transparent 65%,#0c0a0925)}
+  .hector{position:absolute;z-index:2;top:3%;left:7%;height:103%;
+    width:auto;max-width:43%;object-fit:contain;object-position:bottom center;
+    pointer-events:none;filter:drop-shadow(1px 6px 7px #0a080577)}
+  .depot-foreground{z-index:3;clip-path:inset(93% 0 0 0)}
+  .npc-hotspot{position:absolute;z-index:4;top:7%;left:6%;width:41%;
+    height:86%;display:flex;align-items:flex-end;justify-content:center;
+    padding:0 0 6px;border:0;background:transparent;color:#f9dfb2;cursor:pointer}
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
-  .paper-art{position:absolute;z-index:3;bottom:5%;height:30%;width:18%;
-    object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0806069c)}
-  .paper-art.notices{left:43%}.paper-art.sealed{left:62%}.paper-art.route{left:81%}
-  .paper-target{position:absolute;z-index:5;bottom:1%;height:36%;width:18%;
-    display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
-    padding:0;background:transparent;border:0;color:#f3e6d1;cursor:pointer}
-  .paper-target.notices{left:43%}.paper-target.sealed{left:62%}.paper-target.route{left:81%}
-  .paper-target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
-  .paper-target:disabled{cursor:wait}
-  .paper-target.route-ready .workshop-object-label{
-    filter:brightness(1.1) drop-shadow(0 0 6px #f5d08591)}
-  .paper-target:hover~.paper-art{filter:brightness(1.05)}
-  .dispatch-dialogue{position:relative;z-index:1;align-self:stretch;
-    width:min(100%,980px);margin:0;box-sizing:border-box;
-    min-width:0;max-height:none;overflow:visible;padding:15px 18px;
+  /* Content-driven height: two choices make a short sheet, a long speech a
+     taller one. No stretching to match the artwork column. */
+  .dispatch-dialogue{position:relative;z-index:1;display:flex;flex-direction:column;
+    box-sizing:border-box;width:100%;max-width:980px;min-width:0;
+    min-height:0;max-height:none;overflow:visible;margin:0 auto;
+    padding:clamp(20px,2.3vw,39px) clamp(19px,2.35vw,40px) 25px;
     border:2px solid #654022;border-radius:5px;
     background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
-  .eyebrow{font:600 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
-  h2{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .speech,.narration,.work-description{margin:0 0 12px;
-    font:600 clamp(13px,1.2vw,17px)/1.5 var(--pall-font-reading,Georgia,serif);color:#251910}
+  .dialogue-body{min-width:0}
+  .dialogue-navigation{border-top:1px solid #9e8159;margin-top:auto;
+    padding-top:12px;min-width:0}
+  .dialogue-navigation>button{appearance:none;display:inline-flex;align-items:center;
+    gap:10px;min-height:44px;padding:5px 2px;border:0;background:transparent;
+    color:#543820;cursor:pointer;text-align:left;font:600 var(--dialogue-text,17px)/1.3
+    var(--pall-font-reading,Georgia,serif)}
+  .dialogue-navigation>button span{font:24px/1 Georgia,serif}
+  .dialogue-navigation>button:is(:hover,:focus-visible){color:#24140b;
+    text-decoration:underline}
+  .dialogue-navigation>button:focus-visible{outline:2px solid #b58e59;outline-offset:2px}
+  .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.12em;color:#614029;margin:0 0 16px;padding-bottom:10px;
+    border-bottom:1px solid #9e815955}
+  /* One fixed reading scale (tokens in pall-story-landscape.css): every
+     narration, speech, inspection line and choice is the same size. */
+  h2{margin:0 0 12px;font:600 var(--dialogue-title,21px)/1.3
+    var(--pall-font-reading,Georgia,serif);color:#25170f}
+  /* The speaking NPC is labelled like the player's name: a small caption. */
+  .speaker-heading{margin:0 0 16px;padding:0 0 10px;
+    border-bottom:1px solid #9e815955;text-transform:uppercase;
+    font:normal var(--dialogue-label,15px)/1.15
+    var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#624328}
+  .speech,.narration,.work-description{margin:0 0 14px;
+    font:600 var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);
+    color:#251910}
   .narration{font-style:italic}
-   .responses{display:flex;flex-direction:column;gap:6px;margin-top:3px}
+  .responses{display:flex;flex-direction:column;gap:9px;margin-top:18px}
   .responses>button{display:block;width:100%;text-align:left;
     border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);
-    cursor:pointer;min-height:42px}
+    padding:10px 13px;font:600 var(--dialogue-text,17px)/1.35
+    var(--pall-font-reading,Georgia,serif);
+    cursor:pointer;min-height:52px}
   .responses>button:hover,.responses>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}
   .responses>button:disabled{opacity:.55;cursor:wait}
   .error{margin:4px 0 0;color:#873523;font:13px/1.45 Georgia,serif}
-  @media(max-width:700px){
-    .dispatch-scene{height:auto;min-height:0}
-    .scene-illustration{width:100%;aspect-ratio:1672/941}
-    .depot{object-position:39% center}
-    .hector{height:94%;max-width:42%;left:-2%;top:2%}
-    .depot-foreground{object-position:39% center}
-    .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
-    .paper-art{bottom:9%;height:25%;width:20%}
-    .paper-target{bottom:2%;height:35%;width:20%}
-    .paper-art.notices,.paper-target.notices{left:39%}
-    .paper-art.sealed,.paper-target.sealed{left:59%}
-    .paper-art.route,.paper-target.route{left:79%}
-    .dispatch-dialogue{width:100%;margin:0;padding:14px;max-height:none;overflow:visible}
-    .speech,.narration,.work-description{font-size:16px;line-height:1.5}
+  /* A narrow reading slot (beside or below) tightens the parchment. */
+  @container activity-panel (max-width:560px){
+    .dispatch-dialogue{padding:20px 18px}
+  }
+  /* Small rendered artwork: Hector fills the frame height and the hotspot
+     widens with him, whatever produced the small slot. */
+  @container activity-stage (max-width:680px){
+    .depot{object-position:center}
+    .hector{top:0;height:100%;max-width:43%;left:2%}
+    .npc-hotspot{left:0;top:6%;width:47%;height:87%;padding-bottom:0}
   }
 </style>

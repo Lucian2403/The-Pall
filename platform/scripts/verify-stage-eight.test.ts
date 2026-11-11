@@ -95,7 +95,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !clinic.includes("'Leave the clinic'"),
   'Travel Home must save the clinic departure then navigate directly to the room');
  assert.ok(home.includes("href:base+'/home'"));
- assert.ok(web.includes('class="home-scene"')&&
+ assert.ok(web.includes('class="home-scene pall-story-landscape"')&&
   web.includes('class="home-dialogue"')&&
   web.includes('class="home-dialogue notice"')&&
   web.includes('class="home-dialogue speech-panel"')&&
@@ -210,9 +210,9 @@ test('Stage 8 dialogue frame and typography match the approved Stage 7 clinic',(
   'border-image-slice:145 190 125 190 fill;',
   'border-image-width:21px 25px 20px;border-image-repeat:stretch;',
   'margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)',
-  "font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);",
-  "font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);",
-  'font:16px/1.45 var(--pall-font-reading,Georgia,serif);',
+  "font:600 var(--dialogue-label,15px)/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);",
+  "font:600 var(--dialogue-title,21px)/1.3 var(--pall-font-reading,Georgia,serif);",
+  'font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);',
   '.home-dialogue .stage-direction{font-style:italic}',
   '.home-dialogue .speech{font-weight:600}'
  ];
@@ -285,10 +285,13 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- assert.ok(web.includes('height:clamp(650px,65vw,820px)')&&
+ const clinicPage=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+ assert.ok(web.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}')&&
+  clinicPage.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}')&&
+  web.includes('class="home-scene pall-story-landscape"')&&
   web.includes('container-type:size')&&
   web.includes('width:100%'),
-  'Stage 8 should fill the chapter width at the same scene height as Stage 7');
+  'Stage 8 should use the same native-ratio scene stage as Stage 7');
  assert.ok(web.includes('width:max(100cqw,177.683cqh)')&&
   web.includes('aspect-ratio:1672/941')&&
   web.includes("center/100% 100% no-repeat"),
@@ -300,11 +303,12 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
   web.includes('.home-artwork::after')&&web.includes('class="hotspot bed"')&&
   web.includes('class="hotspot book"')&&web.includes('class="hotspot notice-object"'),
   'All room hotspots and the rest fade must stay inside the cover-scaled art');
- assert.ok(web.includes('.home-scene{height:auto;overflow:visible;container-type:normal}')&&
-  web.includes('background-size:contain')&&
-  web.includes('margin:14px auto 0')&&
-  web.includes('.home-dialogue{position:relative'),
-  'Small screens retain the full room and put dialogue below it');
+ assert.ok(web.includes('class="reading-column pall-story-dialogue-section"')&&
+  web.includes('.home-dialogue{position:relative;')&&
+  !/\.home-dialogue\{[^}]*overflow-y:auto/.test(web)&&
+  web.includes('@container activity-stage (max-width:600px)')&&
+  web.includes('.book{min-height:36px}'),
+  'The full room is always visible; dialogue sits beside or below it, never over it');
  assert.ok(!web.includes('width:min(100%,1100px)')&&
   !web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
   'No letterboxed desktop image, blurred duplicate painting or side wallpaper');

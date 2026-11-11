@@ -4,6 +4,8 @@
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
+  import '$lib/pall-story-landscape.css';
   import {
     clinicianAssessment,clinicianDischarge,clinicianFatigue
   } from '$lib/millhand-clinic-dialogue';
@@ -190,7 +192,19 @@
   <TutorialShell {character} sceneLocation="City clinic" sceneStage={7} clinicBackdrop={true}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}>
     <section class="clinic" aria-label="Stage 7 clinic">
-      <div class="clinic-scene" aria-label="Grand Cylinder City clinic interior">
+      <!-- Shared scene layout: the clinic painting is the stage (native
+           1672x941); the clinician conversation is the reading column and
+           the optional examination record sits under it as a supplement. -->
+      <ActivityLayout mode="scene" stageAspect={1672 / 941} class="pall-story-sections">
+      {#snippet stage()}
+      <div class="scene-visuals pall-story-visuals">
+        <div class="clinic-scene pall-story-landscape" role="img"
+          aria-label="Grand Cylinder City clinic interior"></div>
+      </div>
+      {/snippet}
+      {#snippet panel()}
+      {#if clinic}
+      <div class="reading-column pall-story-dialogue-section">
         <aside class="clinic-dialogue" aria-label="Conversation with the clinician">
           <p class="eyebrow">THE CLINIC · STAGE VII</p>
           <h1>The Clinic</h1>
@@ -256,13 +270,12 @@
             </div>
           {/if}
           {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
-
-
-
-
         </aside>
       </div>
-
+      {/if}
+      {/snippet}
+      {#snippet supplement()}
+      {#if clinic}
       <section class="medical-record-wrapper" aria-label="Clinical findings">
           <details class="medical-record">
             <summary>Review examination record</summary>
@@ -285,6 +298,9 @@
             {/if}
           </details>
       </section>
+      {/if}
+      {/snippet}
+      </ActivityLayout>
 
       {#if journalOpen}
         <section id="clinic-journal" class="journal" bind:this={journalElement}
@@ -325,27 +341,29 @@
   :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
   .clinic{display:block;min-width:0;color:#2b1c11;
     font-family:var(--pall-font-reading,Georgia,serif)}
-  /* The scene fills the chapter surface, as in Stages 3–5. Dialogue is
-     overlaid on the original, fully visible illustration. */
+  /* The clinic painting is the scene stage at its native ratio (the
+     pall-story-landscape box is 1672/941), fully visible and never covered
+     by dialogue; the conversation sits in the adjacent reading column. */
   .clinic-scene{position:relative;isolation:isolate;box-sizing:border-box;
-    width:100%;height:clamp(650px,65vw,820px);overflow:hidden;
     background:#20212a url('/locations/clinic/clinic-workshop-cold.webp')
       center center/cover no-repeat}
   .clinic-scene::before{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#17120d0a 0%,#10121b12 48%,#10101555 100%)}
-  .clinic-dialogue{position:absolute;z-index:5;top:3.5%;right:2.4%;
-    box-sizing:border-box;width:min(46%,650px);max-height:91%;overflow-y:auto;
+  /* Reading column: content-height, never an internal scrollbar. */
+  .reading-column{flex-direction:column;align-items:stretch}
+  .clinic-dialogue{position:relative;
+    box-sizing:border-box;width:100%;min-width:0;max-height:none;overflow:visible;
     background:transparent;color:#2b1c11;
     border:solid transparent;border-width:21px 25px 20px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;
     border-image-width:21px 25px 20px;border-image-repeat:stretch;
     margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)}
-  .eyebrow,.speaker{font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
+  .eyebrow,.speaker{font:600 var(--dialogue-label,15px)/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.065em;color:#382416;margin:0 0 10px}
-  h1{margin:0 0 12px;font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);
+  h1{margin:0 0 12px;font:600 var(--dialogue-title,21px)/1.3 var(--pall-font-reading,Georgia,serif);
     color:#2b1b12}
-  .narration,.speech,.instruction{font:16px/1.45 var(--pall-font-reading,Georgia,serif);
+  .narration,.speech,.instruction{font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);
     color:#21150e;margin:0 0 13px}
   .speech{font-weight:600}
   .narration{color:#302016}
@@ -364,17 +382,18 @@
   .charge-slip dt{font-weight:400;flex:0 1 auto}
   .charge-slip dd{margin:0;text-align:right;font-weight:700;
     flex:0 1 54%;font-variant-numeric:tabular-nums}
-  @media(max-width:550px){.charge-slip dl>div{flex-wrap:wrap;gap:2px}.charge-slip dd{flex:1 1 100%;text-align:left}}
+  @container activity-panel (max-width:420px){.charge-slip dl>div{flex-wrap:wrap;gap:2px}.charge-slip dd{flex:1 1 100%;text-align:left}}
   .receipt,.next-note{font-size:14px;line-height:1.5;color:#3d291b;margin:10px 0}
   .actions{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 10px}
   .advance{min-width:210px;max-width:100%}
   .error{padding:8px 10px;background:#f4d3c2;border-left:3px solid #a34129;
     font-size:14px;line-height:1.4;color:#702018}
-  .medical-record-wrapper{background:#e6d5b5;border-top:1px solid #967650;
-    padding:13px clamp(16px,3vw,45px);color:#3d291b}
-  .medical-record{max-width:960px;margin:0 auto;
-    border:1px solid #c5a882;padding:10px 15px;
-    color:#3d291b;font:13px/1.45 Georgia,serif;background:#e9d9bb}
+  /* Examination record: a compact optional card under the conversation
+     (scene supplement), not a full-width band below the painting. */
+  .medical-record-wrapper{color:#3d291b}
+  .medical-record{margin:0;
+    border:1px solid #c5a882;padding:10px 15px;box-sizing:border-box;
+    color:#3d291b;font:14px/1.45 Georgia,serif;background:#e9d9bb}
   .medical-record summary{cursor:pointer;font-weight:700;padding:3px 0}
   .medical-record summary:focus-visible{outline:2px solid #745230;outline-offset:3px}
   .medical-record p{margin:8px 0}
@@ -399,20 +418,11 @@
   .fallback{max-width:760px;margin:8vh auto;padding:30px;background:#28221d;
     border:1px solid #866546;color:#eadfcf}
   .fallback a{color:#eac498}
-  @media(max-width:950px){
-    .clinic-scene{height:auto;min-height:660px;display:flex;
-      flex-direction:column;gap:14px;padding:22px 14px;align-items:flex-end;
-      background-position:45% center}
-    .clinic-dialogue{position:relative;top:auto;right:auto;bottom:auto;
-      left:auto;width:min(100%,590px);max-height:none;overflow:visible}
-  }
-  @media(max-width:550px){
-    .clinic-scene{padding:12px 8px;min-height:670px;background-position:48% center}
-    .clinic-dialogue{width:100%;border-width:17px 18px 17px;
+  /* Narrow reading column (its own width, not the window's): slimmer frame
+     and full-width action; the reading type scale stays fixed. */
+  @container activity-panel (max-width:420px){
+    .clinic-dialogue{border-width:17px 18px 17px;
       border-image-width:17px 18px 17px;padding:8px 11px}
-    .narration,.speech,.instruction{font-size:14px}
-    .eyebrow,.speaker{font-size:12px}
-    h1{font-size:22px}
     .actions .pall-framed-button{width:100%}
   }
 </style>

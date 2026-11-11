@@ -48,7 +48,7 @@
 
 *You count the plates and compare the load with the work paper. The number of plates matches the delivery entry. You check whether any are loose or damaged.*
 
-**Instruction:** Decide how to move the plates.
+**Instruction:** Now, how are you going to carry them?
 
 **Choice 1: Secure the plates together.**
 
@@ -183,7 +183,7 @@ The clerk explains the authority they actually hold. Neither entry is declared f
 
 *You mark the two entries and the difference between them. The clerk notes that you have made a formal complaint, but does not change either record.*
 
-**Action:** Submit the disputed work paper.
+**Action:** Hand over the disputed work paper.
 
 *The clerk records that the complaint has been received. The two entries remain unchanged. The council has not approved the plate lot, and you are not paid.*
 
@@ -322,7 +322,7 @@ After the plates match the work paper, the two choices are presented with their 
 
 **Secured together — immediate result:**
 
-*You fasten the plates together and lift the bundled stack. The weight is awkward, but you can move the lot without making several trips.*
+*You tie the plates together, bend your knees, and get both arms under the bundle. With a grunt, you heave it off the table and pull it against your chest. Bloody heavy. You shift your grip a little until the weight settles. Still, better than making two trips.*
 
 **Secured together — at the depot, before examining the delivery list:**
 
@@ -330,11 +330,11 @@ After the plates match the work paper, the two choices are presented with their 
 
 **Smaller loads — immediate result:**
 
-*You divide the plates into smaller groups. Each load is easier to manage, though you must return to the workshop several times.*
+*You split the plates into smaller stacks, bend down, and slide both hands under the first one. With a grunt, you lift it up and rest it against your chest. Much easier to carry. It'll mean a few trips back to the workshop, but at least you won't break your back hauling the whole lot at once.*
 
 **Smaller loads — at the depot, before examining the delivery list:**
 
-*You bring the last group to the receiving counter and put it beside the others. You count the plates again to make sure the entire lot has arrived.*
+*You carry the last stack to the receiving counter and lower it onto the worn wooden top with a heavy clank. You straighten your back, give your arms a quick shake, then count through the stacks again. Better make sure you've brought the whole lot.*
 
 **Journal once the method is committed:**
 

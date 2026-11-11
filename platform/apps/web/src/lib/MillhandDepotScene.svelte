@@ -10,6 +10,8 @@
     secondJobJournal
   } from '$lib/approved-stage-four';
   import '$lib/workshop-object-labels.css';
+  import '$lib/pall-story-landscape.css';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import StageFourNextStep from '$lib/StageFourNextStep.svelte';
 
   type Snapshot = {
@@ -59,7 +61,12 @@
 </script>
 
 <section class="second-job depot-job" aria-label="Depot Intake Run, Stage 4">
-  <div class="depot-scene">
+  <!-- Shared scene layout: the workshop/depot painting (native 2:1) with its
+       two counter props is the stage; the delivery dialogue is the reading column. -->
+  <ActivityLayout mode="scene" stageAspect={2} class="depot-scene pall-story-sections">
+  {#snippet stage()}
+  <div class="scene-visuals pall-story-visuals">
+  <div class="depot-stage pall-story-landscape">
     <div class="scene-art" class:preparing={atWorkshop}
       role="img" aria-label={atWorkshop
         ? 'Guther’s workshop, with a wooden workbench before the metalworking equipment'
@@ -82,7 +89,11 @@
         <span class="workshop-object-label">Council work paper</span>
       </button>
     </div>
-
+  </div>
+  </div>
+  {/snippet}
+  {#snippet panel()}
+  <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label="Depot delivery interaction">
       <p class="eyebrow">{atWorkshop?'PREPARING THE DELIVERY':'MUNICIPAL DEPOT'} · STAGE 4</p>
       {#if state.revision===0}
@@ -143,6 +154,8 @@
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
     </aside>
   </div>
+  {/snippet}
+  </ActivityLayout>
   {#if journalOpen}
     <section id="depot-job-journal" class="journal" bind:this={journalElement}
       aria-label="Depot Intake Run personal journal">
@@ -162,15 +175,16 @@
 <style>
   .depot-job{display:flex;flex-direction:column;min-width:0;color:#f1dfc7;
     font-family:var(--pall-font-reading,Georgia,serif)}
-  .depot-scene{position:relative;isolation:isolate;overflow:hidden;
-    height:clamp(565px,65vh,680px);min-height:0;background:#271e18}
+  /* Native 2:1 stage (workshop and depot paintings are both 1774x887), so the
+     two counter props stay on the painted counter at any size. */
+  .depot-stage{position:relative;isolation:isolate;overflow:hidden;aspect-ratio:2 / 1;background:#271e18}
   .scene-art{position:absolute;inset:0;z-index:0;
     background:url('/locations/depot/depot-background-cold.webp') center center/cover no-repeat}
   .scene-art.preparing{background-image:url('/workshop/environment.webp')}
   .scene-art::after{content:'';position:absolute;inset:0;
     background:linear-gradient(90deg,transparent 28%,#160f0b16 58%,#160f0b25 100%);
     pointer-events:none}
-  .table-props{position:absolute;left:4%;bottom:1.5%;width:53%;height:33%;z-index:2;
+  .table-props{position:absolute;left:4%;bottom:1.5%;width:53%;height:38%;z-index:2;
     display:flex;gap:3%;align-items:flex-end}
   .table-prop{appearance:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
     position:relative;min-width:0;height:100%;border:0;padding:0;background:transparent;
@@ -183,27 +197,28 @@
   .table-prop:is(:hover,:focus-visible) img{transform:scale(1.018)}
   .table-prop .workshop-object-label{width:100%;max-width:240px}
   .table-prop:focus-visible{outline:2px solid #edd19a;outline-offset:2px}
-  .work-dialogue{position:absolute;z-index:3;top:clamp(24px,3vw,45px);right:3%;
-    width:min(46%,660px);max-height:calc(100% - 58px);box-sizing:border-box;
-    overflow:auto;overscroll-behavior:contain;
+  /* Reading column: content-height, never an internal scrollbar. */
+  .reading-column{flex-direction:column;align-items:stretch}
+  .work-dialogue{position:relative;width:100%;min-width:0;box-sizing:border-box;
+    max-height:none;overflow:visible;
     background:#e9d9bb;color:#261b13;border:2px solid #785637;border-radius:5px;
     margin:0;padding:16px 19px;box-shadow:0 7px 18px #0008}
   .eyebrow{font:normal 15px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.085em;color:#65462f;margin:0 0 13px}
   .speaker{font:normal 15px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.075em;color:#65462f;margin:0 0 8px}
-  .speech{font:17px/1.45 var(--pall-font-reading,Georgia,serif);margin:0 0 15px}
-  .instruction,.result,.outcome,.context{font:15px/1.45 var(--pall-font-reading,Georgia,serif);margin:0 0 13px}
+  .speech{font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 15px}
+  .instruction,.result,.outcome,.context{font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 13px}
   .instruction,.outcome{font-weight:600}
   .context{color:#503b2b}
   .inspection{border-top:1px solid #bba07a;padding-top:10px;margin:13px 0;
-    font:13px/1.4 sans-serif;color:#59412d}
+    font:15px/1.45 var(--pall-font-reading,Georgia,serif);color:#59412d}
   .inspection strong{color:#3f2d1f}
   .inspection p{margin:6px 0 0}
   .actions{display:flex;flex-direction:column;gap:7px;margin:15px 0}
   .actions button{min-height:43px;width:100%;text-align:left;border:1px solid #98734c;
     background:#30251d;color:#f0dfc7;padding:10px 13px;
-    font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
+    font:var(--dialogue-text,17px)/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .actions button:disabled{opacity:.55;cursor:default}
   .actions .transport-hint{display:block;margin-top:4px;font:12px/1.35 var(--pall-font-reading,Georgia,serif);opacity:.86}
   .transport-verification{margin-top:0}
@@ -220,16 +235,18 @@
   .journal-head small{font:700 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#47301d}
   .journal-head h2{font:600 24px/1.25 var(--pall-font-reading,Georgia,serif);color:#25170f;margin:5px 0}
   .journal>p{max-width:960px;margin:0 auto 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
-  @media(max-width:760px){
-    .depot-scene{height:auto;overflow:visible}
+  /* Narrow stage: the props get their own row overlapping the counter edge,
+     so both stay large enough to tap (same treatment as before, by stage width). */
+  @container activity-stage (max-width:600px){
+    .depot-stage{aspect-ratio:auto;overflow:visible}
     .scene-art{position:relative;inset:auto;width:100%;aspect-ratio:2/1}
     .table-props{position:relative;left:auto;bottom:auto;width:100%;height:155px;
       margin-top:-80px;gap:2%;padding:0 8px;box-sizing:border-box}
     .table-prop.plates{width:52%}
     .table-prop.paper{width:45%}
-    .work-dialogue{position:relative;top:auto;right:auto;width:100%;max-height:none;overflow:visible;
-      margin:0;padding:14px;border-radius:0}
-    .speech{font-size:16px}
+  }
+  @container activity-panel (max-width:480px){
+    .work-dialogue{padding:14px}
   }
   @media(prefers-reduced-motion:reduce){
     .table-prop img{transition:none}

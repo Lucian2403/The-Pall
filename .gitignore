@@ -1,0 +1,26 @@
+# Local installs and generated build output
+**/node_modules/
+**/.svelte-kit/
+**/.vite/
+**/dist/
+**/build/
+
+# Local-only configuration
+**/.env
+**/.env.local
+
+# Test output and disposable browser artifacts (not gameplay assets)
+**/test-artifacts/
+**/test-results/
+**/playwright-report/
+**/.playwright/
+
+# Editor leftovers, failed patch residues and log files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*.log
+.DS_Store

@@ -10,7 +10,9 @@
     WAGE_CLAIM_FLINT_INSPECTION,WAGE_CLAIM_CLUB_INSPECTION,WAGE_CLAIM_CART_INSPECTION,
     wageClaimBeat,wageClaimJournal
   } from '$lib/approved-stage-five';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/workshop-object-labels.css';
+  import '$lib/pall-story-landscape.css';
 
   type Snapshot={
     stage:number;tutorialStatus:string;state:WageClaimState;
@@ -72,7 +74,13 @@
 </script>
 
 <section class="second-job wage-claim" aria-label={approaching?'On the way home, Stage 5':'Millhand Stage 5 The Wage Claim and Cornered'}>
-  <div class="alley-scene">
+  <!-- Shared scene layout: the alley painting (native 1672x941) with Flint,
+       the cart and the demand is the stage; the conversation is the reading
+       column beside it on wide screens and below it on narrow ones. -->
+  <ActivityLayout mode="scene" stageAspect={1672 / 941} class="alley-layout pall-story-sections">
+  {#snippet stage()}
+  <div class="scene-visuals pall-story-visuals">
+  <div class="alley-scene pall-story-landscape">
     <div class="alley-art" role="img"
       aria-label="A narrow industrial service passage in Grand Cylinder City, lit by gas lamps, with a wooden work cart to one side"></div>
     {#if !approaching}
@@ -101,7 +109,11 @@
         <span class="workshop-object-label">Contractor's demand</span>
       </button>
     {/if}
-
+  </div>
+  </div>
+  {/snippet}
+  {#snippet panel()}
+  <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label={approaching?'Journey home narration':'Flint dialogue and confrontation'}>
       <p class="eyebrow">{approaching?'ON THE WAY HOME':cornered?'CORNERED':'THE WAGE CLAIM'} · STAGE 5</p>
       {#if state.phase==='OPENING'}
@@ -168,6 +180,8 @@
       {#if pending}<p class="saving" role="status">Saving the conversation…</p>{/if}
     </aside>
   </div>
+  {/snippet}
+  </ActivityLayout>
 
   {#if journalOpen}
     <section id="wage-claim-journal" class="journal" bind:this={journalElement}
@@ -189,8 +203,10 @@
 <style>
   .wage-claim{display:flex;flex-direction:column;min-width:0;color:#edddc4;
     font-family:var(--pall-font-reading,Georgia,serif)}
-  .alley-scene{position:relative;isolation:isolate;overflow:hidden;
-    width:100%;height:clamp(610px,66vw,770px);background:#171b21}
+  /* Native-aspect stage (pall-story-landscape is 1672/941, the alley's own
+     ratio), so Flint, the cart label and the demand stay where they belong
+     on the painting at every size. */
+  .alley-scene{position:relative;isolation:isolate;overflow:hidden;background:#171b21}
   .alley-art{position:absolute;inset:0;
     background:url('/locations/alley/alley-background.webp') center center/cover no-repeat}
   .alley-art::after{content:'';position:absolute;inset:0;
@@ -217,18 +233,20 @@
     box-shadow:1px 4px 8px #000a;clip-path:polygon(0 0,84% 0,100% 18%,100% 100%,0 100%)}
   .folded-paper::after{content:'';display:block;width:66%;height:30%;
     margin:13px auto 0;border-top:2px solid #91795c;border-bottom:2px solid #91795c;opacity:.65}
-  .work-dialogue{position:absolute;z-index:5;top:3.5%;right:2.4%;box-sizing:border-box;
-    width:min(46%,650px);max-height:none;overflow:visible;
+  /* Reading column: content-height, never an internal scrollbar. */
+  .reading-column{flex-direction:column;align-items:stretch}
+  .work-dialogue{position:relative;box-sizing:border-box;
+    width:100%;min-width:0;max-height:none;overflow:visible;
     background:#ead8b8;color:#2b1c11;
     border:solid transparent;border-width:21px 25px 20px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
     border-image-slice:145 190 125 190 fill;border-image-width:21px 25px 20px;
     border-image-repeat:stretch;margin:0;padding:10px 15px 12px;
     filter:drop-shadow(0 6px 8px #0008)}
-  .eyebrow,.speaker{font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
+  .eyebrow,.speaker{font:600 var(--dialogue-label,15px)/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.065em;color:#60402a;margin:0 0 10px}
-  .speech{font:600 17px/1.4 var(--pall-font-reading,Georgia,serif);margin:0 0 12px}
-  .context,.instruction{font:15px/1.45 var(--pall-font-reading,Georgia,serif);margin:0 0 11px}
+  .speech{font:600 var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 12px}
+  .context,.instruction{font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 11px}
   .instruction{font-weight:700}
   .context{color:#463020}
   .current-beat{font-weight:600;white-space:pre-line}
@@ -255,14 +273,14 @@
   }
   .inspection-weapon{margin-top:10px;padding-top:9px;border-top:1px solid #b99a70}
   .inspection-weapon strong{font-weight:700;color:#26190f}
-  .decision-prompt{margin:10px 0 7px;font:700 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#614126}
+  .decision-prompt{margin:10px 0 7px;font:700 var(--dialogue-label,15px)/1.3 var(--pall-font-reading,Georgia,serif);color:#614126}
   .actions{display:flex;flex-direction:column;gap:7px;margin:10px 0}
   .actions button{appearance:none;min-height:43px;text-align:left;padding:8px 13px;
     border:solid transparent;border-width:9px 17px 9px;
     border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
     border-image-slice:50 180 45 180 fill;border-image-width:9px 17px 9px;
     background:transparent;color:#2a1c12;cursor:pointer;
-    font:700 15px/1.25 var(--pall-font-reading,Georgia,serif)}
+    font:700 var(--dialogue-text,17px)/1.25 var(--pall-font-reading,Georgia,serif)}
   .actions button:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .actions button:focus-visible{outline:2px solid #885f2c;outline-offset:2px}
   .actions button:disabled{opacity:.6;cursor:default}
@@ -286,17 +304,21 @@
   .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif)}
   .journal-head h2{margin:4px 0;font:600 24px/1.3 Georgia,serif}
   .journal>p{max-width:960px;margin:0 auto 10px;font:600 16px/1.55 Georgia,serif}
-  @media(max-width:850px){
-    .alley-scene{height:auto;overflow:visible;padding-top:52%;background:#211b1a}
-    .alley-art{height:55%;bottom:auto;background-size:cover;background-position:center top}
-    .flint-figure{top:0;bottom:auto;left:0;width:44%;height:38%}
-    .flint-image{height:calc(100% - 30px)}
-    .object{top:39%;bottom:auto}
-    .cart{left:72%;width:25%}
-    .bill{left:31%;width:38%;top:33%}
-    .work-dialogue{position:relative;top:auto;right:auto;max-height:none;
-      overflow:visible;width:100%;padding:9px 10px 11px;border-width:15px 17px}
-    .speech{font-size:16px}
+  /* Narrow stage (by its own width, not the window): a 4:3 crop keeps Flint
+     tall enough to tap, with the painting shifted so the painted cart stays
+     in view beside its label; captions drop their wide-screen minimum. */
+  @container activity-stage (max-width:600px){
+    .alley-scene{aspect-ratio:4 / 3}
+    .alley-art{background-position:70% center}
+    .flint-figure{left:0;width:44%;height:90%}
+    .flint-image{height:calc(100% - 32px)}
+    .flint-label{width:min(150px,74%)}
+    .object .workshop-object-label{min-width:0}
+    .cart{left:58%;width:28%;bottom:8%}
+    .bill{left:34%;width:24%;bottom:18%}
+  }
+  @container activity-panel (max-width:480px){
+    .work-dialogue{padding:9px 10px 11px;border-width:15px 17px}
     .inspection{padding:11px 12px}
     .inspection-title{font-size:16px}
     .inspection-text,.inspection-weapon{font-size:15px;line-height:1.5}

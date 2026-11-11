@@ -3,6 +3,7 @@
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import {originVisual} from '$lib/origin-visuals';
   import CharacterSkills from '$lib/CharacterSkills.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
 
   type SavedCharacter = {
     id:string; name:string; sex:string; origin:string; avatarId?:string|null;
@@ -218,7 +219,10 @@
       <h2 id="character-record-title">Character details</h2>
       <div class="record-rule" aria-hidden="true"></div>
     </div>
-    <div class="record-columns">
+    <!-- Management layout: the skills ledger dominates; the attribute
+         sheet is the details panel beside it (stacked first when narrow). -->
+    <ActivityLayout mode="management" class="record-columns">
+      {#snippet panel()}
       <section class="attribute-panel" aria-label="Core attributes">
         <h3>Core Attributes</h3>
         <dl class="attribute-list">
@@ -236,9 +240,11 @@
           {/each}
         </dl>
       </section>
-
+      {/snippet}
+      {#snippet stage()}
       <CharacterSkills majorSkillBonuses={character.majorSkillBonuses} origin={character.origin}/>
-    </div>
+      {/snippet}
+    </ActivityLayout>
   </section>
 </div>
 
@@ -447,7 +453,7 @@
   .record-intro h2{
     margin:0;color:#f3dbb8;font:600 clamp(24px,2.4vw,31px)/1.2 var(--pall-font-reading,Georgia,serif);
   }
-  .record-columns{display:grid;grid-template-columns:minmax(230px,.7fr) minmax(0,1.7fr);gap:clamp(17px,2.3vw,30px)}
+  .character-record{--activity-padding:0;--activity-gap:clamp(17px,2.3vw,30px)}
   .attribute-panel{min-width:0;padding-right:clamp(0px,1vw,12px)}
   .attribute-panel h3{
     margin:0 0 13px;font:600 21px/1.2 var(--pall-font-reading,Georgia,serif);color:#e9d1aa;
@@ -484,8 +490,9 @@
     .arrival-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
     .resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
-  @media(max-width:950px){
-    .record-columns{grid-template-columns:1fr}
+  /* A full-width (stacked) attribute sheet uses two columns; beside the
+     skills ledger, or on a phone, it is a single column. */
+  @container activity-panel (min-width:520px){
     .attribute-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
     .attribute-row{margin:0}
   }
@@ -502,7 +509,6 @@
     .hero-portrait :global(.portrait){width:84px;height:112px}
     .identity-copy h2{font-size:25px}
     .work-notice{border-width:23px 25px 22px;border-image-width:23px 25px 22px;padding:10px 11px 15px}
-    .attribute-list{grid-template-columns:1fr}
     .personal-notices{padding:14px 4px}
     .work-order{
       border-width:23px 24px 21px;

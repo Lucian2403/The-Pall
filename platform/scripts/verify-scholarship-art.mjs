@@ -26,7 +26,11 @@ for(const p of paths){
   assert.equal(bytes.toString('ascii',0,4),'RIFF','Not a RIFF image: '+p);
   assert.equal(bytes.toString('ascii',8,12),'WEBP','Not a WebP image: '+p);
 }
-const s=readFileSync(resolve(root,'apps/web/src/lib/MillhandRecordsScene.svelte'),'utf8');
+// The scene was later Prettier-formatted (double quotes, wrapped attributes);
+// compare its source quote- and whitespace-insensitively.
+const norm=x=>x.replace(/"/g,"'").replace(/\s+/g,'').replace(/;\}/g,'}');
+const recordsSource=readFileSync(resolve(root,'apps/web/src/lib/MillhandRecordsScene.svelte'),'utf8');
+const s={includes:needle=>norm(recordsSource).includes(norm(needle))};
 const wrapper=readFileSync(resolve(root,'apps/web/src/lib/MillhandSecondJobScene.svelte'),'utf8');
 assert.ok(s.includes("url('/locations/records/records-room.webp')"),
   'The owner scholarship room background must be used');
@@ -51,7 +55,7 @@ assert.ok(s.includes("if(pending)return") &&
   s.includes('Select the relevant book on the counter to examine it.'),
   'Wrong inspection choices should give feedback without server progress');
 assert.ok(s.includes('{#if readingPhase}') &&
-  s.includes('{:else if snapshot.availableActions.length>0}'),
+  s.includes('{:else if workActions.length>0}'),
   'Do not duplicate physical inspection actions as dialogue buttons');
 assert.ok(s.includes('STAGE_FOUR_DIALOGUE.records') &&
   s.includes('secondJobJournal(state)') &&

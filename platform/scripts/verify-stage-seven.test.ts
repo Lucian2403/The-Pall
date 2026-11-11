@@ -117,8 +117,8 @@ test('Clinic dialogue and journal match earlier stage presentation',()=>{
   assert.ok(frame.includes("border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')"),
     'Reuse the approved dialogue frame artwork');
   assert.ok(web.includes("color:#21150e;margin:0 0 13px}") &&
-    web.includes('font:16px/1.45 var(--pall-font-reading,Georgia,serif)'),
-    'Increase dialogue contrast without changing its established font or size');
+    web.includes('font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif)'),
+    'Keep the dialogue contrast and use the shared fixed dialogue type scale');
   assert.ok(web.includes('bind:this={journalElement}') &&
     web.includes('class="journal-entries"') &&
     !web.includes('.journal{position:absolute') &&
@@ -247,10 +247,12 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(clinicArt.length>40000&&clinicArt.length<400000,
     'Use optimized, real owner-supplied illustrated clinic artwork');
   assert.ok(web.includes("url('/locations/clinic/clinic-workshop-cold.webp')") &&
-    web.includes('class="clinic-scene"') &&
-    web.includes('height:clamp(650px,65vw,820px)') &&
+    web.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}') &&
+    web.includes('class="clinic-scene pall-story-landscape"') &&
+    web.includes('class="reading-column pall-story-dialogue-section"') &&
     web.includes('class="clinic-dialogue"') &&
-    web.includes('position:absolute;z-index:5;top:3.5%;right:2.4%') &&
+    web.includes('.clinic-dialogue{position:relative;') &&
+    !/\.clinic-dialogue\{[^}]*overflow-y:auto/.test(web) &&
     web.includes("url('/ui-kit/frames/dialogue-frame-trim.png')") &&
     web.includes('class="medical-record"') &&
     web.includes('class="journal"') &&
@@ -259,7 +261,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     !web.includes('class="clinic-layout"') &&
     !web.includes('class="small-stats"') &&
     !web.includes('class="condition"'),
-    'The clinic must remain an immersive scene with a framed dialogue overlay and optional details');
+    'The clinic must remain a fully visible painted scene with a framed, content-height dialogue beside it and optional details');
   assert.ok(web.includes('clinicianAssessment(clinic.before,clinic.conditionType)') &&
     web.includes('clinicianFatigue(clinic.before)') &&
     web.includes('clinicianDischarge(clinic.conditionType)') &&

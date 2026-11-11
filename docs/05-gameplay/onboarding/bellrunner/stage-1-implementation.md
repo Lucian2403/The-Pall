@@ -30,21 +30,45 @@ Wrong Bell site and Stages 4–8 are not yet integrated.
   original style rather than generating extra scenic overlays. Hector's original artwork is not cut across the
   waist: the duplicate depot foreground masks only the bottom 7% of
   the scene, where the counter edge can cover his feet.
-- **Side-by-side artwork/dialogue layout shared by Stages 1–2:**
-  at desktop widths, Section 1 is the **left 60%**: complete,
-  aspect-preserved Depot, street or Receiving Desk artwork and
-  only the relevant NPC/item click targets; Section 2 is the
-  **right 40%**: the approved nine-slice parchment containing
-  all dialogue, choices and paper inspection text.
-  Neither section overlays the other. Hector and props retain
-  their coordinates relative to the left illustration; clicking
-  them updates text on the right without a page-scroll jump.
-  On narrow displays (1080px or below) the two sections stack
-  with the image first. `pall-story-landscape.css` owns this
-  reusable column layout. The old full-width image plus
-  **dialogue below** implementation was rejected and superseded.
-  Chromium CI checks this arrangement at 1272px, 1920px,
-  2048px, 3440px and mobile screen widths.
+- **Immersive workstation layout shared by Stages 1–2:** both
+  Bellrunner stages use the shared **scene** mode of
+  `ActivityLayout.svelte` (see
+  [Game shell and activity layouts](../../../07-technology/game-shell-and-activity-layouts.md)).
+  When the activity container (not the window) is at least 880px wide,
+  Hector's full-body portrait over the Depot illustration is on the
+  left, and the parchment dialogue plus the original three job papers
+  in the **Round Documents** tray share the reading column on the
+  right. Narrower containers stack art → dialogue → documents. The
+  art is sized from the measured space below the HUD so that Hector,
+  the parchment and its first choice share the first screen. Spare
+  ultrawide width becomes symmetrical gutters.
+  Each framed card is one keyboard/click target with an Inspect
+  affordance. The Route Sheet card changes to **Take Route Sheet**
+  at the canonical final handoff, continuing through the same
+  authenticated, idempotent `take_round` action. No redundant
+  Review Route button or additional acceptance step is introduced.
+  The parchment is **as tall as its content** (no stretching to the
+  art column). It uses the owner nine-slice framing and button art,
+  and anchors **Previous line** at its foot.
+  Narrative progress actions may use the owner's highlighted button
+  art; the optional topics, route alternatives and receipt choices
+  remain visually neutral. The approved speech is reproduced
+  verbatim, and inspection descriptions are shown in the parchment
+  instead of popups over the painting.
+  During Stage 2, the paper tray appears only at the Depot;
+  street and receiving scenes retain their original art and
+  dialogue-only controls. `ActivityLayout.svelte` owns placement,
+  `pall-story-landscape.css` the shared visual treatment, and
+  `BellrunnerDocumentTray.svelte` the shared cards.
+  Chromium QA (`verify:bellrunner-layout-browser`) checks the actual
+  responsive positions and NPC/paper interactions. The owner requested
+  that the original **Grand Cylinder City header remain visible**. It
+  stays at 88–136px, and now also carries the locked City map
+  gateway. The earlier `compactBanner` suppression is not used.
+  Bellrunner secondary choices now use pale framed parchment with
+  ink-line icons; Continue uses a distinct dark-brass primary style.
+  These button styles apply only to Bellrunner, leaving Millhand and
+  the global owner UI kit unchanged.
 
 ## Stage 1 dialogue
 

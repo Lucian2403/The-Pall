@@ -90,6 +90,14 @@ jobs:
       - name: Real Chromium Stage 6 outcome CTA click and keyboard navigation
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-combat-cta-browser.mjs
-      - name: Real Chromium Bellrunner Stage 1 and 2 separate-scene geometry
+      - name: Real Chromium Bellrunner Stage 1 and 2 workstation geometry
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
+      - name: Save Bellrunner 1272px and 1920px visual QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bellrunner-workstation-visual-qa
+          path: platform/test-artifacts/bellrunner-visuals/*.png
+          if-no-files-found: ignore
+          retention-days: 7
