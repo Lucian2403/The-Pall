@@ -23,6 +23,7 @@ export const WRONG_BELL_AFTER_WATCHMAN=[
 export const WRONG_BELL_BRANCHES={
   contracts:{
     name:'Deliver the notice as ordered',action:'choose_contracts' as const,
+    majorSkill:'Commerce' as const,
     lines:[
       {speaker:'Player',text:"All right. Here's your notice. But I'm putting down that the office was shut."},
       {speaker:'Watchman',text:"Fine by me. I'll see it gets inside."}
@@ -33,6 +34,7 @@ export const WRONG_BELL_BRANCHES={
   },
   trauma:{
     name:'Warn the waiting crew',action:'choose_trauma' as const,
+    majorSkill:'Medicine' as const,
     lines:[
       {speaker:'Player',text:"Don't go in there. Look at him, he can barely breathe. You want to end up the same way?"},
       {speaker:'Narration',text:'One of the workers looks at the coughing man, then back at the gate.'},
@@ -45,6 +47,7 @@ export const WRONG_BELL_BRANCHES={
   },
   machinery:{
     name:'Inspect the bell controls',action:'choose_machinery' as const,
+    majorSkill:'Mechanics' as const,
     lines:[
       {speaker:'Player',text:"That poor bastard can barely breathe, and the shift bell's still ringing. I'm going to find out why."}
     ],
@@ -53,6 +56,16 @@ export const WRONG_BELL_BRANCHES={
     next:'The Bell Linkage · Mechanics / Industrial Machinery'
   }
 } as const;
+/** Number of dialogue lines shown before Continue in a committed route.
+ * Two short conversation beats, followed by a separate result/next-task beat.
+ * The original owner's lines remain unmodified and in their approved order.
+ */
+export const WRONG_BELL_BRANCH_FIRST_BEAT_LINES={
+  contracts:1,
+  trauma:2,
+  machinery:1
+} as const;
+
 export const HECTOR_DEFERRED=[
   {speaker:'Hector',text:"No mark from the last office. Council won't clear the round without it."},
   {speaker:'Player',text:"The bloody place is shut! They've got men coughing their lungs out at the gate, and they're still calling them in for work."},
