@@ -4,6 +4,9 @@
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
+  import BellrunnerDocumentTray from '$lib/BellrunnerDocumentTray.svelte';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import {HAULING_SCENES} from '$lib/hauling-scenes';
   import {BELLRUNNER_ROUTE_NARRATION,BELLRUNNER_RECEIVING_ARRIVAL,
     BELLRUNNER_RECEIVER_OPENING,BELLRUNNER_RECEIVER_RESOLUTIONS}
@@ -42,7 +45,6 @@
       description:'A sheet for the marked stops and their receiving marks. A blurred mark must be accounted for truthfully.'
     }
   };
-  const paperKeys=['notices','sealed','route'] as const;
   const id=$derived(page.params.id);
   let character=$state<Character|null>(null);
   let round=$state<Round|null>(null);
@@ -138,11 +140,16 @@
 <svelte:head><title>The Pall — Shift Dispatch</title></svelte:head>
 {#if status==='ready'&&character&&round&&round.workState}
   <TutorialShell {character} sceneLocation={HAULING_SCENES[sceneKey].label}
-    depotBackdrop={sceneKey==='depot'}>
+    depotBackdrop={sceneKey==='depot'} compactCityVista>
     <section class="workshop dispatch" aria-label="Bellrunner Stage 2 Shift Dispatch">
-      <div class="scene pall-story-sections" class:receiving={sceneKey==='receiving_desk'}>
-        <section class="illustration pall-story-landscape"
-          aria-label={HAULING_SCENES[sceneKey].label+' illustrated location'}>
+      <ActivityLayout mode="scene" stageAspect={1672/941}
+        supplement={sceneKey==='depot'?depotPapers:undefined}
+        class={'scene pall-story-sections'+(sceneKey==='receiving_desk'?' receiving':'')}>
+        {#snippet stage()}
+        <section class="scene-visuals pall-story-visuals"
+          aria-label={HAULING_SCENES[sceneKey].label+' illustrated scene'}>
+          <div class="illustration pall-story-landscape"
+            aria-label={HAULING_SCENES[sceneKey].label}>
           {#if sceneKey==='depot'}
             <!-- The original working Depot and its foreground stay together. -->
             <img class="environment" src={HAULING_SCENES.depot.src}
@@ -156,19 +163,6 @@
               onclick={()=>{selected=null;talkingToHector=true;}}>
               <span class="workshop-npc-label">Hector D. Smoke</span>
             </button>
-            {#each paperKeys as key}
-              <img class="paper-art {key}" src={docs[key].src}
-                alt="" aria-hidden="true" draggable="false"/>
-              <button type="button" class="paper-target {key}" data-workshop-object
-                data-pall-sfx="paper" aria-label={'Inspect '+docs[key].label}
-                aria-pressed={selected===key}
-                onclick={()=>{
-                  talkingToHector=false;
-                  selected=selected===key?null:key;
-                }}>
-                <span class="workshop-object-label">{docs[key].label}</span>
-              </button>
-            {/each}
           {:else}
             <!-- Complete original painting, fitted to the native-ratio scene.
                  Streets and reception have no interactive overlays. -->
@@ -179,8 +173,14 @@
                    Every delivery and receiving-book choice stays in dialogue. -->
             </div>
           {/if}
+          </div>
         </section>
+        {/snippet}
 
+        {#snippet panel()}
+        <!-- Snippets do not inherit the outer block's type narrowing; this
+             repeats the same always-true guard for the dialogue panel. -->
+        {#if character&&round&&round.workState}
         <section class="dialogue-section pall-story-dialogue-section"
           aria-label="Shift Dispatch dialogue and choices">
         <aside class="work-card" aria-label={selected?'Dispatch paper inspection':
@@ -190,7 +190,9 @@
             <h1>{docs[selected].label}</h1>
             <p class="story">{docs[selected].description}</p>
             <div class="actions">
-              <button type="button" onclick={()=>{selected=null;}}>Return to the round</button>
+              <button type="button" class="secondary-choice" onclick={()=>{selected=null;}}>
+                <BellrunnerChoiceIcon kind="back"/>Return to the round
+              </button>
             </div>
           {:else if talkingToHector&&sceneKey==='depot'}
             <BellrunnerHectorConversation characterName={character.name}
@@ -205,13 +207,13 @@
               <p class="route-note"><strong>Short Route:</strong> Through the narrow
                 back streets behind the freight yards. Less walking, more
                 risk of trouble in the alleys.</p>
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('take_direct_road');}}>Take the Short Route</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('take_direct_road');}}><BellrunnerChoiceIcon kind="route"/>Take the Short Route</button>
               <p class="route-note"><strong>Long Route:</strong> Along the main
                 roads. More walking, traffic and crowds, but more people and
                 better visibility.</p>
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('take_quieter_road');}}>Take the Long Route</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('take_quieter_road');}}><BellrunnerChoiceIcon kind="route"/>Take the Long Route</button>
             </div>
           {:else if phase==='road_chosen'}
             <h1>{round.workState.route==='direct'?'The Short Route':'The Long Route'}</h1>
@@ -221,7 +223,7 @@
               {/each}
             {/if}
             <div class="actions">
-              <button type="button" disabled={busy}
+              <button type="button" class="primary-choice" disabled={busy}
                 onclick={()=>{void perform('deliver_notices');}}>Continue to the delivery</button>
             </div>
           {:else if phase==='receiving_arrival'}
@@ -230,7 +232,7 @@
               <p class="story">{paragraph}</p>
             {/each}
             <div class="actions">
-              <button type="button" disabled={busy}
+              <button type="button" class="primary-choice" disabled={busy}
                 onclick={()=>{void perform('continue_to_receiver');}}>Continue</button>
             </div>
           {:else if phase==='spoiled_mark'}
@@ -239,12 +241,12 @@
               <p class="spoken">“{line}”</p>
             {/each}
             <div class="actions">
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('ask_fresh_mark');}}>Ask for a fresh mark</button>
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('check_receiving_book');}}>Check their receiving book</button>
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('note_spoiled_mark');}}>Note the spoiled mark and go on</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('ask_fresh_mark');}}><BellrunnerChoiceIcon kind="mark"/>Ask for a fresh mark</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('check_receiving_book');}}><BellrunnerChoiceIcon kind="book"/>Check their receiving book</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('note_spoiled_mark');}}><BellrunnerChoiceIcon kind="mark"/>Note the spoiled mark and go on</button>
             </div>
           {:else if phase==='book_checked'}
             <!-- Compatibility for saved rounds from the older Stage 2 design.
@@ -253,18 +255,18 @@
             <p class="story">The entry matches the notice you delivered.
               You can note that confirmation or request a clearer mark.</p>
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('confirm_book');}}>Record the book confirmation</button>
-              <button type="button" disabled={busy}
-                onclick={()=>{void perform('ask_fresh_mark');}}>Ask for a fresh mark</button>
-              <button type="button" disabled={busy} data-pall-sfx="paper"
-                onclick={()=>{void perform('note_spoiled_mark');}}>Note the unclear mark</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('confirm_book');}}><BellrunnerChoiceIcon kind="mark"/>Record the book confirmation</button>
+              <button type="button" class="secondary-choice" disabled={busy}
+                onclick={()=>{void perform('ask_fresh_mark');}}><BellrunnerChoiceIcon kind="mark"/>Ask for a fresh mark</button>
+              <button type="button" class="secondary-choice" disabled={busy} data-pall-sfx="paper"
+                onclick={()=>{void perform('note_spoiled_mark');}}><BellrunnerChoiceIcon kind="mark"/>Note the unclear mark</button>
             </div>
           {:else if phase==='receiver_reply'&&receiverDialogue}
             <p class="eyebrow">{character.name.toUpperCase()}</p>
             <p class="spoken">“{receiverDialogue.player}”</p>
             <div class="actions">
-              <button type="button" disabled={busy}
+              <button type="button" class="primary-choice" disabled={busy}
                 onclick={()=>{void perform('continue_receiver_dialogue');}}>Continue</button>
             </div>
           {:else if phase==='receiver_result'&&receiverDialogue}
@@ -276,7 +278,7 @@
               <p class="spoken">“{receiverDialogue.extraPlayer}”</p>
             {/if}
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
+              <button type="button" class="primary-choice" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('continue_to_final_notice');}}>Continue to the final notice</button>
             </div>
           {:else if phase==='round_report'}
@@ -285,7 +287,7 @@
             <p class="story">The ordinary deliveries are finished.
               One sealed council order still needs to reach the address on your route sheet.</p>
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
+              <button type="button" class="primary-choice" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('finish_round');}}>Continue to the final notice</button>
             </div>
           {:else if phase==='final_notice'}
@@ -293,7 +295,7 @@
             <p class="story">The routine deliveries are recorded. One sealed council
               order remains to be presented at its marked address.</p>
             <div class="actions">
-              <button type="button" disabled={busy} data-pall-sfx="paper"
+              <button type="button" class="primary-choice" disabled={busy} data-pall-sfx="paper"
                 onclick={()=>{void perform('take_final_notice');}}>Take the final notice</button>
             </div>
           {:else}
@@ -307,7 +309,9 @@
           {#if busy}<p class="small" role="status">Recording…</p>{/if}
         </aside>
         </section>
-      </div>
+        {/if}
+        {/snippet}
+      </ActivityLayout>
     </section>
   </TutorialShell>
 {:else}
@@ -321,59 +325,65 @@
   </main>
 {/if}
 
+<!-- The Depot's job papers are the scene supplement; streets and the
+     receiving desk have none. -->
+{#snippet depotPapers()}
+  <BellrunnerDocumentTray papers={docs}
+    onChoose={(key)=>{
+      talkingToHector=false;
+      selected=selected===key?null:key;
+    }} {selected}/>
+{/snippet}
+
 <style>
   .dispatch{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;
     color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  /* Separate desktop columns: original artwork and hotspots at left,
-     all dialogue and inspection writing at right; stack on narrow screens. */
-  .scene{width:100%;min-width:0}
+  .scene-visuals{min-width:0}
   .illustration{position:relative;width:100%;aspect-ratio:1672/941;
     overflow:hidden;container-type:size}
   .art-scaled{position:absolute;inset:0;width:100%;height:100%}
   .environment{position:absolute;inset:0;width:100%;height:100%;
     object-fit:contain;pointer-events:none}
-  /* Source paintings vary by two pixels in size. Contain shows every
-     street/counter edge; the remaining subpixel margin is negligible. */
   .art-scaled>.environment{object-fit:contain}
-  .hector{position:absolute;top:5%;left:10%;height:103%;max-width:36%;
+  .hector{position:absolute;top:3%;left:7%;height:103%;max-width:43%;
     width:auto;object-fit:contain;object-position:bottom center;
-    z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
-  .foreground{z-index:2;clip-path:inset(93% 0 0 0)}
-  .npc-hotspot{position:absolute;z-index:4;top:12%;left:10%;width:27%;height:56%;
-    display:flex;align-items:end;justify-content:center;padding:0 0 10px;
+    z-index:2;pointer-events:none;filter:drop-shadow(0 5px 7px #0a080577)}
+  .foreground{z-index:3;clip-path:inset(93% 0 0 0)}
+  .npc-hotspot{position:absolute;z-index:4;top:7%;left:6%;width:41%;height:86%;
+    display:flex;align-items:end;justify-content:center;padding:0 0 6px;
     border:0;background:transparent;cursor:pointer}
   .npc-hotspot:focus-visible{outline:2px solid #efd092;outline-offset:2px}
-  .paper-art{position:absolute;z-index:3;bottom:5%;height:30%;width:18%;
-    object-fit:contain;pointer-events:none;filter:drop-shadow(0 4px 4px #0806069c)}
-  .paper-art.notices{left:43%}.paper-art.sealed{left:62%}.paper-art.route{left:81%}
-  .paper-target{position:absolute;z-index:5;bottom:1%;height:36%;width:18%;
-    display:flex;align-items:end;justify-content:center;padding:0;
-    background:transparent;border:0;color:#f3e6d1;cursor:pointer}
-  .paper-target.notices{left:43%}.paper-target.sealed{left:62%}.paper-target.route{left:81%}
-  .paper-target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
-  .work-card{position:relative;z-index:1;align-self:stretch;
-    box-sizing:border-box;width:min(100%,980px);min-width:0;margin:0;
-    max-height:none;overflow:visible;
+  /* Content-driven: never stretched to the artwork column's height. */
+  .work-card{position:relative;z-index:1;box-sizing:border-box;
+    display:flex;flex-direction:column;
+    width:100%;max-width:980px;min-width:0;min-height:0;margin:0 auto;max-height:none;overflow:visible;
+    padding:clamp(20px,2.3vw,39px) clamp(19px,2.35vw,40px) 25px;
     border:2px solid #654022;border-radius:5px;
-    background:#efdfbb;color:#251910;padding:15px 18px;box-shadow:0 7px 15px #0008}
-  .eyebrow{font:700 11px/1.3 sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
-  h1{margin:0 0 12px;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .story,.instruction,.route-note{font:600 clamp(13px,1.2vw,17px)/1.5
-    var(--pall-font-reading,Georgia,serif);margin:0 0 12px;color:#251910}
+    background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
+  .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.12em;color:#614029;margin:0 0 16px;padding-bottom:10px;
+    border-bottom:1px solid #9e815955}
+  /* One fixed reading scale (tokens in pall-story-landscape.css): every
+     route note, journey paragraph, spoken line and choice is the same size. */
+  h1{margin:0 0 12px;font:600 var(--dialogue-title,21px)/1.3
+    var(--pall-font-reading,Georgia,serif);color:#25170f}
+  .story,.instruction,.route-note{font:600 var(--dialogue-text,17px)/1.55
+    var(--pall-font-reading,Georgia,serif);margin:0 0 14px;color:#251910}
   .instruction{font-weight:700}
-  .route-note{font-size:14px;margin:9px 0 5px}
-  .inner-voice{margin:0 0 13px;font:italic 600 clamp(14px,1.25vw,17px)/1.55
+  .route-note{margin:9px 0 5px}
+  .inner-voice{margin:0 0 14px;font:italic 600 var(--dialogue-text,17px)/1.6
     var(--pall-font-reading,Georgia,serif);color:#322016}
-  .speaker{margin:10px 0 5px;color:#5a3d27;
-    font:700 11px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.08em}
-  .spoken{margin:0 0 12px;color:#26180f;
-    font:600 clamp(14px,1.25vw,17px)/1.5
+  .speaker{margin:10px 0 12px;color:#624328;
+    font:normal var(--dialogue-label,15px)/1.15 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.09em}
+  .spoken{margin:0 0 14px;color:#26180f;
+    font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif)}
-  .actions{display:flex;flex-direction:column;gap:6px;margin-top:3px}
-  .actions>button{display:block;width:100%;min-height:42px;text-align:left;
+  .actions{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+  .actions>button{display:block;width:100%;min-height:52px;text-align:left;
     background:#241d16;border:1px solid #6d5235;color:#f7e6c9;
-    padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
+    padding:10px 13px;font:600 var(--dialogue-text,17px)/1.35
+    var(--pall-font-reading,Georgia,serif);cursor:pointer}
   .actions>button:hover,.actions>button:focus-visible{
     background:#423022;outline:1px solid #c49d65}
   .actions>button:disabled{opacity:.55;cursor:wait}
@@ -385,20 +395,13 @@
   .small{font:600 12px/1.45 Georgia,serif;color:#58412a}
   .error{font:13px/1.45 sans-serif;color:#873523}
   .fallback{padding:40px;color:#e3d0af;background:#25211e}
-  @media(max-width:700px){
-    .scene{height:auto;min-height:0}
-    .illustration{width:100%;aspect-ratio:1672/941;container-type:normal}
-    .art-scaled{inset:0;width:100%;height:100%}
-    .environment{object-position:39% center}
-    .hector{height:94%;max-width:42%;left:-2%;top:2%}
-    .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
-    .foreground{object-position:39% center}
-    .paper-art{bottom:9%;height:25%;width:20%}
-    .paper-target{bottom:2%;height:35%;width:20%}
-    .paper-art.notices,.paper-target.notices{left:39%}
-    .paper-art.sealed,.paper-target.sealed{left:59%}
-    .paper-art.route,.paper-target.route{left:79%}
-    .work-card{width:100%;margin:0;padding:14px;max-height:none;overflow:visible}
-    .story,.instruction{font-size:16px}
+  @container activity-panel (max-width:560px){
+    .work-card{padding:20px 18px}
+  }
+  /* Small rendered artwork: Hector fills the frame height, hotspot follows. */
+  @container activity-stage (max-width:680px){
+    .illustration{container-type:normal}
+    .hector{top:0;height:100%;max-width:43%;left:2%}
+    .npc-hotspot{left:0;top:6%;width:47%;height:87%;padding-bottom:0}
   }
 </style>

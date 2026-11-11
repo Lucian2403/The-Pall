@@ -44,11 +44,13 @@ assert.ok(source.includes('/ui-kit/resources/TheCityVista.png'),'City art must b
 assert.ok(source.includes('/ui-kit/sidebar-illustration.png'),'Sidebar art must match supplied cutout');
 assert.ok(source.includes('character.health')&&source.includes('isMeasured(resource.data)'),'Health bar must use real character values');
 for(const label of ['Stamina','Fatigue','Focus']) assert.ok(source.includes("label:'"+label+"'"),'Missing relevant HUD track '+label);
-assert.ok(source.includes('not tracked yet'),'Unauthored resources must be explicitly unavailable');
-assert.ok(source.includes('min-height:clamp(160px,17vw,225px)'),
-  'The Grand Cylinder city vista must use the owner-approved compact desktop height');
-assert.ok(source.includes('.city-banner{min-height:152px;padding:16px'),
-  'The city banner must remain compact on mobile without hiding the vista');
+assert.ok(source.includes('minorResources.filter(resource=>isMeasured(resource.data))')&&
+  source.includes('{#each measuredMinorResources as resource (resource.id)}'),
+  'Unauthored resources are never rendered as values: the HUD shows only server-provided extras');
+assert.ok(source.includes('height:clamp(88px,8.5cqi,136px)'),
+  'The Grand Cylinder city vista is a clearly visible map-gateway header (88–136px) sized by the activity column');
+assert.ok(source.includes('class="city-map-gateway"')&&source.includes('aria-disabled="true"'),
+  'The City header is the map gateway, honestly locked until a real map exists');
 assert.ok(source.includes("center 12%/cover no-repeat"),'Vista must show the central tower, not only the city walls');
 assert.ok(source.includes('min-height:43px'),'Workshop location strip must remain compact');
 const secondJobUi=readFileSync(resolve(root,'apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte'),'utf8');
@@ -91,7 +93,9 @@ assert.ok(css.includes('border-image-slice:145 190 125 190 fill'),
   'Dialogue art must resize with nine-slice rather than stretch corners');
 assert.ok(css.includes('border-image-slice:50 180 45 180 fill'),
   'Button art must resize with nine-slice rather than stretch corners');
-assert.ok(source.includes('font:normal 29px/1.16 var(--pall-font-reading'),'City title must use legible type rather than the noisy ornamental face');
+assert.ok(source.includes('.banner-copy strong{font:normal clamp(21px,1.7cqi,29px)/1.12 var(--pall-font-reading')&&
+  !source.includes('.banner-copy strong{font:normal clamp(21px,1.7cqi,29px)/1.12 var(--pall-font-decorative'),
+  'City title must use legible type rather than the noisy ornamental face');
 assert.ok(css.includes('var(--pall-font-label'),'Use Bebas Neue for concise game labels');
 for(const weight of ['regular','bold']) {
   const options=['ttf','otf'].map(ext=>resolve(staticRoot,'fonts/bebas-neue-'+weight+'.'+ext));

@@ -253,15 +253,14 @@ assert.ok(characterApi.includes('avatar_id')&&contract.includes('invalid_avatar'
   'Saved portraits must have a validated persistence layer');
 assert.ok(shell.includes('min-height:clamp(160px,17vw,225px)'),
   'The common city banner must be compact');
-for(const [file,expected] of [
-  ['WorkshopScene.svelte','height:clamp(535px,62vh,640px)'],
-  ['MillhandWorkScene.svelte','height:clamp(535px,62vh,640px)'],
-  ['MillhandMissingStampScene.svelte','height:clamp(610px,68vh,690px)'],
-  ['MillhandDepotScene.svelte','height:clamp(565px,65vh,680px)'],
-  ['MillhandContractsScene.svelte','height:clamp(565px,65vh,680px)'],
-  ['MillhandRecordsScene.svelte','height:clamp(565px,65vh,680px)']
-]){
-  assert.ok(read('apps/web/src/lib/'+file).includes(expected),
-    'Compact onboarding image height missing: '+file);
+// Millhand Stages 1-4 share the scene layout's native 2:1 stage (workbench,
+// depot, Contracts office and records room).
+for(const file of ['WorkshopScene.svelte','MillhandWorkScene.svelte','MillhandMissingStampScene.svelte',
+  'MillhandDepotScene.svelte','MillhandContractsScene.svelte','MillhandRecordsScene.svelte']){
+  const flat=read('apps/web/src/lib/'+file).replace(/\s+/g,'');
+  assert.ok(flat.includes('<ActivityLayoutmode="scene"stageAspect={2}')&&flat.includes('aspect-ratio:2/1'),
+    'Millhand scene must use the shared 2:1 scene stage: '+file);
+  assert.ok(!/height:clamp\((535|565|610)px/.test(flat),
+    'No fixed-height scene composition: '+file);
 }
 console.log('PASS: Continuous city masthead, larger responsive logo, owner copy, six full-bleed section backgrounds, logo placements, source privacy and entry checks.');

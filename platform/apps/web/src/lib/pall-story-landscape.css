@@ -1,53 +1,166 @@
-/* Bellrunner scene template: the location and the framed dialogue are
-   independent columns on desktop. Only the location column contains the
-   painting, NPC silhouettes, object props and their click regions.
-   The dialogue column contains all writing and choices. Neither overlaps.
-   On narrow screens they stack, image first and dialogue second. */
+/* The Pall story-scene surfaces, shared by every origin.
+   PLACEMENT is owned by ActivityLayout (mode="scene"): the illustrated
+   location is the stage, the parchment the adjacent reading panel and
+   contextual papers/props the stage supplement. Two columns appear when
+   the activity container (not the window) can hold >=460px of art and a
+   >=380px reading panel; below that the order is art → dialogue → papers.
+   Bellrunner (Dispatch House, streets, receiving desk) and Millhand
+   (workshop, depot, council offices, alley, clinic, home) share this
+   visual treatment; each keeps its own art, props and mechanics.
+   No dialogue overlaps the painting. */
 .pall-story-sections{
-  display:grid;
-  grid-template-columns:minmax(0,60%) minmax(0,40%);
-  align-items:start;
   width:100%;
   min-width:0;
-  height:auto;
+  background:#13100e;
+}
+.pall-story-visuals{
+  display:flex;
+  flex-direction:column;
+  box-sizing:border-box;
+  min-width:0;
   min-height:0;
-  overflow:visible;
-  background:#201a15;
+  border:1px solid #63452f;
+  background:linear-gradient(180deg,#211911,#15110e);
+  box-shadow:inset 0 1px #bd875633;
 }
 .pall-story-landscape{
   position:relative;
+  flex:0 0 auto;
   box-sizing:border-box;
   width:100%;
   min-width:0;
   aspect-ratio:1672 / 941;
-  align-self:start;
   overflow:hidden;
   isolation:isolate;
 }
+/* Content-driven: the reading panel is as tall as its text and choices. */
 .pall-story-dialogue-section{
   position:relative;
   display:flex;
-  justify-content:center;
+  justify-content:stretch;
   align-items:flex-start;
   box-sizing:border-box;
   width:100%;
   min-width:0;
-  align-self:stretch;
-  padding:clamp(12px,1.7vw,28px) clamp(9px,1.7vw,27px);
-  border-left:2px solid #765537;
-  background:linear-gradient(180deg,#2a211a,#1b1815 85%);
+  min-height:0;
+  padding:0;
 }
-/* A narrow play area (including its left navigation rail) requires
-   vertical stacking; a desktop monitor always uses the right column. */
-@media(max-width:1080px){
-  .pall-story-sections{grid-template-columns:minmax(0,1fr)}
-  .pall-story-dialogue-section{
-    min-height:0;
-    border-left:0;
-    border-top:2px solid #765537;
-    padding:14px 12px 24px;
+/* One fixed type scale for every story dialogue beat, NPC topic, object
+   inspection and choice, in both origins: the reading text never scales
+   with the window, so each line and button reads at the same size. */
+:is(.workshop,.second-job,.clinic,.stage8,.pall-story-sections){
+  --dialogue-text:17px;
+  --dialogue-title:21px;
+  --dialogue-label:15px;
+}
+/* Millhand reading panels keep the owner's nine-slice frame and button art;
+   only the type follows the shared scale. Bellrunner sets its own (below). */
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.speech,.story,.narration,.dialogue-line,.spoken,.result,.outcome,
+    .context,.instruction,.finding,.inner-voice,.work-description,.notice-text,
+    .completion-copy){
+  font-size:var(--dialogue-text);
+  line-height:1.55;
+}
+.frame .chapter-content .pall-story-dialogue-section :is(h1,h2):not(.speaker-heading){
+  font-size:var(--dialogue-title);
+  line-height:1.3;
+}
+.frame .chapter-content :is(.workshop,.second-job) .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button,
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.pall-framed-button,.stage-next-step-link){
+  font-size:var(--dialogue-text);
+}
+/* One choice size across narrative origins; apply only to explicit
+   primary and secondary actions, not combat or unrelated controls. */
+.frame .chapter-content .pall-story-dialogue-section :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice){
+  min-height:52px;
+  font:600 var(--dialogue-text)/1.3
+    var(--pall-font-reading,Georgia,serif);
+}
+/* Shared narrative hierarchy: dark brass for progression, pale
+   parchment for alternatives. Action semantics are explicit; workspace
+   and management controls keep their own layouts. */
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice){
+  appearance:none;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:clamp(10px,1vw,17px);
+  width:100%;
+  min-height:52px;
+  padding:10px clamp(13px,1.35vw,20px);
+  border:2px solid transparent;
+  border-image:none;
+  border-radius:7px;
+  text-align:left;
+  font:600 var(--dialogue-text)/1.35
+    var(--pall-font-reading,Georgia,serif);
+  text-shadow:none;
+  cursor:pointer;
+  transition:filter .12s ease,transform .12s ease,border-color .12s ease;
+}
+/* A double hairline and warm edge read like a miniature carved frame. */
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice)::after{
+  content:'';
+  position:absolute;
+  inset:4px;
+  border:1px solid currentColor;
+  border-radius:4px;
+  opacity:.21;
+  pointer-events:none;
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button.secondary-choice{
+  border-color:#684323;
+  background:linear-gradient(180deg,#fff1d6 0%,#eddbb8 37%,#d8bb91 100%);
+  color:#2a1a0f;
+  box-shadow:inset 0 1px 0 #fff8e7,inset 0 -3px 0 #bb9464,
+    0 3px 0 #4d301d,0 5px 8px #1a0e0744;
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button.primary-choice{
+  border-color:#c28a3e;
+  background:linear-gradient(180deg,#654427 0%,#49301f 35%,#261a14 100%);
+  color:#ffe3b2;
+  box-shadow:inset 0 1px 0 #fae0a370,inset 0 -3px 0 #1a110d,
+    0 0 0 1px #684626,0 3px 0 #140e0a,0 5px 10px #1a0e0780;
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button.primary-choice::before{
+  content:'»';
+  font:700 24px/1 var(--pall-font-reading,Georgia,serif);
+  color:#f4bd61;
+  margin-right:1px;
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):hover:not(:disabled){
+  filter:brightness(1.065);
+  transform:translateY(-1px);
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):active:not(:disabled){
+  filter:brightness(.95);
+  transform:translateY(1px);
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):focus-visible{
+  outline:3px solid #f1c27b;
+  outline-offset:3px;
+}
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):disabled{
+  opacity:.57;
+  cursor:wait;
+  transform:none;
+}
+@media(prefers-reduced-motion:reduce){
+  .frame .chapter-content .pall-story-dialogue-section
+    :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice){
+    transition:none;
   }
-}
-@media(max-width:700px){
-  .pall-story-dialogue-section{padding:12px 8px 20px}
 }

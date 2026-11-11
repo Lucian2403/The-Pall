@@ -3,6 +3,8 @@
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
+  import '$lib/pall-story-landscape.css';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
@@ -147,7 +149,13 @@
 {#if status==='ready'&&character&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home">
     <section class="stage8" aria-label="Stage 8 shared rented home">
-      <div class="home-scene" aria-label="A modest rented room in Grand Cylinder City">
+      <!-- Shared scene layout: the rented room (native 1672x941) with its
+           chest, journal, notice and bed is the stage; the room dialogue is
+           the reading column beside it on wide screens, below on narrow. -->
+      <ActivityLayout mode="scene" stageAspect={1672 / 941} class="pall-story-sections">
+      {#snippet stage()}
+      <div class="scene-visuals pall-story-visuals">
+      <div class="home-scene pall-story-landscape" aria-label="A modest rented room in Grand Cylinder City">
         <div class="home-artwork" aria-label="The complete rented room illustration">
         <button type="button" class="hotspot chest" aria-label="Storage"
           title="Storage" onclick={()=>{void openRoomOverlay('storage');}}>
@@ -171,6 +179,12 @@
         </button>
         {#if restAnimating}<div class="rest-fade" aria-hidden="true"></div>{/if}
         </div>
+      </div>
+      </div>
+      {/snippet}
+      {#snippet panel()}
+      {#if home}
+      <div class="reading-column pall-story-dialogue-section">
         {#if restMessage}
           <aside class="home-dialogue rest-dialogue" aria-label="Rest result" role="status">
             <p class="eyebrow">BED · REST</p>
@@ -215,6 +229,10 @@
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
           </aside>
         {/if}
+      </div>
+      {/if}
+      {/snippet}
+      </ActivityLayout>
         <dialog bind:this={overlayDialog} class="room-overlay"
           aria-label={overlayKind==='storage'?'Inventory and Home Chest':'Personal Journal'}
           onclose={handleRoomOverlayClose}>
@@ -235,7 +253,6 @@
             </section>
           {/if}
         </dialog>
-      </div>
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
     </section>
   </TutorialShell>
@@ -253,14 +270,13 @@
 {/if}
 <style>
   :global(body){background:#151515;color:#f2e1c9}
-  /* Match Stage 7's full-width scene rather than letterboxing the room.
-     The art layer is sized to the native 1672:941 ratio at "cover" scale;
-     its percentage-based chest, bed, journal and notice targets then stay
+  /* The room is the scene stage at its native 1672:941 ratio
+     (pall-story-landscape). The art layer keeps its cover-scaled sizing, so
+     its percentage-based chest, bed, journal and notice targets stay
      registered to the same pixel-space as the painted objects. */
   .stage8{min-width:0;background:#1a1816}
   .home-scene{position:relative;box-sizing:border-box;width:100%;
-    height:clamp(650px,65vw,820px);overflow:hidden;
-    container-type:size;isolation:isolate;background:#352d29}
+    overflow:hidden;container-type:size;isolation:isolate;background:#352d29}
   .home-artwork{position:absolute;left:50%;top:50%;isolation:isolate;
     transform:translate(-50%,-50%);
     width:max(100cqw,177.683cqh);aspect-ratio:1672/941;
@@ -268,9 +284,11 @@
   .home-artwork::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(90deg,#0908072b,transparent 37%),linear-gradient(0deg,#0807063d,transparent 40%)}
   /* Exact dialogue-frame slices, inner spacing, typeface and hierarchy from
-     Stage 7 clinic and Stage 5 wage-claim, not a new oversized parchment UI. */
-  .home-dialogue{position:absolute;z-index:8;top:3.5%;right:2.4%;
-    box-sizing:border-box;width:min(46%,650px);max-height:91%;overflow-y:auto;
+     Stage 7 clinic and Stage 5 wage-claim, not a new oversized parchment UI.
+     It lives in the reading column: content-height, no internal scrollbar. */
+  .reading-column{flex-direction:column;align-items:stretch}
+  .home-dialogue{position:relative;
+    box-sizing:border-box;width:100%;min-width:0;max-height:none;overflow:visible;
     background:transparent;color:#2b1c11;
     border:solid transparent;border-width:21px 25px 20px;
     border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
@@ -278,13 +296,13 @@
     border-image-width:21px 25px 20px;border-image-repeat:stretch;
     margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)}
   .home-dialogue .eyebrow,.home-dialogue .speaker{
-    font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
+    font:600 var(--dialogue-label,15px)/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.065em;color:#382416;margin:0 0 10px}
   .home-dialogue h1{margin:0 0 12px;
-    font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);color:#2b1b12}
+    font:600 var(--dialogue-title,21px)/1.3 var(--pall-font-reading,Georgia,serif);color:#2b1b12}
   .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
   .home-dialogue .notice-text,.home-dialogue .completion-copy{
-    font:16px/1.45 var(--pall-font-reading,Georgia,serif);
+    font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);
     color:#21150e;margin:0 0 13px}
   .home-dialogue .speech{font-weight:600}
   .home-dialogue .narration{color:#302016}
@@ -334,7 +352,6 @@
   @keyframes rest-room-fade{
     0%{opacity:0}48%{opacity:1}100%{opacity:0}
   }
-  .home-dialogue.rest-dialogue{z-index:9}
   @media(prefers-reduced-motion:reduce){
     .rest-fade{animation:none;opacity:0}
   }
@@ -360,27 +377,20 @@
   .journal-body{max-width:960px;margin:auto;font:600 16px/1.55 Georgia,serif}
   .journal-body p{margin:0 0 12px}
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
-  @media(max-width:950px){
-    /* A small viewport shows the full art and places the dialogue below.
-       Don't use cover crop here: the touch targets must stay reachable. */
-    .home-scene{height:auto;overflow:visible;container-type:normal}
-    .home-artwork{position:relative;left:auto;top:auto;transform:none;
-      width:100%;aspect-ratio:1672/941;
-      background-size:contain}
-    .home-dialogue{position:relative;top:auto;right:auto;bottom:auto;
-      left:auto;width:min(100%,590px);max-height:none;overflow:visible;
-      margin:14px auto 0}
+  /* Narrow stage (by its own width): the whole room is always visible, so
+     only the small journal and notice targets grow to a tappable size. */
+  @container activity-stage (max-width:600px){
     .book{min-height:36px}
     .notice-object{min-height:36px}
-  }
-  @media(max-width:650px){
-    .home-dialogue{width:calc(100% - 16px);border-width:17px 18px 17px;
-      border-image-width:17px 18px 17px;padding:8px 11px}
-    .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
-    .home-dialogue .notice-text{font-size:14px}
-    .home-dialogue .eyebrow,.home-dialogue .speaker{font-size:12px}
-    .home-dialogue h1{font-size:22px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
+    .chest .object-caption{bottom:auto;top:-22px}
+  }
+  @container activity-panel (max-width:420px){
+    .home-dialogue{border-width:17px 18px 17px;
+      border-image-width:17px 18px 17px;padding:8px 11px}
+  }
+  /* The storage/journal modal sits in the top layer, sized to the window. */
+  @media(max-width:650px){
     .room-overlay{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
     .journal{padding:18px 16px}
     .journal-heading{align-items:flex-start;flex-wrap:wrap}
