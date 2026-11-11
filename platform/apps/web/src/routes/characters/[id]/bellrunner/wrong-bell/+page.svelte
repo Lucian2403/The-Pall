@@ -114,7 +114,8 @@
 <svelte:head><title>The Pall — The Wrong Bell</title></svelte:head>
 <audio bind:this={bellAudio} src="/audio/bellrunner/night-shift-bell.mp3" preload="auto"></audio>
 {#if status==='ready'&&character&&snapshot}
-  <TutorialShell {character} sceneLocation="The Closed Industrial Block" compactCityVista travelLocked>
+  <TutorialShell {character} sceneLocation="The Closed Industrial Block"
+    compactCityVista travelLocked industrialCourtyardBackdrop>
     <section class="workshop wrong-bell" aria-label="Bellrunner Stage 3: The Wrong Bell">
       <ActivityLayout mode="scene" stageAspect={1672/941} class="pall-story-sections">
         {#snippet stage()}
