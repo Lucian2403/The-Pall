@@ -27,6 +27,7 @@ export const WRONG_BELL_BRANCHES={
       {speaker:'Player',text:"All right. Here's your notice. But I'm putting down that the office was shut."},
       {speaker:'Watchman',text:"Fine by me. I'll see it gets inside."}
     ],
+    before:'',
     end:'The watchman takes the sealed order. He cannot provide the authorized receiving mark.',
     next:'Attendance Certificate · Commerce / Contracts'
   },
@@ -46,6 +47,7 @@ export const WRONG_BELL_BRANCHES={
     lines:[
       {speaker:'Player',text:"That poor bastard can barely breathe, and the shift bell's still ringing. I'm going to find out why."}
     ],
+    before:'',
     end:"From outside the sealed work area, you can see where to access the bell's mechanical linkage and the ventilation controls. The bell continues ringing as the workers wait at the gate.",
     next:'The Bell Linkage · Mechanics / Industrial Machinery'
   }
