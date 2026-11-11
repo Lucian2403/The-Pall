@@ -17,12 +17,12 @@ export type DispatchWorkAction=
   'check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
   'deliver_notices'|'continue_to_receiver'|'ask_fresh_mark'|'check_receiving_book'|
   'confirm_book'|'note_spoiled_mark'|'continue_receiver_dialogue'|
-  'continue_to_final_notice'|'continue_to_report'|'finish_round'|'take_final_notice';
+  'continue_to_final_notice'|'continue_to_report'|'finish_round'|'take_final_notice'|'enter_wrong_bell';
 export const DISPATCH_ACTIONS:ReadonlyArray<DispatchWorkAction>=[
   'check_round','sort_notices','take_direct_road','take_quieter_road',
   'deliver_notices','continue_to_receiver','ask_fresh_mark','check_receiving_book','confirm_book',
   'note_spoiled_mark','continue_receiver_dialogue','continue_to_final_notice',
-  'continue_to_report','finish_round','take_final_notice'
+  'continue_to_report','finish_round','take_final_notice','enter_wrong_bell'
 ];
 export const INITIAL_DISPATCH_STATE:DispatchState={
   phase:'issued',route:null,noticesOrdered:false,receipt:null
@@ -84,9 +84,12 @@ export function applyDispatchAction(
    return {...state,phase:'final_notice'};
   case 'take_final_notice':
    if(state.phase!=='final_notice')return reject();
-   // Deliberately do NOT advance tutorial_stage: Stage 3 is not implemented.
-   // The sealed task paper remains a job prop, never an inventory grant.
+   // Task prop only: the server advances stage after confirming the handoff.
    return {...state,phase:'final_notice_taken'};
+  case 'enter_wrong_bell':
+   // Older Stage 2 saves reached this phase before Stage 3 was available.
+   if(state.phase!=='final_notice_taken')return reject();
+   return {...state};
   default:
    return reject();
  }
