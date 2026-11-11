@@ -1,6 +1,7 @@
 <script lang="ts">
   import {APPROVED_GUTHER_OPTIONAL_DIALOGUE, GUTHER_WORK_SKIP_LINE, type GutherTopicId} from '$lib/approved-guther-optional';
   import {NPC_DIALOGUE_STATUS, PROPOSED_NPC_DIALOGUE} from '$lib/proposed-npc-dialogue';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
 
   let {origin, close, skipToWork}: {origin:string;close:()=>void;skipToWork?:()=>void} = $props();
   const speaker = $derived(PROPOSED_NPC_DIALOGUE[origin]);
@@ -30,18 +31,18 @@
       <p class="speech">“{gutherExchange.reply}”</p>
       <div class="choices">
         {#if gutherExchange.followUp}
-          <button type="button" onclick={() => {gutherStep += 1;}}>{gutherExchange.followUp}</button>
+          <button type="button" class="primary-choice" onclick={() => {gutherStep += 1;}}>{gutherExchange.followUp}</button>
         {/if}
-        <button type="button" onclick={changeGutherTopic}>Ask something else</button>
-        <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
+        <button type="button" class="secondary-choice" onclick={changeGutherTopic}><BellrunnerChoiceIcon kind="chat"/>Ask something else</button>
+        <button type="button" class="work-skip secondary-choice" onclick={() => (skipToWork ?? close)()}><BellrunnerChoiceIcon kind="route"/>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {:else}
       <p class="instruction">Ask Guther about:</p>
       <div class="choices">
         {#each APPROVED_GUTHER_OPTIONAL_DIALOGUE as option (option.id)}
-          <button type="button" onclick={() => askGuther(option.id)}>{option.prompt}</button>
+          <button type="button" class="secondary-choice" onclick={() => askGuther(option.id)}><BellrunnerChoiceIcon kind="chat"/>{option.prompt}</button>
         {/each}
-        <button type="button" class="work-skip" onclick={() => (skipToWork ?? close)()}>{GUTHER_WORK_SKIP_LINE}</button>
+        <button type="button" class="work-skip secondary-choice" onclick={() => (skipToWork ?? close)()}><BellrunnerChoiceIcon kind="route"/>{GUTHER_WORK_SKIP_LINE}</button>
       </div>
     {/if}
   {:else if speaker}

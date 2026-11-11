@@ -5,6 +5,7 @@
   import {WORK_ACTION_OBJECT} from '@the-pall/game-core';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/workshop-object-labels.css';
   import '$lib/pall-story-landscape.css';
@@ -92,42 +93,46 @@
         <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} />
       {:else}
       <p class="heading">MARKING THE PLATES</p>
-      <p class="story">{result}</p>
-      {#if work.phase !== 'COMPLETE'}
-        {#if instruction !== result}
-          <div class="rule"></div>
-          <p class="instruction">{instruction}</p>
-        {/if}
-        <p class="small">
-          {selected
-            ? 'The selected object and its available actions are shown beside the workbench.'
-            : 'Select an object on the workbench to examine it.'}
-        </p>
+      {#if selected}
+        <WorkshopItemPopover itemKey={selected} placement="inline"
+          title={objects.find(object=>object.key===selected)?.label??'Workshop object'}
+          description={observation??''}
+          onClose={() => {selected=null;}}>
+          {#if work.phase!=='COMPLETE' && contextualActions.length>0}
+            <div class="actions">
+              {#each contextualActions as action}
+                <button type="button"
+                  class={contextualActions.length===1?'primary-choice':'secondary-choice'}
+                  disabled={pending}
+                  data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
+                    ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
+                    ?'paper':'click'}
+                  onclick={() => {void commitAction(action);}}>
+                  {#if contextualActions.length>1}
+                    <BellrunnerChoiceIcon kind={action==='read_paper'||action==='return_paper'?'book':'mark'}/>
+                  {/if}
+                  {ACTION_LABEL[action]}
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </WorkshopItemPopover>
       {:else}
-        <p class="instruction">Guther takes the finished work paper and lays it on the bench beside the council bundle.</p>
+        <p class="story">{result}</p>
+        {#if work.phase !== 'COMPLETE'}
+          {#if instruction !== result}
+            <div class="rule"></div>
+            <p class="instruction">{instruction}</p>
+          {/if}
+          <p class="small">Select an object on the workbench to examine it.</p>
+        {:else}
+          <p class="instruction">Guther takes the finished work paper and lays it on the bench beside the council bundle.</p>
+        {/if}
       {/if}
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
       {#if pending}<p role="status" class="small">Saving work…</p>{/if}
       {/if}
     </aside>
-    {#if selected && !talkingToGuther}
-      <WorkshopItemPopover itemKey={selected} placement="docked"
-        title={objects.find(object=>object.key===selected)?.label??'Workshop object'}
-        description={observation??''}
-        onClose={() => {selected=null;}}>
-        {#if work.phase!=='COMPLETE' && contextualActions.length>0}
-          <div class="actions">
-            {#each contextualActions as action}
-              <button type="button" disabled={pending}
-                data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
-                  ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
-                  ?'paper':'click'}
-                onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
-            {/each}
-          </div>
-        {/if}
-      </WorkshopItemPopover>
-    {/if}
   </div>
   {/snippet}
   </ActivityLayout>

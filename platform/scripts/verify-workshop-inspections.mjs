@@ -20,18 +20,18 @@ for(const src of [intro,platework]){
     src.includes('aria-pressed=') && src.includes('aria-label=') &&
     src.includes('<span class="workshop-object-label">'),
     'Keep keyboard-operable full-art hitboxes and all four framed object labels');
-  assert.ok(src.includes('{#if selected && !talkingToGuther}') &&
-    src.includes('<WorkshopItemPopover itemKey={selected}') &&
+  assert.ok((src.includes('{:else if selected}') || src.includes('{#if selected}')) &&
+    src.includes('<WorkshopItemPopover itemKey={selected} placement="inline"') &&
     src.includes('onClose={() => {selected=null;}}>'),
-    'Selected item must open nearby, and optional Guther dialogue must hide it');
+    'Selected item must appear within the same dialogue parchment, never a second panel');
   assert.ok(!src.includes('<div class="inspection"') &&
     !src.includes('class="tag"') && !src.includes('class="label"'),
     'Remove old below-art description strip and plain dark labels');
   // Shared scene layout (same as Bellrunner): the 2:1 workbench painting is
-  // the stage; dialogue and the docked object card share the reading column.
+  // the stage; the selected object replaces content inside the same parchment.
   assert.ok(src.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
     src.includes('aspect-ratio:2 / 1') &&
-    src.includes('placement="docked"') &&
+    src.includes('placement="inline"') &&
     src.includes('@container activity-stage (max-width:600px)') &&
     src.includes('bench-foreground') &&
     src.includes('clip-path:inset(70% 0 0 0)') &&
@@ -92,4 +92,8 @@ assert.ok(labels.includes('.workshop .workshop-object-label{') &&
 assert.ok(ui.includes("border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png')") &&
   ui.includes("button-normal-trim.png"),
   'Shared owner dialogue and button artwork must remain intact');
-console.log('PASS: Stage 1 and 2 near-object popovers, outside-click/Escape close, original dialogue labels, real work actions and responsive workshop art.');
+assert.ok(panel.includes('.workshop-inspection.inline{') &&
+  intro.includes('class="primary-choice"') &&
+  platework.includes("contextualActions.length===1?'primary-choice':'secondary-choice'"),
+  'Workshop choices and inspection panels must share the narrative design system');
+console.log('PASS: Stage 1 and 2 one-parchment inspection, choice hierarchy, original labels and saved work actions.');

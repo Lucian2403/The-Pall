@@ -3,6 +3,7 @@
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/workshop-object-labels.css';
   import '$lib/pall-story-landscape.css';
@@ -111,6 +112,18 @@
     <div class="dialogue" aria-label="Workshop conversation">
       {#if talkingToGuther}
         <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} skipToWork={() => {talkingToGuther=false;selected=null;skipToWork();}} />
+      {:else if selected}
+        <p class="speaker">WORKSHOP OBJECT · INSPECTION</p>
+        <WorkshopItemPopover itemKey={selected} placement="inline"
+          title={workshopObjects[selected].name}
+          description={workshopObjects[selected].observation}
+          onClose={() => {selected=null;}}>
+          <small class="inspection-note">
+            {readyForWork
+              ? 'Stage 2 work commands are not enabled in this read-only integration.'
+              : 'This is inspection only. Continue the conversation to receive the work paper.'}
+          </small>
+        </WorkshopItemPopover>
       {:else}
       {#if beat.kind === 'speech'}
         <p class="speaker">{beat.speaker === 'Player' ? characterName : beat.speaker}</p>
@@ -129,16 +142,16 @@
       <div class="responses">
         {#if beat.kind === 'choice' && beat.choices}
           {#each beat.choices as choice}
-            <button type="button" onclick={() => {selected = null; advance(choice.next, true);}}>{choice.label}</button>
+            <button type="button" class="secondary-choice" onclick={() => {selected = null; advance(choice.next, true);}}><BellrunnerChoiceIcon kind="chat"/>{choice.label}</button>
           {/each}
         {:else if beat.next}
-          <button type="button" onclick={() => {selected = null; if (beat.next) advance(beat.next);}}>Continue</button>
+          <button type="button" class="primary-choice" onclick={() => {selected = null; if (beat.next) advance(beat.next);}}>Continue</button>
         {/if}
         {#if beat.kind !== 'handoff'}
-          <button type="button" class="skip-to-work" onclick={() => {selected=null;skipToWork();}}>{GUTHER_WORK_SKIP_LINE}</button>
+          <button type="button" class="skip-to-work secondary-choice" onclick={() => {selected=null;skipToWork();}}><BellrunnerChoiceIcon kind="route"/>{GUTHER_WORK_SKIP_LINE}</button>
         {/if}
         {#if beat.kind === 'handoff' && takeWorkPaper}
-          <button type="button" data-pall-sfx="paper" disabled={takingWork} onclick={() => {void takeWorkPaper();}}>{takingWork ? 'Saving…' : 'Take the work paper'}</button>
+          <button type="button" class="primary-choice" data-pall-sfx="paper" disabled={takingWork} onclick={() => {void takeWorkPaper();}}>{takingWork ? 'Saving…' : 'Take the work paper'}</button>
         {/if}
         {#if handoffError}<p role="alert" class="handoff-error">{handoffError}</p>{/if}
         {#if canGoBack}
@@ -147,18 +160,6 @@
       </div>
       {/if}
     </div>
-    {#if selected && !talkingToGuther}
-      <WorkshopItemPopover itemKey={selected} placement="docked"
-        title={workshopObjects[selected].name}
-        description={workshopObjects[selected].observation}
-        onClose={() => {selected=null;}}>
-        <small class="inspection-note">
-          {readyForWork
-            ? 'Stage 2 work commands are not enabled in this read-only integration.'
-            : 'This is inspection only. Continue the conversation to receive the work paper.'}
-        </small>
-      </WorkshopItemPopover>
-    {/if}
   </div>
   {/snippet}
   </ActivityLayout>
