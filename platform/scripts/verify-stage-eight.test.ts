@@ -210,9 +210,9 @@ test('Stage 8 dialogue frame and typography match the approved Stage 7 clinic',(
   'border-image-slice:145 190 125 190 fill;',
   'border-image-width:21px 25px 20px;border-image-repeat:stretch;',
   'margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)',
-  "font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);",
-  "font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);",
-  'font:16px/1.45 var(--pall-font-reading,Georgia,serif);',
+  "font:600 var(--dialogue-label,15px)/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);",
+  "font:600 var(--dialogue-title,21px)/1.3 var(--pall-font-reading,Georgia,serif);",
+  'font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);',
   '.home-dialogue .stage-direction{font-style:italic}',
   '.home-dialogue .speech{font-weight:600}'
  ];

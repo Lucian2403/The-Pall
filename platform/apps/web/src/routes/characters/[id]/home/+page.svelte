@@ -278,13 +278,13 @@
     border-image-width:21px 25px 20px;border-image-repeat:stretch;
     margin:0;padding:10px 15px 12px;filter:drop-shadow(0 6px 8px #0008)}
   .home-dialogue .eyebrow,.home-dialogue .speaker{
-    font:600 14px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
+    font:600 var(--dialogue-label,15px)/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.065em;color:#382416;margin:0 0 10px}
   .home-dialogue h1{margin:0 0 12px;
-    font:600 26px/1.25 var(--pall-font-reading,Georgia,serif);color:#2b1b12}
+    font:600 var(--dialogue-title,21px)/1.3 var(--pall-font-reading,Georgia,serif);color:#2b1b12}
   .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
   .home-dialogue .notice-text,.home-dialogue .completion-copy{
-    font:16px/1.45 var(--pall-font-reading,Georgia,serif);
+    font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif);
     color:#21150e;margin:0 0 13px}
   .home-dialogue .speech{font-weight:600}
   .home-dialogue .narration{color:#302016}
@@ -376,10 +376,6 @@
   @media(max-width:650px){
     .home-dialogue{width:calc(100% - 16px);border-width:17px 18px 17px;
       border-image-width:17px 18px 17px;padding:8px 11px}
-    .home-dialogue .narration,.home-dialogue .speech,.home-dialogue .instruction,
-    .home-dialogue .notice-text{font-size:14px}
-    .home-dialogue .eyebrow,.home-dialogue .speaker{font-size:12px}
-    .home-dialogue h1{font-size:22px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
     .room-overlay{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
     .journal{padding:18px 16px}
