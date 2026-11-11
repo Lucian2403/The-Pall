@@ -306,7 +306,7 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  assert.ok(web.includes('class="reading-column pall-story-dialogue-section"')&&
   web.includes('.home-dialogue{position:relative;')&&
   !/\.home-dialogue\{[^}]*overflow-y:auto/.test(web)&&
-  web.includes('@container activity-stage (max-width:640px)')&&
+  web.includes('@container activity-stage (max-width:600px)')&&
   web.includes('.book{min-height:36px}'),
   'The full room is always visible; dialogue sits beside or below it, never over it');
  assert.ok(!web.includes('width:min(100%,1100px)')&&

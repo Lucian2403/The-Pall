@@ -204,7 +204,7 @@
   .journal-entries{max-width:960px;margin:0 auto}
   .journal-entries p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 10px}
   /* Narrow stage: the original 4:3 close crop keeps the tools tappable. */
-  @container activity-stage (max-width:640px){
+  @container activity-stage (max-width:600px){
     .illustration{aspect-ratio:4 / 3}
     .environment{object-position:39% center}
     .guther{height:86%;left:-5%;top:2%}

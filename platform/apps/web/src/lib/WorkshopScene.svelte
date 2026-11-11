@@ -217,7 +217,7 @@
   }
   /* A narrow stage (phones, or a narrow column) uses the original 4:3
      close crop so Guther and the four tools stay large enough to tap. */
-  @container activity-stage (max-width:640px){
+  @container activity-stage (max-width:600px){
     .illustration {aspect-ratio:4 / 3}
     .environment {object-position:39% center}
     .guther {height:86%;left:-5%;top:2%}

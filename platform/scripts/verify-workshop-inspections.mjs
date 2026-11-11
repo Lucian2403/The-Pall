@@ -32,7 +32,7 @@ for(const src of [intro,platework]){
   assert.ok(src.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
     src.includes('aspect-ratio:2 / 1') &&
     src.includes('placement="docked"') &&
-    src.includes('@container activity-stage (max-width:640px)') &&
+    src.includes('@container activity-stage (max-width:600px)') &&
     src.includes('bench-foreground') &&
     src.includes('clip-path:inset(70% 0 0 0)') &&
     src.includes('height:37%') && src.includes('height:44%') &&

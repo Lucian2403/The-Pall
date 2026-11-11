@@ -237,7 +237,7 @@
   .journal>p{max-width:960px;margin:0 auto 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
   /* Narrow stage: the props get their own row overlapping the counter edge,
      so both stay large enough to tap (same treatment as before, by stage width). */
-  @container activity-stage (max-width:640px){
+  @container activity-stage (max-width:600px){
     .depot-stage{aspect-ratio:auto;overflow:visible}
     .scene-art{position:relative;inset:auto;width:100%;aspect-ratio:2/1}
     .table-props{position:relative;left:auto;bottom:auto;width:100%;height:155px;

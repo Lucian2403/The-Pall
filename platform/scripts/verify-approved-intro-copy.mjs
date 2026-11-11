@@ -199,7 +199,7 @@ assert.ok(stage3SceneSource.includes('<ActivityLayout mode="scene" stageAspect={
   'Stage3 scene keeps the native 2:1 workbench composition independent of dialogue content');
 assert.ok(stage3Flat.includes('.evidence{position:absolute;z-index:4;left:24%;bottom:3%;width:52%;') &&
   stage3Flat.includes('height:clamp(64px,13cqi,180px)') &&
-  stage3Flat.includes('@containeractivity-stage(max-width:640px)'),
+  stage3Flat.includes('@containeractivity-stage(max-width:600px)'),
   'Stage3 table props must have a fixed tabletop anchor and remain in the illustration on narrow stages');
 for(const name of ['returned-reference-plate.webp','cancellation-slip.webp']) {
   assert.ok(stage3SceneSource.includes('/workshop/'+name),'Missing supplied Stage3 art '+name);

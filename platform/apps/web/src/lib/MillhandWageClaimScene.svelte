@@ -307,7 +307,7 @@
   /* Narrow stage (by its own width, not the window): a 4:3 crop keeps Flint
      tall enough to tap, with the painting shifted so the painted cart stays
      in view beside its label; captions drop their wide-screen minimum. */
-  @container activity-stage (max-width:640px){
+  @container activity-stage (max-width:600px){
     .alley-scene{aspect-ratio:4 / 3}
     .alley-art{background-position:70% center}
     .flint-figure{left:-4%;width:46%;height:90%}

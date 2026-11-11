@@ -524,7 +524,7 @@
   }
   /* Narrow stage: books get their own row overlapping the counter edge so
      both stay tappable (same treatment as before, decided by stage width). */
-  @container activity-stage (max-width: 640px) {
+  @container activity-stage (max-width: 600px) {
     .room-stage {
       aspect-ratio: auto;
       overflow: visible;

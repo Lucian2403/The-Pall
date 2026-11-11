@@ -805,7 +805,7 @@
   }
   /* Narrow stage (phones, or a narrow column): the original 4:3 close crop
      keeps Guther and both evidence props large enough to tap. */
-  @container activity-stage (max-width: 640px) {
+  @container activity-stage (max-width: 600px) {
     .illustration {
       aspect-ratio: 4/3;
     }

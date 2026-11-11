@@ -379,7 +379,7 @@
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
   /* Narrow stage (by its own width): the whole room is always visible, so
      only the small journal and notice targets grow to a tappable size. */
-  @container activity-stage (max-width:640px){
+  @container activity-stage (max-width:600px){
     .book{min-height:36px}
     .notice-object{min-height:36px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
