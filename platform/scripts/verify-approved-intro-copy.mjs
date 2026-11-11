@@ -178,23 +178,29 @@ console.log('PASS: Guther approved optional dialogue and universal Millhand skip
 // card, and the journal must never expand the card or the illustration region.
 // The owner's transparent evidence cutouts are real items, not square UI cards.
 const stage3SceneSource = readFileSync(resolve(root,'apps/web/src/lib/MillhandMissingStampScene.svelte'),'utf8');
+// Prettier-formatted component: compare CSS/markup without whitespace.
+const stage3Flat = stage3SceneSource.replace(/\s+/g,'').replace(/;\}/g,'}');
 const stage3DialogueEnd = stage3SceneSource.indexOf('</aside>');
-const stage3SceneEnd = stage3SceneSource.indexOf('  </div>\n  <div class="scene-footer">',stage3DialogueEnd);
-const journalPanelStart = stage3SceneSource.indexOf('<section id="stage-three-journal"');
+const stage3SceneEnd = stage3SceneSource.indexOf('</ActivityLayout>',stage3DialogueEnd);
+const stage3StageStart = stage3SceneSource.indexOf('{#snippet stage()}');
+const stage3StageEnd = stage3SceneSource.indexOf('{/snippet}',stage3StageStart);
+const journalPanelStart = stage3SceneSource.indexOf('id="stage-three-journal"');
 assert.ok(stage3DialogueEnd>=0 && stage3SceneEnd>stage3DialogueEnd,'Missing Stamp scene shape changed');
-assert.ok(stage3SceneSource.indexOf('<div class="evidence"')>stage3DialogueEnd,
-  'Evidence must be a separate scene-grid sibling, not overlaying dialogue from inside the illustration');
-assert.ok(stage3SceneSource.indexOf('<div class="evidence"')<stage3SceneEnd,
-  'Evidence must remain part of the workshop scene');
+assert.ok(stage3SceneSource.indexOf('<div class="evidence"')>stage3StageStart &&
+  stage3SceneSource.indexOf('<div class="evidence"')<stage3StageEnd,
+  'Evidence must stay on the painted workbench (scene stage), never inside the dialogue');
+assert.ok(stage3SceneSource.indexOf('<aside')>stage3StageEnd,
+  'The dialogue is the adjacent reading column, not an overlay inside the illustration');
 assert.ok(journalPanelStart>stage3SceneEnd,
   'Stage3 journal entries must be outside the workshop scene and NPC popup');
-assert.ok(stage3SceneSource.includes('grid-template-rows:minmax(0,1fr) 178px') &&
-  stage3SceneSource.includes('height:clamp(610px,68vh,690px)'),
-  'Stage3 scene must have a fixed desktop composition independent of dialogue content');
-assert.ok(stage3SceneSource.includes('.evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;') &&
-  stage3SceneSource.includes('height:clamp(74px,6vw,100px)') &&
-  stage3SceneSource.includes('.evidence{position:relative;left:auto;bottom:auto;grid-column:1;grid-row:1;'),
-  'Stage3 table props must have a fixed tabletop anchor on desktop and remain in the illustration on mobile');
+assert.ok(stage3SceneSource.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
+  stage3Flat.includes('aspect-ratio:2/1') &&
+  !stage3Flat.includes('height:clamp(610px,68vh,690px)'),
+  'Stage3 scene keeps the native 2:1 workbench composition independent of dialogue content');
+assert.ok(stage3Flat.includes('.evidence{position:absolute;z-index:4;left:24%;bottom:3%;width:52%;') &&
+  stage3Flat.includes('height:clamp(64px,13cqi,180px)') &&
+  stage3Flat.includes('@containeractivity-stage(max-width:640px)'),
+  'Stage3 table props must have a fixed tabletop anchor and remain in the illustration on narrow stages');
 for(const name of ['returned-reference-plate.webp','cancellation-slip.webp']) {
   assert.ok(stage3SceneSource.includes('/workshop/'+name),'Missing supplied Stage3 art '+name);
 }
@@ -203,17 +209,16 @@ for(const name of ['returned-reference-plate-record.webp','cancellation-slip-rec
     'Owner supplied record image must be shown on the second inspection page: '+name);
 }
 assert.ok(stage3SceneSource.includes('class="record-illustration"') &&
-  stage3SceneSource.includes('max-height:240px'),
+  stage3Flat.includes('max-height:240px'),
   'Printed evidence should remain compact inside the dialogue frame, without growing the scene');
 assert.ok(stage3SceneSource.includes('class:route-choice=') &&
-  stage3SceneSource.includes('let decisionStep=$state<0|1>(0)') &&
-  stage3SceneSource.includes('decisionStep=1;') &&
-  stage3SceneSource.includes('max-height:none;overflow:visible;') &&
-  !stage3SceneSource.includes('overflow-y:auto'),
+  stage3Flat.includes('letdecisionStep=$state<0|1>(0)') &&
+  stage3Flat.includes('decisionStep=1') &&
+  stage3Flat.includes('max-height:none;overflow:visible;') &&
+  !stage3Flat.includes('overflow-y:auto'),
   'Stage3 route selection must have separate briefing/choice beats without any nested dialogue scrollbar');
 assert.ok(stage3SceneSource.includes('class:record-view=') &&
-  stage3SceneSource.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
-  stage3SceneSource.includes('class="scene-footer"') &&
+  stage3Flat.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
   !stage3SceneSource.includes('class="journal-trigger"'),
   'Evidence reading should not introduce a scroll bar or add a journal action inside the popup');
 assert.ok(stage3SceneSource.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
@@ -223,40 +228,41 @@ assert.ok(stage3SceneSource.includes('snapshot.slip.workerNumber || snapshot.sli
 assert.ok(!stage3SceneSource.includes('<div class="journal-entries" aria-label'),
   'Stage3 journal must not be nested inside the NPC dialogue box');
 assert.ok(stage3SceneSource.includes('scrollIntoView') &&
-  stage3SceneSource.includes("import {tick} from 'svelte';"),
+  stage3Flat.includes('import{tick}from"svelte";'),
   'Opening the separate journal should expose it using page scrolling');
-assert.ok(stage3SceneSource.includes('let evidencePage=$state(0)') &&
-  stage3SceneSource.includes("inspectedView=which;\n    evidencePage=0;"),
+assert.ok(stage3Flat.includes('letevidencePage=$state(0)') &&
+  stage3Flat.includes('inspectedView=which;evidencePage=0;'),
   'Each item inspection must restart its authored local reading sequence');
-assert.ok(stage3SceneSource.includes("evidencePage===0") &&
-  stage3SceneSource.includes("evidencePage===1") &&
-  stage3SceneSource.includes("evidencePage=2;"),
+assert.ok(stage3Flat.includes("evidencePage===0") &&
+  stage3Flat.includes("evidencePage===1") &&
+  stage3Flat.includes("evidencePage=2"),
   'Stage3 must show observation, record and contradiction on separate Continue pages');
-const firstPart=stage3SceneSource.indexOf("evidencePage===0");
-const recordPart=stage3SceneSource.indexOf("evidencePage===1",firstPart);
-const findingPart=stage3SceneSource.indexOf("<!-- Part 3:",recordPart);
-const firstServerAction=stage3SceneSource.indexOf("perform('show_guther')",firstPart);
+const firstPart=stage3Flat.indexOf("evidencePage===0");
+const recordPart=stage3Flat.indexOf("evidencePage===1",firstPart);
+const findingPart=stage3Flat.indexOf("<!--Part3:",recordPart);
+const firstServerAction=stage3Flat.indexOf('perform("show_guther")',firstPart);
 assert.ok(firstPart>=0&&recordPart>firstPart&&findingPart>recordPart&&firstServerAction>findingPart,
   'Show Guther action is gated to the final evidence page');
-assert.ok(stage3SceneSource.includes('evidencePage=1;') &&
-  stage3SceneSource.includes('evidencePage=2;') &&
-  !stage3SceneSource.includes("perform('continue_dialogue');}}\n                Continue"),
+assert.ok(stage3Flat.includes('evidencePage=1') &&
+  stage3Flat.includes('evidencePage=2') &&
+  !stage3Flat.includes('perform("continue_dialogue");}}>Continue'),
   'Local evidence page changes must not mutate the server or dialogue revision');
 assert.ok(stage3SceneSource.includes('class="environment bench-foreground"') &&
-  stage3SceneSource.includes('clip-path:inset(70% 0 0 0)') &&
-  !stage3SceneSource.includes('.guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:'),
+  stage3Flat.includes('clip-path:inset(70%000)') &&
+  !stage3Flat.includes('.guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:'),
   'Stage 3 must occlude Guther with the matching foreground workshop table, not cut his apron with a horizontal mask');
-assert.ok(stage3SceneSource.includes("background:#49301d") &&
-  stage3SceneSource.includes("color:#fff1d7"),
+assert.ok(stage3Flat.includes("background:#49301d") &&
+  stage3Flat.includes("color:#fff1d7"),
   'Stage3 route labels must remain high contrast on the supplied button art');
 for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
   const scene=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
-  assert.ok(scene.includes('height:clamp(535px,62vh,640px)') &&
+  assert.ok(scene.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
+    scene.includes('aspect-ratio:2 / 1') &&
     scene.includes('bench-foreground') &&
     scene.includes('clip-path:inset(70% 0 0 0)'),
-    component+' must keep a fixed composition and use the real foreground workbench to occlude Guther');
-  assert.ok(scene.includes('max-height:calc(100% - 48px)'),
-    component+' must keep abnormally long dialogue from resizing the workshop');
+    component+' must keep the native 2:1 workbench composition and use the real foreground workbench to occlude Guther');
+  assert.ok(!scene.includes('max-height:calc(100% - 48px)') && !scene.includes('overflow-y:auto'),
+    component+' dialogue sits in the reading column at content height, so long dialogue never resizes or scrolls inside the workshop');
 }
 // Real tabletop hitboxes must cover the image, not only the text label.
 for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
@@ -270,12 +276,11 @@ for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
   assert.ok(source.includes('aria-label=')&&source.includes('aria-pressed='),
     component+' object interactions must remain keyboard and screen-reader accessible');
 }
-assert.ok(stage3SceneSource.includes('.evidence button:is(:hover,:focus-visible):not(:disabled) .evidence-art{transform:scale(1.018)}'),
+assert.ok(stage3Flat.includes('.evidencebutton:is(:hover,:focus-visible):not(:disabled).evidence-art{transform:scale(1.018)}'),
   'Stage3 inspection art must have the same subtle hover response');
 const ownerSkin=readFileSync(resolve(root,'apps/web/src/lib/pall-owner-ui.css'),'utf8');
-assert.ok(stage3SceneSource.includes('margin:0 0 clamp(89px,10vh,112px)') &&
-  stage3SceneSource.includes('margin:0 0 clamp(32px,7vw,54px)'),
-  'Stage3 evidence artwork and click targets must sit on the bench at desktop and mobile widths');
+assert.ok(stage3Flat.includes('.evidence{left:12%;bottom:4%;width:76%;'),
+  'Stage3 evidence artwork and click targets must sit on the bench at wide and narrow stage widths');
 assert.ok(ownerSkin.includes('color:#21150e') &&
   ownerSkin.includes('font-weight:600') &&
   ownerSkin.includes('font:600 15px/1.35 var(--pall-font-reading'),

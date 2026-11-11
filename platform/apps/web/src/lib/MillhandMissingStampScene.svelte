@@ -18,7 +18,9 @@
     missingStampJournal,
   } from "$lib/approved-stage-three";
   import NpcConversation from "$lib/NpcConversation.svelte";
+  import ActivityLayout from "$lib/ActivityLayout.svelte";
   import "$lib/workshop-object-labels.css";
+  import "$lib/pall-story-landscape.css";
   import { GUTHER_WORK_SKIP_LINE } from "$lib/approved-guther-optional";
 
   type Snapshot = {
@@ -115,7 +117,12 @@
 
 <section class="workshop" aria-label="Millhand Stage 3 The Missing Stamp">
   <div class="scene" bind:this={sceneElement}>
-    <div class="illustration">
+  <!-- Same scene layout as Stages 1-2: the workbench (with the evidence on
+       its tabletop) is the stage; the dialogue is the adjacent reading column. -->
+  <ActivityLayout mode="scene" stageAspect={2} class="pall-story-sections">
+  {#snippet stage()}
+  <div class="scene-visuals pall-story-visuals">
+    <div class="illustration pall-story-landscape">
       <img
         class="environment"
         src="/workshop/environment.webp"
@@ -145,8 +152,55 @@
       >
         <span class="workshop-npc-label">Guther Anvil</span>
       </button>
+        <div class="evidence" aria-label="Council evidence on the bench">
+          <button
+            type="button"
+            class:seen={state.plateRead}
+            data-workshop-object data-pall-sfx="click"
+            aria-pressed={inspectedView === "plate"}
+            disabled={state.phase === "CONFRONT" ||
+              state.phase === "DECISION" ||
+              state.phase === "RESTAMP"}
+            onclick={() => {
+              void inspect("plate");
+            }}
+          >
+            <img
+              class="evidence-art"
+              src="/workshop/returned-reference-plate.webp"
+              alt=""
+              aria-hidden="true"
+            /><span class="workshop-object-label evidence-label"
+              >Returned plate</span
+            >
+          </button>
+          <button
+            type="button"
+            class:seen={state.slipRead}
+            data-workshop-object data-pall-sfx="paper"
+            aria-pressed={inspectedView === "slip"}
+            disabled={state.phase === "CONFRONT" ||
+              state.phase === "DECISION" ||
+              state.phase === "RESTAMP"}
+            onclick={() => {
+              void inspect("slip");
+            }}
+          >
+            <img
+              class="evidence-art"
+              src="/workshop/cancellation-slip.webp"
+              alt=""
+              aria-hidden="true"
+            /><span class="workshop-object-label evidence-label"
+              >Cancellation slip</span
+            >
+          </button>
+        </div>
     </div>
-
+  </div>
+  {/snippet}
+  {#snippet panel()}
+  <div class="reading-column pall-story-dialogue-section">
     <aside
       class="dialogue"
       class:record-view={(state.phase === "INSPECT" ||
@@ -390,50 +444,9 @@
         {#if pending}<p role="status" class="hint">Saving…</p>{/if}
       {/if}
     </aside>
-    <div class="evidence" aria-label="Council evidence on the bench">
-      <button
-        type="button"
-        class:seen={state.plateRead}
-        data-workshop-object data-pall-sfx="click"
-        aria-pressed={inspectedView === "plate"}
-        disabled={state.phase === "CONFRONT" ||
-          state.phase === "DECISION" ||
-          state.phase === "RESTAMP"}
-        onclick={() => {
-          void inspect("plate");
-        }}
-      >
-        <img
-          class="evidence-art"
-          src="/workshop/returned-reference-plate.webp"
-          alt=""
-          aria-hidden="true"
-        /><span class="workshop-object-label evidence-label"
-          >Returned plate</span
-        >
-      </button>
-      <button
-        type="button"
-        class:seen={state.slipRead}
-        data-workshop-object data-pall-sfx="paper"
-        aria-pressed={inspectedView === "slip"}
-        disabled={state.phase === "CONFRONT" ||
-          state.phase === "DECISION" ||
-          state.phase === "RESTAMP"}
-        onclick={() => {
-          void inspect("slip");
-        }}
-      >
-        <img
-          class="evidence-art"
-          src="/workshop/cancellation-slip.webp"
-          alt=""
-          aria-hidden="true"
-        /><span class="workshop-object-label evidence-label"
-          >Cancellation slip</span
-        >
-      </button>
-    </div>
+  </div>
+  {/snippet}
+  </ActivityLayout>
   </div>
   {#if journalOpen}
     <section
@@ -474,24 +487,15 @@
     color: #efdecb;
     font-family: var(--pall-font-reading, Georgia, serif);
   }
-  /* Fixed-size workshop composition: local Continue pages, not taller scenery.
-     Dialogue occupies the upper row and evidence the lower tabletop row. */
-  .scene {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 42%) minmax(0, 47%) minmax(0, 11%);
-    grid-template-rows: minmax(0, 1fr) 178px;
-    flex: 0 0 auto;
-    width: 100%;
-    min-width: 0;
-    height: clamp(610px, 68vh, 690px);
-    min-height: 0;
-    background: #291d15;
-  }
+  /* Same native 2:1 workbench stage as Stages 1-2: Guther, the bench
+     occluder and the evidence anchors stay on the painted tabletop at any
+     size. The dialogue is the adjacent, content-height reading column. */
   .illustration {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 1;
     overflow: hidden;
+    background: #291d15;
   }
   .environment {
     position: absolute;
@@ -574,7 +578,7 @@
     display: block;
     object-fit: contain;
     width: 100%;
-    height: clamp(132px, 13vw, 180px);
+    height: clamp(64px, 13cqi, 180px);
     pointer-events: none;
     filter: drop-shadow(0 5px 6px #0009);
     transform-origin: center 70%;
@@ -598,22 +602,18 @@
   .evidence button:disabled .evidence-label {
     opacity: 0.7;
   }
+  .reading-column {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .dialogue {
     position: relative;
-    z-index: 5;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
+    width: 100%;
     min-width: 0;
-    margin: clamp(20px, 2.6vw, 36px) 0 0;
-    padding: 15px 18px;
+    box-sizing: border-box;
     max-height: none;
     overflow: visible;
-    border: 2px solid #654022;
-    border-radius: 5px;
-    background: #efdfbb;
     color: #251910;
-    box-shadow: 0 7px 15px #0008;
   }
   .eyebrow {
     font: 600 11px sans-serif;
@@ -624,8 +624,8 @@
   .story,
   .speech,
   .finding {
-    font-size: clamp(14px, 1.25vw, 17px);
-    line-height: 1.5;
+    font-size: var(--dialogue-text, 17px);
+    line-height: 1.55;
     margin: 0 0 13px;
   }
   .speaker {
@@ -639,7 +639,7 @@
   }
   .instruction {
     font-weight: bold;
-    font-size: 14px;
+    font-size: var(--dialogue-text, 17px);
     line-height: 1.4;
     margin: 14px 0;
   }
@@ -654,7 +654,7 @@
     padding: 10px 12px;
     min-height: 40px;
     text-align: left;
-    font: 14px/1.4 var(--pall-font-reading, Georgia, serif);
+    font: var(--dialogue-text, 17px)/1.4 var(--pall-font-reading, Georgia, serif);
     border: 1px solid #6d5235;
     background: #241d16;
     color: #f7e6c9;
@@ -803,21 +803,10 @@
     font: 13px/1.4 sans-serif;
     color: #873523;
   }
-  @media (max-width: 700px) {
-    .scene {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto auto;
-      height: auto;
-      min-height: 0;
-      flex: 0 0 auto;
-    }
+  /* Narrow stage (phones, or a narrow column): the original 4:3 close crop
+     keeps Guther and both evidence props large enough to tap. */
+  @container activity-stage (max-width: 640px) {
     .illustration {
-      position: relative;
-      grid-column: 1;
-      grid-row: 1;
-      inset: auto;
-      width: 100%;
       aspect-ratio: 4/3;
     }
     .environment {
@@ -838,39 +827,21 @@
       height: 49%;
     }
     .evidence {
-      position: relative;
-      left: auto;
-      bottom: auto;
-      grid-column: 1;
-      grid-row: 1;
-      justify-self: center;
-      align-self: end;
-      width: min(76%, 440px);
-      margin: 0 0 clamp(32px, 7vw, 54px);
+      left: 12%;
+      bottom: 4%;
+      width: 76%;
       gap: 7px;
     }
     .evidence-art {
-      height: clamp(94px, 25vw, 142px);
+      height: clamp(56px, 24cqi, 142px);
     }
-    .dialogue {
-      grid-column: 1;
-      grid-row: 2;
-      margin: 0;
-      width: 100%;
-      border-radius: 0;
-      padding: 14px;
-      max-height: none;
-      overflow: visible;
-    }
+  }
+  @container activity-panel (max-width: 480px) {
     .record-illustration img {
       max-height: 300px;
     }
-    .journal-outside{top:8px;right:8px;max-width:none;min-width:104px}
-    .story,
-    .speech,
-    .finding {
-      font-size: 16px;
-    }
+  }
+  @media (max-width: 700px) {
     .journal-heading h2 {
       font-size: 20px;
     }
@@ -879,9 +850,6 @@
     }
   }
   @media (max-width: 375px) {
-    .evidence {
-      width: 82%;
-    }
     .journal-heading {
       align-items: start;
     }

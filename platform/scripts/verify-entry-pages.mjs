@@ -253,10 +253,14 @@ assert.ok(characterApi.includes('avatar_id')&&contract.includes('invalid_avatar'
   'Saved portraits must have a validated persistence layer');
 assert.ok(shell.includes('min-height:clamp(160px,17vw,225px)'),
   'The common city banner must be compact');
+// Millhand Stages 1-3 now share the scene layout's native 2:1 workbench stage;
+// Stage 4 rooms keep their own compact composition until migrated.
+for(const file of ['WorkshopScene.svelte','MillhandWorkScene.svelte','MillhandMissingStampScene.svelte']){
+  const flat=read('apps/web/src/lib/'+file).replace(/\s+/g,'');
+  assert.ok(flat.includes('<ActivityLayoutmode="scene"stageAspect={2}')&&flat.includes('aspect-ratio:2/1'),
+    'Workshop scene must use the shared 2:1 scene stage: '+file);
+}
 for(const [file,expected] of [
-  ['WorkshopScene.svelte','height:clamp(535px,62vh,640px)'],
-  ['MillhandWorkScene.svelte','height:clamp(535px,62vh,640px)'],
-  ['MillhandMissingStampScene.svelte','height:clamp(610px,68vh,690px)'],
   ['MillhandDepotScene.svelte','height:clamp(565px,65vh,680px)'],
   ['MillhandContractsScene.svelte','height:clamp(565px,65vh,680px)'],
   ['MillhandRecordsScene.svelte','height:clamp(565px,65vh,680px)']

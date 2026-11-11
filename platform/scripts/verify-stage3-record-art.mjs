@@ -8,6 +8,8 @@ import {resolve} from 'node:path';
 
 const root=resolve(import.meta.dirname,'..');
 const scene=readFileSync(resolve(root,'apps/web/src/lib/MillhandMissingStampScene.svelte'),'utf8');
+// The component is Prettier-formatted; compare its CSS/markup without whitespace.
+const flat=scene.replace(/\s+/g,'');
 const files=['cancellation-slip-record.webp','returned-reference-plate-record.webp'];
 let missing=false;
 for(const name of files){
@@ -23,20 +25,25 @@ for(const name of files){
   assert.equal(bytes.toString('ascii',0,4),'RIFF','Not a WebP: '+name);
   assert.equal(bytes.toString('ascii',8,12),'WEBP','Invalid WebP header: '+name);
 }
-assert.ok(scene.includes('evidencePage===1') &&
+assert.ok(flat.includes('evidencePage===1') &&
   scene.includes('class="record-illustration"') &&
-  scene.includes('max-height:240px'),
+  flat.includes('max-height:240px'),
   'Owner record images must appear only in the compact second inspection page');
-assert.ok(scene.includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
-  scene.includes('max-height:none;overflow:visible;') &&
-  !scene.includes('overflow-y:auto') &&
-  scene.includes('class="scene-footer"'),
-  'All Stage3 dialogue beats must be scrollbar-free; the journal remains outside the popup');
-assert.ok(scene.includes('.evidence{position:absolute;z-index:4;left:29%;bottom:3%;width:42%;') &&
-  scene.includes('height:clamp(74px,6vw,100px)') &&
-  scene.includes("decisionStep=1;") &&
+// Shared scene layout: the dialogue is a content-height reading column beside
+// the workbench, and the journal stays outside the scene in page flow.
+assert.ok(flat.replace(/;\}/g,'}').includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
+  flat.includes('max-height:none;overflow:visible;') &&
+  !flat.includes('overflow-y:auto') &&
+  scene.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
+  scene.indexOf('id="stage-three-journal"')>scene.indexOf('</ActivityLayout>'),
+  'All Stage3 dialogue beats must be scrollbar-free; the journal remains outside the scene');
+const stageStart=scene.indexOf('{#snippet stage()}'),stageEnd=scene.indexOf('{/snippet}',stageStart);
+assert.ok(flat.includes('.evidence{position:absolute;z-index:4;left:24%;bottom:3%;width:52%;') &&
+  scene.indexOf('class="evidence"')>stageStart && scene.indexOf('class="evidence"')<stageEnd &&
+  flat.includes('height:clamp(64px,13cqi,180px)') &&
+  flat.includes('decisionStep=1') &&
   scene.includes('class:route-choice='),
-  'Evidence props must remain on the table and the three-route choice must have a compact separate beat');
+  'Evidence props must remain on the painted table and the three-route choice must have a compact separate beat');
 assert.ok(scene.includes('snapshot.slip.workerNumber || snapshot.slip.recordedDeathDate') &&
   scene.includes('snapshot.plate.workerNumber || snapshot.plate.inspectionDate'),
   'If real numbers or dates are authored, use live data instead of stale printed placeholders');
