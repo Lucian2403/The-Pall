@@ -96,6 +96,11 @@
       if(response.ok){
         round=await response.json() as Round;
         pendingId=null;pendingAction=null;selected=null;
+        if(round.stage===3){
+          await goto('/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',
+            {replaceState:true,invalidateAll:true});
+          return;
+        }
       }else{
         const data=await response.json() as {error?:string};
         if(response.status===409&&data.error==='stale_revision'){
@@ -128,6 +133,9 @@
         round=await r.json() as Round;
         if(character.origin!=='Bellrunner'||round.stage!==2||!round.accepted){
           if(round.stage===1)await goto('/characters/'+encodeURIComponent(id)+'/opening',{replaceState:true});
+          else if(round.stage>=3)await goto(
+            '/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',
+            {replaceState:true,invalidateAll:true});
           else status='unavailable';
           return;
         }
