@@ -11,9 +11,9 @@
     onClose:()=>void;
     children?:Snippet;
     /** overlay: floats over the artwork near its object (original behaviour).
-        docked: sits in the scene's reading column, under the dialogue, so it
-        never covers the art or needs its own scrollbar (scene layout). */
-    placement?:'overlay'|'docked';
+        docked: a separate in-flow reading-column card (legacy).
+        inline: inside the existing narrative parchment; no second frame. */
+    placement?:'overlay'|'docked'|'inline';
   }=$props();
 
   let panel:HTMLElement|undefined;
@@ -45,7 +45,7 @@
   // when stacked); bring it into view without jumping if already visible.
   $effect(()=>{
     void itemKey;
-    if(placement!=='docked')return;
+    if(placement==='overlay')return;
     void tick().then(()=>{
       if(!panel)return;
       const box=panel.getBoundingClientRect();
@@ -56,7 +56,7 @@
   });
 </script>
 
-<aside bind:this={panel} class="workshop-inspection {itemKey}" class:docked={placement==='docked'}
+<aside bind:this={panel} class="workshop-inspection {itemKey}" class:docked={placement==='docked'} class:inline={placement==='inline'}
   role="region" aria-label={title+' inspection'} aria-live="polite">
   <div class="inspection-heading">
     <strong>{title}</strong>
@@ -151,6 +151,28 @@
     font-size:var(--dialogue-title,21px);
   }
   .workshop-inspection.docked .inspection-copy{
+    font-size:var(--dialogue-text,17px);
+    line-height:1.55;
+  }
+  /* Embedded inspection: reuse the current dialogue parchment instead of
+     stacking a second ornate frame underneath the conversation. */
+  .workshop-inspection.inline{
+    position:static;
+    inset:auto;
+    width:100%;
+    max-height:none;
+    overflow:visible;
+    margin:0;
+    padding:9px 0 0;
+    border:0;
+    border-image:none;
+    background:transparent;
+    box-shadow:none;
+  }
+  .workshop-inspection.inline .inspection-heading strong{
+    font-size:var(--dialogue-title,21px);
+  }
+  .workshop-inspection.inline .inspection-copy{
     font-size:var(--dialogue-text,17px);
     line-height:1.55;
   }

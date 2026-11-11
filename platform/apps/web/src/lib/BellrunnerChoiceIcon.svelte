@@ -1,5 +1,5 @@
 <script lang="ts">
-  /** Decorative, consistent ink-line pictograms for framed Bellrunner choices.
+  /** Shared ink-line pictograms for narrative choices across origins.
    * Buttons own the accessible name; never replace their textual labels.
    */
   let {kind='chat'}:{kind?:'chat'|'book'|'back'|'route'|'mark'}=$props();

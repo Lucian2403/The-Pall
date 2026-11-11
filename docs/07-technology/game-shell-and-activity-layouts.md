@@ -80,8 +80,8 @@ its own art, props and mechanics, but uses the same scene layout:
   `.work-card`, `.work-dialogue`, `.clinic-dialogue`, `.home-dialogue`) sits in
   `.reading-column.pall-story-dialogue-section`. It is content-height
   (`max-height:none; overflow:visible`), never an overlay on the art and never
-  an internal scroller. Item inspections dock there too
-  (`WorkshopItemPopover placement="docked"`).
+  an internal scroller. Item inspections render inside the active dialogue frame
+  (`WorkshopItemPopover placement="inline"`).
 - **Supplement** holds optional papers under the conversation (the clinic's
   examination record). Personal journals stay below the layout; Home's
   storage and journal stay native `<dialog>` modals.
