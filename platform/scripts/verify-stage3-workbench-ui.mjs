@@ -22,7 +22,8 @@ assert.match(s,/aria-pressed=\{inspectedView === "plate"\}/);
 assert.match(s,/aria-pressed=\{inspectedView === "slip"\}/);
 assert.match(s,/class:seen=\{state\.plateRead\}/);
 assert.match(s,/class:seen=\{state\.slipRead\}/);
-assert.match(s,/clamp\(132px, 13vw, 180px\)/);
+// Evidence props scale with the scene stage (container units), not the window.
+assert.match(s,/clamp\(64px, 13cqi, 180px\)/);
 assert.doesNotMatch(s,/scene-footer|Council-owned evidence\. No wages/);
 assert.ok(s.includes("registerSceneJournal?.({id:'stage-three-journal'"));
 assert.ok(!s.includes('class="journal-toggle journal-outside"'),
