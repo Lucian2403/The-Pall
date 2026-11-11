@@ -208,7 +208,16 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
       await client.query(
         'UPDATE player_character_bellrunner_dispatch SET revision=$2,work_state=$3::jsonb WHERE character_id=$1',
         [req.params.id,revision+1,JSON.stringify(next)]);
-      const result=view(ch.rows[0],true,revision+1,next);
+      // Only the explicit sealed-order handoff advances the character.
+      const movesToWrongBell=command.action==='take_final_notice';
+      if(movesToWrongBell){
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=3,tutorial_status='NOT_STARTED' WHERE id=$1",
+          [req.params.id]);
+      }
+      const result=view(movesToWrongBell
+        ?{...ch.rows[0],tutorial_stage:3,tutorial_status:'NOT_STARTED'}
+        :ch.rows[0],true,revision+1,next);
       await client.query(
         'INSERT INTO player_character_bellrunner_dispatch_work_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,command.requestId,hash,JSON.stringify(result)]);
