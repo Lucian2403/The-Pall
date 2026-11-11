@@ -310,7 +310,7 @@
   @container activity-stage (max-width:600px){
     .alley-scene{aspect-ratio:4 / 3}
     .alley-art{background-position:70% center}
-    .flint-figure{left:-4%;width:46%;height:90%}
+    .flint-figure{left:0;width:44%;height:90%}
     .flint-image{height:calc(100% - 32px)}
     .flint-label{width:min(150px,74%)}
     .object .workshop-object-label{min-width:0}
