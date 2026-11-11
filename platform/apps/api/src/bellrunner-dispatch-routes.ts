@@ -173,10 +173,6 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
         await client.query('ROLLBACK');transaction=false;
         return reply.code(404).send({error:'not_found'});
       }
-      if(ch.rows[0].tutorial_stage!==2||ch.rows[0].tutorial_status!=='IN_PROGRESS'){
-        await client.query('ROLLBACK');transaction=false;
-        return reply.code(409).send({error:'wrong_work_phase'});
-      }
       const current=await client.query<DispatchRow>(
         'SELECT revision,work_state FROM player_character_bellrunner_dispatch WHERE character_id=$1 FOR UPDATE',
         [req.params.id]);
@@ -192,6 +188,10 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
         if(replay.rows[0].request_hash!==hash)
           return reply.code(409).send({error:'idempotency_key_reuse'});
         return replay.rows[0].result;
+      }
+      if(ch.rows[0].tutorial_stage!==2||ch.rows[0].tutorial_status!=='IN_PROGRESS'){
+        await client.query('ROLLBACK');transaction=false;
+        return reply.code(409).send({error:'wrong_work_phase'});
       }
       const revision=Number(current.rows[0].revision);
       if(revision!==command.expectedRevision){
