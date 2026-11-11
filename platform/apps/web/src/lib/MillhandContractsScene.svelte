@@ -13,6 +13,8 @@
     secondJobJournal,
   } from "$lib/approved-stage-four";
   import "$lib/workshop-object-labels.css";
+  import "$lib/pall-story-landscape.css";
+  import ActivityLayout from "$lib/ActivityLayout.svelte";
   import StageFourNextStep from "$lib/StageFourNextStep.svelte";
 
   type Snapshot = {
@@ -114,7 +116,12 @@
   class="second-job contracts-job"
   aria-label="Disputed Docket, Commerce and Contracts Stage 4"
 >
-  <div class="contracts-scene">
+  <!-- Shared scene layout: the Council Contracts office painting with its two counter books is
+       the stage (2:1); the room's dialogue is the content-height reading column. -->
+  <ActivityLayout mode="scene" stageAspect={2} class="contracts-scene pall-story-sections">
+  {#snippet stage()}
+  <div class="scene-visuals pall-story-visuals">
+  <div class="room-stage pall-story-landscape">
     <div
       class="office-art"
       role="img"
@@ -158,7 +165,11 @@
         <span class="workshop-object-label">Wage record</span>
       </button>
     </div>
-
+  </div>
+  </div>
+  {/snippet}
+  {#snippet panel()}
+  <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label="Contracts office interaction">
       <p class="eyebrow">DISPUTED DOCKET · STAGE 4</p>
       {#if state.revision === 0}
@@ -216,6 +227,8 @@
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
     </aside>
   </div>
+  {/snippet}
+  </ActivityLayout>
 
   <div class="scene-footer">
     <span
@@ -260,20 +273,22 @@
     min-width: 0;
     font-family: var(--pall-font-reading, Georgia, serif);
   }
-  .contracts-scene {
+  .room-stage {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    height: clamp(565px, 65vh, 680px);
+    aspect-ratio: 2 / 1;
     min-width: 0;
     background: #322720;
   }
+  /* Shared 2:1 stage. The office painting (2039x771) covers it centred,
+     close to the previous crop, so the books stay on the painted counter. */
   .office-art {
     position: absolute;
     inset: 0;
     z-index: 0;
     background: url("/locations/contracts/contracts-office.webp") no-repeat
-      center 50%;
+      center 50% / cover;
   }
   .record-props {
     position: absolute;
@@ -281,7 +296,7 @@
     left: 2.5%;
     bottom: 8%;
     width: 54%;
-    height: 29%;
+    height: 36%;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -329,17 +344,18 @@
     outline: 2px solid #e6bb83;
     outline-offset: 2px;
   }
+  /* Reading column: content-height, never an internal scrollbar. */
+  .reading-column {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .work-dialogue {
-    position: absolute;
-    top: clamp(22px, 2.8vw, 42px);
-    right: 3%;
-    z-index: 3;
-    width: min(45%, 650px);
+    position: relative;
+    width: 100%;
     box-sizing: border-box;
     min-width: 0;
-    max-height: calc(100% - 65px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    max-height: none;
+    overflow: visible;
     margin: 0;
     padding: 15px 18px;
     background: #ead9b9;
@@ -355,14 +371,14 @@
     margin: 0 0 11px;
   }
   .speech {
-    font: 17px/1.42 var(--pall-font-reading, Georgia, serif);
+    font: var(--dialogue-text, 17px)/1.55 var(--pall-font-reading, Georgia, serif);
     margin: 0 0 14px;
   }
   .result,
   .instruction,
   .context,
   .outcome {
-    font: 15px/1.45 var(--pall-font-reading, Georgia, serif);
+    font: var(--dialogue-text, 17px)/1.55 var(--pall-font-reading, Georgia, serif);
     color: #25180f;
     margin: 0 0 12px;
   }
@@ -377,7 +393,7 @@
     border-top: 1px solid #b69b74;
     margin: 9px 0;
     padding-top: 9px;
-    font: 13px/1.4 sans-serif;
+    font: 15px/1.45 var(--pall-font-reading, Georgia, serif);
     color: #493021;
   }
   .inspection strong {
@@ -409,7 +425,7 @@
     color: #f2dfc7;
     border: 1px solid #927048;
     cursor: pointer;
-    font: 14px/1.4 var(--pall-font-reading, Georgia, serif);
+    font: var(--dialogue-text, 17px)/1.4 var(--pall-font-reading, Georgia, serif);
     text-align: left;
   }
   .actions button:disabled {
@@ -477,11 +493,11 @@
     font: 600 16px/1.55 var(--pall-font-reading, Georgia, serif);
     color: #24160e;
   }
-  @media (max-width: 760px) {
-    .contracts-scene {
-      display: flex;
-      flex-direction: column;
-      height: auto;
+  /* Narrow stage: books get their own row overlapping the counter edge so
+     both stay tappable (same treatment as before, decided by stage width). */
+  @container activity-stage (max-width: 640px) {
+    .room-stage {
+      aspect-ratio: auto;
       overflow: visible;
     }
     .office-art {
@@ -507,16 +523,13 @@
     .record-prop {
       font-size: 12px;
     }
+  }
+  @container activity-panel (max-width: 480px) {
     .work-dialogue {
-      position: relative;
-      top: auto;
-      right: auto;
-      width: 100%;
-      max-height: none;
-      overflow: visible;
-      margin: 0;
       padding: 14px;
     }
+  }
+  @media (max-width: 760px) {
     .scene-footer {
       flex-wrap: wrap;
     }
