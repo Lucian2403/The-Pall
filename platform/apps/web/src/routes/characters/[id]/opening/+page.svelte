@@ -122,6 +122,10 @@
           await goto('/characters/' + character.id + '/bellrunner/dispatch');
           return;
         }
+        if (character.origin === 'Bellrunner' && character.tutorial.stage >= 3) {
+          await goto('/characters/' + character.id + '/bellrunner/wrong-bell');
+          return;
+        }
         const originScene = APPROVED_STAGE_ONE[body.character.origin];
         if (!originScene || body.character.tutorial.stage !== 1 || body.character.tutorial.status !== 'NOT_STARTED') {
           status = 'not-ready';
