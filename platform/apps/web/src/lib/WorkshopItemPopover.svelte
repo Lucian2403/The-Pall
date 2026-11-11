@@ -1,15 +1,19 @@
 <script lang="ts">
-  import {onMount} from 'svelte';
+  import {onMount,tick} from 'svelte';
   import type {Snippet} from 'svelte';
 
   type WorkshopObjectKey='stamps'|'plates'|'paper'|'hammer'|'notices'|'sealed'|'route';
 
-  let {itemKey,title,description,onClose,children}:{
+  let {itemKey,title,description,onClose,children,placement='overlay'}:{
     itemKey:WorkshopObjectKey;
     title:string;
     description:string;
     onClose:()=>void;
     children?:Snippet;
+    /** overlay: floats over the artwork near its object (original behaviour).
+        docked: sits in the scene's reading column, under the dialogue, so it
+        never covers the art or needs its own scrollbar (scene layout). */
+    placement?:'overlay'|'docked';
   }=$props();
 
   let panel:HTMLElement|undefined;
@@ -37,9 +41,22 @@
       document.removeEventListener('keydown',keydown);
     };
   });
+  // A docked card can open below the fold (short windows, or under the art
+  // when stacked); bring it into view without jumping if already visible.
+  $effect(()=>{
+    void itemKey;
+    if(placement!=='docked')return;
+    void tick().then(()=>{
+      if(!panel)return;
+      const box=panel.getBoundingClientRect();
+      if(box.top>=0&&box.bottom<=window.innerHeight)return;
+      const smooth=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      panel.scrollIntoView({block:'nearest',behavior:smooth?'smooth':'auto'});
+    });
+  });
 </script>
 
-<aside bind:this={panel} class="workshop-inspection {itemKey}"
+<aside bind:this={panel} class="workshop-inspection {itemKey}" class:docked={placement==='docked'}
   role="region" aria-label={title+' inspection'} aria-live="polite">
   <div class="inspection-heading">
     <strong>{title}</strong>
@@ -119,5 +136,22 @@
   }
   @media(max-width:380px){
     .workshop-inspection{bottom:30%;max-height:70%}
+  }
+  /* Docked in the reading column: in normal flow, as tall as its content.
+     position:static ignores every overlay offset above. */
+  .workshop-inspection.docked{
+    position:static;
+    width:100%;
+    max-height:none;
+    overflow:visible;
+    padding:8px 14px 12px;
+    box-shadow:0 7px 15px #0008;
+  }
+  .workshop-inspection.docked .inspection-heading strong{
+    font-size:var(--dialogue-title,21px);
+  }
+  .workshop-inspection.docked .inspection-copy{
+    font-size:var(--dialogue-text,17px);
+    line-height:1.55;
   }
 </style>

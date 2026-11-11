@@ -5,7 +5,9 @@
   import {WORK_ACTION_OBJECT} from '@the-pall/game-core';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/workshop-object-labels.css';
+  import '$lib/pall-story-landscape.css';
   import {PHASE_INSTRUCTION, ACTION_LABEL, resultCopy, observeObject, stageTwoJournal, type ObjectKey} from '$lib/millhand-work-copy';
 
   let {work, available, pending, errorMessage, perform}: {
@@ -51,8 +53,13 @@
 </script>
 
 <section class="workshop" aria-label="Millhand Stage 2 platework">
-  <div class="scene">
-    <div class="illustration">
+  <!-- Same scene layout as Stage 1: the workbench is the stage; the work
+       card and the selected object's card (with its saved actions) share
+       the adjacent reading column. -->
+  <ActivityLayout mode="scene" stageAspect={2} class="scene pall-story-sections">
+  {#snippet stage()}
+  <div class="scene-visuals pall-story-visuals">
+    <div class="illustration pall-story-landscape">
       <img class="environment" src="/workshop/environment.webp" alt="Smithing workshop with a forge and the city outside" />
       <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil standing by the workbench" />
       <img class="environment bench-foreground" src="/workshop/environment.webp" alt="" aria-hidden="true" />
@@ -75,26 +82,11 @@
           </button>
         {/each}
       </div>
-      {#if selected && !talkingToGuther}
-        <WorkshopItemPopover itemKey={selected}
-          title={objects.find(object=>object.key===selected)?.label??'Workshop object'}
-          description={observation??''}
-          onClose={() => {selected=null;}}>
-          {#if work.phase!=='COMPLETE' && contextualActions.length>0}
-            <div class="actions">
-              {#each contextualActions as action}
-                <button type="button" disabled={pending}
-                  data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
-                    ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
-                    ?'paper':'click'}
-                  onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
-              {/each}
-            </div>
-          {/if}
-        </WorkshopItemPopover>
-      {/if}
     </div>
-
+  </div>
+  {/snippet}
+  {#snippet panel()}
+  <div class="reading-column pall-story-dialogue-section">
     <aside class="work-card" aria-label={talkingToGuther ? "Optional conversation with Guther" : "Council platework"}>
       {#if talkingToGuther}
         <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} />
@@ -118,7 +110,27 @@
       {#if pending}<p role="status" class="small">Saving work…</p>{/if}
       {/if}
     </aside>
+    {#if selected && !talkingToGuther}
+      <WorkshopItemPopover itemKey={selected} placement="docked"
+        title={objects.find(object=>object.key===selected)?.label??'Workshop object'}
+        description={observation??''}
+        onClose={() => {selected=null;}}>
+        {#if work.phase!=='COMPLETE' && contextualActions.length>0}
+          <div class="actions">
+            {#each contextualActions as action}
+              <button type="button" disabled={pending}
+                data-pall-sfx={action==='stamp_number'||action==='straighten'||action==='fix_mark'
+                  ?'none':action==='read_paper'||action==='return_paper'||action==='finish_checking'
+                  ?'paper':'click'}
+                onclick={() => {void commitAction(action);}}>{ACTION_LABEL[action]}</button>
+            {/each}
+          </div>
+        {/if}
+      </WorkshopItemPopover>
+    {/if}
   </div>
+  {/snippet}
+  </ActivityLayout>
   <p class="footnote">The council has not paid for this work. The tools and metal remain at the workshop.</p>
   {#if journalOpen}
     <section class="stage-two-journal" id="stage-two-journal"
@@ -137,9 +149,9 @@
 
 <style>
   .workshop{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#eee1cf;font-family:var(--pall-font-reading,Georgia,serif)}
-  .scene{position:relative;display:grid;grid-template-columns:minmax(0,42%) minmax(0,47%) minmax(0,11%);
-    flex:0 0 auto;align-content:start;width:100%;min-width:0;height:clamp(535px,62vh,640px);min-height:0;grid-template-rows:minmax(0,1fr);background:#291d15}
-  .illustration{position:absolute;inset:0;overflow:hidden}
+  /* Same native 2:1 workbench stage as Stage 1: every object hitbox stays
+     on its painted tool at any size. */
+  .illustration{position:relative;width:100%;aspect-ratio:2 / 1;overflow:hidden;background:#291d15}
   .environment{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;pointer-events:none;z-index:1}
   .bench-foreground{z-index:2;clip-path:inset(70% 0 0 0)}
@@ -164,18 +176,20 @@
   .illustration:has(.target.paper:is(:hover,:focus-visible)) .object-art.paper{transform:scale(1.018)}
   .illustration:has(.target.hammer:is(:hover,:focus-visible)) .object-art.hammer{transform:rotate(-32deg) scale(1.018)}
   .target:focus-visible{outline:2px solid #eed4a3;outline-offset:2px}
-  .work-card{position:relative;grid-column:2;z-index:4;align-self:start;width:100%;margin:clamp(24px,3vw,50px) 0 24px;
-    min-width:0;max-height:calc(100% - 48px);overflow-y:auto;overscroll-behavior:contain;padding:15px 18px;border:2px solid #654022;border-radius:5px;background:#efdfbb;color:#251910;box-shadow:0 7px 15px #0008}
+  /* Reading column: work card, then the selected object's card and its
+     saved actions. Content-driven; no internal scrollbars. */
+  .reading-column{flex-direction:column;align-items:stretch;gap:10px}
+  .work-card{position:relative;width:100%;min-width:0;box-sizing:border-box;color:#251910}
   .heading{font:600 11px sans-serif;letter-spacing:.12em;color:#614029;margin:0 0 12px}
-  .story{font-size:clamp(13px,1.2vw,17px);line-height:1.5;margin:0 0 12px}
+  .story{font-size:var(--dialogue-text,17px);line-height:1.55;margin:0 0 12px}
   .rule{border-top:1px solid #b29c7e;margin:12px 0}
-  .instruction{font-weight:600;font-size:clamp(13px,1.1vw,16px);line-height:1.4;margin:0 0 10px}
+  .instruction{font-weight:600;font-size:var(--dialogue-text,17px);line-height:1.45;margin:0 0 10px}
   .actions{display:flex;flex-direction:column;gap:6px;margin-top:3px}
   .actions button{display:block;width:100%;text-align:left;border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 12px;font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer;min-height:42px}
+    padding:10px 12px;font:var(--dialogue-text,17px)/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer;min-height:42px}
   .actions button:hover,.actions button:focus-visible{background:#423022;outline:1px solid #c49d65}
   .actions button:disabled{opacity:.55;cursor:default}
-  .small{font-size:12px;line-height:1.45;color:#614e39}
+  .small{font-size:14px;line-height:1.45;color:#614e39}
   .error{font:13px/1.45 sans-serif;color:#873523}
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif;margin:0}
   .stage-two-journal{background:#e6d5b5;color:#24160e;padding:23px clamp(16px,3vw,45px);
@@ -189,21 +203,19 @@
   .journal-close:is(:hover,:focus-visible){background:#f6e4c3}
   .journal-entries{max-width:960px;margin:0 auto}
   .journal-entries p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 10px}
-  @media(max-width:700px){
-    .scene{display:flex;flex-direction:column;flex:0 0 auto;height:auto;min-height:0}
-    .illustration{position:relative;inset:auto;width:100%;aspect-ratio:4 / 3}
+  /* Narrow stage: the original 4:3 close crop keeps the tools tappable. */
+  @container activity-stage (max-width:640px){
+    .illustration{aspect-ratio:4 / 3}
     .environment{object-position:39% center}
     .guther{height:86%;left:-5%;top:2%}
     .bench-foreground{object-position:39% center}
     .npc-hotspot{left:0;top:7%;width:41%;height:49%;padding-bottom:0}
-    .npc-label{font-size:10px}
     .object-art.stamps{width:26%;height:24%;left:0;bottom:9%}
     .object-art.plates{width:29%;height:23%;left:24%;bottom:9%}
     .object-art.paper{width:27%;height:24%;left:49%;bottom:9%}
     .object-art.hammer{width:27%;height:30%;right:0;bottom:8%}
     .target{bottom:2%}.target.stamps{left:0;width:25%;height:33%}.target.plates{left:24%;width:29%;height:32%}
     .target.paper{left:49%;width:27%;height:33%}.target.hammer{right:0;width:27%;height:39%}
-    .work-card{width:100%;margin:0;padding:14px;border-radius:0;max-height:none;overflow:visible}
-    .story{font-size:16px;line-height:1.5}.instruction{font-size:15px}
   }
+  @media(prefers-reduced-motion:reduce){.object-art{transition:none}}
 </style>

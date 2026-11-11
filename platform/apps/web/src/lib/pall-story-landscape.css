@@ -1,10 +1,12 @@
-/* The Pall / Bellrunner story-scene surfaces.
+/* The Pall story-scene surfaces, shared by every origin.
    PLACEMENT is owned by ActivityLayout (mode="scene"): the illustrated
-   workstation is the stage, the parchment the adjacent reading panel and
-   the Round Documents tray the stage supplement. Two columns appear when
+   location is the stage, the parchment the adjacent reading panel and
+   contextual papers/props the stage supplement. Two columns appear when
    the activity container (not the window) can hold >=460px of art and a
    >=380px reading panel; below that the order is art → dialogue → papers.
-   This file keeps only the visual treatment shared by Stages 1 and 2.
+   Bellrunner (Dispatch House, streets, receiving desk) and Millhand
+   (workshop, depot, council offices, alley, clinic, home) share this
+   visual treatment; each keeps its own art, props and mechanics.
    No dialogue overlaps the painting. */
 .pall-story-sections{
   width:100%;
@@ -43,13 +45,32 @@
   min-height:0;
   padding:0;
 }
-/* One fixed type scale for every Bellrunner dialogue beat, Hector topic,
-   paper inspection and choice: the reading text never scales with the
-   window, so each line and button reads at the same size. */
-.workshop:is(.bellrunner,.dispatch){
+/* One fixed type scale for every story dialogue beat, NPC topic, object
+   inspection and choice, in both origins: the reading text never scales
+   with the window, so each line and button reads at the same size. */
+:is(.workshop,.second-job,.clinic,.stage8,.pall-story-sections){
   --dialogue-text:17px;
   --dialogue-title:21px;
   --dialogue-label:15px;
+}
+/* Millhand reading panels keep the owner's nine-slice frame and button art;
+   only the type follows the shared scale. Bellrunner sets its own (below). */
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.speech,.story,.narration,.dialogue-line,.spoken,.result,.outcome,
+    .context,.instruction,.finding,.inner-voice,.work-description,.notice-text,
+    .completion-copy){
+  font-size:var(--dialogue-text);
+  line-height:1.55;
+}
+.frame .chapter-content .pall-story-dialogue-section :is(h1,h2):not(.speaker-heading){
+  font-size:var(--dialogue-title);
+  line-height:1.3;
+}
+.frame .chapter-content :is(.workshop,.second-job) .pall-story-dialogue-section
+  :is(.responses,.actions,.choices) > button,
+.frame .chapter-content .pall-story-dialogue-section
+  :is(.pall-framed-button,.stage-next-step-link){
+  font-size:var(--dialogue-text);
 }
 /* Larger choice labels within Bellrunner only; the shared Millhand
    frame/button kit retains its own dimensions. */

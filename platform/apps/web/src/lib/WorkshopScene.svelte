@@ -3,7 +3,9 @@
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import WorkshopItemPopover from '$lib/WorkshopItemPopover.svelte';
+  import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/workshop-object-labels.css';
+  import '$lib/pall-story-landscape.css';
 
   type PropKey = 'stamps' | 'plates' | 'paper' | 'hammer';
   type PropSpec = {name: string; label: string; image: string; observation: string};
@@ -62,10 +64,14 @@
   }
 </script>
 
-<!-- The text/game-state is separate from the static artwork. No on-hover image swapping. -->
+<!-- The text/game-state is separate from the static artwork. No on-hover image swapping.
+     Scene layout (shared with Bellrunner): the workbench painting is the stage;
+     Guther's dialogue and any object inspection share the adjacent reading column. -->
 <section class="workshop" aria-label="Guther's workshop">
-  <div class="scene">
-    <div class="illustration">
+  <ActivityLayout mode="scene" stageAspect={2} class="scene pall-story-sections">
+  {#snippet stage()}
+  <div class="scene-visuals pall-story-visuals">
+    <div class="illustration pall-story-landscape">
     <img class="environment" src="/workshop/environment.webp" alt="The smithing workshop, with a forge, bench and distant city" />
     <img class="guther" src="/workshop/guther-front.webp" alt="Guther Anvil, the smithing foreman" />
     <!-- The exact same environment is composited again only over the tabletop.
@@ -97,19 +103,11 @@
         </button>
       {/each}
     </div>
-    {#if selected && !talkingToGuther}
-      <WorkshopItemPopover itemKey={selected}
-        title={workshopObjects[selected].name}
-        description={workshopObjects[selected].observation}
-        onClose={() => {selected=null;}}>
-        <small class="inspection-note">
-          {readyForWork
-            ? 'Stage 2 work commands are not enabled in this read-only integration.'
-            : 'This is inspection only. Continue the conversation to receive the work paper.'}
-        </small>
-      </WorkshopItemPopover>
-    {/if}
     </div>
+  </div>
+  {/snippet}
+  {#snippet panel()}
+  <div class="reading-column pall-story-dialogue-section">
     <div class="dialogue" aria-label="Workshop conversation">
       {#if talkingToGuther}
         <NpcConversation origin="Millhand" close={() => {talkingToGuther=false;}} skipToWork={() => {talkingToGuther=false;selected=null;skipToWork();}} />
@@ -149,14 +147,30 @@
       </div>
       {/if}
     </div>
+    {#if selected && !talkingToGuther}
+      <WorkshopItemPopover itemKey={selected} placement="docked"
+        title={workshopObjects[selected].name}
+        description={workshopObjects[selected].observation}
+        onClose={() => {selected=null;}}>
+        <small class="inspection-note">
+          {readyForWork
+            ? 'Stage 2 work commands are not enabled in this read-only integration.'
+            : 'This is inspection only. Continue the conversation to receive the work paper.'}
+        </small>
+      </WorkshopItemPopover>
+    {/if}
   </div>
+  {/snippet}
+  </ActivityLayout>
 
 </section>
 
 <style>
   .workshop {display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce;font-family:var(--pall-font-reading,Georgia,serif)}
-  .scene {position:relative;display:grid;grid-template-columns:minmax(0,43%) minmax(0,46%) minmax(0,11%);align-content:start;flex:0 0 auto;min-width:0;width:100%;height:clamp(535px,62vh,640px);min-height:0;grid-template-rows:minmax(0,1fr);background:#271b14;border:0;box-sizing:border-box}
-  .illustration {position:absolute;inset:0;overflow:hidden}
+  /* The workbench painting is the scene stage at its native 2:1 ratio, so
+     Guther, the bench occluder and every tabletop hitbox stay registered to
+     the painted objects at any size. */
+  .illustration {position:relative;width:100%;aspect-ratio:2 / 1;overflow:hidden;background:#271b14}
   .environment {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
   .guther {position:absolute;top:6%;left:11%;height:112%;max-width:none;width:auto;object-fit:contain;z-index:1;pointer-events:none;filter:drop-shadow(0 5px 6px #0a080555)}
   .bench-foreground {z-index:2;clip-path:inset(70% 0 0 0)}
@@ -170,18 +184,21 @@
   .prop-art.plates {width:25%;height:30%;bottom:5%;left:26%}
   .prop-art.paper {width:23%;height:29%;bottom:5%;left:56%}
   .prop-art.hammer {width:21%;height:38%;bottom:4%;right:0;transform:rotate(-32deg)}
-  .dialogue {position:relative;grid-column:2;z-index:4;align-self:start;width:100%;margin:clamp(24px,3vw,50px) 0 24px;min-width:0;max-height:calc(100% - 48px);overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;padding:14px 17px;border:2px solid #58351e;border-radius:5px;background:#efe0bf;color:#251a13;box-shadow:0 5px 0 #18110dcc,0 12px 18px #0007}
+  /* Reading column: Guther's conversation, then the selected object's card.
+     Both are as tall as their content; neither scrolls internally. */
+  .reading-column {flex-direction:column;align-items:stretch;gap:10px}
+  .dialogue {position:relative;width:100%;min-width:0;box-sizing:border-box;color:#251a13}
   .speaker {font:600 10px/1.4 sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4c3524;margin:0 0 8px}
-  .dialogue-line,.narration {margin:0 0 10px;font-size:clamp(12px,1.3vw,17px);line-height:1.4}
+  .dialogue-line,.narration {margin:0 0 12px;font-size:var(--dialogue-text,17px);line-height:1.55}
   .narration{font-style:italic}
-  .small {color:#654d3c;font-size:11px;line-height:1.3}
-  .responses {display:flex;flex-direction:column;gap:5px}
-  .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:12px/1.35 var(--pall-font-reading,Georgia,serif);padding:7px 9px;min-height:30px;cursor:pointer}
+  .small {color:#654d3c;font-size:14px;line-height:1.4}
+  .responses {display:flex;flex-direction:column;gap:6px}
+  .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:var(--dialogue-text,17px)/1.35 var(--pall-font-reading,Georgia,serif);padding:7px 9px;min-height:30px;cursor:pointer}
   .responses button:hover,.responses button:focus-visible {outline:2px solid #d3a86a;outline-offset:1px}
   .responses .back {background:#57412c;color:#f6e9d8}
   .responses .skip-to-work{background:#493321;border-color:#a07a4b}
   .responses button:disabled{opacity:.55;cursor:not-allowed}
-  .handoff-error{font:12px/1.4 sans-serif;color:#873523;margin:6px 0}
+  .handoff-error{font:13px/1.4 sans-serif;color:#873523;margin:6px 0}
   /* The entire visible object area, not just its nameplate, is clickable. */
   .prop-marker {position:absolute;z-index:5;bottom:1%;background:none;border:0;color:#f3e8d2;
     cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:0}
@@ -196,27 +213,25 @@
   .prop-marker:focus-visible {outline:2px solid #f2d28f;outline-offset:3px}
   .inspection-note{
     display:block;margin:0;color:#64452b;
-    font:500 12px/1.4 var(--pall-font-reading,Georgia,serif);
+    font:500 14px/1.4 var(--pall-font-reading,Georgia,serif);
   }
-  @media(max-width:700px){
-    .scene {display:flex;flex-direction:column;flex:0 0 auto;height:auto;min-height:0;}
-    .illustration {position:relative;inset:auto;aspect-ratio:4 / 3;width:100%;overflow:hidden;}
-    .environment {object-fit:cover;object-position:39% center}
+  /* A narrow stage (phones, or a narrow column) uses the original 4:3
+     close crop so Guther and the four tools stay large enough to tap. */
+  @container activity-stage (max-width:640px){
+    .illustration {aspect-ratio:4 / 3}
+    .environment {object-position:39% center}
     .guther {height:86%;left:-5%;top:2%}
     .bench-foreground{object-position:39% center}
     .npc-hotspot {left:0;top:7%;width:41%;height:49%;padding-bottom:0}
-    .npc-label {font-size:10px}
     .prop-art.stamps {width:26%;height:24%;left:0;bottom:9%}
     .prop-art.plates {width:29%;height:23%;left:24%;bottom:9%}
     .prop-art.paper {width:27%;height:24%;left:49%;bottom:9%}
     .prop-art.hammer {width:27%;height:30%;right:0;bottom:8%}
-    .dialogue {position:relative;top:auto;left:auto;width:100%;margin:0;padding:14px;border-radius:0;box-shadow:0 4px 10px #0007;max-height:none;overflow:visible}
-    .dialogue-line,.narration {font-size:16px;line-height:1.5}
     .prop-marker {bottom:2%}
     .prop-marker.stamps {left:0;width:25%;height:33%}
     .prop-marker.plates {left:24%;width:29%;height:32%}
     .prop-marker.paper {left:49%;width:27%;height:33%}
     .prop-marker.hammer {right:0;width:27%;height:39%}
   }
-  @media(max-width:380px){.dialogue{margin:0;padding:12px}}
+  @media(prefers-reduced-motion:reduce){.prop-art{transition:none}}
 </style>

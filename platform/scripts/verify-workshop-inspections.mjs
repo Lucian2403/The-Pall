@@ -27,12 +27,19 @@ for(const src of [intro,platework]){
   assert.ok(!src.includes('<div class="inspection"') &&
     !src.includes('class="tag"') && !src.includes('class="label"'),
     'Remove old below-art description strip and plain dark labels');
-  assert.ok(src.includes('height:clamp(535px,62vh,640px)') &&
+  // Shared scene layout (same as Bellrunner): the 2:1 workbench painting is
+  // the stage; dialogue and the docked object card share the reading column.
+  assert.ok(src.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
+    src.includes('aspect-ratio:2 / 1') &&
+    src.includes('placement="docked"') &&
+    src.includes('@container activity-stage (max-width:640px)') &&
     src.includes('bench-foreground') &&
     src.includes('clip-path:inset(70% 0 0 0)') &&
     src.includes('height:37%') && src.includes('height:44%') &&
     src.includes('scale(1.018)'),
-    'Must retain original workshop composition, tabletop hitboxes and hover art');
+    'Must retain original workshop composition, tabletop hitboxes and hover art in the shared scene layout');
+  assert.ok(!src.includes('height:clamp(535px,62vh,640px)') && !src.includes('max-height:calc(100% - 48px)'),
+    'No fixed-height stage or internally scrolling dialogue over the painting');
 }
 assert.ok(intro.includes('description={workshopObjects[selected].observation}') &&
   intro.includes('Stage 2 work commands are not enabled in this read-only integration.') &&
