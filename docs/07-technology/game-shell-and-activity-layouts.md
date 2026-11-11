@@ -42,7 +42,7 @@ so its contents adapt to the slot they get.
 
 | Mode | Two columns when the container is | Wide arrangement | Narrow order | Used by |
 | --- | --- | --- | --- | --- |
-| `scene` | ≥880px (art ≥460, reading ≥380) | Art on the left. Dialogue, then contextual documents, share the reading column (preferred 38%, 380–600px, ≤44%). | art → dialogue → documents | Bellrunner Stage 1 and all Stage 2 locations |
+| `scene` | ≥880px (art ≥460, reading ≥380) | Art on the left. Dialogue, then contextual documents, share the reading column (preferred 38%, 380–600px, ≤44%). | art → dialogue → documents | Bellrunner Stage 1 and all Stage 2 locations; every Millhand scene (Workshop, Platework, Missing Stamp, Depot, Contracts, Records, Wage Claim, Clinic, Home) |
 | `workspace` | ≥1380px (the battlefield keeps ≥1000px, the width its overlays were tuned for) | Encounter/bench on the left; tools, log or abilities in a 360–460px column | stage → tools | Millhand Stage 6 combat |
 | `management` | ≥760px | Details/filter panel (230–340px) first, then the dominant list/table/ledger | panel → list | Character record (attributes + skills) |
 
@@ -64,6 +64,38 @@ Scene-mode rules:
 - Spacing can be tuned per activity with `--activity-gap` and
   `--activity-padding` on an ancestor (combat uses 0 for a full-bleed
   battlefield).
+
+### Millhand scenes
+
+Millhand and Bellrunner are two origins in the same interface. Each keeps
+its own art, props and mechanics, but uses the same scene layout:
+
+- **Stage = the painting at its native ratio.** Workshop, Depot and the
+  council rooms are 2:1 (`stageAspect={2}`, `aspect-ratio:2 / 1`). The alley,
+  clinic and rented room are 1672:941 (`pall-story-landscape`). Hotspots,
+  props, Flint and the evidence are positioned in percentages of that box,
+  so they stay on their painted objects at every size. Home keeps its
+  cover-scaled `.home-artwork` layer for the same reason.
+- **Panel = the reading column.** Every dialogue frame (`.dialogue`,
+  `.work-card`, `.work-dialogue`, `.clinic-dialogue`, `.home-dialogue`) sits in
+  `.reading-column.pall-story-dialogue-section`. It is content-height
+  (`max-height:none; overflow:visible`), never an overlay on the art and never
+  an internal scroller. Item inspections dock there too
+  (`WorkshopItemPopover placement="docked"`).
+- **Supplement** holds optional papers under the conversation (the clinic's
+  examination record). Personal journals stay below the layout; Home's
+  storage and journal stay native `<dialog>` modals.
+- **Narrow stage = 600px container**, not a viewport breakpoint
+  (`@container activity-stage (max-width:600px)`). Below it, Workshop scenes
+  and the alley use a 4:3 crop, the depot and council rooms move their props
+  into a row, and Home enlarges its small targets. 600px keeps 1280×720
+  (stage ≈631–640px with or without a page scrollbar) on the native
+  composition, while 1024 and phones get the tap-friendly crop.
+- All Millhand dialogue uses the shared tokens, including Clinic and Home,
+  which share exact declarations. There is no smaller phone type.
+- **Stage 6 combat stays `workspace`.** On phones Flint keeps his own band
+  and the intent/result parchment follows below him rather than covering
+  him.
 
 ## 3. City map gateway
 
@@ -115,4 +147,10 @@ These are the slots to use. They are not implementations.
 - `npm run verify:game-shell-browser`: workspace (combat), management
   (Character page), dock reflow, map gateway states and the
   Notifications/Chat status popovers.
-- Both write screenshots to `platform/test-artifacts/` (git-ignored).
+- `npm run verify:millhand-scenes-browser`: all nine Millhand scenes from
+  real game-core snapshots at 1920×1080, 1280×720 (with its page scrollbar),
+  1024×768 and 390×844. It checks scene mode, panel beside or below, native
+  painting ratio, hotspots inside the stage, no overflow and no internal
+  scrollbars, plus Flint's inspection, a Stage 5 stance POST and Home's
+  journal modal.
+- All three write screenshots to `platform/test-artifacts/` (git-ignored).
