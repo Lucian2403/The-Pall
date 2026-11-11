@@ -229,8 +229,12 @@
                     <p class="narration">{WRONG_BELL_BRANCHES[snapshot.state.branch].before}</p>
                   {/if}
                   {#each WRONG_BELL_BRANCHES[snapshot.state.branch].lines as line}
-                    <p class="speaker">{line.speaker==='Player'?character.name:line.speaker}</p>
-                    <p class="spoken">“{line.text}”</p>
+                    {#if line.speaker==='Narration'}
+                      <p class="narration">{line.text}</p>
+                    {:else}
+                      <p class="speaker">{line.speaker==='Player'?character.name:line.speaker}</p>
+                      <p class="spoken">“{line.text}”</p>
+                    {/if}
                   {/each}
                   <p class="narration">{WRONG_BELL_BRANCHES[snapshot.state.branch].end}</p>
                   <p class="round-finding">Next: {WRONG_BELL_BRANCHES[snapshot.state.branch].next}</p>
