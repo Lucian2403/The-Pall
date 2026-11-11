@@ -25,7 +25,7 @@
   type WorkAction='check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
     'deliver_notices'|'continue_to_receiver'|'ask_fresh_mark'|'check_receiving_book'|'confirm_book'|
     'note_spoiled_mark'|'continue_receiver_dialogue'|'continue_to_final_notice'|'continue_to_report'|
-    'finish_round'|'take_final_notice';
+    'finish_round'|'take_final_notice'|'enter_wrong_bell';
   type WorkState={phase:Phase;route:'direct'|'quieter'|null;
     noticesOrdered:boolean;receipt:'clear'|'book_confirmed'|'noted_unclear'|null};
   type Round={stage:number;tutorialStatus:string;accepted:boolean;
@@ -311,6 +311,10 @@
             <p class="story">The usual deliveries are done, and the receiving marks are recorded.
               One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.</p>
             <p class="small">The next scene begins at the order's marked address.</p>
+            <div class="actions">
+              <button type="button" class="primary-choice" disabled={busy}
+                onclick={()=>{void perform('enter_wrong_bell');}}>Continue to the closed worksite</button>
+            </div>
           {/if}
           {/if}
           {#if workError}<p class="error" role="alert">{workError}</p>{/if}
