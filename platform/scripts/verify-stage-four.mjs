@@ -194,7 +194,7 @@ assert.ok(norm(stage3Ui).includes(norm('height:clamp(64px,13cqi,180px)')) &&
 assert.ok(copy.includes('STAGE_FOUR_TRANSPORT_HINTS') &&
   copy.includes('STAGE_FOUR_TRANSPORT_VERIFICATION') &&
   copy.includes('You set the bundle on the receiving counter.') &&
-  copy.includes('You bring the last group to the receiving counter') &&
+  copy.includes('You carry the last stack to the receiving counter') &&
   copy.includes('I secured the plates together and carried them to the depot as one load.') &&
   copy.includes('I carried the plates in smaller groups. It took more trips'),
   'Both transport choices must change the immediate/depot/journal copy');
