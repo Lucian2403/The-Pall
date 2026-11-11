@@ -43,12 +43,28 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
     if(!result.rowCount)return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
     if(result.rows[0].origin==='Bellrunner'){
-      const active=await db.query(
-        'SELECT 1 FROM player_character_bellrunner_dispatch WHERE character_id=$1',
+      const active=await db.query<{work_state:{phase:string}}>(
+        'SELECT work_state FROM player_character_bellrunner_dispatch WHERE character_id=$1',
         [req.params.id]);
-      const canRewind=stage===2&&result.rows[0].tutorial_status==='IN_PROGRESS'&&
-        !!active.rowCount;
-      return {enabled:true,canRewind,stage,targetStage:canRewind?1:null};
+      const dispatchReady=active.rows[0]?.work_state?.phase==='final_notice_taken';
+      if(stage===2){
+        const canRewind=result.rows[0].tutorial_status==='IN_PROGRESS'&&!!active.rowCount;
+        return {enabled:true,canRewind,stage,targetStage:canRewind?1:null};
+      }
+      if(stage===3||stage===4){
+        const investigation=await db.query<{state:{phase:string;branch:string|null}}>(
+          'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',
+          [req.params.id]);
+        const saved=investigation.rows[0]?.state;
+        const canRewind=dispatchReady&&(
+          stage===3&&(!saved||saved.branch===null)&&saved?.phase!=='committed' ||
+          stage===4&&saved?.phase==='committed'&&
+            ['contracts','trauma','machinery'].includes(saved.branch??'')&&
+            result.rows[0].tutorial_status==='NOT_STARTED'
+        );
+        return {enabled:true,canRewind,stage,targetStage:canRewind?stage-1:null};
+      }
+      return {enabled:true,canRewind:false,stage,targetStage:null};
     }
     if(result.rows[0].origin!=='Millhand')
       return reply.code(404).send({error:'not_found'});
@@ -108,10 +124,88 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         return reply.code(409).send({error:'stale_stage',stage:c.rows[0].tutorial_stage});
       }
 
+      if(bellrunner&&expectedStage===3){
+        // Development-only Stage 3 -> 2. Never erase completed courier routes.
+        // Reopen only the final notice, resetting Stage 3 investigation receipts.
+        const saved=await client.query<{state:{phase:string;branch:string|null}}>(
+          'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        if(saved.rows[0]&&(saved.rows[0].state.branch!==null||
+          saved.rows[0].state.phase==='committed')){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_wrong_bell_state'});
+        }
+        const dispatch=await client.query<{revision:string|number;work_state:{phase:string}}>(
+          'SELECT revision,work_state FROM player_character_bellrunner_dispatch WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        if(dispatch.rows[0]?.work_state?.phase!=='final_notice_taken'){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_dispatch_state'});
+        }
+        await client.query(
+          'DELETE FROM player_character_bellrunner_wrong_bell_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'DELETE FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',
+          [req.params.id]);
+        // Old final-handoff receipts must not return a stale Stage 3 result.
+        await client.query(
+          "DELETE FROM player_character_bellrunner_dispatch_work_receipts WHERE character_id=$1 AND result->'workState'->>'phase'='final_notice_taken'",
+          [req.params.id]);
+        await client.query(
+          'UPDATE player_character_bellrunner_dispatch SET revision=$2,work_state=$3::jsonb WHERE character_id=$1',
+          [req.params.id,Number(dispatch.rows[0].revision)+1,
+            JSON.stringify({...dispatch.rows[0].work_state,phase:'final_notice'})]);
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=2,tutorial_status='IN_PROGRESS' WHERE id=$1",
+          [req.params.id]);
+        await client.query('COMMIT');transaction=false;
+        return {stage:2,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/bellrunner/dispatch',coinDelta:0};
+      }
+
+      if(bellrunner&&expectedStage===4){
+        // The Stage 4 job has not begun; undo only the selected route's
+        // one-time skill award and restore the choice panel for another test.
+        if(c.rows[0].tutorial_status!=='NOT_STARTED'){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_wrong_bell_state'});
+        }
+        const saved=await client.query<{revision:string|number;state:{
+          revision:number;phase:string;branch:string|null
+        }}>(
+          'SELECT revision,state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        const value=saved.rows[0]?.state;
+        const skill=value?.branch==='contracts'?'Commerce':
+          value?.branch==='trauma'?'Medicine':
+          value?.branch==='machinery'?'Mechanics':null;
+        if(!skill||value?.phase!=='committed'||
+          Number(saved.rows[0].revision)!==value.revision||
+          !Number.isSafeInteger(c.rows[0].major_skill_bonuses[skill])||
+          c.rows[0].major_skill_bonuses[skill]<1){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_wrong_bell_state'});
+        }
+        const bonuses={...c.rows[0].major_skill_bonuses,
+          [skill]:c.rows[0].major_skill_bonuses[skill]-1};
+        const next={...value,phase:'choice',branch:null,revision:value.revision+1};
+        await client.query(
+          'DELETE FROM player_character_bellrunner_wrong_bell_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'UPDATE player_character_bellrunner_wrong_bell SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,next.revision,JSON.stringify(next)]);
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=3,tutorial_status='IN_PROGRESS',major_skill_bonuses=$2::jsonb WHERE id=$1",
+          [req.params.id,JSON.stringify(bonuses)]);
+        await client.query('COMMIT');transaction=false;
+        return {stage:3,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/bellrunner/wrong-bell',coinDelta:0};
+      }
+
       if(bellrunner){
-        // The same developer-only Back to Stage 1 control as Millhand.
-        // No quest reward exists yet. Clear only the dispatch acceptance and
-        // its receipts, atomically under the already locked owner character.
+        // Developer-only Stage 2 -> 1 rewind, preserving all currencies.
         if(expectedStage!==2||c.rows[0].tutorial_status!=='IN_PROGRESS'){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'wrong_work_phase'});
