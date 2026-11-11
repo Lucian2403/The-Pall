@@ -7,7 +7,7 @@
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import {pallAudioSettings} from '$lib/pall-audio';
   import {WRONG_BELL_ENTRY,WATCHMAN_LINES,WRONG_BELL_AFTER_WATCHMAN,
-    WRONG_BELL_BRANCHES} from '$lib/bellrunner-stage3-copy';
+    WRONG_BELL_BRANCHES,WRONG_BELL_BRANCH_FIRST_BEAT_LINES} from '$lib/bellrunner-stage3-copy';
   import '$lib/pall-story-landscape.css';
 
   type Branch='contracts'|'trauma'|'machinery';
@@ -29,6 +29,7 @@
   let requestId=$state<string|null>(null),requestAction=$state<Action|null>(null);
   let detail=$state<'closure'|'slip'|'comparison'|null>(null);
   let proposedBranch=$state<Branch|null>(null);
+  let committedBeat=$state(0);
   let bellAudio=$state<HTMLAudioElement>();
   let backdropUnavailable=$state(false);
   let bellEnabled=false, bellVolume=0.5;
@@ -66,7 +67,7 @@
         else if(action==='inspect_slip')detail='slip';
         else if(action==='compare_orders')detail='comparison';
         else if(action==='continue_watchman'||action==='talk_watchman')detail=null;
-        if(action.startsWith('choose_')){proposedBranch=null;detail=null;}
+        if(action.startsWith('choose_')){proposedBranch=null;detail=null;committedBeat=0;}
       }else{
         const data=await res.json() as {error?:string};
         if(res.status===409){await refresh();requestId=null;requestAction=null;}
@@ -195,7 +196,7 @@
                     <p class="spoken">“{WATCHMAN_LINES[snapshot.state.watchmanLine].text}”</p>
                   {/if}
                   <div class="actions">
-                    <button type="button" class="primary-choice" disabled={busy}
+                    <button type="button" class="primary-choice continue-choice" disabled={busy}
                       onclick={()=>{void perform('continue_watchman');}}>Continue</button>
                   </div>
                 {:else if phase==='choice'}
@@ -223,7 +224,7 @@
                     </div>
                   {:else}
                     <h2>{WRONG_BELL_BRANCHES[proposedBranch].name}</h2>
-                    <p class="narration">This choice selects your second tutorial job and grants +1 once in its associated Major Skill. You cannot switch routes after confirming.</p>
+                    <p class="narration">Confirming this route grants <strong>+1 Major Skill: {WRONG_BELL_BRANCHES[proposedBranch].majorSkill}</strong>. You cannot switch routes after confirming.</p>
                     <div class="actions">
                       <button type="button" class="primary-choice" disabled={busy}
                         onclick={()=>{if(proposedBranch)void perform(WRONG_BELL_BRANCHES[proposedBranch].action);}}>
@@ -234,22 +235,33 @@
                     </div>
                   {/if}
                 {:else if phase==='committed'&&snapshot.state.branch}
-                  <h1>{WRONG_BELL_BRANCHES[snapshot.state.branch].name}</h1>
-                  {#if WRONG_BELL_BRANCHES[snapshot.state.branch].before}
-                    <p class="narration">{WRONG_BELL_BRANCHES[snapshot.state.branch].before}</p>
-                  {/if}
-                  {#each WRONG_BELL_BRANCHES[snapshot.state.branch].lines as line}
-                    {#if line.speaker==='Narration'}
-                      <p class="narration">{line.text}</p>
+                  {@const branch=WRONG_BELL_BRANCHES[snapshot.state.branch]}
+                  {@const splitAt=WRONG_BELL_BRANCH_FIRST_BEAT_LINES[snapshot.state.branch]}
+                  <h1>{branch.name}</h1>
+                  <div class="route-dialogue-beat" aria-live="polite">
+                    {#if committedBeat<2}
+                      {#each (committedBeat===0 ? branch.lines.slice(0,splitAt) : branch.lines.slice(splitAt)) as line}
+                        {#if line.speaker==='Narration'}
+                          <p class="narration">{line.text}</p>
+                        {:else}
+                          <p class="speaker">{line.speaker==='Player'?character.name:line.speaker}</p>
+                          <p class="spoken">“{line.text}”</p>
+                        {/if}
+                      {/each}
+                      {#if committedBeat===1}
+                        <p class="narration">{branch.end}</p>
+                      {/if}
+                      <div class="actions">
+                        <button type="button" class="primary-choice continue-choice"
+                          onclick={()=>{committedBeat+=1;}}>Continue</button>
+                      </div>
                     {:else}
-                      <p class="speaker">{line.speaker==='Player'?character.name:line.speaker}</p>
-                      <p class="spoken">“{line.text}”</p>
+                      <p class="round-finding">Shift Dispatch: round not accepted. The receiving office is closed; its authorized final mark is unavailable. Payment: 0 coins. Ordinary XP: 0. No items.</p>
+                      <p class="round-finding">Major Skill increased: <strong>{branch.majorSkill} +1</strong>.</p>
+                      <p class="round-finding">Next: {branch.next}</p>
+                      <p class="narration">The chosen Stage 4 task is not yet implemented. Your choice and skill award are saved.</p>
                     {/if}
-                  {/each}
-                  <p class="narration">{WRONG_BELL_BRANCHES[snapshot.state.branch].end}</p>
-                  <p class="round-finding">Shift Dispatch: round not accepted. The receiving office is closed; its authorized final mark is unavailable. Payment: 0 coins. Ordinary XP: 0. No items.</p>
-                  <p class="round-finding">Next: {WRONG_BELL_BRANCHES[snapshot.state.branch].next}</p>
-                  <p class="narration">The chosen Stage 4 task is not yet implemented. Your choice and skill award are saved.</p>
+                  </div>
                 {/if}
                 {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
                 {#if busy}<p class="small" role="status">Recording…</p>{/if}
@@ -309,6 +321,10 @@
     background:#241d16;color:#f7e6c9;text-align:left;padding:10px 13px;cursor:pointer;
     font:600 var(--dialogue-text,17px)/1.3 var(--pall-font-reading,Georgia,serif)}
   .actions>button:disabled{opacity:.55;cursor:wait}
+  /* Continue always remains white on the dark primary action at hover/focus. */
+  .actions>button.continue-choice:hover:not(:disabled),
+  .actions>button.continue-choice:focus-visible{color:#fff!important}
+  .route-dialogue-beat{min-width:0}
   .error{color:#873523;font:13px/1.4 sans-serif}
   .small{color:#624c38;font:12px sans-serif}
   .fallback{padding:38px;color:#e3d0af;background:#25211e}
