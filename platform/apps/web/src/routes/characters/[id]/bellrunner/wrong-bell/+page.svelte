@@ -225,7 +225,7 @@
                   {/if}
                 {:else if phase==='committed'&&snapshot.state.branch}
                   <h1>{WRONG_BELL_BRANCHES[snapshot.state.branch].name}</h1>
-                  {#if 'before' in WRONG_BELL_BRANCHES[snapshot.state.branch]}
+                  {#if WRONG_BELL_BRANCHES[snapshot.state.branch].before}
                     <p class="narration">{WRONG_BELL_BRANCHES[snapshot.state.branch].before}</p>
                   {/if}
                   {#each WRONG_BELL_BRANCHES[snapshot.state.branch].lines as line}
