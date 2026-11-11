@@ -35,10 +35,11 @@ export const WRONG_BELL_BRANCHES={
     name:'Warn the waiting crew',action:'choose_trauma' as const,
     lines:[
       {speaker:'Player',text:"Don't go in there. Look at him, he can barely breathe. You want to end up the same way?"},
+      {speaker:'Narration',text:'One of the workers looks at the coughing man, then back at the gate.'},
       {speaker:'Worker',text:"You think we want to go in? They've rung the bell. We're supposed to be working."},
       {speaker:'Player',text:'The place is shut for a reason. Someone needs to get him looked at.'}
     ],
-    before:'One of the workers looks at the coughing man, then back at the gate.',
+    before:'',
     end:'The worker hesitates, then helps the coughing man away from the gate.',
     next:'First Aid Line · Medicine / Trauma'
   },
