@@ -30,6 +30,7 @@
   let detail=$state<'closure'|'slip'|'comparison'|null>(null);
   let proposedBranch=$state<Branch|null>(null);
   let bellAudio=$state<HTMLAudioElement>();
+  let backdropUnavailable=$state(false);
   let bellEnabled=false, bellVolume=0.5;
   const phase=$derived(snapshot?.state.phase??'evidence');
   const available=$derived(snapshot?.availableActions??[]);
@@ -118,8 +119,17 @@
         {#snippet stage()}
           <div class="scene-visuals pall-story-visuals">
             <div class="courtyard pall-story-landscape">
+              {#if backdropUnavailable}
+                <div class="missing-art" role="status">
+                  The Industrial Courtyard artwork has not been installed.
+                  <small>Expected: /locations/industrial/industrial-courtyard.webp</small>
+                </div>
+              {/if}
               <img src="/locations/industrial/industrial-courtyard.webp"
                 alt="Empty industrial courtyard. A locked iron gate, noticeboard, outside bell, pipes and a covered cart."
+                class:asset-hidden={backdropUnavailable}
+                onerror={()=>{backdropUnavailable=true;}}
+                onload={()=>{backdropUnavailable=false;}}
                 draggable="false"/>
               {#if phase==='evidence'&&snapshot&&!snapshot.state.closureRead}
                 <button class="notice-hotspot" type="button" disabled={busy}
@@ -265,6 +275,12 @@
   .wrong-bell{display:flex;flex-direction:column;flex:1;min-width:0;width:100%;color:#f3e3ce}
   .courtyard{position:relative;width:100%;aspect-ratio:1672/941;overflow:hidden;background:#221e1b}
   .courtyard img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+  .courtyard img.asset-hidden{display:none}
+  .missing-art{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:20px;
+    gap:9px;color:#d8b783;background:#1e1a17;
+    font:600 16px/1.45 var(--pall-font-reading,Georgia,serif)}
+  .missing-art small{font:12px/1.4 monospace;opacity:.83;overflow-wrap:anywhere}
   .notice-hotspot,.bell-hotspot{position:absolute;z-index:3;border:0;
     background:transparent;color:#f4dfba;cursor:pointer;display:flex;align-items:end;justify-content:center}
   .notice-hotspot{top:39%;left:24%;width:12%;height:21%}
