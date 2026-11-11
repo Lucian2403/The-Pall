@@ -30,7 +30,8 @@
   let {
     character,children,activePage = 'scene',sceneLocation,compactBanner = false,
     compactCityVista = false,smithingBackdrop = false,
-    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,clinicBackdrop = false,
+    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
+    industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
     cityMap,travelLocked = false,services = {},dock
   }:{
@@ -46,6 +47,8 @@
     councilBackdrop?:boolean;
     alleyBackdrop?:boolean;
     depotBackdrop?:boolean;
+    /** Same owner depot ambience for the reusable Bellrunner Industrial Courtyard. */
+    industrialCourtyardBackdrop?:boolean;
     clinicBackdrop?:boolean;
     /** Only the active combat page supplies live, server-confirmed Stamina. */
     combatStamina?:{current:number;maximum:number};
@@ -177,9 +180,11 @@
     stopNightAlleyAmbience();
   });
 
-  // Depot playback follows the visible backdrop, not merely Stage 4 status.
+  // Hector's Dispatch House and the reusable Industrial Courtyard share
+  // one existing depot ambience stream, not two overlapping audio elements.
+  // The active illustrated scene owns the track and Sound Settings govern it.
   $effect(()=>{
-    if(depotBackdrop)return claimDepotAmbience();
+    if(depotBackdrop||industrialCourtyardBackdrop)return claimDepotAmbience();
     stopDepotAmbience();
   });
   // The clinic's owner soundscape is tied to the mounted painted scene only.
