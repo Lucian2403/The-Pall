@@ -209,7 +209,7 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
         'UPDATE player_character_bellrunner_dispatch SET revision=$2,work_state=$3::jsonb WHERE character_id=$1',
         [req.params.id,revision+1,JSON.stringify(next)]);
       // Only the explicit sealed-order handoff advances the character.
-      const movesToWrongBell=command.action==='take_final_notice';
+      const movesToWrongBell=command.action==='take_final_notice'||command.action==='enter_wrong_bell';
       if(movesToWrongBell){
         await client.query(
           "UPDATE player_characters SET tutorial_stage=3,tutorial_status='NOT_STARTED' WHERE id=$1",
