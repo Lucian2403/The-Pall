@@ -848,9 +848,11 @@
     .resource+.resource{border-left:1px solid #866447;padding-left:8px}
   }
   @media(max-width:640px){
-    .stage-scenery{min-height:360px}
-    .flint{width:51%;height:71%;bottom:0}
-    .parchment{width:94%;top:8px;right:3%;padding:8px 10px;
+    /* Flint keeps his size in his own band; the intent parchment follows
+       below him instead of covering his face (any parchment height fits). */
+    .stage-scenery{min-height:0;padding-top:256px}
+    .flint{width:51%;height:256px;top:0;bottom:auto}
+    .parchment{position:relative;top:auto;right:auto;width:94%;margin:0 auto 8px;padding:8px 10px;
       border-width:15px 18px 14px;border-image-width:15px 18px 14px}
     .parchment .intent{font-size:14px}
     .cart-marker{display:none}

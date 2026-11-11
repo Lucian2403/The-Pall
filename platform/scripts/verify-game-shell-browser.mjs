@@ -122,9 +122,15 @@ try{
   mkdirSync(folder,{recursive:true});
   async function open(path,width,height,ready){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
+    // Tag the outgoing document: consecutive visits reuse the same URL, so the
+    // readiness probe must not succeed on the page that is being replaced.
+    await evalJS('window.__pallLeaving=true').catch(()=>{});
     await cmd('Page.navigate',{url:origin+path});
-    await until(()=>evalJS('!!document.querySelector('+JSON.stringify(ready)+')&&[...document.images].every(i=>i.complete)'),
+    await until(()=>evalJS('!window.__pallLeaving&&!!document.querySelector('+JSON.stringify(ready)+')&&[...document.images].every(i=>i.complete)'),
       24000,path+' at '+width+'x'+height);
+    // Measure after web fonts swap in: in-flow text (e.g. the phone combat
+    // parchment) reflows when they arrive and would otherwise race the boxes.
+    await evalJS('document.fonts.ready.then(()=>true)');
     await delay(300);
     assert.equal(await evalJS("!!document.querySelector('vite-error-overlay')"),false,'No compile overlay on '+path);
     const sw=await evalJS('[document.documentElement.scrollWidth,document.documentElement.clientWidth]');
