@@ -191,7 +191,7 @@
                 {:else if phase==='choice'}
                   <h1>The Wrong Bell</h1>
                   {#each WRONG_BELL_AFTER_WATCHMAN as line}<p class="narration">{line}</p>{/each}
-                  <p class="round-finding">The council will not clear the round: the worksite receiving office is shut, and nobody can provide its authorized mark. Payment: 0 coins. Ordinary XP: 0.</p>
+                  <p class="round-finding">The receiving office is shut. The watchman cannot provide the authorized mark for the final delivery.</p>
                   {#if detail==='comparison'}
                     <p class="narration">The closure and the shift order contradict one another. Neither document authorizes reopening this block.</p>
                   {/if}
@@ -237,6 +237,7 @@
                     {/if}
                   {/each}
                   <p class="narration">{WRONG_BELL_BRANCHES[snapshot.state.branch].end}</p>
+                  <p class="round-finding">Shift Dispatch: round not accepted. The receiving office is closed; its authorized final mark is unavailable. Payment: 0 coins. Ordinary XP: 0. No items.</p>
                   <p class="round-finding">Next: {WRONG_BELL_BRANCHES[snapshot.state.branch].next}</p>
                   <p class="narration">The chosen Stage 4 task is not yet implemented. Your choice and skill award are saved.</p>
                 {/if}
