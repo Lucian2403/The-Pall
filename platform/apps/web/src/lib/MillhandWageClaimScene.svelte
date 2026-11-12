@@ -162,7 +162,8 @@
         {/if}
         <div class="actions" aria-label="Available confrontation actions">
           {#each forwardActions as action (action)}
-            <button type="button" disabled={pending} onclick={()=>choose(action)}
+            <button type="button" class={forwardActions.length===1?'primary-choice':'secondary-choice'}
+              disabled={pending} onclick={()=>choose(action)}
               data-pall-sfx={action==='read_demand'?'paper':'click'}>
               {WAGE_CLAIM_ACTION_LABELS[action]}
             </button>
@@ -276,15 +277,6 @@
   .inspection-weapon strong{font-weight:700;color:#26190f}
   .decision-prompt{margin:10px 0 7px;font:700 var(--dialogue-label,15px)/1.3 var(--pall-font-reading,Georgia,serif);color:#614126}
   .actions{display:flex;flex-direction:column;gap:7px;margin:10px 0}
-  .actions button{appearance:none;min-height:43px;text-align:left;padding:8px 13px;
-    border:solid transparent;border-width:9px 17px 9px;
-    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
-    border-image-slice:50 180 45 180 fill;border-image-width:9px 17px 9px;
-    background:transparent;color:#2a1c12;cursor:pointer;
-    font:700 var(--dialogue-text,17px)/1.25 var(--pall-font-reading,Georgia,serif)}
-  .actions button:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
-  .actions button:focus-visible{outline:2px solid #885f2c;outline-offset:2px}
-  .actions button:disabled{opacity:.6;cursor:default}
   .back-nav{margin:10px 0 0}
   .back-button{appearance:none;border:1px solid #977956;background:#e6d3b1;color:#382619;
     padding:7px 12px;min-height:36px;cursor:pointer;
