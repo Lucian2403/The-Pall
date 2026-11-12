@@ -65,6 +65,24 @@
     void bellAudio.play().catch(()=>{/* Unavailable audio never gates gameplay. */});
   }
   function can(action:Action){return available.includes(action);}
+  // Reading a discovered document again never mutates saved progress or
+  // request revisions. Only the first inspection goes through the API.
+  function inspectDocument(which:'closure'|'slip'){
+    if(busy||!snapshot||phase!=='evidence')return;
+    if(which==='closure'){
+      if(snapshot.state.closureRead){detail='closure';return;}
+      void perform('read_closure');
+    }else{
+      if(snapshot.state.slipRead){detail='slip';return;}
+      void perform('inspect_slip');
+    }
+  }
+  function compareDocuments(){
+    if(busy||!snapshot||phase!=='evidence'||
+      !snapshot.state.closureRead||!snapshot.state.slipRead)return;
+    if(snapshot.state.compared){detail='comparison';return;}
+    void perform('compare_orders');
+  }
   async function refresh(){
     const res=await fetch('/api/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',{cache:'no-store'});
     if(res.ok)snapshot=await res.json() as Snapshot;
@@ -75,7 +93,12 @@
     if(requestAction!==action){requestAction=action;requestId=crypto.randomUUID();}
     try{
       // The bell is an authored one-shot cue, not a silent autoplay loop.
-      if(action==='talk_watchman'||action==='compare_orders')ring();
+      // Cue the shift bell at the actual narrative beats. The second ring
+      // accompanies the final Watchman Continue, immediately before the
+      // scripted "The bell rings again." passage appears.
+      if(action==='talk_watchman'||
+        (action==='continue_watchman'&&
+         snapshot.state.watchmanLine===WATCHMAN_LINES.length-1))ring();
       const res=await fetch('/api/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',{
         method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({action,requestId,expectedRevision:snapshot.state.revision})
@@ -155,10 +178,11 @@
                 onerror={()=>{backdropUnavailable=true;}}
                 onload={()=>{backdropUnavailable=false;}}
                 draggable="false"/>
-              {#if phase==='evidence'&&snapshot&&!snapshot.state.closureRead}
+              {#if phase==='evidence'&&snapshot}
                 <button class="notice-hotspot" type="button" disabled={busy}
-                  aria-label="Read the official closure notice" title="Read the closure notice"
-                  onclick={()=>{void perform('read_closure');}}>
+                  aria-label={snapshot.state.closureRead?'Review the closure notice':'Read the official closure notice'}
+                  title={snapshot.state.closureRead?'Review the closure notice':'Read the closure notice'}
+                  onclick={()=>{inspectDocument('closure');}}>
                   <span>Closure notice</span>
                 </button>
               {/if}
@@ -188,21 +212,23 @@
                     <p class="narration">Closed for fumes. Night shift called in anyway.</p>
                   {/if}
                   <div class="actions">
-                    {#if can('read_closure')}
-                      <button type="button" class="secondary-choice" disabled={busy}
-                        onclick={()=>{void perform('read_closure');}}>
-                        <BellrunnerChoiceIcon kind="book"/>Read the closure notice</button>
-                    {/if}
-                    {#if can('inspect_slip')}
-                      <button type="button" class="secondary-choice" disabled={busy}
-                        onclick={()=>{void perform('inspect_slip');}}>
-                        <BellrunnerChoiceIcon kind="book"/>Check the dispatch slip</button>
-                    {/if}
-                    {#if can('compare_orders')}
-                      <button type="button" class="secondary-choice" disabled={busy}
-                        onclick={()=>{void perform('compare_orders');}}>
-                        <BellrunnerChoiceIcon kind="mark"/>Compare the orders</button>
-                    {/if}
+                    <button type="button" class="secondary-choice" disabled={busy}
+                    onclick={()=>{inspectDocument('closure');}}>
+                    <BellrunnerChoiceIcon kind="book"/>
+                    {snapshot.state.closureRead?'Review the closure notice':'Read the closure notice'}
+                  </button>
+                  <button type="button" class="secondary-choice" disabled={busy}
+                    onclick={()=>{inspectDocument('slip');}}>
+                    <BellrunnerChoiceIcon kind="book"/>
+                    {snapshot.state.slipRead?'Review the dispatch slip':'Check the dispatch slip'}
+                  </button>
+                  {#if snapshot.state.closureRead&&snapshot.state.slipRead}
+                    <button type="button" class="secondary-choice" disabled={busy}
+                      onclick={compareDocuments}>
+                      <BellrunnerChoiceIcon kind="mark"/>
+                      {snapshot.state.compared?'Review the comparison':'Compare the orders'}
+                    </button>
+                  {/if}
                     {#if can('talk_watchman')}
                       <button type="button" class="primary-choice" disabled={busy}
                         onclick={()=>{void perform('talk_watchman');}}>Speak to the watchman</button>
@@ -210,9 +236,6 @@
                   </div>
                 {:else if phase==='watchman'}
                   <h1>The Watchman</h1>
-                  {#if snapshot.state.watchmanLine===0}
-                    {#each WRONG_BELL_ENTRY as line}<p class="narration">{line}</p>{/each}
-                  {/if}
                   {#if WATCHMAN_LINES[snapshot.state.watchmanLine]}
                     <p class="speaker">{dialogueSpeakerLabel(WATCHMAN_LINES[snapshot.state.watchmanLine].speaker)}</p>
                     <p class="spoken">“{WATCHMAN_LINES[snapshot.state.watchmanLine].text}”</p>
