@@ -87,8 +87,9 @@ at a time, with Continue, not as a scroll of large blocks.
   are recorded in saved state and shown in the shared Personal Journal.
 - A completed job exposes **Continue to the outside service gate**.
   This marks Stage 4 as `exited` and moves the character to Stage 5.
-  The Dogman Stage 5 encounter is **not** implemented by this work;
-  a clear stop screen is displayed, not a fake encounter.
+  The Dogman Stage 5 encounter is **not** implemented by this work.
+  Until it exists, the exterior-gate screen shows a brief in-world
+  narrative ending, not a debug screen, technical recap or fake encounter.
 - Local development-only Back to Stage 3 is allowed before Stage 4
   begins, safely removing the once-awarded branch skill. Once the job
   is in progress it is blocked; development-only Back to Stage 4
@@ -97,6 +98,22 @@ at a time, with Continue, not as a scroll of large blocks.
 - No arbitrary timers, success probabilities, penalty values, diagnosis,
   formal register text beyond the explicitly illustrated category or
   skill multipliers are introduced. Their numerical contracts remain TBD.
+
+## Immersion rule — no post-choice reward ledger
+
+The owner rejected a third, technical dialogue screen following a route
+choice (for example: `Payment: 0 coins`, `Major Skill increased +1`,
+`Next:` and `Your choice is recorded`). In all three Bellrunner Stage 3
+branches, the final `Continue` after the approved response and
+consequence now navigates **directly** into the chosen Stage 4 activity.
+The same rule removes the out-of-world Stage 3 route/skill footnote in
+Millhand and technical payout remarks in Stage 4.
+
+The skill award and economy remain saved exactly as before; their values
+belong in HUD, Character Sheet and journal, not in the story parchment.
+Stage 4's own handoff and temporary Stage 5 boundary are narrative only.
+`npm run verify:story-immersion` enforces this across existing and future
+narrative scenes and is part of web checks and CI.
 
 ## Acceptance
 
