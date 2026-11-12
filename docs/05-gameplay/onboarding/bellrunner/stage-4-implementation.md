@@ -131,6 +131,35 @@ was added.
   formal register text beyond the explicitly illustrated category or
   skill multipliers are introduced. Their numerical contracts remain TBD.
 
+## Personal Journal — original Millhand format preserved
+
+The earlier Bellrunner Stage 4 `PERSONAL JOURNAL · STAGE IV` box was
+incorrect. It used a bespoke font/size, a full-width status sheet
+(`Work / Location / Status / Method / Recorded check / Local finding`)
+and a black square close button. None of that was owner-approved.
+
+The corrected Journal follows the exact existing Millhand Stage 3
+presentation: page-flow parchment `.journal-panel`, centered 930px
+`.journal-entries`, original Journal heading/close artwork and the
+**Pall New Standard 16px/600** reading typeface, **24px/600** title,
+and **Pall Bebas Neue 14px/700** kicker from
+`platform/apps/web/src/lib/pall-owner-ui.css`. Typography is not
+redefined by a Bellrunner scene.
+
+`bellrunner-stage4-journal.ts` derives short **first-person** diary
+paragraphs from the saved branch, actions, inspected discrepancy,
+chosen method and completion. It records the player's actual
+experience, not raw state field names or mechanical diagnostics.
+Entries appear only after their corresponding discoveries; it never
+shows facts from another branch, invents data, changes the saved
+choice or awards rewards. This implements the already-approved
+`docs/05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md`
+voice contract for Bellrunner as well.
+
+`verify:bellrunner-stage4` and the Stage 4 Chromium workflow check
+the voice, timing, markup, computed fonts and journal geometry.
+All future origin/stage journals must reuse this contract.
+
 ## Stage 4 — do not echo the story in data cards
 
 **Owner review, 12 November:** the previously rendered `WORKSITE NOTICE`
