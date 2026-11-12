@@ -18,6 +18,17 @@ On the local development server, the shared **Back to Stage 2** button safely cl
 
 After the watchman's final exchange, the coughing worker and repeated bell narration appear alone with **Continue**. The next local beat is **Choose what you will do next.**, rendering exactly three shared Millhand-style nine-slice second-job cards and their Major Skill / discipline plaques: Commerce / Contracts, Medicine / Trauma, Mechanics / Industrial Machinery. The optional **Compare the orders** inspection belongs only to the earlier evidence phase, never to the second-job choice. Choosing a card performs the existing server-owned branch action directly, as in Millhand. Approved branch dialogue then appears in two short Continue beats, followed by a third beat with the unpaid-round result and exact Major Skill award. Local Continue does not itself award skills or save progress. The page intentionally stops after the chosen Stage 4 handoff. **Stage 4 branch gameplay and the separate actor sprites are not implemented in this PR.** Hector's deferred optional return conversation is stored as approved copy but is not inserted into the forced Stage 3–4 path.
 
+## Stage 3 stabilization — 2026-11-12
+
+- **Evidence remains readable after inspection or refresh.** Once the player has read the posted closure or the sealed packet's outside dispatch slip, the visible evidence buttons change to **Review...**. Re-reading is a local presentation action: it does not POST again, advance the revision or repeat a reward.
+- **Compare the orders is recorded once** while still inspecting the worksite. After comparison, the evidence panel offers **Review the comparison** locally. This action is not offered during the watchman conversation or on the three-option second-job choice screen.
+- The initial worksite exposition appears once, during arrival/inspection. It is **not repeated** when the watchman starts speaking; the eleven approved lines are untouched.
+- The Stage 3 night-shift bell SFX is available at the bell hotspot, once as the watchman encounter begins, and again on the final watchman **Continue**, immediately before the authored second-ring narration. It respects the SFX setting, not the shared depot ambience volume.
+- The previous Stage 1/2 Hector component assertion and the shared Millhand/Bellrunner button-style assertion have been updated to test the architecture that is actually rendered.
+- `verify:bellrunner-stage3` now tests all three branch commitments, rejection of repeated comparisons, the exact final narration, local read-only evidence review and the correct second-bell cue.
+
+**Verification boundary:** source-level changes and regression tests are committed, but they still require the owner's local Node/Svelte checks and manual browser validation. No new assets or canonical dialogue were added.
+
 ## Installation and QA
 
 1. Both owner-supplied binary assets are already committed at the exact SvelteKit static paths above. Their original Git blobs were moved from an accidentally nested `platform/platform/...` directory into the correct `platform/apps/web/static/...` directory without changing file bytes. Run `npm run verify:bellrunner-stage3-assets` to verify them.
