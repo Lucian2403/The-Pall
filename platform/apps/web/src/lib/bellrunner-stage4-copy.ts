@@ -13,13 +13,13 @@ export const BELLRUNNER_STAGE_FOUR={
     place:'Shift-Office Records Counter',
     image:'/locations/contracts/contracts-office.webp',
     aspect:2,
-    entry:'The Shift-Office Clerk takes the dispatch slip but leaves the sealed-site receiving space blank.',
+    entry:'The Record Counter clerk takes the dispatch slip, checks the entries, then stops at the empty receiving box.',
     opening:[
-      {speaker:'Clerk',text:"Where's the mark from the receiving office?"},
+      {speaker:'Clerk',text:"There's no mark here. Who did you give the notice to?"},
       {speaker:'Player',text:'The office was locked up. The watchman took the letter.'},
-      {speaker:'Clerk',text:"Then I can't say the works received it."},
-      {speaker:'Player',text:"So what do I put on the form? I didn't just throw it in the street."},
-      {speaker:'Clerk',text:"Write down what happened. I'll record that much."}
+      {speaker:'Clerk',text:"This won't do. The watchman's word isn't an official receipt."},
+      {speaker:'Player',text:"So what do I put on the form? I took it all the way there."},
+      {speaker:'Clerk',text:"Then write that down. I'll make a note of it, but it won't count as an official receipt."}
     ],
     revelation:[
       {speaker:'Player',text:'But he was there. I saw him waiting by the gate. Why have you marked him absent?'},
@@ -128,9 +128,9 @@ export const STAGE_FOUR_ACTION_LABELS:Record<StageFourAction,string>={
   continue_opening:'Continue',
   compare_shift_records:'Compare the notice and attendance sheet',
   inspect_absence_category:'Examine the attendance category',
-  request_attendance_basis:'Request the basis for the absence entry',
-  enter_written_objection:'Enter a written objection',
-  submit_certificate:'Submit the disputed certificate',
+  request_attendance_basis:'Ask why the workers were marked absent.',
+  enter_written_objection:'Write an objection.',
+  submit_certificate:'Submit Certificate',
   prioritize_urgent_worker:'Help the man struggling to breathe.',
   prioritize_mobile_worker:"Help the man who's still walking and talking.",
   continue_triage:'Continue',
@@ -152,10 +152,10 @@ export const STAGE_FOUR_ACTION_LABELS:Record<StageFourAction,string>={
 };
 export const STAGE_FOUR_TASK_TEXT:Record<StageFourBranch,Partial<Record<StageFourPhase,string>>>={
   contracts:{
-    inspect:'The shift book lists the closed industrial block for the night crew. Check the dispatch notice against the attendance sheet.',
+    inspect:'The clerk puts the dispatch slip next to the attendance book. It shows that workers are expected at the closed factory tonight.',
     detail:'A worker who refused to enter the fume-closed block is marked “Absent by choice”. The wages column reads “Not payable”. Examine why.',
-    choose:'The closure notice contradicts treating refusal as voluntary absence. Choose how to record this discrepancy honestly.',
-    finish:'The shift-office clerk can log your objection, but cannot supply the shuttered worksite\'s receiving mark.'
+    choose:'The factory was closed, but workers who refused to go inside are marked absent by choice. Decide how to record this.',
+    finish:'The clerk can record your objection, but can\'t give you the closed factory\'s official receiving mark.'
   },
   trauma:{
     // Legacy pre-revision saved states can still open an already-reached

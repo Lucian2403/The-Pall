@@ -27,7 +27,7 @@ export const WRONG_BELL_BRANCHES={
     skillLabel:'Commerce / Contracts',
     majorSkill:'Commerce' as const,
     lines:[
-      {speaker:'Player',text:"All right. Here's your notice. But I'm putting down that the office was shut."},
+      {speaker:'Player',text:"All right, here. Take it. But I'm writing that the office was shut. I don't want them blaming me for this mess..."},
       {speaker:'Watchman',text:"Fine by me. I'll see it gets inside."}
     ],
     before:'',
