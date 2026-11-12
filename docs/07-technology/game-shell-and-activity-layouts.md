@@ -125,6 +125,40 @@ work actions, stage exits, Clinic, Home and future scenes.
   check the computed normal/hover `border-image-source` in both origins.
   A class name alone is not proof of visually identical controls.
 
+### Mandatory personal Journal contract — same as Millhand
+
+**Owner decision, 12 November 2026:** never invent a new Journal layout,
+font or voice for Bellrunner or a later Stage. The original Millhand
+Journal is canonical:
+
+- The visible Journal is a **first-person personal diary**, not a
+  worksheet or internal report. One short paragraph per real event,
+  with colloquial but factual observations: `I saw...`, `I asked...`,
+  `I wrote...`. Add an entry only after its real action/inspection.
+  Follow the approved voice rules in
+  `docs/05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md`.
+  Do not output `Work:`, `Location:`, `Status:`, `Method:`,
+  `Recorded check:`, `Local finding:` or any other debug schema keys.
+- Reuse the original **Millhand Stage 3** journal structure and classes:
+  `.journal-panel`, `.journal-heading`, `.journal-kicker`,
+  `.journal-entries`, `.journal-toggle`. The heading is
+  `PERSONAL JOURNAL` plus the actual scene title. The content is a
+  centered, readable 930px column, not a full-width wall of text.
+- **Typography comes from `pall-owner-ui.css`, never a scene-local
+  Bellrunner variation:** `Pall New Standard` at 16px/600 for diary
+  paragraphs; 24px/600 for the heading. `Pall Bebas Neue` at
+  14px/700 for the kicker. Ink is dark on parchment.
+  The close control uses the same owner-provided normal/hover/pressed
+  nine-slice art, not a black rectangle.
+- The persistent HUD `Review journal` control continues to use
+  `SCENE_JOURNAL_CONTEXT`. Opening the Journal reveals the page-flow
+  section without resizing the scene/dialogue. Preserve saved work
+  state and journal facts independently of the prose.
+- The Stage 4 Bellrunner reducer/journal and Chromium tests check
+  first-person state-grounded entries, original Millhand CSS classes,
+  computed fonts, original button artwork and the absence of status
+  worksheets. Apply the same checks to future stages.
+
 ## 3. Canonical player speaker label
 
 **Owner decision, 2026-11-12: the speaker heading for every spoken player
