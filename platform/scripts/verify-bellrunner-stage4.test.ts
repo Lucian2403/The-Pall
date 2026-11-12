@@ -10,6 +10,7 @@ import {
 } from '../apps/api/src/bellrunner-second-job-work.ts';
 import type {StageFourBranch,StageFourState,StageFourAction} from '../apps/api/src/bellrunner-second-job-work.ts';
 import {BELLRUNNER_STAGE_FOUR} from '../apps/web/src/lib/bellrunner-stage4-copy.ts';
+import {bellrunnerStageFourJournal} from '../apps/web/src/lib/bellrunner-stage4-journal.ts';
 
 function opening(branch:StageFourBranch):StageFourState{
   let s=initialBellrunnerSecondJob(branch);
@@ -166,7 +167,8 @@ test('approved NPC lines and existing, reusable artwork are the only scene depen
   const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerSecondJobScene.svelte',
     import.meta.url),'utf8');
   assert.ok(scene.includes('mode="scene"')&&scene.includes('dialogueSpeakerLabel(currentLine.speaker)'));
-  assert.ok(scene.includes('SCENE_JOURNAL_CONTEXT')&&scene.includes('journalFact'));
+  assert.ok(scene.includes('SCENE_JOURNAL_CONTEXT')&&
+    scene.includes('bellrunnerStageFourJournal(state)'));
   assert.ok(scene.includes("'Helping the Attendant'")&&
     scene.includes("'The Medical Register'")&&
     scene.includes("state.phase==='triage_response'"));
@@ -184,7 +186,7 @@ test('approved NPC lines and existing, reusable artwork are the only scene depen
   }
   assert.ok(scene.includes('{instruction}')&&
     scene.includes('STAGE_FOUR_TASK_TEXT')&&
-    scene.includes('{copy.done}')&&scene.includes('state.journalFact'),
+    scene.includes('{copy.done}')&&scene.includes('bellrunnerStageFourJournal(state)'),
     'Information must remain available through narrative and the personal journal');
   for(const branch of ['contracts','machinery'] as const){
     assert.ok(BELLRUNNER_STAGE_FOUR[branch].revelation.length>=4,
@@ -198,4 +200,97 @@ test('approved NPC lines and existing, reusable artwork are the only scene depen
   assert.ok(!api.includes('major_skill_bonuses')&&!api.includes('coins=')&&!api.includes('ordinary_xp='),
     'Stage 4 must not pay or award a second skill level');
   assert.ok(api.includes('FOR UPDATE')&&api.includes('request_hash'));
+});
+
+test('Bellrunner Stage 4 journal matches canonical Millhand diary, not a status worksheet',()=>{
+  const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerSecondJobScene.svelte',
+    import.meta.url),'utf8');
+  const millhand=readFileSync(new URL('../apps/web/src/lib/MillhandMissingStampScene.svelte',
+    import.meta.url),'utf8');
+  const owner=readFileSync(new URL('../apps/web/src/lib/pall-owner-ui.css',
+    import.meta.url),'utf8');
+  for(const expected of [
+    'class="journal-panel"','class="journal-heading"','class="journal-kicker"',
+    'class="journal-entries"','class="journal-toggle"','PERSONAL JOURNAL',
+    'data-pall-sfx="paper"','{#each journal as entry,i (i)}'
+  ]){
+    assert.ok(scene.includes(expected),'Bellrunner must reuse Millhand journal structure: '+expected);
+    assert.ok(millhand.includes(expected),
+      'Journal structure must come from original Millhand, not new UI: '+expected);
+  }
+  assert.ok(owner.includes('font:600 16px/1.55 var(--pall-font-reading,Georgia,serif)')&&
+    owner.includes('font:600 24px/1.25 var(--pall-font-reading,Georgia,serif)')&&
+    owner.includes('font:700 14px/1.25 var(--pall-font-label'),
+    'Keep canonical font sizes, weight and New Standard/Bebas roles in owner CSS');
+  assert.ok(!scene.includes('class="job-journal"')&&!scene.includes('class="journal-top"'),
+    'Do not return to Bellrunner-only journal frame or dark square close button');
+  for(const forbidden of ['Work:','Location:','Status:','Method:','Recorded check:',
+    'Local finding:','PERSONAL JOURNAL · STAGE IV']){
+    assert.ok(!scene.includes(forbidden),'No technical field labels in story journal: '+forbidden);
+  }
+});
+test('Bellrunner journal records actual discoveries and choices as first-person entries',()=>{
+  for(const branch of ['contracts','trauma','machinery'] as const){
+    const state=initialBellrunnerSecondJob(branch);
+    const entries=bellrunnerStageFourJournal(state);
+    assert.equal(entries.length,1,branch+' begins with one witnessed fact');
+    assert.ok(entries[0].includes('I ')||entries[0].includes("I've"),
+      'The journal has a personal first-person voice');
+    for(const line of entries){
+      assert.doesNotMatch(line,/^(Work|Location|Status|Method|Local finding|Recorded check):/);
+    }
+  }
+  let contracts=initialBellrunnerSecondJob('contracts');
+  assert.ok(!bellrunnerStageFourJournal(contracts).join(' ').includes('Absent by choice'));
+  for(let i=0;i<STAGE_FOUR_OPENING_LENGTH.contracts;i++)
+    contracts=advanceBellrunnerSecondJob(contracts,'continue_opening');
+  contracts=advanceBellrunnerSecondJob(contracts,'compare_shift_records');
+  assert.match(bellrunnerStageFourJournal(contracts).join(' '),/night crew/);
+  assert.ok(!bellrunnerStageFourJournal(contracts).join(' ').includes('Absent by choice'),
+    'Do not expose the absence category before the player inspects it');
+  contracts=advanceBellrunnerSecondJob(contracts,'inspect_absence_category');
+  assert.match(bellrunnerStageFourJournal(contracts).join(' '),/Absent by choice/);
+  contracts=advanceBellrunnerSecondJob(contracts,'enter_written_objection');
+  assert.match(bellrunnerStageFourJournal(contracts).join(' '),/objection in writing/);
+  assert.doesNotMatch(bellrunnerStageFourJournal(contracts).join(' '),/I asked the clerk what gives/);
+  for(let i=0;i<STAGE_FOUR_REVELATION_LENGTH.contracts;i++)
+    contracts=advanceBellrunnerSecondJob(contracts,'continue_revelation');
+  contracts=advanceBellrunnerSecondJob(contracts,'submit_certificate');
+  assert.match(bellrunnerStageFourJournal(contracts).at(-1)??'',/certificate as disputed/);
+
+  let trauma=initialBellrunnerSecondJob('trauma');
+  for(let i=0;i<STAGE_FOUR_OPENING_LENGTH.trauma-1;i++)
+    trauma=advanceBellrunnerSecondJob(trauma,'continue_opening');
+  trauma=advanceBellrunnerSecondJob(trauma,'prioritize_mobile_worker');
+  assert.match(bellrunnerStageFourJournal(trauma).join(' '),/attendant stopped me/);
+  for(let i=0;i<STAGE_FOUR_TRAUMA_TRIAGE_LENGTH.corrected;i++)
+    trauma=advanceBellrunnerSecondJob(trauma,'continue_triage');
+  for(let i=0;i<STAGE_FOUR_TRAUMA_ASSISTANCE_LENGTH-1;i++)
+    trauma=advanceBellrunnerSecondJob(trauma,'continue_detail');
+  trauma=advanceBellrunnerSecondJob(trauma,'bring_next_worker');
+  assert.match(bellrunnerStageFourJournal(trauma).join(' '),/She asked him/);
+  assert.doesNotMatch(bellrunnerStageFourJournal(trauma).join(' '),/I asked the other worker/);
+  assert.doesNotMatch(bellrunnerStageFourJournal(trauma).join(' '),/Non-work illness/);
+  for(let i=0;i<3;i++)trauma=advanceBellrunnerSecondJob(trauma,'continue_register');
+  assert.match(bellrunnerStageFourJournal(trauma).join(' '),/Non-work illness/);
+  assert.doesNotMatch(bellrunnerStageFourJournal(trauma).join(' '),/left the men paying/);
+  for(let i=3;i<STAGE_FOUR_TRAUMA_REGISTER_LENGTH-1;i++)
+    trauma=advanceBellrunnerSecondJob(trauma,'continue_register');
+  trauma=advanceBellrunnerSecondJob(trauma,'ask_about_classification');
+  assert.match(bellrunnerStageFourJournal(trauma).join(' '),/paying for treatment/);
+
+  let machinery=initialBellrunnerSecondJob('machinery');
+  assert.doesNotMatch(bellrunnerStageFourJournal(machinery).join(' '),/retaining pin/);
+  for(let i=0;i<STAGE_FOUR_OPENING_LENGTH.machinery;i++)
+    machinery=advanceBellrunnerSecondJob(machinery,'continue_opening');
+  machinery=advanceBellrunnerSecondJob(machinery,'inspect_safety_linkage');
+  assert.match(bellrunnerStageFourJournal(machinery).join(' '),/shutoff/);
+  assert.doesNotMatch(bellrunnerStageFourJournal(machinery).join(' '),/retaining pin/);
+  machinery=advanceBellrunnerSecondJob(machinery,'trace_bell_rod');
+  assert.match(bellrunnerStageFourJournal(machinery).join(' '),/retaining pin/);
+  machinery=advanceBellrunnerSecondJob(machinery,'show_mechanic_link');
+  machinery=advanceBellrunnerSecondJob(machinery,'request_second_check');
+  const content=bellrunnerStageFourJournal(machinery).join(' ');
+  assert.match(content,/asked the mechanic to check it again/);
+  assert.doesNotMatch(content,/marked where the pin sat/);
 });
