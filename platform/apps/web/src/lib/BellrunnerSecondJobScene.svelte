@@ -78,18 +78,8 @@
             {/if}
           {:else if state.phase==='done'}
             <p class="narration">{copy.done}</p>
-            {#if state.journalFact}
-              <div class="finding"><strong>Recorded finding</strong><p>{state.journalFact}</p></div>
-            {/if}
-            <p class="narration">The second job is complete. No additional skill level or tutorial wage is awarded here.</p>
           {:else if state.phase==='exited'}
-            <p class="narration">You leave the completed work behind and head toward the outside service gate.</p>
-            <div class="finding">
-              <strong>Stage 4 complete</strong>
-              <p>{copy.title} — {copy.discipline}</p>
-              <p>{state.journalFact??copy.fact}</p>
-            </div>
-            <p class="narration">Stage 5 — the encounter at the service gate — is not implemented yet. Your Stage 4 progress is saved.</p>
+            <p class="narration">You leave the work behind. The outside service gate stands ahead.</p>
           {:else}
             {#if instruction}<p class="narration">{instruction}</p>{/if}
             {#if state.branch==='contracts'}
