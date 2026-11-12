@@ -25,6 +25,7 @@ const chrome=chromeCandidates.find(x=>/[\\/]/.test(x)?existsSync(x):
 if(!chrome)throw Error('Chromium required for Bellrunner Stage 4 browser QA (set CHROME_PATH).');
 
 const fixtures={};
+const primaryFixtures={};
 for(const branch of ['contracts','trauma','machinery']){
   let state=initialBellrunnerSecondJob(branch);
   for(let i=0;i<STAGE_FOUR_OPENING_LENGTH[branch]-(branch==='trauma'?1:0);i++)
@@ -33,6 +34,10 @@ for(const branch of ['contracts','trauma','machinery']){
   // itself; a separate document-style "choose a worker" page is gone.
   fixtures[branch]={stage:4,tutorialStatus:'IN_PROGRESS',state,
     availableActions:availableStageFourActions(state),
+    tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
+  const opening=initialBellrunnerSecondJob(branch);
+  primaryFixtures[branch]={stage:4,tutorialStatus:'IN_PROGRESS',state:opening,
+    availableActions:availableStageFourActions(opening),
     tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
 }
 const port=5185,cdpPort=9253;
@@ -118,6 +123,7 @@ try{
   await cmd('Page.enable');await cmd('Runtime.enable');
   const stub=String.raw`(()=>{
     const fx=${JSON.stringify(fixtures)};
+    const primaryFx=${JSON.stringify(primaryFixtures)};
     const original=window.fetch.bind(window);
     const json=(v,status=200)=>new Response(JSON.stringify(v),
       {status,headers:{'content-type':'application/json'}});
@@ -127,7 +133,8 @@ try{
       if(!route.startsWith('/api/characters/qa-stage4-bellrunner'))
         return original(input,options);
       const branch=new URLSearchParams(location.search).get('branch')||'contracts';
-      const item=fx[branch];
+      const item=new URLSearchParams(location.search).get('primary')==='1'
+        ?primaryFx[branch]:fx[branch];
       if(route==='/api/characters/qa-stage4-bellrunner')
         return Promise.resolve(json({character:{
           id:'qa-stage4-bellrunner',name:'QA Bellrunner',origin:'Bellrunner',
@@ -154,10 +161,10 @@ try{
     const shot=await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
     writeFileSync(join(folder,name+'.png'),Buffer.from(shot.data,'base64'));
   }
-  async function navigate(branch,width,height){
+  async function navigate(branch,width,height,primary=false){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     await evalJS('window.__pallLeaving=true').catch(()=>{});
-    await cmd('Page.navigate',{url:origin+'/characters/qa-stage4-bellrunner/bellrunner/second-job?branch='+branch});
+    await cmd('Page.navigate',{url:origin+'/characters/qa-stage4-bellrunner/bellrunner/second-job?branch='+branch+(primary?'&primary=1':'')});
     await until(()=>evalJS(`(()=>{
       if(window.__pallLeaving)return false;
       const scene=document.querySelector('.bellrunner-second-job .work-card');
@@ -231,8 +238,38 @@ try{
     await until(()=>evalJS("!!document.querySelector('#bellrunner-second-job-journal')"),
       4000,branch+' journal');
     console.log('PASS: '+branch+' work action and shared journal control');
+    // A fresh Stage 4 introduction always exposes Continue as PRIMARY. Use
+    // Chromium's computed style, not merely a copied class name, to catch
+    // accidental CSS overrides by individual Bellrunner scenes.
+    await navigate(branch,1280,720,true);
+    const primaryStyle=await evalJS(`(()=>{
+      const button=document.querySelector('.bellrunner-second-job .actions button.primary-choice');
+      if(!button)return null;
+      const s=getComputedStyle(button);
+      return {source:s.borderImageSource,slice:s.borderImageSlice,
+        background:s.backgroundColor,color:s.color,before:getComputedStyle(button,'::before').content};
+    })()`);
+    assert.ok(primaryStyle,'Real Continue has canonical primary-choice: '+branch);
+    assert.ok(primaryStyle.source.includes('button-normal-trim.png'),
+      'Bellrunner primary MUST use Millhand nine-slice art: '+JSON.stringify(primaryStyle));
+    assert.ok(primaryStyle.slice.includes('50 180 45 180'),
+      'Same Millhand border-image slicing on every origin: '+JSON.stringify(primaryStyle));
+    assert.equal(primaryStyle.before,'none','No fake CSS brass arrow on owner art: '+branch);
+    const rect=await evalJS(`(()=>{
+      const r=document.querySelector('.bellrunner-second-job .actions button.primary-choice').getBoundingClientRect();
+      return {x:r.left+r.width/2,y:r.top+r.height/2};
+    })()`);
+    await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:rect.x,y:rect.y});
+    await delay(80);
+    const hovered=await evalJS(`(()=>{
+      const b=document.querySelector('.bellrunner-second-job .actions button.primary-choice');
+      return getComputedStyle(b).borderImageSource;
+    })()`);
+    assert.ok(hovered.includes('button-hover-trim.png'),
+      'Bellrunner hover must swap to the same Millhand hover art: '+branch);
+    console.log('PASS: '+branch+' actual primary Continue uses the Millhand normal/hover image skin');
   }
-  console.log('PASS: nine real Stage 4 background/layout combinations plus branch actions and journals');
+  console.log('PASS: nine real Stage 4 background/layout combinations plus matching Millhand primary buttons');
 }catch(error){
   console.error(error);
   process.exitCode=1;
