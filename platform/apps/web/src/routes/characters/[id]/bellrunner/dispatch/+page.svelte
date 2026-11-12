@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
   import {page} from '$app/state';
@@ -203,7 +204,7 @@
               </button>
             </div>
           {:else if talkingToHector&&sceneKey==='depot'}
-            <BellrunnerHectorConversation characterName={character.name}
+            <BellrunnerHectorConversation 
               returnToRound={()=>{talkingToHector=false;}}/>
           {:else}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
@@ -271,7 +272,7 @@
                 onclick={()=>{void perform('note_spoiled_mark');}}><BellrunnerChoiceIcon kind="mark"/>Note the unclear mark</button>
             </div>
           {:else if phase==='receiver_reply'&&receiverDialogue}
-            <p class="eyebrow">{character.name.toUpperCase()}</p>
+            <p class="eyebrow">{PLAYER_SPEAKER_LABEL}</p>
             <p class="spoken">“{receiverDialogue.player}”</p>
             <div class="actions">
               <button type="button" class="primary-choice" disabled={busy}
@@ -282,7 +283,7 @@
             <p class="spoken">“{receiverDialogue.receiver}”</p>
             <p class="story">{receiverDialogue.outcome}</p>
             {#if receiverDialogue.extraPlayer}
-              <p class="speaker">{character.name.toUpperCase()}</p>
+              <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
               <p class="spoken">“{receiverDialogue.extraPlayer}”</p>
             {/if}
             <div class="actions">
