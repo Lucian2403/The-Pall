@@ -27,8 +27,10 @@ if(!chrome)throw Error('Chromium required for Bellrunner Stage 4 browser QA (set
 const fixtures={};
 for(const branch of ['contracts','trauma','machinery']){
   let state=initialBellrunnerSecondJob(branch);
-  for(let i=0;i<STAGE_FOUR_OPENING_LENGTH[branch];i++)
+  for(let i=0;i<STAGE_FOUR_OPENING_LENGTH[branch]-(branch==='trauma'?1:0);i++)
     state=advanceBellrunnerSecondJob(state,'continue_opening');
+  // For Trauma the two priorities appear on the final Attendant beat
+  // itself; a separate document-style "choose a worker" page is gone.
   fixtures[branch]={stage:4,tutorialStatus:'IN_PROGRESS',state,
     availableActions:availableStageFourActions(state),
     tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
