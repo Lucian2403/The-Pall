@@ -500,6 +500,109 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
  }
 });
 
+test('Bellrunner Back to Stage 3 is always available across Stage 4 and never duplicates the skill',async()=>{
+ const cases=[
+  {branch:'contracts' as const,skill:'Commerce',point:'entry' as const},
+  {branch:'trauma' as const,skill:'Medicine',point:'dialogue' as const},
+  {branch:'machinery' as const,skill:'Mechanics',point:'inspection' as const},
+  {branch:'contracts' as const,skill:'Commerce',point:'done' as const}
+ ];
+ for(const item of cases){
+  const id=randomUUID(),name='BR Rewind '+id.slice(0,8);
+  await db.query(
+   "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',4,'NOT_STARTED')",
+   [id,owner,name,'br-rewind-'+id,JSON.stringify({Industry:3,[item.skill]:1})]);
+  await db.query(
+   'INSERT INTO player_character_bellrunner_dispatch(character_id,revision,work_state) VALUES($1,17,$2::jsonb)',
+   [id,JSON.stringify({phase:'final_notice_taken',route:'direct',noticesOrdered:true,receipt:'clear'})]);
+  await db.query(
+   'INSERT INTO player_character_bellrunner_wrong_bell(character_id,revision,state) VALUES($1,18,$2::jsonb)',
+   [id,JSON.stringify({...INITIAL_WRONG_BELL,revision:18,phase:'committed',branch:item.branch})]);
+  const endpoint=base+id+'/dev/rewind-stage';
+  const jobUrl=base+id+'/bellrunner/second-job';
+  let progress=0;
+  async function work(action:string){
+   const result=await request('POST',jobUrl,owner,{action,expectedRevision:progress,requestId:randomUUID()});
+   assert.equal(result.status,200,item.branch+' '+item.point+' '+action+' '+JSON.stringify(result.body));
+   progress++;
+   return result;
+  }
+  const first=await request('GET',endpoint);
+  assert.deepEqual(first.body,{enabled:true,canRewind:true,stage:4,targetStage:3},
+   'The Stage 4 rewind button must appear before the first action');
+  if(item.point!=='entry')await work('continue_opening');
+  if(item.point==='inspection'){
+   for(let n=1;n<STAGE_FOUR_OPENING_LENGTH.machinery;n++)await work('continue_opening');
+   await work('inspect_safety_linkage');
+  }
+  if(item.point==='done'){
+   for(let n=1;n<STAGE_FOUR_OPENING_LENGTH.contracts;n++)await work('continue_opening');
+   await work('compare_shift_records');
+   await work('inspect_absence_category');
+   await work('enter_written_objection');
+   for(let n=0;n<STAGE_FOUR_REVELATION_LENGTH.contracts;n++)await work('continue_revelation');
+   await work('submit_certificate');
+   assert.equal((await request('GET',jobUrl)).body?.state?.phase,'done');
+  }
+  if(item.point!=='entry'){
+   const snapshot=await request('GET',endpoint);
+   assert.deepEqual(snapshot.body,{enabled:true,canRewind:true,stage:4,targetStage:3},
+    'The Back to Stage 3 button must remain available after saved Stage 4 commands');
+  }
+  assert.equal((await request('GET',endpoint,stranger)).status,404,
+   'Stage rewind availability must be account scoped');
+  assert.equal((await request('POST',endpoint,stranger,{expectedStage:4})).status,404,
+   'Other accounts must never rewind the selected route');
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:3})).status,409,
+   'Wrong-stage rewind must not run');
+  const result=await request('POST',endpoint,owner,{expectedStage:4});
+  assert.equal(result.status,200,JSON.stringify(result.body));
+  assert.equal(result.body?.stage,3);
+  assert.equal(result.body?.tutorialStatus,'IN_PROGRESS');
+  assert.equal(result.body?.route,'/characters/'+id+'/bellrunner/wrong-bell');
+  assert.equal(result.body?.coinDelta,0);
+  const after=(await db.query<{
+   tutorial_stage:number;tutorial_status:string;coins:number;
+   major_skill_bonuses:Record<string,number>
+  }>(
+   'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',
+   [id])).rows[0];
+  assert.equal(after.tutorial_stage,3);
+  assert.equal(after.tutorial_status,'IN_PROGRESS');
+  assert.equal(Number(after.coins),20);
+  assert.equal(after.major_skill_bonuses[item.skill],0,
+   'The original Stage 3 award is removed exactly once');
+  assert.equal(after.major_skill_bonuses.Industry,3,'Other skills remain untouched');
+  const predecessor=(await db.query<{state:{
+   phase:string;branch:string|null;revision:number
+  } }>(
+   'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',[id])).rows[0].state;
+  assert.equal(predecessor.phase,'choice');
+  assert.equal(predecessor.branch,null);
+  assert.equal(predecessor.revision,19);
+  const jobRow=await db.query(
+   'SELECT character_id FROM player_character_bellrunner_second_job WHERE character_id=$1',[id]);
+  assert.equal(jobRow.rowCount,0,'A rewound job cannot retain mid-stage state');
+  const receipts=await db.query<{n:number}>(
+   'SELECT count(*)::int AS n FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1',[id]);
+  assert.equal(receipts.rows[0].n,0,'Every stale Stage 4 replay receipt must be cleared');
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:4})).status,409,
+   'Repeating rewind cannot deduct the skill again');
+  assert.equal((await request('GET',endpoint)).body?.targetStage,2,
+   'The Stage 3 rewind capability resumes for the previous worksite scene');
+  const replay=await request('POST',base+id+'/bellrunner/wrong-bell',owner,{
+   action:'choose_'+item.branch,expectedRevision:19,requestId:randomUUID()});
+  assert.equal(replay.status,200,JSON.stringify(replay.body));
+  assert.equal(replay.body?.state?.branch,item.branch);
+  const skillAfter=(await db.query<{major_skill_bonuses:Record<string,number>}>(
+   'SELECT major_skill_bonuses FROM player_characters WHERE id=$1',[id])).rows[0];
+  assert.equal(skillAfter.major_skill_bonuses[item.skill],1,
+   'Re-selecting the route awards +1 once, not two or zero');
+  assert.equal((await request('GET',endpoint)).body?.targetStage,3,
+   'After replaying the branch, Stage 4 again exposes Back to Stage 3');
+ }
+});
+
 test('Equipment migration backfills existing starter items without duplicating or losing coins',async()=>{
  const rows=await db.query<{item_code:string;quantity:number;location:string;equipment_slot:string}>(
   'SELECT item_code,quantity,location,equipment_slot FROM player_character_item_instances WHERE character_id=$1 ORDER BY item_code',
