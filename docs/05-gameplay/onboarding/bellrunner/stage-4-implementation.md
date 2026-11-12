@@ -131,6 +131,23 @@ was added.
   formal register text beyond the explicitly illustrated category or
   skill multipliers are introduced. Their numerical contracts remain TBD.
 
+## Stage 4 — do not echo the story in data cards
+
+**Owner review, 12 November:** the previously rendered `WORKSITE NOTICE`
+and `SHIFT BOOK` boxes beneath *Attendance Certificate* repeated the
+narration above them. The same defect existed later in Contracts
+(`ATTENDANCE CATEGORY`, `WAGE COLUMN`) and in *The Bell Linkage*
+(`VENTILATION SAFETY SHUTOFF`, `SHIFT BELL LINKAGE`, `RETAINING PIN`).
+These boxed readouts and adjacent developer-style explanatory notes have
+been removed from **all Bellrunner Stage 4 paths**.
+
+Keep the original visible actions, branch-dependent outcomes and saved
+journal facts. Present what the player sees through one natural narrative
+beat or character dialogue, **not** an extra status/worksheet underneath.
+Genuine inspectable world objects in other stages are different: those
+remain interactive, but must not restate information already delivered.
+`verify:bellrunner-stage4` explicitly forbids these cards from returning.
+
 ## Immersion rule — no post-choice reward ledger
 
 The owner rejected a third, technical dialogue screen following a route
