@@ -42,20 +42,44 @@ at a time, with Continue, not as a scroll of large blocks.
    The clerical record stays disputed; the worksite's missing receiving
    mark is not forged or retroactively supplied.
 
-## Trauma workflow
+## Trauma workflow — owner dialogue revision, 12 November 2026
 
-1. Approved Attendant opening (three individual beats).
-2. Select which worker needs the attendant first. The worker struggling
-   to speak is urgent. Selecting the other worker triggers the canonical
-   staff correction; no simulated death or medical injury is imposed.
-3. Choose **Take observations for the attendant** or **Bring the next
-   worker to the attendant**; staff remain responsible for care.
-4. Compare observed worksite and symptoms with the **Non-work illness**
-   classification and worker-billed treatment charge.
-5. Ask for the worksite to be added to notes, or ask why the worker
-   is billed. Both lead to the four approved exchange beats.
-6. **Finish the handover**. No new disease, treatment, supply, diagnosis
-   or player medical item is created.
+Only the First Aid Line conversations described here have been revised.
+The existing Contracts and Industrial Machinery dialogue remains untouched.
+The authoritative full spoken/narrative script is in
+[Route B — First Aid Line](second-task-branches.md).
+
+1. Two narration beats introduce the workers. The attendant's spoken
+   request appears in a third beat **with both player choices directly
+   beneath the dialogue**: help the man struggling to breathe or help
+   the man who can still walk and talk.
+2. The selected priority triggers its own saved dialogue sequence:
+   **YOU → ATTENDANT → narration** for the urgent worker, or
+   **ATTENDANT → narration** when the other worker was chosen first.
+   The urgent patient is always brought to the trained attendant.
+3. **First Aid Line — Helping the Attendant:** one narration beat,
+   three spoken beats and the choice between recording the worker's
+   account and bringing the next worker over. The buttons appear
+   under the last attendant line, not a separate documentary screen.
+4. **First Aid Line — The Medical Register:** six short beats covering
+   the notes (or the parallel worker-escort introduction), attendant
+   handover, discovered **Non-work illness** entry, worker-billed
+   charges and the player's incredulous response. One action,
+   **Ask the attendant why the illness is classified as
+   non-work-related**, replaces the old comparison and two
+   redundant register-choice buttons.
+5. Nine owner-authored revelation beats, including the attendant's
+   limited authority, the second cough and her return to the
+   treatment bench. **Finish the handover** is displayed under the
+   last narration beat, without an extra mechanical task-summary page.
+
+The new server-owned `triageLine`, `detailLine`, and `registerLine`
+counters are persistent JSON work state; older Stage 4 saved states
+without them use zero. The earlier phases `inspect`, `choose`,
+and `finish` remain readable for users who saved partway through
+the previous version, without displaying the retired data tables.
+No treatment, medical diagnosis, personal item or second skill award
+was added.
 
 ## Industrial Machinery workflow
 
