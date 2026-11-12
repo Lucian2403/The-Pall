@@ -251,9 +251,17 @@ assert.ok(stage3SceneSource.includes('class="environment bench-foreground"') &&
   stage3Flat.includes('clip-path:inset(70%000)') &&
   !stage3Flat.includes('.guther{position:absolute;top:6%;left:11%;height:112%;width:auto;max-width:none;object-fit:contain;clip-path:'),
   'Stage 3 must occlude Guther with the matching foreground workshop table, not cut his apron with a horizontal mask');
-assert.ok(stage3Flat.includes("background:#49301d") &&
-  stage3Flat.includes("color:#fff1d7"),
-  'Stage3 route labels must remain high contrast on the supplied button art');
+// Millhand and Bellrunner now share the same owner-supplied button skin.
+const secondJobChoices=readFileSync(resolve(root,'apps/web/src/lib/SecondJobChoices.svelte'),'utf8');
+const secondJobFlat=secondJobChoices.replace(/\s+/g,'');
+const bellStage3=readFileSync(resolve(root,'apps/web/src/routes/characters/[id]/bellrunner/wrong-bell/+page.svelte'),'utf8');
+assert.ok(stage3SceneSource.includes('<SecondJobChoices choices={secondJobChoices}') &&
+  bellStage3.includes('<SecondJobChoices choices={secondJobChoices}') &&
+  secondJobFlat.includes("background:#49301d") &&
+  secondJobFlat.includes("color:#fff1d7") &&
+  secondJobFlat.includes("button-normal-trim.png") &&
+  secondJobFlat.includes("button-hover-trim.png"),
+  'Both Stage 3 origins must share the accessible high-contrast second-job button skin');
 for(const component of ['WorkshopScene.svelte','MillhandWorkScene.svelte']){
   const scene=readFileSync(resolve(root,'apps/web/src/lib/'+component),'utf8');
   assert.ok(scene.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
