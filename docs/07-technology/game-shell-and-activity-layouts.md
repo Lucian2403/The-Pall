@@ -175,6 +175,21 @@ details, not dialogue.
   narrative Svelte scenes for these regressions. It is included in
   `npm run check:web` and the tutorial CI workflow.
 
+### Avoid duplicate information cards in story scenes
+
+When a narrative sentence or NPC already explains the worksite's state,
+do **not** append a second row of label/value boxes stating the same
+thing. The owner specifically rejected Bellrunner Stage 4's redundant
+`WORKSITE NOTICE` / `SHIFT BOOK`, wage-category and bell-linkage
+readouts. Remove the duplicated UI, not the quest fact or server state.
+Keep concrete inspectable objects only when the player can meaningfully
+interact with them or genuinely discover something not stated elsewhere.
+
+The scene should show **one beat of story, then the relevant action**;
+optional discoveries belong in the Journal. Future Bellrunner and
+Millhand stages must keep this rule. The Bellrunner Stage 4 regression
+test rejects documentary card/readout duplication across all three jobs.
+
 ### Mandatory Back to previous Stage support
 
 **Owner rule — every newly implemented tutorial Stage must support the
