@@ -63,7 +63,8 @@ export const WRONG_BELL_BRANCHES={
   }
 } as const;
 /** Number of dialogue lines shown before Continue in a committed route.
- * Two short conversation beats, followed by a separate result/next-task beat.
+ * Two short story beats lead straight into Stage 4. No reward ledger or
+ * meta progression summary is inserted between the two locations.
  * The original owner's lines remain unmodified and in their approved order.
  */
 export const WRONG_BELL_BRANCH_FIRST_BEAT_LINES={
