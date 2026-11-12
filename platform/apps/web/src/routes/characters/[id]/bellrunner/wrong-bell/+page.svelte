@@ -336,12 +336,11 @@
   h1,h2{margin:0 0 13px;font:600 var(--dialogue-title,21px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
   h2{margin-top:17px}
-  .narration,.spoken,.round-finding{margin:0 0 14px;font:600 var(--dialogue-text,17px)/1.55
+  .narration,.spoken{margin:0 0 14px;font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif);color:#251910}
   .narration{font-style:italic;font-weight:500}
   .speaker{margin:10px 0 6px;font:600 var(--dialogue-label,15px)/1.2
     var(--pall-font-label,'Arial Narrow',sans-serif);color:#67432a;letter-spacing:.08em}
-  .round-finding{padding:13px;border-top:1px solid #b79c78;border-bottom:1px solid #b79c78}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
   .actions>button{width:100%;min-height:52px;border:1px solid #6d5235;
     background:#241d16;color:#f7e6c9;text-align:left;padding:10px 13px;cursor:pointer;
