@@ -65,13 +65,30 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',
           [req.params.id]);
         const saved=investigation.rows[0]?.state;
-        const canRewind=dispatchReady&&(
-          stage===3&&(!saved||saved.branch===null)&&saved?.phase!=='committed' ||
-          stage===4&&saved?.phase==='committed'&&
-            ['contracts','trauma','machinery'].includes(saved.branch??'')&&
-            result.rows[0].tutorial_status==='NOT_STARTED'
-        );
-        return {enabled:true,canRewind,stage,targetStage:canRewind?stage-1:null};
+        if(stage===3){
+          const canRewind=dispatchReady&&
+            (!saved||saved.branch===null)&&saved?.phase!=='committed';
+          return {enabled:true,canRewind,stage,targetStage:canRewind?2:null};
+        }
+        // Every Bellrunner Stage 4 work phase is replayable in local testing,
+        // not just the first page before the initial Continue. Stage 4 awards
+        // nothing new, so its receipts/state can be cleared atomically.
+        const job=await db.query<{revision:string|number;state:{
+          revision:number;phase:string;branch:string
+        }}>(
+          'SELECT revision,state FROM player_character_bellrunner_second_job WHERE character_id=$1',
+          [req.params.id]);
+        const current=job.rows[0];
+        const validJob=!current
+          ?result.rows[0].tutorial_status==='NOT_STARTED'
+          :current.state.branch===saved?.branch&&
+            current.state.phase!=='exited'&&
+            Number(current.revision)===current.state.revision;
+        const canRewind=dispatchReady&&saved?.phase==='committed'&&
+          ['contracts','trauma','machinery'].includes(saved.branch??'')&&
+          ['NOT_STARTED','IN_PROGRESS'].includes(result.rows[0].tutorial_status)&&
+          validJob;
+        return {enabled:true,canRewind,stage,targetStage:canRewind?3:null};
       }
       return {enabled:true,canRewind:false,stage,targetStage:null};
     }
@@ -174,9 +191,11 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       }
 
       if(bellrunner&&expectedStage===4){
-        // The Stage 4 job has not begun; undo only the selected route's
-        // one-time skill award and restore the choice panel for another test.
-        if(c.rows[0].tutorial_status!=='NOT_STARTED'){
+        // Local QA may rewind from EVERY Stage 4 phase: first view,
+        // mid-dialogue, evidence inspection, branch method and completed
+        // handoff. Stage 4 itself awards no coins, XP, items or skills.
+        // Undo the Stage 3 route's one-time skill and reset Stage 4 atomically.
+        if(!['NOT_STARTED','IN_PROGRESS'].includes(c.rows[0].tutorial_status)){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_wrong_bell_state'});
         }
@@ -196,13 +215,19 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_wrong_bell_state'});
         }
-        // The route can be changed only before any Stage 4 work command.
-        // A saved job is not silently deleted when rewinding the skill.
-        const started=await client.query<{state:{revision:number;phase:string}}>(
-          'SELECT state FROM player_character_bellrunner_second_job WHERE character_id=$1 FOR UPDATE',
+        // Lock job state before clearing it; repeated or concurrent rewind
+        // cannot award a second skill or resurrect an old work receipt.
+        const started=await client.query<{revision:string|number;state:{
+          revision:number;phase:string;branch:string
+        }}>(
+          'SELECT revision,state FROM player_character_bellrunner_second_job WHERE character_id=$1 FOR UPDATE',
           [req.params.id]);
-        if(started.rowCount&&
-          (started.rows[0].state.revision!==0||started.rows[0].state.phase!=='opening')){
+        const job=started.rows[0];
+        const validJob=job
+          ?job.state.branch===value.branch&&job.state.phase!=='exited'&&
+            Number(job.revision)===job.state.revision
+          :c.rows[0].tutorial_status==='NOT_STARTED';
+        if(!validJob){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_second_job_state'});
         }
