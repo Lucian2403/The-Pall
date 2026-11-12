@@ -340,13 +340,6 @@
   .speaker{margin:10px 0 6px;font:600 var(--dialogue-label,15px)/1.2
     var(--pall-font-label,'Arial Narrow',sans-serif);color:#67432a;letter-spacing:.08em}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
-  .actions>button{width:100%;min-height:52px;border:1px solid #6d5235;
-    background:#241d16;color:#f7e6c9;text-align:left;padding:10px 13px;cursor:pointer;
-    font:600 var(--dialogue-text,17px)/1.3 var(--pall-font-reading,Georgia,serif)}
-  .actions>button:disabled{opacity:.55;cursor:wait}
-  /* Continue always remains white on the dark primary action at hover/focus. */
-  .actions>button.continue-choice:hover:not(:disabled),
-  .actions>button.continue-choice:focus-visible{color:#fff!important}
   .route-dialogue-beat{min-width:0}
   .decision-heading{
     margin:0 0 10px;
