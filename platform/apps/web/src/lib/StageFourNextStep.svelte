@@ -26,12 +26,12 @@
     {snapshot.state.phase==='EXITED'?'You have already left this location.':'Your work here is finished.'}
   </p>
   {#if exitAvailable}
-    <button class="stage-next-step-link" type="button" disabled={pending}
+    <button class="stage-next-step-link primary-choice" type="button" disabled={pending}
       onclick={()=>{void perform('leave_location');}}>
       {label}
     </button>
   {:else if alreadyAdvanced}
-    <a class="stage-next-step-link" {href}>{label}</a>
+    <a class="stage-next-step-link primary-choice" {href}>{label}</a>
   {/if}
 </nav>
 
@@ -46,38 +46,4 @@
     margin:0 0 10px;
     font:15px/1.45 var(--pall-font-reading,Georgia,serif);
   }
-  .stage-next-step-link{
-    box-sizing:border-box;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    min-height:47px;
-    padding:7px 12px;
-    text-align:center;
-    color:#2d2016;
-    text-decoration:none;
-    cursor:pointer;
-    font:700 16px/1.3 var(--pall-font-reading,Georgia,serif);
-    background:transparent;
-    border:solid transparent;
-    border-width:10px 17px 9px;
-    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
-    border-image-slice:50 180 45 180 fill;
-    border-image-width:10px 17px 9px;
-    border-image-repeat:stretch;
-  }
-  .stage-next-step-link:hover:not(:disabled){
-    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
-    color:#28190f;
-  }
-  .stage-next-step-link:focus-visible{
-    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
-    outline:2px solid #76512f;
-    outline-offset:3px;
-  }
-  .stage-next-step-link:active:not(:disabled){
-    border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
-  }
-  .stage-next-step-link:disabled{cursor:wait;opacity:.65}
 </style>
