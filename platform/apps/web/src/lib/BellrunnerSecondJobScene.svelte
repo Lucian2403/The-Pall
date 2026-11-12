@@ -99,38 +99,12 @@
             <p class="narration">You leave the work behind. The outside service gate stands ahead.</p>
           {:else}
             {#if instruction}<p class="narration">{instruction}</p>{/if}
-            {#if state.branch==='contracts'}
-              {#if state.phase==='inspect'||state.phase==='detail'}
-                <div class="work-evidence" aria-label="Shift book comparison">
-                  <div><small>WORKSITE NOTICE</small><strong>Closed following dangerous fumes</strong></div>
-                  <div><small>SHIFT BOOK</small><strong>Night crew listed for the same block</strong></div>
-                  {#if state.phase==='detail'}
-                    <div><small>ATTENDANCE CATEGORY</small><strong>Absent by choice</strong></div>
-                    <div><small>WAGE COLUMN</small><strong>Not payable</strong></div>
-                  {/if}
-                </div>
-              {:else if state.phase==='choose'}
-                <p class="note">Either method records the conflict without changing the clerk's authority or clearing the worker's wages.</p>
-              {/if}
-            {:else if state.branch==='trauma'}
-              {#if state.phase==='inspect'}
-                <!-- Older saved Stage 4 sessions may already be at this
-                     transitional step. Keep their choices without a ledger. -->
-                <p class="narration">{BELLRUNNER_STAGE_FOUR.trauma.opening[1].text}</p>
-                <p class="speaker">ATTENDANT</p>
-                <p class="spoken">“{BELLRUNNER_STAGE_FOUR.trauma.opening[2].text}”</p>
-              {/if}
-            {:else if state.branch==='machinery'}
-              {#if state.phase==='inspect'||state.phase==='detail'||state.phase==='confirm'}
-                <div class="work-evidence mechanical-readout" aria-label="Supervised exterior safety inspection">
-                  <div><small>VENTILATION SAFETY SHUTOFF</small><strong>Engaged · closed</strong></div>
-                  <div><small>SHIFT BELL LINKAGE</small><strong>Still actuating</strong></div>
-                  {#if state.phase==='confirm'}
-                    <div><small>RETAINING PIN</small><strong>Repositioned past the safety stop</strong></div>
-                  {/if}
-                </div>
-                <p class="note">Observation only. The City-Works Mechanic supervises all checks. Do not touch the moving assembly.</p>
-              {/if}
+            {#if state.branch==='trauma'&&state.phase==='inspect'}
+              <!-- Older saved Stage 4 sessions can still resume here. Show
+                   the real conversation, never a duplicated evidence ledger. -->
+              <p class="narration">{BELLRUNNER_STAGE_FOUR.trauma.opening[1].text}</p>
+              <p class="speaker">ATTENDANT</p>
+              <p class="spoken">“{BELLRUNNER_STAGE_FOUR.trauma.opening[2].text}”</p>
             {/if}
           {/if}
 
@@ -203,19 +177,12 @@
     border-bottom:1px solid #9e815955}
   h1{margin:0 0 15px;font:600 var(--dialogue-title,21px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .narration,.spoken,.note{margin:0 0 15px;font:500 var(--dialogue-text,17px)/1.5
+  .narration,.spoken{margin:0 0 15px;font:500 var(--dialogue-text,17px)/1.5
     var(--pall-font-reading,Georgia,serif);color:#251910}
   .narration{font-style:italic}
   .speaker{margin:10px 0 6px;font:700 15px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.07em;color:#67432a}
   .spoken{font-weight:600}
-  .note{font-size:14px}
-  .work-evidence{display:grid;gap:8px;margin:14px 0 16px}
-  .work-evidence>div{background:#e7d5ae;border:1px solid #a58a65;padding:10px 12px;
-    display:flex;flex-direction:column;gap:5px}
-  .work-evidence small{color:#775132;font:700 11px/1.25 sans-serif;letter-spacing:.09em}
-  .work-evidence strong{font:600 15px/1.4 var(--pall-font-reading,Georgia,serif)}
-  .mechanical-readout>div{border-left:4px solid #8f6944}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
   .error{color:#873523}.saving{color:#644f36}
   .job-journal{margin:12px;padding:20px;border:2px solid #986f46;background:#e9d5ad;color:#27190e;
