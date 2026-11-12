@@ -267,26 +267,24 @@
                   {@const splitAt=WRONG_BELL_BRANCH_FIRST_BEAT_LINES[snapshot.state.branch]}
                   <h1>{branch.name}</h1>
                   <div class="route-dialogue-beat" aria-live="polite">
-                    {#if committedBeat<2}
-                      {#each (committedBeat===0 ? branch.lines.slice(0,splitAt) : branch.lines.slice(splitAt)) as line}
-                        {#if line.speaker==='Narration'}
-                          <p class="narration">{line.text}</p>
-                        {:else}
-                          <p class="speaker">{dialogueSpeakerLabel(line.speaker)}</p>
-                          <p class="spoken">“{line.text}”</p>
-                        {/if}
-                      {/each}
-                      {#if committedBeat===1}
-                        <p class="narration">{branch.end}</p>
+                    {#each (committedBeat===0 ? branch.lines.slice(0,splitAt) : branch.lines.slice(splitAt)) as line}
+                      {#if line.speaker==='Narration'}
+                        <p class="narration">{line.text}</p>
+                      {:else}
+                        <p class="speaker">{dialogueSpeakerLabel(line.speaker)}</p>
+                        <p class="spoken">“{line.text}”</p>
                       {/if}
-                      <div class="actions">
-                        <button type="button" class="primary-choice continue-choice"
-                          onclick={()=>{
-                            if(committedBeat===0)committedBeat=1;
-                            else void goto('/characters/'+encodeURIComponent(id)+'/bellrunner/second-job');
-                          }}>Continue</button>
-                      </div>
+                    {/each}
+                    {#if committedBeat===1}
+                      <p class="narration">{branch.end}</p>
                     {/if}
+                    <div class="actions">
+                      <button type="button" class="primary-choice continue-choice"
+                        onclick={()=>{
+                          if(committedBeat===0)committedBeat=1;
+                          else void goto('/characters/'+encodeURIComponent(id)+'/bellrunner/second-job');
+                        }}>Continue</button>
+                    </div>
                   </div>
                 {/if}
                 {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
