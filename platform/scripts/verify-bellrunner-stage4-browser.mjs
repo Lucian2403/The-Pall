@@ -134,7 +134,7 @@ try{
           tutorial:{stage:4,status:'IN_PROGRESS'}
         }}));
       if(route.endsWith('/dev/rewind-stage'))
-        return Promise.resolve(json({enabled:false,canRewind:false,stage:4,targetStage:null}));
+        return Promise.resolve(json({enabled:true,canRewind:true,stage:4,targetStage:3}));
       if(route.endsWith('/bellrunner/second-job')){
         if(options?.method==='POST'){
           window.__stage4Posts.push(JSON.parse(options.body||'{}'));
@@ -214,6 +214,10 @@ try{
     await navigate(branch,1280,720);
     await until(()=>evalJS("document.querySelector('[data-pall-audio-control]')?.dataset.hydrated==='true'"),
       12000,'Svelte shell hydration');
+    await until(()=>evalJS(`Array.from(document.querySelectorAll('.rewind-button'))
+      .some(button=>button.textContent?.includes('Back to Stage 3'))`),
+      5000,branch+' Back to Stage 3 after starting Stage 4');
+    console.log('PASS: '+branch+' keeps Back to Stage 3 in shared HUD');
     const action=fixtures[branch].availableActions[0];
     await evalJS("document.querySelector('.bellrunner-second-job .actions button').click();true");
     await until(()=>evalJS("window.__stage4Posts.length>0"),3000,branch+' work POST');
