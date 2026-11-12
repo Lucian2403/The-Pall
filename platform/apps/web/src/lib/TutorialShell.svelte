@@ -77,7 +77,9 @@
     :mapState==='unavailable'?'Not available yet':'Open the city map');
   const chapter = $derived(character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
-    : character.origin === 'Bellrunner' && character.tutorial.stage >= 3
+    : character.origin === 'Bellrunner' && character.tutorial.stage >= 4
+    ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/second-job'
+    : character.origin === 'Bellrunner' && character.tutorial.stage === 3
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/wrong-bell'
     : character.origin === 'Bellrunner' && character.tutorial.stage === 2
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/dispatch'
