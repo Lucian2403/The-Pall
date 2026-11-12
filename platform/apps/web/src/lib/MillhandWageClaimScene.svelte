@@ -139,7 +139,7 @@
         <p class="context">{WAGE_CLAIM_STANCE_OUTCOMES[state.stance]}</p>
         <p class="instruction">Your position is saved. The encounter begins in Stage 6.</p>
         {#if snapshot.stage===6}
-          <a class="pall-framed-button combat-link" href={'/characters/'+encodeURIComponent(page.params.id)+'/millhand/combat'}>Enter the fight</a>
+          <a class="pall-framed-button combat-link primary-choice" href={'/characters/'+encodeURIComponent(page.params.id)+'/millhand/combat'}>Enter the fight</a>
         {/if}
       {:else}
         <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
