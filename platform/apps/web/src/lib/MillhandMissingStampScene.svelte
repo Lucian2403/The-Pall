@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import { tick } from "svelte";
@@ -358,7 +359,7 @@
           {/if}
         {:else if state.phase === "CONFRONT" && beat}
           <p class="speaker">
-            {beat.speaker === "Player" ? "You" : beat.speaker}
+            {dialogueSpeakerLabel(beat.speaker)}
           </p>
           <p
             class:stage-narration={"kind" in beat && beat.kind === "narration"}
