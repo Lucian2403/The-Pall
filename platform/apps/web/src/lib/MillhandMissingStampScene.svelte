@@ -256,6 +256,7 @@
               <div class="choices">
                 <button
                   type="button"
+                class="primary-choice"
                   onclick={() => {
                     evidencePage = 1;
                   }}>Continue</button
@@ -322,6 +323,7 @@
               <div class="choices">
                 <button
                   type="button"
+                class="primary-choice"
                   onclick={() => {
                     evidencePage = 2;
                   }}>Continue</button
@@ -343,6 +345,7 @@
             <div class="choices">
               <button
                 type="button"
+                class="primary-choice"
                 disabled={!canAct("show_guther")}
                 onclick={() => {
                   void perform("show_guther");
@@ -372,6 +375,7 @@
           <div class="choices">
             <button
               type="button"
+                class="primary-choice"
               disabled={!canAct("continue_dialogue")}
               onclick={() => {
                 void perform("continue_dialogue");
@@ -379,7 +383,7 @@
             >
             <button
               type="button"
-              class="leave"
+              class="secondary-choice leave"
               disabled={!canAct("skip_confrontation")}
               onclick={() => {
                 void perform("skip_confrontation");
@@ -395,6 +399,7 @@
             <div class="choices">
               <button
                 type="button"
+                class="primary-choice"
                 onclick={() => {
                   decisionStep = 1;
                 }}>Continue</button
@@ -417,6 +422,7 @@
             <div class="choices">
               <button
                 type="button"
+                class="primary-choice"
                 disabled={!canAct("restamp_worker_number")}
                 onclick={() => {
                   void perform("restamp_worker_number");
@@ -425,7 +431,8 @@
             </div>
           {:else if state.phase === "SELECTED"}
             <div class="choices">
-              <button type="button" onclick={continueToJob}>
+              <button type="button"
+                class="primary-choice" onclick={continueToJob}>
                 {state.branch === "restamp"
                   ? "Take the plates to the depot"
                   : state.branch === "contracts"
@@ -643,30 +650,6 @@
     flex-direction: column;
     gap: 7px;
     margin-top: 13px;
-  }
-  .choices button {
-    width: 100%;
-    padding: 10px 12px;
-    min-height: 40px;
-    text-align: left;
-    font: var(--dialogue-text, 17px)/1.4 var(--pall-font-reading, Georgia, serif);
-    border: 1px solid #6d5235;
-    background: #241d16;
-    color: #f7e6c9;
-    cursor: pointer;
-  }
-  .choices button:hover:not(:disabled),
-  .choices button:focus-visible {
-    background: #423022;
-    outline: 2px solid #c49d65;
-    outline-offset: 1px;
-  }
-  .choices button:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-  .choices .leave {
-    background: #503c29;
   }
   /* Owner's printed evidence art replaces the beige information cards.
      Preserve aspect ratio and keep the existing three-page dialogue height. */
