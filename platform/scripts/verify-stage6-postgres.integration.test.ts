@@ -416,8 +416,11 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
     actions:['compare_shift_records','inspect_absence_category','enter_written_objection',
       'submit_certificate'] as const},
   {branch:'trauma' as const,skill:'Medicine',
-    actions:['prioritize_mobile_worker','take_observations','compare_medical_register',
-      'ask_about_charge','finish_handover'] as const},
+    actions:['prioritize_mobile_worker','continue_triage','continue_triage',
+      'continue_detail','continue_detail','continue_detail',
+      'take_observations','continue_register','continue_register',
+      'continue_register','continue_register','continue_register',
+      'ask_about_classification','finish_handover'] as const},
   {branch:'machinery' as const,skill:'Mechanics',
     actions:['inspect_safety_linkage','trace_bell_rod','show_mechanic_link',
       'mark_pin_position','record_inspection'] as const}
@@ -452,7 +455,7 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
    revision++;
    return response;
   }
-  for(let k=0;k<STAGE_FOUR_OPENING_LENGTH[job.branch];k++)
+  for(let k=0;k<STAGE_FOUR_OPENING_LENGTH[job.branch]-(job.branch==='trauma'?1:0);k++)
    await command('continue_opening');
   const first=job.actions[0];
   const firstRequest=randomUUID();
@@ -468,7 +471,7 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
    action:first,expectedRevision:revision-1,requestId:randomUUID()
   })).status,409,'Stale revision cannot re-run a work command');
   for(const action of job.actions.slice(1,-1))await command(action);
-  for(let k=0;k<STAGE_FOUR_REVELATION_LENGTH[job.branch];k++)
+  for(let k=0;k<STAGE_FOUR_REVELATION_LENGTH[job.branch]-(job.branch==='trauma'?1:0);k++)
    await command('continue_revelation');
   await command(job.actions[job.actions.length-1]);
   loaded=await request('GET',path,owner);
