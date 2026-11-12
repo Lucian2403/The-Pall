@@ -83,64 +83,152 @@ This is one understated refusal to own the rule. The clerk is not revealed as th
 
 ## Route B — First Aid Line (Medicine → Trauma)
 
-**Entry:** After the player warned the gathered workers about the closed block, an unnamed **Infirmary Attendant** at a nearby staffed first-aid point needs help bringing the coughing workers to attention. The player is helping in an immediate emergency; they are **not** a qualified doctor and do not acquire Medicine equipment.
+**Owner revision — 12 November 2026.** The conversations and player
+choices below replace the earlier short opening, worker cards and
+documentary register prompts. They are authoritative for the currently
+requested First Aid Line sequence. The rest of this route remains open
+for a subsequent owner dialogue review.
 
-**Goal:** prioritize workers needing urgent trained attention, assist with ordinary observation/queue handling and see how the workplace illness gets classified for payment.
+**Setting:** a staffed first-aid point using the existing clinic art.
+The player is an unqualified helper. A trained attendant, not the player,
+handles the medical assessment. No diagnosis, drug, treatment
+procedure, new item, timer or death is invented. The worker's charge is
+still disputed without being reversed.
 
-### B01 — Observe and assign priority
+### B01 — Two workers, one attendant
 
-The attendant has two visible cases in a short queue; these are **narrative presentation examples**, not diagnoses:
-- **Worker A:** coughs but can speak in full sentences and walk to the attendant.
-- **Worker B:** struggles to speak between breaths and needs immediate staff assessment.
+Show the scene in short saved narrative beats, not as one large parchment
+block or a pair of abstract patient status cards:
 
-The UI displays these signs, not an invented medical score. **[Check who needs the attendant first]** allows the player to select whom the attendant should see immediately. Choosing Worker B gives the obvious safer priority. Choosing Worker A triggers a short correction: the attendant redirects the urgent worker first while the player spends extra time reorganizing the queue. **No permanent medical injury or deaths are caused by a first-time player's incorrect click.** An emergency is not a test of invented clinical thresholds.
+*Two workers have been brought to the first-aid point.*
 
-**Approved opening:**
+*One is coughing badly, but he's on his feet, telling the attendant what
+happened at the factory. The other is leaning against the wall. He tries
+to speak, manages a few words, then stops to catch his breath.*
 
-*The Infirmary Attendant is moving between two waiting workers.*
+**ATTENDANT:** “Give me a hand here. I've got two men waiting, and I can
+only see one at a time. Bring me the one who needs me first.”
 
-**ATTENDANT:** “Come over here a moment. I need a hand with these two.”
+Under this final line, without another interim screen, the player gets
+two actions:
 
-**PLAYER:** “That man can barely get a word out.”
+1. **Help the man struggling to breathe.**
+2. **Help the man who's still walking and talking.**
 
-**ATTENDANT:** “I see him. Bring him over. Easy now.”
+**If the player helps the man struggling to breathe:**
 
-The player helps position or summon the next person within the supervised treatment area; the trained attendant provides any medical care. No player-administered drug, diagnosis, invasive technique or unpaid supply consumption is required.
+**YOU:** “This one's having trouble getting a word out.”
 
-### B02 — Ordinary assistance, meaningful handling choice
+**ATTENDANT:** “I can see that. Don't force it. Bring him here.”
 
-**[Help with the waiting line]** offers two legitimate ordinary approaches:
+*You help the worker over to the attendant.*
 
-| Action | Result | Trade-off |
-| --- | --- | --- |
-| **[Take observations for the attendant]** | Record the worker's reported worksite and visible symptoms for staff use while the attendant examines the urgent case. | More careful clerical/observational work; the attendant retains responsibility for care |
-| **[Bring the next worker to the attendant]** | Organize the waiting patients while the attendant conducts examinations. | Faster queue movement, less detail initially recorded; staff can complete notes afterward |
+**If the player helps the man who can still walk:**
 
-The two approaches affect time and record completeness, **not treatment effectiveness or the locked discovery**. Both are reusable low-tier triage support with professional oversight. Neither creates a new disease state for the protagonist.
+**ATTENDANT:** “No, leave him a moment. The other one's having trouble
+breathing. Help me get him over here first.”
 
-### B03 — The medical register discrepancy
+*You turn to the other worker and help him over to the attendant.*
 
-After the attendant's immediate assessment, the player sees the worksite noted in observations, but the billing/category field reads **“Non-work illness”** despite the workers' association with the fume-closed site. A displayed responsibility field charges the patient rather than the worksite.
+Both responses have their own short Continue beats and converge on the
+same safe staff-led first-aid scene. A wrong first choice causes no
+invented medical injury or penalty.
 
-**[Compare the observation and register entry]** reveals the mismatch. The player may choose **[Ask for the worksite to be written in the notes]** or **[Ask why the charge is on the worker]**. Both paths establish what staff observed without granting them legal authority to reverse billing.
+### B02 — Helping the Attendant
 
-**Approved exchange:**
+Show the subtitle **First Aid Line — Helping the Attendant**.
 
-**PLAYER:** “Why does the book say they didn't get sick at work?”
+*The attendant takes the man struggling to breathe over to a treatment
+bench. The other worker waits nearby, still coughing.*
 
-**ATTENDANT:** “I can't tell you what made them ill just from looking at them. I've written down where they were.”
+**ATTENDANT:** “I've got him now. There's still that other fellow waiting,
+and I've got my hands full.”
 
-**PLAYER:** “But they're still going to have to pay for treatment?”
+**YOU:** “What can I do?”
 
-**ATTENDANT:** “Yes. I can't change the charge.”
+**ATTENDANT:** “I need to know where he was working and what's happened
+to him. Or you can bring him over when I'm ready. Either way, don't leave
+him standing there all day.”
 
-Keep the attendant competent but constrained by the official category. No definitive medical causation is established just by a symptom and proximity. The **register's attribution** is the revelation; clinical diagnosis remains the trained staff's task.
+Under the last Attendant line, offer:
 
-### B04 — Finish the First Aid Line
+1. **Ask the worker what happened and write it down.**
+2. **Help the next worker over to the attendant.**
 
-**[Finish the handover]** leaves patients under ordinary medical staff care. Store in quest state: worker symptoms noted, relevant worksite recorded, register classed non-work and charges allocated to workers. No forced therapeutic cure, new patient name or personal medical item.
+Both keep medical responsibility with the attendant and lead to the
+same documented register discovery. The first choice produces the
+owner-authored notes narration below. The second begins with a short
+contextual variation about helping the worker over; it must not falsely
+say the player wrote down testimony.
 
-**Job context:** The player assists staff rather than taking over treatment. Any patient charge is handled by the infirmary.
+### B03 — The Medical Register
+
+Show the subtitle **First Aid Line — The Medical Register**.
+
+After choosing to write observations:
+
+*You finish writing down what the workers told you. Both had been
+waiting outside the closed factory. The attendant takes your notes
+and enters the details in the medical register.*
+
+**ATTENDANT:** “Right. That's enough for now. I'll take it from here.”
+
+*As the attendant turns to the next patient, you look over the entry.*
+
+*Under the illness category, someone has written **“Non-work illness.”**
+The worksite and symptoms have been recorded correctly. But despite
+the factory being closed for dangerous fumes, the illness is classified
+as unrelated to work. The worker is listed as responsible for paying
+the medical charges.*
+
+**YOU:** “Hang on. You're charging them as if they got sick somewhere else?”
+
+**Single player action:** **Ask the attendant why the illness is classified
+as non-work-related.**
+
+These paragraphs are separated into small Continue beats; the ill-health
+category is a discovery made inside the scene, not a technical UI card.
+The attendant neither diagnoses the cause nor changes the bill.
+
+### B04 — The attendant's response and handover
+
+*The worker on the treatment bench starts coughing again. The attendant
+glances over at him, then turns back to you.*
+
+**ATTENDANT:** “Look, I've written down where they came from and what's
+wrong with them. But I can't say for certain what's made them sick. Not yet.”
+
+**YOU:** “Then why the hell does it say ‘Non-work illness’?”
+
+**ATTENDANT:** “That's how it's been entered.”
+
+**YOU:** “The factory's shut because of the fumes! That man's barely
+breathing, and now you're telling me he's got to pay for his own
+treatment? Can't you change it?”
+
+**ATTENDANT:** “No. I've put your observations down, but the charge
+stays unless someone with the authority changes it.”
+
+*The worker starts coughing harder. The attendant turns toward him.*
+
+**ATTENDANT:** “Listen, I've got two sick men here. I need to see to them.
+You've done what I asked.”
+
+*She goes back to the treatment bench.*
+
+The final narration beat carries the one action:
+
+**Finish the handover.**
+
+**Persistent outcome:** the worksite and observed symptoms are recorded;
+the register retains the **Non-work illness** classification and the
+treatment charge remains with the worker. There are no coins, loot,
+new diagnoses, personal medical items or additional Major Skill levels.
+
+**Implementation behavior:** the story beat index, patient priority,
+chosen assistance method and register finding are server-persisted and
+safe to reload. The shared local-only **Back to Stage 3** control remains
+available throughout Stage 4, including these new dialogue steps.
 
 ## Route C — The Bell Linkage (Mechanics → Industrial Machinery)
 
