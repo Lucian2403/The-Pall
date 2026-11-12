@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
@@ -103,7 +104,7 @@
         <p class="outcome">{STAGE_FOUR_FINAL.restamp}</p>
         <StageFourNextStep {snapshot} {pending} {perform}/>
       {:else if speaking && beat}
-        <p class="speaker">{beat.speaker==='Player'?'You':beat.speaker}</p>
+        <p class="speaker">{dialogueSpeakerLabel(beat.speaker)}</p>
         <p class="speech">“{beat.text}”</p>
       {:else}
         {#if result && !(state.phase==='COMPARE_DELIVERY' && travelConfirmed)}
