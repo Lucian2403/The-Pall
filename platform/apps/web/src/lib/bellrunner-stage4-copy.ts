@@ -70,7 +70,7 @@ export const BELLRUNNER_STAGE_FOUR={
         {speaker:'Player',text:"Hang on. You're charging them as if they got sick somewhere else?"}
       ],
       escort:[
-        {speaker:'Narration',text:'You help the next worker over when the attendant is ready. He tells her what happened outside the closed factory, and she enters the details in the medical register.'},
+        {speaker:'Narration',text:'The attendant calls for the next worker. You help him over to the treatment bench. He tries to explain what happened outside the factory, but keeps stopping to cough and catch his breath. The attendant waits for him to finish, asks a few questions, then writes everything down in the medical register.'},
         {speaker:'Attendant',text:"Right. That's enough for now. I'll take it from here."},
         {speaker:'Narration',text:'As the attendant turns to the next patient, you look over the entry.'},
         {speaker:'Narration',text:'Under the illness category, someone has written “Non-work illness.”'},

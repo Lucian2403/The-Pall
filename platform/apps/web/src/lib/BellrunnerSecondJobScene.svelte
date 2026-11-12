@@ -36,9 +36,9 @@
       ?BELLRUNNER_STAGE_FOUR.trauma.register[state.method==='bring_next_worker'?'escort':'observations'][state.registerLine??0]
     :null);
   const sceneHeading=$derived(state.branch==='trauma'&&state.phase==='detail'
-    ?'First Aid Line — Helping the Attendant'
+    ?'Helping the Attendant'
     :state.branch==='trauma'&&['confirm','choose','revelation','finish'].includes(state.phase)
-      ?'First Aid Line — The Medical Register':copy.title);
+      ?'The Medical Register':copy.title);
   const actions=$derived(snapshot.availableActions);
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
