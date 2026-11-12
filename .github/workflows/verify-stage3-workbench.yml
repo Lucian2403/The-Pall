@@ -15,6 +15,7 @@ on:
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
       - 'platform/scripts/verify-bellrunner-stage4.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage4-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3-assets.mjs'
       - 'platform/scripts/verify-dialogue-speakers.test.ts'
       - 'platform/scripts/verify-approved-intro-copy.mjs'
@@ -105,6 +106,9 @@ jobs:
       - name: Real Chromium Stage 6 outcome CTA click and keyboard navigation
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-combat-cta-browser.mjs
+      - name: Real Chromium Bellrunner Stage 4 all reused locations, action cards and journal
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 150s npm run verify:bellrunner-stage4-browser
       - name: Real Chromium Bellrunner Stage 1 and 2 workstation geometry
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
@@ -113,6 +117,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bellrunner-workstation-visual-qa
-          path: platform/test-artifacts/bellrunner-visuals/*.png
+          path: |
+            platform/test-artifacts/bellrunner-visuals/*.png
+            platform/test-artifacts/bellrunner-stage4-visuals/*.png
           if-no-files-found: ignore
           retention-days: 7
