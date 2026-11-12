@@ -51,6 +51,15 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         const canRewind=result.rows[0].tutorial_status==='IN_PROGRESS'&&!!active.rowCount;
         return {enabled:true,canRewind,stage,targetStage:canRewind?1:null};
       }
+      if(stage===5&&result.rows[0].tutorial_status==='NOT_STARTED'){
+        // Development replay of the completed Stage 4 job, before any
+        // Stage 5 Dogman activity has begun. No skill or item reversal.
+        const job=await db.query<{state:{phase:string}}>(
+          'SELECT state FROM player_character_bellrunner_second_job WHERE character_id=$1',
+          [req.params.id]);
+        const canRewind=job.rows[0]?.state?.phase==='exited';
+        return {enabled:true,canRewind,stage,targetStage:canRewind?4:null};
+      }
       if(stage===3||stage===4){
         const investigation=await db.query<{state:{phase:string;branch:string|null}}>(
           'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',
@@ -187,6 +196,22 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_wrong_bell_state'});
         }
+        // The route can be changed only before any Stage 4 work command.
+        // A saved job is not silently deleted when rewinding the skill.
+        const started=await client.query<{state:{revision:number;phase:string}}>(
+          'SELECT state FROM player_character_bellrunner_second_job WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        if(started.rowCount&&
+          (started.rows[0].state.revision!==0||started.rows[0].state.phase!=='opening')){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_second_job_state'});
+        }
+        await client.query(
+          'DELETE FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'DELETE FROM player_character_bellrunner_second_job WHERE character_id=$1',
+          [req.params.id]);
         const bonuses={...c.rows[0].major_skill_bonuses,
           [skill]:c.rows[0].major_skill_bonuses[skill]-1};
         const next={...value,phase:'choice',branch:null,revision:value.revision+1};
@@ -204,6 +229,37 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           route:'/characters/'+req.params.id+'/bellrunner/wrong-bell',coinDelta:0};
       }
 
+      if(bellrunner&&expectedStage===5){
+        // Stage 5 has not begun. Return to the just-completed Stage 4
+        // summary without removing the saved branch or its +1 skill.
+        if(c.rows[0].tutorial_status!=='NOT_STARTED'){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_second_job_state'});
+        }
+        const saved=await client.query<{revision:string|number;state:{
+          revision:number;phase:string;branch:string
+        }}>(
+          'SELECT revision,state FROM player_character_bellrunner_second_job WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        const state=saved.rows[0]?.state;
+        if(!state||state.phase!=='exited'||Number(saved.rows[0].revision)!==state.revision){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_second_job_state'});
+        }
+        await client.query(
+          "DELETE FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1 AND result->'state'->>'phase'='exited'",
+          [req.params.id]);
+        const next={...state,phase:'done',revision:state.revision+1};
+        await client.query(
+          'UPDATE player_character_bellrunner_second_job SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,next.revision,JSON.stringify(next)]);
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=4,tutorial_status='IN_PROGRESS' WHERE id=$1",
+          [req.params.id]);
+        await client.query('COMMIT');transaction=false;
+        return {stage:4,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
+      }
       if(bellrunner){
         // Developer-only Stage 2 -> 1 rewind, preserving all currencies.
         if(expectedStage!==2||c.rows[0].tutorial_status!=='IN_PROGRESS'){
