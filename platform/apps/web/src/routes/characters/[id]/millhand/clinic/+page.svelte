@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {onMount,tick,getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {page} from '$app/state';
@@ -231,7 +232,7 @@
             {#if pricedBeat.kind==='narration'}
               <p class="narration stage-direction">{pricedBeat.text}</p>
             {:else}
-              <p class="speaker">{pricedBeat.speaker}</p>
+              <p class="speaker">{dialogueSpeakerLabel(pricedBeat.speaker)}</p>
               <p class="speech">“{pricedBeat.text}”</p>
             {/if}
             {#if pricedAtEnd}
