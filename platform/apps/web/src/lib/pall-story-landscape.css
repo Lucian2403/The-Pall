@@ -67,14 +67,14 @@
   line-height:1.3;
 }
 .frame .chapter-content :is(.workshop,.second-job) .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button,
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a),
 .frame .chapter-content .pall-story-dialogue-section
   :is(.pall-framed-button,.stage-next-step-link){
   font-size:var(--dialogue-text);
 }
 /* One choice size across narrative origins; apply only to explicit
    primary and secondary actions, not combat or unrelated controls. */
-.frame .chapter-content .pall-story-dialogue-section :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice){
+.frame .chapter-content .pall-story-dialogue-section :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice){
   min-height:52px;
   font:600 var(--dialogue-text)/1.3
     var(--pall-font-reading,Georgia,serif);
@@ -85,7 +85,7 @@
    rectangle. Secondary actions keep the pale parchment contrast.
    All forward/progress actions must carry primary-choice explicitly. */
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice){
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice){
   appearance:none;
   position:relative;
   display:flex;
@@ -103,7 +103,7 @@
   transition:filter .12s ease,transform .12s ease;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button.primary-choice{
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a).primary-choice{
   padding:8px 13px;
   border:solid transparent;
   border-width:9px 17px 9px;
@@ -117,18 +117,18 @@
   box-shadow:none;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button.primary-choice:is(:hover,:focus-visible):not(:disabled){
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a).primary-choice:is(:hover,:focus-visible):not(:disabled){
   border-image-source:url('/ui-kit/buttons/button-hover-trim.png');
   background:transparent;
   color:#170d08;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button.primary-choice:active:not(:disabled){
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a).primary-choice:active:not(:disabled){
   border-image-source:url('/ui-kit/buttons/button-pressed-trim.png');
   background:transparent;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button.secondary-choice{
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a).secondary-choice{
   padding:10px clamp(13px,1.35vw,20px);
   border:2px solid #684323;
   border-radius:7px;
@@ -138,7 +138,7 @@
     0 3px 0 #4d301d,0 5px 8px #1a0e0744;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button.secondary-choice::after{
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a).secondary-choice::after{
   content:'';
   position:absolute;
   inset:4px;
@@ -148,33 +148,33 @@
   pointer-events:none;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):hover:not(:disabled){
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice):hover:not(:disabled){
   filter:brightness(1.035);
   transform:translateY(-1px);
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button.secondary-choice:is(:hover,:focus-visible):not(:disabled){
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a).secondary-choice:is(:hover,:focus-visible):not(:disabled){
   color:#2a1a0f;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):active:not(:disabled){
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice):active:not(:disabled){
   filter:brightness(.96);
   transform:translateY(1px);
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):focus-visible{
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice):focus-visible{
   outline:3px solid #f1c27b;
   outline-offset:3px;
 }
 .frame .chapter-content .pall-story-dialogue-section
-  :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice):disabled{
+  :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice):disabled{
   opacity:.57;
   cursor:wait;
   transform:none;
 }
 @media(prefers-reduced-motion:reduce){
   .frame .chapter-content .pall-story-dialogue-section
-    :is(.responses,.actions,.choices) > button:is(.primary-choice,.secondary-choice){
+    :is(.responses,.actions,.choices,.stage-next-step,.work-dialogue) > :is(button,a):is(.primary-choice,.secondary-choice){
     transition:none;
   }
 }
