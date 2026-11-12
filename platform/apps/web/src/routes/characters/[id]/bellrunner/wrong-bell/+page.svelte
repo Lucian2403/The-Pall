@@ -5,6 +5,7 @@
   import TutorialShell from '$lib/TutorialShell.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
+  import SecondJobChoices from '$lib/SecondJobChoices.svelte';
   import {pallAudioSettings} from '$lib/pall-audio';
   import {WRONG_BELL_ENTRY,WATCHMAN_LINES,WRONG_BELL_AFTER_WATCHMAN,
     WRONG_BELL_BRANCHES,WRONG_BELL_BRANCH_FIRST_BEAT_LINES} from '$lib/bellrunner-stage3-copy';
@@ -28,13 +29,33 @@
   let busy=$state(false),errorMessage=$state('');
   let requestId=$state<string|null>(null),requestAction=$state<Action|null>(null);
   let detail=$state<'closure'|'slip'|'comparison'|null>(null);
-  let proposedBranch=$state<Branch|null>(null);
+  // As in Millhand Stage 3, the decision briefing is its own Continue beat.
+  // Navigation within the two screens is local; only choosing a job writes
+  // progression to the server.
+  let decisionStep=$state<0|1>(0);
   let committedBeat=$state(0);
   let bellAudio=$state<HTMLAudioElement>();
   let backdropUnavailable=$state(false);
   let bellEnabled=false, bellVolume=0.5;
   const phase=$derived(snapshot?.state.phase??'evidence');
   const available=$derived(snapshot?.availableActions??[]);
+  const secondJobChoices=$derived([
+    {id:WRONG_BELL_BRANCHES.contracts.action,
+      line:WRONG_BELL_BRANCHES.contracts.choice,
+      skill:WRONG_BELL_BRANCHES.contracts.skillLabel,
+      disabled:busy||!can('choose_contracts')},
+    {id:WRONG_BELL_BRANCHES.trauma.action,
+      line:WRONG_BELL_BRANCHES.trauma.choice,
+      skill:WRONG_BELL_BRANCHES.trauma.skillLabel,
+      disabled:busy||!can('choose_trauma')},
+    {id:WRONG_BELL_BRANCHES.machinery.action,
+      line:WRONG_BELL_BRANCHES.machinery.choice,
+      skill:WRONG_BELL_BRANCHES.machinery.skillLabel,
+      disabled:busy||!can('choose_machinery')}
+  ]);
+  $effect(()=>{
+    if(phase!=='choice')decisionStep=0;
+  });
 
   function ring(){
     if(!bellAudio||!bellEnabled||bellVolume===0||document.hidden)return;
@@ -67,7 +88,7 @@
         else if(action==='inspect_slip')detail='slip';
         else if(action==='compare_orders')detail='comparison';
         else if(action==='continue_watchman'||action==='talk_watchman')detail=null;
-        if(action.startsWith('choose_')){proposedBranch=null;detail=null;committedBeat=0;}
+        if(action.startsWith('choose_')){detail=null;committedBeat=0;decisionStep=0;}
       }else{
         const data=await res.json() as {error?:string};
         if(res.status===409){await refresh();requestId=null;requestAction=null;}
@@ -201,39 +222,19 @@
                       onclick={()=>{void perform('continue_watchman');}}>Continue</button>
                   </div>
                 {:else if phase==='choice'}
-                  <h1>The Wrong Bell</h1>
-                  {#each WRONG_BELL_AFTER_WATCHMAN as line}<p class="narration">{line}</p>{/each}
-                  <p class="round-finding">The receiving office is shut. The watchman cannot provide the authorized mark for the final delivery.</p>
-                  {#if detail==='comparison'}
-                    <p class="narration">The closure and the shift order contradict one another. Neither document authorizes reopening this block.</p>
-                  {/if}
-                  {#if !proposedBranch}
+                  {#if decisionStep===0}
+                    <h1>The Wrong Bell</h1>
+                    {#each WRONG_BELL_AFTER_WATCHMAN as line}
+                      <p class="narration">{line}</p>
+                    {/each}
                     <div class="actions">
-                      {#each ['contracts','trauma','machinery'] as key}
-                        {@const branchKey=key as Branch}
-                        <button type="button" class="secondary-choice" disabled={busy}
-                          onclick={()=>{proposedBranch=branchKey;}}>
-                          <BellrunnerChoiceIcon kind="route"/>
-                          {WRONG_BELL_BRANCHES[branchKey].name}
-                        </button>
-                      {/each}
-                      {#if can('compare_orders')}
-                        <button type="button" class="secondary-choice" disabled={busy}
-                          onclick={()=>{void perform('compare_orders');}}>
-                          <BellrunnerChoiceIcon kind="book"/>Compare the orders</button>
-                      {/if}
+                      <button type="button" class="primary-choice continue-choice"
+                        onclick={()=>{decisionStep=1;}}>Continue</button>
                     </div>
                   {:else}
-                    <h2>{WRONG_BELL_BRANCHES[proposedBranch].name}</h2>
-                    <p class="narration">Confirming this route grants <strong>+1 Major Skill: {WRONG_BELL_BRANCHES[proposedBranch].majorSkill}</strong>. You cannot switch routes after confirming.</p>
-                    <div class="actions">
-                      <button type="button" class="primary-choice" disabled={busy}
-                        onclick={()=>{if(proposedBranch)void perform(WRONG_BELL_BRANCHES[proposedBranch].action);}}>
-                        Confirm this choice</button>
-                      <button type="button" class="secondary-choice" disabled={busy}
-                        onclick={()=>{proposedBranch=null;}}>
-                        <BellrunnerChoiceIcon kind="back"/>Review the alternatives</button>
-                    </div>
+                    <p class="decision-heading">Choose what you will do next.</p>
+                    <SecondJobChoices choices={secondJobChoices}
+                      onChoose={(chosen)=>{void perform(chosen as Action);}}/>
                   {/if}
                 {:else if phase==='committed'&&snapshot.state.branch}
                   {@const branch=WRONG_BELL_BRANCHES[snapshot.state.branch]}
@@ -326,6 +327,12 @@
   .actions>button.continue-choice:hover:not(:disabled),
   .actions>button.continue-choice:focus-visible{color:#fff!important}
   .route-dialogue-beat{min-width:0}
+  .decision-heading{
+    margin:0 0 10px;
+    color:#24170f;
+    font:700 var(--dialogue-text,17px)/1.4
+      var(--pall-font-reading,Georgia,serif);
+  }
   .error{color:#873523;font:13px/1.4 sans-serif}
   .small{color:#624c38;font:12px sans-serif}
   .fallback{padding:38px;color:#e3d0af;background:#25211e}
