@@ -1,5 +1,6 @@
 <script lang="ts">
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
+  import '$lib/pall-story-landscape.css';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
@@ -78,7 +79,7 @@
       </div>
       <p class="purpose">{route.task}</p>
     </div>
-    <aside class="work-dialogue" aria-label="Current work interaction">
+    <aside class="work-dialogue pall-story-dialogue-section" aria-label="Current work interaction">
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
@@ -102,7 +103,8 @@
       {#if actions.length>0}
         <div class="actions" aria-label="Available work actions">
           {#each actions as action (action)}
-            <button type="button" disabled={pending} onclick={() => {void perform(action);}}>
+            <button type="button" class={actions.length===1?'primary-choice':'secondary-choice'}
+              disabled={pending} onclick={() => {void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
             </button>
           {/each}
@@ -162,10 +164,6 @@
   .outcome{font-weight:bold}
   .context{color:#59432e}
   .actions{display:flex;flex-direction:column;gap:8px;margin:14px 0}
-  .actions button{min-height:43px;width:100%;text-align:left;padding:10px 13px;background:#30251d;color:#f0dfc7;
-    border:1px solid #98734c;font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .actions button:hover,.actions button:focus-visible{background:#56402c;outline:2px solid #cfa777;outline-offset:1px}
-  .actions button:disabled{opacity:.5;cursor:default}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
   .journal-trigger{margin-top:19px;padding-top:12px;border-top:1px solid #c2a98b}
