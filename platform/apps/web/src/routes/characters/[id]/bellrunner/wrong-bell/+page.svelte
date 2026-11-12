@@ -284,7 +284,13 @@
                       <p class="round-finding">Shift Dispatch: round not accepted. The receiving office is closed; its authorized final mark is unavailable. Payment: 0 coins. Ordinary XP: 0. No items.</p>
                       <p class="round-finding">Major Skill increased: <strong>{branch.majorSkill} +1</strong>.</p>
                       <p class="round-finding">Next: {branch.next}</p>
-                      <p class="narration">The chosen Stage 4 task is not yet implemented. Your choice and skill award are saved.</p>
+                      <p class="narration">Your choice is recorded. The work continues at the appropriate location.</p>
+                      <div class="actions">
+                        <button type="button" class="primary-choice continue-choice"
+                          onclick={()=>{void goto('/characters/'+encodeURIComponent(id)+'/bellrunner/second-job');}}>
+                          Continue to Stage 4
+                        </button>
+                      </div>
                     {/if}
                   </div>
                 {/if}
