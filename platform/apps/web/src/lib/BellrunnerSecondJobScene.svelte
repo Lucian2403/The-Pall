@@ -217,12 +217,6 @@
   .work-evidence strong{font:600 15px/1.4 var(--pall-font-reading,Georgia,serif)}
   .mechanical-readout>div{border-left:4px solid #8f6944}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
-  .actions>button{display:flex;align-items:center;gap:10px;box-sizing:border-box;
-    width:100%;min-height:52px;border:1px solid #6d5235;background:#241d16;
-    color:#f7e6c9;text-align:left;padding:10px 13px;cursor:pointer;
-    font:600 var(--dialogue-text,17px)/1.3 var(--pall-font-reading,Georgia,serif)}
-  .actions>button:hover:not(:disabled),.actions>button:focus-visible{color:white}
-  .actions>button:disabled{opacity:.55;cursor:wait}
   .error{color:#873523}.saving{color:#644f36}
   .job-journal{margin:12px;padding:20px;border:2px solid #986f46;background:#e9d5ad;color:#27190e;
     font:15px/1.5 var(--pall-font-reading,Georgia,serif)}
