@@ -34,7 +34,10 @@ export function availableBellActions(s:BellState):BellAction[]{
     if(!s.slipRead)actions.push('inspect_slip');
     if(s.closureRead&&s.slipRead)actions.push('talk_watchman');
   }
-  if(s.closureRead&&s.slipRead)actions.push('compare_orders');
+  // A comparison is a one-time evidence finding, not a repeatable
+  // server action or a fourth second-job option. Reading it again is local UI.
+  if(s.phase==='evidence'&&s.closureRead&&s.slipRead&&!s.compared)
+    actions.push('compare_orders');
   if(s.phase==='choice')actions.push('choose_contracts','choose_trauma','choose_machinery');
   return actions;
 }
