@@ -235,9 +235,52 @@ try{
     const button=await evalJS("document.querySelector('.scene-journal-button')?.outerHTML");
     assert.ok(button,'Persistent journal control should be available: '+branch);
     await evalJS("document.querySelector('.scene-journal-button').click();true");
-    await until(()=>evalJS("!!document.querySelector('#bellrunner-second-job-journal')"),
-      4000,branch+' journal');
-    console.log('PASS: '+branch+' work action and shared journal control');
+    await until(()=>evalJS("!!document.querySelector('#bellrunner-second-job-journal .journal-entries p')"),
+      4000,branch+' personal journal');
+    const diaryStyle=await evalJS(`(()=>{
+      const journal=document.querySelector('#bellrunner-second-job-journal');
+      const text=journal?.querySelector('.journal-entries p');
+      const entries=journal?.querySelector('.journal-entries');
+      const heading=journal?.querySelector('.journal-heading h2');
+      const kicker=journal?.querySelector('.journal-kicker');
+      const close=journal?.querySelector('.journal-toggle');
+      if(!journal||!text||!entries||!heading||!kicker||!close)return null;
+      const style=node=>getComputedStyle(node);
+      return {
+        journalColor:style(journal).color,
+        entryFont:style(text).fontFamily,entryWeight:style(text).fontWeight,
+        entrySize:style(text).fontSize,entryLineHeight:style(text).lineHeight,
+        headingFont:style(heading).fontFamily,headingWeight:style(heading).fontWeight,
+        headingSize:style(heading).fontSize,
+        kickerFont:style(kicker).fontFamily,kickerWeight:style(kicker).fontWeight,
+        kickerSize:style(kicker).fontSize,
+        contentMaxWidth:style(entries).maxWidth,
+        closeImage:style(close).borderImageSource,
+        copy:journal.innerText,
+        paragraphCount:entries.children.length
+      };
+    })()`);
+    assert.ok(diaryStyle,'The journal must use the shared Millhand heading and entries: '+branch);
+    assert.ok(diaryStyle.entryFont.includes('Pall New Standard'),
+      'Stage 4 diary uses the original Millhand New Standard reading font: '+branch);
+    assert.equal(diaryStyle.entrySize,'16px','Millhand journal paragraph size: '+branch);
+    assert.equal(diaryStyle.entryWeight,'600','Millhand journal paragraph weight: '+branch);
+    assert.ok(diaryStyle.headingFont.includes('Pall New Standard'),
+      'Millhand New Standard journal heading: '+branch);
+    assert.equal(diaryStyle.headingSize,'24px');
+    assert.equal(diaryStyle.headingWeight,'600');
+    assert.ok(diaryStyle.kickerFont.includes('Pall Bebas Neue'),
+      'Millhand Bebas Neue label font: '+branch);
+    assert.equal(diaryStyle.kickerSize,'14px');
+    assert.equal(diaryStyle.kickerWeight,'700');
+    assert.equal(diaryStyle.contentMaxWidth,'930px','Millhand narrow diary reading measure');
+    assert.ok(diaryStyle.closeImage.includes('button-normal-trim.png'),
+      'Shared illustrated close-journal button: '+branch);
+    assert.ok(diaryStyle.paragraphCount>0,'Journal has action-grounded diary entries: '+branch);
+    assert.ok(!/(?:^|\\n)\\s*(?:Work|Status|Location|Method|Recorded check|Local finding):/.test(diaryStyle.copy),
+      'Never show a debug worksheet in the personal diary: '+branch);
+    await screenshot('stage4-'+branch+'-journal-1280x720');
+    console.log('PASS: '+branch+' shared Millhand journal font, layout, first-person diary and close button');
     // A fresh Stage 4 introduction always exposes Continue as PRIMARY. Use
     // Chromium's computed style, not merely a copied class name, to catch
     // accidental CSS overrides by individual Bellrunner scenes.
