@@ -712,8 +712,7 @@
   .record p {
     margin: 6px 0;
   }
-  .hint,
-  .skill {
+  .hint {
     font: 12px/1.45 sans-serif;
     color: #614e39;
   }
