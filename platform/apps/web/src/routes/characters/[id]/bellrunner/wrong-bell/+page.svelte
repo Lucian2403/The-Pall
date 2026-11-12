@@ -92,19 +92,19 @@
     busy=true;errorMessage='';
     if(requestAction!==action){requestAction=action;requestId=crypto.randomUUID();}
     try{
-      // The bell is an authored one-shot cue, not a silent autoplay loop.
-      // Cue the shift bell at the actual narrative beats. The second ring
-      // accompanies the final Watchman Continue, immediately before the
-      // scripted "The bell rings again." passage appears.
-      if(action==='talk_watchman'||
-        (action==='continue_watchman'&&
-         snapshot.state.watchmanLine===WATCHMAN_LINES.length-1))ring();
+      // The bell is an authored one-shot cue, not a looping background.
+      // Wait for a successful server transition before playing the cue,
+      // so it lines up with the newly displayed conversation/narration.
+      const isSecondRing=action==='continue_watchman'&&
+        snapshot.state.watchmanLine===WATCHMAN_LINES.length-1;
       const res=await fetch('/api/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',{
         method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({action,requestId,expectedRevision:snapshot.state.revision})
       });
       if(res.ok){
         snapshot=await res.json() as Snapshot;
+        if((action==='talk_watchman'&&snapshot.state.phase==='watchman')||
+          (isSecondRing&&snapshot.state.phase==='choice'))ring();
         requestId=null;requestAction=null;
         if(character&&snapshot)character={...character,
           tutorial:{stage:snapshot.stage,status:snapshot.tutorialStatus}};
