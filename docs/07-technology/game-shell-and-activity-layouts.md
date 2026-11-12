@@ -97,6 +97,34 @@ its own art, props and mechanics, but uses the same scene layout:
   and the intent/result parchment follows below him rather than covering
   him.
 
+### Mandatory unified primary dialogue buttons
+
+**Owner rule (12 November 2026): primary buttons in every narrative
+dialogue must use the exact original Millhand illustrated nine-slice
+button art**, not a CSS-only dark rectangle. The sole implementation is
+`platform/apps/web/src/lib/pall-story-landscape.css` on the
+`primary-choice` class. This contract applies to **both origins and
+every stage**, including optional NPC conversations, Continue, single
+work actions, stage exits, Clinic, Home and future scenes.
+
+- Normal: `/ui-kit/buttons/button-normal-trim.png`; hover/focus:
+  `button-hover-trim.png`; pressed: `button-pressed-trim.png`.
+  Use the Millhand **50 180 45 180 fill** nine-slice with its authored
+  trim widths and legible dark text; no decorative `»` CSS pseudo-element.
+  Multiple alternative choices are `secondary-choice` (pale parchment);
+  the single forward or Continue action is `primary-choice`.
+- No scene-specific `.actions > button`, `.responses > button` or
+  `.choices > button` rule should redefine primary background, borders
+  or hover images. New stages inherit the shared CSS; do not copy/paste
+  a new Bellrunner/Millhand approximation.
+- The separately authored **SecondJobChoices** large framed three-route
+  cards intentionally keep their own 94px card geometry, but use the
+  exact same owner-supplied button image family.
+- Every future stage must pass `npm run verify:dialogue-primary-style`
+  (part of `check:web` and tutorial CI). Real Chromium tests additionally
+  check the computed normal/hover `border-image-source` in both origins.
+  A class name alone is not proof of visually identical controls.
+
 ## 3. Canonical player speaker label
 
 **Owner decision, 2026-11-12: the speaker heading for every spoken player
