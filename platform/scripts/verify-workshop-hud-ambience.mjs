@@ -20,6 +20,7 @@ const openingPage=read('apps/web/src/routes/characters/[id]/opening/+page.svelte
 const workPage=read('apps/web/src/routes/characters/[id]/millhand/work/+page.svelte');
 const missingPage=read('apps/web/src/routes/characters/[id]/millhand/missing-stamp/+page.svelte');
 const depotPage=read('apps/web/src/routes/characters/[id]/millhand/second-job/+page.svelte');
+const wrongBellPage=read('apps/web/src/routes/characters/[id]/bellrunner/wrong-bell/+page.svelte');
 const qaPage=read('apps/web/src/routes/__audio-qa/+page.svelte');
 
 // UI state is provisional until the saved character/Flint combat API supplies
@@ -160,12 +161,15 @@ assert.ok(audio.includes("depotAmbienceFile='depot-ambience.mp3'") &&
   audio.includes('export function claimDepotAmbience()') &&
   audio.includes('export function stopDepotAmbience()') &&
   audio.includes('depotAmbience.loop=true') &&
-  hud.includes('if(depotBackdrop)return claimDepotAmbience()') &&
+  hud.includes('if(depotBackdrop||industrialCourtyardBackdrop)return claimDepotAmbience()') &&
+  hud.includes('industrialCourtyardBackdrop?:boolean') &&
   hud.includes('stopDepotAmbience()') &&
+  wrongBellPage.includes('compactCityVista travelLocked industrialCourtyardBackdrop') &&
+  wrongBellPage.includes('night-shift-bell.mp3') &&
   depot.includes('confirmTravel()') &&
   !depot.includes('let travelConfirmed=$state(false)') &&
   mainLayout.includes('stopDepotAmbience();'),
-  'Depot ambience must follow the painted backdrop, including local travel confirmation');
+  'Depot ambience must follow the active Hector/Industrial Courtyard or Millhand depot backdrop, without duplicating bell SFX');
 assert.ok(!audio.includes("music.loop=true") &&
   audio.includes("music.loop=false") &&
   audio.includes('MUSIC_PAUSE_MIN_MS=30_000') &&
