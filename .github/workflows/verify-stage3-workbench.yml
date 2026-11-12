@@ -14,6 +14,7 @@ on:
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage4.test.ts'
       - 'platform/scripts/verify-bellrunner-stage3-assets.mjs'
       - 'platform/scripts/verify-dialogue-speakers.test.ts'
       - 'platform/scripts/verify-approved-intro-copy.mjs'
@@ -73,6 +74,8 @@ jobs:
         run: npm run verify:bellrunner-stage1
       - name: Bellrunner Stage 3 state machine, choices and authored dialogue beats
         run: npm run verify:bellrunner-stage3
+      - name: Bellrunner Stage 4 all branch mechanics, inherited asset locations and dialogues
+        run: npm run verify:bellrunner-stage4
       - name: Bellrunner Stage 3 owner art and sound
         run: npm run verify:bellrunner-stage3-assets
       - name: Canonical YOU speaker labels for all tutorial scenes
