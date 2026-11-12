@@ -34,6 +34,9 @@
   // Navigation within the two screens is local; only choosing a job writes
   // progression to the server.
   let decisionStep=$state<0|1>(0);
+  // The approved branch dialogue is the transition to Stage 4. The skill
+  // award and unpaid-round outcome are persisted and visible in their proper
+  // systems; never insert an out-of-world reward ledger into a story panel.
   let committedBeat=$state(0);
   let bellAudio=$state<HTMLAudioElement>();
   let backdropUnavailable=$state(false);
@@ -278,18 +281,10 @@
                       {/if}
                       <div class="actions">
                         <button type="button" class="primary-choice continue-choice"
-                          onclick={()=>{committedBeat+=1;}}>Continue</button>
-                      </div>
-                    {:else}
-                      <p class="round-finding">Shift Dispatch: round not accepted. The receiving office is closed; its authorized final mark is unavailable. Payment: 0 coins. Ordinary XP: 0. No items.</p>
-                      <p class="round-finding">Major Skill increased: <strong>{branch.majorSkill} +1</strong>.</p>
-                      <p class="round-finding">Next: {branch.next}</p>
-                      <p class="narration">Your choice is recorded. The work continues at the appropriate location.</p>
-                      <div class="actions">
-                        <button type="button" class="primary-choice continue-choice"
-                          onclick={()=>{void goto('/characters/'+encodeURIComponent(id)+'/bellrunner/second-job');}}>
-                          Continue to Stage 4
-                        </button>
+                          onclick={()=>{
+                            if(committedBeat===0)committedBeat=1;
+                            else void goto('/characters/'+encodeURIComponent(id)+'/bellrunner/second-job');
+                          }}>Continue</button>
                       </div>
                     {/if}
                   </div>
