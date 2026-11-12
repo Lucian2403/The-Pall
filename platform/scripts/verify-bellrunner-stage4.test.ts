@@ -112,7 +112,7 @@ test('Trauma follows owner-revised patient choice, two different responses, assi
   }
 });
 test('Trauma in-flight older saves can still reach the revised story without losing their branch',()=>{
-  let s={...opening('trauma'),phase:'inspect' as const};
+  let s:StageFourState={...opening('trauma'),phase:'inspect'};
   s=advanceBellrunnerSecondJob(s,'prioritize_urgent_worker');
   assert.equal(s.phase,'triage_response');
   // Before the revision, existing scenes could be saved in detail,
