@@ -231,13 +231,6 @@
   {/snippet}
   </ActivityLayout>
 
-  <div class="scene-footer">
-    <span
-      >Council records remain at the office. No wages or inventory items are
-      awarded here.</span
-    >
-  </div>
-
   {#if journalOpen}
     <section
       id="contracts-job-journal"
@@ -441,16 +434,6 @@
     font: 12px sans-serif;
     color: #675039;
   }
-  .scene-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    padding: 9px 14px;
-    background: #201c17;
-    color: #c9b393;
-    font: 12px/1.4 sans-serif;
-  }
   .journal-button {
     border: 1px solid #987652;
     background: #d7c5a5;
@@ -528,11 +511,6 @@
   @container activity-panel (max-width: 480px) {
     .work-dialogue {
       padding: 14px;
-    }
-  }
-  @media (max-width: 760px) {
-    .scene-footer {
-      flex-wrap: wrap;
     }
   }
   @media (prefers-reduced-motion: reduce) {
