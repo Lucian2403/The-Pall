@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {onDestroy} from 'svelte';
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import BellrunnerHectorConversation from '$lib/BellrunnerHectorConversation.svelte';
@@ -115,7 +116,7 @@
           </button>
         </div>
       {:else if talking}
-        <BellrunnerHectorConversation {characterName} {returnToRound}/>
+        <BellrunnerHectorConversation {returnToRound}/>
       {:else if !entered}
         <p class="eyebrow">DISPATCH HOUSE · STAGE I</p>
         <h2>Hector D. Smoke</h2>
@@ -132,7 +133,7 @@
           <p class="narration">{say}</p>
         {:else if beat.kind==='speech'}
           {#if beat.speaker==='Player'}
-            <p class="eyebrow">{characterName}</p>
+            <p class="eyebrow">{dialogueSpeakerLabel(beat.speaker)}</p>
           {:else}
             <h2 class="speaker-heading">HECTOR D. SMOKE</h2>
           {/if}
