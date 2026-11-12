@@ -112,7 +112,6 @@
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
     </aside>
   </div>
-  <div class="notice">Council and workshop property stays at its workplace. No wages, ordinary XP or personal inventory items are awarded for this task.</div>
   {#if journalOpen}
     <section id="second-job-journal" class="journal" bind:this={journalElement} aria-label="Stage 4 personal journal">
       <header class="journal-head"><div><small>PERSONAL JOURNAL</small><h2>{route.name}</h2></div>
