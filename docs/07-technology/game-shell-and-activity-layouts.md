@@ -147,6 +147,45 @@ details, not dialogue.
   narrative Svelte scenes for these regressions. It is included in
   `npm run check:web` and the tutorial CI workflow.
 
+### Mandatory Back to previous Stage support
+
+**Owner rule — every newly implemented tutorial Stage must support the
+existing `← Back to Stage N` developer testing control.** It belongs
+in the shared `TutorialShell` activity bar, not inside a dialogue card,
+and follows the exact numeric previous stage. The control is only enabled
+on the loopback development API; production must not expose destructive
+stage rewinds.
+
+Before any new stage is presented for acceptance, implement and test all
+four parts:
+
+1. The new scene mounts `TutorialShell`, including the shared chapter
+   bar. Never use a separate, origin-specific Back button.
+2. The authenticated `GET /api/characters/:id/dev/rewind-stage`
+   returns `canRewind:true` and the appropriate `targetStage` from
+   **initial arrival, after the first Continue, during the entire
+   activity, and after its local completion**. Merely checking
+   `tutorial_status='NOT_STARTED'` is not acceptable.
+3. `POST /api/characters/:id/dev/rewind-stage` atomically rewinds
+   the character and the current stage state, invalidates old action
+   receipts, and reverses **only** rewards created by the rewound
+   segment. An owner-scoped character lock, stage revision checks,
+   repeated-request rejection and no duplicate XP/skill/currency/item
+   grants are compulsory. If effects are irreversible or another stage
+   has begun, reject safely without partial mutations.
+4. Add a real PostgreSQL integration test for capability availability,
+   midway rewind, retry, account ownership, action receipts and replay.
+   Verify the visible **Back to Stage N** button in Chromium on every
+   stage branch. Include `npm run verify:dev-rewind` in web checks and
+   CI; do not declare a stage ready without these checks.
+
+Bellrunner Stage 4 satisfies this by restoring the Stage 3 decision,
+deleting the Stage 4 job and its replay receipts and reversing its
+selected Major Skill +1 in one transaction. This is developer replay
+only. The Stage 4 work does not otherwise grant XP, coins or items.
+At Stage 5 before its encounter begins, Back to Stage 4 preserves
+the completed job and awarded Stage 3 skill.
+
 ## 4. City map gateway
 
 `TutorialShell` exposes `cityMap?: {href}` and `travelLocked?: boolean`. The
