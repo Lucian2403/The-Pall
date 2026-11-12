@@ -171,7 +171,6 @@
   .journal-trigger{margin-top:19px;padding-top:12px;border-top:1px solid #c2a98b}
   .journal-button{background:#dbcaab;border:1px solid #8c6d50;color:#3a281b;padding:7px 10px;font:12px sans-serif;cursor:pointer}
   .journal-button:hover,.journal-button:focus-visible{background:#eedabc}
-  .notice{background:#1d1a18;padding:10px 15px;color:#c6b093;font:12px/1.4 sans-serif}
   .journal{background:#e6d5b5;color:#2b211a;padding:24px clamp(15px,3vw,48px);border-top:2px solid #98714c;scroll-margin-top:12px}
   .journal-head{max-width:960px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 auto 18px}
   .journal-head small{font:10px sans-serif;letter-spacing:.12em;color:#6f583e}
