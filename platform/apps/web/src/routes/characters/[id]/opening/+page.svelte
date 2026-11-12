@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {onMount} from 'svelte';
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
@@ -189,7 +190,7 @@
         {#if beat.kind === 'narration'}
           <p class="narration">{displayText}</p>
         {:else if beat.kind === 'speech'}
-          <p class="speaker">{beat.speaker === 'Player' ? character.name : beat.speaker}</p>
+          <p class="speaker">{dialogueSpeakerLabel(beat.speaker)}</p>
           <p class="line">“{displayText}”</p>
         {:else if beat.kind === 'choice'}
           <p class="speaker">Your response</p>
