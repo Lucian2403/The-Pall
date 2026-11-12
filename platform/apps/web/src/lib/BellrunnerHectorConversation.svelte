@@ -1,11 +1,10 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {APPROVED_HECTOR_TOPICS,type HectorTopicId} from '$lib/approved-bellrunner-hector';
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
 
   // Local conversation state only. No character writes or stage transitions.
-  let {characterName,returnToRound}:{
-    characterName:string;returnToRound:()=>void
-  }=$props();
+  let {returnToRound}:{returnToRound:()=>void}=$props();
   let topic=$state<HectorTopicId|null>(null);
   let lineIndex=$state(0);
   const currentTopic=$derived(APPROVED_HECTOR_TOPICS.find(x=>x.id===topic)??null);
@@ -22,7 +21,7 @@
 <section class="hector-conversation" aria-label="Optional conversation with Hector D. Smoke">
   {#if currentTopic && currentLine}
     {#if currentLine.speaker==='Player'}
-      <p class="eyebrow">{characterName}</p>
+      <p class="eyebrow">{dialogueSpeakerLabel(currentLine.speaker)}</p>
     {:else}
       <h2 class="speaker-heading">HECTOR D. SMOKE</h2>
     {/if}

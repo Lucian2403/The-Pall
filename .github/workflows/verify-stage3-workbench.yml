@@ -13,6 +13,12 @@ on:
       - 'platform/scripts/verify-stage-six.mjs'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
+      - 'platform/scripts/verify-bellrunner-stage3.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage3-assets.mjs'
+      - 'platform/scripts/verify-dialogue-speakers.test.ts'
+      - 'platform/scripts/verify-approved-intro-copy.mjs'
+      - 'platform/apps/web/static/locations/industrial/**'
+      - 'platform/apps/web/static/audio/bellrunner/**'
       - 'platform/scripts/verify-stage-seven.test.ts'
       - 'platform/scripts/verify-stage-eight.test.ts'
       - 'platform/apps/web/static/locations/home/**'
@@ -63,6 +69,14 @@ jobs:
       - run: npm ci
       - run: npm run build:packages
       - run: npm run verify:stage3-workbench-ui
+      - name: Bellrunner Stage 1 art, dialogue and handoff contract
+        run: npm run verify:bellrunner-stage1
+      - name: Bellrunner Stage 3 state machine, choices and authored dialogue beats
+        run: npm run verify:bellrunner-stage3
+      - name: Bellrunner Stage 3 owner art and sound
+        run: npm run verify:bellrunner-stage3-assets
+      - name: Canonical YOU speaker labels for all tutorial scenes
+        run: npm run verify:dialogue-speakers
       - name: First-entry Welcome modal and character storage contract
         run: npm run verify:welcome
       - run: npm run verify:stage4-transport-ui
@@ -77,8 +91,6 @@ jobs:
         run: npm run verify:stage-eight
       - name: Inventory weights, stack merging and capacity unit tests
         run: npm run verify:inventory
-      - name: Bellrunner Stage 1 art, dialogue and handoff contract
-        run: npm run verify:bellrunner-stage1
       - name: PostgreSQL Stage 6–8 combat, clinic, final home and character lifecycle integration
         env:
           STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test

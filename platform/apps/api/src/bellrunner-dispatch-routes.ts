@@ -173,10 +173,6 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
         await client.query('ROLLBACK');transaction=false;
         return reply.code(404).send({error:'not_found'});
       }
-      if(ch.rows[0].tutorial_stage!==2||ch.rows[0].tutorial_status!=='IN_PROGRESS'){
-        await client.query('ROLLBACK');transaction=false;
-        return reply.code(409).send({error:'wrong_work_phase'});
-      }
       const current=await client.query<DispatchRow>(
         'SELECT revision,work_state FROM player_character_bellrunner_dispatch WHERE character_id=$1 FOR UPDATE',
         [req.params.id]);
@@ -193,6 +189,10 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
           return reply.code(409).send({error:'idempotency_key_reuse'});
         return replay.rows[0].result;
       }
+      if(ch.rows[0].tutorial_stage!==2||ch.rows[0].tutorial_status!=='IN_PROGRESS'){
+        await client.query('ROLLBACK');transaction=false;
+        return reply.code(409).send({error:'wrong_work_phase'});
+      }
       const revision=Number(current.rows[0].revision);
       if(revision!==command.expectedRevision){
         await client.query('ROLLBACK');transaction=false;
@@ -208,7 +208,16 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
       await client.query(
         'UPDATE player_character_bellrunner_dispatch SET revision=$2,work_state=$3::jsonb WHERE character_id=$1',
         [req.params.id,revision+1,JSON.stringify(next)]);
-      const result=view(ch.rows[0],true,revision+1,next);
+      // Only the explicit sealed-order handoff advances the character.
+      const movesToWrongBell=command.action==='take_final_notice'||command.action==='enter_wrong_bell';
+      if(movesToWrongBell){
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=3,tutorial_status='NOT_STARTED' WHERE id=$1",
+          [req.params.id]);
+      }
+      const result=view(movesToWrongBell
+        ?{...ch.rows[0],tutorial_stage:3,tutorial_status:'NOT_STARTED'}
+        :ch.rows[0],true,revision+1,next);
       await client.query(
         'INSERT INTO player_character_bellrunner_dispatch_work_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,command.requestId,hash,JSON.stringify(result)]);

@@ -30,7 +30,8 @@
   let {
     character,children,activePage = 'scene',sceneLocation,compactBanner = false,
     compactCityVista = false,smithingBackdrop = false,
-    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,clinicBackdrop = false,
+    councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
+    industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
     cityMap,travelLocked = false,services = {},dock
   }:{
@@ -46,6 +47,8 @@
     councilBackdrop?:boolean;
     alleyBackdrop?:boolean;
     depotBackdrop?:boolean;
+    /** Same owner depot ambience for the reusable Bellrunner Industrial Courtyard. */
+    industrialCourtyardBackdrop?:boolean;
     clinicBackdrop?:boolean;
     /** Only the active combat page supplies live, server-confirmed Stamina. */
     combatStamina?:{current:number;maximum:number};
@@ -74,6 +77,8 @@
     :mapState==='unavailable'?'Not available yet':'Open the city map');
   const chapter = $derived(character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
+    : character.origin === 'Bellrunner' && character.tutorial.stage >= 3
+    ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/wrong-bell'
     : character.origin === 'Bellrunner' && character.tutorial.stage === 2
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/dispatch'
     : character.origin === 'Millhand' && character.tutorial.stage >= 7
@@ -175,9 +180,11 @@
     stopNightAlleyAmbience();
   });
 
-  // Depot playback follows the visible backdrop, not merely Stage 4 status.
+  // Hector's Dispatch House and the reusable Industrial Courtyard share
+  // one existing depot ambience stream, not two overlapping audio elements.
+  // The active illustrated scene owns the track and Sound Settings govern it.
   $effect(()=>{
-    if(depotBackdrop)return claimDepotAmbience();
+    if(depotBackdrop||industrialCourtyardBackdrop)return claimDepotAmbience();
     stopDepotAmbience();
   });
   // The clinic's owner soundscape is tied to the mounted painted scene only.
@@ -215,6 +222,10 @@
     const fromStage=rewindFromStage;
     const warning=character.origin==='Bellrunner'&&fromStage===2
       ?'TESTING ONLY: Return to Bellrunner Stage 1? The saved round acceptance and its request receipts will be cleared so you can replay Hector\'s opening. Character items, coins and skills are preserved.'
+      :character.origin==='Bellrunner'&&fromStage===3
+      ?'TESTING ONLY: Return to Bellrunner Stage 2? This clears the Wrong Bell investigation and returns you to the final sealed notice. Earlier deliveries, Health, coins and skills are preserved.'
+      :character.origin==='Bellrunner'&&fromStage===4
+      ?'TESTING ONLY: Return to Bellrunner Stage 3? This clears your chosen route and removes its one-time +1 Major Skill award. The original delivery and character are preserved.'
       :fromStage===8
       ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
@@ -238,6 +249,8 @@
           rewindError='Bellrunner schema is missing. Run npm run bellrunner:migrate, then restart the API.';
         }else if(response.status===409 && data.error==='unsafe_dispatch_state'){
           rewindError='The accepted Bellrunner round is missing or inconsistent; nothing was reset.';
+        }else if(response.status===409 && data.error==='unsafe_wrong_bell_state'){
+          rewindError='The saved Bellrunner route or skill award cannot safely be reset. No progress was changed.';
         }else if(response.status===503 && data.error==='second_job_schema_missing'){
           rewindError='Stage 4 database setup is missing. Run npm run second-job:migrate from platform, then restart the API.';
         }else if(response.status===503 && data.error==='combat_schema_missing'){

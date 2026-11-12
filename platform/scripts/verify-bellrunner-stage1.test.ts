@@ -359,7 +359,11 @@ test('Hector, document cards and original UI/audio remain consistent',()=>{
  assert.ok(!stage2.includes('WorkshopItemPopover')&&stage2.includes('class="work-card"'));
  assert.ok(stage2.includes('DISPATCH HOUSE · PAPER INSPECTION')&&
   stage2.includes('{docs[selected].description}'));
- assert.ok(stage2.includes('<BellrunnerHectorConversation characterName={character.name}'));
+ assert.ok(stage2.includes('<BellrunnerHectorConversation')&&
+  stage2.includes('returnToRound={()=>{talkingToHector=false;}}'),
+  'Hector conversation must preserve the Stage 2 return handler');
+ assert.ok(!stage2.includes('characterName={character.name}'),
+  'The player speaks as YOU; the optional Hector dialogue no longer receives a character-name label');
  assert.ok(stage2.includes('talkingToHector=true'));
  assert.ok(stage2.includes('talkingToHector=false'),
   'Returning to the active dispatch must preserve saved work and its revision');

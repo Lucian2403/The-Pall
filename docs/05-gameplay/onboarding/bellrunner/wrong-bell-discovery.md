@@ -1,6 +1,6 @@
 # Bellrunner — Stage 3: The Wrong Bell (APPROVED)
 
-**Status: APPROVED AND LOCKED (2026-10-15).** The user approved the exact discovery, watchman speech, cause of nonpayment, immediate branch handoffs and deferred optional Hector exchange. The incident premise, three second Major Skills and their jobs, Dogman, and the shared tutorial rules were already canonical in the [Bellrunner overview](README.md). Numerical tuning, exact world labels and production identifiers remain TBD. It follows [approved Stage 1](opening-dialogue.md), [approved Stage 2](shift-dispatch-interaction.md) and the [game-wide dialogue standard](../../interactions/dialogue-style-guide.md).
+**Status: APPROVED AND LOCKED (2026-10-15); owner dialogue revision approved 2026-11-11.** The user approved the exact discovery, watchman speech, cause of nonpayment, immediate branch handoffs and deferred optional Hector exchange. The incident premise, three second Major Skills and their jobs, Dogman, and the shared tutorial rules were already canonical in the [Bellrunner overview](README.md). Numerical tuning, exact world labels and production identifiers remain TBD. It follows [approved Stage 1](opening-dialogue.md), [approved Stage 2](shift-dispatch-interaction.md) and the [game-wide dialogue standard](../../interactions/dialogue-style-guide.md).
 
 ## Scope and dramatic purpose
 
@@ -27,23 +27,35 @@ These are three distinct objects. The closure notice is not the sealed order; it
 
 ## B03-B — The watchman (APPROVED exact dialogue)
 
-*The watchman looks at the packet in the courier's hand.*
+*An official closure notice is nailed to the gate. The block was shut after workers were overcome by dangerous fumes. Several men wait outside, their faces covered with dirty cloth. One is bent over, coughing so hard that another worker has to hold him upright.*
 
-**WATCHMAN:** “Night notice?”
+*The night-shift bell rings from inside the closed building.*
 
-**PLAYER:** “This place is closed.”
+**WATCHMAN:** “That the night notice?”
 
-**WATCHMAN:** “It is.”
+**PLAYER:** “Aye. But this place is shut. They closed it because the fumes were making men sick.”
 
-**PLAYER:** “Then why's the bell ringing?”
+**WATCHMAN:** “I know. I've been told to let the night crew through anyway.”
 
-**WATCHMAN:** “They told me to let the night crew through.”
+**PLAYER:** “Look at that poor bastard. He can barely breathe. And you're sending them back in?”
 
-**PLAYER:** “Who's signing for the notice?”
+**WATCHMAN:** “I'm not sending anyone anywhere. My orders are to open the gate when the bell rings.”
 
-**WATCHMAN:** “The office is shut. I can take the paper. Can't give you their mark.”
+**PLAYER:** “Then why the hell is it still ringing?”
 
-*The waiting workers look toward the gate. One coughs.*
+**WATCHMAN:** “I don't know. And nobody's bothered to tell me.”
+
+**PLAYER:** “Well, I need someone to mark my route sheet.”
+
+**WATCHMAN:** “Office is shut. I'll take the notice, but I can't sign for them.”
+
+**PLAYER:** “So I deliver it, and I've nothing to show for it?”
+
+**WATCHMAN:** “You can put down that I took it. That's all I can give you.”
+
+*The coughing worker tries to straighten up but struggles to catch his breath. The others watch him. Nobody moves toward the gate.*
+
+*The bell rings again.*
 
 **Why he speaks:** The watchman expects the order and has instructions to admit workers, but he has no power to reopen a closed office or certify its receiving seal. He is not Dogman, a lawful city guard, a named major NPC or the Shift Marshal. He does not know the hidden mechanical cause or confess to illegal arrangements.
 
@@ -72,9 +84,11 @@ After the inspections and watchman exchange, offer **all three**, with no skill 
 
 **[Deliver the notice]**
 
-**PLAYER:** “You were told to take it. Here.”
+**PLAYER:** “All right. Here's your notice. But I'm putting down that the office was shut.”
 
-**WATCHMAN:** “I'll see it gets inside.”
+**WATCHMAN:** “Fine by me. I'll see it gets inside.”
+
+*The watchman takes the sealed order. He cannot provide the authorized receiving mark.*
 
 The watchman accepts the sealed order but cannot give the closed site's official receipt. Following the courier order is **not an endorsement of the building's safety**.
 
@@ -90,9 +104,15 @@ The separate shift office can enter worker attendance without being able to issu
 
 **[Warn the crew]**
 
-**PLAYER:** “The block's closed for fumes. Don't go in.”
+**PLAYER:** “Don't go in there. Look at him, he can barely breathe. You want to end up the same way?”
 
-*A worker coughs. Others turn to read the closure notice.*
+*One of the workers looks at the coughing man, then back at the gate.*
+
+**WORKER:** “You think we want to go in? They've rung the bell. We're supposed to be working.”
+
+**PLAYER:** “The place is shut for a reason. Someone needs to get him looked at.”
+
+*The worker hesitates, then helps the coughing man away from the gate.*
 
 At least one worker already has breathing trouble; Stage 3 does not assert that the protagonist can diagnose its cause by sight. Past exposure or a local leak may explain symptoms, but no exposure mechanic or specific diagnosis is canonized here. The player does **not** need to enter the unsafe interior without protection.
 
@@ -108,9 +128,9 @@ Do not conflate the workers' medical charges with the player character's later s
 
 **[Inspect the bell controls]**
 
-**PLAYER:** “If they've shut the block, that bell shouldn't be calling anyone in.”
+**PLAYER:** “That poor bastard can barely breathe, and the shift bell's still ringing. I'm going to find out why.”
 
-*Service linkage and ventilation-control access are visible from outside the sealed work area.*
+*From outside the sealed work area, you can see where to access the bell's mechanical linkage and the ventilation controls. The bell continues ringing as the workers wait at the gate.*
 
 The player notices an inspectable external control route, not the reason for its condition. An unnamed **city-works mechanic** supervises checking the linkage and safety shutoff using normal machinery interactions. No special tool or permanent component enters the player's inventory; access stays outside the dangerous interior.
 
@@ -133,19 +153,27 @@ Do not reveal the deliberate bypass in Stage 3, automatically stop the bell or n
 
 **Placement:** when the character **next naturally visits the Dispatch House after dealing with the immediate condemned-site tasks**. It is drafted now because Hector is the established recurring job-giver, but it is **not** a required interlude before Stage 4 or the gate confrontation.
 
-*Hector looks over the returned route sheet.*
+*Hector takes the route sheet and looks over the receiving marks. He stops at the last entry.*
 
-**PLAYER:** “They won't clear my last round?”
+**HECTOR:** “No mark from the last office. Council won't clear the round without it.”
 
-**HECTOR:** “No. That last office is shut. There's no mark for it.”
+**PLAYER:** “The bloody place is shut! They've got men coughing their lungs out at the gate, and they're still calling them in for work.”
+
+**HECTOR:** “I know it's shut. That's the problem. Nobody there can give you the proper mark.”
 
 **PLAYER:** “You sent me there.”
 
-**HECTOR:** “I sent you where the council put on the sheet. I've put the round down as disputed.”
+**HECTOR:** “I sent you where the council told me to send you. I've put in that the office was closed. What else do you want me to do?”
 
-**PLAYER:** “So there's no pay.”
+**PLAYER:** “Pay me for the work I've done, for a start.”
 
-**HECTOR:** “Not for that round. There's other work on the board.”
+**HECTOR:** “Out of my own pocket? I don't get paid for that round either, you know.”
+
+**PLAYER:** “So I do the whole bloody round, and get nothing?”
+
+**HECTOR:** “That's what they're saying. I've marked it as disputed, but I can't make them pay. There's other work on the board, if you want it.”
+
+*Hector puts the route sheet aside and reaches for the next stack of notices.*
 
 Hector acknowledges his dispatch role without inventing advance knowledge of the closure, promising he can override council approval or implying he deliberately put the courier at risk. His answer has one restrained point of friction: the courier followed his route and is nonetheless unpaid. The other work on the board is ordinary compensated Industry/Hauling work, not a new tutorial grant. Do not force the player to seek this conversation to finish onboarding.
 
@@ -181,3 +209,10 @@ There is no forced joke, false-worker-death callback, invented named NPC, fabric
 **LATER / TBD:** actual Stage 4 job interactions and accompanying supporting NPC exchanges; two Dogman interactions; turn-based PvE outcome; clinic/home scenes; all formulas, timing and implementation values.
 
 Related: [Bellrunner master](README.md), [approved Stage 1](opening-dialogue.md), [approved Stage 2](shift-dispatch-interaction.md), [shared E2E structure](../shared-structure.md), [jobs and time](../../jobs/jobs-and-time.md), [dialogue standard](../../interactions/dialogue-style-guide.md).
+
+## Asset contract — 2026-11-11 owner delivery
+
+- The reusable industrial courtyard painting is supplied as `IndustrialCourtyard.png` (1672×941), with **no painted NPCs or workers**. Install the optimized original-resolution WebP at `/locations/industrial/industrial-courtyard.webp`; keep the location reusable beyond this story.
+- The owner's separate 4.81-second night-shift bell MP3 is `BellRunnerBellCourtyard.mp3`, installed at `/audio/bellrunner/night-shift-bell.mp3`. It is distinct from Hector's Dispatch House duty bell.
+- Watchman, waiting crew, and their coughs remain authored narrative until the owner supplies separate character artwork; never fake them by recycling unrelated NPC sprites.
+- The closure notice can be an accessible UI hotspot anchored to the existing noticeboard without baking arbitrary dates or invented text into the painting. The sealed order's outside dispatch slip stays readable separately.

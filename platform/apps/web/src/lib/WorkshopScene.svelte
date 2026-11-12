@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import type {StageOneBeat} from '$lib/approved-stage-one';
   import {GUTHER_WORK_SKIP_LINE} from '$lib/approved-guther-optional';
   import NpcConversation from '$lib/NpcConversation.svelte';
@@ -126,7 +127,7 @@
         </WorkshopItemPopover>
       {:else}
       {#if beat.kind === 'speech'}
-        <p class="speaker">{beat.speaker === 'Player' ? characterName : beat.speaker}</p>
+        <p class="speaker">{dialogueSpeakerLabel(beat.speaker)}</p>
         <p class="dialogue-line">“{say}”</p>
       {:else if beat.kind === 'narration'}
         <p class="speaker">The workshop</p>

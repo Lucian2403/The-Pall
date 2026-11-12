@@ -97,7 +97,29 @@ its own art, props and mechanics, but uses the same scene layout:
   and the intent/result parchment follows below him rather than covering
   him.
 
-## 3. City map gateway
+## 3. Canonical player speaker label
+
+**Owner decision, 2026-11-12: the speaker heading for every spoken player
+line is always `YOU`, uppercase, across all origins, tutorial stages and
+future activities.** Never display the player's custom character name,
+`Player`, `PLAYER` or mixed-case `You` as a dialogue speaker caption.
+
+- Import `dialogueSpeakerLabel` from `$lib/dialogue-speaker` for dynamic
+  script speaker IDs, or `PLAYER_SPEAKER_LABEL` for an explicit player
+  speech caption. Use the same convention in any new stage and shared
+  dialogue component; do not create origin-specific speaker formatting.
+- Approved scripts and game-core types may continue storing `'Player'`
+  as an internal speaker identifier. Normalise **only when rendering**;
+  rewriting canonical dialogue, quest state or API data is prohibited.
+- NPC names and labels are unchanged. The player's chosen character name
+  still appears in HUD, Character Sheet, narration and NPC speech where
+  authored. Narrative second-person sentences (`You reach the gate`) and
+  buttons such as `Your response` are not speaker headings.
+- The `verify:dialogue-speakers` test checks the shared formatter and
+  scans all current Svelte scenes for inconsistent dialogue headings.
+  It is part of `npm run check:web` to catch regressions in future stages.
+
+## 4. City map gateway
 
 `TutorialShell` exposes `cityMap?: {href}` and `travelLocked?: boolean`. The
 gateway is a real link **only** when all of the following are true:
@@ -113,7 +135,7 @@ this activity" or "Not available yet". Nothing here guesses a map URL or
 lists POIs. The workbook's structured locations (`loc_cylinder`,
 `loc_grey_marches`, `loc_ashlands`) remain the source when a map is built.
 
-## 4. Notifications and Chat
+## 5. Notifications and Chat
 
 `services?: {notifications?: ShellService; chat?: ShellService}` where
 `ShellService = {open(): void; active?: boolean; unread?: number}`.
@@ -126,7 +148,7 @@ lists POIs. The workbook's structured locations (`loc_cylinder`,
   drawer, and notifications in their own centre. Neither may cover combat
   targets, document hotspots, primary actions or dialogue choices.
 
-## 5. Adapters for systems that do not exist yet
+## 6. Adapters for systems that do not exist yet
 
 These are the slots to use. They are not implementations.
 
@@ -138,7 +160,7 @@ These are the slots to use. They are not implementations.
 | Expedition | `workspace` | Route board / scene | Supplies, party, risks | Log |
 | Market / selling / contracts / recipes / inventory | `management` | Table or grid with prices, quantities and slots | Filters + selected-item details | Totals / confirm bar (only when wired to the backend) |
 
-## 6. Verification
+## 7. Verification
 
 - `npm run verify:bellrunner-layout-browser`: 45 Bellrunner page/viewport
   combinations (1024–3440px and 768/390px), interactions, the Route Sheet

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel,PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
@@ -123,13 +124,13 @@
         {#if beat.speaker==='Narration'}
           <p class="context current-beat">{beat.text}</p>
         {:else}
-          <p class="speaker">{beat.speaker==='Player'?'You':'Flint'}</p>
+          <p class="speaker">{dialogueSpeakerLabel(beat.speaker)}</p>
           <p class="speech">“{beat.text}”</p>
         {/if}
       {:else if approaching}
         <p class="context current-beat">{WAGE_CLAIM_WALK_HOME[state.branch]}</p>
       {:else if state.phase==='LEAVING'}
-        <p class="speaker">You</p>
+        <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
         <p class="speech">“I'm going home.”</p>
       {:else if state.phase==='CHOOSE_STANCE'}
         <p class="context">You have to choose how to meet him. Flint is close enough to strike if you try to push past.</p>

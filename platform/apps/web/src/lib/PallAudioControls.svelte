@@ -76,7 +76,7 @@
             Test click
           </button>
       </div>
-      <small class="audio-footnote">Music rests between playthroughs. Environmental ambience follows the illustrated workshop, depot, council offices, Flint's alley and the medical clinic.</small>
+      <small class="audio-footnote">Music rests between playthroughs. Environmental ambience follows the illustrated workshop, Dispatch House / industrial courtyard, depot, council offices, Flint's alley and the medical clinic.</small>
     </div>
   {/if}
 </div>

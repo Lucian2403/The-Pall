@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {onMount,tick,getContext} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -217,7 +218,7 @@
           <aside class="home-dialogue speech-panel" aria-label="Closing dialogue">
             <p class="eyebrow">RETURN HOME · STAGE VIII</p>
             <p class="narration stage-direction">You put the notice down.</p>
-            <p class="speaker">YOU</p><p class="speech">“{home.closingSpeech}”</p>
+            <p class="speaker">{PLAYER_SPEAKER_LABEL}</p><p class="speech">“{home.closingSpeech}”</p>
             <button type="button" class="pall-framed-button" disabled={pending}
               onclick={()=>{void perform('finish');}}>Continue</button>
           </aside>
