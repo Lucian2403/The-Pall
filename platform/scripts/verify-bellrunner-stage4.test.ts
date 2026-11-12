@@ -167,11 +167,29 @@ test('approved NPC lines and existing, reusable artwork are the only scene depen
     import.meta.url),'utf8');
   assert.ok(scene.includes('mode="scene"')&&scene.includes('dialogueSpeakerLabel(currentLine.speaker)'));
   assert.ok(scene.includes('SCENE_JOURNAL_CONTEXT')&&scene.includes('journalFact'));
-  assert.ok(scene.includes("First Aid Line — Helping the Attendant")&&
-    scene.includes("First Aid Line — The Medical Register")&&
+  assert.ok(scene.includes("'Helping the Attendant'")&&
+    scene.includes("'The Medical Register'")&&
     scene.includes("state.phase==='triage_response'"));
-  assert.ok(!scene.includes('WORKER A</small>')&&!scene.includes('REGISTER CLASSIFICATION</small>'),
-    'No documentary triage cards may displace the revised character dialogue');
+  for(const obsolete of [
+    'work-evidence','mechanical-readout',
+    'WORKSITE NOTICE</small>','SHIFT BOOK</small>',
+    'ATTENDANCE CATEGORY</small>','WAGE COLUMN</small>',
+    'VENTILATION SAFETY SHUTOFF</small>','SHIFT BELL LINKAGE</small>',
+    'RETAINING PIN</small>','WORKER A</small>','REGISTER CLASSIFICATION</small>',
+    'Either method records the conflict without changing',
+    'Observation only. The City-Works Mechanic supervises'
+  ]){
+    assert.ok(!scene.includes(obsolete),
+      'Do not reproduce a document/status ledger inside Bellrunner dialogue: '+obsolete);
+  }
+  assert.ok(scene.includes('{instruction}')&&
+    scene.includes('STAGE_FOUR_TASK_TEXT')&&
+    scene.includes('{copy.done}')&&scene.includes('state.journalFact'),
+    'Information must remain available through narrative and the personal journal');
+  for(const branch of ['contracts','machinery'] as const){
+    assert.ok(BELLRUNNER_STAGE_FOUR[branch].revelation.length>=4,
+      'Do not remove the character dialogue while removing duplicate cards: '+branch);
+  }
   assert.ok(scene.includes('snapshot.availableActions'));
   const api=readFileSync(new URL('../apps/api/src/bellrunner-second-job-routes.ts',
     import.meta.url),'utf8');
