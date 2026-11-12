@@ -13,6 +13,7 @@ on:
       - 'platform/scripts/verify-stage-six.mjs'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
+      - 'platform/scripts/verify-millhand-scenes-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
       - 'platform/scripts/verify-bellrunner-stage4.test.ts'
       - 'platform/scripts/verify-dev-stage-rewind.mjs'
@@ -121,6 +122,9 @@ jobs:
       - name: Real Chromium Bellrunner Stage 1 and 2 workstation geometry
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
+      - name: Real Chromium Millhand stages 1–8 and the matching primary button art
+        timeout-minutes: 4
+        run: timeout --signal=TERM --kill-after=5s 180s npm run verify:millhand-scenes-browser
       - name: Save Bellrunner 1272px and 1920px visual QA screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -129,5 +133,6 @@ jobs:
           path: |
             platform/test-artifacts/bellrunner-visuals/*.png
             platform/test-artifacts/bellrunner-stage4-visuals/*.png
+            platform/test-artifacts/millhand-scenes/*.png
           if-no-files-found: ignore
           retention-days: 7
