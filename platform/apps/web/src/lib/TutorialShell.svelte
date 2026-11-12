@@ -228,6 +228,8 @@
       ?'TESTING ONLY: Return to Bellrunner Stage 2? This clears the Wrong Bell investigation and returns you to the final sealed notice. Earlier deliveries, Health, coins and skills are preserved.'
       :character.origin==='Bellrunner'&&fromStage===4
       ?'TESTING ONLY: Return to Bellrunner Stage 3? This clears your chosen route and removes its one-time +1 Major Skill award. The original delivery and character are preserved.'
+      :character.origin==='Bellrunner'&&fromStage===5
+      ?'TESTING ONLY: Return to Bellrunner Stage 4? The completed second job remains saved and your +1 Major Skill is preserved. Only the final departure to the service gate is undone.'
       :fromStage===8
       ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
@@ -253,6 +255,8 @@
           rewindError='The accepted Bellrunner round is missing or inconsistent; nothing was reset.';
         }else if(response.status===409 && data.error==='unsafe_wrong_bell_state'){
           rewindError='The saved Bellrunner route or skill award cannot safely be reset. No progress was changed.';
+        }else if(response.status===409 && data.error==='unsafe_second_job_state'){
+          rewindError='Stage 4 work has begun or the completed handoff is inconsistent. Nothing was reset.';
         }else if(response.status===503 && data.error==='second_job_schema_missing'){
           rewindError='Stage 4 database setup is missing. Run npm run second-job:migrate from platform, then restart the API.';
         }else if(response.status===503 && data.error==='combat_schema_missing'){
