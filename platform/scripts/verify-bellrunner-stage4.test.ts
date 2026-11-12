@@ -211,13 +211,14 @@ test('Bellrunner Stage 4 journal matches canonical Millhand diary, not a status 
     import.meta.url),'utf8');
   for(const expected of [
     'class="journal-panel"','class="journal-heading"','class="journal-kicker"',
-    'class="journal-entries"','class="journal-toggle"',
-    '{#each journal as entry,i (i)}'
+    'class="journal-entries"','class="journal-toggle"'
   ]){
     assert.ok(scene.includes(expected),'Bellrunner must reuse Millhand journal structure: '+expected);
     assert.ok(millhand.includes(expected),
       'Journal structure must come from original Millhand, not new UI: '+expected);
   }
+  assert.match(scene,/\{#each journal as entry,\s*i \(i\)\}/);
+  assert.match(millhand,/\{#each journal as entry,\s*i \(i\)\}/);
   assert.ok(scene.includes('PERSONAL JOURNAL')&&scene.includes('data-pall-sfx="paper"'),
     'Keep the existing Stage 4 Journal label and paper sound');
   assert.ok(owner.includes('font:600 16px/1.55 var(--pall-font-reading,Georgia,serif)')&&
