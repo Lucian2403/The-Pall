@@ -90,11 +90,19 @@ at a time, with Continue, not as a scroll of large blocks.
   The Dogman Stage 5 encounter is **not** implemented by this work.
   Until it exists, the exterior-gate screen shows a brief in-world
   narrative ending, not a debug screen, technical recap or fake encounter.
-- Local development-only Back to Stage 3 is allowed before Stage 4
-  begins, safely removing the once-awarded branch skill. Once the job
-  is in progress it is blocked; development-only Back to Stage 4
-  from unopened Stage 5 returns to the saved completed-job handoff
-  without affecting skills, coins or the completed work.
+- **Owner requirement: the local-only `← Back to Stage 3` button
+  remains visible throughout Stage 4**, including opening dialogue,
+  records/inspection, choice, revelation and completed-job handoff.
+  Rewind holds an owner-scoped character lock, clears Stage 4 state and
+  idempotency receipts and reopens the Stage 3 route decision, reversing
+  exactly the selected route's one-time +1 Major Skill award. The
+  character's coins, Health, items, earlier courier work and other
+  skills are preserved. A repeated rewind is rejected. This destructive
+  developer replay is unavailable on production/public API hosts.
+  Development-only Back to Stage 4 from unopened Stage 5 keeps the
+  already completed job and awarded skill, undoing only the departure.
+  The same rewind requirements are **mandatory for all future stages**
+  and verified in CI by `verify:dev-rewind` and PostgreSQL tests.
 - No arbitrary timers, success probabilities, penalty values, diagnosis,
   formal register text beyond the explicitly illustrated category or
   skill multipliers are introduced. Their numerical contracts remain TBD.
