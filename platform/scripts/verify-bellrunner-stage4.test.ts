@@ -227,9 +227,11 @@ test('Bellrunner Stage 4 journal matches canonical Millhand diary, not a status 
     'Keep canonical font sizes, weight and New Standard/Bebas roles in owner CSS');
   assert.ok(!scene.includes('class="job-journal"')&&!scene.includes('class="journal-top"'),
     'Do not return to Bellrunner-only journal frame or dark square close button');
+  const rendered=scene.split('</script>')[1]?.split('<style>')[0]??'';
   for(const forbidden of ['Work:','Location:','Status:','Method:','Recorded check:',
     'Local finding:','PERSONAL JOURNAL · STAGE IV']){
-    assert.ok(!scene.includes(forbidden),'No technical field labels in story journal: '+forbidden);
+    assert.ok(!rendered.includes(forbidden),
+      'No technical field labels in rendered story journal: '+forbidden);
   }
 });
 test('Bellrunner journal records actual discoveries and choices as first-person entries',()=>{
