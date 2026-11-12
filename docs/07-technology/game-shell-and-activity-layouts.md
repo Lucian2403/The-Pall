@@ -119,6 +119,34 @@ future activities.** Never display the player's custom character name,
   scans all current Svelte scenes for inconsistent dialogue headings.
   It is part of `npm run check:web` to catch regressions in future stages.
 
+### Dialogue and action outcomes must remain in-world
+
+**Owner decision, 2026-11-12:** no player-choice branch, origin or background
+may insert a technical reward/status recap into the story parchment.
+Choosing a route shows the approved NPC response, the direct consequence,
+and a natural **Continue** to the next location. Do not interpose a third
+screen containing `Payment: 0 coins`, `Ordinary XP: 0`,
+`Major Skill increased +1`, `Next:`, `Your choice is recorded`
+or `Stage N not implemented / progress saved`. These are implementation
+details, not dialogue.
+
+- Server authority remains unchanged: skills, work phase, rewards and
+  receipts are saved by the actual game action. The HUD, Character Sheet
+  and Personal Journal are the proper surfaces for such information.
+- A diegetic result ("The clerk refuses to clear the disputed certificate")
+  is **not** a debug summary. Neither is an actionable receipt that
+  actually charges or pays currency; preserve meaningful economic facts
+  when they affect a character's situation.
+- Final `Continue` in Bellrunner Stage 3 leads directly to the chosen
+  Stage 4 job. In Millhand Stage 3, the canonical Guther response and
+  route consequences stay, but no `Route / +1 Skill` footnote appears.
+- In unfinished future stages, preserve an honest navigation boundary,
+  but do not fill the story panel with developer status or fake reward
+  statements. Stage 4's own final scene remains a natural handoff.
+- `npm run verify:story-immersion` scans the current and future
+  narrative Svelte scenes for these regressions. It is included in
+  `npm run check:web` and the tutorial CI workflow.
+
 ## 4. City map gateway
 
 `TutorialShell` exposes `cityMap?: {href}` and `travelLocked?: boolean`. The
