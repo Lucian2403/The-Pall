@@ -3,6 +3,7 @@
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
+  import {bellrunnerStageFourJournal} from '$lib/bellrunner-stage4-journal';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {
     BELLRUNNER_STAGE_FOUR,STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_TASK_TEXT,
@@ -23,6 +24,7 @@
     perform:(action:StageFourAction)=>Promise<void>;
   }=$props();
   const state=$derived(snapshot.state);
+  const journal=$derived(bellrunnerStageFourJournal(state));
   const copy=$derived(BELLRUNNER_STAGE_FOUR[state.branch]);
   const instruction=$derived(STAGE_FOUR_TASK_TEXT[state.branch][state.phase]);
   const currentLine=$derived(state.phase==='opening'
@@ -50,7 +52,7 @@
   });
   async function toggleJournal(){
     journalOpen=!journalOpen;
-    if(journalOpen){await tick();journalElement?.scrollIntoView({block:'nearest',behavior:'smooth'});}
+    if(journalOpen){await tick();journalElement?.scrollIntoView({block:'start',behavior:'smooth'});}
   }
   function act(action:StageFourAction){if(!pending&&actions.includes(action))void perform(action);}
 </script>
@@ -138,26 +140,22 @@
     {/snippet}
   </ActivityLayout>
   {#if journalOpen}
-    <aside class="job-journal" id="bellrunner-second-job-journal" bind:this={journalElement}
-      aria-label="Bellrunner Stage 4 personal journal">
-      <div class="journal-top"><strong>PERSONAL JOURNAL · STAGE IV</strong>
-        <button type="button" onclick={()=>{journalOpen=false;}}>Close journal</button>
+    <section id="bellrunner-second-job-journal" class="journal-panel"
+      bind:this={journalElement} aria-label={'Personal journal — '+copy.title}>
+      <header class="journal-heading">
+        <div>
+          <span class="journal-kicker">PERSONAL JOURNAL</span>
+          <h2>{copy.title}</h2>
+        </div>
+        <button type="button" class="journal-toggle" data-pall-sfx="paper"
+          onclick={()=>{void toggleJournal();}}>Close journal</button>
+      </header>
+      <div class="journal-entries">
+        {#each journal as entry,i (i)}
+          <p>{entry}</p>
+        {/each}
       </div>
-      <p><strong>Work:</strong> {copy.title} ({copy.discipline})</p>
-      <p><strong>Location:</strong> {copy.place}</p>
-      <p><strong>Status:</strong> {state.phase==='done'||state.phase==='exited'?'Completed':'In progress'}</p>
-      {#if state.priority==='corrected'}
-        <p>Urgent worker was prioritised by the attendant after your first selection.</p>
-      {/if}
-      {#if state.method}
-        <p><strong>Method:</strong> {STAGE_FOUR_ACTION_LABELS[state.method as StageFourAction]??state.method}</p>
-      {/if}
-      {#if state.observation}
-        <p><strong>Recorded check:</strong> {STAGE_FOUR_ACTION_LABELS[state.observation as StageFourAction]??state.observation.replaceAll('_',' ')}</p>
-      {/if}
-      {#if state.journalFact}<p><strong>Local finding:</strong> {state.journalFact}</p>{/if}
-      <p>The closed worksite's authorized receiving mark remains unavailable.</p>
-    </aside>
+    </section>
   {/if}
 </section>
 
@@ -185,11 +183,27 @@
   .spoken{font-weight:600}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
   .error{color:#873523}.saving{color:#644f36}
-  .job-journal{margin:12px;padding:20px;border:2px solid #986f46;background:#e9d5ad;color:#27190e;
-    font:15px/1.5 var(--pall-font-reading,Georgia,serif)}
-  .job-journal p{margin:9px 0}
-  .journal-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-  .journal-top button{cursor:pointer;border:1px solid #67452a;background:#302316;
-    color:white;padding:9px 12px;font:600 13px sans-serif}
+  /* Match the original Millhand Stage 3 journal panel. Typography
+     (New Standard 16px/600, title 24px/600, Bebas label 14px/700)
+     comes from the shared pall-owner-ui.css, not a Bellrunner override. */
+  .journal-panel{width:100%;box-sizing:border-box;
+    padding:19px clamp(16px,4vw,46px) 25px;background:#e8d6b6;
+    color:#24160e;border-top:2px solid #9a7147;
+    font-synthesis:weight;scroll-margin-top:56px}
+  .journal-heading{display:flex;align-items:center;justify-content:space-between;
+    gap:15px;max-width:930px;margin:0 auto 15px}
+  .journal-heading h2{margin:6px 0 0}
+  .journal-entries{max-width:930px;margin:0 auto}
+  .journal-entries p{margin:9px 0}
+  .journal-toggle{box-sizing:border-box;min-height:40px;padding:3px 8px;
+    border:solid transparent;border-width:10px 17px 9px;
+    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
+    border-image-slice:50 180 45 180 fill;border-image-width:10px 17px 9px;
+    border-image-repeat:stretch;border-radius:0;background:transparent;
+    color:#2e1d11;cursor:pointer}
+  .journal-toggle:is(:hover,:focus-visible){
+    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');color:#24170d}
+  .journal-toggle:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
+  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   @container activity-panel (max-width:480px){.work-card{padding:18px 15px}}
 </style>
