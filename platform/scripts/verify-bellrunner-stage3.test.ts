@@ -105,8 +105,10 @@ test('Stage 3 UI lets players re-read evidence without changing server state',()
     'The location hotspot remains available after the first reading');
   assert.ok(!ui.includes('snapshot.state.watchmanLine===0'),
     'The original location exposition must not repeat at the Watchman');
-  assert.ok(ui.includes("snapshot.state.watchmanLine===WATCHMAN_LINES.length-1"),
-    'The second shift-bell cue belongs to the final Watchman Continue');
+  assert.ok(ui.includes("snapshot.state.watchmanLine===WATCHMAN_LINES.length-1") &&
+    ui.includes("isSecondRing&&snapshot.state.phase==='choice'") &&
+    ui.indexOf('if(res.ok){')<ui.indexOf("isSecondRing&&snapshot.state.phase==='choice'"),
+    'The second shift-bell cue must follow the confirmed final Watchman Continue');
   assert.ok(ui.includes('decisionStep=1;')&&
     ui.includes('<SecondJobChoices choices={secondJobChoices}'),
     'One local Continue precedes the three Millhand-style job selections');
