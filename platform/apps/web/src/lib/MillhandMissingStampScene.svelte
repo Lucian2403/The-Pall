@@ -434,10 +434,6 @@
               </button>
             </div>
           {/if}
-          <p class="skill">
-            Route: {branchCopy.label}. The associated Major Skill received +1 on
-            the saved route choice.
-          </p>
         {/if}
         {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
         {#if pending}<p role="status" class="hint">Saving…</p>{/if}
