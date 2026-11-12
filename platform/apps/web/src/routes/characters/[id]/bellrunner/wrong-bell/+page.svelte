@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {onMount} from 'svelte';
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
@@ -213,8 +214,7 @@
                     {#each WRONG_BELL_ENTRY as line}<p class="narration">{line}</p>{/each}
                   {/if}
                   {#if WATCHMAN_LINES[snapshot.state.watchmanLine]}
-                    <p class="speaker">{WATCHMAN_LINES[snapshot.state.watchmanLine].speaker==='Player'
-                      ?character.name:WATCHMAN_LINES[snapshot.state.watchmanLine].speaker}</p>
+                    <p class="speaker">{dialogueSpeakerLabel(WATCHMAN_LINES[snapshot.state.watchmanLine].speaker)}</p>
                     <p class="spoken">“{WATCHMAN_LINES[snapshot.state.watchmanLine].text}”</p>
                   {/if}
                   <div class="actions">
@@ -246,7 +246,7 @@
                         {#if line.speaker==='Narration'}
                           <p class="narration">{line.text}</p>
                         {:else}
-                          <p class="speaker">{line.speaker==='Player'?character.name:line.speaker}</p>
+                          <p class="speaker">{dialogueSpeakerLabel(line.speaker)}</p>
                           <p class="spoken">“{line.text}”</p>
                         {/if}
                       {/each}
