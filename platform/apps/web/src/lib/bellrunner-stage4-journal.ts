@@ -42,7 +42,7 @@ export function bellrunnerStageFourJournal(s:BellrunnerJournalState):readonly st
       entries.push("The clerk recorded the certificate as disputed, but he couldn't change the man's wage entry. The works still haven't given me a receiving mark.");
     }
   }else if(s.branch==='trauma'){
-    entries.push("Two workers were brought to the first-aid point. The attendant's trying to look after both of them.");
+    entries.push("I saw two workers brought to the first-aid point. The attendant's trying to look after both of them.");
     if(s.phase!=='opening'||s.openingLine>=1){
       entries.push("One man can still walk and talk, though he's coughing. The other's got to stop for breath every time he tries to speak.");
     }
