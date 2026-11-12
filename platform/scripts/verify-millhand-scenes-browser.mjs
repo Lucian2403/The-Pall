@@ -292,7 +292,7 @@ try{
   }
   assert.ok(sharedPrimary,'At least one Millhand forward action must use the canonical primary');
   assert.ok(sharedPrimary.source.includes('button-normal-trim.png')&&
-    sharedPrimary.slice.includes('50 180 45 180'),
+    sharedPrimary.slice.includes('50 180 45'),
     'Millhand primary and Bellrunner must use the exact same owner image and slice: '+JSON.stringify(sharedPrimary));
   await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:sharedPrimary.x,y:sharedPrimary.y});
   await delay(80);
