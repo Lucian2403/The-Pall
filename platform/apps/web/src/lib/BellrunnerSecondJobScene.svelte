@@ -11,8 +11,9 @@
   import '$lib/pall-story-landscape.css';
   type State={
     revision:number;branch:StageFourBranch;phase:StageFourPhase;
-    openingLine:number;revelationLine:number;method:string|null;
-    observation:string|null;priority:'urgent'|'corrected'|null;
+    openingLine:number;revelationLine:number;
+    triageLine?:number;detailLine?:number;registerLine?:number;
+    method:string|null;observation:string|null;priority:'urgent'|'corrected'|null;
     journalFact:string|null
   };
   type Snapshot={stage:number;tutorialStatus:string;state:State;
@@ -26,7 +27,18 @@
   const instruction=$derived(STAGE_FOUR_TASK_TEXT[state.branch][state.phase]);
   const currentLine=$derived(state.phase==='opening'
     ?copy.opening[state.openingLine]
-    :state.phase==='revelation'?copy.revelation[state.revelationLine]:null);
+    :state.phase==='revelation'?copy.revelation[state.revelationLine]
+    :state.branch==='trauma'&&state.phase==='triage_response'
+      ?BELLRUNNER_STAGE_FOUR.trauma.triageResponse[state.priority==='urgent'?'urgent':'corrected'][state.triageLine??0]
+    :state.branch==='trauma'&&state.phase==='detail'
+      ?BELLRUNNER_STAGE_FOUR.trauma.assistance[state.detailLine??0]
+    :state.branch==='trauma'&&state.phase==='confirm'
+      ?BELLRUNNER_STAGE_FOUR.trauma.register[state.method==='bring_next_worker'?'escort':'observations'][state.registerLine??0]
+    :null);
+  const sceneHeading=$derived(state.branch==='trauma'&&state.phase==='detail'
+    ?'First Aid Line — Helping the Attendant'
+    :state.branch==='trauma'&&['confirm','choose','revelation','finish'].includes(state.phase)
+      ?'First Aid Line — The Medical Register':copy.title);
   const actions=$derived(snapshot.availableActions);
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
@@ -62,19 +74,24 @@
       <section class="pall-story-dialogue-section" aria-label={'Stage 4 '+copy.title+' interaction'}>
         <div class="work-card">
           <p class="eyebrow">SECOND JOB · STAGE IV · {copy.discipline}</p>
-          <h1>{copy.title}</h1>
-          {#if state.phase==='opening'}
-            {#if state.openingLine===0}
+          <h1>{sceneHeading}</h1>
+          {#if state.phase==='opening'||state.phase==='revelation'||
+            (state.branch==='trauma'&&
+              (state.phase==='triage_response'||state.phase==='detail'||state.phase==='confirm'))}
+            {#if state.phase==='opening'&&state.openingLine===0&&state.branch!=='trauma'}
               <p class="narration">{copy.entry}</p>
             {/if}
             {#if currentLine}
-              <p class="speaker">{dialogueSpeakerLabel(currentLine.speaker)}</p>
-              <p class="spoken">“{currentLine.text}”</p>
-            {/if}
-          {:else if state.phase==='revelation'}
-            {#if currentLine}
-              <p class="speaker">{dialogueSpeakerLabel(currentLine.speaker)}</p>
-              <p class="spoken">“{currentLine.text}”</p>
+              {#if currentLine.speaker==='Narration'}
+                {#if state.branch==='trauma'&&state.phase==='confirm'&&(state.registerLine??0)===3}
+                  <p class="narration">Under the illness category, someone has written <strong>“Non-work illness.”</strong></p>
+                {:else}
+                  <p class="narration">{currentLine.text}</p>
+                {/if}
+              {:else}
+                <p class="speaker">{dialogueSpeakerLabel(currentLine.speaker).toUpperCase()}</p>
+                <p class="spoken">“{currentLine.text}”</p>
+              {/if}
             {/if}
           {:else if state.phase==='done'}
             <p class="narration">{copy.done}</p>
@@ -97,20 +114,11 @@
               {/if}
             {:else if state.branch==='trauma'}
               {#if state.phase==='inspect'}
-                <div class="work-evidence" aria-label="Workers waiting for the infirmary attendant">
-                  <div><small>WORKER A</small><strong>Coughing; can walk and speak in full sentences</strong></div>
-                  <div><small>WORKER B</small><strong>Struggling to speak between breaths; needs immediate staff assessment</strong></div>
-                </div>
-              {:else if state.phase==='detail'&&state.priority==='corrected'}
-                <p class="correction">The attendant redirects Worker B to immediate assessment. You help reorganize the line. No harm or additional treatment has been imposed.</p>
-              {:else if state.phase==='detail'&&state.priority==='urgent'}
-                <p class="note">Worker B receives immediate attention from the trained attendant.</p>
-              {:else if state.phase==='confirm'||state.phase==='choose'}
-                <div class="work-evidence" aria-label="Medical observations and register">
-                  <div><small>OBSERVATION</small><strong>Closed industrial worksite; cough and difficulty breathing</strong></div>
-                  <div><small>REGISTER CLASSIFICATION</small><strong>Non-work illness</strong></div>
-                  <div><small>PAYMENT RESPONSIBILITY</small><strong>Worker</strong></div>
-                </div>
+                <!-- Older saved Stage 4 sessions may already be at this
+                     transitional step. Keep their choices without a ledger. -->
+                <p class="narration">{BELLRUNNER_STAGE_FOUR.trauma.opening[1].text}</p>
+                <p class="speaker">ATTENDANT</p>
+                <p class="spoken">“{BELLRUNNER_STAGE_FOUR.trauma.opening[2].text}”</p>
               {/if}
             {:else if state.branch==='machinery'}
               {#if state.phase==='inspect'||state.phase==='detail'||state.phase==='confirm'}
@@ -130,13 +138,17 @@
             <div class="actions" aria-label="Available work actions">
               {#each actions as action (action)}
                 <button type="button"
-                  class={action==='continue_opening'||action==='continue_revelation'||
+                  class={action==='continue_opening'||action==='continue_triage'||
+                    action==='continue_detail'||action==='continue_register'||
+                    action==='continue_revelation'||
                     action==='submit_certificate'||action==='finish_handover'||
                     action==='record_inspection'||action==='leave_for_gate'
                       ?'primary-choice':'secondary-choice'}
                   disabled={pending}
                   onclick={()=>{act(action);}}>
-                  {#if action!=='continue_opening'&&action!=='continue_revelation'}
+                  {#if action!=='continue_opening'&&action!=='continue_triage'&&
+                    action!=='continue_detail'&&action!=='continue_register'&&
+                    action!=='continue_revelation'}
                     <BellrunnerChoiceIcon kind={action==='leave_for_gate'?'route':
                       action==='submit_certificate'||action==='record_inspection'?'mark':'book'}/>
                   {/if}
@@ -191,14 +203,13 @@
     border-bottom:1px solid #9e815955}
   h1{margin:0 0 15px;font:600 var(--dialogue-title,21px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
-  .narration,.spoken,.note,.correction{margin:0 0 15px;font:500 var(--dialogue-text,17px)/1.5
+  .narration,.spoken,.note{margin:0 0 15px;font:500 var(--dialogue-text,17px)/1.5
     var(--pall-font-reading,Georgia,serif);color:#251910}
   .narration{font-style:italic}
   .speaker{margin:10px 0 6px;font:700 15px/1.2 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.07em;color:#67432a}
   .spoken{font-weight:600}
   .note{font-size:14px}
-  .correction{border-left:3px solid #9c6440;padding:10px;background:#e4cda6}
   .work-evidence{display:grid;gap:8px;margin:14px 0 16px}
   .work-evidence>div{background:#e7d5ae;border:1px solid #a58a65;padding:10px 12px;
     display:flex;flex-direction:column;gap:5px}
