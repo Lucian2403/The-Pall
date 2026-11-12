@@ -5,19 +5,21 @@
 import type {BellBranch} from './bellrunner-wrong-bell-work.js';
 export type StageFourBranch=BellBranch;
 export type StageFourPhase=
-  'opening'|'inspect'|'detail'|'confirm'|'choose'|'revelation'|'finish'|'done'|'exited';
+  'opening'|'inspect'|'triage_response'|'detail'|'confirm'|'choose'|'revelation'|'finish'|'done'|'exited';
 export type StageFourAction=
   'continue_opening'|'compare_shift_records'|'inspect_absence_category'|
   'request_attendance_basis'|'enter_written_objection'|'submit_certificate'|
   'prioritize_urgent_worker'|'prioritize_mobile_worker'|'take_observations'|
-  'bring_next_worker'|'compare_medical_register'|
-  'ask_for_worksite_note'|'ask_about_charge'|'finish_handover'|
+  'bring_next_worker'|'continue_triage'|'continue_detail'|
+  'continue_register'|'ask_about_classification'|'finish_handover'|
   'inspect_safety_linkage'|'trace_bell_rod'|'compare_linkage_marks'|
   'show_mechanic_link'|'mark_pin_position'|'request_second_check'|
   'record_inspection'|'continue_revelation'|'leave_for_gate';
 export type StageFourState={
   revision:number;branch:StageFourBranch;phase:StageFourPhase;
   openingLine:number;revelationLine:number;
+  // Optional on existing Stage 4 saves created before the narrative revision.
+  triageLine?:number;detailLine?:number;registerLine?:number;
   method:string|null;observation:string|null;
   priority:'urgent'|'corrected'|null;
   journalFact:string|null;
@@ -26,8 +28,11 @@ export const STAGE_FOUR_OPENING_LENGTH:Record<StageFourBranch,number>={
   contracts:5,trauma:3,machinery:3
 };
 export const STAGE_FOUR_REVELATION_LENGTH:Record<StageFourBranch,number>={
-  contracts:4,trauma:4,machinery:4
+  contracts:4,trauma:9,machinery:4
 };
+export const STAGE_FOUR_TRAUMA_TRIAGE_LENGTH={urgent:3,corrected:2} as const;
+export const STAGE_FOUR_TRAUMA_ASSISTANCE_LENGTH=4;
+export const STAGE_FOUR_TRAUMA_REGISTER_LENGTH=6;
 export const STAGE_FOUR_FACT:Record<StageFourBranch,string>={
   contracts:'Refusal to enter the closed site is classified as voluntary absence; the worker\'s wages are forfeited.',
   trauma:'The medical register classifies complaints as non-work illness, charging the affected workers.',
@@ -36,39 +41,54 @@ export const STAGE_FOUR_FACT:Record<StageFourBranch,string>={
 export const STAGE_FOUR_ACTIONS:readonly StageFourAction[]=[
   'continue_opening','compare_shift_records','inspect_absence_category',
   'request_attendance_basis','enter_written_objection','submit_certificate',
-  'prioritize_urgent_worker','prioritize_mobile_worker','take_observations',
-  'bring_next_worker','compare_medical_register','ask_for_worksite_note',
-  'ask_about_charge','finish_handover','inspect_safety_linkage',
+  'prioritize_urgent_worker','prioritize_mobile_worker','continue_triage',
+  'continue_detail','take_observations','bring_next_worker','continue_register',
+  'ask_about_classification','finish_handover','inspect_safety_linkage',
   'trace_bell_rod','compare_linkage_marks','show_mechanic_link',
   'mark_pin_position','request_second_check','record_inspection',
   'continue_revelation','leave_for_gate'
 ];
 export function initialBellrunnerSecondJob(branch:StageFourBranch):StageFourState{
   return {revision:0,branch,phase:'opening',openingLine:0,
-    revelationLine:0,method:null,observation:null,priority:null,journalFact:null};
+    revelationLine:0,triageLine:0,detailLine:0,registerLine:0,
+    method:null,observation:null,priority:null,journalFact:null};
 }
 export class InvalidStageFourAction extends Error{
   constructor(){super('invalid_bellrunner_second_job_action');this.name='InvalidStageFourAction';}
 }
 export function availableStageFourActions(s:StageFourState):StageFourAction[]{
   switch(s.phase){
-    case 'opening':return ['continue_opening'];
+    case 'opening':
+      // The final opening beat contains the Attendant's request and both
+      // patient choices. Never send the player through a duplicate summary.
+      return s.branch==='trauma'&&
+        s.openingLine>=STAGE_FOUR_OPENING_LENGTH.trauma-1
+          ?['prioritize_urgent_worker','prioritize_mobile_worker']
+          :['continue_opening'];
     case 'inspect':
       return s.branch==='contracts'?['compare_shift_records']
         :s.branch==='trauma'?['prioritize_urgent_worker','prioritize_mobile_worker']
         :['inspect_safety_linkage'];
+    case 'triage_response':return ['continue_triage'];
     case 'detail':
       return s.branch==='contracts'?['inspect_absence_category']
-        :s.branch==='trauma'?['take_observations','bring_next_worker']
+        :s.branch==='trauma'
+          ?(s.detailLine??0)<STAGE_FOUR_TRAUMA_ASSISTANCE_LENGTH-1
+            ?['continue_detail']:['take_observations','bring_next_worker']
         :['trace_bell_rod','compare_linkage_marks'];
     case 'confirm':
-      return s.branch==='trauma'?['compare_medical_register']
+      return s.branch==='trauma'
+          ?(s.registerLine??0)<STAGE_FOUR_TRAUMA_REGISTER_LENGTH-1
+            ?['continue_register']:['ask_about_classification']
         :s.branch==='machinery'?['show_mechanic_link']:[];
     case 'choose':
       return s.branch==='contracts'?['request_attendance_basis','enter_written_objection']
-        :s.branch==='trauma'?['ask_for_worksite_note','ask_about_charge']
+        :s.branch==='trauma'?['ask_about_classification']
         :['mark_pin_position','request_second_check'];
-    case 'revelation':return ['continue_revelation'];
+    case 'revelation':
+      return s.branch==='trauma'&&
+        s.revelationLine>=STAGE_FOUR_REVELATION_LENGTH.trauma-1
+          ?['finish_handover']:['continue_revelation'];
     case 'finish':
       return s.branch==='contracts'?['submit_certificate']
         :s.branch==='trauma'?['finish_handover']:['record_inspection'];
@@ -92,13 +112,20 @@ export function advanceBellrunnerSecondJob(s:StageFourState,action:StageFourActi
       next.method=action;next.phase='revelation';break;
     case 'prioritize_urgent_worker':case 'prioritize_mobile_worker':
       next.priority=action==='prioritize_urgent_worker'?'urgent':'corrected';
-      next.phase='detail';break;
+      next.triageLine=0;next.phase='triage_response';break;
+    case 'continue_triage':{
+      const length=STAGE_FOUR_TRAUMA_TRIAGE_LENGTH[s.priority??'corrected'];
+      if((s.triageLine??0)<length-1)next.triageLine=(s.triageLine??0)+1;
+      else {next.phase='detail';next.detailLine=0;}
+      break;
+    }
+    case 'continue_detail':next.detailLine=(s.detailLine??0)+1;break;
     case 'take_observations':case 'bring_next_worker':
-      next.method=action;next.phase='confirm';break;
-    case 'compare_medical_register':
-      next.journalFact=STAGE_FOUR_FACT.trauma;next.phase='choose';break;
-    case 'ask_for_worksite_note':case 'ask_about_charge':
-      next.observation=action;next.phase='revelation';break;
+      next.method=action;next.registerLine=0;next.phase='confirm';break;
+    case 'continue_register':next.registerLine=(s.registerLine??0)+1;break;
+    case 'ask_about_classification':
+      next.observation=action;next.journalFact=STAGE_FOUR_FACT.trauma;
+      next.revelationLine=0;next.phase='revelation';break;
     case 'inspect_safety_linkage':
       next.observation='shutoff_engaged_bell_moving';next.phase='detail';break;
     case 'trace_bell_rod':case 'compare_linkage_marks':
