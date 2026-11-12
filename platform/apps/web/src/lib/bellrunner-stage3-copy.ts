@@ -23,6 +23,8 @@ export const WRONG_BELL_AFTER_WATCHMAN=[
 export const WRONG_BELL_BRANCHES={
   contracts:{
     name:'Deliver the notice as ordered',action:'choose_contracts' as const,
+    choice:"I'll deliver the notice as ordered.",
+    skillLabel:'Commerce / Contracts',
     majorSkill:'Commerce' as const,
     lines:[
       {speaker:'Player',text:"All right. Here's your notice. But I'm putting down that the office was shut."},
@@ -34,6 +36,8 @@ export const WRONG_BELL_BRANCHES={
   },
   trauma:{
     name:'Warn the waiting crew',action:'choose_trauma' as const,
+    choice:"I'll warn the waiting crew not to go in.",
+    skillLabel:'Medicine / Trauma',
     majorSkill:'Medicine' as const,
     lines:[
       {speaker:'Player',text:"Don't go in there. Look at him, he can barely breathe. You want to end up the same way?"},
@@ -47,6 +51,8 @@ export const WRONG_BELL_BRANCHES={
   },
   machinery:{
     name:'Inspect the bell controls',action:'choose_machinery' as const,
+    choice:"I'll inspect the bell controls and find out why it's ringing.",
+    skillLabel:'Mechanics / Industrial Machinery',
     majorSkill:'Mechanics' as const,
     lines:[
       {speaker:'Player',text:"That poor bastard can barely breathe, and the shift bell's still ringing. I'm going to find out why."}
