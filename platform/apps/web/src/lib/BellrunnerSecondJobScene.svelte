@@ -205,8 +205,6 @@
   .work-evidence small{color:#775132;font:700 11px/1.25 sans-serif;letter-spacing:.09em}
   .work-evidence strong{font:600 15px/1.4 var(--pall-font-reading,Georgia,serif)}
   .mechanical-readout>div{border-left:4px solid #8f6944}
-  .finding{border:1px solid #a58a65;background:#e9d5b0;padding:12px;margin-bottom:16px}
-  .finding strong{color:#4c2f18}.finding p{margin:6px 0 0;font:15px/1.5 Georgia,serif}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
   .actions>button{display:flex;align-items:center;gap:10px;box-sizing:border-box;
     width:100%;min-height:52px;border:1px solid #6d5235;background:#241d16;
