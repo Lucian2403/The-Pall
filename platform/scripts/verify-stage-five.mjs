@@ -53,8 +53,10 @@ assert.ok(!copy.includes('You did the plate work for Anvil?') &&
   !scene.includes('Flint holds out the folded paper.'),
   'Outdated Stage 5 opening or duplicate paper narration must not return');
 assert.ok(scene.includes("white-space:pre-line") &&
-  scene.includes("beat.speaker==='Player'?'You':'Flint'"),
-  'Demand narration keeps all three owner-authored paragraphs and Flint nameplate');
+  scene.includes("beat.speaker==='Narration'") &&
+  scene.includes("{dialogueSpeakerLabel(beat.speaker)}") &&
+  scene.includes("from '$lib/dialogue-speaker'"),
+  'Demand narration preserves the three authored paragraphs, Flint nameplate and canonical YOU player label');
 for(const branch of ['restamp','contracts','records']){
   assert.match(copy,new RegExp(branch+':\\['),'Missing branch-only evidence: '+branch);
 }

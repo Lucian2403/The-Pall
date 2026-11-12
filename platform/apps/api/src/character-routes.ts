@@ -265,6 +265,9 @@ export function registerCharacterRoutes(app:FastifyInstance,options:{
         'player_character_second_job_receipts','player_character_second_job',
         'player_character_missing_stamp_receipts','player_character_missing_stamp',
         'player_character_work_receipts','player_character_platework',
+        'player_character_bellrunner_wrong_bell_receipts','player_character_bellrunner_wrong_bell',
+        'player_character_bellrunner_dispatch_work_receipts','player_character_bellrunner_dispatch_receipts',
+        'player_character_bellrunner_dispatch',
         'player_character_create_receipts'
       ]){
         await client.query('DELETE FROM '+table+' WHERE character_id=$1',[request.params.id]);

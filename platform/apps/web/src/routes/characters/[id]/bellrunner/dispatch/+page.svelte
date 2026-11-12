@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
   import {page} from '$app/state';
@@ -25,7 +26,7 @@
   type WorkAction='check_round'|'sort_notices'|'take_direct_road'|'take_quieter_road'|
     'deliver_notices'|'continue_to_receiver'|'ask_fresh_mark'|'check_receiving_book'|'confirm_book'|
     'note_spoiled_mark'|'continue_receiver_dialogue'|'continue_to_final_notice'|'continue_to_report'|
-    'finish_round'|'take_final_notice';
+    'finish_round'|'take_final_notice'|'enter_wrong_bell';
   type WorkState={phase:Phase;route:'direct'|'quieter'|null;
     noticesOrdered:boolean;receipt:'clear'|'book_confirmed'|'noted_unclear'|null};
   type Round={stage:number;tutorialStatus:string;accepted:boolean;
@@ -96,6 +97,11 @@
       if(response.ok){
         round=await response.json() as Round;
         pendingId=null;pendingAction=null;selected=null;
+        if(round.stage===3){
+          await goto('/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',
+            {replaceState:true,invalidateAll:true});
+          return;
+        }
       }else{
         const data=await response.json() as {error?:string};
         if(response.status===409&&data.error==='stale_revision'){
@@ -128,6 +134,9 @@
         round=await r.json() as Round;
         if(character.origin!=='Bellrunner'||round.stage!==2||!round.accepted){
           if(round.stage===1)await goto('/characters/'+encodeURIComponent(id)+'/opening',{replaceState:true});
+          else if(round.stage>=3)await goto(
+            '/characters/'+encodeURIComponent(id)+'/bellrunner/wrong-bell',
+            {replaceState:true,invalidateAll:true});
           else status='unavailable';
           return;
         }
@@ -195,7 +204,7 @@
               </button>
             </div>
           {:else if talkingToHector&&sceneKey==='depot'}
-            <BellrunnerHectorConversation characterName={character.name}
+            <BellrunnerHectorConversation 
               returnToRound={()=>{talkingToHector=false;}}/>
           {:else}
           <p class="eyebrow">SHIFT DISPATCH · INDUSTRY / HAULING</p>
@@ -263,7 +272,7 @@
                 onclick={()=>{void perform('note_spoiled_mark');}}><BellrunnerChoiceIcon kind="mark"/>Note the unclear mark</button>
             </div>
           {:else if phase==='receiver_reply'&&receiverDialogue}
-            <p class="eyebrow">{character.name.toUpperCase()}</p>
+            <p class="eyebrow">{PLAYER_SPEAKER_LABEL}</p>
             <p class="spoken">“{receiverDialogue.player}”</p>
             <div class="actions">
               <button type="button" class="primary-choice" disabled={busy}
@@ -274,7 +283,7 @@
             <p class="spoken">“{receiverDialogue.receiver}”</p>
             <p class="story">{receiverDialogue.outcome}</p>
             {#if receiverDialogue.extraPlayer}
-              <p class="speaker">{character.name.toUpperCase()}</p>
+              <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
               <p class="spoken">“{receiverDialogue.extraPlayer}”</p>
             {/if}
             <div class="actions">
@@ -303,6 +312,10 @@
             <p class="story">The usual deliveries are done, and the receiving marks are recorded.
               One sealed council order remains. It still needs to be delivered to the address marked on the route sheet.</p>
             <p class="small">The next scene begins at the order's marked address.</p>
+            <div class="actions">
+              <button type="button" class="primary-choice" disabled={busy}
+                onclick={()=>{void perform('enter_wrong_bell');}}>Continue to the closed worksite</button>
+            </div>
           {/if}
           {/if}
           {#if workError}<p class="error" role="alert">{workError}</p>{/if}

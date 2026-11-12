@@ -150,7 +150,8 @@ test('Priced clinic conversation advances one owner-approved beat at a time befo
     web.indexOf("{:else if clinic.phase==='PAID'}"));
   assert.ok(price.includes("pricedBeat.kind==='narration'") &&
     price.includes('{pricedBeat.text}') &&
-    price.includes('<p class="speaker">{pricedBeat.speaker}</p>') &&
+    price.includes('<p class="speaker">{dialogueSpeakerLabel(pricedBeat.speaker)}</p>') &&
+    web.includes("from '$lib/dialogue-speaker'") &&
     price.includes('{#if pricedAtEnd}') &&
     price.includes('class="charge-slip"') &&
     price.includes('Clinic charge') && price.includes('{clinic.fee}') &&

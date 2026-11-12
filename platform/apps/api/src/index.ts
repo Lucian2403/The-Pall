@@ -6,6 +6,7 @@ import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js'
 import {registerCharacterRoutes} from './character-routes.js';
 import {registerMillhandWorkRoutes} from './millhand-work-routes.js';
 import {registerBellrunnerDispatchRoutes} from './bellrunner-dispatch-routes.js';
+import {registerBellrunnerWrongBellRoutes} from './bellrunner-wrong-bell-routes.js';
 import {registerMissingStampRoutes} from './millhand-missing-stamp-routes.js';
 import {registerMillhandSecondJobRoutes} from './millhand-second-job-routes.js';
 import {registerMillhandWageClaimRoutes} from './millhand-wage-claim-routes.js';
@@ -26,6 +27,7 @@ registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);
 registerMillhandWorkRoutes(api);
 registerBellrunnerDispatchRoutes(api);
+registerBellrunnerWrongBellRoutes(api);
 registerMissingStampRoutes(api);
 registerMillhandSecondJobRoutes(api);
 registerMillhandWageClaimRoutes(api);

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import { tick } from "svelte";
@@ -19,6 +20,7 @@
   } from "$lib/approved-stage-three";
   import NpcConversation from "$lib/NpcConversation.svelte";
   import ActivityLayout from "$lib/ActivityLayout.svelte";
+  import SecondJobChoices from "$lib/SecondJobChoices.svelte";
   import "$lib/workshop-object-labels.css";
   import "$lib/pall-story-landscape.css";
   import { GUTHER_WORK_SKIP_LINE } from "$lib/approved-guther-optional";
@@ -99,6 +101,19 @@
   );
   const canAct = (a: MissingStampAction) =>
     snapshot.availableActions.includes(a) && !pending;
+  // The same presentational cards now render both origins' Stage 3 job
+  // decisions. These options still dispatch the original server actions.
+  const secondJobChoices=$derived(
+    (["restamp","contracts","records"] as const).map(route=>{
+      const action=("choose_"+route) as MissingStampAction;
+      return {
+        id:action,
+        line:MISSING_STAMP_ROUTES[route].choice,
+        skill:MISSING_STAMP_ROUTES[route].label,
+        disabled:!canAct(action)
+      };
+    })
+  );
   async function inspect(which: "slip" | "plate") {
     if (
       state.phase === "CONFRONT" ||
@@ -344,7 +359,7 @@
           {/if}
         {:else if state.phase === "CONFRONT" && beat}
           <p class="speaker">
-            {beat.speaker === "Player" ? "You" : beat.speaker}
+            {dialogueSpeakerLabel(beat.speaker)}
           </p>
           <p
             class:stage-narration={"kind" in beat && beat.kind === "narration"}
@@ -387,24 +402,8 @@
             </div>
           {:else}
             <p class="instruction">Choose what you will do next.</p>
-            <div class="choices">
-              {#each ["restamp", "contracts", "records"] as route (route)}
-                {@const copy =
-                  MISSING_STAMP_ROUTES[
-                    route as keyof typeof MISSING_STAMP_ROUTES
-                  ]}
-                {@const action = ("choose_" + route) as MissingStampAction}
-                <button
-                  type="button"
-                  disabled={!canAct(action)}
-                  onclick={() => {
-                    void perform(action);
-                  }}
-                >
-                  “{copy.choice}” <span class="route">{copy.label}</span>
-                </button>
-              {/each}
-            </div>
+            <SecondJobChoices choices={secondJobChoices}
+              onChoose={(action)=>{void perform(action as MissingStampAction);}}/>
           {/if}
         {:else if branchCopy}
           <p class="speaker">Guther</p>
@@ -673,20 +672,6 @@
   .choices .leave {
     background: #503c29;
   }
-  .route {
-    display: block;
-    width: fit-content;
-    max-width: 100%;
-    box-sizing: border-box;
-    margin-top: 5px;
-    padding: 2px 8px;
-    background: #49301d;
-    border: 1px solid #63472a;
-    color: #fff1d7;
-    font: 600 12px/1.45 sans-serif;
-    opacity: 1;
-    text-shadow: none;
-  }
   /* Owner's printed evidence art replaces the beige information cards.
      Preserve aspect ratio and keep the existing three-page dialogue height. */
   /* The printed plate and slip are their own short reading beat. Keep the
@@ -699,13 +684,6 @@
      enlarging the workshop. The preceding narration is its own Continue beat. */
   .dialogue.route-choice .instruction {
     margin: 0 0 8px;
-  }
-  .dialogue.route-choice .choices {
-    margin-top: 4px;
-    gap: 5px;
-  }
-  .dialogue.route-choice .route {
-    margin-top: 3px;
   }
   .record-illustration {
     display: flex;
