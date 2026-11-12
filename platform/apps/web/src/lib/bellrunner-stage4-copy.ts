@@ -1,11 +1,11 @@
-/** Exact approved Bellrunner Stage 4 spoken lines (2026-10-15).
- * Narrative hints and work choices follow the approved Stage 4 contract.
- * Keep the NPCs unnamed except by their approved role.
+/** Bellrunner Stage 4: the owner's revised First Aid Line dialogue (2026-11-12).
+ * Only the Trauma branch is revised here. Commerce / Mechanics keep their
+ * previously approved copy, job mechanics, rewards and location artwork.
  */
 export type StageFourBranch='contracts'|'trauma'|'machinery';
-export type StageFourPhase='opening'|'inspect'|'detail'|'confirm'|'choose'|'revelation'|'finish'|'done'|'exited';
-export type StageFourAction='continue_opening'|'compare_shift_records'|'inspect_absence_category'|'request_attendance_basis'|'enter_written_objection'|'submit_certificate'|'prioritize_urgent_worker'|'prioritize_mobile_worker'|'take_observations'|'bring_next_worker'|'compare_medical_register'|'ask_for_worksite_note'|'ask_about_charge'|'finish_handover'|'inspect_safety_linkage'|'trace_bell_rod'|'compare_linkage_marks'|'show_mechanic_link'|'mark_pin_position'|'request_second_check'|'record_inspection'|'continue_revelation'|'leave_for_gate';
-export type StageFourLine={speaker:'Player'|'Clerk'|'Attendant'|'Mechanic';text:string};
+export type StageFourPhase='opening'|'inspect'|'triage_response'|'detail'|'confirm'|'choose'|'revelation'|'finish'|'done'|'exited';
+export type StageFourAction='continue_opening'|'compare_shift_records'|'inspect_absence_category'|'request_attendance_basis'|'enter_written_objection'|'submit_certificate'|'prioritize_urgent_worker'|'prioritize_mobile_worker'|'take_observations'|'bring_next_worker'|'continue_triage'|'continue_detail'|'continue_register'|'ask_about_classification'|'finish_handover'|'inspect_safety_linkage'|'trace_bell_rod'|'compare_linkage_marks'|'show_mechanic_link'|'mark_pin_position'|'request_second_check'|'record_inspection'|'continue_revelation'|'leave_for_gate';
+export type StageFourLine={speaker:'Player'|'Clerk'|'Attendant'|'Mechanic'|'Narration';text:string};
 export const BELLRUNNER_STAGE_FOUR={
   contracts:{
     title:'Attendance Certificate',
@@ -37,17 +37,57 @@ export const BELLRUNNER_STAGE_FOUR={
     place:'Staffed First-Aid Point',
     image:'/locations/clinic/clinic-workshop-cold.webp',
     aspect:2,
-    entry:'The Infirmary Attendant is moving between two waiting workers.',
+    entry:'Two workers have been brought to the first-aid point.',
     opening:[
-      {speaker:'Attendant',text:'Come over here a moment. I need a hand with these two.'},
-      {speaker:'Player',text:'That man can barely get a word out.'},
-      {speaker:'Attendant',text:'I see him. Bring him over. Easy now.'}
+      {speaker:'Narration',text:'Two workers have been brought to the first-aid point.'},
+      {speaker:'Narration',text:"One is coughing badly, but he's on his feet, telling the attendant what happened at the factory. The other is leaning against the wall. He tries to speak, manages a few words, then stops to catch his breath."},
+      {speaker:'Attendant',text:"Give me a hand here. I've got two men waiting, and I can only see one at a time. Bring me the one who needs me first."}
     ],
+    triageResponse:{
+      urgent:[
+        {speaker:'Player',text:"This one's having trouble getting a word out."},
+        {speaker:'Attendant',text:"I can see that. Don't force it. Bring him here."},
+        {speaker:'Narration',text:'You help the worker over to the attendant.'}
+      ],
+      corrected:[
+        {speaker:'Attendant',text:"No, leave him a moment. The other one's having trouble breathing. Help me get him over here first."},
+        {speaker:'Narration',text:'You turn to the other worker and help him over to the attendant.'}
+      ]
+    },
+    assistance:[
+      {speaker:'Narration',text:'The attendant takes the man struggling to breathe over to a treatment bench. The other worker waits nearby, still coughing.'},
+      {speaker:'Attendant',text:"I've got him now. There's still that other fellow waiting, and I've got my hands full."},
+      {speaker:'Player',text:'What can I do?'},
+      {speaker:'Attendant',text:"I need to know where he was working and what's happened to him. Or you can bring him over when I'm ready. Either way, don't leave him standing there all day."}
+    ],
+    register:{
+      observations:[
+        {speaker:'Narration',text:'You finish writing down what the workers told you. Both had been waiting outside the closed factory. The attendant takes your notes and enters the details in the medical register.'},
+        {speaker:'Attendant',text:"Right. That's enough for now. I'll take it from here."},
+        {speaker:'Narration',text:'As the attendant turns to the next patient, you look over the entry.'},
+        {speaker:'Narration',text:'Under the illness category, someone has written “Non-work illness.”'},
+        {speaker:'Narration',text:'The worksite and symptoms have been recorded correctly. But despite the factory being closed for dangerous fumes, the illness is classified as unrelated to work. The worker is listed as responsible for paying the medical charges.'},
+        {speaker:'Player',text:"Hang on. You're charging them as if they got sick somewhere else?"}
+      ],
+      escort:[
+        {speaker:'Narration',text:'You help the next worker over when the attendant is ready. He tells her what happened outside the closed factory, and she enters the details in the medical register.'},
+        {speaker:'Attendant',text:"Right. That's enough for now. I'll take it from here."},
+        {speaker:'Narration',text:'As the attendant turns to the next patient, you look over the entry.'},
+        {speaker:'Narration',text:'Under the illness category, someone has written “Non-work illness.”'},
+        {speaker:'Narration',text:'The worksite and symptoms have been recorded correctly. But despite the factory being closed for dangerous fumes, the illness is classified as unrelated to work. The worker is listed as responsible for paying the medical charges.'},
+        {speaker:'Player',text:"Hang on. You're charging them as if they got sick somewhere else?"}
+      ]
+    },
     revelation:[
-      {speaker:'Player',text:"Why does the book say they didn't get sick at work?"},
-      {speaker:'Attendant',text:"I can't tell you what made them ill just from looking at them. I've written down where they were."},
-      {speaker:'Player',text:"But they're still going to have to pay for treatment?"},
-      {speaker:'Attendant',text:"Yes. I can't change the charge."}
+      {speaker:'Narration',text:'The worker on the treatment bench starts coughing again. The attendant glances over at him, then turns back to you.'},
+      {speaker:'Attendant',text:"Look, I've written down where they came from and what's wrong with them. But I can't say for certain what's made them sick. Not yet."},
+      {speaker:'Player',text:"Then why the hell does it say ‘Non-work illness’?"},
+      {speaker:'Attendant',text:"That's how it's been entered."},
+      {speaker:'Player',text:"The factory's shut because of the fumes! That man's barely breathing, and now you're telling me he's got to pay for his own treatment? Can't you change it?"},
+      {speaker:'Attendant',text:"No. I've put your observations down, but the charge stays unless someone with the authority changes it."},
+      {speaker:'Narration',text:'The worker starts coughing harder. The attendant turns toward him.'},
+      {speaker:'Attendant',text:"Listen, I've got two sick men here. I need to see to them. You've done what I asked."},
+      {speaker:'Narration',text:'She goes back to the treatment bench.'}
     ],
     fact:'The first-aid register assigns non-work illness to the affected workers, leaving them responsible for treatment charges.',
     done:'The patients remain with trained staff. The register still classifies the charges as non-work illness.',
@@ -78,6 +118,9 @@ export const BELLRUNNER_STAGE_FOUR={
 } as const satisfies Record<StageFourBranch,{
   title:string;discipline:string;place:string;image:string;aspect:number;
   entry:string;opening:readonly StageFourLine[];revelation:readonly StageFourLine[];
+  triageResponse?:{urgent:readonly StageFourLine[];corrected:readonly StageFourLine[]};
+  assistance?:readonly StageFourLine[];
+  register?:{observations:readonly StageFourLine[];escort:readonly StageFourLine[]};
   fact:string;done:string;next:string
 }>;
 
@@ -88,13 +131,14 @@ export const STAGE_FOUR_ACTION_LABELS:Record<StageFourAction,string>={
   request_attendance_basis:'Request the basis for the absence entry',
   enter_written_objection:'Enter a written objection',
   submit_certificate:'Submit the disputed certificate',
-  prioritize_urgent_worker:'Worker B — struggling to speak',
-  prioritize_mobile_worker:'Worker A — can walk and speak',
-  take_observations:'Take observations for the attendant',
-  bring_next_worker:'Bring the next worker to the attendant',
-  compare_medical_register:'Compare the observations and medical register',
-  ask_for_worksite_note:'Ask for the worksite to be written in the notes',
-  ask_about_charge:'Ask why the charge is on the worker',
+  prioritize_urgent_worker:'Help the man struggling to breathe.',
+  prioritize_mobile_worker:"Help the man who's still walking and talking.",
+  continue_triage:'Continue',
+  continue_detail:'Continue',
+  take_observations:'Ask the worker what happened and write it down.',
+  bring_next_worker:'Help the next worker over to the attendant.',
+  continue_register:'Continue',
+  ask_about_classification:'Ask the attendant why the illness is classified as non-work-related.',
   finish_handover:'Finish the handover',
   inspect_safety_linkage:'Inspect shutoff and linkage',
   trace_bell_rod:'Trace the bell rod',
@@ -114,11 +158,11 @@ export const STAGE_FOUR_TASK_TEXT:Record<StageFourBranch,Partial<Record<StageFou
     finish:'The shift-office clerk can log your objection, but cannot supply the shuttered worksite\'s receiving mark.'
   },
   trauma:{
-    inspect:'Worker A can walk and speak in full sentences despite coughing. Worker B struggles to speak between breaths. Who needs the trained attendant first?',
-    detail:'The attendant takes responsibility for the urgent worker. Choose how to assist the waiting line while staff provide care.',
-    confirm:'The worksite and visible symptoms are noted. The register category says “Non-work illness”; the charge is assigned to the worker.',
-    choose:'The medical register does not match the reported worksite circumstances. Ask the attendant about the notes or the charge.',
-    finish:'The attendant has taken responsibility for both workers. Complete the handover.'
+    // Legacy pre-revision saved states can still open an already-reached
+    // "inspect", "choose" or "finish" without a stale documentary recap.
+    inspect:"The man against the wall tries to speak again. The attendant watches you, waiting for your help.",
+    choose:'The medical register still says “Non-work illness.”',
+    finish:'She goes back to the treatment bench.'
   },
   machinery:{
     inspect:'From the accessible exterior service side: the ventilation shutoff is ENGAGED while the shift bell linkage is STILL ACTUATING. Observe, do not touch.',
