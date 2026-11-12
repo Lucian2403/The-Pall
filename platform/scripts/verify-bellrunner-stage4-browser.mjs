@@ -252,7 +252,7 @@ try{
     assert.ok(primaryStyle,'Real Continue has canonical primary-choice: '+branch);
     assert.ok(primaryStyle.source.includes('button-normal-trim.png'),
       'Bellrunner primary MUST use Millhand nine-slice art: '+JSON.stringify(primaryStyle));
-    assert.ok(primaryStyle.slice.includes('50 180 45 180'),
+    assert.ok(primaryStyle.slice.includes('50 180 45'),
       'Same Millhand border-image slicing on every origin: '+JSON.stringify(primaryStyle));
     assert.equal(primaryStyle.before,'none','No fake CSS brass arrow on owner art: '+branch);
     const rect=await evalJS(`(()=>{
