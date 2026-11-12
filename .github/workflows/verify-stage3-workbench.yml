@@ -19,6 +19,7 @@ on:
       - 'platform/scripts/verify-bellrunner-stage4-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3-assets.mjs'
       - 'platform/scripts/verify-dialogue-speakers.test.ts'
+      - 'platform/scripts/verify-dialogue-primary-style.mjs'
       - 'platform/scripts/verify-story-immersion.mjs'
       - 'platform/scripts/verify-approved-intro-copy.mjs'
       - 'platform/apps/web/static/locations/industrial/**'
@@ -85,6 +86,8 @@ jobs:
         run: npm run verify:bellrunner-stage3-assets
       - name: Canonical YOU speaker labels for all tutorial scenes
         run: npm run verify:dialogue-speakers
+      - name: Millhand primary button art shared by both origins and every tutorial stage
+        run: npm run verify:dialogue-primary-style
       - name: Immersive transitions — no out-of-world payout or debug recaps
         run: npm run verify:story-immersion
       - name: First-entry Welcome modal and character storage contract
