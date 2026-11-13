@@ -90,8 +90,10 @@ export function availableStageFourActions(s:StageFourState):StageFourAction[]{
         s.revelationLine>=STAGE_FOUR_REVELATION_LENGTH.trauma-1
           ?['finish_handover']:['continue_revelation'];
     case 'finish':
+      // The mechanic has the report at this point; leaving also finalizes
+      // the inspection. Do not add a redundant Stage IV completion screen.
       return s.branch==='contracts'?['submit_certificate']
-        :s.branch==='trauma'?['finish_handover']:['record_inspection'];
+        :s.branch==='trauma'?['finish_handover']:['leave_for_gate'];
     case 'done':return ['leave_for_gate'];
     case 'exited':return [];
   }
@@ -139,7 +141,10 @@ export function advanceBellrunnerSecondJob(s:StageFourState,action:StageFourActi
       break;
     case 'submit_certificate':case 'finish_handover':case 'record_inspection':
       next.phase='done';break;
-    case 'leave_for_gate':next.phase='exited';break;
+    case 'leave_for_gate':
+      // Existing saved 'done' sessions also remain eligible to exit.
+      // For machinery the 'finish' handover is the final playable beat.
+      next.phase='exited';break;
   }
   return next;
 }

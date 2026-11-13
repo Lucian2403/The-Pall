@@ -9,7 +9,7 @@ import {
   STAGE_FOUR_TRAUMA_REGISTER_LENGTH
 } from '../apps/api/src/bellrunner-second-job-work.ts';
 import type {StageFourBranch,StageFourState,StageFourAction} from '../apps/api/src/bellrunner-second-job-work.ts';
-import {BELLRUNNER_STAGE_FOUR,STAGE_FOUR_ACTION_LABELS} from '../apps/web/src/lib/bellrunner-stage4-copy.ts';
+import {BELLRUNNER_STAGE_FOUR,STAGE_FOUR_ACTION_LABELS,STAGE_FOUR_TASK_TEXT} from '../apps/web/src/lib/bellrunner-stage4-copy.ts';
 import {bellrunnerStageFourJournal} from '../apps/web/src/lib/bellrunner-stage4-journal.ts';
 
 function opening(branch:StageFourBranch):StageFourState{
@@ -139,9 +139,35 @@ test('Machinery records a pinned bypass without authorising repairs or site entr
       s=advanceBellrunnerSecondJob(s,method);
       assert.equal(s.observation,method);
       s=revelation(s);
-      finished(s,'record_inspection');
+      assert.equal(s.phase,'finish');
+      assert.deepEqual(availableStageFourActions(s),['leave_for_gate'],
+        'Report handover has one final gate choice, not another completion step');
+      assert.throws(()=>advanceBellrunnerSecondJob(s,'record_inspection'),InvalidStageFourAction);
+      const exited=advanceBellrunnerSecondJob(s,'leave_for_gate');
+      assert.equal(exited.phase,'exited');
+      assert.equal(exited.revision,s.revision+1);
+      assert.equal(exited.observation,method);
+      assert.equal(exited.method,check);
+      assert.equal(exited.journalFact,STAGE_FOUR_FACT.machinery);
+      assert.deepEqual(availableStageFourActions(exited),[]);
+      assert.match(bellrunnerStageFourJournal(exited).at(-1)??'',/mechanic's got the fault on record/);
     }
   }
+  // Backward-compatible saved 'done' states still offer the gate action,
+  // but no longer display the old redundant end-card narration.
+  const legacy={...initialBellrunnerSecondJob('machinery'),phase:'done' as const};
+  assert.deepEqual(availableStageFourActions(legacy),['leave_for_gate']);
+  assert.equal(advanceBellrunnerSecondJob(legacy,'leave_for_gate').phase,'exited');
+});
+test('Machinery final handover is the last dialogue choice',()=>{
+  assert.equal(STAGE_FOUR_ACTION_LABELS.leave_for_gate,'Head back to the service gate');
+  assert.equal(STAGE_FOUR_TASK_TEXT.machinery.finish,
+    'You hand the completed report to the mechanic. He takes responsibility for passing it to the authorized repair crew. The mechanism is left untouched.');
+  const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerSecondJobScene.svelte',
+    import.meta.url),'utf8');
+  assert.ok(scene.includes("state.branch==='machinery'&&"));
+  assert.ok(scene.includes("(state.phase==='done'||state.phase==='exited')"));
+  assert.ok(scene.includes('{STAGE_FOUR_TASK_TEXT.machinery.finish}'));
 });
 test('Machinery pin confirmation renders approved dialogue and unchanged actions',()=>{
   const pin=BELLRUNNER_STAGE_FOUR.machinery.pinCheck;

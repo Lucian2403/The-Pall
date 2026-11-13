@@ -95,6 +95,11 @@
                 <p class="spoken">“{currentLine.text}”</p>
               {/if}
             {/if}
+          {:else if state.branch==='machinery'&&
+            (state.phase==='done'||state.phase==='exited')}
+            <!-- Resume legacy 'done' saves without the discarded recap.
+                 An exited machinery task retains the same final handover. -->
+            <p class="narration">{STAGE_FOUR_TASK_TEXT.machinery.finish}</p>
           {:else if state.phase==='done'}
             <p class="narration">{copy.done}</p>
           {:else if state.phase==='exited'}
