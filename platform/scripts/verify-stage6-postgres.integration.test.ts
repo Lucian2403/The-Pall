@@ -566,7 +566,7 @@ test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe
   const rewritten=await request('POST',base+id+'/dev/rewind-stage',owner,{expectedStage:6});
   assert.equal(rewritten.status,200,JSON.stringify(rewritten.body));
   assert.equal(rewritten.body?.stage,5);
-  assert.equal(rewritten.body?.route,base+id+'/bellrunner/dogman');
+  assert.equal(rewritten.body?.route,'/characters/'+id+'/bellrunner/dogman');
   const cleared=await db.query(
     'SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',[id]);
   assert.equal(cleared.rowCount,0,'Combat state and rounds are cleared atomically');
