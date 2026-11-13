@@ -151,9 +151,9 @@ try{
     await delay(200);
     assert.equal(await evalJS('!!document.querySelector("vite-error-overlay")'),false);
   }
-  for(const width of [1280,1366,390]){
+  for(const width of [1280,1366,1920,390]){
     for(const outcome of ['active','victory','defeat']){
-      await navigate(outcome,width,width===390?844:900);
+      await navigate(outcome,width,width===390?844:width===1920?1080:900);
       const data=await evalJS('(()=>{const sprite=document.querySelector(".battle .dogman img");'+
         'const arena=document.querySelector(".battle .alley");'+
         'const actor=document.querySelector(".battle .dogman");'+
@@ -184,7 +184,7 @@ try{
           (outcome==='victory'?'dogman-defeated.webp':'dogman-standing.webp'));
       }
       if(outcome==='victory'||outcome==='defeat')assert.ok(!data.body.includes('Continue to medical care'));
-      if(width===1280)await screenshot('dogman-'+outcome+'-'+width);
+      if(width===1280||width===1920)await screenshot('dogman-'+outcome+'-'+width);
     }
   }
   await navigate('victory',1366,900);
