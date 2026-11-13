@@ -16,6 +16,9 @@ on:
       - 'platform/scripts/verify-millhand-scenes-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
       - 'platform/scripts/verify-bellrunner-stage4.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage5.test.ts'
+      - 'platform/apps/web/static/locations/bellrunner/**'
+      - 'platform/apps/web/static/characters/dogman/**'
       - 'platform/scripts/verify-dev-stage-rewind.mjs'
       - 'platform/scripts/verify-bellrunner-stage4-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3-assets.mjs'
@@ -81,6 +84,8 @@ jobs:
         run: npm run verify:bellrunner-stage3
       - name: Bellrunner Stage 4 all branch mechanics, inherited asset locations and dialogues
         run: npm run verify:bellrunner-stage4
+      - name: Bellrunner Stage 5 Dogman dialogue, saved stances and supplied assets
+        run: npm run verify:bellrunner-stage5
       - name: Every stage retains safe Back to previous Stage replay
         run: npm run verify:dev-rewind
       - name: Bellrunner Stage 3 owner art and sound
