@@ -9,7 +9,7 @@ import {
   STAGE_FOUR_TRAUMA_REGISTER_LENGTH
 } from '../apps/api/src/bellrunner-second-job-work.ts';
 import type {StageFourBranch,StageFourState,StageFourAction} from '../apps/api/src/bellrunner-second-job-work.ts';
-import {BELLRUNNER_STAGE_FOUR} from '../apps/web/src/lib/bellrunner-stage4-copy.ts';
+import {BELLRUNNER_STAGE_FOUR,STAGE_FOUR_ACTION_LABELS} from '../apps/web/src/lib/bellrunner-stage4-copy.ts';
 import {bellrunnerStageFourJournal} from '../apps/web/src/lib/bellrunner-stage4-journal.ts';
 
 function opening(branch:StageFourBranch):StageFourState{
@@ -143,6 +143,24 @@ test('Machinery records a pinned bypass without authorising repairs or site entr
     }
   }
 });
+test('Machinery pin confirmation renders approved dialogue and unchanged actions',()=>{
+  const pin=BELLRUNNER_STAGE_FOUR.machinery.pinCheck;
+  assert.equal(pin.narration,'The mechanic takes a closer look at the pin.');
+  assert.equal(pin.spoken,"Aye, someone's moved it. Leave it alone. We need to write down exactly how we found it.");
+  assert.equal(STAGE_FOUR_ACTION_LABELS.mark_pin_position,'Mark the pin on the sketch');
+  assert.equal(STAGE_FOUR_ACTION_LABELS.request_second_check,'Ask the mechanic to check again');
+  const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerSecondJobScene.svelte',
+    import.meta.url),'utf8');
+  assert.ok(scene.includes("state.branch==='machinery'&&state.phase==='choose'"));
+  assert.ok(scene.includes('BELLRUNNER_STAGE_FOUR.machinery.pinCheck.narration'));
+  assert.ok(scene.includes('BELLRUNNER_STAGE_FOUR.machinery.pinCheck.spoken'));
+  let s=opening('machinery');
+  s=advanceBellrunnerSecondJob(s,'inspect_safety_linkage');
+  s=advanceBellrunnerSecondJob(s,'trace_bell_rod');
+  s=advanceBellrunnerSecondJob(s,'show_mechanic_link');
+  assert.deepEqual(availableStageFourActions(s),['mark_pin_position','request_second_check']);
+});
+
 test('branch ownership, ordered actions and revision monotonicity',()=>{
   for(const branch of ['contracts','trauma','machinery'] as const){
     const s=initialBellrunnerSecondJob(branch);
