@@ -232,6 +232,7 @@ try{
         }:null,
         primary:primary?{label:primary.textContent.trim(),
           background:getComputedStyle(primary).backgroundImage,
+          borderImage:getComputedStyle(primary).borderImageSource,
           color:getComputedStyle(primary).color}:null,
         viteError:!!document.querySelector('vite-error-overlay'),
         text:frame.textContent.slice(0,160),width:window.innerWidth};
@@ -345,9 +346,9 @@ try{
           'Secondary choice must use cream/parchment surface and a real framed border: '+suffix);
       }
       if(m.primary){
-        assert.ok(m.primary.background.includes('linear-gradient')&&
-          m.primary.color.includes('rgb('),
-          'Progression should retain a visually distinct dark-brass primary choice: '+suffix);
+        assert.ok(m.primary.borderImage.includes('button-normal-trim.png')&&
+          m.primary.background==='none'&&m.primary.color.includes('rgb('),
+          'Progression must use the actual Millhand nine-slice primary button, not a CSS-only dark-brass approximation: '+suffix);
       }
       assert.equal(m.fit,'contain','Full image must not be cover-cropped: '+suffix);
       assert.equal(m.frameOverflow,'visible','No internal frame scrollbar: '+suffix);

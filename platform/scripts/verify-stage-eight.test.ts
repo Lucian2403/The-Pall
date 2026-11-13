@@ -221,7 +221,7 @@ test('Stage 8 dialogue frame and typography match the approved Stage 7 clinic',(
   if(!css.includes('.home-dialogue'))
    assert.ok(clinic.includes(css),'Reference clinic dialogue must still use: '+css);
  }
- assert.ok(home.includes('class="pall-framed-button"') &&
+ assert.ok(home.includes('class="pall-framed-button primary-choice"') &&
   !home.includes('background:#e9d7b9;border:solid transparent') &&
   home.includes('RETURN HOME · STAGE VIII'));
 });

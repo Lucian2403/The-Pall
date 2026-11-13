@@ -270,6 +270,40 @@ try{
     console.log('PASS: '+name+' — scene layout at '+sizes.map(s=>s.join('x')).join(', '));
   }
 
+  // Confirm the owner-approved Millhand normal/hover skin is computed
+  // from the SAME global primary-choice rule used by Bellrunner Stage 4.
+  let sharedPrimary=null;
+  for(const [url,ready] of [
+    ['/characters/qa-scenes-millhand/opening','.workshop .illustration'],
+    ['/characters/qa-scenes-millhand/millhand/second-job?qa=depot','.depot-stage'],
+    ['/characters/qa-scenes-millhand/millhand/clinic?qa=clinic','.clinic-dialogue']
+  ]){
+    await open(url,1280,720,ready);
+    sharedPrimary=await evalJS(`(()=>{
+      const button=document.querySelector('.chapter-content .pall-story-dialogue-section .primary-choice');
+      if(!button)return null;
+      button.scrollIntoView({block:'center'});
+      const cs=getComputedStyle(button);
+      const r=button.getBoundingClientRect();
+      return {source:cs.borderImageSource,slice:cs.borderImageSlice,
+        x:r.left+r.width/2,y:r.top+r.height/2};
+    })()`);
+    if(sharedPrimary)break;
+  }
+  assert.ok(sharedPrimary,'At least one Millhand forward action must use the canonical primary');
+  assert.ok(sharedPrimary.source.includes('button-normal-trim.png')&&
+    sharedPrimary.slice.includes('50 180 45'),
+    'Millhand primary and Bellrunner must use the exact same owner image and slice: '+JSON.stringify(sharedPrimary));
+  await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:sharedPrimary.x,y:sharedPrimary.y});
+  await delay(80);
+  const hoverArt=await evalJS(`(()=>{
+    const b=document.querySelector('.chapter-content .pall-story-dialogue-section .primary-choice');
+    return getComputedStyle(b).borderImageSource;
+  })()`);
+  assert.ok(hoverArt.includes('button-hover-trim.png'),
+    'Millhand primary hover must use the same image as Bellrunner hover');
+  console.log('PASS: Millhand actual primary button matches the Bellrunner normal/hover nine-slice skin');
+
   // Interactions still reach their real handlers through the new layout.
   await open('/characters/qa-scenes-millhand/millhand/wage-claim?qa=wage',1280,720,'.alley-scene .flint-figure');
   await evalJS("document.querySelector('.flint-figure').click()");

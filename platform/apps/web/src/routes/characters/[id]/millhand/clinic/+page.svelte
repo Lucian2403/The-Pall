@@ -254,16 +254,16 @@
             <p class="narration">You leave the clinic and head toward your rented home.</p>
             <p class="receipt">Coins remaining: {clinic.coins}.</p>
             <p class="next-note">The clinic is complete. Your rented home is the final chapter.</p>
-            <a class="pall-framed-button advance" href={'/characters/'+encodeURIComponent(id)+'/home'}>Travel Home</a>
+            <a class="pall-framed-button advance primary-choice" href={'/characters/'+encodeURIComponent(id)+'/home'}>Travel Home</a>
           {/if}
 
           {#if next}
             <div class="actions">
               {#if clinic.phase==='PRICED' && !pricedAtEnd}
-                <button class="pall-framed-button advance" type="button"
+                <button class="pall-framed-button advance primary-choice" type="button"
                   disabled={pending} onclick={advancePricedDialogue}>Continue</button>
               {:else}
-                <button class="pall-framed-button advance" type="button" disabled={pending}
+                <button class="pall-framed-button advance primary-choice" type="button" disabled={pending}
                   onclick={()=>{if(next)void perform(next);}}>
                   {pending?'Saving…':label}
                 </button>

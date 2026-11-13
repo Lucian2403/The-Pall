@@ -97,6 +97,68 @@ its own art, props and mechanics, but uses the same scene layout:
   and the intent/result parchment follows below him rather than covering
   him.
 
+### Mandatory unified primary dialogue buttons
+
+**Owner rule (12 November 2026): primary buttons in every narrative
+dialogue must use the exact original Millhand illustrated nine-slice
+button art**, not a CSS-only dark rectangle. The sole implementation is
+`platform/apps/web/src/lib/pall-story-landscape.css` on the
+`primary-choice` class. This contract applies to **both origins and
+every stage**, including optional NPC conversations, Continue, single
+work actions, stage exits, Clinic, Home and future scenes.
+
+- Normal: `/ui-kit/buttons/button-normal-trim.png`; hover/focus:
+  `button-hover-trim.png`; pressed: `button-pressed-trim.png`.
+  Use the Millhand **50 180 45 180 fill** nine-slice with its authored
+  trim widths and legible dark text; no decorative `»` CSS pseudo-element.
+  Multiple alternative choices are `secondary-choice` (pale parchment);
+  the single forward or Continue action is `primary-choice`.
+- No scene-specific `.actions > button`, `.responses > button` or
+  `.choices > button` rule should redefine primary background, borders
+  or hover images. New stages inherit the shared CSS; do not copy/paste
+  a new Bellrunner/Millhand approximation.
+- The separately authored **SecondJobChoices** large framed three-route
+  cards intentionally keep their own 94px card geometry, but use the
+  exact same owner-supplied button image family.
+- Every future stage must pass `npm run verify:dialogue-primary-style`
+  (part of `check:web` and tutorial CI). Real Chromium tests additionally
+  check the computed normal/hover `border-image-source` in both origins.
+  A class name alone is not proof of visually identical controls.
+
+### Mandatory personal Journal contract — same as Millhand
+
+**Owner decision, 12 November 2026:** never invent a new Journal layout,
+font or voice for Bellrunner or a later Stage. The original Millhand
+Journal is canonical:
+
+- The visible Journal is a **first-person personal diary**, not a
+  worksheet or internal report. One short paragraph per real event,
+  with colloquial but factual observations: `I saw...`, `I asked...`,
+  `I wrote...`. Add an entry only after its real action/inspection.
+  Follow the approved voice rules in
+  `docs/05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md`.
+  Do not output `Work:`, `Location:`, `Status:`, `Method:`,
+  `Recorded check:`, `Local finding:` or any other debug schema keys.
+- Reuse the original **Millhand Stage 3** journal structure and classes:
+  `.journal-panel`, `.journal-heading`, `.journal-kicker`,
+  `.journal-entries`, `.journal-toggle`. The heading is
+  `PERSONAL JOURNAL` plus the actual scene title. The content is a
+  centered, readable 930px column, not a full-width wall of text.
+- **Typography comes from `pall-owner-ui.css`, never a scene-local
+  Bellrunner variation:** `Pall New Standard` at 16px/600 for diary
+  paragraphs; 24px/600 for the heading. `Pall Bebas Neue` at
+  14px/700 for the kicker. Ink is dark on parchment.
+  The close control uses the same owner-provided normal/hover/pressed
+  nine-slice art, not a black rectangle.
+- The persistent HUD `Review journal` control continues to use
+  `SCENE_JOURNAL_CONTEXT`. Opening the Journal reveals the page-flow
+  section without resizing the scene/dialogue. Preserve saved work
+  state and journal facts independently of the prose.
+- The Stage 4 Bellrunner reducer/journal and Chromium tests check
+  first-person state-grounded entries, original Millhand CSS classes,
+  computed fonts, original button artwork and the absence of status
+  worksheets. Apply the same checks to future stages.
+
 ## 3. Canonical player speaker label
 
 **Owner decision, 2026-11-12: the speaker heading for every spoken player
@@ -118,6 +180,88 @@ future activities.** Never display the player's custom character name,
 - The `verify:dialogue-speakers` test checks the shared formatter and
   scans all current Svelte scenes for inconsistent dialogue headings.
   It is part of `npm run check:web` to catch regressions in future stages.
+
+### Dialogue and action outcomes must remain in-world
+
+**Owner decision, 2026-11-12:** no player-choice branch, origin or background
+may insert a technical reward/status recap into the story parchment.
+Choosing a route shows the approved NPC response, the direct consequence,
+and a natural **Continue** to the next location. Do not interpose a third
+screen containing `Payment: 0 coins`, `Ordinary XP: 0`,
+`Major Skill increased +1`, `Next:`, `Your choice is recorded`
+or `Stage N not implemented / progress saved`. These are implementation
+details, not dialogue.
+
+- Server authority remains unchanged: skills, work phase, rewards and
+  receipts are saved by the actual game action. The HUD, Character Sheet
+  and Personal Journal are the proper surfaces for such information.
+- A diegetic result ("The clerk refuses to clear the disputed certificate")
+  is **not** a debug summary. Neither is an actionable receipt that
+  actually charges or pays currency; preserve meaningful economic facts
+  when they affect a character's situation.
+- Final `Continue` in Bellrunner Stage 3 leads directly to the chosen
+  Stage 4 job. In Millhand Stage 3, the canonical Guther response and
+  route consequences stay, but no `Route / +1 Skill` footnote appears.
+- In unfinished future stages, preserve an honest navigation boundary,
+  but do not fill the story panel with developer status or fake reward
+  statements. Stage 4's own final scene remains a natural handoff.
+- `npm run verify:story-immersion` scans the current and future
+  narrative Svelte scenes for these regressions. It is included in
+  `npm run check:web` and the tutorial CI workflow.
+
+### Avoid duplicate information cards in story scenes
+
+When a narrative sentence or NPC already explains the worksite's state,
+do **not** append a second row of label/value boxes stating the same
+thing. The owner specifically rejected Bellrunner Stage 4's redundant
+`WORKSITE NOTICE` / `SHIFT BOOK`, wage-category and bell-linkage
+readouts. Remove the duplicated UI, not the quest fact or server state.
+Keep concrete inspectable objects only when the player can meaningfully
+interact with them or genuinely discover something not stated elsewhere.
+
+The scene should show **one beat of story, then the relevant action**;
+optional discoveries belong in the Journal. Future Bellrunner and
+Millhand stages must keep this rule. The Bellrunner Stage 4 regression
+test rejects documentary card/readout duplication across all three jobs.
+
+### Mandatory Back to previous Stage support
+
+**Owner rule — every newly implemented tutorial Stage must support the
+existing `← Back to Stage N` developer testing control.** It belongs
+in the shared `TutorialShell` activity bar, not inside a dialogue card,
+and follows the exact numeric previous stage. The control is only enabled
+on the loopback development API; production must not expose destructive
+stage rewinds.
+
+Before any new stage is presented for acceptance, implement and test all
+four parts:
+
+1. The new scene mounts `TutorialShell`, including the shared chapter
+   bar. Never use a separate, origin-specific Back button.
+2. The authenticated `GET /api/characters/:id/dev/rewind-stage`
+   returns `canRewind:true` and the appropriate `targetStage` from
+   **initial arrival, after the first Continue, during the entire
+   activity, and after its local completion**. Merely checking
+   `tutorial_status='NOT_STARTED'` is not acceptable.
+3. `POST /api/characters/:id/dev/rewind-stage` atomically rewinds
+   the character and the current stage state, invalidates old action
+   receipts, and reverses **only** rewards created by the rewound
+   segment. An owner-scoped character lock, stage revision checks,
+   repeated-request rejection and no duplicate XP/skill/currency/item
+   grants are compulsory. If effects are irreversible or another stage
+   has begun, reject safely without partial mutations.
+4. Add a real PostgreSQL integration test for capability availability,
+   midway rewind, retry, account ownership, action receipts and replay.
+   Verify the visible **Back to Stage N** button in Chromium on every
+   stage branch. Include `npm run verify:dev-rewind` in web checks and
+   CI; do not declare a stage ready without these checks.
+
+Bellrunner Stage 4 satisfies this by restoring the Stage 3 decision,
+deleting the Stage 4 job and its replay receipts and reversing its
+selected Major Skill +1 in one transaction. This is developer replay
+only. The Stage 4 work does not otherwise grant XP, coins or items.
+At Stage 5 before its encounter begins, Back to Stage 4 preserves
+the completed job and awarded Stage 3 skill.
 
 ## 4. City map gateway
 

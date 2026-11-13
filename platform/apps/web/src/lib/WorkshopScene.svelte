@@ -195,11 +195,9 @@
   .narration{font-style:italic}
   .small {color:#654d3c;font-size:14px;line-height:1.4}
   .responses {display:flex;flex-direction:column;gap:6px}
-  .responses button {text-align:left;background:#221c16;border:1px solid #65492e;color:#f5e4c9;font:var(--dialogue-text,17px)/1.35 var(--pall-font-reading,Georgia,serif);padding:7px 9px;min-height:30px;cursor:pointer}
-  .responses button:hover,.responses button:focus-visible {outline:2px solid #d3a86a;outline-offset:1px}
-  .responses .back {background:#57412c;color:#f6e9d8}
-  .responses .skip-to-work{background:#493321;border-color:#a07a4b}
-  .responses button:disabled{opacity:.55;cursor:not-allowed}
+  .responses .back {background:#57412c;color:#f6e9d8;
+    border:1px solid #6c5135;padding:10px;cursor:pointer}
+  .responses .back:is(:hover,:focus-visible){outline:2px solid #d3a86a;outline-offset:1px}
   .handoff-error{font:13px/1.4 sans-serif;color:#873523;margin:6px 0}
   /* The entire visible object area, not just its nameplate, is clickable. */
   .prop-marker {position:absolute;z-index:5;bottom:1%;background:none;border:0;color:#f3e8d2;

@@ -73,11 +73,4 @@
   .speech{margin:0 0 14px;font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif);color:#251910}
   .responses{display:flex;flex-direction:column;gap:9px;margin-top:18px}
-  .responses>button{display:block;width:100%;min-height:52px;
-    border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    text-align:left;padding:10px 13px;
-    font:600 var(--dialogue-text,17px)/1.35
-    var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .responses>button:hover,.responses>button:focus-visible{
-    background:#423022;outline:1px solid #c49d65}
 </style>

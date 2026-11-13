@@ -17,6 +17,10 @@ import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerBellrunnerDispatchRoutes} from '../apps/api/src/bellrunner-dispatch-routes.ts';
+import {registerBellrunnerWrongBellRoutes} from '../apps/api/src/bellrunner-wrong-bell-routes.ts';
+import {registerBellrunnerSecondJobRoutes} from '../apps/api/src/bellrunner-second-job-routes.ts';
+import {INITIAL_WRONG_BELL} from '../apps/api/src/bellrunner-wrong-bell-work.ts';
+import {STAGE_FOUR_FACT,STAGE_FOUR_OPENING_LENGTH,STAGE_FOUR_REVELATION_LENGTH} from '../apps/api/src/bellrunner-second-job-work.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
@@ -38,7 +42,8 @@ const schema=[
   '0009_character_welcome.sql','0010_tutorial_home.sql',
   '0011_inventory_foundation.sql','0012_equipment_slots.sql',
   '0013_equipment_stats_and_clothing.sql','0014_bellrunner_stage1.sql',
-  '0015_bellrunner_dispatch_work.sql'
+  '0015_bellrunner_dispatch_work.sql',
+  '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -51,6 +56,8 @@ const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
 const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDispatchRoutes(app,{pool:db,resolveSession});
+registerBellrunnerWrongBellRoutes(app,{pool:db,resolveSession});
+registerBellrunnerSecondJobRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
@@ -349,14 +356,14 @@ test('Bellrunner Stage 2 records the route and two receiver RP beats without rew
  state=(await command('take_final_notice',6)).body!;
  assert.equal(state.workState.phase,'final_notice_taken');
  assert.equal(state.revision,7);
- assert.equal(state.stage,2,'Stage 3 cannot start before its scene is implemented');
+ assert.equal(state.stage,3,'Taking the final notice advances to the implemented Stage 3');
  assert.equal((await command('take_final_notice',7)).status,409);
  const latest=(await request('GET',path)).body!;
  assert.deepEqual(latest.workState,state.workState);
  assert.deepEqual(latest.tutorialPayout,{coins:0,ordinaryXp:0,items:0});
  const stored=(await db.query(
   'SELECT tutorial_stage,coins,major_skill_bonuses FROM player_characters WHERE id=$1',[id])).rows[0];
- assert.equal(stored.tutorial_stage,2);
+ assert.equal(stored.tutorial_stage,3);
  assert.equal(Number(stored.coins),20);
  assert.deepEqual(stored.major_skill_bonuses,{Industry:3});
  const grants=(await db.query(
@@ -400,6 +407,207 @@ test('Both roads and the other receipt choices preserve the complete RP sequence
   assert.equal(result.workState.receipt,receipt);
   assert.equal(result.workState.noticesOrdered,false,'No compulsory sorting on new routes');
   assert.equal(result.workState.phase,'final_notice_taken');
+ }
+});
+
+test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve the one-time skill',async()=>{
+ const jobs=[
+  {branch:'contracts' as const,skill:'Commerce',
+    actions:['compare_shift_records','inspect_absence_category','enter_written_objection',
+      'submit_certificate'] as const},
+  {branch:'trauma' as const,skill:'Medicine',
+    actions:['prioritize_mobile_worker','continue_triage','continue_triage',
+      'continue_detail','continue_detail','continue_detail',
+      'take_observations','continue_register','continue_register',
+      'continue_register','continue_register','continue_register',
+      'ask_about_classification','finish_handover'] as const},
+  {branch:'machinery' as const,skill:'Mechanics',
+    actions:['inspect_safety_linkage','trace_bell_rod','show_mechanic_link',
+      'mark_pin_position'] as const}
+ ];
+ for(const job of jobs){
+  const id=randomUUID();
+  const name='BR Stage4 '+id.slice(0,8);
+  const bonuses={Industry:3,[job.skill]:1};
+  await db.query(
+   "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',4,'NOT_STARTED')",
+   [id,owner,name,'br-job-'+id,JSON.stringify(bonuses)]);
+  const predecessor={...INITIAL_WRONG_BELL,phase:'committed',branch:job.branch,revision:18};
+  await db.query(
+   'INSERT INTO player_character_bellrunner_wrong_bell(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+   [id,18,JSON.stringify(predecessor)]);
+  const path=base+id+'/bellrunner/second-job';
+  assert.equal((await request('GET',path,stranger)).status,404,'Stage 4 is owner scoped');
+  assert.equal((await request('POST',path,null,
+    {action:'continue_opening',expectedRevision:0,requestId:randomUUID()})).status,401);
+  let loaded=await request('GET',path,owner);
+  assert.equal(loaded.status,200,JSON.stringify(loaded.body));
+  assert.equal(loaded.body?.state?.branch,job.branch);
+  assert.equal(loaded.body?.state?.revision,0);
+  assert.equal((await request('POST',path,owner,{
+   action:'finish_handover',expectedRevision:0,requestId:randomUUID()
+  })).status,409,'Wrong branch/work phase rejected');
+  let revision=0;
+  async function command(action:string,requestId=randomUUID()){
+   const response=await request('POST',path,owner,{action,expectedRevision:revision,requestId});
+   assert.equal(response.status,200,action+': '+JSON.stringify(response.body));
+   assert.equal(response.body?.state?.revision,revision+1);
+   revision++;
+   return response;
+  }
+  for(let k=0;k<STAGE_FOUR_OPENING_LENGTH[job.branch]-(job.branch==='trauma'?1:0);k++)
+   await command('continue_opening');
+  const first=job.actions[0];
+  const firstRequest=randomUUID();
+  const committed=await command(first,firstRequest);
+  const replay=await request('POST',path,owner,{
+   action:first,expectedRevision:revision-1,requestId:firstRequest});
+  assert.equal(replay.status,200,JSON.stringify(replay.body));
+  assert.deepEqual(replay.body,committed.body,'Same request must not advance twice');
+  assert.equal((await request('POST',path,owner,{
+   action:'leave_for_gate',expectedRevision:revision,requestId:firstRequest
+  })).status,409,'Reusing request ID for different action is forbidden');
+  assert.equal((await request('POST',path,owner,{
+   action:first,expectedRevision:revision-1,requestId:randomUUID()
+  })).status,409,'Stale revision cannot re-run a work command');
+  // Machinery finalizes on the gate action directly after its handover.
+  // The other jobs still have their own completion action and 'done' phase.
+  const laterActions=job.branch==='machinery'?job.actions.slice(1):job.actions.slice(1,-1);
+  for(const action of laterActions)await command(action);
+  for(let k=0;k<STAGE_FOUR_REVELATION_LENGTH[job.branch]-(job.branch==='trauma'?1:0);k++)
+   await command('continue_revelation');
+  if(job.branch!=='machinery')await command(job.actions[job.actions.length-1]);
+  loaded=await request('GET',path,owner);
+  assert.equal(loaded.body?.state?.phase,job.branch==='machinery'?'finish':'done');
+  assert.equal(loaded.body?.state?.journalFact,STAGE_FOUR_FACT[job.branch]);
+  assert.deepEqual(loaded.body?.availableActions,['leave_for_gate'],
+    'Only the gate action remains after finishing the job');
+  const gateRequest=randomUUID();
+  const exited=await command('leave_for_gate',gateRequest);
+  assert.equal(exited.body?.stage,5);
+  assert.equal(exited.body?.state?.phase,'exited');
+  assert.equal((await request('POST',path,owner,{
+   action:'leave_for_gate',expectedRevision:revision,requestId:randomUUID()
+  })).status,409,'Finished Stage 4 cannot be submitted again');
+  const gateReplay=await request('POST',path,owner,{
+   action:'leave_for_gate',expectedRevision:revision-1,requestId:gateRequest});
+  assert.equal(gateReplay.status,200);
+  assert.deepEqual(gateReplay.body,exited.body,'Stage 5 replay must not change rewards');
+  const saved=(await db.query(
+   'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',
+   [id])).rows[0];
+  assert.equal(saved.tutorial_stage,5);
+  assert.equal(saved.tutorial_status,'NOT_STARTED');
+  assert.equal(Number(saved.coins),20);
+  assert.deepEqual(saved.major_skill_bonuses,bonuses,
+   'Stage 4 must never grant another +1 skill or alter coins');
+  const receipts=(await db.query<{n:number}>(
+   'SELECT count(*)::int AS n FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1',
+   [id])).rows[0].n;
+  assert.equal(receipts,revision,'No duplicate request receipts');
+ }
+});
+
+test('Bellrunner Back to Stage 3 is always available across Stage 4 and never duplicates the skill',async()=>{
+ const cases=[
+  {branch:'contracts' as const,skill:'Commerce',point:'entry' as const},
+  {branch:'trauma' as const,skill:'Medicine',point:'dialogue' as const},
+  {branch:'machinery' as const,skill:'Mechanics',point:'inspection' as const},
+  {branch:'contracts' as const,skill:'Commerce',point:'done' as const}
+ ];
+ for(const item of cases){
+  const id=randomUUID(),name='BR Rewind '+id.slice(0,8);
+  await db.query(
+   "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',4,'NOT_STARTED')",
+   [id,owner,name,'br-rewind-'+id,JSON.stringify({Industry:3,[item.skill]:1})]);
+  await db.query(
+   'INSERT INTO player_character_bellrunner_dispatch(character_id,revision,work_state) VALUES($1,17,$2::jsonb)',
+   [id,JSON.stringify({phase:'final_notice_taken',route:'direct',noticesOrdered:true,receipt:'clear'})]);
+  await db.query(
+   'INSERT INTO player_character_bellrunner_wrong_bell(character_id,revision,state) VALUES($1,18,$2::jsonb)',
+   [id,JSON.stringify({...INITIAL_WRONG_BELL,revision:18,phase:'committed',branch:item.branch})]);
+  const endpoint=base+id+'/dev/rewind-stage';
+  const jobUrl=base+id+'/bellrunner/second-job';
+  let progress=0;
+  async function work(action:string){
+   const result=await request('POST',jobUrl,owner,{action,expectedRevision:progress,requestId:randomUUID()});
+   assert.equal(result.status,200,item.branch+' '+item.point+' '+action+' '+JSON.stringify(result.body));
+   progress++;
+   return result;
+  }
+  const first=await request('GET',endpoint);
+  assert.deepEqual(first.body,{enabled:true,canRewind:true,stage:4,targetStage:3},
+   'The Stage 4 rewind button must appear before the first action');
+  if(item.point!=='entry')await work('continue_opening');
+  if(item.point==='inspection'){
+   for(let n=1;n<STAGE_FOUR_OPENING_LENGTH.machinery;n++)await work('continue_opening');
+   await work('inspect_safety_linkage');
+  }
+  if(item.point==='done'){
+   for(let n=1;n<STAGE_FOUR_OPENING_LENGTH.contracts;n++)await work('continue_opening');
+   await work('compare_shift_records');
+   await work('inspect_absence_category');
+   await work('enter_written_objection');
+   for(let n=0;n<STAGE_FOUR_REVELATION_LENGTH.contracts;n++)await work('continue_revelation');
+   await work('submit_certificate');
+   assert.equal((await request('GET',jobUrl)).body?.state?.phase,'done');
+  }
+  if(item.point!=='entry'){
+   const snapshot=await request('GET',endpoint);
+   assert.deepEqual(snapshot.body,{enabled:true,canRewind:true,stage:4,targetStage:3},
+    'The Back to Stage 3 button must remain available after saved Stage 4 commands');
+  }
+  assert.equal((await request('GET',endpoint,stranger)).status,404,
+   'Stage rewind availability must be account scoped');
+  assert.equal((await request('POST',endpoint,stranger,{expectedStage:4})).status,404,
+   'Other accounts must never rewind the selected route');
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:3})).status,409,
+   'Wrong-stage rewind must not run');
+  const result=await request('POST',endpoint,owner,{expectedStage:4});
+  assert.equal(result.status,200,JSON.stringify(result.body));
+  assert.equal(result.body?.stage,3);
+  assert.equal(result.body?.tutorialStatus,'IN_PROGRESS');
+  assert.equal(result.body?.route,'/characters/'+id+'/bellrunner/wrong-bell');
+  assert.equal(result.body?.coinDelta,0);
+  const after=(await db.query<{
+   tutorial_stage:number;tutorial_status:string;coins:number;
+   major_skill_bonuses:Record<string,number>
+  }>(
+   'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',
+   [id])).rows[0];
+  assert.equal(after.tutorial_stage,3);
+  assert.equal(after.tutorial_status,'IN_PROGRESS');
+  assert.equal(Number(after.coins),20);
+  assert.equal(after.major_skill_bonuses[item.skill],0,
+   'The original Stage 3 award is removed exactly once');
+  assert.equal(after.major_skill_bonuses.Industry,3,'Other skills remain untouched');
+  const predecessor=(await db.query<{state:{
+   phase:string;branch:string|null;revision:number
+  } }>(
+   'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',[id])).rows[0].state;
+  assert.equal(predecessor.phase,'choice');
+  assert.equal(predecessor.branch,null);
+  assert.equal(predecessor.revision,19);
+  const jobRow=await db.query(
+   'SELECT character_id FROM player_character_bellrunner_second_job WHERE character_id=$1',[id]);
+  assert.equal(jobRow.rowCount,0,'A rewound job cannot retain mid-stage state');
+  const receipts=await db.query<{n:number}>(
+   'SELECT count(*)::int AS n FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1',[id]);
+  assert.equal(receipts.rows[0].n,0,'Every stale Stage 4 replay receipt must be cleared');
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:4})).status,409,
+   'Repeating rewind cannot deduct the skill again');
+  assert.equal((await request('GET',endpoint)).body?.targetStage,2,
+   'The Stage 3 rewind capability resumes for the previous worksite scene');
+  const replay=await request('POST',base+id+'/bellrunner/wrong-bell',owner,{
+   action:'choose_'+item.branch,expectedRevision:19,requestId:randomUUID()});
+  assert.equal(replay.status,200,JSON.stringify(replay.body));
+  assert.equal(replay.body?.state?.branch,item.branch);
+  const skillAfter=(await db.query<{major_skill_bonuses:Record<string,number>}>(
+   'SELECT major_skill_bonuses FROM player_characters WHERE id=$1',[id])).rows[0];
+  assert.equal(skillAfter.major_skill_bonuses[item.skill],1,
+   'Re-selecting the route awards +1 once, not two or zero');
+  assert.equal((await request('GET',endpoint)).body?.targetStage,3,
+   'After replaying the branch, Stage 4 again exposes Back to Stage 3');
  }
 });
 

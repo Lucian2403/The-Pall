@@ -155,11 +155,11 @@ test('Bellrunner secondary parchment buttons follow the reference with icon and 
  const opening=source('apps/web/src/lib/BellrunnerOpeningScene.svelte');
  const hector=source('apps/web/src/lib/BellrunnerHectorConversation.svelte');
  const stage2=source('apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte');
- assert.ok(css.includes('button.secondary-choice'));
+ assert.ok(css.includes(':is(button,a).secondary-choice'));
  assert.ok(css.includes('background:linear-gradient(180deg,#fff1d6'));
- assert.ok(css.includes('border-color:#684323'));
- assert.ok(css.includes('button.primary-choice'));
- assert.ok(css.includes('background:linear-gradient(180deg,#654427'));
+ assert.ok(css.includes('border:2px solid #684323'));
+ assert.ok(css.includes(':is(button,a).primary-choice'));
+ assert.ok(css.includes("border-image-source:url('/ui-kit/buttons/button-normal-trim.png')"));
  assert.ok(css.includes('outline:3px solid #f1c27b'));
  assert.ok(css.includes('@media(prefers-reduced-motion:reduce)'));
  for(const scene of [opening,stage2,hector]){
@@ -216,9 +216,10 @@ test('Hector stage has legible dialogue hierarchy, an accessible previous contro
   'Previous line belongs at the foot of the parchment, not among the main choices');
  assert.ok(opening.includes('class="primary-choice"'));
  assert.ok(hector.includes('class="primary-choice"'));
- assert.ok(shared.includes('button.primary-choice'));
- assert.ok(shared.includes('background:linear-gradient(180deg,#654427'),
-  'Primary continuation actions retain the darker brass emphasis');
+ assert.ok(shared.includes(':is(button,a).primary-choice'));
+ assert.ok(shared.includes("border-image-source:url('/ui-kit/buttons/button-normal-trim.png')")&&
+  shared.includes("border-image-source:url('/ui-kit/buttons/button-hover-trim.png')"),
+  'Primary continuation actions must use the same Millhand owner artwork on all origins');
  assert.ok(opening.includes('max-width:980px'));
  assert.ok(opening.includes('max-height:none;overflow:visible'));
  assert.ok(!opening.includes('Payment: Not yet cleared'));

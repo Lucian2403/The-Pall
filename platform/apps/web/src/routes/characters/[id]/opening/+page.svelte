@@ -123,7 +123,11 @@
           await goto('/characters/' + character.id + '/bellrunner/dispatch');
           return;
         }
-        if (character.origin === 'Bellrunner' && character.tutorial.stage >= 3) {
+        if (character.origin === 'Bellrunner' && character.tutorial.stage >= 4) {
+          await goto('/characters/' + character.id + '/bellrunner/second-job');
+          return;
+        }
+        if (character.origin === 'Bellrunner' && character.tutorial.stage === 3) {
           await goto('/characters/' + character.id + '/bellrunner/wrong-bell');
           return;
         }

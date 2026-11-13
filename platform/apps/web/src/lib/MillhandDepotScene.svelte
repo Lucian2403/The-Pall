@@ -137,12 +137,13 @@
       {/if}
 
       {#if state.phase==='COMPARE_DELIVERY' && !travelConfirmed}
-        <div class="actions"><button type="button" disabled={pending}
+        <div class="actions"><button type="button" class="primary-choice" disabled={pending}
           onclick={() => {selected=null;confirmTravel();}}>Continue to the depot</button></div>
       {:else if workActions.length>0}
         <div class="actions" aria-label="Available delivery actions">
           {#each workActions as action (action)}
-            <button type="button" disabled={pending} onclick={() => {selected=null;void perform(action);}}>
+            <button type="button" class={workActions.length===1?'primary-choice':'secondary-choice'}
+              disabled={pending} onclick={() => {selected=null;void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
               {#if action==='secure_plates'||action==='carry_smaller_loads'}
                 <small class="transport-hint">{STAGE_FOUR_TRANSPORT_HINTS[action]}</small>
@@ -217,10 +218,6 @@
   .inspection strong{color:#3f2d1f}
   .inspection p{margin:6px 0 0}
   .actions{display:flex;flex-direction:column;gap:7px;margin:15px 0}
-  .actions button{min-height:43px;width:100%;text-align:left;border:1px solid #98734c;
-    background:#30251d;color:#f0dfc7;padding:10px 13px;
-    font:var(--dialogue-text,17px)/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .actions button:disabled{opacity:.55;cursor:default}
   .actions .transport-hint{display:block;margin-top:4px;font:12px/1.35 var(--pall-font-reading,Georgia,serif);opacity:.86}
   .transport-verification{margin-top:0}
   .error{font:13px/1.4 sans-serif;color:#842c19}

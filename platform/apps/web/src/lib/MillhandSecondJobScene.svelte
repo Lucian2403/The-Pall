@@ -1,5 +1,6 @@
 <script lang="ts">
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
+  import '$lib/pall-story-landscape.css';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {tick} from 'svelte';
@@ -78,7 +79,7 @@
       </div>
       <p class="purpose">{route.task}</p>
     </div>
-    <aside class="work-dialogue" aria-label="Current work interaction">
+    <aside class="work-dialogue pall-story-dialogue-section" aria-label="Current work interaction">
       <p class="eyebrow">CURRENT WORK</p>
       {#if committed}
         <p class="outcome">{STAGE_FOUR_FINAL[state.branch]}</p>
@@ -102,7 +103,8 @@
       {#if actions.length>0}
         <div class="actions" aria-label="Available work actions">
           {#each actions as action (action)}
-            <button type="button" disabled={pending} onclick={() => {void perform(action);}}>
+            <button type="button" class={actions.length===1?'primary-choice':'secondary-choice'}
+              disabled={pending} onclick={() => {void perform(action);}}>
               {STAGE_FOUR_ACTION_LABELS[action]}
             </button>
           {/each}
@@ -112,7 +114,6 @@
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
     </aside>
   </div>
-  <div class="notice">Council and workshop property stays at its workplace. No wages, ordinary XP or personal inventory items are awarded for this task.</div>
   {#if journalOpen}
     <section id="second-job-journal" class="journal" bind:this={journalElement} aria-label="Stage 4 personal journal">
       <header class="journal-head"><div><small>PERSONAL JOURNAL</small><h2>{route.name}</h2></div>
@@ -163,16 +164,11 @@
   .outcome{font-weight:bold}
   .context{color:#59432e}
   .actions{display:flex;flex-direction:column;gap:8px;margin:14px 0}
-  .actions button{min-height:43px;width:100%;text-align:left;padding:10px 13px;background:#30251d;color:#f0dfc7;
-    border:1px solid #98734c;font:14px/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .actions button:hover,.actions button:focus-visible{background:#56402c;outline:2px solid #cfa777;outline-offset:1px}
-  .actions button:disabled{opacity:.5;cursor:default}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
   .journal-trigger{margin-top:19px;padding-top:12px;border-top:1px solid #c2a98b}
   .journal-button{background:#dbcaab;border:1px solid #8c6d50;color:#3a281b;padding:7px 10px;font:12px sans-serif;cursor:pointer}
   .journal-button:hover,.journal-button:focus-visible{background:#eedabc}
-  .notice{background:#1d1a18;padding:10px 15px;color:#c6b093;font:12px/1.4 sans-serif}
   .journal{background:#e6d5b5;color:#2b211a;padding:24px clamp(15px,3vw,48px);border-top:2px solid #98714c;scroll-margin-top:12px}
   .journal-head{max-width:960px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 auto 18px}
   .journal-head small{font:10px sans-serif;letter-spacing:.12em;color:#6f583e}
