@@ -393,13 +393,6 @@
     font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif)}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:18px}
-  .actions>button{display:block;width:100%;min-height:52px;text-align:left;
-    background:#241d16;border:1px solid #6d5235;color:#f7e6c9;
-    padding:10px 13px;font:600 var(--dialogue-text,17px)/1.35
-    var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .actions>button:hover,.actions>button:focus-visible{
-    background:#423022;outline:1px solid #c49d65}
-  .actions>button:disabled{opacity:.55;cursor:wait}
   .round-summary{display:grid;gap:0;margin:8px 0 12px}
   .round-summary div{display:flex;align-items:start;justify-content:space-between;
     gap:10px;padding:5px 0;border-bottom:1px solid #b19b7d}

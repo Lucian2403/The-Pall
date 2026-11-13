@@ -212,6 +212,7 @@
           {#each workActions as action (action)}
             <button
               type="button"
+              class={workActions.length===1?'primary-choice':'secondary-choice'}
               disabled={pending}
               onclick={() => {
                 inspected = null;
@@ -230,13 +231,6 @@
   </div>
   {/snippet}
   </ActivityLayout>
-
-  <div class="scene-footer">
-    <span
-      >Council records remain at the office. No wages or inventory items are
-      awarded here.</span
-    >
-  </div>
 
   {#if journalOpen}
     <section
@@ -417,22 +411,6 @@
     gap: 7px;
     margin: 13px 0 0;
   }
-  .actions button {
-    width: 100%;
-    min-height: 44px;
-    box-sizing: border-box;
-    padding: 8px 12px;
-    background: #30251d;
-    color: #f2dfc7;
-    border: 1px solid #927048;
-    cursor: pointer;
-    font: var(--dialogue-text, 17px)/1.4 var(--pall-font-reading, Georgia, serif);
-    text-align: left;
-  }
-  .actions button:disabled {
-    opacity: 0.55;
-    cursor: default;
-  }
   .error {
     font: 13px/1.4 sans-serif;
     color: #912d1a;
@@ -440,16 +418,6 @@
   .saving {
     font: 12px sans-serif;
     color: #675039;
-  }
-  .scene-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    padding: 9px 14px;
-    background: #201c17;
-    color: #c9b393;
-    font: 12px/1.4 sans-serif;
   }
   .journal-button {
     border: 1px solid #987652;
@@ -528,11 +496,6 @@
   @container activity-panel (max-width: 480px) {
     .work-dialogue {
       padding: 14px;
-    }
-  }
-  @media (max-width: 760px) {
-    .scene-footer {
-      flex-wrap: wrap;
     }
   }
   @media (prefers-reduced-motion: reduce) {

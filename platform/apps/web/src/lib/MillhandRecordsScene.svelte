@@ -244,6 +244,7 @@
           {#each workActions as action (action)}
             <button
               type="button"
+              class={workActions.length===1?'primary-choice':'secondary-choice'}
               disabled={pending}
               onclick={() => {
                 inspected = null;
@@ -445,22 +446,6 @@
     flex-direction: column;
     gap: 7px;
     margin: 13px 0 0;
-  }
-  .actions button {
-    width: 100%;
-    min-height: 44px;
-    box-sizing: border-box;
-    padding: 8px 12px;
-    background: #30251d;
-    color: #f2dfc7;
-    border: 1px solid #927048;
-    cursor: pointer;
-    font: var(--dialogue-text, 17px)/1.4 var(--pall-font-reading, Georgia, serif);
-    text-align: left;
-  }
-  .actions button:disabled {
-    opacity: 0.55;
-    cursor: default;
   }
   .error {
     font: 13px/1.4 sans-serif;

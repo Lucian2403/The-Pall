@@ -192,7 +192,7 @@
             <h1>A moment of quiet</h1>
             <p class="narration">You lie down. For a little while, the racket of the city falls away.</p>
             <p class="instruction">{restMessage}</p>
-            <button type="button" class="pall-framed-button"
+            <button type="button" class="pall-framed-button primary-choice"
               onclick={()=>restMessage=''}>Continue</button>
           </aside>
         {:else if home.phase==='HOME'}
@@ -207,10 +207,10 @@
             <p class="eyebrow">NOTICE · STAGE VIII</p>
             <h1>{home.noticeTitle}</h1><p class="notice-text">{home.noticeText}</p>
             {#if home.phase==='NOTICE'}
-              <button type="button" class="pall-framed-button" disabled={pending}
+              <button type="button" class="pall-framed-button primary-choice" disabled={pending}
                 onclick={()=>{void perform('put_down');}}>Put the notice down</button>
             {:else}
-              <button type="button" class="pall-framed-button"
+              <button type="button" class="pall-framed-button secondary-choice"
                 onclick={()=>noticeExpanded=false}>Close notice</button>
             {/if}
           </aside>
@@ -219,7 +219,7 @@
             <p class="eyebrow">RETURN HOME · STAGE VIII</p>
             <p class="narration stage-direction">You put the notice down.</p>
             <p class="speaker">{PLAYER_SPEAKER_LABEL}</p><p class="speech">“{home.closingSpeech}”</p>
-            <button type="button" class="pall-framed-button" disabled={pending}
+            <button type="button" class="pall-framed-button primary-choice" disabled={pending}
               onclick={()=>{void perform('finish');}}>Continue</button>
           </aside>
         {:else if home.phase==='COMPLETE'}

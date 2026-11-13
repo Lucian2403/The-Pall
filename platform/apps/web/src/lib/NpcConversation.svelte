@@ -51,16 +51,16 @@
     {#if current}
       <p class="speech">“{current.reply}”</p>
       <div class="choices">
-        <button type="button" onclick={() => {topic=null;}}>Ask something else</button>
-        <button type="button" onclick={close}>Return to work</button>
+        <button type="button" class="secondary-choice" onclick={() => {topic=null;}}>Ask something else</button>
+        <button type="button" class="secondary-choice" onclick={close}>Return to work</button>
       </div>
     {:else}
       <p class="instruction">What do you want to ask?</p>
       <div class="choices">
         {#each speaker.topics as option (option.id)}
-          <button type="button" onclick={() => {topic=option.id;}}>{option.prompt}</button>
+          <button type="button" class="secondary-choice" onclick={() => {topic=option.id;}}>{option.prompt}</button>
         {/each}
-        <button type="button" onclick={close}>Leave the conversation</button>
+        <button type="button" class="secondary-choice" onclick={close}>Leave the conversation</button>
       </div>
     {/if}
   {:else}
@@ -77,8 +77,4 @@
   .speech{font-size:var(--dialogue-text,17px);line-height:1.55;margin:7px 0 17px}
   .instruction{font:15px/1.45 sans-serif;margin:6px 0 12px}
   .choices{display:flex;flex-direction:column;gap:6px}
-  .choices button{width:100%;border:1px solid #624b35;background:#241d16;color:#f5e3c8;text-align:left;cursor:pointer;
-    padding:10px 12px;min-height:40px;font:14px/1.4 var(--pall-font-reading,Georgia,serif)}
-  .choices .work-skip{background:#493321;border-color:#a07a4b}
-  .choices button:hover,.choices button:focus-visible{background:#503927;outline:2px solid #d9a76e;outline-offset:1px}
 </style>

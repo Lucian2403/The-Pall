@@ -34,6 +34,9 @@
   // Navigation within the two screens is local; only choosing a job writes
   // progression to the server.
   let decisionStep=$state<0|1>(0);
+  // The approved branch dialogue is the transition to Stage 4. The skill
+  // award and unpaid-round outcome are persisted and visible in their proper
+  // systems; never insert an out-of-world reward ledger into a story panel.
   let committedBeat=$state(0);
   let bellAudio=$state<HTMLAudioElement>();
   let backdropUnavailable=$state(false);
@@ -264,28 +267,24 @@
                   {@const splitAt=WRONG_BELL_BRANCH_FIRST_BEAT_LINES[snapshot.state.branch]}
                   <h1>{branch.name}</h1>
                   <div class="route-dialogue-beat" aria-live="polite">
-                    {#if committedBeat<2}
-                      {#each (committedBeat===0 ? branch.lines.slice(0,splitAt) : branch.lines.slice(splitAt)) as line}
-                        {#if line.speaker==='Narration'}
-                          <p class="narration">{line.text}</p>
-                        {:else}
-                          <p class="speaker">{dialogueSpeakerLabel(line.speaker)}</p>
-                          <p class="spoken">“{line.text}”</p>
-                        {/if}
-                      {/each}
-                      {#if committedBeat===1}
-                        <p class="narration">{branch.end}</p>
+                    {#each (committedBeat===0 ? branch.lines.slice(0,splitAt) : branch.lines.slice(splitAt)) as line}
+                      {#if line.speaker==='Narration'}
+                        <p class="narration">{line.text}</p>
+                      {:else}
+                        <p class="speaker">{dialogueSpeakerLabel(line.speaker)}</p>
+                        <p class="spoken">“{line.text}”</p>
                       {/if}
-                      <div class="actions">
-                        <button type="button" class="primary-choice continue-choice"
-                          onclick={()=>{committedBeat+=1;}}>Continue</button>
-                      </div>
-                    {:else}
-                      <p class="round-finding">Shift Dispatch: round not accepted. The receiving office is closed; its authorized final mark is unavailable. Payment: 0 coins. Ordinary XP: 0. No items.</p>
-                      <p class="round-finding">Major Skill increased: <strong>{branch.majorSkill} +1</strong>.</p>
-                      <p class="round-finding">Next: {branch.next}</p>
-                      <p class="narration">The chosen Stage 4 task is not yet implemented. Your choice and skill award are saved.</p>
+                    {/each}
+                    {#if committedBeat===1}
+                      <p class="narration">{branch.end}</p>
                     {/if}
+                    <div class="actions">
+                      <button type="button" class="primary-choice continue-choice"
+                        onclick={()=>{
+                          if(committedBeat===0)committedBeat=1;
+                          else void goto('/characters/'+encodeURIComponent(id)+'/bellrunner/second-job');
+                        }}>Continue</button>
+                    </div>
                   </div>
                 {/if}
                 {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
@@ -335,20 +334,12 @@
   h1,h2{margin:0 0 13px;font:600 var(--dialogue-title,21px)/1.3
     var(--pall-font-reading,Georgia,serif);color:#25170f}
   h2{margin-top:17px}
-  .narration,.spoken,.round-finding{margin:0 0 14px;font:600 var(--dialogue-text,17px)/1.55
+  .narration,.spoken{margin:0 0 14px;font:600 var(--dialogue-text,17px)/1.55
     var(--pall-font-reading,Georgia,serif);color:#251910}
   .narration{font-style:italic;font-weight:500}
   .speaker{margin:10px 0 6px;font:600 var(--dialogue-label,15px)/1.2
     var(--pall-font-label,'Arial Narrow',sans-serif);color:#67432a;letter-spacing:.08em}
-  .round-finding{padding:13px;border-top:1px solid #b79c78;border-bottom:1px solid #b79c78}
   .actions{display:flex;flex-direction:column;gap:9px;margin-top:19px}
-  .actions>button{width:100%;min-height:52px;border:1px solid #6d5235;
-    background:#241d16;color:#f7e6c9;text-align:left;padding:10px 13px;cursor:pointer;
-    font:600 var(--dialogue-text,17px)/1.3 var(--pall-font-reading,Georgia,serif)}
-  .actions>button:disabled{opacity:.55;cursor:wait}
-  /* Continue always remains white on the dark primary action at hover/focus. */
-  .actions>button.continue-choice:hover:not(:disabled),
-  .actions>button.continue-choice:focus-visible{color:#fff!important}
   .route-dialogue-beat{min-width:0}
   .decision-heading{
     margin:0 0 10px;

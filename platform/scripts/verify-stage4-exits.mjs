@@ -44,7 +44,7 @@ assert.ok(fallback.includes("availableActions.filter(action=>action!=='leave_loc
 assert.ok(next.includes("snapshot.stage>=5") &&
   next.includes("snapshot.state.phase==='DONE'||snapshot.state.phase==='EXITED'") &&
   next.includes("void perform('leave_location')") &&
-  next.includes('class="stage-next-step-link" {href}'),
+  next.includes('class="stage-next-step-link primary-choice" {href}'),
   'Legacy Stage 5/6 must see navigation without a forbidden server write');
 assert.doesNotMatch(next,/NEXT STEP|Continue to The Wage Claim|face Flint/i,
   'Never spoil the encounter in the completion screen');

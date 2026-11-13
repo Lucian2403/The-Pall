@@ -568,7 +568,7 @@ assert.ok(
   scene.includes('pointer-events:auto;filter:drop-shadow(0 6px 10px #0008)') &&
   scene.includes('<a class="pall-framed-button clinic-link" href=') &&
   scene.includes('.clinic-link{position:relative;z-index:1;') &&
-  wageScene.includes('<a class="pall-framed-button combat-link" href=') &&
+  wageScene.includes('<a class="pall-framed-button combat-link primary-choice" href=') &&
   framedStyles.includes('.pall-framed-button {') &&
   framedStyles.includes("url('/ui-kit/buttons/button-normal-trim.png')") &&
   framedStyles.includes("url('/ui-kit/buttons/button-hover-trim.png')") &&

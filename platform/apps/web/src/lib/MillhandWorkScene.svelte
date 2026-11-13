@@ -190,10 +190,6 @@
   .rule{border-top:1px solid #b29c7e;margin:12px 0}
   .instruction{font-weight:600;font-size:var(--dialogue-text,17px);line-height:1.45;margin:0 0 10px}
   .actions{display:flex;flex-direction:column;gap:6px;margin-top:3px}
-  .actions button{display:block;width:100%;text-align:left;border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 12px;font:var(--dialogue-text,17px)/1.4 var(--pall-font-reading,Georgia,serif);cursor:pointer;min-height:42px}
-  .actions button:hover,.actions button:focus-visible{background:#423022;outline:1px solid #c49d65}
-  .actions button:disabled{opacity:.55;cursor:default}
   .small{font-size:14px;line-height:1.45;color:#614e39}
   .error{font:13px/1.45 sans-serif;color:#873523}
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif;margin:0}

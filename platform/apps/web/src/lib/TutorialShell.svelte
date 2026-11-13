@@ -77,7 +77,9 @@
     :mapState==='unavailable'?'Not available yet':'Open the city map');
   const chapter = $derived(character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
-    : character.origin === 'Bellrunner' && character.tutorial.stage >= 3
+    : character.origin === 'Bellrunner' && character.tutorial.stage >= 4
+    ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/second-job'
+    : character.origin === 'Bellrunner' && character.tutorial.stage === 3
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/wrong-bell'
     : character.origin === 'Bellrunner' && character.tutorial.stage === 2
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/dispatch'
@@ -225,7 +227,9 @@
       :character.origin==='Bellrunner'&&fromStage===3
       ?'TESTING ONLY: Return to Bellrunner Stage 2? This clears the Wrong Bell investigation and returns you to the final sealed notice. Earlier deliveries, Health, coins and skills are preserved.'
       :character.origin==='Bellrunner'&&fromStage===4
-      ?'TESTING ONLY: Return to Bellrunner Stage 3? This clears your chosen route and removes its one-time +1 Major Skill award. The original delivery and character are preserved.'
+      ?'TESTING ONLY: Return to Bellrunner Stage 3? This restarts the chosen Stage 4 job, including its saved dialogue, inspections and receipts, and removes the original route\'s one-time +1 Major Skill award. Your completed delivery, coins and character are preserved.'
+      :character.origin==='Bellrunner'&&fromStage===5
+      ?'TESTING ONLY: Return to Bellrunner Stage 4? The completed second job remains saved and your +1 Major Skill is preserved. Only the final departure to the service gate is undone.'
       :fromStage===8
       ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
@@ -251,6 +255,8 @@
           rewindError='The accepted Bellrunner round is missing or inconsistent; nothing was reset.';
         }else if(response.status===409 && data.error==='unsafe_wrong_bell_state'){
           rewindError='The saved Bellrunner route or skill award cannot safely be reset. No progress was changed.';
+        }else if(response.status===409 && data.error==='unsafe_second_job_state'){
+          rewindError='The saved Stage 4 job is inconsistent with its original branch. Nothing was reset.';
         }else if(response.status===503 && data.error==='second_job_schema_missing'){
           rewindError='Stage 4 database setup is missing. Run npm run second-job:migrate from platform, then restart the API.';
         }else if(response.status===503 && data.error==='combat_schema_missing'){

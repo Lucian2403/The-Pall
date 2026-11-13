@@ -229,14 +229,6 @@
     color:#251910}
   .narration{font-style:italic}
   .responses{display:flex;flex-direction:column;gap:9px;margin-top:18px}
-  .responses>button{display:block;width:100%;text-align:left;
-    border:1px solid #6d5235;background:#241d16;color:#f7e6c9;
-    padding:10px 13px;font:600 var(--dialogue-text,17px)/1.35
-    var(--pall-font-reading,Georgia,serif);
-    cursor:pointer;min-height:52px}
-  .responses>button:hover,.responses>button:focus-visible{
-    background:#423022;outline:1px solid #c49d65}
-  .responses>button:disabled{opacity:.55;cursor:wait}
   .error{margin:4px 0 0;color:#873523;font:13px/1.45 Georgia,serif}
   /* A narrow reading slot (beside or below) tightens the parchment. */
   @container activity-panel (max-width:560px){

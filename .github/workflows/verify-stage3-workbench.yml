@@ -13,9 +13,15 @@ on:
       - 'platform/scripts/verify-stage-six.mjs'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
+      - 'platform/scripts/verify-millhand-scenes-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage4.test.ts'
+      - 'platform/scripts/verify-dev-stage-rewind.mjs'
+      - 'platform/scripts/verify-bellrunner-stage4-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3-assets.mjs'
       - 'platform/scripts/verify-dialogue-speakers.test.ts'
+      - 'platform/scripts/verify-dialogue-primary-style.mjs'
+      - 'platform/scripts/verify-story-immersion.mjs'
       - 'platform/scripts/verify-approved-intro-copy.mjs'
       - 'platform/apps/web/static/locations/industrial/**'
       - 'platform/apps/web/static/audio/bellrunner/**'
@@ -73,10 +79,18 @@ jobs:
         run: npm run verify:bellrunner-stage1
       - name: Bellrunner Stage 3 state machine, choices and authored dialogue beats
         run: npm run verify:bellrunner-stage3
+      - name: Bellrunner Stage 4 all branch mechanics, inherited asset locations and dialogues
+        run: npm run verify:bellrunner-stage4
+      - name: Every stage retains safe Back to previous Stage replay
+        run: npm run verify:dev-rewind
       - name: Bellrunner Stage 3 owner art and sound
         run: npm run verify:bellrunner-stage3-assets
       - name: Canonical YOU speaker labels for all tutorial scenes
         run: npm run verify:dialogue-speakers
+      - name: Millhand primary button art shared by both origins and every tutorial stage
+        run: npm run verify:dialogue-primary-style
+      - name: Immersive transitions — no out-of-world payout or debug recaps
+        run: npm run verify:story-immersion
       - name: First-entry Welcome modal and character storage contract
         run: npm run verify:welcome
       - run: npm run verify:stage4-transport-ui
@@ -102,14 +116,23 @@ jobs:
       - name: Real Chromium Stage 6 outcome CTA click and keyboard navigation
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-combat-cta-browser.mjs
+      - name: Real Chromium Bellrunner Stage 4 all reused locations, action cards and journal
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 150s npm run verify:bellrunner-stage4-browser
       - name: Real Chromium Bellrunner Stage 1 and 2 workstation geometry
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
+      - name: Real Chromium Millhand stages 1–8 and the matching primary button art
+        timeout-minutes: 4
+        run: timeout --signal=TERM --kill-after=5s 180s npm run verify:millhand-scenes-browser
       - name: Save Bellrunner 1272px and 1920px visual QA screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bellrunner-workstation-visual-qa
-          path: platform/test-artifacts/bellrunner-visuals/*.png
+          path: |
+            platform/test-artifacts/bellrunner-visuals/*.png
+            platform/test-artifacts/bellrunner-stage4-visuals/*.png
+            platform/test-artifacts/millhand-scenes/*.png
           if-no-files-found: ignore
           retention-days: 7

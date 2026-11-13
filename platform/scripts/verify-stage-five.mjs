@@ -167,7 +167,9 @@ for(const label of ['Leave the depot','Leave the Contracts office','Leave the re
 assert.match(nextStep,/leave_location/);
 assert.match(nextStep,/alreadyAdvanced/);
 assert.match(nextStep,/millhand\/wage-claim/);
-assert.match(nextStep,/button-normal-trim\.png/);
+assert.match(nextStep,/stage-next-step-link primary-choice/);
+assert.match(read('apps/web/src/lib/pall-story-landscape.css'),/button-normal-trim\.png/,
+  'The one shared Millhand primary artwork must style all Stage 4 exit buttons');
 for(const name of [
   'MillhandDepotScene.svelte',
   'MillhandContractsScene.svelte',
@@ -177,7 +179,7 @@ for(const name of [
   const scene=read('apps/web/src/lib/'+name);
   assert.match(scene,/StageFourNextStep/,
     'All Stage 4 outcomes must show the next-chapter action inside their dialogue: '+name);
-  assert.match(scene,/class="work-dialogue"/);
+  assert.match(scene,/class="work-dialogue(?: pall-story-dialogue-section)?"/);
   assert.match(scene,/STAGE_FOUR_FINAL/);
 }
 assert.doesNotMatch(last,/class="follow-up"|Continue to The Wage Claim/,
