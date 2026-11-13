@@ -35,12 +35,14 @@ New additive SQL migration: `0019_bellrunner_dogman_combat.sql`, included in `np
 
 The original engine outcome (`player_victory` or `player_defeat`) is saved without any fabricated win, loss, random post-fight wound, skill level, coin, item or inventory loss. On victory, Dogman gives way to the public street and keeps no paper. On defeat, he is interrupted by the workers approaching from the road; an unnamed passerby helps the courier. The route sheet, bag and Stage IV evidence remain. The defeated Dogman art appears only if the **player** wins. The journal is in first person and records the actual saved outcome.
 
-Rewind to the Stage V position choice is permitted only **before** combat has initialized. It is rejected as soon as the first combat row exists, avoiding undoing damage or replaying a victory. Stage VI is retained as **COMPLETED** after the fight. Bellrunner Stage VII clinic is not yet implemented, so no invalid clinic URL, charge or fake cure is shown.
+In local developer testing, **Back to Stage 5** can replay the encounter even after a victory or defeat. The server checks the persisted combat Health against the character row, restores the exact pre-fight Health from the revision-zero start receipt, deletes the old battle and request receipts atomically, then returns to the final Stage V positioning choice. Earlier decisions, coin balance and skills are preserved. The server rejects a replay if the saved Health or start receipt does not match. In ordinary play the header uses a non-destructive Stage V review link and returning to Stage VI resumes the saved battle. Stage VI is retained as **COMPLETED** after the fight. Bellrunner Stage VII clinic is not yet implemented, so no invalid clinic URL, charge or fake cure is shown.
 
 ## Verification and acceptance
 
 - `npm run verify:bellrunner-stage6`: baseline Flint weapon unchanged, Dogman damage, unarmed starter, staging, deterministic Guard/sidestep behavior, UI and persistence contract.
 - Real PostgreSQL integration tests: all three stances, account isolation, idempotency, stale commands, concurrent-minded transaction locks, actual saved victory or defeat, current Health, stage status and irreversible combat rewind protection.
 - Existing shared engine and Flint combat tests, Svelte compilation and Chromium workshop regressions run in CI.
+
+**Visual layout:** Dogman's condition card sits over the empty left wall rather than his face; the personal journal opens in a centred, scrollable dialog at desktop and phone widths. The outcome parchment contains only the in-world resolution, with no Stage VII implementation-status text.
 
 **Visual acceptance** remains before merging the PR. The owner should review Dogman's proportions in the shared battle HUD, the placement of the work cart, real club intent text, Dodge/Guard frequency and the two aftermath depictions.
