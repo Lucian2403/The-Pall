@@ -173,6 +173,6 @@ export const STAGE_FOUR_TASK_TEXT:Record<StageFourBranch,Partial<Record<StageFou
     inspect:'The ventilation safety shutoff is engaged, but the bell\'s mechanism is still moving.',
     detail:'The safety stop is shut, but the bell rod is still moving. The mechanic tells you to keep your hands clear and take a closer look.',
     confirm:'Someone has moved a retaining pin, keeping the bell rod connected even though the safety stop is shut.',
-    finish:'The safety defect has been documented for authorized staff. The apparatus remains untouched.'
+    finish:'You hand the completed report to the mechanic. He takes responsibility for passing it to the authorized repair crew. The mechanism is left untouched.'
   }
 };
