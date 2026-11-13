@@ -81,7 +81,9 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(api.includes("'COMPLETED':'IN_PROGRESS'"));
   assert.ok(!api.includes('coins=$')&&!api.includes('major_skill_bonuses='));
   assert.match(rewind,/SELECT 1 FROM player_character_dogman_combat WHERE character_id=/);
-  assert.match(rewind,/combat_already_started/);
+  assert.match(rewind,/SELECT response FROM player_character_dogman_combat_receipts/);
+  assert.match(rewind,/restoredHealth=first.player.hp/);
+  assert.match(rewind,/DELETE FROM player_character_dogman_combat_receipts/);
   assert.ok(page.includes('BellrunnerDogmanCombatScene'));
   assert.ok(page.includes('claimCombatSfx'));
   assert.ok(page.includes('soundSavedCombatTurn'));
@@ -90,4 +92,13 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(scene.includes('Dogman defeated you. Witnesses interrupted him.'));
   assert.ok(scene.includes('Your papers remain yours'));
   assert.ok(!scene.includes('/millhand/clinic'));
+  assert.ok(!scene.includes('Your battle outcome and actual Health are saved.'));
+  assert.ok(!scene.includes('Stage VII is not implemented'));
+  assert.ok(scene.includes('class="journal-dialog"'));
+  assert.ok(scene.includes('journalDialog.showModal()'));
+  assert.ok(scene.includes('left:1.5%'));
+  const shell=read('apps/web/src/lib/TutorialShell.svelte');
+  assert.ok(shell.includes("character.origin==='Bellrunner') && character.tutorial.stage===6"));
+  assert.ok(page.includes('backToStageFive'));
+  assert.ok(page.includes("'/bellrunner/dogman'"));
 });
