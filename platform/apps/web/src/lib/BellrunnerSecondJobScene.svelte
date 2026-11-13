@@ -100,7 +100,13 @@
           {:else if state.phase==='exited'}
             <p class="narration">You leave the work behind. The outside service gate stands ahead.</p>
           {:else}
-            {#if instruction}<p class="narration">{instruction}</p>{/if}
+            {#if state.branch==='machinery'&&state.phase==='choose'}
+              <p class="narration">{BELLRUNNER_STAGE_FOUR.machinery.pinCheck.narration}</p>
+              <p class="speaker">{dialogueSpeakerLabel('Mechanic').toUpperCase()}:</p>
+              <p class="spoken">“{BELLRUNNER_STAGE_FOUR.machinery.pinCheck.spoken}”</p>
+            {:else if instruction}
+              <p class="narration">{instruction}</p>
+            {/if}
             {#if state.branch==='trauma'&&state.phase==='inspect'}
               <!-- Older saved Stage 4 sessions can still resume here. Show
                    the real conversation, never a duplicated evidence ledger. -->
