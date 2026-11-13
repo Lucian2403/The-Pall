@@ -8,7 +8,7 @@ import {
 } from '../apps/api/src/bellrunner-dogman-work.ts';
 import type {DogmanReply,DogmanAction} from '../apps/api/src/bellrunner-dogman-work.ts';
 import {
-  DOGMAN_PAPERS,DOGMAN_DEMAND,DOGMAN_GATE,DOGMAN_ANSWERS,
+  DOGMAN_ARRIVAL,DOGMAN_PAPERS,DOGMAN_DEMAND,DOGMAN_GATE,DOGMAN_ANSWERS,
   DOGMAN_ACTION_LABELS,DOGMAN_ASSETS,dogmanLine,dogmanJournal
 } from '../apps/web/src/lib/bellrunner-dogman-copy.ts';
 
@@ -19,9 +19,11 @@ function continueUntilChoice(branch:typeof branches[number]){
   let s=initialDogman(branch);
   assert.equal(s.phase,'arrival');
   assert.equal(dogmanLine(s)?.speaker,'Narration');
+  assert.equal(dogmanLine(s)?.text,DOGMAN_ARRIVAL.text);
   assert.deepEqual(availableDogmanActions(s),['continue']);
   s=advanceDogman(s,'continue');
   assert.equal(s.phase,'papers');
+  assert.equal(dogmanLine(s)?.text,DOGMAN_PAPERS[0]?.text);
   for(let i=0;i<DOGMAN_PAPERS_LENGTH-1;i++){
     assert.deepEqual(availableDogmanActions(s),['continue']);
     assert.equal(dogmanLine(s)?.text,DOGMAN_PAPERS[i]?.text);
@@ -85,6 +87,23 @@ test('Dogman cannot claim information not volunteered in the selected branch',()
       :branch==='trauma'?/infirmary/:/mechanic/;
     assert.match(journal,exclusive);
   }
+});
+test('arrival introduces the passage before Dogman appears; one Continue reveals the existing first line',()=>{
+  const intro=initialDogman('machinery');
+  assert.match(DOGMAN_ARRIVAL.text,/turn back toward the public street/);
+  assert.match(DOGMAN_ARRIVAL.text,/worksite hands call him Dogman/);
+  assert.equal(dogmanLine(intro)?.text,DOGMAN_ARRIVAL.text);
+  assert.deepEqual(availableDogmanActions(intro),['continue']);
+  const after=advanceDogman(intro,'continue');
+  assert.equal(after.phase,'papers');
+  assert.equal(after.line,0);
+  assert.equal(after.revision,1);
+  assert.equal(dogmanLine(after)?.text,DOGMAN_PAPERS[0]?.text);
+  const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerDogmanScene.svelte',
+    import.meta.url),'utf8');
+  assert.match(scene,/state.phase!=='arrival'/);
+  assert.match(scene,/\{#if dogmanVisible\}/);
+  assert.match(scene,/The Service Passage/);
 });
 test('Dogman approved dialogue is preserved and actions are non-aggressive',()=>{
   const canon=readFileSync(new URL('../../docs/05-gameplay/onboarding/bellrunner/dogman-confrontation.md',
