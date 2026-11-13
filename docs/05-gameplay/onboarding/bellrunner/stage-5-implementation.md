@@ -4,7 +4,7 @@
 
 ## Authored encounter
 
-1. Enter **after** a completed and exited Stage IV (Attendance Certificate, First Aid Line or The Bell Linkage), with the branch read from server-owned saved evidence. Entry is at the exterior industrial service passage.
+1. Enter **after** a completed and exited Stage IV (Attendance Certificate, First Aid Line or The Bell Linkage), with the branch read from server-owned saved evidence. The first screen is **The Service Passage**, a single journey-and-encounter narration with only the alley background; Dogman's sprite and nameplate are not shown. **Continue** reveals Dogman and starts the existing first spoken line of **Show Your Papers**.
 2. **Show Your Papers:** first narration and seven spoken beats, ending with the three approved choices: ask for Dogman's orders, keep hold of the sheet or tell him what happened. Only the last choice reveals a specific Stage IV job. No documents or items are confiscated.
 3. Dogman's branch-specific response is saved with the selected conversation path; the two common replies follow. Dogman still cannot claim unseen information.
 4. **Gate Barred:** eight approved narration/spoken beats, ending on the last spoken line with three defensive positions. No new encounter between the dialogue and this choice.
