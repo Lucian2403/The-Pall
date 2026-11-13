@@ -106,8 +106,8 @@ test('Dogman approved dialogue is preserved and actions are non-aggressive',()=>
   assert.match(api,/request_hash/);
   assert.match(api,/stale_revision/);
   assert.match(api,/expectedRevision/);
-  assert.match(api,/tutorial_stage=\\$2/);
-  assert.doesNotMatch(api,/major_skill_bonuses\\s*=/);
+  assert.match(api,/tutorial_stage=\$2/);
+  assert.doesNotMatch(api,/major_skill_bonuses\s*=/);
   assert.match(api,/tutorialPayout:\{coins:0,ordinaryXp:0,items:0\}/);
 });
 test('exact owner-supplied Dogman and alley WebP images are committed; Flint ambience reused',()=>{
