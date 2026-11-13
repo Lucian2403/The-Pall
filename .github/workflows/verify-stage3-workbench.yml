@@ -17,6 +17,7 @@ on:
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
       - 'platform/scripts/verify-bellrunner-stage4.test.ts'
       - 'platform/scripts/verify-bellrunner-stage5.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage5-browser.mjs'
       - 'platform/apps/web/static/locations/bellrunner/**'
       - 'platform/apps/web/static/characters/dogman/**'
       - 'platform/scripts/verify-dev-stage-rewind.mjs'
@@ -124,6 +125,9 @@ jobs:
       - name: Real Chromium Bellrunner Stage 4 all reused locations, action cards and journal
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 150s npm run verify:bellrunner-stage4-browser
+      - name: Real Chromium Dogman scene, owner art and all three route callbacks
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 150s npm run verify:bellrunner-stage5-browser
       - name: Real Chromium Bellrunner Stage 1 and 2 workstation geometry
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
@@ -138,6 +142,7 @@ jobs:
           path: |
             platform/test-artifacts/bellrunner-visuals/*.png
             platform/test-artifacts/bellrunner-stage4-visuals/*.png
+            platform/test-artifacts/bellrunner-stage5-visuals/*.png
             platform/test-artifacts/millhand-scenes/*.png
           if-no-files-found: ignore
           retention-days: 7
