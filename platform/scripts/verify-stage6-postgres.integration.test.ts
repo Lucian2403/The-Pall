@@ -20,6 +20,7 @@ import {registerBellrunnerDispatchRoutes} from '../apps/api/src/bellrunner-dispa
 import {registerBellrunnerWrongBellRoutes} from '../apps/api/src/bellrunner-wrong-bell-routes.ts';
 import {registerBellrunnerSecondJobRoutes} from '../apps/api/src/bellrunner-second-job-routes.ts';
 import {registerBellrunnerDogmanRoutes} from '../apps/api/src/bellrunner-dogman-routes.ts';
+import {registerBellrunnerDogmanCombatRoutes} from '../apps/api/src/bellrunner-dogman-combat-routes.ts';
 import {
   DOGMAN_PAPERS_LENGTH,DOGMAN_REPLY_LENGTH,DOGMAN_DEMAND_LENGTH,DOGMAN_GATE_LENGTH
 } from '../apps/api/src/bellrunner-dogman-work.ts';
@@ -48,7 +49,7 @@ const schema=[
   '0013_equipment_stats_and_clothing.sql','0014_bellrunner_stage1.sql',
   '0015_bellrunner_dispatch_work.sql',
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
-  '0018_bellrunner_dogman.sql'
+  '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -64,6 +65,7 @@ registerBellrunnerDispatchRoutes(app,{pool:db,resolveSession});
 registerBellrunnerWrongBellRoutes(app,{pool:db,resolveSession});
 registerBellrunnerSecondJobRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDogmanRoutes(app,{pool:db,resolveSession});
+registerBellrunnerDogmanCombatRoutes(app,{pool:db,resolveSession,seed:()=>7});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
@@ -511,6 +513,99 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
    'SELECT count(*)::int AS n FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1',
    [id])).rows[0].n;
   assert.equal(receipts,revision,'No duplicate request receipts');
+ }
+});
+
+test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe turns and rewind lock',async()=>{
+ for(const stance of ['defend','street','cart'] as const){
+  const id=randomUUID();
+  const bonuses={Industry:3,Mechanics:1};
+  await db.query(
+    "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',6,'NOT_STARTED')",
+    [id,owner,'Combat '+id.slice(0,8),'dogfight-'+id,JSON.stringify(bonuses)]);
+  await db.query(
+    'INSERT INTO player_character_bellrunner_dogman(character_id,revision,state) VALUES($1,11,$2::jsonb)',
+    [id,JSON.stringify({revision:11,branch:'machinery',phase:'done',line:0,
+      reply:'tell_him',stance})]);
+  const path=base+id+'/bellrunner/combat';
+  assert.equal((await request('GET',path,null)).status,401);
+  assert.equal((await request('GET',path,stranger)).status,404);
+  assert.equal((await request('POST',path,stranger,{kind:'start',requestId:randomUUID()})).status,404);
+  const notStarted=await request('GET',path);
+  assert.equal(notStarted.status,200);
+  assert.equal(notStarted.body?.needsStart,true);
+  const firstId=randomUUID();
+  const start=await request('POST',path,owner,{kind:'start',requestId:firstId});
+  assert.equal(start.status,200,JSON.stringify(start.body));
+  assert.equal(start.body?.stage,6);
+  assert.equal(start.body?.status,'active');
+  assert.equal(start.body?.enemy?.name,'Dogman');
+  assert.deepEqual(start.body?.rules?.enemyStrikeDamage,{min:12,max:15});
+  assert.equal(start.body?.stance,stance==='defend'?'brace':stance==='street'?'moving':'cart');
+  assert.equal(start.body?.distance,stance==='defend'?'contact':stance==='street'?'near':'far');
+  assert.equal(start.body?.revision,0);
+  const repeat=await request('POST',path,owner,{kind:'start',requestId:firstId});
+  assert.deepEqual(repeat.body,start.body,'Repeated start does not reset encounter');
+  const fresh=await request('POST',path,owner,{kind:'start',requestId:randomUUID()});
+  assert.equal(fresh.body?.revision,0,'Another start does not reroll existing encounter');
+  const move=stance==='cart'||stance==='street'?{type:'move',to:'close'}:{type:'guard'};
+  const cmd={kind:'turn',expectedRevision:0,action:move,requestId:randomUUID()};
+  const turn=await request('POST',path,owner,cmd);
+  assert.equal(turn.status,200,JSON.stringify(turn.body));
+  assert.equal(turn.body?.revision,1);
+  assert.equal((await request('POST',path,owner,{...cmd,requestId:randomUUID()})).status,409);
+  assert.deepEqual((await request('POST',path,owner,cmd)).body,turn.body);
+  assert.equal((await request('POST',path,owner,{...cmd,action:{type:'attack',zone:'not_real'},requestId:randomUUID()})).status,400);
+  const record=await db.query<{state:Record<string,any>;history:any[];stance:string}>(
+    'SELECT state,history,stance FROM player_character_dogman_combat WHERE character_id=$1',[id]);
+  assert.equal(record.rows[0].state.revision,1);
+  assert.equal(record.rows[0].stance,stance);
+  assert.ok(record.rows[0].history.length>0,'Committed battle events persisted');
+  assert.equal((await request('GET',base+id+'/dev/rewind-stage')).body?.canRewind,false,
+    'Stage V stance cannot be changed after battle started');
+  const after=await db.query<{major_skill_bonuses:Record<string,number>;coins:number}>(
+    'SELECT major_skill_bonuses,coins FROM player_characters WHERE id=$1',[id]);
+  assert.deepEqual(after.rows[0].major_skill_bonuses,bonuses);
+  assert.equal(Number(after.rows[0].coins),20);
+ }
+});
+test('Dogman victory and genuine defeat are saved separately without confiscating quest items',async()=>{
+ for(const outcome of ['player_victory','player_defeat'] as const){
+  const id=randomUUID();
+  await db.query(
+    "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Female','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',6,'NOT_STARTED')",
+    [id,owner,'Outcome '+id.slice(0,8),'dog-outcome-'+id,JSON.stringify({Industry:3,Medicine:1})]);
+  await db.query(
+    'INSERT INTO player_character_bellrunner_dogman(character_id,revision,state) VALUES($1,4,$2::jsonb)',
+    [id,JSON.stringify({revision:4,branch:'trauma',phase:'done',line:0,reply:'ask_orders',stance:'defend'})]);
+  const path=base+id+'/bellrunner/combat';
+  const opened=await request('POST',path,owner,{kind:'start',requestId:randomUUID()});
+  assert.equal(opened.status,200);
+  // Exactly one engine-determined terminal transition; only the fixture's
+  // combatant HP is altered. No outcome flag is fabricated in storage.
+  const key=outcome==='player_victory'?'enemy':'player';
+  await db.query(
+    'UPDATE player_character_dogman_combat SET state=jsonb_set(state,$2::text[],$3::jsonb) WHERE character_id=$1',
+    [id,[''+key,'hp'],JSON.stringify(0)]);
+  const ended=await request('POST',path,owner,{
+    kind:'turn',expectedRevision:0,requestId:randomUUID(),action:{type:'guard'}
+  });
+  assert.equal(ended.status,200,JSON.stringify(ended.body));
+  assert.equal(ended.body?.status,'finished');
+  assert.equal(ended.body?.outcome,outcome);
+  const persisted=await db.query<{outcome:string;state:{outcome:string};history:any[]}>(
+    'SELECT outcome,state,history FROM player_character_dogman_combat WHERE character_id=$1',[id]);
+  assert.equal(persisted.rows[0].outcome,outcome);
+  assert.equal(persisted.rows[0].state.outcome,outcome);
+  assert.ok(persisted.rows[0].history.some(x=>x.kind==='outcome'));
+  const person=await db.query<{tutorial_stage:number;tutorial_status:string;current_health:number}>(
+    'SELECT tutorial_stage,tutorial_status,current_health FROM player_characters WHERE id=$1',[id]);
+  assert.equal(person.rows[0].tutorial_stage,6);
+  assert.equal(person.rows[0].tutorial_status,'COMPLETED');
+  assert.equal(person.rows[0].current_health,ended.body?.player?.hp);
+  assert.equal((await request('POST',path,owner,{
+    kind:'turn',expectedRevision:1,requestId:randomUUID(),action:{type:'guard'}
+  })).status,422,'A saved finished encounter cannot be replayed for more damage');
  }
 });
 
