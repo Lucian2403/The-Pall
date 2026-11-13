@@ -15,7 +15,7 @@ export const DOGMAN_ASSETS={
   ambience:'/audio/the-pall/night-alley-ambience.mp3'
 } as const;
 export const DOGMAN_ARRIVAL:DogmanLine={
-  speaker:'Narration',text:'Dogman steps away from the service gate and stops the courier.'
+  speaker:'Narration',text:'With the work finished, you turn back toward the public street. The narrow service passage lies ahead, its cobbles wet beneath the factory walls. A man waits near the gate. The worksite hands call him Dogman — hired muscle, not a city guard. As you approach, he steps into your path.'
 };
 export const DOGMAN_PAPERS:readonly DogmanLine[]=[
   {speaker:'Dogman',text:"You're the runner who brought the night notice?"},
@@ -96,7 +96,7 @@ export function dogmanLine(s:DogmanViewState):DogmanLine|null{
 }
 export function dogmanJournal(s:DogmanViewState):readonly string[]{
   const entries:string[]=[
-    "I was heading back through the outside service passage when a man stepped away from the gate and stopped me."
+    "I turned back toward the public street and met a rough-looking man at the service gate. The worksite hands call him Dogman."
   ];
   if(s.phase==='arrival')return entries;
   entries.push("He calls himself Dogman. Says he works for the Shift Marshal, but he isn't one of the city guards. He wants my route sheet and anything I've written down.");
