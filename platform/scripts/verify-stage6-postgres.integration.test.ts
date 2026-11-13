@@ -423,7 +423,7 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
       'ask_about_classification','finish_handover'] as const},
   {branch:'machinery' as const,skill:'Mechanics',
     actions:['inspect_safety_linkage','trace_bell_rod','show_mechanic_link',
-      'mark_pin_position','record_inspection'] as const}
+      'mark_pin_position'] as const}
  ];
  for(const job of jobs){
   const id=randomUUID();
@@ -470,13 +470,18 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
   assert.equal((await request('POST',path,owner,{
    action:first,expectedRevision:revision-1,requestId:randomUUID()
   })).status,409,'Stale revision cannot re-run a work command');
-  for(const action of job.actions.slice(1,-1))await command(action);
+  // Machinery finalizes on the gate action directly after its handover.
+  // The other jobs still have their own completion action and 'done' phase.
+  const laterActions=job.branch==='machinery'?job.actions.slice(1):job.actions.slice(1,-1);
+  for(const action of laterActions)await command(action);
   for(let k=0;k<STAGE_FOUR_REVELATION_LENGTH[job.branch]-(job.branch==='trauma'?1:0);k++)
    await command('continue_revelation');
-  await command(job.actions[job.actions.length-1]);
+  if(job.branch!=='machinery')await command(job.actions[job.actions.length-1]);
   loaded=await request('GET',path,owner);
-  assert.equal(loaded.body?.state?.phase,'done');
+  assert.equal(loaded.body?.state?.phase,job.branch==='machinery'?'finish':'done');
   assert.equal(loaded.body?.state?.journalFact,STAGE_FOUR_FACT[job.branch]);
+  assert.deepEqual(loaded.body?.availableActions,['leave_for_gate'],
+    'Only the gate action remains after finishing the job');
   const gateRequest=randomUUID();
   const exited=await command('leave_for_gate',gateRequest);
   assert.equal(exited.body?.stage,5);
