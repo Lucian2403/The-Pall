@@ -151,26 +151,35 @@ try{
     await delay(200);
     assert.equal(await evalJS('!!document.querySelector("vite-error-overlay")'),false);
   }
-  for(const width of [1280,390]){
+  for(const width of [1280,1366,390]){
     for(const outcome of ['active','victory','defeat']){
       await navigate(outcome,width,width===390?844:900);
       const data=await evalJS('(()=>{const sprite=document.querySelector(".battle .dogman img");'+
         'const arena=document.querySelector(".battle .alley");'+
+        'const actor=document.querySelector(".battle .dogman");'+
+        'const enemyStatus=document.querySelector(".battle .enemy-status");'+
         'const visible=document.querySelector(".battle .parchment");'+
+        'const r=e=>{const x=e.getBoundingClientRect();return {left:x.left,right:x.right,top:x.top,bottom:x.bottom,width:x.width,height:x.height};};'+
         'return {viewport:document.documentElement.clientWidth,bodyWidth:document.documentElement.scrollWidth,'+
         'sprite:new URL(sprite.currentSrc).pathname,spriteWidth:sprite.naturalWidth,'+
         'background:getComputedStyle(arena).backgroundImage,body:visible?.innerText,'+
+        'spriteBox:r(actor),statusBox:r(enemyStatus),'+
         'actionTiles:document.querySelectorAll(".battle .action-tile").length,'+
-        'notice:document.querySelector(".battle [role=status]")?.innerText};})()');
+        'backVisible:[...document.querySelectorAll(".chapter-bar .rewind-button")].some(x=>x.textContent.includes("Back to Stage 5"))};})()');
       assert.ok(data.bodyWidth<=data.viewport,'Horizontal overflow '+outcome+' '+width);
       assert.ok(data.spriteWidth>=450,'Dogman owner sprite did not load');
       assert.ok(data.background.includes('industrial-alley.webp'),'Wrong battle location');
+      assert.ok(data.backVisible,'Back to Stage 5 must remain reachable in the shared header');
+      if(width>=921){
+        assert.ok(data.statusBox.right<data.spriteBox.left+data.spriteBox.width*.5,
+          'Dogman condition box obscures his face: '+JSON.stringify(data));
+      }
       if(outcome==='active'){
         assert.equal(data.actionTiles,6,'Shared six-action combat HUD');
         assert.match(data.body,/Dogman/i);
       }else{
         assert.equal(data.actionTiles,0,'Finished fight has no combat controls');
-        assert.match(data.body,/Stage VII/);
+        assert.doesNotMatch(data.body,/Stage VII|not implemented|Your battle outcome and actual Health/);
         assert.equal(data.sprite,'/characters/dogman/'+
           (outcome==='victory'?'dogman-defeated.webp':'dogman-standing.webp'));
       }
@@ -178,6 +187,24 @@ try{
       if(width===1280)await screenshot('dogman-'+outcome+'-'+width);
     }
   }
+  await navigate('victory',1366,900);
+  assert.equal(await evalJS('document.querySelector("#combat-personal-journal")?.open'),false,
+    'The completed fight should remain visible until the journal is requested');
+  await evalJS('document.querySelector(".scene-journal-button").click()');
+  await until(()=>evalJS('document.querySelector("#combat-personal-journal")?.open'),
+    5000,'journal modal opens');
+  const journal=await evalJS('(()=>{const j=document.querySelector("#combat-personal-journal");'+
+    'const r=j.getBoundingClientRect();return {left:r.left,right:r.right,width:r.width,height:r.height,'+
+    'viewport:innerWidth,viewportHeight:innerHeight,readable:j.textContent.includes("The Fight with Dogman")};})()');
+  assert.ok(journal.readable&&journal.width>=680,'Journal must use a readable width: '+JSON.stringify(journal));
+  assert.ok(Math.abs(journal.left-(journal.viewport-journal.width)/2)<25,
+    'Journal must be centred at this viewport: '+JSON.stringify(journal));
+  assert.ok(journal.height<=journal.viewportHeight-40,
+    'Journal must fit vertically: '+JSON.stringify(journal));
+  await screenshot('dogman-victory-journal-1366');
+  await evalJS('document.querySelector(".journal-close").click()');
+  await until(()=>evalJS('!document.querySelector("#combat-personal-journal")?.open'),
+    4000,'journal closes');
   await navigate('active',1280,900);
   await evalJS('document.querySelector(".battle .commit").click()');
   await until(()=>evalJS('window.__dogmanCombatPosts.length>0'),
