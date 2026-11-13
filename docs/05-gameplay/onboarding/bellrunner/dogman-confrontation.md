@@ -22,7 +22,11 @@ Dogman's only asserted source of authority is that he **works for the Shift Mars
 
 **Trigger:** selected Stage 4 job finishes. The courier leaves the shift office, first-aid point or external mechanical panel and reaches the passage by the site's service gate. Once only; no encounter before completion of the selected second task.
 
-*Dogman steps away from the service gate and stops the courier.*
+**Arrival: The Service Passage (one narration screen; Dogman is not yet visible).**
+
+*With the work finished, you turn back toward the public street. The narrow service passage lies ahead, its cobbles wet beneath the factory walls. A man waits near the gate. The worksite hands call him Dogman — hired muscle, not a city guard. As you approach, he steps into your path.*
+
+**[Continue]** — Dogman and his nameplate now appear over the same alley background. The encounter begins with his first spoken line; no second arrival screen is inserted.
 
 **DOGMAN:** “You're the runner who brought the night notice?”
 
