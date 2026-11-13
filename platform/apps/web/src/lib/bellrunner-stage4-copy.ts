@@ -105,6 +105,10 @@ export const BELLRUNNER_STAGE_FOUR={
       {speaker:'Player',text:"Yes. It's shut."},
       {speaker:'Mechanic',text:'Right. Now look at the rod going up to the bell.'}
     ],
+    pinCheck:{
+      narration:'The mechanic takes a closer look at the pin.',
+      spoken:"Aye, someone's moved it. Leave it alone. We need to write down exactly how we found it."
+    },
     revelation:[
       {speaker:'Player',text:"Wait. Is that pin what's keeping the bell ringing?"},
       {speaker:'Mechanic',text:'Yes. Someone moved it so the bell would work even with the shutoff down.'},
@@ -118,6 +122,7 @@ export const BELLRUNNER_STAGE_FOUR={
 } as const satisfies Record<StageFourBranch,{
   title:string;discipline:string;place:string;image:string;aspect:number;
   entry:string;opening:readonly StageFourLine[];revelation:readonly StageFourLine[];
+  pinCheck?:{narration:string;spoken:string};
   triageResponse?:{urgent:readonly StageFourLine[];corrected:readonly StageFourLine[]};
   assistance?:readonly StageFourLine[];
   register?:{observations:readonly StageFourLine[];escort:readonly StageFourLine[]};
@@ -144,8 +149,8 @@ export const STAGE_FOUR_ACTION_LABELS:Record<StageFourAction,string>={
   trace_bell_rod:'Follow the bell rod',
   compare_linkage_marks:'Check the safety stop',
   show_mechanic_link:'Show the mechanic what you found',
-  mark_pin_position:"Mark the pin's position on the work sketch",
-  request_second_check:'Request a second check',
+  mark_pin_position:'Mark the pin on the sketch',
+  request_second_check:'Ask the mechanic to check again',
   record_inspection:'Record the inspection',
   continue_revelation:'Continue',
   leave_for_gate:'Head back to the service gate'
@@ -168,7 +173,6 @@ export const STAGE_FOUR_TASK_TEXT:Record<StageFourBranch,Partial<Record<StageFou
     inspect:'The ventilation safety shutoff is engaged, but the bell\'s mechanism is still moving.',
     detail:'The safety stop is shut, but the bell rod is still moving. The mechanic tells you to keep your hands clear and take a closer look.',
     confirm:'Someone has moved a retaining pin, keeping the bell rod connected even though the safety stop is shut.',
-    choose:'The mechanic confirms the held-open link. Record the finding without touching the moving apparatus.',
     finish:'The safety defect has been documented for authorized staff. The apparatus remains untouched.'
   }
 };
