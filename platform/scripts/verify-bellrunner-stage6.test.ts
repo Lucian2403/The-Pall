@@ -80,7 +80,7 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(api.includes("claim?.state.phase!=='done'"));
   assert.ok(api.includes("'COMPLETED':'IN_PROGRESS'"));
   assert.ok(!api.includes('coins=$')&&!api.includes('major_skill_bonuses='));
-  assert.match(rewind,/SELECT 1 FROM player_character_dogman_combat WHERE character_id=/);
+  assert.match(rewind,/SELECT state,stance FROM player_character_dogman_combat WHERE character_id=/);
   assert.match(rewind,/SELECT response FROM player_character_dogman_combat_receipts/);
   assert.match(rewind,/restoredHealth=first.player.hp/);
   assert.match(rewind,/DELETE FROM player_character_dogman_combat_receipts/);
