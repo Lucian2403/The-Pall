@@ -24,6 +24,8 @@
   const line=$derived(dogmanLine(state));
   const journal=$derived(dogmanJournal(state));
   const atGate=$derived(state.phase==='gate'||state.phase==='done');
+  // The alley comes first. Dogman's artwork enters only after Continue.
+  const dogmanVisible=$derived(state.phase!=='arrival');
   const actions=$derived(snapshot.availableActions);
   let alleyImageMissing=$state(false);
   let dogmanImageMissing=$state(false);
@@ -59,13 +61,15 @@
             <img class="scene-background" src="/locations/alley/alley-background.webp"
               alt="An industrial service passage" draggable="false"/>
           {/if}
-          {#if !dogmanImageMissing}
-            <img class="dogman-standing" src={DOGMAN_ASSETS.standing} alt="Dogman, the Shift Marshal's hired man, holding a short club"
-              draggable="false" onerror={()=>{dogmanImageMissing=true;}}/>
-          {:else}
-            <p class="missing-character" role="status">Dogman stands in the path, club in hand.</p>
+          {#if dogmanVisible}
+            {#if !dogmanImageMissing}
+              <img class="dogman-standing" src={DOGMAN_ASSETS.standing} alt="Dogman, the Shift Marshal's hired man, holding a short club"
+                draggable="false" onerror={()=>{dogmanImageMissing=true;}}/>
+            {:else}
+              <p class="missing-character" role="status">Dogman stands in the path, club in hand.</p>
+            {/if}
+            <span class="dogman-label">Dogman</span>
           {/if}
-          <span class="dogman-label">Dogman</span>
           {#if atGate}<span class="cart-label">Work cart</span>{/if}
         </div>
       </div>
@@ -73,8 +77,8 @@
     {#snippet panel()}
       <section class="pall-story-dialogue-section" aria-label="Dogman confrontation dialogue">
         <div class="work-card">
-          <p class="eyebrow">BELLRUNNER · STAGE V · {atGate?'GATE BARRED':'SHOW YOUR PAPERS'}</p>
-          <h1>{atGate?'Gate Barred':'Show Your Papers'}</h1>
+          <p class="eyebrow">BELLRUNNER · STAGE V · {state.phase==='arrival'?'SERVICE PASSAGE':atGate?'GATE BARRED':'SHOW YOUR PAPERS'}</p>
+          <h1>{state.phase==='arrival'?'The Service Passage':atGate?'Gate Barred':'Show Your Papers'}</h1>
           {#if line}
             {#if line.speaker==='Narration'}
               <p class="narration">{line.text}</p>
