@@ -20,8 +20,8 @@ blueprint, background or bell asset is required.
 The available `/audio/bellrunner/night-shift-bell.mp3` is used as a
 separate SFX on the first exterior safety-linkage inspection. It uses
 Effects Volume, not Ambience Volume. **No supplementary mechanism art** is
-created for a single-use tutorial encounter. The shutdown state and
-bell drive are presented as distinct *textual observation panels* while
+created for a single-use tutorial encounter. The shutoff state and bell drive are conveyed through dialogue and
+natural narration, without duplicate technical status cards, while
 the trained mechanic supervises passive inspection outside the gate.
 
 NPCs speak as role labels — Clerk, Attendant, Mechanic — with no
@@ -89,11 +89,18 @@ was added.
    recorded inspection beat.
 3. Choose **Trace the bell rod** or **Compare the stop and its linkage
    marks**. Both reveal the retaining pin positioned past the stop.
-4. **Show the mechanic the held-open link**, then choose to **Mark the
-   pin's position on the work sketch** or **Request a second check**.
-5. Four approved revelation beats. **Record the inspection**. No
-   machinery operation, repair, fume exposure, part collection or
-   unapproved restoration of the site occurs.
+4. **Show the mechanic the held-open link**. The mechanic looks again
+   and says: “Aye, someone's moved it. Leave it alone. We need to
+   write down exactly how we found it.” Choose **Mark the pin on the
+   sketch** or **Ask the mechanic to check again**.
+5. Four revelation beats lead to the handover: “You hand the completed
+   report to the mechanic. He takes responsibility for passing it to
+   the authorized repair crew. The mechanism is left untouched.”
+   **Head back to the service gate** is the only final action. It records
+   departure and advances to Stage 5 directly, without the retired
+   “Record the inspection” and second completion card. No machinery
+   operation, repair, fume exposure, part collection or unapproved
+   restoration of the site occurs.
 
 ## Shared save/progression contract
 
@@ -109,8 +116,11 @@ was added.
   There are **no new coins, XP, loot or inventory items**.
 - The local finding, honest method and optional staff triage correction
   are recorded in saved state and shown in the shared Personal Journal.
-- A completed job exposes **Continue to the outside service gate**.
+- A completed job exposes the final **Head back to the service gate**.
   This marks Stage 4 as `exited` and moves the character to Stage 5.
+  The Machinery branch reaches this action directly from its final
+  report-handover narration, skipping the old extra `done` card.
+  Existing saved Machinery `done` states remain eligible to exit.
   The Dogman Stage 5 encounter is **not** implemented by this work.
   Until it exists, the exterior-gate screen shows a brief in-world
   narrative ending, not a debug screen, technical recap or fake encounter.
