@@ -200,7 +200,7 @@ try{
   await evalJS('document.querySelector(".bellrunner-dogman .actions button").click()');
   const posts=await evalJS('window.__dogmanPosts');
   assert.equal(posts[0]?.action,'step_street','Real action handler receives the selected stance');
-  await evalJS('document.querySelector(".scene-journal-bar button").click()');
+  await evalJS('document.querySelector(".scene-journal-button").click()');
   await until(()=>evalJS('!!document.querySelector("#bellrunner-dogman-journal .journal-entries p")'),
     8000,'personal journal');
   console.log('PASS: Dogman artwork, three branch callbacks, three stances, journal, and responsive UI.');
