@@ -163,7 +163,9 @@ try{
         'return {viewport:document.documentElement.clientWidth,bodyWidth:document.documentElement.scrollWidth,'+
         'sprite:new URL(sprite.currentSrc).pathname,spriteWidth:sprite.naturalWidth,'+
         'background:getComputedStyle(arena).backgroundImage,body:visible?.innerText,'+
-        'spriteBox:r(actor),statusBox:r(enemyStatus),'+
+        'spriteBox:r(actor),statusBox:r(enemyStatus),parchmentBox:r(visible),'+
+        'arenaBox:r(arena),typeSize:parseFloat(getComputedStyle(visible.querySelector(".defeat-narration")||visible).fontSize),'+
+        'textHeight:visible.scrollHeight,visibleHeight:visible.clientHeight,'+
         'actionTiles:document.querySelectorAll(".battle .action-tile").length,'+
         'backVisible:[...document.querySelectorAll(".chapter-bar .rewind-button")].some(x=>x.textContent.includes("Back to Stage 5"))};})()');
       assert.ok(data.bodyWidth<=data.viewport,'Horizontal overflow '+outcome+' '+width);
@@ -182,6 +184,17 @@ try{
         assert.doesNotMatch(data.body,/Stage VII|not implemented|Your battle outcome and actual Health/);
         assert.equal(data.sprite,'/characters/dogman/'+
           (outcome==='victory'?'dogman-defeated.webp':'dogman-standing.webp'));
+      }
+      if(outcome==='defeat'){
+        assert.match(data.body,/Dogman defeated you, but approaching workers forced him to back off/);
+        assert.match(data.body,/You hit the cobblestones hard/);
+        assert.match(data.body,/WORKER:.*Oi! Get away from him/);
+        assert.match(data.body,/Your papers are still in your bag/);
+        assert.ok(data.typeSize>=16,'Defeat narration must have legible type: '+JSON.stringify(data));
+        assert.ok(data.textHeight<=data.visibleHeight+3,
+          'Defeat narrative text must not overflow its frame: '+JSON.stringify(data));
+        assert.ok(data.parchmentBox.bottom<=data.arenaBox.bottom+3,
+          'Defeat narrative parchment must remain in the illustrated stage: '+JSON.stringify(data));
       }
       if(outcome==='victory'||outcome==='defeat')assert.ok(!data.body.includes('Continue to medical care'));
       if(width===1280||width===1920)await screenshot('dogman-'+outcome+'-'+width);
