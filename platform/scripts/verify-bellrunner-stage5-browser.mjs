@@ -29,6 +29,8 @@ for(const branch of ['contracts','trauma','machinery']){
   fixtures[branch]={arrival:{stage:5,tutorialStatus:'NOT_STARTED',state,
     availableActions:availableDogmanActions(state),tutorialPayout:{coins:0,ordinaryXp:0,items:0}}};
   state=advanceDogman(state,'continue');
+  fixtures[branch].papers={stage:5,tutorialStatus:'IN_PROGRESS',state,
+    availableActions:availableDogmanActions(state),tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
   for(let i=0;i<DOGMAN_PAPERS_LENGTH-1;i++)state=advanceDogman(state,'continue');
   state=advanceDogman(state,'tell_him');
   fixtures[branch].tell={stage:5,tutorialStatus:'IN_PROGRESS',state,
@@ -137,6 +139,7 @@ try{
       'if(url.pathname.endsWith("/dev/rewind-stage"))return Promise.resolve(json({enabled:true,canRewind:true,stage:5,targetStage:4}));'+
       'if(url.pathname.endsWith("/bellrunner/dogman")){' +
         'if(options?.method==="POST"){window.__dogmanPosts.push(JSON.parse(options.body||"{}"));'+
+          'if(mode==="arrival")return Promise.resolve(json(fixtures[branch].papers));'+
           'return Promise.resolve(json({error:"qa_stub_no_write"},503));}'+
         'return Promise.resolve(json(fixtures[branch][mode]));}' +
       'return Promise.resolve(json({error:"unavailable"},404));'+
@@ -155,7 +158,9 @@ try{
     await until(()=>evalJS('(()=>{const art=document.querySelector(".bellrunner-dogman .scene-background");'+
       'const dog=document.querySelector(".bellrunner-dogman .dogman-standing");'+
       'const panel=document.querySelector(".bellrunner-dogman .work-card");'+
-      'return !!art&&!!dog&&!!panel&&art.complete&&dog.complete&&art.naturalWidth>0&&dog.naturalWidth>0;})()'),
+      'const visible=new URLSearchParams(location.search).get("mode")!=="arrival";'+
+      'return !!art&&!!panel&&art.complete&&art.naturalWidth>0&&'+
+      '(visible?!!dog&&dog.complete&&dog.naturalWidth>0:!dog);})()'),
       26000,branch+'/'+mode+' '+width+'px');
     await evalJS('document.fonts.ready.then(()=>true)');
     await delay(180);
@@ -170,22 +175,35 @@ try{
           'const art=document.querySelector(".bellrunner-dogman .scene-background");'+
           'const dog=document.querySelector(".bellrunner-dogman .dogman-standing");'+
           'return {bodyWidth:document.documentElement.scrollWidth,viewport:document.documentElement.clientWidth,'+
-          'artSrc:new URL(art.currentSrc).pathname,artWidth:art.naturalWidth,dogSrc:new URL(dog.currentSrc).pathname,dogWidth:dog.naturalWidth,'+
+          'artSrc:new URL(art.currentSrc).pathname,artWidth:art.naturalWidth,'+
+          'dogSrc:dog?new URL(dog.currentSrc).pathname:null,dogWidth:dog?.naturalWidth??0,'+
+          'dogNameVisible:!!document.querySelector(".bellrunner-dogman .dogman-label"),'+
           'stage:rect(".bellrunner-dogman .activity-stage"),panel:rect(".bellrunner-dogman .activity-panel"),'+
           'scene:rect(".bellrunner-dogman .dogman-stage"),'+
           'mode:document.querySelector(".bellrunner-dogman .activity-layout")?.dataset.activityMode,'+
           'actions:[...document.querySelectorAll(".bellrunner-dogman .actions button")].map(b=>b.textContent.trim()),'+
           'copy:document.querySelector(".bellrunner-dogman .work-card")?.innerText};})()');
         assert.equal(d.artSrc,'/locations/bellrunner/industrial-alley.webp');
-        assert.equal(d.dogSrc,'/characters/dogman/dogman-standing.webp');
-        assert.ok(d.artWidth>=1300&&d.dogWidth>=700);
+        assert.ok(d.artWidth>=1300);
+        if(mode==='arrival'){
+          assert.equal(d.dogSrc,null,'No Dogman portrait on the arrival narration');
+          assert.equal(d.dogNameVisible,false,'No Dogman nameplate before Continue');
+        }else{
+          assert.equal(d.dogSrc,'/characters/dogman/dogman-standing.webp');
+          assert.ok(d.dogWidth>=700);
+          assert.equal(d.dogNameVisible,true);
+        }
         assert.ok(d.bodyWidth<=d.viewport,'No page overflow: '+branch+'/'+mode+'/'+width);
         assert.equal(d.mode,'scene');
         assert.ok(d.stage&&d.panel&&d.scene);
         if(width===1280)assert.ok(d.stage.x+d.stage.width<=d.panel.x+5,'Side by side dialogue');
         else assert.ok(d.panel.y>=d.stage.y+d.stage.height-5,'Stacked below art');
         if(mode==='gate')assert.equal(d.actions.length,3,'Three real defensive choices');
-        if(mode==='arrival')assert.match(d.copy,/Dogman steps away from the service gate/);
+        if(mode==='arrival'){
+          assert.match(d.copy,/turn back toward the public street/);
+          assert.match(d.copy,/The Service Passage/);
+          assert.deepEqual(d.actions,['Continue']);
+        }
         if(mode==='tell'){
           const fact=branch==='contracts'?'marking men absent':
             branch==='trauma'?'standing there coughing':'safety shutoff was down';
@@ -196,6 +214,13 @@ try{
       }
     }
   }
+  await navigate('contracts','arrival',1280,900);
+  await evalJS('document.querySelector(".bellrunner-dogman .actions button").click()');
+  await until(()=>evalJS('!!document.querySelector(".bellrunner-dogman .dogman-standing")'),
+    7000,'Dogman appears only after Continue');
+  const revealed=await evalJS('document.querySelector(".bellrunner-dogman .work-card")?.innerText');
+  assert.match(revealed,/Show Your Papers/);
+  assert.match(revealed,/You're the runner who brought the night notice/);
   await navigate('contracts','gate',1280,900);
   await evalJS('document.querySelector(".bellrunner-dogman .actions button").click()');
   const posts=await evalJS('window.__dogmanPosts');
