@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import BellrunnerDogmanCombatScene from '$lib/BellrunnerDogmanCombatScene.svelte';
@@ -65,6 +66,12 @@
     return releaseCombatSfx;
   });
 
+  // Navigation, not developer rewind: Stage V is read-only after the fight
+  // begins, and returning never deletes turns, Health or the outcome.
+  async function backToStageFive(){
+    await goto('/characters/'+encodeURIComponent(id)+'/bellrunner/dogman');
+  }
+
   async function perform(action:CombatAction){
     const previous=battle;
     const revision=battle?.revision;
@@ -109,7 +116,7 @@
 <svelte:head><title>The Pall — The Passage, Dogman</title></svelte:head>
 {#if status==='ready' && character && battle}
   <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
-    travelLocked={battle.status==='active'}
+    {backToStageFive} travelLocked={battle.status==='active'}
     combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
     <BellrunnerDogmanCombatScene snapshot={battle} characterId={id} {feedback} {pending} {errorMessage} {perform}/>
   </TutorialShell>
