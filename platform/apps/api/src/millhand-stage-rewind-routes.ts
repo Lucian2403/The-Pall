@@ -70,20 +70,39 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         return {enabled:true,canRewind,stage,targetStage:canRewind?4:null};
       }
       if(stage===6){
-        // The Dogman stance is replayable only until the first saved combat
-        // command. No completed turns or character Health may be erased.
+        // Same local replay policy as Flint: restore the true pre-fight HP
+        // from the immutable revision-zero receipt, never from maximum HP.
         const dogman=await db.query<{revision:string|number;state:{
           revision:number;phase:string;stance:string|null
         }}>(
           'SELECT revision,state FROM player_character_bellrunner_dogman WHERE character_id=$1',
           [req.params.id]);
         const saved=dogman.rows[0];
-        const combat=await db.query(
-          'SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',
-          [req.params.id]);
-        const canRewind=!combat.rowCount&&saved?.state.phase==='done'&&
-          !!saved.state.stance&&Number(saved.revision)===saved.state.revision;
-        return {enabled:true,canRewind,stage,targetStage:canRewind?5:null};
+        let valid=saved?.state.phase==='done'&&
+          ['street','cart','defend'].includes(saved.state.stance??'')&&
+          Number(saved.revision)===saved.state.revision;
+        if(valid){
+          const combat=await db.query<{state:{player:{hp:number}};stance:string}>(
+            'SELECT state,stance FROM player_character_dogman_combat WHERE character_id=$1',
+            [req.params.id]);
+          if(combat.rowCount){
+            const encounter=combat.rows[0];
+            const start=await db.query<{response:{
+              revision:number;stance:string;player:{hp:number}
+            }}>(
+              "SELECT response FROM player_character_dogman_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+              [req.params.id]);
+            const first=start.rows[0]?.response;
+            const viewStance=saved.state.stance==='street'?'moving'
+              :saved.state.stance==='defend'?'brace':'cart';
+            valid=encounter.stance===saved.state.stance&&
+              encounter.state.player.hp===result.rows[0].current_health&&
+              first?.revision===0&&first.stance===viewStance&&
+              Number.isSafeInteger(first.player?.hp)&&
+              first.player.hp>0&&first.player.hp<=result.rows[0].max_health;
+          }
+        }
+        return {enabled:true,canRewind:!!valid,stage,targetStage:valid?5:null};
       }
       if(stage===3||stage===4){
         const investigation=await db.query<{state:{phase:string;branch:string|null}}>(
@@ -325,26 +344,56 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
       }
       if(bellrunner&&expectedStage===6){
-        // Stance is mutable only before Dogman combat starts; subsequent
-        // rounds, Health loss and fight result must never be rewound here.
-        const combat=await client.query(
-          'SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',
-          [req.params.id]);
-        if(combat.rowCount){
-          await client.query('ROLLBACK');transaction=false;
-          return reply.code(409).send({error:'combat_already_started'});
-        }
+        // Local testing only: a full Dogman replay follows Flint's policy.
+        // Lock the owned character first (above), then these two state rows.
+        // The combat adapter uses that same lock before committing any turn.
         const saved=await client.query<{revision:string|number;state:{
           revision:number;phase:string;line:number;stance:string|null
         }}>(
           'SELECT revision,state FROM player_character_bellrunner_dogman WHERE character_id=$1 FOR UPDATE',
           [req.params.id]);
         const state=saved.rows[0]?.state;
-        if(!state||state.phase!=='done'||!state.stance||
+        if(!state||state.phase!=='done'||
+          !['street','cart','defend'].includes(state.stance??'')||
           Number(saved.rows[0].revision)!==state.revision){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_dogman_state'});
         }
+        const combat=await client.query<{state:{player:{hp:number}};stance:string}>(
+          'SELECT state,stance FROM player_character_dogman_combat WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        let restoredHealth=c.rows[0].current_health;
+        if(combat.rowCount){
+          const encounter=combat.rows[0];
+          if(encounter.stance!==state.stance||
+             encounter.state.player.hp!==c.rows[0].current_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_health_state'});
+          }
+          const start=await client.query<{response:{
+            revision:number;stance:string;player:{hp:number}
+          }}>(
+            "SELECT response FROM player_character_dogman_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+            [req.params.id]);
+          const first=start.rows[0]?.response;
+          const viewStance=state.stance==='street'?'moving'
+            :state.stance==='defend'?'brace':'cart';
+          if(first?.revision!==0||first.stance!==viewStance||
+             !Number.isSafeInteger(first.player?.hp)||
+             first.player.hp<=0||first.player.hp>c.rows[0].max_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_initial_health'});
+          }
+          restoredHealth=first.player.hp;
+        }
+        // Replaying requires clearing both sets of receipts, so an old action
+        // ID cannot revive a prior fight or reapply its Health loss.
+        await client.query(
+          'DELETE FROM player_character_dogman_combat_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'DELETE FROM player_character_dogman_combat WHERE character_id=$1',
+          [req.params.id]);
         const next={...state,phase:'gate',line:7,stance:null,
           revision:state.revision+1};
         await client.query(
@@ -354,8 +403,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           'UPDATE player_character_bellrunner_dogman SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
           [req.params.id,next.revision,JSON.stringify(next)]);
         await client.query(
-          "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS' WHERE id=$1",
-          [req.params.id]);
+          "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS',current_health=$2 WHERE id=$1",
+          [req.params.id,restoredHealth]);
         await client.query('COMMIT');transaction=false;
         return {stage:5,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/dogman',coinDelta:0};
