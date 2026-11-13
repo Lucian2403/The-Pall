@@ -95,7 +95,7 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(!scene.includes('Your battle outcome and actual Health are saved.'));
   assert.ok(!scene.includes('Stage VII is not implemented'));
   assert.ok(scene.includes('class="journal-dialog"'));
-  assert.ok(scene.includes('journalDialog.showModal()'));
+  assert.ok(scene.includes('dialog.showModal()'));
   assert.ok(scene.includes('left:1.5%'));
   const shell=read('apps/web/src/lib/TutorialShell.svelte');
   assert.ok(shell.includes("character.origin==='Bellrunner') && character.tutorial.stage===6"));
