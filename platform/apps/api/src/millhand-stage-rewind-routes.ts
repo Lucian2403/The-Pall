@@ -70,15 +70,19 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         return {enabled:true,canRewind,stage,targetStage:canRewind?4:null};
       }
       if(stage===6){
-        // The Dogman stance can be revisited before Stage VI combat is built.
+        // The Dogman stance is replayable only until the first saved combat
+        // command. No completed turns or character Health may be erased.
         const dogman=await db.query<{revision:string|number;state:{
           revision:number;phase:string;stance:string|null
         }}>(
           'SELECT revision,state FROM player_character_bellrunner_dogman WHERE character_id=$1',
           [req.params.id]);
         const saved=dogman.rows[0];
-        const canRewind=saved?.state.phase==='done'&&!!saved.state.stance&&
-          Number(saved.revision)===saved.state.revision;
+        const combat=await db.query(
+          'SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',
+          [req.params.id]);
+        const canRewind=!combat.rowCount&&saved?.state.phase==='done'&&
+          !!saved.state.stance&&Number(saved.revision)===saved.state.revision;
         return {enabled:true,canRewind,stage,targetStage:canRewind?5:null};
       }
       if(stage===3||stage===4){
@@ -321,8 +325,15 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
       }
       if(bellrunner&&expectedStage===6){
-        // Before Stage VI combat is integrated there is no fight state to
-        // destroy. Return to the last defensive-position choice only.
+        // Stance is mutable only before Dogman combat starts; subsequent
+        // rounds, Health loss and fight result must never be rewound here.
+        const combat=await client.query(
+          'SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',
+          [req.params.id]);
+        if(combat.rowCount){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'combat_already_started'});
+        }
         const saved=await client.query<{revision:string|number;state:{
           revision:number;phase:string;line:number;stance:string|null
         }}>(
