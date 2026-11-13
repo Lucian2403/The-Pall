@@ -516,7 +516,7 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
  }
 });
 
-test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe turns and rewind lock',async()=>{
+test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe turns and receipt-backed rewind',async()=>{
  for(const stance of ['defend','street','cart'] as const){
   const id=randomUUID();
   const bonuses={Industry:3,Mechanics:1};
@@ -561,12 +561,37 @@ test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe
   assert.equal(record.rows[0].state.revision,1);
   assert.equal(record.rows[0].stance,stance);
   assert.ok(record.rows[0].history.length>0,'Committed battle events persisted');
-  assert.equal((await request('GET',base+id+'/dev/rewind-stage')).body?.canRewind,false,
-    'Stage V stance cannot be changed after battle started');
-  const after=await db.query<{major_skill_bonuses:Record<string,number>;coins:number}>(
-    'SELECT major_skill_bonuses,coins FROM player_characters WHERE id=$1',[id]);
+  assert.equal((await request('GET',base+id+'/dev/rewind-stage')).body?.canRewind,true,
+    'Local developer rewind restores receipt-backed HP even after combat starts');
+  const rewritten=await request('POST',base+id+'/dev/rewind-stage',owner,{expectedStage:6});
+  assert.equal(rewritten.status,200,JSON.stringify(rewritten.body));
+  assert.equal(rewritten.body?.stage,5);
+  assert.equal(rewritten.body?.route,base+id+'/bellrunner/dogman');
+  const cleared=await db.query(
+    'SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',[id]);
+  assert.equal(cleared.rowCount,0,'Combat state and rounds are cleared atomically');
+  const clearedReceipts=await db.query(
+    'SELECT 1 FROM player_character_dogman_combat_receipts WHERE character_id=$1',[id]);
+  assert.equal(clearedReceipts.rowCount,0,'Previously accepted action IDs cannot replay damage');
+  const dialog=(await db.query<{state:{phase:string;stance:string|null;line:number;revision:number}}>(
+    'SELECT state FROM player_character_bellrunner_dogman WHERE character_id=$1',[id])).rows[0].state;
+  assert.equal(dialog.phase,'gate');
+  assert.equal(dialog.stance,null);
+  assert.equal(dialog.line,7);
+  const after=await db.query<{major_skill_bonuses:Record<string,number>;coins:number;current_health:number;tutorial_stage:number}>(
+    'SELECT major_skill_bonuses,coins,current_health,tutorial_stage FROM player_characters WHERE id=$1',[id]);
   assert.deepEqual(after.rows[0].major_skill_bonuses,bonuses);
   assert.equal(Number(after.rows[0].coins),20);
+  assert.equal(after.rows[0].current_health,50);
+  assert.equal(after.rows[0].tutorial_stage,5);
+  const newStance=await request('POST',base+id+'/bellrunner/dogman',owner,{
+    action:'step_street',expectedRevision:dialog.revision,requestId:randomUUID()});
+  assert.equal(newStance.status,200,JSON.stringify(newStance.body));
+  assert.equal(newStance.body?.stage,6,'Player can actually reselect the stance');
+  const restarted=await request('POST',path,owner,{kind:'start',requestId:randomUUID()});
+  assert.equal(restarted.status,200);
+  assert.equal(restarted.body?.revision,0,'Fresh fight starts at revision zero');
+  assert.equal(restarted.body?.distance,'near','New streetward stance is applied');
  }
 });
 test('Dogman victory and genuine defeat are saved separately without confiscating quest items',async()=>{
@@ -606,6 +631,12 @@ test('Dogman victory and genuine defeat are saved separately without confiscatin
   assert.equal((await request('POST',path,owner,{
     kind:'turn',expectedRevision:1,requestId:randomUUID(),action:{type:'guard'}
   })).status,422,'A saved finished encounter cannot be replayed for more damage');
+  const rewind=await request('POST',base+id+'/dev/rewind-stage',owner,{expectedStage:6});
+  assert.equal(rewind.status,200,JSON.stringify(rewind.body));
+  const savedHealth=(await db.query<{current_health:number;tutorial_stage:number}>(
+    'SELECT current_health,tutorial_stage FROM player_characters WHERE id=$1',[id])).rows[0];
+  assert.equal(savedHealth.current_health,50,'Victory/defeat restores the exact original starting HP');
+  assert.equal(savedHealth.tutorial_stage,5);
  }
 });
 
