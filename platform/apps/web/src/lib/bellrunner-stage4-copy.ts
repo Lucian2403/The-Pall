@@ -25,10 +25,10 @@ export const BELLRUNNER_STAGE_FOUR={
       {speaker:'Player',text:'But he was there. I saw him waiting by the gate. Why have you marked him absent?'},
       {speaker:'Clerk',text:"He didn't go inside when the bell rang."},
       {speaker:'Player',text:"The place is shut. There's a notice on the gate telling people not to go in."},
-      {speaker:'Clerk',text:"I can note that. I can't change how he's marked."}
+      {speaker:'Clerk',text:"Look, I'll write down what you've said. But I can't change his record. That's not up to me."}
     ],
     fact:"Workers refusing the condemned site are listed voluntarily absent and lose wages.",
-    done:'The attendance certificate is marked disputed, not cleared. The closed site still has no authorized receiving mark.',
+    done:'The clerk files the Attendance Certificate as disputed. The factory\'s official receiving mark is still missing.',
     next:'Outside service gate'
   },
   trauma:{
@@ -99,11 +99,11 @@ export const BELLRUNNER_STAGE_FOUR={
     place:'Industrial Courtyard · Outside Service Controls',
     image:'/locations/industrial/industrial-courtyard.webp',
     aspect:1672/941,
-    entry:"The City-Works Mechanic stops the courier's hand short of the moving linkage.",
+    entry:"The mechanic points to a small metal stop beside the moving machinery.",
     opening:[
-      {speaker:'Mechanic',text:'Keep your hands back. See that little stop there?'},
-      {speaker:'Player',text:"Yes. It's already shut."},
-      {speaker:'Mechanic',text:'Right. Now look at the rod leading up to the bell.'}
+      {speaker:'Mechanic',text:'Don\'t touch anything. See that stop there?'},
+      {speaker:'Player',text:"Yes. It's shut."},
+      {speaker:'Mechanic',text:'Right. Now look at the rod going up to the bell.'}
     ],
     revelation:[
       {speaker:'Player',text:"Wait. Is that pin what's keeping the bell ringing?"},
@@ -140,22 +140,22 @@ export const STAGE_FOUR_ACTION_LABELS:Record<StageFourAction,string>={
   continue_register:'Continue',
   ask_about_classification:'Ask the attendant why the illness is classified as non-work-related.',
   finish_handover:'Finish the handover',
-  inspect_safety_linkage:'Inspect shutoff and linkage',
-  trace_bell_rod:'Trace the bell rod',
-  compare_linkage_marks:'Compare the stop and its linkage marks',
-  show_mechanic_link:'Show the mechanic the held-open link',
+  inspect_safety_linkage:'Inspect the shutoff and bell rod.',
+  trace_bell_rod:'Follow the bell rod',
+  compare_linkage_marks:'Check the safety stop',
+  show_mechanic_link:'Show the mechanic what you found',
   mark_pin_position:"Mark the pin's position on the work sketch",
   request_second_check:'Request a second check',
   record_inspection:'Record the inspection',
   continue_revelation:'Continue',
-  leave_for_gate:'Continue to the outside service gate'
+  leave_for_gate:'Head back to the service gate'
 };
 export const STAGE_FOUR_TASK_TEXT:Record<StageFourBranch,Partial<Record<StageFourPhase,string>>>={
   contracts:{
     inspect:'The clerk puts the dispatch slip next to the attendance book. It shows that workers are expected at the closed factory tonight.',
     detail:'A worker who refused to enter the fume-closed block is marked “Absent by choice”. The wages column reads “Not payable”. Examine why.',
-    choose:'The factory was closed, but workers who refused to go inside are marked absent by choice. Decide how to record this.',
-    finish:'The clerk can record your objection, but can\'t give you the closed factory\'s official receiving mark.'
+    choose:'The factory was closed, but the watchman has orders to let the night shift in anyway.The workers who refused to enter are marked absent by choice.',
+    finish:''
   },
   trauma:{
     // Legacy pre-revision saved states can still open an already-reached
@@ -165,9 +165,9 @@ export const STAGE_FOUR_TASK_TEXT:Record<StageFourBranch,Partial<Record<StageFou
     finish:'She goes back to the treatment bench.'
   },
   machinery:{
-    inspect:'From the accessible exterior service side: the ventilation shutoff is ENGAGED while the shift bell linkage is STILL ACTUATING. Observe, do not touch.',
-    detail:'Choose a safe visual check while the City-Works Mechanic supervises. Both methods lead to the retaining pin beyond the safety stop.',
-    confirm:'A repositioned retaining pin holds a secondary link clear of the engaged stop. The bell is still mechanically connected.',
+    inspect:'The ventilation safety shutoff is engaged, but the bell\'s mechanism is still moving.',
+    detail:'The safety stop is shut, but the bell rod is still moving. The mechanic tells you to keep your hands clear and take a closer look.',
+    confirm:'Someone has moved a retaining pin, keeping the bell rod connected even though the safety stop is shut.',
     choose:'The mechanic confirms the held-open link. Record the finding without touching the moving apparatus.',
     finish:'The safety defect has been documented for authorized staff. The apparatus remains untouched.'
   }
