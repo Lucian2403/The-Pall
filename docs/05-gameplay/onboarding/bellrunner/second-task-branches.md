@@ -267,12 +267,18 @@ The player chooses one of two standard Industrial Machinery checks. Both are **p
 
 ### C03 — Record the condition instead of repairing the condemned site
 
-**[Show the mechanic the held-open link]** confirms the physical observation. Then choose:
+**[Show the mechanic the held-open link]** confirms the physical observation.
+
+*The mechanic takes a closer look at the pin.*
+
+**MECHANIC:** “Aye, someone's moved it. Leave it alone. We need to write down exactly how we found it.”
+
+Then choose:
 
 | Player action | Practical outcome |
 | --- | --- |
-| **[Mark the pin's position on the work sketch]** | Document where the connection is held; leave physical apparatus untouched |
-| **[Request a second check]** | Mechanic independently verifies the stop and pinned connection, costing more work time; then the same accurate condition is documented |
+| **[Mark the pin on the sketch]** | Document where the connection is held; leave physical apparatus untouched |
+| **[Ask the mechanic to check again]** | Mechanic independently verifies the stop and pinned connection, costing more work time; then the same accurate condition is documented |
 
 The ordinary non-destructive **Industrial Machinery** task ends in a recorded safety defect. Neither branch magically repairs the closed ventilation machinery, removes evidence, stops the bell as an unapproved world effect or consumes a personal tool.
 
