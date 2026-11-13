@@ -41,6 +41,18 @@
       label:'Continue Shift Dispatch',
       href:base+'/bellrunner/dispatch'
     };
+    if(character.origin==='Bellrunner'&&character.tutorial.stage===5) return {
+      title:'Show Your Papers',
+      description:'Dogman has stopped you beside the condemned site’s exterior service gate.',
+      label:'Continue the confrontation',
+      href:base+'/bellrunner/dogman'
+    };
+    if(character.origin==='Bellrunner'&&character.tutorial.stage===6) return {
+      title:'Gate Barred',
+      description:'Your response to Dogman and the opening position are saved.',
+      label:'Continue at the service gate',
+      href:base+'/bellrunner/combat'
+    };
     if(character.origin==='Millhand'&&character.tutorial.stage===2) return {
       title:'Marking the Plates',
       description:'Return to the council plate lot and continue the work you have already begun.',
