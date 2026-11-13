@@ -223,16 +223,26 @@ function makeIntent(state) {
     return scene==='flint'
       ? {type:'technique',zone:'torso',speed:2,momentumCost:20,ability:'Driving Blow',tracking:false,signal:'heavy threat',
           tell:'Flint sets both hands on his club and puts his weight behind the next movement. A heavy blow may follow.'}
+      : scene==='dogman'
+      ? {type:'technique',zone:'torso',speed:3,momentumCost:20,ability:'Committed Swing',tracking:false,signal:'heavy threat',
+          tell:'Dogman draws his thinner club back for a hard swing.'}
       : {type:'technique',zone:'limbs',speed:3,momentumCost:20,ability:'Hook and Draw',tracking:false,signal:'heavy threat',
           tell:'Silas sets the curved iron low and braces his stance. He looks capable of a hard, wrenching move.'};
   }
   if(scene==='silas' && state.player.momentum>=15 && state.round===1) return {type:'guard',speed:10,signal:'watchful',tell:'Silas shifts the hook across his chest, studying your movements.'};
-  const defensiveChance=scene==='silas'?.24:scene==='flint'?.04:0; // Flint mostly presses; rarely guards
-  if(scene!=='boar' && state.round>1 && ((repeatedAttack && rng(state)<(scene==='flint'?.10:.72)) ||
+  // Mildly more defensive than Flint. Only committed, telegraphed actions.
+  const defensiveChance=scene==='silas'?.24:scene==='dogman'?.12:scene==='flint'?.04:0;
+  if(scene!=='boar' && state.round>1 && ((repeatedAttack && rng(state)<(scene==='flint'?.10:scene==='dogman'?.18:.72)) ||
         (state.player.momentum>=10 && rng(state)<defensiveChance))) {
     return {type:'guard',speed:10,signal:'watchful',
       tell:scene==='flint'?'Flint squares his shoulders, club held across him. He watches for your commitment.'
+        :scene==='dogman'?'Dogman raises his light club across his chest, watching your hands.'
         :'Silas plants his boots, turning the hook slightly as he watches your hands.'};
+  }
+  // Occasional sidestep; uses normal Move speed and reach, not a passive buff.
+  if(scene==='dogman' && state.round>1 && rng(state)<.08){
+    return {type:'move',to:'side',speed:7,signal:'repositioning',
+      tell:'Dogman shifts onto his toes, looking for room to sidestep.'};
   }
   // Charge can reach NEAR, but is committed to the visible player's *old* spot.
   // It never changes target after reading the next Move.
@@ -241,13 +251,17 @@ function makeIntent(state) {
       tell:'The boar limps along the fence, testing the gap again.'};
   }
   const zone=(scene==='boar'||rng(state)<.75)?'torso':'limbs';
-  return {type:'attack',zone,targetSpot:scene==='boar'?state.terrain.playerSpot:null,tracking:false,speed:scene==='flint'?1:scene==='boar'?(distance==='near'?7:5):4,
+  return {type:'attack',zone,targetSpot:scene==='boar'?state.terrain.playerSpot:null,tracking:false,speed:scene==='flint'?1:scene==='dogman'?3:scene==='boar'?(distance==='near'?7:5):4,
     signal:scene==='boar'?'threatening':'watchful',
     tell:scene==='flint'?freshPhrase(state,'flint-cue',[
       'Flint adjusts his grip on the club and leans into the passage.',
       'Flint watches your feet before shifting his own.',
       'Flint lowers the club a little. His shoulders stay tight.',
       'The enforcer plants a boot by the cart, weighing up the gap.'])
+      :scene==='dogman'?freshPhrase(state,'dogman-cue',[
+        'Dogman turns the slim club in his hand, watching your feet.',
+        'Dogman edges forward, light on his feet.',
+        'Dogman holds his club low, judging the gap beside the cart.'])
       :scene==='boar'?freshPhrase(state,'boar-cue',[
        'The injured boar lowers its head, tense beside the broken fence.',
        'The boar scrapes the ground with its sound foreleg. It has not settled.',
@@ -259,12 +273,15 @@ function makeIntent(state) {
 }
 
 export function newEncounter(scene, opts = {}) {
-  if (!['flint','boar','silas'].includes(scene)) throw new CombatError('Unknown fixture');
+  if (!['flint','boar','silas','dogman'].includes(scene)) throw new CombatError('Unknown fixture');
   const approach=opts.approach??'hold';
   if(scene==='boar'&&!['hold','fence','embankment'].includes(approach))throw new CombatError('Unknown boar staging');
   const enemies = {
     flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,
       weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
+    dogman: {name:'Dogman', hp:50, hpMax:50, ceiling:50,readiness:0,
+      // 12–15 vs Flint's 14–17; a lighter and quicker blunt weapon.
+      weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
     boar: {name:'Young Injured Wild Boar', hp:30,hpMax:65,ceiling:65, readiness:1,
       weapon:{damage:12,accuracy:.70,guardMitigation:.30,type:'blunt',reach:'contact'}},
     silas: {name:'Silas Pumpard', hp:50,hpMax:50,ceiling:50,readiness:0,
