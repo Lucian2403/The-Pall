@@ -18,6 +18,7 @@ on:
       - 'platform/scripts/verify-bellrunner-stage4.test.ts'
       - 'platform/scripts/verify-bellrunner-stage5.test.ts'
       - 'platform/scripts/verify-bellrunner-stage6.test.ts'
+      - 'platform/scripts/verify-bellrunner-stage6-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage5-browser.mjs'
       - 'platform/apps/web/static/locations/bellrunner/**'
       - 'platform/apps/web/static/characters/dogman/**'
@@ -131,6 +132,9 @@ jobs:
       - name: Real Chromium Dogman scene, owner art and all three route callbacks
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 150s npm run verify:bellrunner-stage5-browser
+      - name: Real Chromium Dogman Stage VI battle HUD, owner sprites and saved action interface
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 150s npm run verify:bellrunner-stage6-browser
       - name: Real Chromium Bellrunner Stage 1 and 2 workstation geometry
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s npm run verify:bellrunner-layout-browser
@@ -146,6 +150,7 @@ jobs:
             platform/test-artifacts/bellrunner-visuals/*.png
             platform/test-artifacts/bellrunner-stage4-visuals/*.png
             platform/test-artifacts/bellrunner-stage5-visuals/*.png
+            platform/test-artifacts/bellrunner-stage6-visuals/*.png
             platform/test-artifacts/millhand-scenes/*.png
           if-no-files-found: ignore
           retention-days: 7
