@@ -123,7 +123,7 @@ type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
  * and cryptographic seeds. Dependencies can be supplied only by the in-process
  * PostgreSQL integration harness; no HTTP header can enable this substitution.
  */
-export function registerBellrunnerCombatRoutes(app:FastifyInstance,options:{
+export function registerBellrunnerDogmanCombatRoutes(app:FastifyInstance,options:{
   pool?:pg.Pool;
   resolveSession?:SessionResolver;
   seed?:()=>number;
@@ -134,7 +134,7 @@ export function registerBellrunnerCombatRoutes(app:FastifyInstance,options:{
   const seed=options.seed??(()=>randomBytes(4).readUInt32BE(0));
   app.addHook('onClose',async()=>{if(!options.pool)await db.end();});
 
-  app.get<{Params:Params}>('/api/characters/:id/millhand/combat',async(req,reply)=>{
+  app.get<{Params:Params}>('/api/characters/:id/bellrunner/combat',async(req,reply)=>{
     reply.header('Cache-Control','no-store');
     const session=await resolveSession(req.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
@@ -162,7 +162,7 @@ export function registerBellrunnerCombatRoutes(app:FastifyInstance,options:{
     }
   });
 
-  app.post<{Params:Params}>('/api/characters/:id/millhand/combat',async(req,reply)=>{
+  app.post<{Params:Params}>('/api/characters/:id/bellrunner/combat',async(req,reply)=>{
     reply.header('Cache-Control','no-store');
     const session=await resolveSession(req.headers);
     if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
