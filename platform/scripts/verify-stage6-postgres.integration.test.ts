@@ -523,6 +523,11 @@ test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe
   await db.query(
     "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',6,'NOT_STARTED')",
     [id,owner,'Combat '+id.slice(0,8),'dogfight-'+id,JSON.stringify(bonuses)]);
+  // An actual Stage V reply after replay still requires the completed Stage IV
+  // work record. Build the full predecessor chain rather than a dangling gate.
+  await db.query(
+    'INSERT INTO player_character_bellrunner_second_job(character_id,revision,state) VALUES($1,10,$2::jsonb)',
+    [id,JSON.stringify({revision:10,branch:'machinery',phase:'exited'})]);
   await db.query(
     'INSERT INTO player_character_bellrunner_dogman(character_id,revision,state) VALUES($1,11,$2::jsonb)',
     [id,JSON.stringify({revision:11,branch:'machinery',phase:'done',line:0,
