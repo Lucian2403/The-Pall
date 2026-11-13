@@ -15,7 +15,7 @@ export const DOGMAN_ASSETS={
   ambience:'/audio/the-pall/night-alley-ambience.mp3'
 } as const;
 export const DOGMAN_ARRIVAL:DogmanLine={
-  speaker:'Narration',text:'With the work finished, you turn back toward the public street. The narrow service passage lies ahead, its cobbles wet beneath the factory walls. A man waits near the gate. The worksite hands call him Dogman — hired muscle, not a city guard. As you approach, he steps into your path.'
+  speaker:'Narration',text:'With the work finished, you turn back toward the public street. The narrow service passage lies ahead, its cobbles wet beneath the factory walls. A man waits near the gate. The worksite hands call him Dogman, a hired muscle. As you approach, he steps into your path.'
 };
 export const DOGMAN_PAPERS:readonly DogmanLine[]=[
   {speaker:'Dogman',text:"You're the runner who brought the night notice?"},
@@ -56,12 +56,12 @@ export const DOGMAN_DEMAND:readonly DogmanLine[]=[
   {speaker:'Player',text:"I'm leaving. I'm not giving you my papers."}
 ];
 export const DOGMAN_GATE:readonly DogmanLine[]=[
-  {speaker:'Narration',text:'Dogman steps into the way. The courier turns toward the open street, but Dogman moves to block it. A work cart stands nearby.'},
+  {speaker:'Narration',text:'Dogman steps into the way. You turn toward the open street, but Dogman moves to block it. A work cart stands nearby.'},
   {speaker:'Player',text:"I'm done talking. Let me go home."},
   {speaker:'Dogman',text:'Put the papers down.'},
   {speaker:'Player',text:"No. They're not yours."},
   {speaker:'Dogman',text:"Then I'll take them off you."},
-  {speaker:'Narration',text:"Dogman reaches toward the courier's bag. The courier pulls back. He draws a short club."},
+  {speaker:'Narration',text:"Dogman reaches toward your bag. You pull back. He draws a short club."},
   {speaker:'Player',text:"Don't touch my bag."},
   {speaker:'Dogman',text:'Then stop pulling away.'}
 ];
