@@ -8,10 +8,11 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {resolve,join} from 'node:path';
 import {mkdtempSync,rmSync,mkdirSync,writeFileSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {newEncounter} from '@the-pall/game-core/combat-v0.5.1';
+import {initializeDogmanCombat} from '../apps/api/src/bellrunner-dogman-combat-opening.ts';
 import {combatView} from '../apps/api/src/millhand-combat-view.ts';
 
-const state=newEncounter('dogman',{seed:7,id:'qa-dogman-encounter'});
+const state=initializeDogmanCombat('00000000-0000-4000-8000-000000000001',
+  {current_health:50,max_health:50},'cart',7);
 const active=combatView(state,[],'cart');
 const win=structuredClone(state);win.status='finished';win.outcome='player_victory';
 win.enemy.hp=0;win.intent=null;win.round=8;
@@ -142,7 +143,7 @@ try{
   async function navigate(outcome,width,height){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     await cmd('Page.navigate',{url:origin+'/characters/qa-dogman-stage6/bellrunner/combat?outcome='+outcome});
-    await until(()=>evalJS('(()=>{const art=document.querySelector(".bellrunner-dogman-combat .dogman img");'+
+    await until(()=>evalJS('(()=>{const art=document.querySelector(".battle .dogman img");'+
       'return !!art&&art.complete&&art.naturalWidth>0&&'+
       '!!document.querySelector(".battle .parchment");})()'),
       26000,outcome+' rendered at '+width+'px');
