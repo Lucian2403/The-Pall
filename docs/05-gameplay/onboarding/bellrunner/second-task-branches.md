@@ -296,7 +296,9 @@ The last instruction is immediate workplace caution, not a maxim. The mechanic d
 
 ### C04 — Finish The Bell Linkage
 
-**[Record the inspection]** finishes the supervised inspection without operating the live installation. Store: safety shutoff engaged, bell linkage bypassed/held, inspection method, location of pinned connection, defect noted. The mechanism remains **untouched**, and the building is not legally reopened.
+**Final handover:** *You hand the completed report to the mechanic. He takes responsibility for passing it to the authorized repair crew. The mechanism is left untouched.*
+
+**[Head back to the service gate]** is the **only final dialogue choice**. It saves the documented safety defect and advances from Stage 4 directly to Stage 5; there is no separate **[Record the inspection]** or repeated completion screen. Store: safety shutoff engaged, bell linkage bypassed/held, inspection method, location of pinned connection, defect noted. The mechanism remains **untouched**, and the building is not legally reopened.
 
 **Job context:** The mechanic supervises an inspection and records the problem; there is no authorized repair work.
 
