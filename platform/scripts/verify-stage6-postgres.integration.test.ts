@@ -19,6 +19,10 @@ import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerBellrunnerDispatchRoutes} from '../apps/api/src/bellrunner-dispatch-routes.ts';
 import {registerBellrunnerWrongBellRoutes} from '../apps/api/src/bellrunner-wrong-bell-routes.ts';
 import {registerBellrunnerSecondJobRoutes} from '../apps/api/src/bellrunner-second-job-routes.ts';
+import {registerBellrunnerDogmanRoutes} from '../apps/api/src/bellrunner-dogman-routes.ts';
+import {
+  DOGMAN_PAPERS_LENGTH,DOGMAN_REPLY_LENGTH,DOGMAN_DEMAND_LENGTH,DOGMAN_GATE_LENGTH
+} from '../apps/api/src/bellrunner-dogman-work.ts';
 import {INITIAL_WRONG_BELL} from '../apps/api/src/bellrunner-wrong-bell-work.ts';
 import {STAGE_FOUR_FACT,STAGE_FOUR_OPENING_LENGTH,STAGE_FOUR_REVELATION_LENGTH} from '../apps/api/src/bellrunner-second-job-work.ts';
 import {registerMillhandClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
@@ -43,7 +47,8 @@ const schema=[
   '0011_inventory_foundation.sql','0012_equipment_slots.sql',
   '0013_equipment_stats_and_clothing.sql','0014_bellrunner_stage1.sql',
   '0015_bellrunner_dispatch_work.sql',
-  '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql'
+  '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
+  '0018_bellrunner_dogman.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -58,6 +63,7 @@ registerCharacterRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDispatchRoutes(app,{pool:db,resolveSession});
 registerBellrunnerWrongBellRoutes(app,{pool:db,resolveSession});
 registerBellrunnerSecondJobRoutes(app,{pool:db,resolveSession});
+registerBellrunnerDogmanRoutes(app,{pool:db,resolveSession});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
@@ -505,6 +511,93 @@ test('Bellrunner Stage 4: all branch methods persist, replay safely and preserve
    'SELECT count(*)::int AS n FROM player_character_bellrunner_second_job_receipts WHERE character_id=$1',
    [id])).rows[0].n;
   assert.equal(receipts,revision,'No duplicate request receipts');
+ }
+});
+
+test('Bellrunner Stage V: all branches keep Dogman dialogue and stance in one saved encounter',async()=>{
+ for(const branch of ['contracts','trauma','machinery'] as const){
+  for(const reply of ['ask_orders','keep_sheet','tell_him'] as const){
+   const id=randomUUID(),name='Dogman QA '+id.slice(0,8);
+   const bonuses={Industry:3,[branch==='contracts'?'Commerce':branch==='trauma'?'Medicine':'Mechanics']:1};
+   await db.query(
+    "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,$3,$4,'Male','Bellrunner',$5::jsonb,'[]'::jsonb,'Dispatch House',5,'NOT_STARTED')",
+    [id,owner,name,'dogman-'+id,JSON.stringify(bonuses)]);
+   const prev={revision:10,branch,phase:'exited',openingLine:2,revelationLine:3,
+    method:'trace_bell_rod',observation:'mark_pin_position',priority:null,
+    journalFact:'The Stage IV finding remains intact.'};
+   await db.query(
+    'INSERT INTO player_character_bellrunner_second_job(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [id,10,JSON.stringify(prev)]);
+   const path=base+id+'/bellrunner/dogman';
+   assert.equal((await request('GET',path,stranger)).status,404);
+   assert.equal((await request('POST',path,null,
+    {action:'continue',requestId:randomUUID(),expectedRevision:0})).status,401);
+   let loaded=await request('GET',path,owner);
+   assert.equal(loaded.status,200,JSON.stringify(loaded.body));
+   assert.equal(loaded.body?.state?.branch,branch);
+   assert.deepEqual(loaded.body?.availableActions,['continue']);
+   let revision=0;
+   async function command(action:string,requestId=randomUUID()){
+    const response=await request('POST',path,owner,{
+      action,expectedRevision:revision,requestId
+    });
+    assert.equal(response.status,200,action+': '+JSON.stringify(response.body));
+    revision++;
+    assert.equal(response.body?.state?.revision,revision);
+    return response;
+   }
+   let first=await command('continue');
+   const requestId=randomUUID();
+   first=await command('continue',requestId);
+   const replay=await request('POST',path,owner,{
+    action:'continue',expectedRevision:revision-1,requestId
+   });
+   assert.deepEqual(replay.body,first.body);
+   assert.equal((await request('POST',path,owner,{
+    action:'use_cart',expectedRevision:revision-1,requestId
+   })).status,409,'Request IDs cannot be reused for other actions');
+   assert.equal((await request('POST',path,owner,{
+    action:'continue',expectedRevision:revision-1,requestId:randomUUID()
+   })).status,409,'Stale revisions cannot add dialogue beats');
+   for(let i=1;i<DOGMAN_PAPERS_LENGTH-1;i++)await command('continue');
+   loaded=await request('GET',path,owner);
+   assert.deepEqual(loaded.body?.availableActions,['ask_orders','keep_sheet','tell_him']);
+   assert.equal((await request('POST',path,owner,{
+    action:'protect_bag',expectedRevision:revision,requestId:randomUUID()
+   })).status,409,'Cannot skip the paperwork choice and start fighting');
+   await command(reply);
+   for(let i=0;i<DOGMAN_REPLY_LENGTH[reply];i++)await command('continue');
+   for(let i=0;i<DOGMAN_DEMAND_LENGTH;i++)await command('continue');
+   for(let i=0;i<DOGMAN_GATE_LENGTH-1;i++)await command('continue');
+   loaded=await request('GET',path,owner);
+   assert.deepEqual(loaded.body?.availableActions,['step_street','use_cart','protect_bag']);
+   const endId=randomUUID();
+   const exited=await command('use_cart',endId);
+   assert.equal(exited.body?.stage,6);
+   assert.equal(exited.body?.state?.phase,'done');
+   assert.equal(exited.body?.state?.stance,'cart');
+   assert.equal(exited.body?.state?.reply,reply);
+   assert.equal(exited.body?.state?.branch,branch);
+   assert.deepEqual(exited.body?.availableActions,[]);
+   const endReplay=await request('POST',path,owner,{
+    action:'use_cart',expectedRevision:revision-1,requestId:endId});
+   assert.equal(endReplay.status,200);
+   assert.deepEqual(endReplay.body,exited.body);
+   assert.equal((await request('POST',path,owner,{
+    action:'use_cart',expectedRevision:revision,requestId:randomUUID()
+   })).status,409);
+   const ch=(await db.query(
+     'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',[id])).rows[0];
+   assert.equal(ch.tutorial_stage,6);
+   assert.equal(ch.tutorial_status,'NOT_STARTED');
+   assert.equal(Number(ch.coins),20);
+   assert.deepEqual(ch.major_skill_bonuses,bonuses,'No second skill reward');
+   const evidence=(await db.query('SELECT state FROM player_character_bellrunner_second_job WHERE character_id=$1',[id])).rows[0].state;
+   assert.deepEqual(evidence,prev,'Stage IV findings remain untouched');
+   const receipts=(await db.query<{n:number}>(
+    'SELECT count(*)::int AS n FROM player_character_bellrunner_dogman_receipts WHERE character_id=$1',[id])).rows[0].n;
+   assert.equal(receipts,revision,'Each accepted action stores one durable receipt');
+  }
  }
 });
 
