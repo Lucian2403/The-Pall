@@ -69,11 +69,19 @@ Avoid a second triumphant insult or slick movie one-liner from either character.
 
 A defeat must be **shown as a defeat**: Dogman knocks the courier down or leaves them unable to defend the lane; the UI records that the player lost. The encounter cannot switch to a fake victory because the origin story has to continue.
 
-**Proposed non-spoken defeat sequence:**
+**Owner-approved defeat display (13 November 2026):**
 
-*The courier goes down by the gate. Dogman reaches for the bag, but voices and footsteps come from the nearby street. The workers who had been gathering at the block have noticed the fight.*
+**Dogman defeated you, but approaching workers forced him to back off.**
 
-*Dogman lets go and moves away before they reach the passage. An unnamed passerby helps the courier toward the ordinary city clinic.*
+*You hit the cobblestones hard. Dogman grabs your bag and starts pulling it open.*
+
+**WORKER:** “Oi! Get away from him!”
+
+*Dogman looks up. Several workers are coming down the street, one already running towards you. He lets go of your bag and hurries off down the passage.*
+
+*You try to stand, but your legs give way. A passerby catches you and helps you towards the city clinic.*
+
+*Your papers are still in your bag.*
 
 Dogman withdraws **because witnesses are arriving** and he has no official right to be assaulting a courier at a public workplace gate, not because the courier suddenly defeated him. He does not steal the route sheet, sealed notice if still held, coins, clothes, bag or medical payment, and he is not revealed to have a secret source of law-enforcement power. Do not invent a named rescuer or additional quest giver.
 

@@ -70,9 +70,7 @@
     : snapshot.stance === 'moving'
       ? 'You have stepped toward the public street, with room between you and Dogman.'
       : 'You begin with the work cart between you and Dogman; he must go around it.');
-  const resultText = $derived(snapshot.outcome === 'player_defeat'
-    ? 'You go down by the service gate. Dogman reaches for the bag, but voices and footsteps rise from the nearby street. As workers approach, he lets go and withdraws. An unnamed passerby helps you toward the city clinic. Your papers remain yours.'
-    : 'Dogman stumbles back and lowers the club. He looks toward the public street, then gets out of the way. You keep hold of your bag and walk past him.');
+  const resultText = 'Dogman stumbles back and lowers the club. He looks toward the public street, then gets out of the way. You keep hold of your bag and walk past him.';
   const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
     snapshot.player.wounds.some(wound => wound.severity === 'serious'));
   const journal = $derived(snapshot.outcome === 'player_defeat'
@@ -193,7 +191,7 @@
 <section class="battle" aria-label="Stage 6, the fight with Dogman">
   <ActivityLayout mode="workspace">
   {#snippet stage()}
-  <div class="alley">
+  <div class="alley" class:defeat={ended&&snapshot.outcome==='player_defeat'}>
     <div class="stage-scenery">
       <div class="dogman" role="img"
         aria-label={dogmanDefeated ? 'Dogman defeated in the passage' : 'Dogman holding his club'}>
@@ -207,17 +205,25 @@
       </div>
       <span class="cart-marker scene-label">WORK CART</span>
 
-      <aside class="parchment" aria-label="Current encounter situation">
+      <aside class="parchment" class:defeat={ended&&snapshot.outcome==='player_defeat'}
+        aria-label="Current encounter situation">
         <div class="encounter-line">
           <h2>{ended ? 'The fight ends' : 'Round ' + String(snapshot.round).padStart(2, '0')}</h2>
           {#if !ended}<span class="distance">{snapshot.distance} range</span>{/if}
         </div>
         {#if snapshot.round === 1 && !ended}<p class="stance">{stanceText}</p>{/if}
         {#if ended}
-          <p class="outcome">{snapshot.outcome === 'player_defeat'
-            ? 'Dogman defeated you, but approaching workers forced him to back off.' : 'You defeated Dogman.'}</p>
-          <p>{resultText}</p>
-
+          {#if snapshot.outcome==='player_defeat'}
+            <p class="outcome">Dogman defeated you, but approaching workers forced him to back off.</p>
+            <p class="defeat-narration">You hit the cobblestones hard. Dogman grabs your bag and starts pulling it open.</p>
+            <p class="defeat-worker"><strong>WORKER:</strong> “Oi! Get away from him!”</p>
+            <p class="defeat-narration">Dogman looks up. Several workers are coming down the street, one already running towards you. He lets go of your bag and hurries off down the passage.</p>
+            <p class="defeat-narration">You try to stand, but your legs give way. A passerby catches you and helps you towards the city clinic.</p>
+            <p class="defeat-narration">Your papers are still in your bag.</p>
+          {:else}
+            <p class="outcome">You defeated Dogman.</p>
+            <p>{resultText}</p>
+          {/if}
         {:else}
           <p class="telegraph-title">DOGMAN'S OBSERVABLE INTENTION</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -580,6 +586,17 @@
   .parchment .stance{font-style:italic;font-size:14px}
   .parchment .position{font-size:12px;color:#604531}
   .parchment .outcome{font-weight:700}
+  /* Defeat is a full narrated scene. Give it the width, ink contrast and
+     readable type that the shorter victory outcome does not need. */
+  .alley.defeat{min-height:clamp(665px,55vw,790px)}
+  .parchment.defeat{top:18px;width:min(46%,600px);padding:15px 19px 17px}
+  .parchment.defeat .outcome{font:700 clamp(17px,1.4vw,19px)/1.42
+    var(--pall-font-reading,Georgia,serif);color:#29170f;margin-bottom:12px}
+  .parchment .defeat-narration{font:italic 600 clamp(16px,1.26vw,18px)/1.48
+    var(--pall-font-reading,Georgia,serif);color:#291a10;margin:0 0 12px}
+  .parchment .defeat-worker{font:600 clamp(16px,1.26vw,18px)/1.45
+    var(--pall-font-reading,Georgia,serif);color:#211309;margin:0 0 12px}
+  .parchment .defeat-worker strong{font-weight:800}
   .parchment .after{border-top:1px solid #baa17f;padding-top:8px;font-size:12px}
   .heavy{color:#8b2a1f;font-weight:700}
 
@@ -849,6 +866,13 @@
     .stage-scenery{position:relative;min-height:350px}
     .dogman{width:43%;height:89%;bottom:0;left:17%}
     .parchment{width:54%;right:2%;top:15px}
+    /* The full defeat narrative follows the character image on narrower
+       screens instead of being clipped by the 350px illustrated stage. */
+    .alley.defeat{min-height:0}
+    .alley.defeat .stage-scenery{min-height:0;padding-top:350px}
+    .alley.defeat .dogman{top:0;bottom:auto;height:350px}
+    .alley.defeat .parchment{position:relative;top:auto;right:auto;
+      width:min(94%,675px);margin:0 auto 16px}
     .cart-marker{top:68%}
     .enemy-status{position:relative;left:auto;top:auto;width:auto;min-width:0;margin:0 12px 8px}
     .action-zone{position:relative;left:auto;right:auto;bottom:auto;width:auto;
@@ -863,7 +887,9 @@
     /* Dogman keeps his size in his own band; the intent parchment follows
        below him instead of covering his face (any parchment height fits). */
     .stage-scenery{min-height:0;padding-top:256px}
+    .alley.defeat .stage-scenery{padding-top:256px}
     .dogman{width:51%;height:256px;top:0;bottom:auto;left:19%}
+    .alley.defeat .dogman{height:256px}
     .parchment{position:relative;top:auto;right:auto;width:94%;margin:0 auto 8px;padding:8px 10px;
       border-width:15px 18px 14px;border-image-width:15px 18px 14px}
     .parchment .intent{font-size:14px}

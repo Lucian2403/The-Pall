@@ -89,8 +89,19 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(page.includes('soundSavedCombatTurn'));
   assert.ok(scene.includes("'/characters/dogman/dogman-defeated.webp'"));
   assert.ok(scene.includes("'/locations/bellrunner/industrial-alley.webp'"));
-  assert.ok(scene.includes('Dogman defeated you, but approaching workers forced him to back off.'));
-  assert.ok(scene.includes('Your papers remain yours'));
+  const approvedDefeat=[
+    'Dogman defeated you, but approaching workers forced him to back off.',
+    'You hit the cobblestones hard. Dogman grabs your bag and starts pulling it open.',
+    '“Oi! Get away from him!”',
+    'Dogman looks up. Several workers are coming down the street, one already running towards you. He lets go of your bag and hurries off down the passage.',
+    'You try to stand, but your legs give way. A passerby catches you and helps you towards the city clinic.',
+    'Your papers are still in your bag.'
+  ];
+  for(const beat of approvedDefeat)assert.ok(scene.includes(beat),'Missing owner-approved defeat narration: '+beat);
+  assert.ok(scene.includes('<strong>WORKER:</strong>'));
+  assert.ok(scene.includes('class="defeat-narration"'));
+  assert.ok(scene.includes('.parchment.defeat .outcome'));
+  assert.ok(scene.includes('.alley.defeat .parchment'));
   assert.ok(!scene.includes('/millhand/clinic'));
   assert.ok(!scene.includes('Your battle outcome and actual Health are saved.'));
   assert.ok(!scene.includes('Stage VII is not implemented'));
