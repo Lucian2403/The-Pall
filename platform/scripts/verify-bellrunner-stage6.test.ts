@@ -89,7 +89,7 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(page.includes('soundSavedCombatTurn'));
   assert.ok(scene.includes("'/characters/dogman/dogman-defeated.webp'"));
   assert.ok(scene.includes("'/locations/bellrunner/industrial-alley.webp'"));
-  assert.ok(scene.includes('Dogman defeated you. Witnesses interrupted him.'));
+  assert.ok(scene.includes('Dogman defeated you, but approaching workers forced him to back off.'));
   assert.ok(scene.includes('Your papers remain yours'));
   assert.ok(!scene.includes('/millhand/clinic'));
   assert.ok(!scene.includes('Your battle outcome and actual Health are saved.'));

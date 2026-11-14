@@ -76,9 +76,9 @@
   const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
     snapshot.player.wounds.some(wound => wound.severity === 'serious'));
   const journal = $derived(snapshot.outcome === 'player_defeat'
-    ? "Dogman beat me by the service gate. I went down, and he tried to get at my bag. People were coming along the street; he didn't stay to face them. Someone helped me toward the clinic. I still have the route sheet. The trouble at the factory isn't over."
+    ? "He beat me badly. I went down by the service gate, and the bastard tried to get into my bag. Luckily, some people were coming down the street, and he cleared off before they got too close. Someone helped me towards the clinic. I could barely stand, but at least I still had my route sheet. \nWhatever's going on at that factory, it isn't over yet."
     : toughVictory
-      ? "I got past Dogman, but I took some hard knocks. His club was quicker than I expected. He backed off when he couldn't keep me in the passage. I kept hold of my papers, though the closed factory and its night shift are still someone else's problem to answer for."
+      ? "I got past him, but he landed a few good hits. Bastard was quicker than he looked. He finally backed off when he realised he couldn't stop me. At least I kept my papers.\nThe factory's still shut, the night shift's still being called in, and I've no idea who's going to answer for any of it."
       : "Dogman tried to stop me with that thin club. I managed to drive him back and get through the passage. I've still got my bag and route sheet. I don't imagine the Shift Marshal will be pleased, but that doesn't make Dogman a city guard.");
 
   const iconBase = '/ui-kit/combat-actions/';
@@ -215,7 +215,7 @@
         {#if snapshot.round === 1 && !ended}<p class="stance">{stanceText}</p>{/if}
         {#if ended}
           <p class="outcome">{snapshot.outcome === 'player_defeat'
-            ? 'Dogman defeated you. Witnesses interrupted him.' : 'You defeated Dogman.'}</p>
+            ? 'Dogman defeated you, but approaching workers forced him to back off.' : 'You defeated Dogman.'}</p>
           <p>{resultText}</p>
 
         {:else}
@@ -497,7 +497,7 @@
       </header>
       <div class="journal-entries">
         {#if ended}
-          <p>Dogman barred the passage and reached for my papers. When I refused, he drew the club. It came to a fight.</p>
+          <p>Dogman blocked my way and tried to take my papers. I told him to get lost. He pulled out his club, and that was that.</p>
           <p>{journal}</p>
         {:else}
           <p>The fight with Dogman is still going on. I haven't recorded how it ends.</p>
