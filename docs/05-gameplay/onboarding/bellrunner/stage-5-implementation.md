@@ -8,7 +8,7 @@
 2. **Show Your Papers:** first narration and seven spoken beats, ending with the three approved choices: ask for Dogman's orders, keep hold of the sheet or tell him what happened. Only the last choice reveals a specific Stage IV job. No documents or items are confiscated.
 3. Dogman's branch-specific response is saved with the selected conversation path; the two common replies follow. Dogman still cannot claim unseen information.
 4. **Gate Barred:** eight approved narration/spoken beats, ending on the last spoken line with three defensive positions. No new encounter between the dialogue and this choice.
-5. The selected **street / cart / defend** position is saved; Stage V ends and hands off to Stage VI. Combat has not been simulated in the Stage V reducer. Stage VI requires its own shared-engine combat implementation and balancing.
+5. The selected **street / cart / defend** position is saved; Stage V ends and hands off to Stage VI. The Stage V reducer does not calculate combat. The **Stage VI shared-engine fight** consumes the saved position on its authenticated combat route. See [Stage VI implementation](stage-6-implementation.md).
 
 The player does not return to Hector, enter the condemned building or earn an additional skill level.
 
@@ -32,8 +32,8 @@ The existing soundscape **/audio/the-pall/night-alley-ambience.mp3** is activate
 - Server state records \`branch\`, \`phase\`, \`line\`, \`reply\`, \`stance\` and \`revision\`. Stage V is no XP, coins, inventory, Health or new Major Skill.
 - UI: \`/characters/[id]/bellrunner/dogman\`, shared \`ActivityLayout mode="scene"\` with owner art and the existing Millhand primary/secondary choice skin. Dialogue is one beat per Continue. The common upper journal control opens the first-person personal journal.
 - Stage IV's final service-gate button navigates into Stage V; Character Home and shell chapter navigation resume the correct saved chapter.
-- Stage VI has a **truthful handoff boundary only**, not a counterfeit turn-based fight. The encounter awaits a separate Stage VI combat PR; the defeated Dogman image must appear only upon a confirmed combat victory.
-- Local-only developer rewind from an unfinished Stage V deletes only Dogman state/receipts, preserving Stage IV's finding and Stage III's +1 skill. The unstarted Stage VI boundary can be rewound to the saved final stance choice.
+- Stage VI now runs the actual common turn-based combat engine in its own route, using the saved stance and persistent combat state. The defeated Dogman image appears only upon a confirmed player victory.
+- Local-only developer rewind from an unfinished Stage V deletes only Dogman state/receipts, preserving Stage IV's finding and Stage III's +1 skill. An unstarted Stage VI combat state can be rewound to the last stance choice. Once a combat record is created, rewind is blocked to preserve actual Health and encounter history.
 
 ## Verification
 

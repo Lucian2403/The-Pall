@@ -210,7 +210,9 @@ function makeIntent(state) {
   }
   if(scene!=='boar' && shouldHumanYield(state))
     return {type:'withdraw',speed:8,signal:'uncertain',
-      tell:scene==='flint'?'Flint draws a slow breath and glances past the cart. His grip loosens.':'Silas turns towards the coal box, uncertain whether to press the quarrel.'};
+      tell:scene==='flint'?'Flint draws a slow breath and glances past the cart. His grip loosens.'
+      :scene==='dogman'?'Dogman looks toward the public street. His club hangs lower.'
+      :'Silas turns towards the coal box, uncertain whether to press the quarrel.'};
   if(distance!=='contact' && !(scene==='boar' && distance==='near')){
     return {type:'move',to:'close',speed:5,signal:'repositioning',tell:scene==='boar'
       ?'The boar paws at the ground and shifts towards the narrow way.'
@@ -223,16 +225,26 @@ function makeIntent(state) {
     return scene==='flint'
       ? {type:'technique',zone:'torso',speed:2,momentumCost:20,ability:'Driving Blow',tracking:false,signal:'heavy threat',
           tell:'Flint sets both hands on his club and puts his weight behind the next movement. A heavy blow may follow.'}
+      : scene==='dogman'
+      ? {type:'technique',zone:'torso',speed:3,momentumCost:20,ability:'Committed Swing',tracking:false,signal:'heavy threat',
+          tell:'Dogman draws his thinner club back for a hard swing.'}
       : {type:'technique',zone:'limbs',speed:3,momentumCost:20,ability:'Hook and Draw',tracking:false,signal:'heavy threat',
           tell:'Silas sets the curved iron low and braces his stance. He looks capable of a hard, wrenching move.'};
   }
   if(scene==='silas' && state.player.momentum>=15 && state.round===1) return {type:'guard',speed:10,signal:'watchful',tell:'Silas shifts the hook across his chest, studying your movements.'};
-  const defensiveChance=scene==='silas'?.24:scene==='flint'?.04:0; // Flint mostly presses; rarely guards
-  if(scene!=='boar' && state.round>1 && ((repeatedAttack && rng(state)<(scene==='flint'?.10:.72)) ||
+  // Mildly more defensive than Flint. Only committed, telegraphed actions.
+  const defensiveChance=scene==='silas'?.24:scene==='dogman'?.12:scene==='flint'?.04:0;
+  if(scene!=='boar' && state.round>1 && ((repeatedAttack && rng(state)<(scene==='flint'?.10:scene==='dogman'?.18:.72)) ||
         (state.player.momentum>=10 && rng(state)<defensiveChance))) {
     return {type:'guard',speed:10,signal:'watchful',
       tell:scene==='flint'?'Flint squares his shoulders, club held across him. He watches for your commitment.'
+        :scene==='dogman'?'Dogman raises his light club across his chest, watching your hands.'
         :'Silas plants his boots, turning the hook slightly as he watches your hands.'};
+  }
+  // Occasional sidestep; uses normal Move speed and reach, not a passive buff.
+  if(scene==='dogman' && state.round>1 && rng(state)<.08){
+    return {type:'move',to:'side',speed:7,signal:'repositioning',
+      tell:'Dogman shifts onto his toes, looking for room to sidestep.'};
   }
   // Charge can reach NEAR, but is committed to the visible player's *old* spot.
   // It never changes target after reading the next Move.
@@ -241,13 +253,17 @@ function makeIntent(state) {
       tell:'The boar limps along the fence, testing the gap again.'};
   }
   const zone=(scene==='boar'||rng(state)<.75)?'torso':'limbs';
-  return {type:'attack',zone,targetSpot:scene==='boar'?state.terrain.playerSpot:null,tracking:false,speed:scene==='flint'?1:scene==='boar'?(distance==='near'?7:5):4,
+  return {type:'attack',zone,targetSpot:scene==='boar'?state.terrain.playerSpot:null,tracking:false,speed:scene==='flint'?1:scene==='dogman'?3:scene==='boar'?(distance==='near'?7:5):4,
     signal:scene==='boar'?'threatening':'watchful',
     tell:scene==='flint'?freshPhrase(state,'flint-cue',[
       'Flint adjusts his grip on the club and leans into the passage.',
       'Flint watches your feet before shifting his own.',
       'Flint lowers the club a little. His shoulders stay tight.',
       'The enforcer plants a boot by the cart, weighing up the gap.'])
+      :scene==='dogman'?freshPhrase(state,'dogman-cue',[
+        'Dogman turns the slim club in his hand, watching your feet.',
+        'Dogman edges forward, light on his feet.',
+        'Dogman holds his club low, judging the gap beside the cart.'])
       :scene==='boar'?freshPhrase(state,'boar-cue',[
        'The injured boar lowers its head, tense beside the broken fence.',
        'The boar scrapes the ground with its sound foreleg. It has not settled.',
@@ -259,12 +275,15 @@ function makeIntent(state) {
 }
 
 export function newEncounter(scene, opts = {}) {
-  if (!['flint','boar','silas'].includes(scene)) throw new CombatError('Unknown fixture');
+  if (!['flint','boar','silas','dogman'].includes(scene)) throw new CombatError('Unknown fixture');
   const approach=opts.approach??'hold';
   if(scene==='boar'&&!['hold','fence','embankment'].includes(approach))throw new CombatError('Unknown boar staging');
   const enemies = {
     flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,
       weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
+    dogman: {name:'Dogman', hp:50, hpMax:50, ceiling:50,readiness:0,
+      // 12–15 vs Flint's 14–17; a lighter and quicker blunt weapon.
+      weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
     boar: {name:'Young Injured Wild Boar', hp:30,hpMax:65,ceiling:65, readiness:1,
       weapon:{damage:12,accuracy:.70,guardMitigation:.30,type:'blunt',reach:'contact'}},
     silas: {name:'Silas Pumpard', hp:50,hpMax:50,ceiling:50,readiness:0,
@@ -331,7 +350,7 @@ function tryAttack(s, who, a) {
   cost(s,who,special?15:testAttackCost(s,who),special?'technique':'attack');
   // A failed committed dodge lets this specific club swing catch the mover
   // despite new spacing. A successful dodge uses the ordinary reach/miss path.
-  const caughtDodging=who==='enemy'&&s.scene==='flint'&&
+  const caughtDodging=who==='enemy'&&(s.scene==='flint'||s.scene==='dogman')&&
     s.dodgeAttempt?.attempted===true&&!s.dodgeAttempt.success;
   if(!caughtDodging&&(s.distance==='far' ||
     (s.distance==='near' && !(s.scene==='boar' && who==='enemy')))){
@@ -358,12 +377,14 @@ function tryAttack(s, who, a) {
       ? ["Your blow passes wide. You find nothing but air.","You commit to the strike, but the opponent slips outside its path.","You reach for an opening that closes too quickly."]
       :s.scene==='flint'
        ? ["Flint's club whistles past you and cracks against empty cobbles.","Flint overreaches. The heavy club misses you entirely.","The club cuts the air beside your shoulder, missing by a hand's breadth."]
+       :s.scene==='dogman'
+        ? ["Dogman's light club passes your shoulder.","Dogman flicks the club across the gap but misses.","The thin cudgel whistles harmlessly past."]
        :s.scene==='boar'
         ? ["The boar rushes past, hooves scraping at the ground.","Its head drives through the gap you have already left behind."]
         :["The coal hook catches nothing but air.","Silas lunges, but the curved iron passes clear of you."];
     log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',
       {actor:who,zone,damage:0,focusedBonusPercent:Math.round(focusedBonus*100)});
-    if(targetWho==='player' && (s.scene==='flint'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
+    if(targetWho==='player' && (s.scene==='flint'||s.scene==='dogman'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
     return;
   }
   const base=src.weapon.damage;
@@ -394,6 +415,10 @@ function tryAttack(s, who, a) {
     `Flint's club slams into your ${part}.`,
     `The cudgel catches your ${part} with a dull thud.`,
     `Flint steps through the swing. The heavy wood strikes your ${part}.`]);
+  else if (s.scene==='dogman') narrative=freshPhrase(s,'hit-dogman',[
+    `Dogman's club snaps against your ${part}.`,
+    `The thin cudgel catches your ${part}.`,
+    `Dogman darts in and clips your ${part} with the club.`]);
   else if (s.scene==='boar') narrative=freshPhrase(s,'hit-boar',[
     `The boar's weight catches you hard across the ${part}.`,
     `The animal's charge collides with your ${part}.`]);
@@ -467,7 +492,15 @@ function perform(s,who,a) {
     case 'guard': cost(s,who,TEST_CONFIG.guardCost,'guard');log(s,x.name==='Player'?'You brace for the incoming blow, letting your chance to strike pass.':`${x.name} raises a deliberate guard and waits for your attack.`, 'guard', {actor:who});break;
     case 'move':
       cost(s,who,TEST_CONFIG.moveCost,'move');
-      if(who==='enemy') {s.distance='contact'; s.side=false; log(s,`${x.name} steps around the obstruction and closes the gap.`, 'move',{actor:who});}
+      if(who==='enemy') {
+        if(s.scene==='dogman'&&a.to==='side'){
+          s.distance='near';s.side=true;
+          log(s,'Dogman slips sideways out of your immediate reach.','move',{actor:who,position:'side'});
+        }else{
+          s.distance='contact';s.side=false;
+          log(s,`${x.name} steps around the obstruction and closes the gap.`,'move',{actor:who});
+        }
+      }
       else if(a.to==='close'){s.distance='contact';s.side=false;setBoarPosition(s,'close');log(s,'You step forward, close enough to trade blows.','move',{actor:who});}
       else {s.distance=a.to==='back'?'far':'near';s.side=true;
         const previousSpot=s.terrain?.playerSpot;setBoarPosition(s,a.to);
@@ -511,7 +544,7 @@ function perform(s,who,a) {
       cost(s,who,TEST_CONFIG.useCost,'use');x.bandages--;x.bleed=0;
       log(s,`${x.name==='Player'?'You bind the wound firmly.':x.name+' binds a wound.'} Bleeding is controlled, but the injury remains.`,'wound');break;
     case 'withdraw':
-      if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':'Silas gives ground and ends the assault, remaining by the locked coal box.');
+      if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':s.scene==='dogman'?'Dogman lowers his club and gets out of the way of the public street.':'Silas gives ground and ends the assault, remaining by the locked coal box.');
       else if(s.distance==='far') result(s,'player_escaped','You put enough distance between yourself and the threat to leave the fight.');
       else log(s,'You try to break away, but your opponent is still close enough to bar the route.','warning');break;
     default: throw new CombatError('Unsupported resolved action');
@@ -546,13 +579,13 @@ export function step(input, chosen, {requestId,expectedRevision}={}) {
       actionSpeed('player',t.a,s)>=actionSpeed('enemy',foe,s)){
       const outOfReach=(before==='contact'&&s.distance!=='contact'&&s.scene!=='boar') ||
         (s.scene==='boar'&&foe.targetSpot&&s.terrain.playerSpot!==foe.targetSpot);
-      if(outOfReach&&s.scene==='flint'){
+      if(outOfReach&&(s.scene==='flint'||s.scene==='dogman')){
         const chance=TEST_CONFIG.dodgeChance[t.a.to]??0;
         const success=rng(s)<chance;
         s.dodgeAttempt={attempted:true,success,chance};
         if(success){
           movedSuccessfullyAvoiding=true;
-          log(s,`You dodge Flint's committed swing (${Math.round(chance*100)}% chance).`,
+          log(s,`You dodge ${s.enemy.name}'s committed swing (${Math.round(chance*100)}% chance).`,
             'tactical',{actor:'player',condition:'dodge_success',chance});
         }else{
           log(s,`Your reposition does not evade the committed club swing (${Math.round(chance*100)}% dodge chance).`,
