@@ -53,6 +53,12 @@
       label:'Continue the Dogman encounter',
       href:base+'/bellrunner/combat'
     };
+    if(character.origin==='Bellrunner'&&character.tutorial.stage===7) return {
+      title:'The Clinic',
+      description:'The fight with Dogman is recorded. Continue your examination and any basic care; the service costs ten coins.',
+      label:'Continue clinic visit',
+      href:base+'/bellrunner/clinic'
+    };
     if(character.origin==='Millhand'&&character.tutorial.stage===2) return {
       title:'Marking the Plates',
       description:'Return to the council plate lot and continue the work you have already begun.',

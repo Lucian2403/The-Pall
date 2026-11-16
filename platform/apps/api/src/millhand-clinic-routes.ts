@@ -1,4 +1,4 @@
-/** Stage 7 — authenticated, once-paid examination after Flint combat.
+/** Shared Stage 7 — authenticated, once-paid examination after the recorded fight.
  * A clinic state and the character's coins/Health advance atomically.
  * No modification of the immutable saved fight, history, skills or items.
  */
@@ -47,15 +47,22 @@ function parseCommand(input:unknown):Command{
   };
 }
 function schemaMissing(e:unknown){return (e as {code?:string})?.code==='42P01';}
-export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
-  pool?:pg.Pool;resolveSession?:SessionResolver
-}={}){
+type ClinicOrigin='Millhand'|'Bellrunner';
+type ClinicDependencies={pool?:pg.Pool;resolveSession?:SessionResolver};
+/** Shared authenticated clinic: identical examination, ten-coin payment,
+ * Health discharge and replay-safe receipts for both origins. */
+function registerSharedClinicRoutes(
+  app:FastifyInstance,origin:ClinicOrigin,options:ClinicDependencies={}
+){
+  const combatTable=origin==='Bellrunner'
+    ?'player_character_dogman_combat':'player_character_flint_combat';
+  const route='/api/characters/:id/'+origin.toLowerCase()+'/clinic';
   const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
   const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
   app.addHook('onClose',async()=>{if(!options.pool)await pool.end();});
 
-  app.get<{Params:{id:string}}>('/api/characters/:id/millhand/clinic',
+  app.get<{Params:{id:string}}>(route,
     async(req,reply)=>{
       reply.header('Cache-Control','no-store');
       const session=await resolveSession(req.headers);
@@ -66,7 +73,7 @@ export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
           'SELECT origin,tutorial_stage,tutorial_status,current_health,max_health,coins FROM player_characters WHERE id=$1 AND account_id=$2',
           [req.params.id,session.user.id]
         );
-        if(!char.rowCount||char.rows[0].origin!=='Millhand')
+        if(!char.rowCount||char.rows[0].origin!==origin)
           return reply.code(404).send({error:'not_found'});
         const c=char.rows[0];
         if(c.tutorial_stage<6)return reply.code(409).send({error:'clinic_not_ready'});
@@ -77,7 +84,7 @@ export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
         if(c.tutorial_stage!==6||c.tutorial_status!=='COMPLETED')
           return reply.code(409).send({error:'clinic_not_ready'});
         const fight=await pool.query<{state:CombatState}>(
-          'SELECT state FROM player_character_flint_combat WHERE character_id=$1',
+          `SELECT state FROM ${combatTable} WHERE character_id=$1`,
           [req.params.id]
         );
         if(!fight.rowCount||fight.rows[0].state.status!=='finished')
@@ -90,7 +97,7 @@ export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
       }
     });
 
-  app.post<{Params:{id:string}}>('/api/characters/:id/millhand/clinic',
+  app.post<{Params:{id:string}}>(route,
     async(req,reply)=>{
       reply.header('Cache-Control','no-store');
       const session=await resolveSession(req.headers);
@@ -113,7 +120,7 @@ export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
           'SELECT origin,tutorial_stage,tutorial_status,current_health,max_health,coins FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
           [req.params.id,session.user.id]
         );
-        if(!char.rowCount||char.rows[0].origin!=='Millhand'){
+        if(!char.rowCount||char.rows[0].origin!==origin){
           await db.query('ROLLBACK');open=false;
           return reply.code(404).send({error:'not_found'});
         }
@@ -132,7 +139,7 @@ export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
           return reply.code(409).send({error:'clinic_not_ready'});
         }
         const combat=await db.query<{state:CombatState}>(
-          'SELECT state FROM player_character_flint_combat WHERE character_id=$1',
+          `SELECT state FROM ${combatTable} WHERE character_id=$1`,
           [req.params.id]
         );
         if(!combat.rowCount||combat.rows[0].state.status!=='finished'){
@@ -218,4 +225,12 @@ export function registerMillhandClinicRoutes(app:FastifyInstance,options:{
         throw error;
       }finally{db.release();}
     });
+}
+
+/** Preserve the Millhand route and add the Bellrunner façade. */
+export function registerMillhandClinicRoutes(app:FastifyInstance,options:ClinicDependencies={}){
+  registerSharedClinicRoutes(app,'Millhand',options);
+}
+export function registerBellrunnerClinicRoutes(app:FastifyInstance,options:ClinicDependencies={}){
+  registerSharedClinicRoutes(app,'Bellrunner',options);
 }
