@@ -10,7 +10,7 @@ export type StitcherAction=
  'start'|'ask_linen'|'continue_intro'|'check_ward'|'begin_round'|
  'inspect_a'|'inspect_b'|'order_bleeding'|'order_dirty'|
  'prep_cut'|'prep_ready'|'dress_a'|'dress_b'|'check_linen'|
- 'discard_end'|'trim_end'|'inspect_finished'|'record_linen'|'report_claudia'|
+ 'discard_end'|'trim_end'|'inspect_finished'|'record_linen'|'report_claudia'|'continue_report'|
  'close_round'|'observe_bed'|'read_chart'|'ask_patient'|'ask_again'|
  'continue_patient'|'confront_claudia'|'continue_claudia'|
  'choose_trolley'|'choose_consent'|'choose_notes'|'continue_opening'|
@@ -24,7 +24,7 @@ export type StitcherState={
  introLine:number;inspectedA:boolean;inspectedB:boolean;
  first:'a'|'b'|null;prepared:'cut'|'ready'|null;
  treatedA:boolean;treatedB:boolean;correction:'discard'|'trim'|null;
- bedObserved:boolean;chartRead:boolean;patientHeard:boolean;
+ reportLine:number;bedObserved:boolean;chartRead:boolean;patientHeard:boolean;
  patientLine:number;focus:'bed'|'chart'|'patient'|null;
  claudiaLine:number;branch:StitcherBranch|null;taskStep:number;
  routeMethod:string|null;openingLine:number;dialogueLine:number;
@@ -33,7 +33,7 @@ export const INITIAL_STITCHER:StitcherState={
  revision:0,stage:1,phase:'intro',introLine:0,
  inspectedA:false,inspectedB:false,first:null,prepared:null,
  treatedA:false,treatedB:false,correction:null,
- bedObserved:false,chartRead:false,patientHeard:false,patientLine:0,
+ reportLine:0,bedObserved:false,chartRead:false,patientHeard:false,patientLine:0,
  focus:null,claudiaLine:0,branch:null,taskStep:0,routeMethod:null,
  openingLine:0,dialogueLine:0
 };
@@ -41,7 +41,7 @@ export const STITCHER_ACTIONS:readonly StitcherAction[]=[
  'start','ask_linen','continue_intro','check_ward','begin_round',
  'inspect_a','inspect_b','order_bleeding','order_dirty',
  'prep_cut','prep_ready','dress_a','dress_b','check_linen',
- 'discard_end','trim_end','inspect_finished','record_linen','report_claudia',
+ 'discard_end','trim_end','inspect_finished','record_linen','report_claudia','continue_report',
  'close_round','observe_bed','read_chart','ask_patient','ask_again',
  'continue_patient','confront_claudia','continue_claudia',
  'choose_trolley','choose_consent','choose_notes','continue_opening',
@@ -122,7 +122,7 @@ export function stitcherActions(state:StitcherState):StitcherAction[]{
    case 'linen_fix':return ['discard_end','trim_end'];
    case 'verify':return ['inspect_finished'];
    case 'record':return ['record_linen'];
-   case 'report':return ['report_claudia'];
+   case 'report':return s.reportLine===0?['report_claudia']:['continue_report'];
    case 'close':return ['close_round'];
   }
   return [];
@@ -183,7 +183,8 @@ export function applyStitcherAction(state:StitcherState,action:StitcherAction):S
    s.correction=action==='discard_end'?'discard':'trim';s.phase='care';return s;
   case 'inspect_finished':s.phase='record';return s;
   case 'record_linen':s.phase='report';return s;
-  case 'report_claudia':s.phase='close';return s;
+  case 'report_claudia':s.reportLine=1;return s;
+  case 'continue_report':if(s.reportLine===1)s.reportLine=2;else s.phase='close';return s;
   case 'close_round':s.stage=3;s.phase='discovery';return s;
   case 'observe_bed':s.bedObserved=true;s.focus='bed';return s;
   case 'read_chart':s.chartRead=true;s.focus='chart';return s;
