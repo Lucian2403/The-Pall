@@ -99,7 +99,10 @@ test('Both origins reuse one clinic API, state table, paid transaction and UI',(
   assert.ok(shell.includes('completed Dogman fight'));
   assert.ok(rewind.includes('if(stage===7)'));
   assert.ok(home.includes("href:base+'/bellrunner/clinic'"));
-  assert.ok(rewind.includes('if(bellrunner&&expectedStage===7)'));
+  assert.ok(rewind.includes('if(bellrunner&&(expectedStage===7||expectedStage===8))'));
+  assert.ok(rewind.includes('if(stage===7||stage===8)'));
+  assert.ok(rewind.includes("const left=expectedStage===8"));
+  assert.ok(rewind.includes("visit.phase!=='LEFT'"));
   assert.ok(rewind.includes('DELETE FROM player_character_dogman_combat_receipts'));
   const m=read('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
   const b=read('apps/web/src/routes/characters/[id]/bellrunner/clinic/+page.svelte');
