@@ -22,7 +22,7 @@ Major Skills use a long 0–100 progression. Specializations use a smaller tier 
 
 Use Roman numerals **I, II, III, IV** for the four proposed specialization ranks, rather than a second numerical 0–100 progression. For example, **Smithing I** is the intended entry specialization for a newly created **Millhand**. **Craftsmanship +3** remains the separate, already-implemented starting **Major Skill** level grant; it is not Smithing III.
 
-**Implementation boundary:** the existing character API does not yet store specialization ranks. Until persistence, training rules and migrations exist, any displayed *Smithing I* on a new Millhand character screen must be clearly identified as a **starting specialization preview**, derived from the chosen origin, not reported as a saved progression value. Do not infer other origins' initial specializations, distribute ranks across subskills, or award higher ranks without explicit rules. Unrecorded specialties should not be shown as Rank I.
+**Implementation boundary:** the existing character API does not yet store specialization ranks. Until persistence, training rules and migrations exist, any displayed *Smithing I* on a new Millhand character screen must be clearly identified as a **starting specialization preview**, derived from the chosen origin, not reported as a saved progression value. **Bellrunner Hauling I** is likewise an explicitly requested starting preview (owner decision, 2026-11-16) and does not create a persisted subskill grant. Do not infer other origins' initial specializations, distribute ranks across subskills, or award higher ranks without explicit rules. Unrecorded specialties should not be shown as Rank I.
 
 ## Canonical Major Skills and Subskills
 
