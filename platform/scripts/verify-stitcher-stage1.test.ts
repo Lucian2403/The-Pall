@@ -19,6 +19,8 @@ test('Owner-provided Claudia portrait is present as WebP and mounted on the actu
   assert.ok(scene.includes('class="claudia"'));
   assert.ok(scene.includes('aria-label="Inspect Claudia Cyka"'));
   assert.ok(scene.includes('class="npc-hotspot"'));
+  assert.ok(scene.includes('class="workshop stitcher-opening"'),
+    'The NPC nameplate and primary buttons must inherit exact shared workshop frames');
   assert.ok(scene.includes('<ActivityLayout mode="scene"'));
   assert.ok(scene.includes('stageAspect={1672/941}'));
   assert.ok(scene.includes("import '$lib/pall-story-landscape.css'"));
