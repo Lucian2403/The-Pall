@@ -262,12 +262,12 @@ export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
     "start": "setting",
     "nodes": {
       "setting": {
-        "text": "At Cinder Row Infirmary, Claudia's hair and dress are immaculate despite the cramped ward and smoky coal stove. The linen clerk objects to how many clean dressings she has taken. Claudia turns a beautiful smile on him and asks him to check the count again. He goes back to his books. The smile vanishes when he leaves.",
+        "text": "At Cinder Row Infirmary, Claudia's hair and dress are immaculate despite the crowded ward and the smoking coal stove. A linen clerk questions the clean dressings she has taken. Claudia gives him a warm smile and asks him to check his count again. He returns to his book. The smile disappears as soon as he turns away.",
         "next": "opening",
         "kind": "narration"
       },
       "opening": {
-        "text": "Two dressings by the door. Get them changed.",
+        "text": "Those two by the door need fresh dressings. Get on with it.",
         "next": "remark",
         "kind": "speech",
         "speaker": "Claudia"
@@ -276,31 +276,24 @@ export const APPROVED_STAGE_ONE: Readonly<Record<string, StageOneScene>> = {
         "text": "Your response",
         "kind": "choice",
         "choices": [
-          {
-            "label": "We're nearly out of clean linen.",
-            "next": "remarkPlayer"
-          },
-          {
-            "label": "Continue",
-            "next": "instructions",
-            "ui": true
-          }
+          {"label": "There's hardly any clean linen left.", "next": "remarkPlayer"},
+          {"label": "Continue", "next": "instructions", "ui": true}
         ]
       },
       "remarkPlayer": {
-        "text": "We're nearly out of clean linen.",
+        "text": "There's hardly any clean linen left.",
         "next": "remarkAnswer",
         "kind": "speech",
         "speaker": "Player"
       },
       "remarkAnswer": {
-        "text": "I can count. Let them complain. Just don't waste the clean linen.",
+        "text": "I know. Use what they need. No more.",
         "next": "instructions",
         "kind": "speech",
         "speaker": "Claudia"
       },
       "instructions": {
-        "text": "Look at the wounds first. If one's worse than it should be, fetch me. I'm not fixing your mistakes as well.",
+        "text": "Look at the wounds first. If either one's worse than expected, come and get me. Don't guess.",
         "next": "take",
         "kind": "speech",
         "speaker": "Claudia"
