@@ -134,7 +134,7 @@
                 onclick={()=>act(allowed.includes('dress_a')?'dress_a':'inspect_a')}
                 aria-label={s.phase==='care'?'Clean and dress Bed A':'Inspect Bed A, shallow bleeding cut'}
                 title={s.phase==='care'?'Clean and dress Bed A':'Inspect the bleeding cut at Bed A'}>
-                <span>Bed A</span>
+                <span class="bed-marker"><span class="bed-poi" aria-hidden="true"></span><span class="bed-label">Bed A</span></span>
               </button>
               <button class="bed-hotspot bed-b" type="button"
                 class:completed={s.inspectedB||s.treatedB}
@@ -142,13 +142,13 @@
                 onclick={()=>act(allowed.includes('dress_b')?'dress_b':'inspect_b')}
                 aria-label={s.phase==='care'?'Clean and dress Bed B':'Inspect Bed B, dirty outer dressing'}
                 title={s.phase==='care'?'Clean and dress Bed B':'Inspect the dirty dressing at Bed B'}>
-                <span>Bed B</span>
+                <span class="bed-marker"><span class="bed-poi" aria-hidden="true"></span><span class="bed-label">Bed B</span></span>
               </button>
             {:else if s.stage===3}
               <button class="bed-hotspot teaching-bed" type="button"
                 disabled={pending} onclick={()=>act('observe_bed')}
                 aria-label="Examine the Teaching Bed and its adult patient" title="Look at the Teaching Bed">
-                <span>Teaching Bed</span>
+                <span class="bed-marker"><span class="bed-poi" aria-hidden="true"></span><span class="bed-label">Teaching Bed</span></span>
               </button>
             {/if}
           {/if}
@@ -314,14 +314,24 @@
   .scene-place{position:absolute;bottom:12px;left:12px;
     padding:5px 9px;background:#1d1511df;border:1px solid #97724c;color:#eddbbc;
     font:600 12px/1.4 var(--pall-font-label,Georgia,serif)}
+  /* Keep full-size, percentage-anchored bed hit targets. Only the POI + label
+     are painted; the old dashed rectangles must never appear, even on focus. */
   .bed-hotspot{position:absolute;display:flex;align-items:flex-end;justify-content:center;
-    padding:0;border:2px dashed #f4cc8555;border-radius:10px;background:#f4d09812;
-    color:#fff2cd;cursor:pointer;outline-offset:2px}
-  .bed-hotspot span{display:block;white-space:nowrap;margin-bottom:-13px;
-    border:1px solid #957651;padding:2px 8px;background:#1b1510ed;
-    font:700 13px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .bed-hotspot:is(:hover,:focus-visible){background:#f4d09842;border-color:#ffe6ad;
-    outline:2px solid #ffdb9c}
+    padding:0;border:0;border-radius:0;background:transparent;
+    color:#fff2cd;cursor:pointer;outline:none;box-shadow:none}
+  .bed-marker{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    white-space:nowrap;pointer-events:none}
+  .bed-poi{display:block;flex:none;width:8px;height:8px;border-radius:50%;
+    background:#e9c480;border:1px solid #39261a;box-shadow:0 0 0 1px #e5bf7980}
+  .bed-label{display:block;border:1px solid #957651;padding:2px 8px;
+    background:#1b1510ed;font:700 13px/1.3 var(--pall-font-reading,Georgia,serif)}
+  .bed-hotspot:is(:hover,:focus-visible):not(:disabled) .bed-poi{
+    background:#fff0b7;box-shadow:0 0 0 2px #e9c480}
+  .bed-hotspot:is(:hover,:focus-visible):not(:disabled) .bed-label{
+    border-color:#ffdb9c;filter:brightness(1.1)}
+  .bed-hotspot:focus-visible:not(:disabled) .bed-label{
+    outline:2px solid #ffdb9c;outline-offset:2px}
   .bed-hotspot:disabled{opacity:.33;cursor:default;pointer-events:none}
   .bed-a{left:31%;top:42%;width:25%;height:22%}
   .bed-b{left:53%;top:38%;width:14%;height:20%}
