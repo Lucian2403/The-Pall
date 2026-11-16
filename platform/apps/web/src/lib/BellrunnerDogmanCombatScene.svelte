@@ -224,10 +224,16 @@
             <p class="outcome">You defeated Dogman.</p>
             <p>{resultText}</p>
           {/if}
-          <a class="clinic-transition" data-pall-sfx="paper"
-            href={'/characters/'+encodeURIComponent(characterId)+'/bellrunner/clinic'}>
-            Continue to the city clinic
-          </a>
+          <!-- Share the EXACT nine-slice primary-choice art used by Millhand
+               and Bellrunner narrative actions; no bespoke dark rectangle. -->
+          <div class="pall-story-dialogue-section combat-outcome-actions">
+            <div class="actions">
+              <a class="pall-framed-button primary-choice clinic-transition"
+                href={'/characters/'+encodeURIComponent(characterId)+'/bellrunner/clinic'}>
+                Continue to the city clinic
+              </a>
+            </div>
+          </div>
         {:else}
           <p class="telegraph-title">DOGMAN'S OBSERVABLE INTENTION</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -590,13 +596,8 @@
   .parchment .stance{font-style:italic;font-size:14px}
   .parchment .position{font-size:12px;color:#604531}
   .parchment .outcome{font-weight:700}
-  .parchment .clinic-transition{box-sizing:border-box;display:block;width:100%;
-    min-height:41px;margin-top:16px;padding:9px 10px;
-    text-align:center;text-decoration:none;font:700 15px/1.35
-    var(--pall-font-reading,Georgia,serif);background:#3b291a;
-    border:2px solid #9b7144;color:#ffedc9}
-  .parchment .clinic-transition:hover,.parchment .clinic-transition:focus-visible{
-    background:#614027;outline:2px solid #a97d43;outline-offset:2px}
+  .parchment .combat-outcome-actions{margin-top:16px}
+  .parchment .combat-outcome-actions .actions{width:100%}
   /* Defeat is a full narrated scene. Give it the width, ink contrast and
      readable type that the shorter victory outcome does not need. */
   .alley.defeat{min-height:clamp(665px,55vw,790px)}
