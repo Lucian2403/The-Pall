@@ -19,7 +19,7 @@
   }
 </script>
 
-<section class="stitcher-opening" aria-label="Stitcher Stage I — Cinder Row Infirmary">
+<section class="workshop stitcher-opening" aria-label="Stitcher Stage I — Cinder Row Infirmary">
   <ActivityLayout mode="scene" class="pall-story-sections" stageAspect={1672/941}>
     {#snippet stage()}
       <section class="scene-visuals pall-story-visuals" aria-label="Cinder Row Infirmary with Claudia Cyka">
