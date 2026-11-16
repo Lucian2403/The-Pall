@@ -114,7 +114,7 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
  assert.ok(page.includes('clinicBackdrop'));
  assert.ok(routes.includes('STITCHER_MAJOR[next.branch]'));
  assert.ok(routes.includes('player_character_stitcher_ward_receipts'));
- assert.ok(routes.includes("ch.rows[0].tutorial_status!=='IN_PROGRESS'"));
+ assert.ok(routes.includes("ch.tutorial_status!=='IN_PROGRESS'"));
  assert.ok(routes.includes('FOR UPDATE'));
  assert.ok(rewind.includes("if(result.rows[0].origin==='Stitcher')"));
  assert.ok(rewind.includes("if(c.rows[0].origin==='Stitcher')"));
