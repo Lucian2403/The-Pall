@@ -1,9 +1,8 @@
-# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (APPROVED)
+# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (STORY APPROVED; DIALOGUE FOR REVIEW)
 
 > **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
 
-
-**Status: APPROVED AND LOCKED (2026-10-16) following the requested dialogue correction.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality direction and exact Stage 1 scene are now LOCKED. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
+**Status: APPROVED AND LOCKED (2026-10-16) following the requested dialogue correction.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality and the Stage 1 story remain locked; the November dialogue wording awaits owner approval. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
 
 ## Editorial diagnosis — why Stage 1 was revised
 
