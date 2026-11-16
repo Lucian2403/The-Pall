@@ -107,7 +107,7 @@ export function stitcherActions(state:StitcherState):StitcherAction[]{
  switch(s.stage){
  case 1:
   if(s.phase==='intro')return s.introLine===0?['ask_linen','continue_intro']:
-   s.introLine===1?['continue_intro']:['check_ward'];
+   s.introLine===1||s.introLine===2?['continue_intro']:['check_ward'];
   return s.phase==='briefing'?['begin_round']:[];
  case 2:
   switch(s.phase){
@@ -164,7 +164,7 @@ export function applyStitcherAction(state:StitcherState,action:StitcherAction):S
  const s:StitcherState={...state,revision:state.revision+1};
  switch(action){
   case 'ask_linen':s.introLine=1;return s;
-  case 'continue_intro':s.introLine=2;return s;
+  case 'continue_intro':s.introLine=s.introLine===0?3:s.introLine+1;return s;
   case 'check_ward':s.phase='briefing';return s;
   case 'begin_round':s.stage=2;s.phase='inspect';return s;
   case 'inspect_a':s.inspectedA=true;if(s.inspectedB)s.phase='order';return s;
