@@ -1,4 +1,6 @@
-# Stitcher — Stage 5: The Empty Sheet / The Night Door (APPROVED)
+# Stitcher — Stage 5: The Empty Sheet / The Night Door (STORY APPROVED; DIALOGUE FOR REVIEW)
+
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
 
 **Status: APPROVED AND LOCKED (2026-10-16).** The user approved both pre-combat interactions, their dialogue, player approaches and patient-witness hold. This follows approved [Stage 4](second-task-branches.md) and leads to approved-at-encounter-level [Stage 6](owler-fight.md), the fight with **Owler, the Night Porter**. Exact combat values remain TBD.
 
@@ -6,9 +8,9 @@
 
 *The Stitcher returns to the side ward. The bed is empty. Its sheets are still warm, with the straps hanging loose from the frame. A ward attendant is coming back from the service passage.*
 
-**PLAYER:** “Where's the man from this bed?”
+**PLAYER:** “Where've they taken him?”
 
-**ATTENDANT:** “On the trolley. They were taking him to the night door.”
+**ATTENDANT:** “Down to the night door. He's still on the trolley in the passage.”
 
 The man is **alive**. Staff have moved him within the hospital, not completed his delivery to the teaching theatre. If the player selected *The Night Trolley*, they recognize the same trolley from its pending handover, not a separate transfer invented for the scene.
 
@@ -17,21 +19,21 @@ The player chooses one ordinary investigatory response:
 - **[Check the trolley seal and ward record]** — confirms the transfer is not signed over to the receiver. On the Industry route this uses the exact receiving mark recorded earlier; other routes see only the uncompleted release.
 - **[Fetch Claudia]** — brings the Matron from the nearby ward rather than teleporting a remote official; she is furious the commotion has reached the patients. This does not cause her to become kind.
 - **[Use what you learned]** — the player tells the attendant **only the fact proven in their Stage 4 branch**:
-  - **Industry / Hauling:** “They asked for his contract number, not his name. I didn't sign the handover.”
-  - **Commerce / Contracts:** “His consent is disputed. It's already in the ward book.”
-  - **Scholarship / Investigation:** “The surgeon's notes call this a lesson. They don't say he needs another operation.”
+  - **Industry / Hauling:** “They wanted his contract number, not his name. I didn't sign him over.”
+  - **Commerce / Contracts:** “His consent's marked disputed in the ward book.”
+  - **Scholarship / Investigation:** “The surgeon's notes say it's for teaching. There's no treatment listed.”
 
 Whichever route the player takes, the attendant accompanies them to the waiting trolley. The patient is awake and speaks in front of them.
 
-**PATIENT:** “I'm not going with them. I never agreed.”
+**PATIENT:** “I'm not going with them. I never said yes.”
 
-**ATTENDANT:** “I heard you. Don't move him yet.”
+**ATTENDANT:** “I heard you. Nobody moves him until this is sorted.”
 
 The attendant keeps the trolley **inside the ward-side service passage** while the dispute is recorded. This is a limited, believable interruption, not an automatic legal victory or a special skill reward. The three Stage 4 findings remain separate; the patient's own refusal is something everyone in the scene can hear.
 
 Claudia can arrive because the player fetched her **or** because the night door dispute calls for the Matron's authority. Her concern is protecting her ward and avoiding an indefensible handover, rather than newly discovered affection:
 
-**CLAUDIA:** “No more moving him. I've got enough trouble without the ward hearing all this.”
+**CLAUDIA:** “Leave the trolley where it is. I've got enough trouble without an argument in front of the whole ward.”
 
 A temporary in-house stop is now visibly in place **before combat**. Stage 6 will determine how the player fares against Owler, not whether a silent patient can be carried off while the camera is elsewhere.
 
@@ -39,19 +41,19 @@ A temporary in-house stop is now visibly in place **before combat**. Stage 6 wil
 
 *The trolley stands behind the ward attendant on the infirmary side of the service doorway. Owler blocks the exit, holding the transfer paper. He is worn down from night work, but strong enough to shove past someone.*
 
-**OWLER:** “Hand me the papers. I'm meant to take him over.”
+**OWLER:** “Give me the papers. I'm here to take him over.”
 
-**PLAYER:** “He's not going.”
+**PLAYER:** “He's not going anywhere.”
 
-**OWLER:** “That's not what I've been paid to hear.”
+**OWLER:** “I've already been paid to take him.”
 
 ### One preparatory response
 
 **[Reason with Owler]**
 
-**PLAYER:** “He said no. You've got a witness now.”
+**PLAYER:** “He said no. The attendant heard him.”
 
-**OWLER:** “Then let the school sort it. I've a job to finish.”
+**OWLER:** “Then take it up with the school. I've got a job to finish.”
 
 The player faces him without a barrier; his insistence is motivated by the paid transfer, not secret knowledge of the consent records.
 
@@ -59,7 +61,7 @@ The player faces him without a barrier; his insistence is motivated by the paid 
 
 *The player pushes an unused supply cart across the narrow approach. The patient remains behind the attendant.*
 
-**OWLER:** “Move that thing.”
+**OWLER:** “Move that cart.”
 
 This creates a plausible small obstruction to be carried into Stage 6. It is **an empty ward cart**, not the patient's trolley and not a free player weapon.
 
@@ -67,7 +69,7 @@ This creates a plausible small obstruction to be carried into Stage 6. It is **a
 
 *The player takes firmer footing to keep Owler from reaching the ward passage.*
 
-**OWLER:** “I'm telling you once. Step away.”
+**OWLER:** “Move. I'm not saying it again.”
 
 This establishes close defensive spacing, not an automatic victory.
 
@@ -91,7 +93,7 @@ His weapon remains **TBD** between the already outlined leather strap and short 
 
 **Already locked:** two named beats, Owler as the one common opponent, three preparatory approaches in principle, patient's eventual rescue, one route finding and the shared nonlethal PvE rule.
 
-**Approved in Stage 5:** exact dialogue, warm-sheet investigation choices, patient/attendant witness exchange, Claudia's self-protective hold, physical doorway blocking and fight handoff. Preserve spoken dialogue unless explicitly revised.
+**Approved in Stage 5 (October story approval):** warm-sheet investigation choices, patient/attendant witness hold, Claudia's self-protective intervention, physical doorway blocking and fight handoff. Spoken lines in this branch are a November editorial revision awaiting owner review.
 
 **TBD:** service-passage geometry, true official transfer authority, any exact obstruction/defense modifiers, world clock and combat action data.
 
