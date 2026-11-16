@@ -1,82 +1,150 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
-  import ActivityLayout from '$lib/ActivityLayout.svelte';
-  import {DOGMAN_ASSETS,DOGMAN_STANCE_NOTES,type DogmanStance} from '$lib/bellrunner-dogman-copy';
-  import '$lib/pall-story-landscape.css';
-  type Character={id:string;name:string;origin:string;sex:string;coins:number;
-    health:{current:number;maximum:number};startingLocation:string;
-    tutorial:{stage:number;status:string}};
-  type Snapshot={stage:number;state:{phase:string;stance:DogmanStance|null}};
-  const id=$derived(page.params.id);
+  import BellrunnerDogmanCombatScene from '$lib/BellrunnerDogmanCombatScene.svelte';
+  import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
+  import type {CombatSnapshot} from '$lib/millhand-combat-model';
+  import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
+  import {claimCombatSfx} from '$lib/pall-audio';
+  import {soundSavedCombatTurn} from '$lib/millhand-combat-sound';
+  import {floatingFeedbackForSavedTurn} from '$lib/millhand-combat-feedback';
+  import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
+
+  type Character={id:string;name:string;origin:string;sex:string;
+    avatarId?:string|null;coins:number;health:{current:number;maximum:number};
+    startingLocation:string;tutorial:{stage:number;status:string}};
+  type Snapshot=CombatSnapshot;
+  type PendingStart={needsStart:true;stage:number};
   let character=$state<Character|null>(null);
-  let snapshot=$state<Snapshot|null>(null);
-  let status=$state<'loading'|'ready'|'error'>('loading');
+  let battle=$state<Snapshot|null>(null);
+  // Transient presentation only. No floating text is restored on reload.
+  let feedback=$state<CombatFloatingFeedback[]>([]);
+  let status=$state<'loading'|'ready'|'login'|'missing'|'prerequisite'|'schema'|'unavailable'>('loading');
+  let pending=$state(false);
+  let errorMessage=$state('');
+  let retryId:string|null=null;
+  let retrySignature:string|null=null;
+  const id=$derived(page.params.id);
+  const api=$derived('/api/characters/'+encodeURIComponent(id)+'/bellrunner/combat');
+
+  async function initialize(){
+    // No extra pre-fight choice. A single idempotent start creates the encounter
+    // from the saved Stage 5 stance when the player enters the combat route.
+    const response=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
+    if(!response.ok)throw Error('start_failed_'+response.status);
+    battle=await response.json() as Snapshot;
+  }
+  async function refresh(){
+    feedback=[];
+    status='loading';
+    try{
+      const [person,fight]=await Promise.all([
+        fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
+        fetch(api,{cache:'no-store'})
+      ]);
+      if(person.status===401||fight.status===401){status='login';return;}
+      if(person.status===404||fight.status===404){status='missing';return;}
+      if(fight.status===409){status='prerequisite';return;}
+      if(fight.status===503){status='schema';return;}
+      if(!person.ok||!fight.ok){status='unavailable';return;}
+      character=(await person.json() as {character:Character}).character;
+      const state=await fight.json() as Snapshot|PendingStart;
+      if('needsStart' in state && state.needsStart)await initialize();
+      else battle=state as Snapshot;
+      status='ready';
+    }catch(error){
+      status='unavailable';
+      errorMessage=error instanceof Error?error.message:'The encounter could not be loaded.';
+    }
+  }
   onMount(()=>{
-    void (async()=>{
-      try{
-        const [a,b]=await Promise.all([
-          fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
-          fetch('/api/characters/'+encodeURIComponent(id)+'/bellrunner/dogman',{cache:'no-store'})
-        ]);
-        if(!a.ok||!b.ok){status='error';return;}
-        character=(await a.json() as {character:Character}).character;
-        snapshot=await b.json() as Snapshot;
-        status=character.origin==='Bellrunner'&&snapshot.stage===6&&
-          snapshot.state.phase==='done'&&snapshot.state.stance?'ready':'error';
-      }catch{status='error';}
-    })();
+    const releaseCombatSfx=claimCombatSfx();
+    void refresh();
+    return releaseCombatSfx;
   });
+
+  // Navigation, not developer rewind: Stage V is read-only after the fight
+  // begins, and returning never deletes turns, Health or the outcome.
+  async function backToStageFive(){
+    await goto('/characters/'+encodeURIComponent(id)+'/bellrunner/dogman');
+  }
+
+  async function perform(action:CombatAction){
+    const previous=battle;
+    const revision=battle?.revision;
+    if(pending||revision===undefined||!battle||battle.status!=='active')return;
+    if(!battle.legalActions.includes(action.type))return;
+    pending=true;errorMessage='';
+    const signature=JSON.stringify([revision,action]);
+    if(signature!==retrySignature||!retryId){
+      retrySignature=signature;retryId=crypto.randomUUID();
+    }
+    try{
+      const response=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},
+        body:JSON.stringify({kind:'turn',requestId:retryId,
+          expectedRevision:revision,action})});
+      const result=await response.json() as Snapshot&{error?:string;detail?:string};
+      if(response.ok){
+        // React only to committed new damage/miss events, never stale history.
+        feedback=previous?floatingFeedbackForSavedTurn(previous,result):[];
+        if(previous)soundSavedCombatTurn(previous,result,action,character?.sex);
+        battle=result;retryId=null;retrySignature=null;
+        if(character){
+          const p=result.player as {hp:number};
+          character={...character,health:{...character.health,current:p.hp},
+            tutorial:{...character.tutorial,status:result.status==='finished'?'COMPLETED':'IN_PROGRESS'}};
+        }
+      }else{
+        if(response.status===409){
+          retryId=null;retrySignature=null;
+          const current=await fetch(api,{cache:'no-store'});
+          if(current.ok)battle=await current.json() as Snapshot;
+        }
+        errorMessage=result.error==='stale_revision'?'The encounter changed in another tab; the saved turn has been reloaded.'
+          :result.error==='invalid_combat_action'?'That action cannot be performed from the current position.'
+          :'The turn could not be saved: '+(result.error??response.status);
+      }
+    }catch{
+      errorMessage='Connection interrupted. Retry the same action; damage will not be applied twice.';
+    }finally{pending=false;}
+  }
 </script>
 
-<svelte:head><title>The Pall — Dogman at the Gate</title></svelte:head>
-{#if status==='ready'&&character&&snapshot&&snapshot.state.stance}
-  <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true} travelLocked>
-    <section class="second-job bellrunner-dogman-combat-boundary">
-      <ActivityLayout mode="scene" stageAspect={1648/928} class="pall-story-sections">
-        {#snippet stage()}
-          <div class="scene-visuals pall-story-visuals">
-            <div class="scene">
-              <img src={DOGMAN_ASSETS.background} alt="A narrow industrial alley beside the closed factory"
-                onerror={(event)=>{event.currentTarget.src='/locations/alley/alley-background.webp';}}/>
-              <img class="dogman" src={DOGMAN_ASSETS.standing} alt="Dogman with his club"
-                onerror={(event)=>{event.currentTarget.style.display='none';}}/>
-            </div>
-          </div>
-        {/snippet}
-        {#snippet panel()}
-          <section class="pall-story-dialogue-section">
-            <div class="work-card">
-              <p class="eyebrow">BELLRUNNER · STAGE VI · THE SERVICE GATE</p>
-              <h1>The Fight With Dogman</h1>
-              <p class="narration">{DOGMAN_STANCE_NOTES[snapshot.state.stance]}</p>
-              <p class="narration">Dogman comes forward with the club held low. The service lane is narrow, with a work cart to one side and the public street beyond.</p>
-              <p class="notice" role="status">The Stage VI turn-based combat encounter has not been implemented. Your chosen opening position is saved.</p>
-            </div>
-          </section>
-        {/snippet}
-      </ActivityLayout>
-    </section>
+<svelte:head><title>The Pall — The Passage, Dogman</title></svelte:head>
+{#if status==='ready' && character && battle}
+  <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
+    {backToStageFive} travelLocked={battle.status==='active'}
+    combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
+    <BellrunnerDogmanCombatScene snapshot={battle} characterId={id} {feedback} {pending} {errorMessage} {perform}/>
   </TutorialShell>
 {:else}
-  <main role="status" class="fallback">
-    <h1>{status==='loading'?'Checking the encounter…':'Finish the confrontation first'}</h1>
-    <a href={'/characters/'+encodeURIComponent(id)+'/bellrunner/dogman'}>Show Your Papers</a>
+  <main class="fallback">
+    {#if status==='loading'}
+      <p role="status">Loading the saved encounter…</p>
+    {:else if status==='login'}
+      <h1>Sign in required</h1><p><a href="/account">Account</a></p>
+    {:else if status==='missing'}
+      <h1>Character not found</h1>
+    {:else if status==='prerequisite'}
+      <h1>The confrontation is not complete</h1>
+      <p>Stage 6 begins after the opening stance has been saved.</p>
+      <a href={'/characters/'+encodeURIComponent(id)+'/bellrunner/dogman'}>Return to the passage</a>
+    {:else if status==='schema'}
+      <h1>Combat persistence is not installed</h1>
+      <p>Run <code>npm run bellrunner:migrate</code> from the platform folder, then restart the API.</p>
+    {:else}
+      <h1>The combat service is unavailable</h1>
+      <p role="alert">{errorMessage}</p>
+      <button type="button" onclick={()=>{void refresh();}}>Retry</button>
+    {/if}
+    <nav><a href={'/characters/'+encodeURIComponent(id)}>Character</a></nav>
   </main>
 {/if}
 <style>
-  .bellrunner-dogman-combat-boundary{width:100%;min-width:0}
-  .scene{position:relative;aspect-ratio:1648/928;overflow:hidden;background:#151413}
-  .scene>img:first-child{width:100%;height:100%;object-fit:cover}
-  .scene .dogman{position:absolute;bottom:0;left:36%;height:94%;max-width:48%;object-fit:contain}
-  .work-card{box-sizing:border-box;width:100%;padding:clamp(20px,3vw,36px);
-    border:2px solid #654022;background:#efdfbb;color:#251910}
-  .eyebrow{font:600 14px/1.3 var(--pall-font-label,Arial,sans-serif);
-    letter-spacing:.07em;border-bottom:1px solid #a78d62;padding-bottom:10px}
-  h1{font:600 21px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .narration{font:italic 500 17px/1.55 var(--pall-font-reading,Georgia,serif)}
-  .notice{font:600 15px/1.45 var(--pall-font-reading,Georgia,serif);
-    padding-top:15px;border-top:1px solid #a78d62}
-  .fallback{padding:40px;background:#25211e;color:#ecd8b2}
+  :global(body){margin:0;background:#151717;color:#eadfcf;font-family:Georgia,serif}
+  :global(a){color:#dcb98b}.fallback{max-width:750px;margin:6vh auto;padding:30px;background:#24211e;border:1px solid #72583e}
+  .fallback button{padding:8px 14px}nav{margin-top:24px}
 </style>

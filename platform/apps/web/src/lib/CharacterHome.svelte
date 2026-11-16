@@ -49,8 +49,8 @@
     };
     if(character.origin==='Bellrunner'&&character.tutorial.stage===6) return {
       title:'Gate Barred',
-      description:'Your response to Dogman and the opening position are saved.',
-      label:'Continue at the service gate',
+      description:'Your saved opening position and combat rounds are retained. Resume the fight or review its result.',
+      label:'Continue the Dogman encounter',
       href:base+'/bellrunner/combat'
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===2) return {

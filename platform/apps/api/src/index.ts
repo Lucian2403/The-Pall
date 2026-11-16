@@ -9,6 +9,7 @@ import {registerBellrunnerDispatchRoutes} from './bellrunner-dispatch-routes.js'
 import {registerBellrunnerWrongBellRoutes} from './bellrunner-wrong-bell-routes.js';
 import {registerBellrunnerSecondJobRoutes} from './bellrunner-second-job-routes.js';
 import {registerBellrunnerDogmanRoutes} from './bellrunner-dogman-routes.js';
+import {registerBellrunnerDogmanCombatRoutes} from './bellrunner-dogman-combat-routes.js';
 import {registerMissingStampRoutes} from './millhand-missing-stamp-routes.js';
 import {registerMillhandSecondJobRoutes} from './millhand-second-job-routes.js';
 import {registerMillhandWageClaimRoutes} from './millhand-wage-claim-routes.js';
@@ -32,6 +33,7 @@ registerBellrunnerDispatchRoutes(api);
 registerBellrunnerWrongBellRoutes(api);
 registerBellrunnerSecondJobRoutes(api);
 registerBellrunnerDogmanRoutes(api);
+registerBellrunnerDogmanCombatRoutes(api);
 registerMissingStampRoutes(api);
 registerMillhandSecondJobRoutes(api);
 registerMillhandWageClaimRoutes(api);

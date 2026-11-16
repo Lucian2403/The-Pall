@@ -239,7 +239,9 @@
       :fromStage===7
       ?'TESTING ONLY: Replay the fight in Stage 6? This clears the clinic visit and the completed Flint fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Earlier jobs, equipment and skill awards remain saved.'
       :fromStage===6
-        ?'TESTING ONLY: Return to Stage 5 stance selection? This discards Flint combat turns and Chronicle, restores the Health saved at the start of the fight, and keeps the character, rewards and earlier jobs.'
+        ?character.origin==='Bellrunner'
+          ?'TESTING ONLY: Replay the Dogman fight from Stage 5? This discards the current battle, restores the exact saved pre-fight Health, and returns to the three defensive positions. Your papers, earlier jobs, skills and coins remain unchanged.'
+          :'TESTING ONLY: Return to Stage 5 stance selection? This discards Flint combat turns and Chronicle, restores the Health saved at the start of the fight, and keeps the character, rewards and earlier jobs.'
         :'TESTING ONLY: Replay Stage '+(fromStage-1)+'? This resets the stage you are returning to and clears any later-stage progress, including a Stage 3 route skill award if earned. Your character will be kept.';
     if(!window.confirm(warning))return;
     rewinding=true;
@@ -436,14 +438,16 @@
         <span class="chapter-location">{sceneLocation ?? character.startingLocation}</span>
       </div>
       <div class="chapter-meta">Stage {sceneStage??character.tutorial.stage} · {character.origin}</div>
-      {#if character.origin==='Millhand' && character.tutorial.stage===6 && backToStageFive}
+      {#if (character.origin==='Millhand'||character.origin==='Bellrunner') && character.tutorial.stage===6 && backToStageFive && !canRewind}
         <button type="button" class="rewind-button" disabled={backStageBusy}
-          title="Return to the saved Stage 5 stance selection before combat begins"
+          title={character.origin==='Bellrunner'
+            ? 'Review the saved Stage 5 confrontation. Combat turns and Health are not reset.'
+            : 'Return to the saved Stage 5 stance selection before combat begins'}
           onclick={()=>{void backToStageFive();}}>
           {backStageBusy?'Returning…':'← Back to Stage 5'}
         </button>
       {/if}
-      {#if character.origin==='Millhand' && character.tutorial.stage===6 && backToStageFive && backStageError}
+      {#if (character.origin==='Millhand'||character.origin==='Bellrunner') && character.tutorial.stage===6 && backToStageFive && backStageError}
         <span class="back-stage-error" role="alert">{backStageError}</span>
       {/if}
       {#if canRewind && rewindFromStage!==null && rewindTargetStage!==null}
