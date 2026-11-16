@@ -101,6 +101,25 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
  assert.ok(scene.includes('class="bed-hotspot bed-a"'));
  assert.ok(scene.includes('class="bed-hotspot bed-b"'));
  assert.ok(scene.includes('class="bed-hotspot teaching-bed"'));
+ for(const label of ['Bed A','Bed B','Teaching Bed']){
+  assert.ok(scene.includes('<span class="bed-label">'+label+'</span>'),
+    'Visible hotspot label must remain: '+label);
+ }
+ assert.equal((scene.match(/class="bed-poi"/g)??[]).length,3,
+   'All three bed targets must show one small POI');
+ assert.ok(scene.includes('aria-hidden="true"></span><span class="bed-label"'),
+   'The decorative POI must be hidden from screen readers');
+ assert.ok(scene.includes('.bed-hotspot{position:absolute;display:flex;align-items:flex-end;justify-content:center;'));
+ assert.ok(scene.includes('padding:0;border:0;border-radius:0;background:transparent;'));
+ assert.ok(scene.includes('.bed-hotspot:focus-visible:not(:disabled) .bed-label'),
+   'Keyboard focus must highlight the visible label, not outline the large hit area');
+ assert.ok(!scene.includes('border:2px dashed'));
+ assert.ok(!scene.includes('background:#f4d09842'));
+ for(const hitbox of [
+  '.bed-a{left:31%;top:42%;width:25%;height:22%}',
+  '.bed-b{left:53%;top:38%;width:14%;height:20%}',
+  '.teaching-bed{left:31%;top:42%;width:25%;height:22%}'
+ ])assert.ok(scene.includes(hitbox),'Keep the original generous clickable bed hit zone');
  assert.ok(scene.includes('onclick={()=>act(allowed.includes('));
  assert.ok(scene.includes('title="Look at the Teaching Bed"'));
  assert.ok(scene.includes('aria-label="Examine the Teaching Bed'));
