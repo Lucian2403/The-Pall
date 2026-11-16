@@ -84,6 +84,7 @@
     "verify:bellrunner-stage5": "node --import tsx --test scripts/verify-bellrunner-stage5.test.ts",
     "verify:bellrunner-stage6": "node --import tsx --test scripts/verify-bellrunner-stage6.test.ts",
     "verify:bellrunner-stage7": "node --import tsx --test scripts/verify-bellrunner-stage7.test.ts",
+    "verify:bellrunner-stage8": "node --import tsx --test scripts/verify-bellrunner-stage8.test.ts",
     "verify:bellrunner-stage6-browser": "node --import tsx scripts/verify-bellrunner-stage6-browser.mjs",
     "verify:bellrunner-stage5-browser": "node --import tsx scripts/verify-bellrunner-stage5-browser.mjs",
     "verify:bellrunner-stage3-assets": "node scripts/verify-bellrunner-stage3-assets.mjs",
