@@ -6,6 +6,7 @@ import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js'
 import {registerCharacterRoutes} from './character-routes.js';
 import {registerMillhandWorkRoutes} from './millhand-work-routes.js';
 import {registerBellrunnerDispatchRoutes} from './bellrunner-dispatch-routes.js';
+import {registerStitcherWardRoutes} from './stitcher-ward-routes.js';
 import {registerBellrunnerWrongBellRoutes} from './bellrunner-wrong-bell-routes.js';
 import {registerBellrunnerSecondJobRoutes} from './bellrunner-second-job-routes.js';
 import {registerBellrunnerDogmanRoutes} from './bellrunner-dogman-routes.js';
@@ -30,6 +31,7 @@ registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);
 registerMillhandWorkRoutes(api);
 registerBellrunnerDispatchRoutes(api);
+registerStitcherWardRoutes(api);
 registerBellrunnerWrongBellRoutes(api);
 registerBellrunnerSecondJobRoutes(api);
 registerBellrunnerDogmanRoutes(api);
