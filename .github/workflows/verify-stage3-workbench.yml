@@ -20,6 +20,13 @@ on:
       - 'platform/scripts/verify-bellrunner-stage6.test.ts'
       - 'platform/scripts/verify-bellrunner-stage7.test.ts'
       - 'platform/scripts/verify-bellrunner-stage8.test.ts'
+      - 'platform/scripts/verify-stitcher-stages1-4.test.ts'
+      - 'platform/apps/api/src/stitcher-*.ts'
+      - 'platform/apps/web/src/lib/Stitcher*.svelte'
+      - 'platform/apps/web/src/lib/stitcher-*.ts'
+      - 'platform/apps/web/src/routes/characters/*/stitcher/**'
+      - 'platform/db/migrations/0020_stitcher_ward.sql'
+      - 'platform/scripts/stitcher-migrate.mjs'
       - 'platform/scripts/verify-bellrunner-stage6-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage5-browser.mjs'
       - 'platform/apps/web/static/locations/bellrunner/**'
@@ -97,6 +104,8 @@ jobs:
         run: npm run verify:bellrunner-stage7
       - name: Bellrunner Stage 8 shared rented home, starting specialization and second skill
         run: npm run verify:bellrunner-stage8
+      - name: Stitcher Stages 1–4 ward dialogue, two-bed interactions and one-time branch rewards
+        run: npm run verify:stitcher-stages1-4
       - name: Every stage retains safe Back to previous Stage replay
         run: npm run verify:dev-rewind
       - name: Bellrunner Stage 3 owner art and sound
