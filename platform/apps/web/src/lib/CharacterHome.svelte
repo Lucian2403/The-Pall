@@ -24,6 +24,17 @@
   const newArrival=$derived(character.tutorial.stage===1&&character.tutorial.status==='NOT_STARTED');
   const artwork=$derived(originVisual(character.origin));
   const work=$derived.by(():WorkAction|null=>{
+    if(character.origin==='Stitcher'&&character.tutorial.stage>=1&&character.tutorial.stage<=5)return {
+      title:character.tutorial.stage===1?'Cinder Row Infirmary':
+        character.tutorial.stage===2?'Morning Dressings':
+        character.tutorial.stage===3?'The Teaching Bed':
+        character.tutorial.stage===4?'Your Second Job':'The Empty Sheet',
+      description:character.tutorial.stage===5
+        ?'Your selected ward work is complete. The service corridor encounter comes next.'
+        :'Your saved ward round, clues and chosen work remain available.',
+      label:character.tutorial.stage===1?'Report to Claudia':'Continue at Cinder Row',
+      href:base+'/stitcher/ward'
+    };
     if(newArrival) return {
       title:character.origin==='Millhand'?'The Smithing Workshop':
         character.origin==='Bellrunner'?'The Dispatch House':'Your first work',
