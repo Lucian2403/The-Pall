@@ -69,6 +69,23 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         const canRewind=job.rows[0]?.state?.phase==='exited'&&valid;
         return {enabled:true,canRewind,stage,targetStage:canRewind?4:null};
       }
+      if(stage===8){
+        // Once shared Stage VIII has started, its previous stage is the
+        // already-paid clinic. Keep coins, combat and clinic evidence intact.
+        const savedHome=await db.query<{state:{origin:string;phase:string;outcome:string}}>(
+          'SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[req.params.id]);
+        if(savedHome.rowCount){
+          const clinic=await db.query<{state:ClinicState}>(
+            'SELECT state FROM player_character_clinic WHERE character_id=$1',[req.params.id]);
+          const home=savedHome.rows[0].state;
+          const visit=clinic.rows[0]?.state;
+          const canRewind=home.origin==='Bellrunner'&&
+            home.outcome===visit?.outcome&&visit?.phase==='LEFT'&&visit.paid&&
+            ((home.phase==='COMPLETE'&&result.rows[0].tutorial_status==='COMPLETED')||
+             (home.phase!=='COMPLETE'&&result.rows[0].tutorial_status==='IN_PROGRESS'));
+          return {enabled:true,canRewind:!!canRewind,stage,targetStage:canRewind?7:null};
+        }
+      }
       if(stage===7||stage===8){
         // The Bellrunner clinic is still onscreen after its LEFT transition.
         // Unlike Millhand, Bellrunner has no implemented Stage VIII home yet:
@@ -377,6 +394,77 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         return {stage:4,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
       }
+      if(expectedStage===8){
+        // For Bellrunner, the final clinic screen can still show saved Stage
+        // VIII before home starts. Only a *saved home row* takes the shared
+        // Stage VIII -> VII path; otherwise the previous clinic rewind applies.
+        const homeExists=await client.query(
+          'SELECT 1 FROM player_character_tutorial_home WHERE character_id=$1',[req.params.id]);
+        if(!bellrunner||homeExists.rowCount){
+        // Developer-only replay of the final home scene. Restore the already
+        // PAID clinic interaction without refunding its fee or touching combat.
+        // The character lock serializes this with the Stage 8 action API.
+        const clinic=await client.query<{revision:number;state:ClinicState}>(
+          'SELECT revision,state FROM player_character_clinic WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        const visit=clinic.rows[0]?.state;
+        const currentStatus=c.rows[0].tutorial_status;
+        if(!visit||visit.phase!=='LEFT'||visit.paid!==true||
+           !visit.after||visit.after.hp!==c.rows[0].current_health||
+           visit.after.hp!==c.rows[0].max_health){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_clinic_state'});
+        }
+        const saved=await client.query<{state:{phase:string;outcome:string;origin:string}}>(
+          'SELECT state FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]
+        );
+        const prior=saved.rows[0]?.state;
+        const validProgress=prior
+          ?prior.origin===c.rows[0].origin&&prior.outcome===visit.outcome&&
+             ((prior.phase==='COMPLETE'&&currentStatus==='COMPLETED')||
+               (prior.phase!=='COMPLETE'&&currentStatus==='IN_PROGRESS'))
+          :currentStatus==='NOT_STARTED';
+        if(!validProgress){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_home_state'});
+        }
+        // Delete receipts before their FK parent. Revision changes prevent
+        // stale in-flight clinic/home commands from replaying old transitions.
+        await client.query(
+          'DELETE FROM player_character_tutorial_home_receipts WHERE character_id=$1',
+          [req.params.id]
+        );
+        await client.query(
+          'DELETE FROM player_character_tutorial_home WHERE character_id=$1',
+          [req.params.id]
+        );
+        // Invalidate only the previously saved departure receipt: replaying
+        // it after rewind must not yield an obsolete LEFT success response.
+        // Keep paid examination receipts and the single fee intact.
+        await client.query(
+          "DELETE FROM player_character_clinic_receipts WHERE character_id=$1 AND response->>'phase'='LEFT'",
+          [req.params.id]
+        );
+        const reopened={...visit,phase:'PAID',revision:visit.revision+1};
+        await client.query(
+          'UPDATE player_character_clinic SET state=$2::jsonb,revision=$3,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,JSON.stringify(reopened),reopened.revision]
+        );
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
+          [req.params.id]
+        );
+        await client.query('COMMIT');transaction=false;
+        return {
+          stage:7,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/'+(bellrunner?'bellrunner':'millhand')+'/clinic',
+          coinDelta:0
+        };
+        }
+      }
+
       if(bellrunner&&(expectedStage===7||expectedStage===8)){
         // The final Bellrunner clinic screen remains Stage VII visually after
         // leaving (saved tutorial_stage=8). Both positions need the exact same
@@ -552,70 +640,6 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query('COMMIT');transaction=false;
         return {stage:1,tutorialStatus:'NOT_STARTED',
           route:'/characters/'+req.params.id+'/opening',coinDelta:0};
-      }
-
-      if(expectedStage===8){
-        // Developer-only replay of the final home scene. Restore the already
-        // PAID clinic interaction without refunding its fee or touching combat.
-        // The character lock serializes this with the Stage 8 action API.
-        const clinic=await client.query<{revision:number;state:ClinicState}>(
-          'SELECT revision,state FROM player_character_clinic WHERE character_id=$1 FOR UPDATE',
-          [req.params.id]
-        );
-        const visit=clinic.rows[0]?.state;
-        const currentStatus=c.rows[0].tutorial_status;
-        if(!visit||visit.phase!=='LEFT'||visit.paid!==true||
-           !visit.after||visit.after.hp!==c.rows[0].current_health||
-           visit.after.hp!==c.rows[0].max_health){
-          await client.query('ROLLBACK');transaction=false;
-          return reply.code(409).send({error:'unsafe_clinic_state'});
-        }
-        const saved=await client.query<{state:{phase:string;outcome:string;origin:string}}>(
-          'SELECT state FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',
-          [req.params.id]
-        );
-        const prior=saved.rows[0]?.state;
-        const validProgress=prior
-          ?prior.origin==='Millhand'&&prior.outcome===visit.outcome&&
-             ((prior.phase==='COMPLETE'&&currentStatus==='COMPLETED')||
-               (prior.phase!=='COMPLETE'&&currentStatus==='IN_PROGRESS'))
-          :currentStatus==='NOT_STARTED';
-        if(!validProgress){
-          await client.query('ROLLBACK');transaction=false;
-          return reply.code(409).send({error:'unsafe_home_state'});
-        }
-        // Delete receipts before their FK parent. Revision changes prevent
-        // stale in-flight clinic/home commands from replaying old transitions.
-        await client.query(
-          'DELETE FROM player_character_tutorial_home_receipts WHERE character_id=$1',
-          [req.params.id]
-        );
-        await client.query(
-          'DELETE FROM player_character_tutorial_home WHERE character_id=$1',
-          [req.params.id]
-        );
-        // Invalidate only the previously saved departure receipt: replaying
-        // it after rewind must not yield an obsolete LEFT success response.
-        // Keep paid examination receipts and the single fee intact.
-        await client.query(
-          "DELETE FROM player_character_clinic_receipts WHERE character_id=$1 AND response->>'phase'='LEFT'",
-          [req.params.id]
-        );
-        const reopened={...visit,phase:'PAID',revision:visit.revision+1};
-        await client.query(
-          'UPDATE player_character_clinic SET state=$2::jsonb,revision=$3,updated_at=NOW() WHERE character_id=$1',
-          [req.params.id,JSON.stringify(reopened),reopened.revision]
-        );
-        await client.query(
-          "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
-          [req.params.id]
-        );
-        await client.query('COMMIT');transaction=false;
-        return {
-          stage:7,tutorialStatus:'IN_PROGRESS',
-          route:'/characters/'+req.params.id+'/millhand/clinic',
-          coinDelta:0
-        };
       }
 
       if(expectedStage===7){

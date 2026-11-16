@@ -24,7 +24,9 @@ export function homeCondition(from?:Partial<HomeCondition>|null):HomeCondition{
     stress:safeResource(from?.stress,DEFAULT_HOME_CONDITION.stress)
   };
 }
-export type Branch='restamp'|'contracts'|'records';
+export type MillhandBranch='restamp'|'contracts'|'records';
+export type BellrunnerBranch='contracts'|'trauma'|'machinery';
+export type Branch=MillhandBranch|BellrunnerBranch;
 export type Outcome='player_victory'|'player_defeat';
 export type State={revision:number;phase:Phase;homeId:string;origin:string;
   branch:Branch;outcome:Outcome;condition?:HomeCondition};

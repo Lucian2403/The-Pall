@@ -60,6 +60,7 @@
     .context,.instruction,.finding,.inner-voice,.work-description,.notice-text,
     .completion-copy){
   font-size:var(--dialogue-text);
+  font-weight:600;
   line-height:1.55;
 }
 .frame .chapter-content .pall-story-dialogue-section :is(h1,h2):not(.speaker-heading){

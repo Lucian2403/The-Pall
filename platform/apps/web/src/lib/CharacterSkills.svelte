@@ -16,9 +16,13 @@
     return majorSkillDisplayLevel(origin,major,majorSkillBonuses)+' / 100';
   }
   function secondJobRouteAward(major:string):boolean{
-    return origin==='Millhand' &&
-      (major==='Industry'||major==='Commerce'||major==='Scholarship') &&
-      Number.isSafeInteger(majorSkillBonuses[major]) && majorSkillBonuses[major]>0;
+    const routeMajor=origin==='Millhand'
+      ?['Industry','Commerce','Scholarship'].includes(major)
+      :origin==='Bellrunner'
+        ?['Commerce','Medicine','Mechanics'].includes(major)
+        :false;
+    return routeMajor&&Number.isSafeInteger(majorSkillBonuses[major])&&
+      majorSkillBonuses[major]>0;
   }
   function majorSkillTitle(major:string):string{
     return secondJobRouteAward(major)
@@ -27,15 +31,19 @@
   }
   // A derived introductory *preview*, not a persisted rank. Roman I-IV are
   // now the proposed tiers; no backend specialization ledger exists yet.
+  function startingSpecialization(major:string,skill:string):boolean{
+    return (origin==='Millhand'&&major==='Craftsmanship'&&skill==='Smithing'&&
+      (majorSkillBonuses.Craftsmanship??0)>=3)||
+      (origin==='Bellrunner'&&major==='Industry'&&skill==='Hauling'&&
+      (majorSkillBonuses.Industry??0)>=3);
+  }
   function specializationLabel(major:string,skill:string){
-    return origin==='Millhand'&&(majorSkillBonuses.Craftsmanship??0)>=3&&major==='Craftsmanship'&&skill==='Smithing'
-      ? 'I · starting'
-      : '—';
+    return startingSpecialization(major,skill)?'I · starting':'—';
   }
   function specializationTitle(major:string,skill:string){
-    return origin==='Millhand'&&(majorSkillBonuses.Craftsmanship??0)>=3&&major==='Craftsmanship'&&skill==='Smithing'
-      ? 'Starting specialization preview; rank not persisted in the current character API'
-      : 'No specialization rank recorded';
+    return startingSpecialization(major,skill)
+      ?'Starting specialization preview; rank not persisted in the current character API'
+      :'No specialization rank recorded';
   }
   function openWindow(){
     if(!windowElement||windowElement.open)return;
@@ -117,7 +125,7 @@
     <button class="window-close" type="button" data-pall-sfx="paper" aria-label="Close skills window" onclick={()=>windowElement?.close()}>×</button>
   </div>
   <div class="window-body">
-    <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline. A Millhand's chosen second-job route adds +1 to Industry, Commerce or Scholarship; that saved grant displays as 2 / 100. Specializations: Roman I–IV (planned); Smithing I is a starting preview.</p>
+    <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline. Your chosen second-job route grants +1 to a different Major Skill, displayed as 2 / 100 over that baseline (Industry, Commerce or Scholarship for Millhand; Commerce, Medicine or Mechanics for Bellrunner). Roman I–IV specializations are planned; Smithing I and Hauling I are starting previews, not persisted training ranks.</p>
     <div class="window-list">
       {#each CHARACTER_SKILLS as group (group.major)}
         <section class="window-skill">
