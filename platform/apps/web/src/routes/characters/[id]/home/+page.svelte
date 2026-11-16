@@ -64,13 +64,13 @@
   const combatEntry=$derived(home?.origin==='Bellrunner'
     ?home.outcome==='player_victory'
       ?"Dogman tried to take my papers, but he backed off when I got past him. I've still got them."
-      :"Dogman knocked me down and reached for my bag. Workers coming along the street scared him off, and a passerby got me to the clinic."
+      :"Dogman knocked me down by the service gate and tried to get into my bag. Luckily, some workers came down the street, and the bastard cleared off. A passerby helped me to the clinic. At least I've still got my route sheet."
     :home?.outcome==='player_victory'
       ?'Flint backed away from the passage after our fight.'
       :home?.outcome==='player_defeat'
         ?'Flint beat me. Another worker helped me get to the clinic.':null);
   const homeJournalIntro=$derived(home?.origin==='Bellrunner'
-    ?"Home at last. Ten coins left after the clinic, and the rent notice wants a hundred and fifty. Two unpaid jobs, Dogman and the clinic — that's been some day. Need work that actually pays."
+    ?"Home at last. Ten coins left after the clinic, and now I've got a rent notice demanding a hundred and fifty. Two jobs done, not a bloody coin earned. And after everything that's happened today, I'm lucky to be home at all. I need to find work that actually pays."
     :"Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.");
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
