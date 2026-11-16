@@ -7,6 +7,7 @@
   import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
+  import '$lib/pall-story-landscape.css';
 
   let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
     snapshot: CombatSnapshot;
@@ -224,6 +225,16 @@
             <p class="outcome">You defeated Dogman.</p>
             <p>{resultText}</p>
           {/if}
+          <!-- Share the EXACT nine-slice primary-choice art used by Millhand
+               and Bellrunner narrative actions; no bespoke dark rectangle. -->
+          <div class="pall-story-dialogue-section combat-outcome-actions">
+            <div class="actions">
+              <a class="pall-framed-button primary-choice clinic-transition"
+                href={'/characters/'+encodeURIComponent(characterId)+'/bellrunner/clinic'}>
+                Continue to the city clinic
+              </a>
+            </div>
+          </div>
         {:else}
           <p class="telegraph-title">DOGMAN'S OBSERVABLE INTENTION</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -586,6 +597,8 @@
   .parchment .stance{font-style:italic;font-size:14px}
   .parchment .position{font-size:12px;color:#604531}
   .parchment .outcome{font-weight:700}
+  .parchment .combat-outcome-actions{margin-top:16px}
+  .parchment .combat-outcome-actions .actions{width:100%}
   /* Defeat is a full narrated scene. Give it the width, ink contrast and
      readable type that the shorter victory outcome does not need. */
   .alley.defeat{min-height:clamp(665px,55vw,790px)}

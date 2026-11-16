@@ -56,7 +56,7 @@ const files={
     'class="primary-choice"'],
   'apps/web/src/lib/NpcConversation.svelte':[
     'class="primary-choice"'],
-  'apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte':[
+  'apps/web/src/lib/SharedTutorialClinic.svelte':[
     'class="pall-framed-button advance primary-choice"'],
   'apps/web/src/routes/characters/[id]/home/+page.svelte':[
     'class="pall-framed-button primary-choice"']

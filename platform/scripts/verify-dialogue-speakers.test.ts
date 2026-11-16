@@ -77,7 +77,7 @@ test('existing narrative scene components adopt the shared speaker convention',(
     'apps/web/src/routes/characters/[id]/opening/+page.svelte',
     'apps/web/src/routes/characters/[id]/bellrunner/dispatch/+page.svelte',
     'apps/web/src/routes/characters/[id]/bellrunner/wrong-bell/+page.svelte',
-    'apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte',
+    'apps/web/src/lib/SharedTutorialClinic.svelte',
     'apps/web/src/routes/characters/[id]/home/+page.svelte'
   ];
   for(const file of components){
