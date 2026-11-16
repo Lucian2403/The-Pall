@@ -11,7 +11,8 @@
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
   type Action='read_notice'|'put_down'|'finish'|'rest';
   type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:string;
-    branch:'restamp'|'contracts'|'records';outcome:'player_victory'|'player_defeat';
+    branch:'restamp'|'contracts'|'records'|'trauma'|'machinery';
+    outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
     condition:{stamina:number;composure:number;fatigue:number;stress:number}};
@@ -50,16 +51,33 @@
     registerSceneJournal?.({id:'home-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
-  const routeEntry=$derived(home?.branch==='restamp'
-    ?'The depot recorded metal plates, though the original manifest called them a transfer of workers.'
-    :home?.branch==='contracts'
-      ?'Two contradictory official classifications were sealed for the same dead worker number. I lodged an objection.'
-      :home?.branch==='records'
-        ?'The cancelled worker number appears in a later wage tally. A correction in the records had been scraped away.':null);
-  const combatEntry=$derived(home?.outcome==='player_victory'
-    ?'Flint backed away from the passage after our fight.'
-    :home?.outcome==='player_defeat'
-      ?'Flint beat me. Another worker helped me get to the clinic.':null);
+  // Exactly one local Stage IV finding from the persisted route. Keep the
+  // incident unresolved. Never reveal discoveries from unchosen branches.
+  const routeEntry=$derived(home?.origin==='Bellrunner'
+    ?home.branch==='contracts'
+      ?"The register called workers who refused the condemned building voluntarily absent. They lost their wages for staying out."
+      :home.branch==='trauma'
+        ?"The medical register called the workers' complaints non-work illness. They were left paying for their own treatment."
+        :home.branch==='machinery'
+          ?"The safety shutoff was engaged, but the bell linkage was left connected. Someone moved that retaining pin. I don't know who."
+          :null
+    :home?.branch==='restamp'
+      ?'The depot recorded metal plates, though the original manifest called them a transfer of workers.'
+      :home?.branch==='contracts'
+        ?'Two contradictory official classifications were sealed for the same dead worker number. I lodged an objection.'
+        :home?.branch==='records'
+          ?'The cancelled worker number appears in a later wage tally. A correction in the records had been scraped away.':null);
+  const combatEntry=$derived(home?.origin==='Bellrunner'
+    ?home.outcome==='player_victory'
+      ?"Dogman tried to take my papers, but he backed off when I got past him. I've still got them."
+      :"Dogman knocked me down and reached for my bag. Workers coming along the street scared him off, and a passerby got me to the clinic."
+    :home?.outcome==='player_victory'
+      ?'Flint backed away from the passage after our fight.'
+      :home?.outcome==='player_defeat'
+        ?'Flint beat me. Another worker helped me get to the clinic.':null);
+  const homeJournalIntro=$derived(home?.origin==='Bellrunner'
+    ?"Home at last. Ten coins left after the clinic, and the rent notice wants a hundred and fifty. Two unpaid jobs, Dogman and the clinic — that's been some day. Need work that actually pays."
+    :"Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.");
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
   async function openRoomOverlay(kind:'storage'|'journal'){
@@ -224,8 +242,11 @@
           </aside>
         {:else if home.phase==='COMPLETE'}
           <aside class="home-dialogue completion" aria-label="Stage eight completion">
-            <p class="eyebrow">STAGE VIII · COMPLETE</p><h1>Millhand opening complete.</h1>
-            <p>The council has not paid for the plate lot. The dispute over the worker number remains unresolved.</p>
+            <p class="eyebrow">STAGE VIII · COMPLETE</p>
+            <h1>{home.origin==='Bellrunner'?'Bellrunner opening complete.':'Millhand opening complete.'}</h1>
+            <p>{home.origin==='Bellrunner'
+              ?'The condemned worksite remains closed, and your local findings have not been resolved.'
+              :'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.'}</p>
             <p><strong>{home.coins} coins remaining. Rent notice: {home.rent} coins.</strong></p>
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
           </aside>
@@ -247,7 +268,7 @@
                   onclick={closeRoomOverlay}>Close journal</button>
               </header>
               <div class="journal-body">
-                <p>Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.</p>
+                <p>{homeJournalIntro}</p>
                 {#if routeEntry}<p>{routeEntry}</p>{/if}
                 {#if combatEntry}<p>{combatEntry}</p>{/if}
               </div>
