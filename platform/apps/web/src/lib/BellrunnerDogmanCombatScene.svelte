@@ -7,6 +7,7 @@
   import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
+  import '$lib/pall-story-landscape.css';
 
   let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
     snapshot: CombatSnapshot;
