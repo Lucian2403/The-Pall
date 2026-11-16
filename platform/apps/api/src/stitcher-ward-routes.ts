@@ -36,7 +36,7 @@ const schemaMissing=(e:unknown)=>['42P01','42703'].includes((e as {code?:string}
 function view(character:Character,state:StitcherState,started:boolean){
  return {stage:character.tutorial_stage,tutorialStatus:character.tutorial_status,
   state,started,availableActions:started?stitcherActions(state):['start'],
-  coins:character.coins,majorSkillBonuses:character.major_skill_bonuses,
+  coins:Number(character.coins),majorSkillBonuses:character.major_skill_bonuses,
   tutorialPayout:{coins:0,ordinaryXp:0,items:0}};
 }
 export function registerStitcherWardRoutes(app:FastifyInstance,options:{
