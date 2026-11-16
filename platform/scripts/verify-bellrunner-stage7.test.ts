@@ -97,7 +97,7 @@ test('Both origins reuse one clinic API, state table, paid transaction and UI',(
   const shell=read('apps/web/src/lib/TutorialShell.svelte');
   assert.ok(shell.includes("'← Back to Stage '+rewindTargetStage"));
   assert.ok(shell.includes('completed Dogman fight'));
-  assert.ok(rewind.includes('if(stage===7)'));
+  assert.ok(rewind.includes('if(stage===7||stage===8)'));
   assert.ok(home.includes("href:base+'/bellrunner/clinic'"));
   assert.ok(rewind.includes('if(bellrunner&&(expectedStage===7||expectedStage===8))'));
   assert.ok(rewind.includes('if(stage===7||stage===8)'));
