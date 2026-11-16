@@ -9,6 +9,7 @@ import {step} from '@the-pall/game-core/combat-v0.5.1';
 import {initializeFlintCombat} from '../apps/api/src/millhand-combat-opening.ts';
 import {initializeDogmanCombat} from '../apps/api/src/bellrunner-dogman-combat-opening.ts';
 import * as clinicState from '../apps/api/src/millhand-clinic-state.ts';
+import * as homeState from '../apps/api/src/shared-home-state.ts';
 
 /* Millhand tutorial scenes in the shared ActivityLayout scene mode, in REAL
  * Svelte pages (run with: node --import tsx). Snapshots are produced by the
@@ -63,7 +64,13 @@ for(const action of ['examine','speak','review_price','pay','leave'])
 assert.equal(bellClinicLeft.phase,'LEFT','Bellrunner browser fixture must be a completed clinic');
 let clinic=clinicState.initialClinic(fight);
 for(const action of ['examine','speak'])clinic=clinicState.advanceClinic(clinic,action);
+const bellHomeStart=homeState.initial('Bellrunner','machinery','player_victory');
+let bellHomeDone=bellHomeStart;
+for(const action of ['read_notice','put_down','finish'])
+  bellHomeDone=homeState.advance(bellHomeDone,action);
 const fixtures={
+  bellHome:homeState.view(bellHomeStart,'QA Bellrunner',10),
+  bellHomeDone:homeState.view(bellHomeDone,'QA Bellrunner',10),
   work:{stage:2,tutorialStatus:'IN_PROGRESS',work,availableActions:[...core.availableActions(work)],tutorialPayout:payout},
   stamp:{stage:3,tutorialStatus:'IN_PROGRESS',majorSkillBonuses:{},state:stamp,
     availableActions:[...core.availableMissingStampActions(stamp,evidence)],contentReady:true,
@@ -96,7 +103,9 @@ const scenes=[
   ['Bellrunner Stage 7 defeat','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicDefeat',7,'.clinic-dialogue','.clinic-scene',A],
   ['Bellrunner Stage 7 victory','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicVictory',7,'.clinic-dialogue','.clinic-scene',A],
   ['Bellrunner Stage 7 completed','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicLeft',7,'.clinic-dialogue','.clinic-scene',A],
-  ['Stage 8 home','/characters/qa-scenes-millhand/home',8,'.home-artwork','.home-scene',A]
+  ['Stage 8 home','/characters/qa-scenes-millhand/home',8,'.home-artwork','.home-scene',A],
+  ['Bellrunner Stage 8 shared home','/characters/qa-scenes-bellrunner/home?qa=bellHome',8,'.home-artwork','.home-scene',A],
+  ['Bellrunner Stage 8 complete','/characters/qa-scenes-bellrunner/home?qa=bellHomeDone',8,'.home-artwork','.home-scene',A]
 ];
 const sizes=[[1920,1080],[1280,720],[1024,768],[390,844]];
 
@@ -123,19 +132,23 @@ const stub=String.raw`(()=>{
     if(route==='/api/characters/qa-scenes-bellrunner')return Promise.resolve(json({character:{
       id:'qa-scenes-bellrunner',name:'QA Bellrunner',origin:'Bellrunner',sex:'Female',coins:20,
       welcomeSeen:true,startingLocation:'Dispatch House',health:{current:0,maximum:50},
-      tutorial:{stage:7,status:'IN_PROGRESS'}}}));
+      tutorial:{stage:stage===8?8:7,status:key==='bellHomeDone'?'COMPLETED':'IN_PROGRESS'}}}));
     if(route.endsWith('/dev/rewind-stage'))return Promise.resolve(
       json(route.includes('qa-scenes-bellrunner')
-        ?{enabled:true,canRewind:true,stage:key==='bellClinicLeft'?8:7,targetStage:6}
+        ?{enabled:true,canRewind:true,stage:key?.startsWith('bellHome')?8:key==='bellClinicLeft'?8:7,
+           targetStage:key?.startsWith('bellHome')?7:6}
         :{enabled:false,canRewind:false,stage,targetStage:null}));
     if(method==='POST'){
       window.__pallPosts=(window.__pallPosts||[]).concat([JSON.parse(options.body||'{}')]);
       return Promise.resolve(json({error:'qa_stub_no_write'},503));
     }
-    if(route.endsWith('/tutorial/home'))return Promise.resolve(json({stage:8,revision:0,phase:'HOME',
-      homeId:'qa-home',origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Millhand',
-      coins:10,rent:150,shortfall:140,noticeTitle:'Notice',noticeText:'Rent is due.',closingSpeech:'Right.',
-      completed:false,condition:{stamina:100,composure:100,fatigue:0,stress:0}}));
+    if(route.endsWith('/tutorial/home')){
+      if(key?.startsWith('bellHome'))return Promise.resolve(json(fx[key]));
+      return Promise.resolve(json({stage:8,revision:0,phase:'HOME',
+       homeId:'qa-home',origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Millhand',
+       coins:10,rent:150,shortfall:140,noticeTitle:'Notice',noticeText:'Rent is due.',closingSpeech:'Right.',
+       completed:false,condition:{stamina:100,composure:100,fatigue:0,stress:0}}));
+    }
     if(route.endsWith('/inventory')){
       const empty={slotsUsed:0,maxSlots:12,weightKg:0,volumeL:0,maxWeightKg:20,maxVolumeL:30,overCapacity:false,items:[]};
       return Promise.resolve(json({revision:0,storageEnabled:true,pack:empty,chest:{...empty,maxSlots:24},
@@ -298,6 +311,31 @@ try{
     console.log('PASS: '+name+' — scene layout at '+sizes.map(s=>s.join('x')).join(', '));
   }
 
+  // Shared home must be the same image while the Bellrunner journal shows
+  // only the saved machinery finding and Dogman victory. The chapter header
+  // must expose its proper previous stage (VII), even after completion.
+  for(const key of ['bellHome','bellHomeDone']){
+    await open('/characters/qa-scenes-bellrunner/home?qa='+key,
+      1280,720,'.home-dialogue');
+    await until(()=>evalJS(
+      "[...document.querySelectorAll('.chapter-bar .rewind-button')].some(b=>b.textContent.includes('Back to Stage 7'))"),
+      5000,'Bellrunner Stage VIII Back to Stage 7');
+    const text=await evalJS("document.querySelector('.home-dialogue')?.innerText");
+    assert.ok(key==='bellHomeDone'?text.includes('Bellrunner opening complete'):
+      text.includes('You return to your rented home'),text);
+    assert.ok(!text.includes('Millhand opening complete'),text);
+    await evalJS("document.querySelector('.scene-journal-button').click()");
+    await until(()=>evalJS("document.querySelector('#home-journal')!==null"),
+      5000,'Bellrunner shared-room journal');
+    const journal=await evalJS("document.querySelector('#home-journal')?.innerText");
+    assert.match(journal,/retaining pin|bell linkage/);
+    assert.match(journal,/Dogman/);
+    assert.ok(!journal.includes('Flint')&&!journal.includes('dead worker number')&&
+      !journal.includes('non-work illness'),journal);
+    await shot('bellrunner-'+key+'-back-to-stage-7');
+  }
+  console.log('PASS: Bellrunner Stage VIII uses same rented room with Back to Stage VII and one chosen journal finding.');
+  
   // The Bellrunner arrival is real Svelte dialogue, not a static screenshot.
   // Both outcomes must begin AT the clinic, not repeat Dogman's escape.
   await open('/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicDefeat',
