@@ -115,6 +115,10 @@
         if (!response.ok) {status = 'unavailable'; return;}
         const body = await response.json() as {character: Character};
         character = body.character;
+        if (character.origin === 'Stitcher' && character.tutorial.stage <= 5) {
+          await goto('/characters/' + encodeURIComponent(character.id) + '/stitcher/ward');
+          return;
+        }
         if (character.origin === 'Millhand' && character.tutorial.stage === 2) {
           await goto('/characters/' + character.id + '/millhand/work');
           return;
