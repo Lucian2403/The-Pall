@@ -374,7 +374,7 @@ try{
   await open('/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicLeft',
     1280,720,'.clinic-dialogue');
   const completedText=await evalJS("document.querySelector('.clinic-dialogue')?.innerText");
-  assert.match(completedText,/Return to character/);
+  assert.match(completedText,/Travel Home/);
   assert.match(completedText,/Coins remaining: 10/);
   assert.equal(await evalJS(
     "document.querySelector('.chapter-meta')?.innerText.includes('Stage 7')"),true,
