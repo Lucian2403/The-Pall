@@ -110,7 +110,7 @@ test('Clinician remarks depend on actual wounds, blood loss and Health, not inve
 });
 
 test('Clinic dialogue and journal match earlier stage presentation',()=>{
-  const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+  const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
   const frame=web.slice(web.indexOf('  .clinic-dialogue{'),web.indexOf('  .eyebrow,.speaker{'));
   assert.ok(frame.includes('background:transparent;'),
     'Transparent frame corners must show the clinic, not a solid pale rectangle');
@@ -131,8 +131,8 @@ test('Clinic dialogue and journal match earlier stage presentation',()=>{
 });
 
 test('Priced clinic conversation advances one owner-approved beat at a time before payment',()=>{
-  const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
-  const script=web.slice(web.indexOf('const PRICED_DIALOGUE_BEATS:'),web.indexOf('  type Character='));
+  const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
+  const script=web.slice(web.indexOf('const PRICED_DIALOGUE_BEATS:'),web.indexOf('  const BELLRUNNER_PRICED_BEATS:'));
   assert.equal((script.match(/kind:'(?:narration|speech)'/g)??[]).length,9,
     'The price conversation has two stage directions and seven spoken lines');
   for(const line of [
@@ -169,7 +169,7 @@ test('Priced clinic conversation advances one owner-approved beat at a time befo
 });
 
 test('Clinic record is separate from scene dialogue; payment and ambience are confirmed-only',()=>{
-  const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+  const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
   const shell=source('apps/web/src/lib/TutorialShell.svelte');
   const audio=source('apps/web/src/lib/pall-audio.ts');
   const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
@@ -214,7 +214,7 @@ test('Owner coin and clinic ambience exports are really present and decodable fi
 
 test('Web and API wire the clinic without altering original combat rules',()=>{
   const api=source('apps/api/src/millhand-clinic-routes.ts');
-  const web=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+  const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
   const clinician=source('apps/web/src/lib/millhand-clinic-dialogue.ts');
   const battle=source('apps/web/src/lib/MillhandCombatScene.svelte');
   const migration=source('db/migrations/0008_millhand_clinic.sql');
