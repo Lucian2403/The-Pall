@@ -1,7 +1,6 @@
-# Stitcher — Stage 3: The Teaching Bed (APPROVED)
+# Stitcher — Stage 3: The Teaching Bed (STORY APPROVED; DIALOGUE FOR REVIEW)
 
 > **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
-
 
 **Status: APPROVED AND LOCKED (2026-10-16), with Claudia's revised spoken line.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). The user approved the playable discovery, Claudia/player exchange, revised fever-ward coal line, and three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
 
@@ -49,7 +48,7 @@ He has received some care; the chart's claimed teaching operation is unnecessary
 
 **CLAUDIA:** “And I've got a ward full of patients waiting. Get on with your work.”
 
-Claudia's previous stiff phrasing has been replaced at the user's request; the revised line gives the argument a personal cost: the Matron is defending a financial arrangement that keeps vulnerable patients supplied at the expense of **this one patient's consent**. Her manner is cold, practical and contemptuous of interference. She need not smile at anybody in this scene—her beauty and ability to charm do not make her less culpable.
+The fever-ward coal line is preserved verbatim in this editorial pass; Claudia's other replies are tightened around the same argument: the Matron is defending a financial arrangement that keeps vulnerable patients supplied at the expense of **this one patient's consent**. Her manner is cold, practical and contemptuous of interference. She need not smile at anybody in this scene—her beauty and ability to charm do not make her less culpable.
 
 The Matron **does not** admit to forging the thumbprint or personally signing for a sedated patient; that specific proof belongs to Stage 4's Contracts route. She knows there is a teaching arrangement, knows it is not needed treatment, and refuses to set aside the ward funding simply because the patient objects. She is not physically attacking the player, and Owler is not introduced until the later service-door encounter.
 
@@ -97,7 +96,7 @@ After Stage 4, the common [The Empty Sheet] encounter and [The Night Door] encou
 
 **Already LOCKED:** Teaching Bed adult patient, blue surgical guide marks, awake and restrained, thumbprint claim, exact chart text, coerced medically unnecessary demonstration, Claudia's revised fever-ward coal argument and institutional motive, the three named second skills/tasks, one +1 skill level at branch selection and the shared zero-reward tutorial economy.
 
-**APPROVED IN STAGE 3:** physical scene staging, optional player/patient exchange, fuller Claudia interaction, visible choice labels, player one-liners and Claudia convergence.
+**APPROVED IN STAGE 3 (October story approval):** physical scene staging, optional patient exchange, Claudia interaction, three route meanings and branch convergence. The November dialogue revisions above await owner review.
 
 **TBD:** surgical procedure specifics (do not author graphic details), chart visual asset, patient identity and exact transfer time, funding contract rules beyond this single case, exact camera/staging, and procedural names in the ordinary job systems.
 
