@@ -162,7 +162,7 @@
           <p class="eyebrow">{s.stage===4?'SECOND JOB':'STITCHER'} · STAGE {['','I','II','III','IV','V'][s.stage]}{#if branchData} · {branchData.discipline}{/if}</p>
           <h1>{s.stage===5?STITCHER_STAGE_TITLES[5]:branchData?.title??STITCHER_STAGE_TITLES[s.stage]}</h1>
           {#if !snapshot.started}
-            <p class="narration">The infirmary's beds are full. Steam rises from a wash basin, and the coal stove smokes. Claudia Cyka is checking the morning round.</p>
+            <p class="narration">The infirmary is packed, with every bed taken. Steam rises from a basin of hot water, and smoke drifts from the coal stove. Claudia Cyka is going over the morning's work.</p>
           {:else if s.stage===1}
             {#if s.phase==='intro'}
               {#if s.introLine===0}
@@ -180,8 +180,8 @@
                 <p class="spoken">“Look at the wounds first. If either one's worse than expected, come and get me. Don't guess.”</p>
               {/if}
             {:else}
-              <p class="narration">Two charity beds by the door require ordinary dressing changes under Claudia's supervision. The infirmary provides clean water and linen. This cover round is unpaid.</p>
-              <p class="instruction">Inspect the wounds first. Unexpected serious findings must be referred to the Matron.</p>
+              <p class="narration">Two patients lie in the beds near the door, waiting for their bandages to be changed. Claudia has left you clean water and linen to work with. She'll be keeping an eye on you, though you won't be paid for the round.</p>
+              <p class="instruction">Before you begin, you need to check both wounds. If anything looks serious, you'll have to call Claudia over.</p>
             {/if}
           {:else if s.stage===2}
             {#if s.phase==='inspect'}
@@ -191,7 +191,7 @@
             {:else if s.phase==='order'}
               <p class="narration">Both beds need attention. Who do you see first?</p>
             {:else if s.phase==='prepare'}
-              <p class="narration">The clean water and linen are limited but sufficient to treat both minor wounds. You may take time to cut pieces that fit, or use the ready-cut ward dressings.</p>
+              <p class="narration">You check the clean water and linen. There's enough for both patients, but not much left to spare. You can cut the dressings to fit each wound, or use the ones already prepared.  </p>
             {:else if s.phase==='care'}
               <p class="narration">{!s.treatedA&&!s.treatedB
                 ?'Inspect, clean and dress the first bed. Select the appropriate bed in the illustration.'
