@@ -159,6 +159,9 @@ try{
         'const actor=document.querySelector(".battle .dogman");'+
         'const enemyStatus=document.querySelector(".battle .enemy-status");'+
         'const visible=document.querySelector(".battle .parchment");'+
+        'const clinicLink=visible.querySelector("a.clinic-transition");'+
+        'const clinicStyle=clinicLink?getComputedStyle(clinicLink):null;'+
+        'const clinicRect=clinicLink?.getBoundingClientRect();'+
         'const r=e=>{const x=e.getBoundingClientRect();return {left:x.left,right:x.right,top:x.top,bottom:x.bottom,width:x.width,height:x.height};};'+
         'return {viewport:document.documentElement.clientWidth,bodyWidth:document.documentElement.scrollWidth,'+
         'sprite:new URL(sprite.currentSrc).pathname,spriteWidth:sprite.naturalWidth,'+
@@ -166,6 +169,9 @@ try{
         'spriteBox:r(actor),statusBox:r(enemyStatus),parchmentBox:r(visible),'+
         'arenaBox:r(arena),typeSize:parseFloat(getComputedStyle(visible.querySelector(".defeat-narration")||visible).fontSize),'+
         'textHeight:visible.scrollHeight,visibleHeight:visible.clientHeight,'+
+        'clinicCTA:clinicLink?{frame:clinicStyle.borderImageSource,'+
+          'width:clinicRect.width,height:clinicRect.height,'+
+          'background:clinicStyle.backgroundColor,href:clinicLink.getAttribute("href")}:null,'+
         'actionTiles:document.querySelectorAll(".battle .action-tile").length,'+
         'backVisible:[...document.querySelectorAll(".chapter-bar .rewind-button")].some(x=>x.textContent.includes("Back to Stage 5"))};})()');
       assert.ok(data.bodyWidth<=data.viewport,'Horizontal overflow '+outcome+' '+width);
@@ -180,6 +186,13 @@ try{
         assert.equal(data.actionTiles,6,'Shared six-action combat HUD');
         assert.match(data.body,/Dogman/i);
       }else{
+        assert.ok(data.clinicCTA,'Both outcomes must show the framed clinic transition');
+        assert.ok(data.clinicCTA.frame.includes('button-normal-trim.png'),
+          'Dogman clinic transition must use the EXACT primary button artwork: '+JSON.stringify(data.clinicCTA));
+        assert.ok(data.clinicCTA.width>=180&&data.clinicCTA.height>=48,
+          'Dogman clinic CTA must retain the shared readable click area: '+JSON.stringify(data.clinicCTA));
+        assert.ok(data.clinicCTA.href.endsWith('/bellrunner/clinic'),
+          'Dogman clinic CTA must link to Bellrunner Stage VII');
         assert.equal(data.actionTiles,0,'Finished fight has no combat controls');
         assert.doesNotMatch(data.body,/Stage VII|not implemented|Your battle outcome and actual Health/);
         assert.equal(data.sprite,'/characters/dogman/'+
