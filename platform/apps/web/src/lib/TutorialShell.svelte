@@ -235,7 +235,9 @@
       :character.origin==='Bellrunner'&&fromStage===5
       ?'TESTING ONLY: Return to Bellrunner Stage 4? The completed second job remains saved and your +1 Major Skill is preserved. Only the final departure to the service gate is undone.'
       :fromStage===8
-      ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
+      ?character.origin==='Bellrunner'
+        ?'TESTING ONLY: Back to Stage 6 from the completed clinic? This resets the Dogman fight and clinic visit, restores your exact pre-fight Health and refunds the 10-coin clinic fee. Your bag, papers, earlier jobs and skills are preserved.'
+        :'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
       ?character.origin==='Bellrunner'
         ?'TESTING ONLY: Back to Stage 6? This clears the clinic visit and the completed Dogman fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Your papers, earlier jobs, equipment and skills remain saved.'
