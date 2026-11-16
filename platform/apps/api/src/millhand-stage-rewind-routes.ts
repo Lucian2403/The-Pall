@@ -69,20 +69,38 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         const canRewind=job.rows[0]?.state?.phase==='exited'&&valid;
         return {enabled:true,canRewind,stage,targetStage:canRewind?4:null};
       }
-      if(stage===7){
+      if(stage===7||stage===8){
+        // The Bellrunner clinic is still onscreen after its LEFT transition.
+        // Unlike Millhand, Bellrunner has no implemented Stage VIII home yet:
+        // the visible previous stage remains the Dogman fight (Stage VI).
         const visit=await db.query<{state:ClinicState}>(
           'SELECT state FROM player_character_clinic WHERE character_id=$1',[req.params.id]);
         const combat=await db.query<{state:CombatState}>(
           'SELECT state FROM player_character_dogman_combat WHERE character_id=$1',[req.params.id]);
         const saved=visit.rows[0]?.state;
         const fight=combat.rows[0]?.state;
-        const canRewind=!!saved&&!!fight&&
-          saved.phase!=='LEFT'&&saved.outcome===fight.outcome&&
+        const left=stage===8;
+        let canRewind=!!saved&&!!fight&&fight.status==='finished'&&
+          saved.outcome===fight.outcome&&
           saved.before.hp===fight.player.hp&&
           saved.before.hpMax===fight.player.hpMax&&
+          (left
+            ?saved.phase==='LEFT'&&saved.paid===true&&
+              result.rows[0].tutorial_status==='NOT_STARTED'
+            :saved.phase!=='LEFT'&&
+              result.rows[0].tutorial_status==='IN_PROGRESS')&&
           (saved.paid
-            ?saved.phase==='PAID'&&saved.after?.hp===result.rows[0].current_health
-            :saved.after===null&&saved.before.hp===result.rows[0].current_health);
+            ?(saved.phase==='PAID'||(left&&saved.phase==='LEFT'))&&
+              saved.after?.hp===result.rows[0].current_health
+            :!left&&saved.after===null&&
+              saved.before.hp===result.rows[0].current_health);
+        if(canRewind&&left){
+          // Never destroy progress once a Stage VIII home record exists.
+          const home=await db.query(
+            'SELECT 1 FROM player_character_tutorial_home WHERE character_id=$1',
+            [req.params.id]);
+          canRewind=!home.rowCount;
+        }
         return {enabled:true,canRewind,stage,targetStage:canRewind?6:null};
       }
       if(stage===6){
@@ -359,9 +377,12 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         return {stage:4,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
       }
-      if(bellrunner&&expectedStage===7){
-        // Local replay of the shared clinic is serialized against clinic pay
-        // and combat rounds. Restore only the recorded pre-fight condition.
+      if(bellrunner&&(expectedStage===7||expectedStage===8)){
+        // The final Bellrunner clinic screen remains Stage VII visually after
+        // leaving (saved tutorial_stage=8). Both positions need the exact same
+        // developer-only Back to Stage VI contract, never an unguarded reset.
+        // Lock the character first to serialize with clinic pay and combat.
+        const left=expectedStage===8;
         const visitRows=await client.query<{state:ClinicState}>(
           'SELECT state FROM player_character_clinic WHERE character_id=$1 FOR UPDATE',
           [req.params.id]);
@@ -371,14 +392,17 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         const visit=visitRows.rows[0]?.state;
         const fight=combatRows.rows[0];
         if(!visit||!fight||fight.state.status!=='finished'||
-          visit.phase==='LEFT'||visit.outcome!==fight.state.outcome||
+          visit.outcome!==fight.state.outcome||
           visit.before.hp!==fight.state.player.hp||
           visit.before.hpMax!==fight.state.player.hpMax||
-          c.rows[0].tutorial_status!=='IN_PROGRESS'){
+          (left
+            ?visit.phase!=='LEFT'||visit.paid!==true||
+              c.rows[0].tutorial_status!=='NOT_STARTED'
+            :visit.phase==='LEFT'||c.rows[0].tutorial_status!=='IN_PROGRESS')){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_clinic_state'});
         }
-        const paid=visit.phase==='PAID'&&visit.paid;
+        const paid=visit.paid&&(visit.phase==='PAID'||(left&&visit.phase==='LEFT'));
         if((visit.paid&&!paid)||
           (paid?(!visit.after||
              visit.after.hp!==c.rows[0].current_health||
@@ -406,6 +430,17 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           fight.stance!==stance||original.stance!==mapped){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_combat_initial_health'});
+        }
+        if(left){
+          // Stage VIII is not available for Bellrunner yet. Refuse to rewind
+          // once it has acquired any persistent state, even unexpectedly.
+          const home=await client.query(
+            'SELECT 1 FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          if(home.rowCount){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_home_state'});
+          }
         }
         await client.query(
           'DELETE FROM player_character_clinic_receipts WHERE character_id=$1',[req.params.id]);
