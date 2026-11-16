@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {INITIAL_STITCHER,applyStitcherAction,stitcherActions,STITCHER_MAJOR,
  STITCHER_LINES,STITCHER_CLAUDIA_LINES,StitcherInvalidAction} from '../apps/api/src/stitcher-work.ts';
+import {shouldShowClaudia} from '../apps/web/src/lib/stitcher-claudia-presence.ts';
 
 const read=(p:string)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const progress=(s:typeof INITIAL_STITCHER,actions:string[])=>
@@ -84,6 +85,36 @@ test('Stage IV three ordinary routes reach pending handoff without wages or earl
   assert.equal(s.stage,5);assert.equal(s.phase,'exited');
   assert.deepEqual(stitcherActions(s),[]);
  }
+});
+test('Claudia appears only during her live exchanges in Stages I–IV',()=>{
+ const sample=(stage:number,phase:string,dialogueLine=0,branch:string|null=null,started=true)=>
+   shouldShowClaudia({stage,phase,branch,dialogueLine},started);
+ assert.equal(sample(1,'intro'),true);
+ assert.equal(sample(1,'intro',0,null,false),false);
+ assert.equal(sample(1,'briefing'),false);
+ // The Stage II linen report is a three-line *conversation*, not three
+ // independent sprite appearances; she stays while YOU answer.
+ for(const line of [0,1,2])assert.equal(sample(2,'report',line),true);
+ for(const phase of ['inspect','order','prepare','care','linen_check','linen_fix',
+   'verify','record','close'])assert.equal(sample(2,phase),false);
+ // Claudia enters when called in Stage III, remains for the player's lines,
+ // and delivers the final instruction before branch choice.
+ for(const line of [0,1,2,3,4,5])assert.equal(sample(3,'claudia',line),true);
+ assert.equal(sample(3,'choose'),true);
+ assert.equal(sample(3,'discovery'),false);
+ // If the selected Stage IV consent route reaches Claudia, show her for
+ // both of her lines and the player's intervening response only.
+ for(const line of [5,6,7])assert.equal(sample(4,'dialogue',line,'consent'),true);
+ for(const line of [0,1,2,3,4,8])assert.equal(sample(4,'dialogue',line,'consent'),false);
+ for(const branch of ['trolley','notes']){
+   for(const line of [0,5,6,7])assert.equal(sample(4,'dialogue',line,branch),false);
+ }
+ assert.equal(sample(4,'work',6,'consent'),false);
+ assert.equal(sample(5,'exited'),false);
+ const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
+ assert.ok(scene.includes('shouldShowClaudia(s,snapshot.started)'));
+ assert.ok(scene.includes('{#if claudiaVisible&&!claudiaArtMissing}'));
+ assert.ok(!scene.includes('{#if s.stage===1&&!claudiaArtMissing&&snapshot.started}'));
 });
 test('UI uses the exact existing frames, accessible background-bed hotspots and owner dialogue',()=>{
  const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
