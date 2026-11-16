@@ -237,7 +237,9 @@
       :fromStage===8
       ?'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
-      ?'TESTING ONLY: Replay the fight in Stage 6? This clears the clinic visit and the completed Flint fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Earlier jobs, equipment and skill awards remain saved.'
+      ?character.origin==='Bellrunner'
+        ?'TESTING ONLY: Back to Stage 6? This clears the clinic visit and the completed Dogman fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Your papers, earlier jobs, equipment and skills remain saved.'
+        :'TESTING ONLY: Replay the fight in Stage 6? This clears the clinic visit and the completed Flint fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Earlier jobs, equipment and skill awards remain saved.'
       :fromStage===6
         ?character.origin==='Bellrunner'
           ?'TESTING ONLY: Replay the Dogman fight from Stage 5? This discards the current battle, restores the exact saved pre-fight Health, and returns to the three defensive positions. Your papers, earlier jobs, skills and coins remain unchanged.'
