@@ -85,7 +85,7 @@
     :next==='speak'?(origin==='Bellrunner'?'Let the clinician examine you':'Speak to clinician')
     :next==='review_price'?'Review the price'
     :next==='pay'?'Pay 10 coins'
-    :next==='leave'?'Travel Home':'');
+    :next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home'):'');
   let pricedDialogueIndex=$state(0);
   const pricedBeats=$derived(origin==='Bellrunner'?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS);
   const pricedBeat=$derived(pricedBeats[pricedDialogueIndex]!);
