@@ -247,8 +247,8 @@
             {#if origin==='Bellrunner'}
               {#if arrivalIndex<0}
                 <p class="narration">{clinic.outcome==='player_defeat'
-                  ?'The passerby who caught you after Dogman knocked you down helps you through the streets to the city clinic. Your bag and papers are still yours.'
-                  :'Dogman lowers his club and clears the passage. You walk on toward the city clinic with your bag and papers.'}</p>
+                  ?'The passerby helps you through the city clinic door. You are unsteady on your feet, but you keep hold of your bag and papers. There is a chair nearby.'
+                  :'You arrive at the city clinic on your own, still carrying your bag and papers. There is a place to sit, and a clinician is available to see you.'}</p>
                 <p class="instruction">You reach the ordinary city clinic.</p>
               {:else if arrivalBeat}
                 {#if arrivalBeat.kind==='narration'}
