@@ -4,10 +4,12 @@
 
 ## Handoff from Dogman
 
-The saved **victory** or **defeat** from Stage VI is the sole authority for the opening. The battle result shows a **Continue to the city clinic** action.
+The saved **victory** or **defeat** from Stage VI is the sole authority for the opening. The battle result shows a **Continue to the city clinic** action using the **same owner-provided primary nine-slice frame** as every other narrative choice, not a custom rectangle.
 
-- **Victory:** Dogman lowers the club, clears the passage; the courier walks to the normal city clinic with bag and papers.
-- **Defeat:** the unnamed passerby who caught the courier after Dogman's assault helps them through the streets. The papers remain in the bag.
+The first panel, already over the **clinic background**, is about arriving in the clinic rather than escaping Dogman:
+
+- **Victory:** *You arrive at the city clinic on your own, still carrying your bag and papers. There is a place to sit, and a clinician is available to see you.*
+- **Defeat:** *The passerby helps you through the city clinic door. You are unsteady on your feet, but you keep hold of your bag and papers. There is a chair nearby.*
 
 Bellrunner then displays **one beat per Continue**:
 
@@ -38,7 +40,7 @@ The payment slip is revealed before the **Pay 10 coins** action.
 - The original full Dogman battle remains immutable. A **0-Health defeat** is a valid arrival. After payment, restore the shared tutorial starting condition: Health 50/50, default Stamina/Composure, zero fatigue/stress/momentum/bleeding and no active wounds. No invented injuries are ever inserted into the saved combat record.
 - The clinic background, ambience, readable dialogue, examination record, coin sound and journal are rendered by a **single shared Svelte component**, `SharedTutorialClinic.svelte`, mounted from separate Millhand and Bellrunner routes.
 - Bellrunner's journal mentions Dogman and preserves the existing branch finding. No visit to Hector is added.
-- Developer-only Stage VII rewind can restore the exactly recorded pre-fight Health, refund an already paid 10-coin examination once, clear only Dogman combat and clinic state, and restart at Stage VI. Earlier stage choices, skill gains and evidence stay intact.
+- A visible **← Back to Stage 6** button is retained in the sticky chapter header of every playable Stage VII clinic phase in the loopback/local testing environment. The server-authoritative developer-only rewind restores exactly recorded pre-fight Health, refunds an already paid 10-coin examination once, clears only Dogman combat and clinic state, and restarts Stage VI. The confirmation correctly names Dogman (not Flint). Earlier stage choices, skill gains and evidence stay intact. The control is not exposed on a production server; the later Stage VIII rewind belongs with the Stage VIII implementation.
 
 ## Stage VIII boundary
 
