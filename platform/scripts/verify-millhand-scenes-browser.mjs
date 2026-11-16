@@ -118,7 +118,10 @@ const stub=String.raw`(()=>{
       id:'qa-scenes-bellrunner',name:'QA Bellrunner',origin:'Bellrunner',sex:'Female',coins:20,
       welcomeSeen:true,startingLocation:'Dispatch House',health:{current:0,maximum:50},
       tutorial:{stage:7,status:'IN_PROGRESS'}}}));
-    if(route.endsWith('/dev/rewind-stage'))return Promise.resolve(json({enabled:false,canRewind:false,stage,targetStage:null}));
+    if(route.endsWith('/dev/rewind-stage'))return Promise.resolve(
+      json(route.includes('qa-scenes-bellrunner')
+        ?{enabled:true,canRewind:true,stage:7,targetStage:6}
+        :{enabled:false,canRewind:false,stage,targetStage:null}));
     if(method==='POST'){
       window.__pallPosts=(window.__pallPosts||[]).concat([JSON.parse(options.body||'{}')]);
       return Promise.resolve(json({error:'qa_stub_no_write'},503));
@@ -290,12 +293,16 @@ try{
   }
 
   // The Bellrunner arrival is real Svelte dialogue, not a static screenshot.
-  // Both outcomes must open on a distinct travel beat before the clinician.
+  // Both outcomes must begin AT the clinic, not repeat Dogman's escape.
   await open('/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicDefeat',
     1280,720,'.clinic-dialogue');
   let opening=await evalJS("document.querySelector('.clinic-dialogue')?.innerText");
-  assert.match(opening,/passerby who caught you after Dogman knocked you down/);
+  assert.match(opening,/The passerby helps you through the city clinic door/);
+  assert.ok(!opening.includes('through the streets'));
   assert.ok(!opening.includes('Flint'));
+  await until(()=>evalJS(
+    "[...document.querySelectorAll('.chapter-bar .rewind-button')].some(b=>b.textContent.includes('Back to Stage 6'))"),
+    4500,'Bellrunner Stage VII Back to Stage 6 control');
   for(const expected of [
     'The clinician looks up as you approach.',
     'What happened?',
@@ -315,8 +322,12 @@ try{
   await open('/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicVictory',
     1280,720,'.clinic-dialogue');
   const healthyOpening=await evalJS("document.querySelector('.clinic-dialogue')?.innerText");
-  assert.match(healthyOpening,/Dogman lowers his club and clears the passage/);
-  console.log('PASS: Bellrunner defeats/victories lead to distinct clinic arrivals with approved dialogue.');
+  assert.match(healthyOpening,/You arrive at the city clinic on your own/);
+  assert.ok(!healthyOpening.includes('Dogman lowers his club'));
+  await until(()=>evalJS(
+    "[...document.querySelectorAll('.chapter-bar .rewind-button')].some(b=>b.textContent.includes('Back to Stage 6'))"),
+    4500,'Bellrunner Stage VII victory Back to Stage 6 control');
+  console.log('PASS: Bellrunner defeat/victory begin at the clinic and retain Back to Stage 6.');
 
   // Confirm the owner-approved Millhand normal/hover skin is computed
   // from the SAME global primary-choice rule used by Bellrunner Stage 4.
