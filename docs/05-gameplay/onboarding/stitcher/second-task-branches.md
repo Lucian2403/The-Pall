@@ -1,5 +1,8 @@
 # Stitcher — Stage 4: Three Second-Skill Jobs (APPROVED)
 
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+
+
 **Status: APPROVED AND LOCKED (2026-10-16).** This follows [approved Stage 3, The Teaching Bed](teaching-bed-discovery.md), and approved [Stage 1](opening-dialogue.md) and [Stage 2](morning-dressings-interaction.md). The user approved each of the three job interaction branches, their spoken lines, evidence findings and convergence; exact numerical job systems remain TBD.
 
 The adult patient is alive. The dawn teaching demonstration has not happened. The Stitcher selected one way to investigate or block his transfer. Only **one** second job is played. The **+1 level in Industry, Commerce or Scholarship** was granted when the route was selected in Stage 3, not at task completion. Every scripted Stage 4 task gives **0 coins, 0 ordinary XP and no loot**, because this is a response to the dispute during an unpaid charity round, not a paid commission. Ordinary repeatable jobs of the same kinds still pay normally.
@@ -12,15 +15,15 @@ The player stays near the patient while ward equipment and a secured transfer tr
 
 *At the receiving door, a clerk looks at the papers rather than the patient.*
 
-**RECEIVER:** “Which contract?”
+**RECEIVER:** “Contract number?”
 
-**PLAYER:** “There's a man here. Doesn't he have a name?”
+**PLAYER:** “There's a man on this trolley. Haven't you got his name?”
 
-**RECEIVER:** “I asked for the number.”
+**RECEIVER:** “I need the number.”
 
-**PLAYER:** “I'm not handing him over yet.”
+**PLAYER:** “I'm not signing him over.”
 
-**RECEIVER:** “Then go back to the ward.”
+**RECEIVER:** “Then take him back to the ward.”
 
 **Branch finding:** The receiving theatre requests the patient by contract reference rather than name. The player knows the service door and the required official mark; the final transfer is still pending. The receiving worker need not know whether the patient consented.
 
@@ -34,25 +37,25 @@ The player challenges the authority to move the patient. An unnamed ward records
 
 The entries show a sleeping draught was administered **before the thumbprint was registered**. The paper cannot be accepted as proof of willing agreement merely because it bears a print. Do not require a forged signature or secret high-level Contracts skill.
 
-**CLERK:** “There's his mark on the paper.”
+**CLERK:** “His thumbprint's right here.”
 
-**PLAYER:** “He says they took it while he slept.”
+**PLAYER:** “He says they took it while he was asleep.”
 
-**CLERK:** “Let's see the medicine book.”
+**CLERK:** “Then we'd better check the medicine book.”
 
-*After checking it:*
+*After they check the entries:*
 
-**PLAYER:** “They'd given him the draught before they took his print.”
+**PLAYER:** “They gave him the draught before they took his print.”
 
-**CLERK:** “I'll put it down as disputed.”
+**CLERK:** “I'll mark the transfer disputed.”
 
 *Claudia sees the amended entry.*
 
-**CLAUDIA:** “You might have come to me first.”
+**CLAUDIA:** “You couldn't come to me first?”
 
-**PLAYER:** “Would you have listened?”
+**PLAYER:** “Would you have changed anything?”
 
-**CLAUDIA:** “Well, the school won't pay while that's on the page.”
+**CLAUDIA:** “Now the school won't pay until this is settled.”
 
 **Branch finding:** The ward record shows the mark was entered while he was sedated. A genuine witnessed objection provides a procedural hold that Claudia can act on. She resents the financial loss; her looks and charm cannot change a written contradiction. This does not amount to a court ruling or a citywide ban.
 
@@ -64,17 +67,17 @@ The player asks an unnamed records copyist to compare the patient's treatment no
 
 **Ordinary Investigation interactions:** [Compare the admission note with care already given] → [Match the teaching schedule's reference] → choose which pages to copy and cross-reference → [Record the difference between treatment and instruction].
 
-**COPYIST:** “Which pages?”
+**COPYIST:** “What do you need?”
 
-**PLAYER:** “His treatment. And tomorrow's lesson.”
+**PLAYER:** “His treatment notes. And the teaching list for tomorrow.”
 
-*After the comparison:*
+*After comparing the records:*
 
-**PLAYER:** “There's nothing here saying he needs another operation.”
+**PLAYER:** “I can't find anything saying he needs another operation.”
 
-**COPYIST:** “No. He's down for instruction.”
+**COPYIST:** “He's down for a demonstration.”
 
-**PLAYER:** “Not for his own wound, then?”
+**PLAYER:** “So it's not to treat his wound?”
 
 **COPYIST:** “Not according to these notes.”
 

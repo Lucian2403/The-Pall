@@ -1,5 +1,8 @@
 # Stitcher — Stage 3: The Teaching Bed (APPROVED)
 
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+
+
 **Status: APPROVED AND LOCKED (2026-10-16), with Claudia's revised spoken line.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). The user approved the playable discovery, Claudia/player exchange, revised fever-ward coal line, and three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
 
 ## S03-A — A bed that isn't on the round
@@ -18,15 +21,15 @@ He is an **adult**, not a child. There is no depiction of surgery, cutting or ex
 
 **[Ask the patient what happened]** — allowed before or after the chart inspection, without a skill test:
 
-**PATIENT:** “They let me sleep. That's when they took my thumbprint.”
+**PATIENT:** “I was asleep when they took my thumbprint.”
 
 The claim is his testimony at this stage, **not yet a verified record of sedation**. His exact name and medical history remain unknown. Do not invent a named patient or pretend a thumbprint on a paper conclusively establishes informed consent.
 
 ### Optional short player response
 
-**PLAYER:** “You didn't agree to it?”
+**PLAYER:** “You never agreed to an operation?”
 
-**PATIENT:** “Not to that. They said they'd see to my wound.”
+**PATIENT:** “No. They said they'd look after my wound.”
 
 He has received some care; the chart's claimed teaching operation is unnecessary. His inability to pay is being converted into a fee in the form of his body and future suffering. Do not allege that all city hospitals make these arrangements.
 
@@ -34,17 +37,17 @@ He has received some care; the chart's claimed teaching operation is unnecessary
 
 *Claudia closes the casebook on the end table. She looks at the chart rather than the man.*
 
-**PLAYER:** “What's the demonstration for? He says he never agreed to it.”
+**PLAYER:** “What's this demonstration? He says he never agreed to it.”
 
-**CLAUDIA:** “The school pays for the ward. He had his care.”
+**CLAUDIA:** “The school's paying us. He got his treatment.”
 
-**PLAYER:** “That doesn't mean they can do what they like with him.”
+**PLAYER:** “So now they get to operate on him for a lesson?”
 
 **CLAUDIA:** “Who's paying for the fever ward's coal if I turn them away? You?”
 
-**PLAYER:** “He can't even get out of the bed.”
+**PLAYER:** “He's strapped to the bed, Claudia.”
 
-**CLAUDIA:** “Then don't stand there arguing. I've got a ward to keep open.”
+**CLAUDIA:** “And I've got a ward full of patients waiting. Get on with your work.”
 
 Claudia's previous stiff phrasing has been replaced at the user's request; the revised line gives the argument a personal cost: the Matron is defending a financial arrangement that keeps vulnerable patients supplied at the expense of **this one patient's consent**. Her manner is cold, practical and contemptuous of interference. She need not smile at anybody in this scene—her beauty and ability to charm do not make her less culpable.
 
@@ -64,15 +67,15 @@ After seeing the chart and hearing the patient (in any order), present three cho
 
 **Approved short spoken player lines:**
 
-A. **PLAYER:** “I'll go with the trolley. I want to see where they're taking him.”
+A. **PLAYER:** “I'll go with the trolley. I want to see where they take him.”
 
-B. **PLAYER:** “Show me the paper they say he signed.”
+B. **PLAYER:** “Then show me his consent paper.”
 
-C. **PLAYER:** “I want to see what the surgeon wrote.”
+C. **PLAYER:** “Let me see the surgeon's notes.”
 
 Claudia need not give an approving speech to any choice. Her terse convergence:
 
-**CLAUDIA:** “Do as you please. Just stay out of my way.”
+**CLAUDIA:** “Do what you like. Stay out of my way.”
 
 The player's selected action should open the **real ordinary work template** for that discipline in Stage 4. Any involved ward paperwork, keys and carts are facility/job props, not new free inventory.
 

@@ -1,5 +1,8 @@
 # Stitcher — Stage 6: Owler at the Night Door (APPROVED ENCOUNTER)
 
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+
+
 **Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The user approved the encounter and explicitly replaced three spoken lines (one victory, two defeat) with the exact wording below. This follows approved [Stage 5 service-corridor interactions](owler-confrontation.md). The patient rescue, Owler's identity and common clinic/home continuation are locked; combat numbers and formulas remain TBD.
 
 ## S06-A — What the fight is actually about
@@ -36,9 +39,9 @@ Victory is **nonlethal**: the player uses normal combat choices to make Owler un
 
 *Owler backs away from the doorway, breathing hard. He looks at the attendant standing with the trolley and at the people gathering in the ward.*
 
-**OWLER:** “Fine. I'll tell them you wouldn't let me through.”
+**OWLER:** “Fine. I'll tell them you stopped the transfer.”
 
-**PLAYER:** “Tell them whatever you want.”
+**PLAYER:** “Tell them he refused.”
 
 He can complain to the school; he does not suddenly become compassionate or disclose a secret surgeon's name. His paid transfer fails. The player gets a clear **combat victory**.
 
@@ -48,15 +51,15 @@ Defeat is a genuine loss. Owler can overpower the Stitcher with normal combat ou
 
 *Owler drives the player against the door frame. The Stitcher falls. He turns toward the ward, but the attendant has already drawn the patient trolley back behind the inner passage door. Other staff have heard the shouting.*
 
-**ATTENDANT:** “He's not leaving. We all heard him say no.”
+**ATTENDANT:** “He said no. We all heard him. You're not taking him.”
 
-*Claudia steps into the doorway and sees the fallen worker and the gathered witnesses.*
+*Claudia steps into the doorway. She sees the fallen worker and the other staff gathering behind the attendant.*
 
-**CLAUDIA:** “This brawl can raise some questions. Get out now!”
+**CLAUDIA:** “That's enough. You're not moving him past these witnesses.”
 
-**OWLER:** “You'll answer for the school, then.”
+**OWLER:** “You'll have to answer to the school.”
 
-**CLAUDIA:** “Know your place! I'll just smile to them. Get out!”
+**CLAUDIA:** “I'll speak to them myself. Now get out of my infirmary.”
 
 Owler backs off **because the contested transfer is physically withheld, witnessed, and now carries professional consequences**, not because the defeated player somehow beat him. Claudia is defending her authority, not turning into an empathetic rescuer. She expects to smooth over the school's questions with her appearance and charm, which she knowingly uses to escape scrutiny; this is her belief, not a guarantee that a smile defeats witnessed objections or written evidence.
 
@@ -66,9 +69,9 @@ The player remains **defeated**, receives whatever actual injury/Health conseque
 
 After Owler withdraws, Claudia must record the cancellation of **this particular disputed transfer** rather than a permanent stop to all future teaching contracts. The patient is placed back in ordinary care with the requested demonstration cancelled. This step works in either outcome because of his witnessed refusal and the public struggle—not because the player obtained all three branch proofs.
 
-**PLAYER (if conscious and present; optional, not used after an incapacitating loss):** “What happens to him now?”
+**PLAYER (if conscious and present; optional, not used after an incapacitating loss):** “What happens to him?”
 
-**CLAUDIA:** “He stays here. I won't have the school calling it a proper handover after this mess.”
+**CLAUDIA:** “He stays here. I'm cancelling this transfer. The school can take it up with me.”
 
 The patient remains alive, and the unnecessary teaching demonstration does **not** occur in this episode. He is not magically healed, released from all debt or assigned a new identity. Claudia still faces missing school money and the fever ward's coal problem; neither issue is solved by defeating Owler.
 
@@ -95,6 +98,6 @@ The clinic may take place using the normal Cinder Row medical service (if availa
 
 **Already locked:** human opponent, nonlethal encounter, patient rescue, normal post-fight care, common starter equipment/economy and home ending.
 
-**Approved in Stage 6:** telegraphed shove/strike, obstacle-dependent battle entry, Owler's two narrow outcome scenes (with the user's three exact replacement lines), ward intervention on defeat, Claudia's cold institutional cancellation and final patient safety. Preserve these spoken lines verbatim.
+**Previously approved in Stage 6:** telegraphed shove/strike, obstacle-dependent battle entry, Owler's two narrow outcome scenes, ward intervention on defeat, Claudia's cold institutional cancellation and final patient safety. The October 2026 exact line replacements have now been superseded by the pending November 2026 editorial candidate; do not treat the new words as owner-approved until reviewed.
 
 Related: [Stage 5 approved](owler-confrontation.md), [Stitcher master](README.md), [shared Stage 8](../shared-home-rent-ending.md), [Millhand encounter reference](../millhand/flint-fight.md).

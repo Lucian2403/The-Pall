@@ -1,5 +1,8 @@
 # Stitcher — Stage 2: Morning Dressings, Ordinary Trauma Work (APPROVED)
 
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+
+
 **Status: APPROVED AND LOCKED (2026-10-16).** The user approved Stage 2's clinical work loop, practical choices and Claudia's reporting dialogue, after a wording correction confined to [approved Stage 1 with Claudia Cyka](opening-dialogue.md) at Cinder Row Infirmary. The *Morning Dressings* job, **Medicine → Trauma**, working-class charity ward, shortage of clean water/linen and need for a generic reusable medical work loop are already established in [Stitcher's locked story](README.md). Stage 2 must be normal medical labour **before** the one-time *Teaching Bed* revelation.
 
 ## S02-A — Read the two charity-bed work entries
@@ -23,10 +26,10 @@ Do not introduce named patients, new disposable item definitions, special medica
 
 For each bed, the player can **[Check the dressing and skin]** or **[Review the ward note]**. Both lead to truthful information; checking a note alone never makes a wound magically clean. When an unexpected alarming finding appears in the eventual generic job system, **[Call the Matron]** remains a safe escalation; a first-job player is not made to improvise a difficult medical intervention.
 
-**Ordinary task prompt:** “Both patients need attention. Which should you treat first?”
+**Ordinary task prompt:** “Both beds need attention. Who do you see first?”
 
-- **[Attend to the seeping cut first]** — deal with the mild active bleeding promptly, then clean and redress the scrape.
-- **[Check the dirty dressing first]** — inspect/clean the scrape promptly, then attend to the cut. The temporary delay is visible, but the injury here is minor enough not to turn an acceptable ordering choice into a lethal mistake.
+- **[See to the bleeding cut first]** — deal with the mild active bleeding promptly, then clean and redress the scrape.
+- **[See to the dirty dressing first]** — inspect/clean the scrape promptly, then attend to the cut. The temporary delay is visible, but the injury here is minor enough not to turn an acceptable ordering choice into a lethal mistake.
 
 This is an ordinary triage/time decision, not a false dilemma between two deaths, and there is no mandatory moral score. Both patients receive care.
 
@@ -38,8 +41,8 @@ Clean water and linen are **scarce but sufficient** for treating both assigned m
 
 | Choice | Physical difference | Visible cost/consequence |
 | --- | --- | --- |
-| **[Cut only what each wound needs]** | Prepare smaller clean pieces for the two sites | Extra handling/preparation time, less unused clean linen |
-| **[Use ready-sized dressings]** | Apply the ward's already prepared standard dressings | Faster, but uses more of the limited stock |
+| **[Cut the dressings to fit]** | Prepare smaller clean pieces for the two sites | Extra handling/preparation time, less unused clean linen |
+| **[Use ready-cut dressings]** | Apply the ward's already prepared standard dressings | Faster, but uses more of the limited stock |
 
 Both use clean material and do not ration away medically necessary care. If the selected method strains remaining supply, the job displays the shortage **before** application and permits **[Adjust the dressing size]** or **[Ask for more linen]**, with time/ledger consequences. No secretly unsafe treatment is presented as equivalent.
 
@@ -49,7 +52,7 @@ Both use clean material and do not ration away medically necessary care. If the 
 
 During the dressing work, a loose end of **unused** clean linen slips against the visibly dirty side of the cot. The player sees **which portion touched the rail**. This is a routine mishap, not the surgical transfer plot.
 
-**UI text (proposed, not spoken):** “The loose end of the dressing brushes the dirty bed rail.”
+**UI text (revised, not spoken):** “The loose end of the clean dressing brushes the dirty bed rail.”
 
 **[Check the linen]** then choose:
 
@@ -68,21 +71,21 @@ After both injuries have been treated and checked:
 2. **[Record treatment and linen used]** — work sheet shows which beds received care and the actual supplies consumed, with any discarded/trimmed section documented.
 3. **[Report the round to Claudia]** — brief exchange; she cares about correct records and avoiding responsibility for missing materials.
 
-*Claudia scans the dressing count without looking up.*
+*Claudia checks the linen count before looking at you.*
 
-**CLAUDIA:** “Both done?”
+**CLAUDIA:** “Both finished?”
 
-**PLAYER:** “Yes. I had to throw out some linen. It touched the bed rail.”
+**PLAYER:** “Yes. Some clean linen touched the bed rail. I threw it out and got fresh.”
 
-**CLAUDIA:** “Then write it down. I won't answer for missing dressings.”
+**CLAUDIA:** “Write it down, then. They'll ask me where the linen went.”
 
 **[Close the ward round]** — mark normal work complete exactly once. This round is an **unpaid charity-bed cover** as displayed at entry, yielding **0 coins, 0 ordinary Medicine XP and no loot**. The player does not acquire a reusable bandage kit or permanent medical inventory; materials were the infirmary's. The original +3 Medicine came from character creation.
 
 **Dialogue state guardrail:** The brief exchange above is **only** for a run that actually discarded linen. If the player trimmed the affected end instead, use the alternative acknowledgement:
 
-**PLAYER:** “Yes. The linen slipped, but I cut off the dirty end.”
+**PLAYER:** “Yes. I cut off the end that touched the rail.”
 
-**CLAUDIA:** “Put the waste on the sheet. I won't have the count come up short.”
+**CLAUDIA:** “Put the offcut on the sheet. I want the count right.”
 
 Both paths then converge at **[Close the ward round]**. If the complication is resolved without consuming extra material, the ledger still notes the trimmed waste accurately. No dialogue falsely assumes the player chose a different correction.
 

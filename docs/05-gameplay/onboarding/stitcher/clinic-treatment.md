@@ -1,5 +1,8 @@
 # Stitcher — Stage 7: Treatment After Owler (APPROVED)
 
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+
+
 **Status: APPROVED AND LOCKED (2026-10-16).** The user approved the exact Stitcher clinician exchange, after-Owler clinic arrival, and reusable 10-coin Care / Treatment flow. The service, patient-safe outcome and common home are already locked in [shared onboarding](../shared-structure.md), [Stitcher story](README.md) and [Owler fight](owler-fight.md). Medical mechanics and the perfectly uninjured player case remain shared-system TBD.
 
 ## S07-A — Reach ordinary medical care
@@ -18,21 +21,21 @@ Use the **existing care provider role**, e.g. **CLINICIAN** (unnamed), at Cinder
 
 **CLINICIAN:** “Sit down. What happened?”
 
-**PLAYER:** “Owler tried to take a patient out. We had a fight.”
+**PLAYER:** “Owler tried to take a patient. I got in his way.”
 
-**CLINICIAN:** “Let's have a look at you.”
+**CLINICIAN:** “All right. Let me have a look.”
 
 **[Examine condition]** — open the normal Care / Treatment screen displaying the character's **actual** current Health, known injuries and available care. No visible wound is assumed from the word “fight” or from a player victory. Do not select a dressing or injury treatment before checking the player's condition.
 
 *The clinician finishes checking the player and displays the fee and any appropriate care.*
 
-**PLAYER:** “I have to pay for this?”
+**PLAYER:** “You're charging me?”
 
 **CLINICIAN:** “Ten coins.”
 
 **PLAYER:** “I work here.”
 
-**CLINICIAN:** “I know. Ten coins.”
+**CLINICIAN:** “I know. It's still ten.”
 
 **[Pay 10 coins and accept care]** — charge once, provide only medically appropriate care according to the common Health system. The small exchange underscores the institution's priorities without inventing a new reason why the patient must pay or making the clinician sound like a villain. Claudia need not appear to make another speech.
 

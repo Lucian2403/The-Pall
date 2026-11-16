@@ -1,5 +1,8 @@
 # Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (APPROVED)
 
+> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+
+
 **Status: APPROVED AND LOCKED (2026-10-16) following the requested dialogue correction.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality direction and exact Stage 1 scene are now LOCKED. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
 
 ## Editorial diagnosis — why Stage 1 was revised
@@ -9,17 +12,17 @@
 - “If you find one going bad, come and get me.” was sound medical advice, but combined with the gentle exchange made her seem supportive. Her new version maintains clinical oversight **without becoming kind or attentive to feelings**.
 - The earlier stage contained **no evidence** that Claudia is attractive, knows the effect she has on others, or uses charm to avoid scrutiny. The revision adds a small, observable exchange with an unnamed linen clerk instead of Claudia boasting about her appearance.
 
-## Scene ST01 — Morning Dressings
+## Scene ST01 — Morning Dressings (revised dialogue)
 
-*At Cinder Row Infirmary, Claudia's hair and dress are immaculate despite the cramped ward and smoky coal stove. The linen clerk objects to how many clean dressings she has taken. Claudia turns a beautiful smile on him and asks him to check the count again. He goes back to his books. The smile vanishes when he leaves.*
+*At Cinder Row Infirmary, Claudia's hair and dress are immaculate despite the crowded ward and the smoking coal stove. A linen clerk questions the clean dressings she has taken. Claudia gives him a warm smile and asks him to check his count again. He returns to his book. The smile disappears as soon as he turns away.*
 
-**CLAUDIA:** “Two dressings by the door. Get them changed.”
+**CLAUDIA:** “Those two by the door need fresh dressings. Get on with it.”
 
-**PLAYER (optional):** “We're nearly out of clean linen.”
+**PLAYER (optional):** “There's hardly any clean linen left.”
 
-**CLAUDIA (optional reply):** “I can count. Let them complain. Just don't waste the clean linen.”
+**CLAUDIA (optional reply):** “I know. Use what they need. No more.”
 
-**CLAUDIA (convergence, also if the optional line is skipped):** “Look at the wounds first. If one's worse than it should be, fetch me. I'm not fixing your mistakes as well.”
+**CLAUDIA (convergence, also if the optional line is skipped):** “Look at the wounds first. If either one's worse than expected, come and get me. Don't guess.”
 
 **[Check the ward round]** — open the ordinary Morning Dressings job information: which two minor-injury charity beds need attention, a safe supply listing, current job/account status and basic condition information. **[Begin the dressings round]** — enter the normal Medicine / Trauma interactions.
 
