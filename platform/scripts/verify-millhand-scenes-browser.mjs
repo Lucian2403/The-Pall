@@ -57,6 +57,10 @@ dogmanVictory.player.hp=50;
 const dogmanDefeat=structuredClone(dogmanFight);
 dogmanDefeat.status='finished';dogmanDefeat.outcome='player_defeat';
 dogmanDefeat.player.hp=0;
+let bellClinicLeft=clinicState.initialClinic(dogmanVictory);
+for(const action of ['examine','speak','review_price','pay','leave'])
+  bellClinicLeft=clinicState.advanceClinic(bellClinicLeft,action);
+assert.equal(bellClinicLeft.phase,'LEFT','Bellrunner browser fixture must be a completed clinic');
 let clinic=clinicState.initialClinic(fight);
 for(const action of ['examine','speak'])clinic=clinicState.advanceClinic(clinic,action);
 const fixtures={
@@ -72,7 +76,8 @@ const fixtures={
   wage:{stage:5,tutorialStatus:'IN_PROGRESS',state:wage,availableActions:[...core.availableWageClaimActions(wage)],tutorialPayout:payout},
   clinic:clinicState.clinicView(clinic,20),
   bellClinicDefeat:clinicState.clinicView(clinicState.initialClinic(dogmanDefeat),20),
-  bellClinicVictory:clinicState.clinicView(clinicState.initialClinic(dogmanVictory),20)
+  bellClinicVictory:clinicState.clinicView(clinicState.initialClinic(dogmanVictory),20),
+  bellClinicLeft:clinicState.clinicView(bellClinicLeft,10)
 };
 assert.equal(depot.phase,'DEPOT_DIALOGUE','Depot fixture reaches the receiving counter');
 assert.equal(wage.phase,'CHOOSE_STANCE','Wage-claim fixture reaches the stance choice');
@@ -90,6 +95,7 @@ const scenes=[
   ['Stage 7 clinic','/characters/qa-scenes-millhand/millhand/clinic?qa=clinic',7,'.clinic-dialogue','.clinic-scene',A],
   ['Bellrunner Stage 7 defeat','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicDefeat',7,'.clinic-dialogue','.clinic-scene',A],
   ['Bellrunner Stage 7 victory','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicVictory',7,'.clinic-dialogue','.clinic-scene',A],
+  ['Bellrunner Stage 7 completed','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicLeft',7,'.clinic-dialogue','.clinic-scene',A],
   ['Stage 8 home','/characters/qa-scenes-millhand/home',8,'.home-artwork','.home-scene',A]
 ];
 const sizes=[[1920,1080],[1280,720],[1024,768],[390,844]];
@@ -120,7 +126,7 @@ const stub=String.raw`(()=>{
       tutorial:{stage:7,status:'IN_PROGRESS'}}}));
     if(route.endsWith('/dev/rewind-stage'))return Promise.resolve(
       json(route.includes('qa-scenes-bellrunner')
-        ?{enabled:true,canRewind:true,stage:7,targetStage:6}
+        ?{enabled:true,canRewind:true,stage:key==='bellClinicLeft'?8:7,targetStage:6}
         :{enabled:false,canRewind:false,stage,targetStage:null}));
     if(method==='POST'){
       window.__pallPosts=(window.__pallPosts||[]).concat([JSON.parse(options.body||'{}')]);
@@ -327,7 +333,19 @@ try{
   await until(()=>evalJS(
     "[...document.querySelectorAll('.chapter-bar .rewind-button')].some(b=>b.textContent.includes('Back to Stage 6'))"),
     4500,'Bellrunner Stage VII victory Back to Stage 6 control');
-  console.log('PASS: Bellrunner defeat/victory begin at the clinic and retain Back to Stage 6.');
+  await open('/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicLeft',
+    1280,720,'.clinic-dialogue');
+  const completedText=await evalJS("document.querySelector('.clinic-dialogue')?.innerText");
+  assert.match(completedText,/Return to character/);
+  assert.match(completedText,/Coins remaining: 10/);
+  assert.equal(await evalJS(
+    "document.querySelector('.chapter-meta')?.innerText.includes('Stage 7')"),true,
+    'Completed clinic must still be visually labelled Stage 7');
+  await until(()=>evalJS(
+    "[...document.querySelectorAll('.chapter-bar .rewind-button')].some(b=>b.textContent.includes('Back to Stage 6'))"),
+    5000,'Back to Stage 6 must survive the saved LEFT / tutorial_stage=8 state');
+  await shot('bellrunner-completed-clinic-back-to-stage-6');
+  console.log('PASS: Bellrunner Stage VII completed screen still exposes Back to Stage 6 after leaving.');
 
   // Confirm the owner-approved Millhand normal/hover skin is computed
   // from the SAME global primary-choice rule used by Bellrunner Stage 4.
