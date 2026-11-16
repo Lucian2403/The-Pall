@@ -1,6 +1,6 @@
-# Stitcher — Stage 2: Morning Dressings, Ordinary Trauma Work (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 2: Morning Dressings, Ordinary Trauma Work (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial approval — 2026-11-16:** The owner approved this natural-dialogue revision for implementation. Earlier plot, clinical safeguards, evidence, branch skills and zero-wage introductory economy remain unchanged.
 
 **Status: APPROVED AND LOCKED (2026-10-16).** The user approved Stage 2's clinical work loop, practical choices and Claudia's reporting dialogue, after a wording correction confined to [approved Stage 1 with Claudia Cyka](opening-dialogue.md) at Cinder Row Infirmary. The *Morning Dressings* job, **Medicine → Trauma**, working-class charity ward, shortage of clean water/linen and need for a generic reusable medical work loop are already established in [Stitcher's locked story](README.md). Stage 2 must be normal medical labour **before** the one-time *Teaching Bed* revelation.
 
