@@ -1,5 +1,5 @@
-/** Authenticated, idempotent Stage 8 home, shared by later origins.
- * Only Millhand currently has a playable preceding clinic. */
+/** Authenticated, idempotent Stage 8 home shared by Millhand and Bellrunner.
+ * The rented room, rent, closing speech, storage and Home state are identical. */
 import type {FastifyInstance} from 'fastify';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
@@ -44,7 +44,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
   try{
    const rows=await pool.query<Character>(characterSQL,[req.params.id,session.user.id]);
    const c=rows.rows[0];
-   if(!c||c.origin!=='Millhand')return reply.code(404).send({error:'not_found'});
+   if(!c||!['Millhand','Bellrunner'].includes(c.origin))return reply.code(404).send({error:'not_found'});
    if(c.tutorial_stage!==8)return reply.code(409).send({error:'home_not_ready'});
    const saved=await pool.query<{state:State}>('SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[c.id]);
    if(saved.rowCount){
@@ -79,7 +79,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    await db.query('BEGIN');open=true;
    const characters=await db.query<Character>(characterSQL+' FOR UPDATE',[req.params.id,session.user.id]);
    const c=characters.rows[0];
-   if(!c||c.origin!=='Millhand'){
+   if(!c||!['Millhand','Bellrunner'].includes(c.origin)){
     await db.query('ROLLBACK');open=false;return reply.code(404).send({error:'not_found'});
    }
    const receipt=await db.query<{request_hash:string;response:unknown}>(
@@ -107,13 +107,33 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
      if(!ready(clinic.rows[0]?.state)){
       await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'clinic_not_left'});
      }
-     const branchRows=await db.query<{state:{branch:string;phase:string}}>(
-      'SELECT state FROM player_character_missing_stamp WHERE character_id=$1',[c.id]);
-     const branch=branchRows.rows[0]?.state.branch;
-     if(branchRows.rows[0]?.state.phase!=='SELECTED'||!['restamp','contracts','records'].includes(String(branch))){
-      await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'route_not_saved'});
+     // Allowlisted tables, selected solely by the owner-locked origin.
+     // Stage IV's Bellrunner job must match its committed Stage III route.
+     let branch:Branch;
+     if(c.origin==='Bellrunner'){
+      const finding=await db.query<{state:{branch:string;phase:string}}>(
+       'SELECT state FROM player_character_bellrunner_wrong_bell WHERE character_id=$1',[c.id]);
+      const work=await db.query<{state:{branch:string;phase:string}}>(
+       'SELECT state FROM player_character_bellrunner_second_job WHERE character_id=$1',[c.id]);
+      const chosen=finding.rows[0]?.state;
+      const second=work.rows[0]?.state;
+      if(chosen?.phase!=='committed'||second?.phase!=='exited'||
+       chosen.branch!==second.branch||!['contracts','trauma','machinery'].includes(chosen.branch)){
+       await db.query('ROLLBACK');open=false;
+       return reply.code(409).send({error:'route_not_saved'});
+      }
+      branch=chosen.branch as Branch;
+     }else{
+      const finding=await db.query<{state:{branch:string;phase:string}}>(
+       'SELECT state FROM player_character_missing_stamp WHERE character_id=$1',[c.id]);
+      const chosen=finding.rows[0]?.state;
+      if(chosen?.phase!=='SELECTED'||!['restamp','contracts','records'].includes(chosen.branch)){
+       await db.query('ROLLBACK');open=false;
+       return reply.code(409).send({error:'route_not_saved'});
+      }
+      branch=chosen.branch as Branch;
      }
-     state=initial(c.origin,branch as Branch,clinic.rows[0].state.outcome as Outcome,
+     state=initial(c.origin,branch,clinic.rows[0].state.outcome as Outcome,
        clinic.rows[0].state.after);
      await db.query('INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',
       [c.id,JSON.stringify(state)]);

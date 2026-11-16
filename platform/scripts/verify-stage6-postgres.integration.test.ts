@@ -1909,6 +1909,127 @@ test('Bellrunner clinic payment races are serialized and an earlier defeat can b
  assert.equal(fresh.body?.player?.hp,50);
 });
 
+test('Bellrunner final Stage VIII shares rented-room notice, exact speech and branch-only journal prerequisites',async()=>{
+ for(const branch of ['contracts','trauma','machinery'] as const){
+  for(const outcome of ['player_victory','player_defeat'] as const){
+   const f=await bellrunnerClinicFixture(branch,outcome,outcome==='player_defeat'?0:33);
+   const path=base+f.id+'/tutorial/home';
+   assert.equal((await request('GET',path)).status,409,'Cannot enter home before clinic leaves');
+   await db.query(
+     'INSERT INTO player_character_bellrunner_wrong_bell(character_id,revision,state) VALUES($1,8,$2::jsonb)',
+     [f.id,JSON.stringify({revision:8,phase:'committed',branch})]);
+   let clinic=(await bellClinicCommand(f.clinicPath,'start')).body!;
+   for(const action of ['examine','speak','review_price','pay','leave'])
+     clinic=await bellClinicStep(f.clinicPath,clinic,action);
+   assert.equal(clinic.phase,'LEFT');
+   assert.equal((await request('GET',path,null)).status,401);
+   assert.equal((await request('GET',path,stranger)).status,404);
+   const ready=await request('GET',path);
+   assert.equal(ready.status,200,JSON.stringify(ready.body));
+   assert.equal(ready.body?.needsStart,true);
+   assert.deepEqual((await request('GET',base+f.id+'/dev/rewind-stage')).body,{
+     enabled:true,canRewind:true,stage:8,targetStage:6
+   },'Clinic screen still rewinds to Dogman before the first home action');
+   const key=randomUUID();
+   const created=await request('POST',path,owner,{kind:'start',requestId:key});
+   assert.equal(created.status,200,JSON.stringify(created.body));
+   assert.equal(created.body?.phase,'HOME');
+   assert.equal(created.body?.homeId,'starter-rented-room');
+   assert.equal(created.body?.origin,'Bellrunner');
+   assert.equal(created.body?.branch,branch);
+   assert.equal(created.body?.outcome,outcome);
+   assert.equal(created.body?.rent,150);
+   assert.equal(created.body?.coins,10);
+   assert.equal(created.body?.shortfall,140);
+   assert.equal(created.body?.noticeTitle,'FINAL NOTICE');
+   assert.equal(created.body?.noticeText,
+     'Clinic Bellrunner '+f.id.slice(0,8)+', you have to pay 150 coins in rent, or you are out. No discussion.');
+   assert.equal(created.body?.closingSpeech,
+     "Ah, hell. Need a place of my own. First I've got this rent to pay. More jobs... or I could make something to sell.");
+   assert.deepEqual((await request('POST',path,owner,{kind:'start',requestId:key})).body,created.body);
+   assert.deepEqual((await request('GET',base+f.id+'/dev/rewind-stage')).body,{
+     enabled:true,canRewind:true,stage:8,targetStage:7
+   },'Once the shared home opens, Back to Stage VII must replace clinic-to-combat rewind');
+   let s=created.body!;
+   for(const [action,phase] of [['read_notice','NOTICE'],['put_down','SPEECH'],['finish','COMPLETE']] as const){
+     const result=await request('POST',path,owner,{
+       kind:'action',action,expectedRevision:s.revision,requestId:randomUUID()});
+     assert.equal(result.status,200,JSON.stringify(result.body));
+     s=result.body!;
+     assert.equal(s.phase,phase);
+   }
+   assert.equal(s.completed,true);
+   assert.equal((await request('POST',path,owner,{
+     kind:'action',action:'finish',expectedRevision:s.revision,requestId:randomUUID()
+   })).status,409,'Completion cannot be granted twice');
+   assert.equal((await request('GET',path)).body?.phase,'COMPLETE');
+   const saved=await db.query<{tutorial_stage:number;tutorial_status:string;
+     major_skill_bonuses:Record<string,number>;coins:string|number;current_health:number}>(
+     'SELECT tutorial_stage,tutorial_status,major_skill_bonuses,coins,current_health FROM player_characters WHERE id=$1',[f.id]);
+   assert.equal(saved.rows[0].tutorial_stage,8);
+   assert.equal(saved.rows[0].tutorial_status,'COMPLETED');
+   assert.deepEqual(saved.rows[0].major_skill_bonuses,f.major);
+   assert.equal(Number(saved.rows[0].coins),10);
+   assert.equal(saved.rows[0].current_health,50);
+   assert.equal((await db.query('SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',[f.id])).rowCount,1);
+  }
+ }
+});
+test('Bellrunner Back to Stage 7 from completed home restores PAID clinic, preserves coins and Dogman',async()=>{
+ for(const outcome of ['player_victory','player_defeat'] as const){
+  const f=await bellrunnerClinicFixture('machinery',outcome,outcome==='player_defeat'?0:25);
+  await db.query(
+    'INSERT INTO player_character_bellrunner_wrong_bell(character_id,revision,state) VALUES($1,8,$2::jsonb)',
+    [f.id,JSON.stringify({revision:8,phase:'committed',branch:'machinery'})]);
+  let clinic=(await bellClinicCommand(f.clinicPath,'start')).body!;
+  for(const action of ['examine','speak','review_price','pay','leave'])
+    clinic=await bellClinicStep(f.clinicPath,clinic,action);
+  const path=base+f.id+'/tutorial/home';
+  let home=(await request('POST',path,owner,{kind:'start',requestId:randomUUID()})).body!;
+  for(const action of ['read_notice','put_down','finish']){
+    const result=await request('POST',path,owner,{
+      kind:'action',action,expectedRevision:home.revision,requestId:randomUUID()});
+    assert.equal(result.status,200,JSON.stringify(result.body));
+    home=result.body!;
+  }
+  assert.equal(home.phase,'COMPLETE');
+  const endpoint=base+f.id+'/dev/rewind-stage';
+  assert.deepEqual((await request('GET',endpoint)).body,{
+    enabled:true,canRewind:true,stage:8,targetStage:7
+  });
+  const reset=await request('POST',endpoint,owner,{expectedStage:8});
+  assert.equal(reset.status,200,JSON.stringify(reset.body));
+  assert.equal(reset.body?.stage,7);
+  assert.equal(reset.body?.route,'/characters/'+f.id+'/bellrunner/clinic');
+  assert.equal(reset.body?.coinDelta,0);
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:8})).status,409);
+  const retained=(await db.query<{tutorial_stage:number;tutorial_status:string;coins:string|number;
+    current_health:number;major_skill_bonuses:Record<string,number>}>(
+    'SELECT tutorial_stage,tutorial_status,coins,current_health,major_skill_bonuses FROM player_characters WHERE id=$1',[f.id])).rows[0];
+  assert.equal(retained.tutorial_stage,7);
+  assert.equal(retained.tutorial_status,'IN_PROGRESS');
+  assert.equal(Number(retained.coins),10,'Never refund/charge again at home rewind');
+  assert.equal(retained.current_health,50);
+  assert.deepEqual(retained.major_skill_bonuses,f.major);
+  assert.equal((await db.query('SELECT 1 FROM player_character_tutorial_home WHERE character_id=$1',[f.id])).rowCount,0);
+  assert.equal((await db.query('SELECT 1 FROM player_character_tutorial_home_receipts WHERE character_id=$1',[f.id])).rowCount,0);
+  const priorClinic=(await request('GET',f.clinicPath)).body!;
+  assert.equal(priorClinic.phase,'PAID');
+  assert.equal(priorClinic.paid,true);
+  assert.equal(priorClinic.coins,10);
+  const fight=(await db.query<{state:Record<string,any>}>(
+    'SELECT state FROM player_character_dogman_combat WHERE character_id=$1',[f.id])).rows[0].state;
+  assert.deepEqual(fight,f.original,'Rewind must never discard the recorded Dogman battle');
+  const left=await bellClinicStep(f.clinicPath,priorClinic,'leave');
+  assert.equal(left.phase,'LEFT');
+  const newHome=await request('POST',path,owner,{kind:'start',requestId:randomUUID()});
+  assert.equal(newHome.status,200);
+  assert.equal(newHome.body?.phase,'HOME');
+  assert.equal(newHome.body?.branch,'machinery');
+  assert.equal(newHome.body?.outcome,outcome);
+ }
+});
+
 test('Stage 7 enforces the finished-fight boundary and account ownership',async()=>{
   const c=await character();
   await start(c);

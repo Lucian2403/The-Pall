@@ -90,7 +90,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
  assert.ok(clinic.includes('Travel Home</a>')&&
   clinic.includes("'/home'")&&
   clinic.includes("next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home')")&&
-  clinic.includes("if(action==='leave'&&result.phase==='LEFT'&&origin==='Millhand')")&&
+  clinic.includes("if(action==='leave'&&result.phase==='LEFT')")&&
   clinic.includes("await goto('/characters/'+encodeURIComponent(id)+'/home')")&&
   clinic.includes("origin==='Millhand'"),
   'Travel Home must save the clinic departure then navigate directly to the room');
@@ -235,7 +235,7 @@ test('Back to Stage 7 reopens the paid clinic without touching combat, coins or 
    api.includes('DELETE FROM player_character_tutorial_home_receipts') &&
    api.includes('DELETE FROM player_character_tutorial_home WHERE character_id') &&
    api.includes("tutorial_stage=7,tutorial_status='IN_PROGRESS'") &&
-   api.includes("route:'/characters/'+req.params.id+'/millhand/clinic'") &&
+   api.includes("(bellrunner?'bellrunner':'millhand')+'/clinic'") &&
    api.includes('coinDelta:0'),
    'Stage 8 back button should return to the paid clinic, not replay Flint');
  assert.ok(shell.includes("'← Back to Stage '+rewindTargetStage") &&

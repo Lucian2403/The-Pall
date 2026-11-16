@@ -191,7 +191,7 @@
         if(paidNow)playCoinTransactionSfx();
         // Commit the paid clinic departure once, then go straight into the
         // room: there is no intermediary city card or door interaction.
-        if(action==='leave'&&result.phase==='LEFT'&&origin==='Millhand'){
+        if(action==='leave'&&result.phase==='LEFT'){
           await goto('/characters/'+encodeURIComponent(id)+'/home');
         }
         if(character){
@@ -306,13 +306,8 @@
           {:else if clinic.phase==='LEFT'}
             <p class="narration">You leave the clinic and head toward your rented home.</p>
             <p class="receipt">Coins remaining: {clinic.coins}.</p>
-            {#if origin==='Millhand'}
-              <p class="next-note">The clinic is complete. Your rented home is the final chapter.</p>
-              <a class="pall-framed-button advance primary-choice" href={'/characters/'+encodeURIComponent(id)+'/home'}>Travel Home</a>
-            {:else}
-              <p class="next-note">Your rented room is the next stop.</p>
-              <a class="pall-framed-button advance primary-choice" href={'/characters/'+encodeURIComponent(id)}>Return to character</a>
-            {/if}
+            <p class="next-note">The clinic is complete. Your rented home is the final chapter.</p>
+            <a class="pall-framed-button advance primary-choice" href={'/characters/'+encodeURIComponent(id)+'/home'}>Travel Home</a>
           {/if}
 
           {#if next}
