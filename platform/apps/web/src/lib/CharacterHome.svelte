@@ -226,7 +226,7 @@
         <p>{work.description}</p>
         <a class="framed-action" href={work.href}>{work.label}</a>
       {:else}
-        <p>Your saved introduction is at Stage {character.tutorial.stage} of 8. No further action is available from this page at present.</p>
+        <strong>Your saved introduction is at Stage {character.tutorial.stage} of 8. No further action is available from this page at present.</strong>
       {/if}
     </section>
   {/if}
