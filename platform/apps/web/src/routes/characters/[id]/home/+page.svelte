@@ -1,12 +1,11 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
-  import {onMount,tick,getContext} from 'svelte';
+  import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/pall-story-landscape.css';
-  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
   type Action='read_notice'|'put_down'|'finish'|'rest';
@@ -46,11 +45,6 @@
   }
   const journalOpen=$derived(overlayKind==='journal');
   let retryKey:string|null=null,retryId:string|null=null;
-  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
-  $effect(()=>{
-    registerSceneJournal?.({id:'home-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
-    return ()=>registerSceneJournal?.(null);
-  });
   // Exactly one local Stage IV finding from the persisted route. Keep the
   // incident unresolved. Never reveal discoveries from unchosen branches.
   const routeEntry=$derived(home?.origin==='Bellrunner'
@@ -166,7 +160,8 @@
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character&&home}
-  <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home">
+  <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
+    journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
