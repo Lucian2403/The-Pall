@@ -1831,6 +1831,9 @@ test('Bellrunner: three Stage IV routes, both Dogman outcomes, shared paid clini
       'SELECT tutorial_stage,tutorial_status,coins,current_health,major_skill_bonuses FROM player_characters WHERE id=$1',[f.id])).rows[0];
    assert.equal(saved.tutorial_stage,8);assert.equal(saved.tutorial_status,'NOT_STARTED');
    assert.equal(Number(saved.coins),10);assert.equal(saved.current_health,50);
+   assert.deepEqual((await request('GET',base+f.id+'/dev/rewind-stage')).body,{
+     enabled:true,canRewind:true,stage:8,targetStage:6
+   },'Back to Stage 6 must remain visible on the final LEFT clinic screen');
    assert.deepEqual(saved.major_skill_bonuses,f.major);
    const fight=(await db.query<{state:Record<string,any>}>(
       'SELECT state FROM player_character_dogman_combat WHERE character_id=$1',[f.id])).rows[0].state;
@@ -1839,6 +1842,43 @@ test('Bellrunner: three Stage IV routes, both Dogman outcomes, shared paid clini
       'SELECT state FROM player_character_bellrunner_second_job WHERE character_id=$1',[f.id])).rows[0].state;
    assert.equal(secondJob.branch,branch);assert.equal(secondJob.phase,'exited');
   }
+ }
+});
+test('Bellrunner final clinic: Back to Stage 6 rewinds LEFT, refunds once, and preserves earlier decisions',async()=>{
+ for(const outcome of ['player_victory','player_defeat'] as const){
+  const f=await bellrunnerClinicFixture('contracts',outcome,outcome==='player_defeat'?0:35);
+  let state=(await bellClinicCommand(f.clinicPath,'start')).body!;
+  for(const action of ['examine','speak','review_price','pay','leave'])
+    state=await bellClinicStep(f.clinicPath,state,action);
+  assert.equal(state.phase,'LEFT');
+  const endpoint=base+f.id+'/dev/rewind-stage';
+  assert.deepEqual((await request('GET',endpoint)).body,{
+    enabled:true,canRewind:true,stage:8,targetStage:6
+  });
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:7})).status,409,
+    'The stored tutorial stage, not the displayed clinic heading, controls the rewind');
+  const reset=await request('POST',endpoint,owner,{expectedStage:8});
+  assert.equal(reset.status,200,JSON.stringify(reset.body));
+  assert.equal(reset.body?.stage,6);
+  assert.equal(reset.body?.route,'/characters/'+f.id+'/bellrunner/combat');
+  assert.equal(reset.body?.coinDelta,10);
+  assert.equal((await request('POST',endpoint,owner,{expectedStage:8})).status,409,
+    'Replaying the same LEFT reset cannot refund twice');
+  assert.equal((await db.query('SELECT 1 FROM player_character_clinic WHERE character_id=$1',[f.id])).rowCount,0);
+  assert.equal((await db.query('SELECT 1 FROM player_character_clinic_receipts WHERE character_id=$1',[f.id])).rowCount,0);
+  assert.equal((await db.query('SELECT 1 FROM player_character_dogman_combat WHERE character_id=$1',[f.id])).rowCount,0);
+  assert.equal((await db.query('SELECT 1 FROM player_character_dogman_combat_receipts WHERE character_id=$1',[f.id])).rowCount,0);
+  const person=(await db.query<{tutorial_stage:number;tutorial_status:string;current_health:number;coins:string|number;major_skill_bonuses:Record<string,number>}>(
+    'SELECT tutorial_stage,tutorial_status,current_health,coins,major_skill_bonuses FROM player_characters WHERE id=$1',[f.id])).rows[0];
+  assert.equal(person.tutorial_stage,6);
+  assert.equal(person.tutorial_status,'NOT_STARTED');
+  assert.equal(person.current_health,50);
+  assert.equal(Number(person.coins),20);
+  assert.deepEqual(person.major_skill_bonuses,f.major);
+  const reopened=await request('POST',f.fightPath,owner,{kind:'start',requestId:randomUUID()});
+  assert.equal(reopened.status,200,JSON.stringify(reopened.body));
+  assert.equal(reopened.body?.revision,0);
+  assert.equal(reopened.body?.player.hp,50);
  }
 });
 test('Bellrunner clinic payment races are serialized and an earlier defeat can be replayed safely',async()=>{
