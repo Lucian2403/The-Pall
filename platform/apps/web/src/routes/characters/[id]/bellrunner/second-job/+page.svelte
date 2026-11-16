@@ -1,5 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
+  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import BellrunnerSecondJobScene from '$lib/BellrunnerSecondJobScene.svelte';
@@ -49,6 +50,9 @@
       if(res.ok){
         snapshot=await res.json() as Snapshot;
         if(action==='inspect_safety_linkage'&&snapshot.state.branch==='machinery')ring();
+        if(action==='leave_for_gate'&&snapshot.state.phase==='exited'){
+          await goto('/characters/'+encodeURIComponent(id)+'/bellrunner/dogman');
+        }
         requestId=null;requestAction=null;
         if(character)character={...character,
           tutorial:{stage:snapshot.stage,status:snapshot.tutorialStatus}};
