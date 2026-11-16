@@ -33,7 +33,7 @@
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
     industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
-    cityMap,travelLocked = false,services = {},dock
+    cityMap,travelLocked = false,services = {},dock,journalController
   }:{
     character:SavedCharacter;
     children:Snippet;
@@ -66,6 +66,9 @@
     /** Future chat/messages dock. It takes its own grid column and reflows the
         activity area (activity layouts are container-driven), never overlaying it. */
     dock?:Snippet;
+    /** For pages that mount TutorialShell themselves instead of beneath it.
+     * All existing descendant-scene journal context registration still works. */
+    journalController?:SceneJournalController;
   }=$props();
   // The City header is the future map gateway. It only becomes a link when the
   // server-confirmed introduction is complete, travel is not locked by the
@@ -149,6 +152,7 @@
   // Every playable scene shares one permanent upper-right journal control.
   // Scene components register their already-existing journals through context.
   let sceneJournal=$state<SceneJournalController|null>(null);
+  const activeSceneJournal=$derived(journalController??sceneJournal);
   let emptyJournalOpen=$state(false);
   const registerJournal:SceneJournalRegistrar=(controller)=>{sceneJournal=controller;};
   setContext(SCENE_JOURNAL_CONTEXT,registerJournal);
@@ -465,13 +469,13 @@
       {/if}
       <div class="scene-journal-bar" aria-label="Personal journal controls">
         <button type="button" class="scene-journal-button" data-pall-sfx="paper"
-          aria-expanded={sceneJournal?.open??emptyJournalOpen}
-          aria-controls={sceneJournal?.id??'scene-empty-journal'}
+          aria-expanded={activeSceneJournal?.open??emptyJournalOpen}
+          aria-controls={activeSceneJournal?.id??'scene-empty-journal'}
           onclick={()=>{
-            if(sceneJournal)sceneJournal.toggle();
+            if(activeSceneJournal)activeSceneJournal.toggle();
             else void toggleEmptyJournal();
           }}>
-          {(sceneJournal?.open??emptyJournalOpen)?'Close journal':'Review journal'}
+          {(activeSceneJournal?.open??emptyJournalOpen)?'Close journal':'Review journal'}
         </button>
       </div>
       <a href="/characters" class="exit-link">Character selection</a>
