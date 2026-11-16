@@ -237,7 +237,9 @@
       :fromStage===8
       ?character.origin==='Bellrunner'&&rewindTargetStage===6
         ?'TESTING ONLY: Back to Stage 6 from the completed clinic? This resets the Dogman fight and clinic visit, restores your exact pre-fight Health and refunds the 10-coin clinic fee. Your bag, papers, earlier jobs and skills are preserved.'
-        :'TESTING ONLY: Return to Stage 7? This restarts the shared rented-home ending from the already-paid clinic departure. The clinic fee, your fight outcome, Health, coins, skills and earlier choices are preserved.'
+        :character.origin==='Bellrunner'
+          ?'TESTING ONLY: Return to Stage 7? This reopens the already-paid clinic and resets only the rented-home scene. Your Dogman fight outcome, Health, coins, skills, papers and earlier choices are preserved.'
+          :'TESTING ONLY: Return to Stage 7? This restarts the rented-home ending from the paid clinic departure. The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'
       :fromStage===7
       ?character.origin==='Bellrunner'
         ?'TESTING ONLY: Back to Stage 6? This clears the clinic visit and the completed Dogman fight, restores your exact pre-fight Health, and refunds the 10-coin clinic fee if already paid. Your papers, earlier jobs, equipment and skills remain saved.'
