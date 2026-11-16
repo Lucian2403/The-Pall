@@ -147,8 +147,8 @@
             {:else if s.stage===3}
               <button class="bed-hotspot teaching-bed" type="button"
                 disabled={pending} onclick={()=>act('observe_bed')}
-                aria-label="Examine the Teaching Bed and its adult patient" title="Look at the Teaching Bed">
-                <span class="bed-marker"><span class="bed-poi" aria-hidden="true"></span><span class="bed-label">Teaching Bed</span></span>
+                aria-label="Examine the Narrow Bed and its adult patient" title="Look at the Narrow Bed">
+                <span class="bed-marker"><span class="bed-poi" aria-hidden="true"></span><span class="bed-label">Narrow Bed</span></span>
               </button>
             {/if}
           {/if}
@@ -194,16 +194,16 @@
               <p class="narration">You check the clean water and linen. There's enough for both patients, but not much left to spare. You can cut the dressings to fit each wound, or use the ones already prepared.  </p>
             {:else if s.phase==='care'}
               <p class="narration">{!s.treatedA&&!s.treatedB
-                ?'Inspect, clean and dress the first bed. Select the appropriate bed in the illustration.'
-                :'The affected clean linen has been dealt with safely. Finish dressing the remaining patient.'}</p>
-              <p class="instruction">Only clean material is applied; the other patient will also receive care.</p>
+                ?'You turn to the patient in Bed B. The old bandage is dirty, and the scrape underneath needs cleaning. You have fresh linen and clean water ready.'
+                :'You\'ve taken care of the dirty bandage. Now you can finish treating the other patient.'}</p>
+              <p class="instruction">Once you've finished here, you'll see to the other patient.</p>
             {:else if s.phase==='linen_check'}
-              <p class="narration">The loose end of the clean dressing brushes the dirty bed rail.</p>
-              <p class="instruction">This unused portion cannot touch a wound.</p>
+              <p class="narration">The end of the clean bandage touches the dirty bed rail.</p>
+              <p class="instruction">You can't use that part on the wound.</p>
             {:else if s.phase==='linen_fix'}
               <p class="narration">The part of the dressing that touched the rail is visible. The unaffected linen is long enough to cover the wound if trimmed cleanly.</p>
             {:else if s.phase==='verify'}
-              <p class="narration">Both patients have been dressed with clean material. Check the fit and cleanliness before you record the work.</p>
+              <p class="narration">Both patients have fresh bandages. You take one last look to make sure they're clean and not too loose. Everything looks fine. Now you can write down what you've done.</p>
             {:else if s.phase==='record'}
               <p class="narration">Record which beds received care and the linen used, including {s.correction==='trim'?'the trimmed offcut':'the discarded piece'}.</p>
             {:else if s.phase==='report'}
@@ -222,14 +222,14 @@
                   :"Write it down, then. They'll ask me where the linen went."}”</p>
               {/if}
             {:else}
-              <p class="narration">The charity-bed dressings are secure, the material accounted for, and Claudia has the written round record.</p>
+              <p class="narration">Both patients have clean, secure bandages. You've written down the linen you used and handed the finished report to Claudia.</p>
             {/if}
           {:else if s.stage===3}
             {#if s.phase==='discovery'}
               {#if !s.bedObserved}
-                <p class="narration">Claudia enters a side ward to shut it for the day. One narrow bed has a man awake on it. Select the marked bed in the illustration.</p>
+                <p class="narration">Claudia goes into the side ward to close it for the day. You notice a man lying awake in one of the narrow beds.</p>
               {:else if s.focus==='bed'}
-                <p class="narration">The adult patient lies awake. Straps cross his wrists, and straight blue surgical marks run near an old wound. He watches the doorway.</p>
+                <p class="narration">A man lies awake in the narrow bed, with straps holding his wrists down. Blue lines have been drawn on his skin near an old wound. He keeps looking towards the door.</p>
               {:else if s.focus==='chart'}
                 <p class="narration">The bedside chart does not list another treatment needed for the wound. Its transfer entry reads:</p>
                 <p class="finding"><strong>CHARITY ACCOUNT SETTLED — TEACHING DEMONSTRATION, DAWN.</strong></p>
@@ -263,10 +263,10 @@
               <p class="spoken">“{currentLine.text}”</p>
             {:else}
               <p class="narration">{branchData.finding}</p>
-              <p class="narration">The patient has not been signed over. The work remains unpaid and the local matter is not yet resolved.</p>
+              <p class="narration">You haven't signed the patient over, so he's still in the infirmary's care. There's no pay for this work, and you still need to find a way to stop the transfer.</p>
             {/if}
           {:else if s.stage===5}
-            <p class="narration">You return toward the infirmary's service corridor. The patient's transfer is still pending, and the ward's ordinary noise carries on behind you.</p>
+            <p class="narration">Tired and fed up, you make your way back to the service corridor. The patient still hasn't been handed over, and you've no idea how much longer this will go on. Behind you, the ward is as busy as ever.</p>
           {/if}
           {#if s.stage===3&&s.phase==='choose'}
             <SecondJobChoices {choices} onChoose={act}/>

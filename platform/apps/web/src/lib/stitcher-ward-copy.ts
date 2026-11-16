@@ -33,11 +33,11 @@ export const STITCHER_ACTION_LABEL:Readonly<Record<string,string>>={
  choose_consent:'Contest the consent paper',
  choose_notes:"Examine the surgeon's notes",
  continue_opening:'Continue',
- check_load:'Check the load against the docket',
- balance_load:'Arrange equipment to keep the trolley stable',
- route_short:'Take the short, narrow passage',
- route_wide:'Take the longer, roomier passage',
- check_receiver:'Compare the receiving mark to the dispatch note',
+ check_load:'Check what\'s on the trolley',
+ balance_load:'Make sure the load is steady',
+ route_short:'Take the narrow passage',
+ route_wide:'Take the wider passage',
+ check_receiver:'Check if the receiving mark matches your dispatch note',
  match_consent:'Match the consent paper to the patient record',
  check_medicine:'Check the medicine and witnessing entries',
  attach_record:'Attach the timing record',
@@ -56,16 +56,16 @@ export const STITCHER_ROUTE_UI={
   title:'The Night Trolley',
   discipline:'INDUSTRY / HAULING',
   opening:[
-   'The transfer trolley is secured beside the ward equipment. The work is part of the unpaid charity cover, not a paid hauling order.',
-   'You can choose the passage, check the load, and verify the receiving mark without signing the patient over.'
+   'The trolley stands beside the ward equipment, ready to be moved. You\'ve already been working the charity shift without pay, and there\'s still more to do.',
+   'You make sure everything on the trolley is secure before setting off. There are two passages through the infirmary, and you\'ll have to decide which way to go. At the receiving door, someone will need to check the papers. Until you\'re sure everything is in order, you\'re not handing the patient over.'
   ],
   steps:[
-   'Check the trolley docket before moving anything. The patient and ward equipment must remain accounted for.',
-   'The heavier equipment is balanced and secured. Neither passage requires a dangerous load.',
-   'The narrow passage is shorter. The wider passage permits easier handling. Both reach the receiving door.',
+   'Before moving the trolley, you look over the list of everything being taken. You need to make sure the patient and all the equipment are there.',
+   'The trolley is loaded, but some of the heavier equipment could slide around when you move it. You need to settle everything before setting off.',
+   'You come to a split in the corridor. The narrow passage is quicker, but it\'ll be harder to get the trolley through. The wider passage gives you more room, though it\'ll take longer. Both lead to the receiving door.',
    'At the receiving door, a clerk looks at the papers rather than the patient.'
   ],
-  finding:'The receiving theatre requests the man by contract number, not by name. The handover remains pending.'
+  finding:'The receiving clerk asks for the man\'s contract number without even asking his name.'
  },
  consent:{
   title:'The Signed Consent',
