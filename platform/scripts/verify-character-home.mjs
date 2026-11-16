@@ -303,14 +303,24 @@ for(const major of ['Industry','Commerce','Scholarship']){
   assert.equal(majorSkillDisplayLevel('Millhand','Craftsmanship',granted),3,
     'The original Craftsmanship +3 must not become +4');
   assert.equal(majorSkillDisplayLevel('Millhand','Arms',granted),1);
-  assert.equal(majorSkillDisplayLevel('Bellrunner',major,granted),1,
-    'Never infer additional levels for other origins');
+  assert.equal(majorSkillDisplayLevel('Bellrunner',major,granted),
+    major==='Commerce'?2:1,
+    'Bellrunner only receives baseline-plus-grant on its approved different Major Skills');
+}
+const bellrunnerStarting={Industry:3};
+for(const major of ['Commerce','Medicine','Mechanics']){
+  const granted={...bellrunnerStarting,[major]:1};
+  assert.equal(majorSkillDisplayLevel('Bellrunner',major,granted),2,
+    'Bellrunner route grant must display as provisional baseline plus saved +1: '+major);
+  assert.equal(majorSkillDisplayLevel('Bellrunner','Industry',granted),3,
+    'Origin Industry +3 must remain unchanged');
 }
 assert.ok(panelMarkup.includes('import {majorSkillDisplayLevel}') &&
   panelMarkup.includes("secondJobRouteAward(major:string)") &&
   panelMarkup.includes('title={majorSkillTitle(group.major)}') &&
-  panelMarkup.includes('A Millhand\'s chosen second-job route adds +1'),
-  'The major skill list and full skills window must explain the route +1');
+  panelMarkup.includes('Your chosen second-job route grants +1') &&
+  panelMarkup.includes("origin==='Bellrunner'&&major==='Industry'&&skill==='Hauling'"),
+  'The skills list and window must explain the Bellrunner route +1 and Hauling I preview');
 
 console.log('PASS: Wide unframed notice, readable parchment attributes, framed skill dropdowns, six original resource icons with honest API state and existing game contracts.');
 
