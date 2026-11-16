@@ -54,8 +54,10 @@ test('Bellrunner approved speech, real findings, and differing Dogman arrivals',
     assert.ok(shared.includes(line),'Missing approved Bellrunner dialogue: '+line);
     assert.ok(authorized.includes(line),'Not present in approved script: '+line);
   }
-  assert.match(shared,/passerby who caught you after Dogman knocked you down/);
-  assert.match(shared,/Dogman lowers his club and clears the passage/);
+  assert.match(shared,/The passerby helps you through the city clinic door/);
+  assert.match(shared,/You arrive at the city clinic on your own/);
+  assert.doesNotMatch(shared,/Dogman lowers his club and clears the passage/);
+  assert.doesNotMatch(shared,/helps you through the streets to the city clinic/);
   assert.match(shared,/origin==='Bellrunner'\?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS/);
   assert.match(shared,/arrivalIndex<0/);
   assert.match(shared,/onclick=\{advanceArrival\}/);
@@ -83,6 +85,19 @@ test('Both origins reuse one clinic API, state table, paid transaction and UI',(
   assert.ok(web.includes("playCoinTransactionSfx()"));
   assert.ok(web.includes("origin==='Millhand'"));
   assert.ok(combat.includes("'/bellrunner/clinic'"));
+  // The transition inherits the actual Millhand nine-slice primary frame,
+  // not a one-off dark CSS rectangle.
+  assert.ok(combat.includes('class="pall-story-dialogue-section combat-outcome-actions"'));
+  assert.ok(combat.includes('class="pall-framed-button primary-choice clinic-transition"'));
+  assert.ok(!combat.includes('background:#3b291a'));
+  const nineSlice=read('apps/web/src/lib/pall-story-landscape.css');
+  assert.ok(nineSlice.includes("url('/ui-kit/buttons/button-normal-trim.png')"));
+  assert.ok(nineSlice.includes("url('/ui-kit/buttons/button-hover-trim.png')"));
+  assert.ok(nineSlice.includes("url('/ui-kit/buttons/button-pressed-trim.png')"));
+  const shell=read('apps/web/src/lib/TutorialShell.svelte');
+  assert.ok(shell.includes("'← Back to Stage '+rewindTargetStage"));
+  assert.ok(shell.includes('completed Dogman fight'));
+  assert.ok(rewind.includes('if(stage===7)'));
   assert.ok(home.includes("href:base+'/bellrunner/clinic'"));
   assert.ok(rewind.includes('if(bellrunner&&expectedStage===7)'));
   assert.ok(rewind.includes('DELETE FROM player_character_dogman_combat_receipts'));
