@@ -206,7 +206,8 @@
   // Read the local-only replay contract for each implemented origin.
   // Production/non-loopback never exposes this route or its button.
   $effect(()=>{
-    if(character.origin!=='Millhand'&&character.origin!=='Bellrunner')return;
+    if(character.origin!=='Millhand'&&character.origin!=='Bellrunner'&&
+       character.origin!=='Stitcher')return;
     const characterId=character.id;
     const currentStage=character.tutorial.stage;
     let stale=false;
@@ -230,7 +231,13 @@
   async function rewindOneStage(){
     if(!canRewind||rewinding||rewindFromStage===null)return;
     const fromStage=rewindFromStage;
-    const warning=character.origin==='Bellrunner'&&fromStage===2
+    const warning=character.origin==='Stitcher'
+      ?'TESTING ONLY: Back to Stage '+(fromStage-1)+'? This reopens the earlier Cinder Row ward step. '+
+        (fromStage===4?'Your chosen second job and its one-time +1 Major Skill grant will be reversed. ':
+         fromStage===5?'The selected job and its +1 skill are preserved. ':
+         'Earlier saved ward actions will be reopened. ')+
+        'No wages, XP, coins, items or Health are added or removed.'
+      :character.origin==='Bellrunner'&&fromStage===2
       ?'TESTING ONLY: Return to Bellrunner Stage 1? The saved round acceptance and its request receipts will be cleared so you can replay Hector\'s opening. Character items, coins and skills are preserved.'
       :character.origin==='Bellrunner'&&fromStage===3
       ?'TESTING ONLY: Return to Bellrunner Stage 2? This clears the Wrong Bell investigation and returns you to the final sealed notice. Earlier deliveries, Health, coins and skills are preserved.'
