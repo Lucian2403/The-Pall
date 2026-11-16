@@ -202,7 +202,7 @@ for(const [sourcePath,recordId] of [
   ['apps/web/src/lib/MillhandContractsScene.svelte','contracts-job-journal'],
   ['apps/web/src/lib/MillhandRecordsScene.svelte','records-job-journal'],
   ['apps/web/src/lib/MillhandWageClaimScene.svelte','wage-claim-journal'],
-  ['apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte','clinic-journal'],
+  ['apps/web/src/lib/SharedTutorialClinic.svelte','clinic-journal'],
   ['apps/web/src/lib/MillhandCombatScene.svelte','combat-personal-journal']
 ]){
   const source=read(sourcePath);
