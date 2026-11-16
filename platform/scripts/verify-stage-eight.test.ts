@@ -68,7 +68,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
  const api=source('apps/api/src/tutorial-home-routes.ts');
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
- const clinic=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+ const clinic=source('apps/web/src/lib/SharedTutorialClinic.svelte');
  const home=source('apps/web/src/lib/CharacterHome.svelte');
  const migration=source('db/migrations/0010_tutorial_home.sql');
  const state=source('apps/api/src/shared-home-state.ts');
@@ -89,10 +89,10 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   shell.includes("'/home'"));
  assert.ok(clinic.includes('Travel Home</a>')&&
   clinic.includes("'/home'")&&
-  clinic.includes("next==='leave'?'Travel Home'")&&
-  clinic.includes("if(action==='leave'&&result.phase==='LEFT')")&&
+  clinic.includes("next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home')")&&
+  clinic.includes("if(action==='leave'&&result.phase==='LEFT'&&origin==='Millhand')")&&
   clinic.includes("await goto('/characters/'+encodeURIComponent(id)+'/home')")&&
-  !clinic.includes("'Leave the clinic'"),
+  clinic.includes("origin==='Millhand'"),
   'Travel Home must save the clinic departure then navigate directly to the room');
  assert.ok(home.includes("href:base+'/home'"));
  assert.ok(web.includes('class="home-scene pall-story-landscape"')&&
@@ -201,7 +201,7 @@ test('Stage 8 hotspots never paint a rectangular debug hover and bed is clickabl
 });
 
 test('Stage 8 dialogue frame and typography match the approved Stage 7 clinic',()=>{
- const clinic=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+ const clinic=source('apps/web/src/lib/SharedTutorialClinic.svelte');
  const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const styles=[
   "background:transparent;color:#2b1c11;",
@@ -285,7 +285,7 @@ test('Storage uses the owner chest sounds and the home background stays room-siz
  }
  assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
  assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- const clinicPage=source('apps/web/src/routes/characters/[id]/millhand/clinic/+page.svelte');
+ const clinicPage=source('apps/web/src/lib/SharedTutorialClinic.svelte');
  assert.ok(web.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}')&&
   clinicPage.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}')&&
   web.includes('class="home-scene pall-story-landscape"')&&
