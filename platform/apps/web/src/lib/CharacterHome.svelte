@@ -59,6 +59,14 @@
       label:'Continue clinic visit',
       href:base+'/bellrunner/clinic'
     };
+    if(character.origin==='Bellrunner'&&character.tutorial.stage===8) return {
+      title:character.tutorial.status==='COMPLETED'?'Your rented home':'Return Home',
+      description:character.tutorial.status==='COMPLETED'
+        ?'Your introduction is complete. Your shared rent notice and Journal remain available.'
+        :'Your examination is complete. Return to the rented room and read the notice.',
+      label:character.tutorial.status==='COMPLETED'?'Return to rented home':'Travel home',
+      href:base+'/home'
+    };
     if(character.origin==='Millhand'&&character.tutorial.stage===2) return {
       title:'Marking the Plates',
       description:'Return to the council plate lot and continue the work you have already begun.',
