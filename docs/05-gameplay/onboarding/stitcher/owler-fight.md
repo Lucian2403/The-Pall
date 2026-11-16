@@ -1,9 +1,8 @@
-# Stitcher — Stage 6: Owler at the Night Door (APPROVED ENCOUNTER)
+# Stitcher — Stage 6: Owler at the Night Door (STORY APPROVED; DIALOGUE FOR REVIEW)
 
 > **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
 
-
-**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The user approved the encounter and explicitly replaced three spoken lines (one victory, two defeat) with the exact wording below. This follows approved [Stage 5 service-corridor interactions](owler-confrontation.md). The patient rescue, Owler's identity and common clinic/home continuation are locked; combat numbers and formulas remain TBD.
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The October-approved encounter and earlier exact line replacements remain the story baseline; this document now proposes new wording for owner review. This follows approved [Stage 5 service-corridor interactions](owler-confrontation.md). The patient rescue, Owler's identity and common clinic/home continuation are locked; combat numbers and formulas remain TBD.
 
 ## S06-A — What the fight is actually about
 
@@ -61,7 +60,7 @@ Defeat is a genuine loss. Owler can overpower the Stitcher with normal combat ou
 
 **CLAUDIA:** “I'll speak to them myself. Now get out of my infirmary.”
 
-Owler backs off **because the contested transfer is physically withheld, witnessed, and now carries professional consequences**, not because the defeated player somehow beat him. Claudia is defending her authority, not turning into an empathetic rescuer. She expects to smooth over the school's questions with her appearance and charm, which she knowingly uses to escape scrutiny; this is her belief, not a guarantee that a smile defeats witnessed objections or written evidence.
+Owler backs off **because the contested transfer is physically withheld, witnessed, and now carries professional consequences**, not because the defeated player somehow beat him. Claudia is defending her authority, not turning into an empathetic rescuer. She intends to handle the school's response herself; her established charm does not override witnesses or written evidence.
 
 The player remains **defeated**, receives whatever actual injury/Health consequences the shared combat system determines, and is helped to the ordinary clinical service by an unnamed worker. Owler takes **no coins, clothes, bag, papers or equipment**. There is no rematch requirement and no abrupt teleporting to the rented home.
 
