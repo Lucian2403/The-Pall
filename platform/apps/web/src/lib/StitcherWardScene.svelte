@@ -160,7 +160,7 @@
       <section class="pall-story-dialogue-section" aria-label="Stitcher ward interaction">
         <div class="work-card">
           <p class="eyebrow">{s.stage===4?'SECOND JOB':'STITCHER'} · STAGE {['','I','II','III','IV','V'][s.stage]}{#if branchData} · {branchData.discipline}{/if}</p>
-          <h1>{branchData?.title??STITCHER_STAGE_TITLES[s.stage]}</h1>
+          <h1>{s.stage===5?STITCHER_STAGE_TITLES[5]:branchData?.title??STITCHER_STAGE_TITLES[s.stage]}</h1>
           {#if !snapshot.started}
             <p class="narration">The infirmary's beds are full. Steam rises from a wash basin, and the coal stove smokes. Claudia Cyka is checking the morning round.</p>
           {:else if s.stage===1}
