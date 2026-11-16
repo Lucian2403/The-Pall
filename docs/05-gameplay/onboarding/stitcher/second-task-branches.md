@@ -1,6 +1,6 @@
-# Stitcher — Stage 4: Three Second-Skill Jobs (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 4: Three Second-Skill Jobs (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial approval — 2026-11-16:** The owner approved this natural-dialogue revision for implementation. Earlier plot, clinical safeguards, evidence, branch skills and zero-wage introductory economy remain unchanged.
 
 **Status: APPROVED AND LOCKED (2026-10-16).** This follows [approved Stage 3, The Teaching Bed](teaching-bed-discovery.md), and approved [Stage 1](opening-dialogue.md) and [Stage 2](morning-dressings-interaction.md). The user approved each of the three job interaction branches, their spoken lines, evidence findings and convergence; exact numerical job systems remain TBD.
 
