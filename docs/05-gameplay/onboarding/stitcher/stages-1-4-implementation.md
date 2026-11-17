@@ -38,7 +38,13 @@ Stage V The Empty Sheet / The Night Door and later Owler combat remain a separat
 
 ## Night Trolley environment (owner corridor, 2026-11-17)
 
-The supplied Cinder Row Infirmary service-corridor image is stored as `platform/apps/web/static/locations/stitcher/service-corridor.webp`, keeping its original 1672 × 941 aspect ratio. Stage IV switches to that scene **only** for the Night Trolley route, from choosing that job until it finishes. The Signed Consent and Notes for the Living remain in the existing infirmary ward. The saved Stage V `exited` handoff preview uses the same corridor for all routes, preparing the Night Door; Stage V gameplay itself is not yet implemented. No new bed sprites, props or scene overlays are introduced. The shared `clinicBackdrop` flag intentionally stays on for both locations, preserving the existing `medical-clinic-ambience.mp3` stream without restarting it or replacing it with alley audio.
+The supplied Cinder Row Infirmary service-corridor image is stored as `platform/apps/web/static/locations/stitcher/service-corridor.webp`, keeping its original 1672 × 941 aspect ratio. Stage IV switches to that scene **only** for the Night Trolley route, from choosing that job until it finishes. The Signed Consent remains in the existing infirmary ward; Notes for the Living has its own records-room illustration. The saved Stage V `exited` handoff preview uses the same corridor for all routes, preparing the Night Door; Stage V gameplay itself is not yet implemented. No new bed sprites, props or scene overlays are introduced. The shared `clinicBackdrop` flag intentionally stays on for both locations, preserving the existing `medical-clinic-ambience.mp3` stream without restarting it or replacing it with alley audio.
+
+## Notes for the Living — records room (owner painting, 2026-11-18)
+
+The original 1672 × 941 records-room illustration is committed as `platform/apps/web/static/locations/stitcher/notes-for-the-living-room.webp`. Stage IV selects this background **only** for Scholarship / Investigation — **Notes for the Living**. Industry / Hauling — Night Trolley retains the service corridor. Commerce / Contracts — Signed Consent retains the existing infirmary ward. All branches retain their prior Stage V handoff corridor.
+
+The scene and chapter header share `stitcher-scene-environment.ts` so the visible location matches the correct painting. No new object hitboxes or controls are introduced. The established `clinicBackdrop` remains enabled for all three rooms, reusing `medical-clinic-ambience.mp3` without adding or changing audio. The `verify:stitcher-stages1-4` suite checks both Stage IV background routing and the supplied WebP assets.
 
 ## Claudia Cyka — optional conversations during Stages I–II
 
