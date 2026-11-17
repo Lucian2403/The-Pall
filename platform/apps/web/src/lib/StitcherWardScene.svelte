@@ -1,6 +1,7 @@
 <script lang="ts">
   import {getContext,tick} from 'svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
+  import StitcherWardItemTray from '$lib/StitcherWardItemTray.svelte';
   import SecondJobChoices from '$lib/SecondJobChoices.svelte';
   import NpcConversation from '$lib/NpcConversation.svelte';
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
@@ -193,7 +194,6 @@
       </div>
     {/snippet}
     {#snippet panel()}
-      <div class="stitcher-reading-column">
       <section class="pall-story-dialogue-section" aria-label="Stitcher ward interaction">
         <div class="work-card">
           <p class="eyebrow">{s.stage===4?'SECOND JOB':'STITCHER'} · STAGE {['','I','II','III','IV','V'][s.stage]}{#if branchData} · {branchData.discipline}{/if}</p>
@@ -330,19 +330,11 @@
           {#if pending}<p role="status" class="saving">Recording the work…</p>{/if}
         </div>
       </section>
+    {/snippet}
+    {#snippet supplement()}
       {#if itemChoices.length&&!claudiaTalkOpen}
-        <div class="stitcher-item-tray" aria-label="Choose a ward item">
-          {#each itemChoices as item (item.action)}
-            <button type="button" class="stitcher-item-button" disabled={pending}
-              aria-label={STITCHER_ACTION_LABEL[item.action]}
-              title={STITCHER_ACTION_LABEL[item.action]}
-              onclick={()=>act(item.action)}>
-              <img src={item.image} alt="" draggable="false"/>
-            </button>
-          {/each}
-        </div>
+        <StitcherWardItemTray items={itemChoices} busy={pending} onChoose={act}/>
       {/if}
-      </div>
     {/snippet}
   </ActivityLayout>
   {#if journalOpen}
@@ -407,19 +399,7 @@
   .bed-a{left:31%;top:42%;width:25%;height:22%}
   .bed-b{left:53%;top:38%;width:14%;height:20%}
   .teaching-bed{left:31%;top:42%;width:25%;height:22%}
-  .stitcher-reading-column{display:flex;flex-direction:column;gap:10px;min-width:0;width:100%}
-  .stitcher-item-tray{display:flex;justify-content:center;align-items:center;
-    flex-wrap:wrap;gap:clamp(12px,3vw,28px);padding:4px 8px 10px;min-width:0}
-  .stitcher-item-button{appearance:none;display:flex;align-items:center;justify-content:center;
-    width:clamp(92px,33%,128px);height:116px;padding:3px;border:2px solid transparent;
-    border-radius:9px;background:transparent;cursor:pointer;transition:transform .12s ease,filter .12s ease}
-  .stitcher-item-button img{display:block;max-width:100%;max-height:100%;width:100%;height:100%;
-    object-fit:contain;filter:drop-shadow(0 5px 5px #0008);pointer-events:none}
-  .stitcher-item-button:is(:hover,:focus-visible):not(:disabled){transform:translateY(-3px);filter:brightness(1.14)}
-  .stitcher-item-button:focus-visible{outline:2px solid #f4d39c;outline-offset:2px}
-  .stitcher-item-button:disabled{opacity:.45;cursor:wait}
   .item-instruction{font:600 13px/1.4 var(--pall-font-reading,Georgia,serif);color:#5d412b;margin:6px 0 0}
-  @media(prefers-reduced-motion:reduce){.stitcher-item-button{transition:none}}
   .work-card{box-sizing:border-box;width:100%;min-width:0;margin:0}
   .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.08em;color:#614029;margin:0 0 13px;padding-bottom:10px;
