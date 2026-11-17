@@ -268,7 +268,7 @@
               <p class="spoken">“{currentLine.text}”</p>
             {:else}
               <p class="narration">{branchData.finding}</p>
-              <p class="narration">You haven't signed the patient over, so he's still in the infirmary's care. There's no pay for this work, and you still need to find a way to stop the transfer.</p>
+              <p class="narration">He's still in the infirmary, and you haven't signed him over. You won't get paid for this work, but at least you've kept him from being taken away.</p>
             {/if}
           {:else if s.stage===5}
             <p class="narration">Tired and fed up, you make your way back to the service corridor. The patient still hasn't been handed over, and you've no idea how much longer this will go on. Behind you, the ward is as busy as ever.</p>

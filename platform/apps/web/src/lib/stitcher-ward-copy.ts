@@ -38,15 +38,15 @@ export const STITCHER_ACTION_LABEL:Readonly<Record<string,string>>={
  route_short:'Take the narrow passage',
  route_wide:'Take the wider passage',
  check_receiver:'Check if the receiving mark matches your dispatch note',
- match_consent:'Match the consent paper to the patient record',
- check_medicine:'Check the medicine and witnessing entries',
+ match_consent:'Check that both papers belong to the same patient',
+ check_medicine:'Check the times and witness records',
  attach_record:'Attach the timing record',
  bring_witness:'Bring a witness to the objection',
  mark_disputed:'Mark the transfer disputed',
- compare_admission:'Compare the admission note with care already given',
- match_schedule:"Match the teaching schedule's reference",
- copy_pages:'Copy the treatment and teaching pages',
- cross_reference:'Cross-reference the casebook and teaching list',
+ compare_admission:'Check what treatment the man has had',
+ match_schedule:"Check if the entry is about the same patient",
+ copy_pages:'Copy both pages',
+ cross_reference:'Write down the matching entries',
  record_difference:'Record the difference between treatment and instruction',
  continue_dialogue:'Continue',
  finish_job:'Record the work and return to the service passage'
@@ -71,29 +71,29 @@ export const STITCHER_ROUTE_UI={
   title:'The Signed Consent',
   discipline:'COMMERCE / CONTRACTS',
   opening:[
-   'An unnamed ward clerk opens the charity-bond and consent papers. This is a continuation of the unpaid charity round.',
-   'A thumbprint is recorded, but its presence alone does not establish informed agreement.'
+   'You arrive at the ward records desk, where a clerk is busy sorting through papers. You explain what\'s happened with the patient, and he pulls out the charity records and consent form for you to check.',
+   'There\'s a thumbprint on the consent form, but that doesn\'t mean the patient knew what he was agreeing to.'
   ],
   steps:[
-   'The consent sheet and the patient entry refer to the same man.',
-   'The medicine entry records a sleeping draught before the thumbprint was registered.',
+   'You place the patient\'s records beside the consent form. The names and records match, and there\'s a thumbprint at the bottom. But the patient says he was asleep when they took it. Something isn\'t right here.',
+   'You turn to the medicine book. It shows that the patient was given a sleeping draught before his thumbprint was recorded on the consent form.',
    'You can use the timing entry or ask for a witness to mark an honest objection.',
-   'The clerk prepares a disputed transfer entry without forging a signature.'
+   'The clerk writes down your complaint and marks the transfer as disputed. He leaves the original form alone, so there\'s no doubt about what was written on it.'
   ],
-  finding:'The timing record places the mark while the patient was sedated. A witnessed objection puts the handover on hold.'
+  finding:'The records show that the man was asleep when they took his thumbprint. Someone also heard him say he never agreed to the operation. For now, they can\'t move him.'
  },
  notes:{
   title:'Notes for the Living',
   discipline:'SCHOLARSHIP / INVESTIGATION',
   opening:[
-   'An unnamed copyist sets out the casebook and the teaching schedule. This is an unpaid review during the existing ward dispute.',
-   'No additional surgical procedure is listed as necessary care for the patient.'
+   'You arrive at the records desk, where a copyist pulls out the man\'s casebook and the teaching schedule. He lays them side by side for you to look through. It\'s been a long morning, and you haven\'t earned a coin. Still, you want to know why they\'re planning to operate on this man.',
+   'You look through the man\'s records, but there\'s nothing saying he needs another operation.'
   ],
   steps:[
-   'Compare the admission note with the treatment already given.',
-   'The teaching schedule refers to the patient as a demonstration case.',
-   'Choose what to copy so the distinction can be checked from the original entries.',
-   'The records show an instructional demonstration, not a treatment requirement.'
+   'You open the man\'s records and read what was wrong with him when he first arrived. Then you look at the treatment he\'s already had. You want to see if there\'s anything the doctors still need to do.',
+   'You turn to the teaching schedule and find an entry for a demonstration. It seems to be about the same man, but you want to be sure. You look for the number that matches his records.',
+   'The man\'s treatment notes say nothing about another operation, but his name is on the teaching list. You want to keep a record of what you\'ve found.',
+   'The records make it clear. The doctors aren\'t planning another operation to treat the man. They only want to use him for a teaching lesson.'
   ],
   finding:'The casebook shows no need for another operation; the new procedure is scheduled for instruction alone.'
  }
