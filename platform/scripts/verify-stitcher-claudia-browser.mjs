@@ -157,7 +157,7 @@ try{
       "const buttons=[...document.querySelectorAll('.stitcher-ward .conversation .choices button')];"+
       "const button=buttons.find(b=>b.textContent?.trim()===label);"+
       "if(!button)return false;button.click();return true;})()";
-    assert.equal(await evalJS(script),true,'Missing clicked choice '+label);
+    assert.equal(await until(()=>evalJS(script),4000,'Clicked choice '+label),true);
   };
   const enter=async()=>{
     assert.equal(await evalJS("!!document.querySelector('.claudia-hotspot')"),true);
@@ -212,14 +212,21 @@ try{
       }
       await enterTopic(topic,topic.exchanges.length-1);
       await choose('Ask something else');
+      await until(()=>evalJS(
+        "[...document.querySelectorAll('.conversation .choices button')].some(b=>b.textContent?.trim()==="+
+        JSON.stringify(APPROVED_CLAUDIA_OPTIONAL_DIALOGUE[0].prompt)+")"),
+        4000,'Claudia five-topic menu after Ask something else');
       const menu=await evalJS(
         "[...document.querySelectorAll('.conversation .choices button')].map(b=>b.textContent.trim())");
       for(const t of APPROVED_CLAUDIA_OPTIONAL_DIALOGUE)
         assert.ok(menu.includes(t.prompt),'Five topics remain after returning to menu');
       await choose(APPROVED_CLAUDIA_OPTIONAL_DIALOGUE[0].prompt);
-      assert.equal(await conversationSpeech(),
-        '“'+APPROVED_CLAUDIA_OPTIONAL_DIALOGUE[0].exchanges[0].reply+'”');
+      await until(async()=> (await conversationSpeech())===
+        '“'+APPROVED_CLAUDIA_OPTIONAL_DIALOGUE[0].exchanges[0].reply+'”',
+        4000,'Topic switch resets to first answer');
       await choose(CLAUDIA_WORK_SKIP_LINE);
+      await until(()=>evalJS("!document.querySelector('.conversation')"),
+        3000,'Return after topic change');
       assert.equal(await displayedText(),starting);
       assert.deepEqual(await evalJS('window.__claudiaPosts'),[]);
     }
