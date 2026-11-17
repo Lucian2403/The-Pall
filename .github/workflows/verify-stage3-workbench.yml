@@ -21,6 +21,8 @@ on:
       - 'platform/scripts/verify-bellrunner-stage7.test.ts'
       - 'platform/scripts/verify-bellrunner-stage8.test.ts'
       - 'platform/scripts/verify-stitcher-stages1-4.test.ts'
+      - 'platform/scripts/verify-stitcher-claudia-optional.test.ts'
+      - 'platform/scripts/verify-stitcher-claudia-browser.mjs'
       - 'platform/apps/api/src/stitcher-*.ts'
       - 'platform/apps/web/src/lib/Stitcher*.svelte'
       - 'platform/apps/web/src/lib/stitcher-*.ts'
@@ -106,6 +108,8 @@ jobs:
         run: npm run verify:bellrunner-stage8
       - name: Stitcher Stages 1–4 ward dialogue, two-bed interactions and one-time branch rewards
         run: npm run verify:stitcher-stages1-4
+      - name: Stitcher Claudia five optional dialogue topics and immutable job state
+        run: npm run verify:stitcher-claudia
       - name: Every stage retains safe Back to previous Stage replay
         run: npm run verify:dev-rewind
       - name: Bellrunner Stage 3 owner art and sound
@@ -156,6 +160,9 @@ jobs:
       - name: Real Chromium Millhand stages 1–8 and the matching primary button art
         timeout-minutes: 4
         run: timeout --signal=TERM --kill-after=5s 180s npm run verify:millhand-scenes-browser
+      - name: Real Chromium Stitcher Claudia five topics, both stages and every early exit
+        timeout-minutes: 3
+        run: timeout --signal=TERM --kill-after=5s 150s npm run verify:stitcher-claudia-browser
       - name: Save Bellrunner 1272px and 1920px visual QA screenshots
         if: always()
         uses: actions/upload-artifact@v4
