@@ -27,6 +27,7 @@ const stub=[
   "const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'content-type':'application/json'}});",
   'window.__claudiaExpectedSnapshot=structuredClone(fixtures[key]);',
   'window.__claudiaPosts=[];',
+  'window.__claudiaLeaving=false;',
   'window.fetch=(input,options)=>{',
   " const route=new URL(typeof input==='string'?input:input.url,location.href).pathname;",
   " if(!route.startsWith('/api/characters/qa-claudia'))return original(input,options);",
@@ -143,8 +144,10 @@ try{
     await cmd('Emulation.setDeviceMetricsOverride',{
       width:1280,height:800,deviceScaleFactor:1,mobile:false
     });
+    await evalJS('window.__claudiaLeaving=true').catch(()=>{});
     await cmd('Page.navigate',{url:origin+'/characters/qa-claudia/stitcher/ward?qa='+key});
-    await until(()=>evalJS("!!document.querySelector('.stitcher-ward .work-card')"),
+    await until(()=>evalJS("!window.__claudiaLeaving&&location.search==='?qa="+key+"'&&"+
+      "!!document.querySelector('.stitcher-ward .work-card')"),
       24000,'Stitcher '+key+' ward UI');
     assert.equal(await evalJS("!!document.querySelector('vite-error-overlay')"),false);
   }
