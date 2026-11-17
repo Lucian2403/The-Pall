@@ -39,3 +39,36 @@ Stage V The Empty Sheet / The Night Door and later Owler combat remain a separat
 ## Night Trolley environment (owner corridor, 2026-11-17)
 
 The supplied Cinder Row Infirmary service-corridor image is stored as `platform/apps/web/static/locations/stitcher/service-corridor.webp`, keeping its original 1672 × 941 aspect ratio. Stage IV switches to that scene **only** for the Night Trolley route, from choosing that job until it finishes. The Signed Consent and Notes for the Living remain in the existing infirmary ward. The saved Stage V `exited` handoff preview uses the same corridor for all routes, preparing the Night Door; Stage V gameplay itself is not yet implemented. No new bed sprites, props or scene overlays are introduced. The shared `clinicBackdrop` flag intentionally stays on for both locations, preserving the existing `medical-clinic-ambience.mp3` stream without restarting it or replacing it with alley audio.
+
+## Claudia Cyka — optional conversations during Stages I–II
+
+The owner's five optional conversations are stored **verbatim** in
+`apps/web/src/lib/approved-claudia-optional.ts`. They use the established
+Guther Anvil conversation component (`NpcConversation.svelte`) and the existing
+framed Stitcher reading panel. They are available by clicking Claudia in
+Stage I or Stage II. During independent Stage II treatment, the small framed
+Claudia POI remains available; clicking it brings her portrait back for the
+conversation. The original bed hit targets return when talk ends.
+
+Topics: **About the Infirmary; About Claudia Herself; About Grand Cylinder
+City; About the Pall; About the Plume**. Each selected player question is
+itself the clickable choice. Claudia's answer appears immediately without
+repeating the question. Every answer offers **Ask something else** or
+**Enough talk. Back to work.**, including between follow-up questions.
+Topic state is private to the mounted conversation component and resets when
+the player returns to work.
+
+**No backend call or state mutation:** the optional exchange never submits
+a ward action, updates the saved revision, advances the treatment or changes
+coins, XP, items, skills or evidence. The dialogue does **not** disclose the
+Teaching Bed incident prior to Stage III, and no optional Claudia topics are
+offered from Stage III onward. Guther's existing optional conversations are
+unchanged.
+
+Automated contract checks: `npm run verify:stitcher-claudia` compares all
+five topics and fourteen exchanges against the owner's exact approved words,
+checks question ordering and UI entry gating. `npm run
+verify:stitcher-claudia-browser` uses real Chromium to click all topics at
+Stages I and II, select every follow-up, exit after each answer, switch
+topics and confirm the original ward text/actions and the absence of any
+POST requests. Both suites are included in the workshop CI workflow.
