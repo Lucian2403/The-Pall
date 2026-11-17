@@ -98,6 +98,7 @@
     "verify:millhand-scenes-browser": "node --import tsx scripts/verify-millhand-scenes-browser.mjs",
     "verify:stage-six": "node scripts/verify-stage-six.mjs",
     "verify:stage-seven": "node --import tsx --test scripts/verify-stage-seven.test.ts",
-    "verify:stage-eight": "node --import tsx --test scripts/verify-stage-eight.test.ts"
+    "verify:stage-eight": "node --import tsx --test scripts/verify-stage-eight.test.ts",
+    "verify:stitcher-ward-items": "node --import tsx --test scripts/verify-stitcher-ward-items.test.ts"
   }
 }

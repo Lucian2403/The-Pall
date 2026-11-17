@@ -108,6 +108,8 @@ jobs:
         run: npm run verify:bellrunner-stage8
       - name: Stitcher Stages 1–4 ward dialogue, two-bed interactions and one-time branch rewards
         run: npm run verify:stitcher-stages1-4
+      - name: Stitcher Stage II illustrated ward item interactions
+        run: npm run verify:stitcher-ward-items
       - name: Stitcher Claudia five optional dialogue topics and immutable job state
         run: npm run verify:stitcher-claudia
       - name: Every stage retains safe Back to previous Stage replay
