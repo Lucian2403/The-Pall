@@ -15,10 +15,18 @@ const root=resolve(import.meta.dirname,'..');
 const stage1=structuredClone(INITIAL_STITCHER);
 const stage2=['continue_intro','check_ward','begin_round']
   .reduce((state,action)=>applyStitcherAction(state,action),stage1);
+const stage2Mid=['inspect_a','inspect_b','order_bleeding','prep_cut']
+  .reduce((state,action)=>applyStitcherAction(state,action),stage2);
+const stage2Report=['dress_a','check_linen','trim_end','dress_b','inspect_finished','record_linen']
+  .reduce((state,action)=>applyStitcherAction(state,action),stage2Mid);
 const stage3={...stage2,stage:3,phase:'discovery'};
 const fixture=state=>({stage:state.stage,tutorialStatus:'IN_PROGRESS',
   state,started:true,availableActions:stitcherActions(state)});
-const fixtures={one:fixture(stage1),two:fixture(stage2),three:fixture(stage3)};
+const fixtures={
+  one:fixture(stage1),two:fixture(stage2),
+  twoMid:fixture(stage2Mid),twoReport:fixture(stage2Report),
+  three:fixture(stage3)
+};
 const stub=[
   '(()=>{',
   'const fixtures='+JSON.stringify(fixtures)+';',
@@ -236,6 +244,25 @@ try{
     assert.equal(exits,14);
     console.log('PASS Stage '+(key==='one'?'I':'II')+
       ': 5 topics, 14 answers and early exit after every answer; zero server writes');
+  }
+  // More than the initial saved Stage II state: opening optional speech while
+  // a dressing is underway, or while Claudia is delivering a required report,
+  // must restore the exact current phase and available work actions.
+  for(const key of ['twoMid','twoReport']){
+    await open(key);
+    const previous=await displayedText();
+    const previousSprite=await evalJS("!!document.querySelector('.stitcher-ward img.claudia')");
+    const snapshot=await evalJS('JSON.stringify(window.__claudiaExpectedSnapshot)');
+    await enterTopic(APPROVED_CLAUDIA_OPTIONAL_DIALOGUE[3],1);
+    await choose(CLAUDIA_WORK_SKIP_LINE);
+    await until(()=>evalJS("!document.querySelector('.conversation')"),
+      3000,'Return to interrupted Stage II work');
+    assert.equal(await displayedText(),previous,'An interrupted ward phase must reappear unchanged');
+    assert.equal(await evalJS('JSON.stringify(window.__claudiaExpectedSnapshot)'),snapshot);
+    assert.deepEqual(await evalJS('window.__claudiaPosts'),[]);
+    assert.equal(await evalJS("!!document.querySelector('.stitcher-ward img.claudia')"),
+      previousSprite,'Claudia resumes precisely the previous staged presence');
+    console.log('PASS Stage II '+key+' interrupted work unchanged by optional conversation');
   }
   await open('three');
   assert.equal(await evalJS("!!document.querySelector('.claudia-hotspot')"),false,
