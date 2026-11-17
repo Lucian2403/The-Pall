@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {INITIAL_STITCHER,applyStitcherAction,stitcherActions,STITCHER_MAJOR,
  STITCHER_LINES,STITCHER_CLAUDIA_LINES,StitcherInvalidAction} from '../apps/api/src/stitcher-work.ts';
 import {shouldShowClaudia} from '../apps/web/src/lib/stitcher-claudia-presence.ts';
-import {stitcherUsesServiceCorridor} from '../apps/web/src/lib/stitcher-scene-environment.ts';
+import {stitcherUsesServiceCorridor,stitcherSceneEnvironment,STITCHER_SCENE_ART} from '../apps/web/src/lib/stitcher-scene-environment.ts';
 
 const read=(p:string)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const progress=(s:typeof INITIAL_STITCHER,actions:string[])=>
@@ -117,31 +117,40 @@ test('Claudia appears only during her live exchanges in Stages I–IV',()=>{
  assert.ok(scene.includes('{#if claudiaVisible&&!claudiaArtMissing}'));
  assert.ok(!scene.includes('{#if s.stage===1&&!claudiaArtMissing&&snapshot.started}'));
 });
-test('Night Trolley uses owner corridor artwork, only while the route is outside the ward',()=>{
- const image=readFileSync(new URL('../apps/web/static/locations/stitcher/service-corridor.webp',import.meta.url));
- assert.ok(image.length>40000,'Keep the actual owner corridor painting, not a placeholder');
- assert.equal(image.toString('ascii',0,4),'RIFF');
- assert.equal(image.toString('ascii',8,12),'WEBP');
+test('Stitcher paints the owner-provided records room only for Stage IV Investigation',()=>{
+ for(const [key,minBytes] of [['service-corridor.webp',40000],['notes-for-the-living-room.webp',100000]] as const){
+   const image=readFileSync(new URL('../apps/web/static/locations/stitcher/'+key,import.meta.url));
+   assert.ok(image.length>minBytes,'Require the supplied painting, not a placeholder: '+key);
+   assert.equal(image.toString('ascii',0,4),'RIFF');
+   assert.equal(image.toString('ascii',8,12),'WEBP');
+ }
  for(const stage of [1,2,3])for(const branch of [null,'trolley','consent','notes'])
-   assert.equal(stitcherUsesServiceCorridor(stage,branch),false);
- assert.equal(stitcherUsesServiceCorridor(4,null),false);
- assert.equal(stitcherUsesServiceCorridor(4,'trolley'),true);
- assert.equal(stitcherUsesServiceCorridor(4,'consent'),false);
- assert.equal(stitcherUsesServiceCorridor(4,'notes'),false);
- for(const branch of [null,'trolley','consent','notes'])
-   assert.equal(stitcherUsesServiceCorridor(5,branch),true,
-     'All Stage V paths converge on the Night Door corridor');
+   assert.equal(stitcherSceneEnvironment(stage,branch),'ward');
+ assert.equal(stitcherSceneEnvironment(4,null),'ward');
+ assert.equal(stitcherSceneEnvironment(4,'trolley'),'corridor');
+ assert.equal(stitcherSceneEnvironment(4,'consent'),'ward');
+ assert.equal(stitcherSceneEnvironment(4,'notes'),'records');
+ for(const branch of [null,'trolley','consent','notes']){
+   assert.equal(stitcherSceneEnvironment(5,branch),'corridor',
+     'All Stage V branches rejoin at the Night Door corridor');
+   assert.equal(stitcherUsesServiceCorridor(4,branch),branch==='trolley');
+   assert.equal(stitcherUsesServiceCorridor(5,branch),true);
+ }
+ assert.equal(STITCHER_SCENE_ART.ward.image,'/locations/clinic/clinic-workshop-cold.webp');
+ assert.equal(STITCHER_SCENE_ART.corridor.image,'/locations/stitcher/service-corridor.webp');
+ assert.equal(STITCHER_SCENE_ART.records.image,'/locations/stitcher/notes-for-the-living-room.webp');
+ assert.equal(STITCHER_SCENE_ART.records.place,'Infirmary records room');
  const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
  const page=read('apps/web/src/routes/characters/[id]/stitcher/ward/+page.svelte');
- assert.ok(scene.includes('stitcherUsesServiceCorridor(s.stage,s.branch)'));
- assert.ok(scene.includes('/locations/stitcher/service-corridor.webp'));
- assert.ok(scene.includes('/locations/clinic/clinic-workshop-cold.webp'));
- assert.ok(scene.includes("inServiceCorridor?'Infirmary service corridor':'Cinder Row Infirmary'"));
- assert.ok(page.includes('stitcherUsesServiceCorridor(snapshot.state.stage,snapshot.state.branch)'));
+ assert.ok(scene.includes('STITCHER_SCENE_ART[stitcherSceneEnvironment(s.stage,s.branch)]'));
+ assert.ok(scene.includes('src={sceneArt.image} alt={sceneArt.alt}'));
+ assert.ok(scene.includes('{sceneArt.place}'));
+ assert.ok(page.includes('STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch)]'));
+ assert.ok(page.includes('sceneLocation={sceneArt.place}'));
  assert.ok(page.includes('clinicBackdrop compactCityVista travelLocked'),
-   'Both locations must reuse the same medical-clinic ambience, no audio swap');
+   'All three environments must retain the existing medical-clinic ambience');
  assert.ok(!page.includes('nightAlleyBackdrop'),
-   'The service corridor must not accidentally play the night-alley ambience');
+   'No alley ambience is to be introduced into Stage IV');
 });
 test('UI uses the exact existing frames, accessible background-bed hotspots and owner dialogue',()=>{
  const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
@@ -155,7 +164,7 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
  assert.ok(page.includes('TutorialShell')&&page.includes('ActivityLayout')===false);
  assert.ok(scene.includes('<ActivityLayout mode="scene"'));
  assert.ok(scene.includes('class="ward-art pall-story-landscape"'));
- assert.ok(scene.includes('/locations/clinic/clinic-workshop-cold.webp'));
+ assert.ok(scene.includes('src={sceneArt.image} alt={sceneArt.alt}'));
  assert.ok(scene.includes('class="bed-hotspot bed-a"'));
  assert.ok(scene.includes('class="bed-hotspot bed-b"'));
  assert.ok(scene.includes('class="bed-hotspot teaching-bed"'));
