@@ -1,5 +1,6 @@
 <script lang="ts">
   import {APPROVED_GUTHER_OPTIONAL_DIALOGUE, GUTHER_WORK_SKIP_LINE, type GutherTopicId} from '$lib/approved-guther-optional';
+  import {APPROVED_CLAUDIA_OPTIONAL_DIALOGUE, CLAUDIA_WORK_SKIP_LINE, type ClaudiaTopicId} from '$lib/approved-claudia-optional';
   import {NPC_DIALOGUE_STATUS, PROPOSED_NPC_DIALOGUE} from '$lib/proposed-npc-dialogue';
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
 
@@ -22,6 +23,21 @@
     gutherTopic = null;
     gutherStep = 0;
   }
+
+  // Same read-only exchange pattern as Guther. This component owns every
+  // optional question/answer step; no ward or tutorial command is submitted.
+  let claudiaTopic=$state<ClaudiaTopicId|null>(null);
+  let claudiaStep=$state(0);
+  const claudiaCurrent=$derived(APPROVED_CLAUDIA_OPTIONAL_DIALOGUE.find(t=>t.id===claudiaTopic)??null);
+  const claudiaExchange=$derived(claudiaCurrent?.exchanges[claudiaStep]??null);
+  function askClaudia(topicId:ClaudiaTopicId){
+    claudiaTopic=topicId;
+    claudiaStep=0;
+  }
+  function changeClaudiaTopic(){
+    claudiaTopic=null;
+    claudiaStep=0;
+  }
 </script>
 
 <section class="conversation" aria-label="Optional conversation">
@@ -43,6 +59,26 @@
           <button type="button" class="secondary-choice" onclick={() => askGuther(option.id)}><BellrunnerChoiceIcon kind="chat"/>{option.prompt}</button>
         {/each}
         <button type="button" class="work-skip secondary-choice" onclick={() => (skipToWork ?? close)()}><BellrunnerChoiceIcon kind="route"/>{GUTHER_WORK_SKIP_LINE}</button>
+      </div>
+    {/if}
+  {:else if origin === 'Stitcher'}
+    <p class="name">Claudia Cyka <span>· Matron</span></p>
+    {#if claudiaCurrent && claudiaExchange}
+      <p class="speech">“{claudiaExchange.reply}”</p>
+      <div class="choices">
+        {#if claudiaExchange.followUp}
+          <button type="button" class="secondary-choice" onclick={() => {claudiaStep+=1;}}>{claudiaExchange.followUp}</button>
+        {/if}
+        <button type="button" class="secondary-choice" onclick={changeClaudiaTopic}><BellrunnerChoiceIcon kind="chat"/>Ask something else</button>
+        <button type="button" class="work-skip secondary-choice" onclick={close}><BellrunnerChoiceIcon kind="route"/>{CLAUDIA_WORK_SKIP_LINE}</button>
+      </div>
+    {:else}
+      <p class="instruction">Ask Claudia about:</p>
+      <div class="choices">
+        {#each APPROVED_CLAUDIA_OPTIONAL_DIALOGUE as option (option.id)}
+          <button type="button" class="secondary-choice" onclick={() => askClaudia(option.id)}><BellrunnerChoiceIcon kind="chat"/>{option.prompt}</button>
+        {/each}
+        <button type="button" class="work-skip secondary-choice" onclick={close}><BellrunnerChoiceIcon kind="route"/>{CLAUDIA_WORK_SKIP_LINE}</button>
       </div>
     {/if}
   {:else if speaker}
