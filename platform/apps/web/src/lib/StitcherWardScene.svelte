@@ -2,12 +2,14 @@
   import {getContext,tick} from 'svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import SecondJobChoices from '$lib/SecondJobChoices.svelte';
+  import NpcConversation from '$lib/NpcConversation.svelte';
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
   import {stitcherUsesServiceCorridor} from '$lib/stitcher-scene-environment';
   import '$lib/pall-story-landscape.css';
+  import '$lib/workshop-object-labels.css';
   type Branch='trolley'|'consent'|'notes';
   type Phase='intro'|'briefing'|'inspect'|'order'|'prepare'|'care'|'linen_check'|
     'linen_fix'|'verify'|'record'|'report'|'close'|'discovery'|'claudia'|'choose'|
@@ -111,10 +113,16 @@
   ]);
   const interactiveBeds=$derived(s.stage===2&&(s.phase==='inspect'||s.phase==='care')||s.stage===3&&s.phase==='discovery'&&!s.bedObserved);
   const inServiceCorridor=$derived(stitcherUsesServiceCorridor(s.stage,s.branch));
-  // Keep Claudia visible for the whole exchange (including the player's
-  // replies); remove her when independent ward work resumes.
-  const claudiaVisible=$derived(shouldShowClaudia(s,snapshot.started));
+  // Claudia can be called to the ward during either of the first two stages.
+  // Optional talk is client-only: opening/closing it cannot alter the saved
+  // action list, revision, inspection, rewards or any other gameplay state.
+  let claudiaTalkOpen=$state(false);
+  const canTalkClaudia=$derived(s.stage===1||s.stage===2);
+  const claudiaVisible=$derived(claudiaTalkOpen||shouldShowClaudia(s,snapshot.started));
   let claudiaArtMissing=$state(false);
+  $effect(()=>{
+    if(!canTalkClaudia&&claudiaTalkOpen)claudiaTalkOpen=false;
+  });
 </script>
 
 <section class="workshop stitcher-ward" aria-label={'Stitcher Stage '+s.stage+' — '+STITCHER_STAGE_TITLES[s.stage]}>
@@ -138,7 +146,21 @@
               alt="Claudia Cyka, the Matron" draggable="false"
               onerror={()=>claudiaArtMissing=true}/>
           {/if}
-          {#if interactiveBeds}
+          {#if canTalkClaudia}
+            <!-- The whole portrait is a generous invisible hit target while
+                 Claudia is present. During solo ward work only the small
+                 framed summon label remains; opening it brings her back. -->
+            <button type="button" class="claudia-hotspot" class:present={claudiaVisible}
+              aria-label="Talk to Claudia Cyka" title="Talk to Claudia Cyka"
+              aria-pressed={claudiaTalkOpen} disabled={pending}
+              onclick={()=>{claudiaTalkOpen=true;}}>
+              <span class="claudia-marker">
+                <span class="claudia-poi" aria-hidden="true"></span>
+                <span class="workshop-npc-label">Claudia Cyka</span>
+              </span>
+            </button>
+          {/if}
+          {#if interactiveBeds&&!claudiaTalkOpen}
             {#if s.stage===2}
               <button class="bed-hotspot bed-a" type="button"
                 class:completed={s.inspectedA||s.treatedA}
@@ -173,6 +195,9 @@
         <div class="work-card">
           <p class="eyebrow">{s.stage===4?'SECOND JOB':'STITCHER'} · STAGE {['','I','II','III','IV','V'][s.stage]}{#if branchData} · {branchData.discipline}{/if}</p>
           <h1>{s.stage===5?STITCHER_STAGE_TITLES[5]:branchData?.title??STITCHER_STAGE_TITLES[s.stage]}</h1>
+          {#if claudiaTalkOpen}
+            <NpcConversation origin="Stitcher" close={()=>{claudiaTalkOpen=false;}}/>
+          {:else}
           {#if !snapshot.started}
             <p class="narration">The infirmary is packed, with every bed taken. Steam rises from a basin of hot water, and smoke drifts from the coal stove. Claudia Cyka is going over the morning's work.</p>
           {:else if s.stage===1}
@@ -296,6 +321,7 @@
               {/each}
             </div>
           {/if}
+          {/if}
           {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
           {#if pending}<p role="status" class="saving">Recording the work…</p>{/if}
         </div>
@@ -323,6 +349,22 @@
   .claudia{position:absolute;bottom:0;left:6%;height:83%;max-width:40%;
     object-fit:contain;object-position:bottom;filter:drop-shadow(6px 7px 10px #0b090caa);
     pointer-events:none}
+  .claudia-hotspot{position:absolute;z-index:4;bottom:12%;left:6%;width:210px;
+    min-height:44px;padding:0;border:0;background:transparent;
+    display:flex;align-items:flex-end;justify-content:center;cursor:pointer}
+  .claudia-hotspot.present{top:11%;left:6%;width:35%;height:75%;bottom:auto}
+  .claudia-marker{display:flex;align-items:center;gap:6px;pointer-events:none;
+    max-width:100%}
+  .claudia-poi{width:8px;height:8px;flex:none;border-radius:50%;
+    background:#e9c480;border:1px solid #39261a;box-shadow:0 0 0 1px #e5bf7980}
+  .claudia-hotspot:is(:hover,:focus-visible) .claudia-poi{
+    background:#fff0b7;box-shadow:0 0 0 2px #e9c480}
+  .claudia-hotspot:is(:hover,:focus-visible) .workshop-npc-label{
+    filter:brightness(1.08)}
+  .claudia-hotspot:focus-visible{outline:none}
+  .claudia-hotspot:focus-visible .workshop-npc-label{
+    outline:2px solid #ffdb9c;outline-offset:2px}
+  .claudia-hotspot:disabled{cursor:wait}
   .scene-place{position:absolute;bottom:12px;left:12px;
     padding:5px 9px;background:#1d1511df;border:1px solid #97724c;color:#eddbbc;
     font:600 12px/1.4 var(--pall-font-label,Georgia,serif)}
