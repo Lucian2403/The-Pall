@@ -7,7 +7,7 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
-  import {stitcherUsesServiceCorridor} from '$lib/stitcher-scene-environment';
+  import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
   import '$lib/pall-story-landscape.css';
   import '$lib/workshop-object-labels.css';
   type Branch='trolley'|'consent'|'notes';
@@ -112,7 +112,7 @@
     {id:'choose_notes',line:"Let me see the surgeon's notes.",skill:'Scholarship / Investigation',disabled:pending}
   ]);
   const interactiveBeds=$derived(s.stage===2&&(s.phase==='inspect'||s.phase==='care')||s.stage===3&&s.phase==='discovery'&&!s.bedObserved);
-  const inServiceCorridor=$derived(stitcherUsesServiceCorridor(s.stage,s.branch));
+  const sceneArt=$derived(STITCHER_SCENE_ART[stitcherSceneEnvironment(s.stage,s.branch)]);
   // Claudia can be called to the ward during either of the first two stages.
   // Optional talk is client-only: opening/closing it cannot alter the saved
   // action list, revision, inspection, rewards or any other gameplay state.
@@ -130,13 +130,7 @@
     {#snippet stage()}
       <div class="scene-visuals pall-story-visuals">
         <div class="ward-art pall-story-landscape">
-          <img class="infirmary"
-            src={inServiceCorridor
-              ?'/locations/stitcher/service-corridor.webp'
-              :'/locations/clinic/clinic-workshop-cold.webp'}
-            alt={inServiceCorridor
-              ?'Cinder Row Infirmary service corridor, with medicine shelves, linen crates and an arched passage to the receiving door.'
-              :'A working-class infirmary ward. Two cots stand beside curtains, with clean linen and medicine cupboards nearby.'}
+          <img class="infirmary" src={sceneArt.image} alt={sceneArt.alt}
             draggable="false"/>
           {#if claudiaVisible&&!claudiaArtMissing}
             <!-- One approved Claudia sprite, reused only during exchanges
@@ -186,7 +180,7 @@
               </button>
             {/if}
           {/if}
-          <span class="scene-place">{inServiceCorridor?'Infirmary service corridor':'Cinder Row Infirmary'}</span>
+          <span class="scene-place">{sceneArt.place}</span>
         </div>
       </div>
     {/snippet}
