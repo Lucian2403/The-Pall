@@ -155,7 +155,7 @@
               aria-pressed={claudiaTalkOpen} disabled={pending}
               onclick={()=>{claudiaTalkOpen=true;}}>
               <span class="claudia-marker">
-                <span class="claudia-poi" aria-hidden="true"></span>
+                <!-- <span class="claudia-poi" aria-hidden="true"></span> -->
                 <span class="workshop-npc-label">Claudia Cyka</span>
               </span>
             </button>
