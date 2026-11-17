@@ -159,7 +159,7 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
  assert.ok(scene.includes('class="bed-hotspot bed-a"'));
  assert.ok(scene.includes('class="bed-hotspot bed-b"'));
  assert.ok(scene.includes('class="bed-hotspot teaching-bed"'));
- for(const label of ['Bed A','Bed B','Teaching Bed']){
+ for(const label of ['Bed A','Bed B','Narrow Bed']){
   assert.ok(scene.includes('<span class="bed-label">'+label+'</span>'),
     'Visible hotspot label must remain: '+label);
  }
@@ -179,8 +179,8 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
   '.teaching-bed{left:31%;top:42%;width:25%;height:22%}'
  ])assert.ok(scene.includes(hitbox),'Keep the original generous clickable bed hit zone');
  assert.ok(scene.includes('onclick={()=>act(allowed.includes('));
- assert.ok(scene.includes('title="Look at the Teaching Bed"'));
- assert.ok(scene.includes('aria-label="Examine the Teaching Bed'));
+ assert.ok(scene.includes('title="Look at the Narrow Bed"'));
+ assert.ok(scene.includes('aria-label="Examine the Narrow Bed'));
  assert.ok(scene.includes('SecondJobChoices'));
  assert.ok(scene.includes("SCENE_JOURNAL_CONTEXT"));
  assert.ok(scene.includes("CLAUDIA")&&scene.includes('I was asleep when they took my thumbprint.'));
