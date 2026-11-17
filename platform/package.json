@@ -87,6 +87,8 @@
     "verify:bellrunner-stage7": "node --import tsx --test scripts/verify-bellrunner-stage7.test.ts",
     "verify:bellrunner-stage8": "node --import tsx --test scripts/verify-bellrunner-stage8.test.ts",
     "verify:stitcher-stages1-4": "node --import tsx --test scripts/verify-stitcher-stages1-4.test.ts",
+    "verify:stitcher-claudia": "node --import tsx --test scripts/verify-stitcher-claudia-optional.test.ts",
+    "verify:stitcher-claudia-browser": "node --import tsx scripts/verify-stitcher-claudia-browser.mjs",
     "verify:bellrunner-stage6-browser": "node --import tsx scripts/verify-bellrunner-stage6-browser.mjs",
     "verify:bellrunner-stage5-browser": "node --import tsx scripts/verify-bellrunner-stage5-browser.mjs",
     "verify:bellrunner-stage3-assets": "node scripts/verify-bellrunner-stage3-assets.mjs",
