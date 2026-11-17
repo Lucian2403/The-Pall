@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {INITIAL_STITCHER,applyStitcherAction,stitcherActions,STITCHER_MAJOR,
  STITCHER_LINES,STITCHER_CLAUDIA_LINES,StitcherInvalidAction} from '../apps/api/src/stitcher-work.ts';
 import {shouldShowClaudia} from '../apps/web/src/lib/stitcher-claudia-presence.ts';
+import {stitcherUsesServiceCorridor} from '../apps/web/src/lib/stitcher-scene-environment.ts';
 
 const read=(p:string)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const progress=(s:typeof INITIAL_STITCHER,actions:string[])=>
@@ -116,6 +117,32 @@ test('Claudia appears only during her live exchanges in Stages I–IV',()=>{
  assert.ok(scene.includes('{#if claudiaVisible&&!claudiaArtMissing}'));
  assert.ok(!scene.includes('{#if s.stage===1&&!claudiaArtMissing&&snapshot.started}'));
 });
+test('Night Trolley uses owner corridor artwork, only while the route is outside the ward',()=>{
+ const image=readFileSync(new URL('../apps/web/static/locations/stitcher/service-corridor.webp',import.meta.url));
+ assert.ok(image.length>40000,'Keep the actual owner corridor painting, not a placeholder');
+ assert.equal(image.toString('ascii',0,4),'RIFF');
+ assert.equal(image.toString('ascii',8,12),'WEBP');
+ for(const stage of [1,2,3])for(const branch of [null,'trolley','consent','notes'])
+   assert.equal(stitcherUsesServiceCorridor(stage,branch),false);
+ assert.equal(stitcherUsesServiceCorridor(4,null),false);
+ assert.equal(stitcherUsesServiceCorridor(4,'trolley'),true);
+ assert.equal(stitcherUsesServiceCorridor(4,'consent'),false);
+ assert.equal(stitcherUsesServiceCorridor(4,'notes'),false);
+ for(const branch of [null,'trolley','consent','notes'])
+   assert.equal(stitcherUsesServiceCorridor(5,branch),true,
+     'All Stage V paths converge on the Night Door corridor');
+ const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
+ const page=read('apps/web/src/routes/characters/[id]/stitcher/ward/+page.svelte');
+ assert.ok(scene.includes('stitcherUsesServiceCorridor(s.stage,s.branch)'));
+ assert.ok(scene.includes('/locations/stitcher/service-corridor.webp'));
+ assert.ok(scene.includes('/locations/clinic/clinic-workshop-cold.webp'));
+ assert.ok(scene.includes("inServiceCorridor?'Infirmary service corridor':'Cinder Row Infirmary'"));
+ assert.ok(page.includes('stitcherUsesServiceCorridor(snapshot.state.stage,snapshot.state.branch)'));
+ assert.ok(page.includes('clinicBackdrop compactCityVista travelLocked'),
+   'Both locations must reuse the same medical-clinic ambience, no audio swap');
+ assert.ok(!page.includes('nightAlleyBackdrop'),
+   'The service corridor must not accidentally play the night-alley ambience');
+});
 test('UI uses the exact existing frames, accessible background-bed hotspots and owner dialogue',()=>{
  const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
  const page=read('apps/web/src/routes/characters/[id]/stitcher/ward/+page.svelte');
@@ -132,7 +159,7 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
  assert.ok(scene.includes('class="bed-hotspot bed-a"'));
  assert.ok(scene.includes('class="bed-hotspot bed-b"'));
  assert.ok(scene.includes('class="bed-hotspot teaching-bed"'));
- for(const label of ['Bed A','Bed B','Teaching Bed']){
+ for(const label of ['Bed A','Bed B','Narrow Bed']){
   assert.ok(scene.includes('<span class="bed-label">'+label+'</span>'),
     'Visible hotspot label must remain: '+label);
  }
@@ -152,8 +179,8 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
   '.teaching-bed{left:31%;top:42%;width:25%;height:22%}'
  ])assert.ok(scene.includes(hitbox),'Keep the original generous clickable bed hit zone');
  assert.ok(scene.includes('onclick={()=>act(allowed.includes('));
- assert.ok(scene.includes('title="Look at the Teaching Bed"'));
- assert.ok(scene.includes('aria-label="Examine the Teaching Bed'));
+ assert.ok(scene.includes('title="Look at the Narrow Bed"'));
+ assert.ok(scene.includes('aria-label="Examine the Narrow Bed'));
  assert.ok(scene.includes('SecondJobChoices'));
  assert.ok(scene.includes("SCENE_JOURNAL_CONTEXT"));
  assert.ok(scene.includes("CLAUDIA")&&scene.includes('I was asleep when they took my thumbprint.'));

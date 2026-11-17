@@ -35,3 +35,7 @@ The supplied `Clinic_Workshop_cold.png` corresponds to the artwork already prese
 - Owner visual review remains necessary for precise hotspot geometry over each bed, Claudia's portrait scale once the static art is installed, and the intended treatment pacing.
 
 Stage V The Empty Sheet / The Night Door and later Owler combat remain a separate PR; no fake combat or clinic resolution is inserted into Stage IV.
+
+## Night Trolley environment (owner corridor, 2026-11-17)
+
+The supplied Cinder Row Infirmary service-corridor image is stored as `platform/apps/web/static/locations/stitcher/service-corridor.webp`, keeping its original 1672 × 941 aspect ratio. Stage IV switches to that scene **only** for the Night Trolley route, from choosing that job until it finishes. The Signed Consent and Notes for the Living remain in the existing infirmary ward. The saved Stage V `exited` handoff preview uses the same corridor for all routes, preparing the Night Door; Stage V gameplay itself is not yet implemented. No new bed sprites, props or scene overlays are introduced. The shared `clinicBackdrop` flag intentionally stays on for both locations, preserving the existing `medical-clinic-ambience.mp3` stream without restarting it or replacing it with alley audio.
