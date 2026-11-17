@@ -67,7 +67,7 @@
       <p class="speech">“{claudiaExchange.reply}”</p>
       <div class="choices">
         {#if claudiaExchange.followUp}
-          <button type="button" class="secondary-choice" onclick={() => {claudiaStep+=1;}}>{claudiaExchange.followUp}</button>
+          <button type="button" class="primary-choice" onclick={() => {claudiaStep+=1;}}>{claudiaExchange.followUp}</button>
         {/if}
         <button type="button" class="secondary-choice" onclick={changeClaudiaTopic}><BellrunnerChoiceIcon kind="chat"/>Ask something else</button>
         <button type="button" class="work-skip secondary-choice" onclick={close}><BellrunnerChoiceIcon kind="route"/>{CLAUDIA_WORK_SKIP_LINE}</button>
