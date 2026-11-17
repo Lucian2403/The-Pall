@@ -15,6 +15,7 @@ on:
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-millhand-scenes-browser.mjs'
       - 'platform/scripts/verify-bellrunner-stage3.test.ts'
+      - 'platform/scripts/verify-stitcher-stage1.test.ts'
       - 'platform/scripts/verify-bellrunner-stage4.test.ts'
       - 'platform/scripts/verify-bellrunner-stage5.test.ts'
       - 'platform/scripts/verify-bellrunner-stage6.test.ts'
@@ -85,6 +86,8 @@ jobs:
       - run: npm run verify:stage3-workbench-ui
       - name: Bellrunner Stage 1 art, dialogue and handoff contract
         run: npm run verify:bellrunner-stage1
+      - name: Stitcher Stage I approved Claudia sprite and dialogue
+        run: npm run verify:stitcher-stage1
       - name: Bellrunner Stage 3 state machine, choices and authored dialogue beats
         run: npm run verify:bellrunner-stage3
       - name: Bellrunner Stage 4 all branch mechanics, inherited asset locations and dialogues

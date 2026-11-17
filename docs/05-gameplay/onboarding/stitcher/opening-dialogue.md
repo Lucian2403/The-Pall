@@ -1,8 +1,8 @@
-# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 1: Claudia Cyka at Cinder Row Infirmary (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial revision — 2026-11-16 (owner approved):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
 
-**Status: APPROVED AND LOCKED (2026-10-16) following the requested dialogue correction.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality and the Stage 1 story remain locked; the November dialogue wording awaits owner approval. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
+**Status: APPROVED AND LOCKED (2026-10-16) following the requested dialogue correction.** The user's new characterization is authoritative: **Claudia Cyka is strikingly beautiful and knows how to use it to get away with things; she is severe, highly competent and has very little empathy for patients or subordinates.** Her personality and the Stage 1 story remain locked; the November dialogue wording is approved by the owner. The [Stitcher master](README.md) locks the Cinder Row Infirmary, Morning Dressings and the much later Teaching Bed incident.
 
 ## Editorial diagnosis — why Stage 1 was revised
 
@@ -51,6 +51,6 @@ The normal work (Stage 2) consists of inspecting conditions, allocating genuinel
 
 **Approved in Stage 1:** exact spoken lines and scene, the short linen-clerk demonstration of Claudia's social leverage, and charity-bed cover-round presentation.
 
-**TBD:** artwork and physical appearance beyond her beauty/immaculate bearing, NPC reaction implementation, specific ward supplies, patient condition data, treatment numbers and duration.
+**Assets provided:** Claudia front/back portraits, clinic ward background, ward register and wash basin. **Implementation direction:** use clickable hotspots on the two beds already drawn in the ward background; do not commission separate bed art. **TBD:** specific ward supplies, patient condition data, treatment numbers and duration.
 
 Related: [Stitcher overview](README.md), [shared tutorial](../shared-structure.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md), [jobs and time](../../jobs/jobs-and-time.md).
