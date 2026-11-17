@@ -3,7 +3,7 @@
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import StitcherWardScene from '$lib/StitcherWardScene.svelte';
-  import {stitcherUsesServiceCorridor} from '$lib/stitcher-scene-environment';
+  import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
   type Character={id:string;name:string;origin:string;sex:string;coins:number;
     health:{current:number;maximum:number};startingLocation:string;
     tutorial:{stage:number;status:string}};
@@ -14,7 +14,9 @@
   const api=$derived('/api/characters/'+encodeURIComponent(id)+'/stitcher/ward');
   let character=$state<Character|null>(null);
   let snapshot=$state<Snapshot|null>(null);
-  const inServiceCorridor=$derived(snapshot!==null&&stitcherUsesServiceCorridor(snapshot.state.stage,snapshot.state.branch));
+  const sceneArt=$derived(snapshot
+    ?STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch)]
+    :STITCHER_SCENE_ART.ward);
   let status=$state<'loading'|'ready'|'login'|'missing'|'migration'|'unavailable'>('loading');
   let pending=$state(false),errorMessage=$state('');
   let pendingId=$state<string|null>(null),pendingAction=$state<string|null>(null);
@@ -66,7 +68,7 @@
 <svelte:head><title>The Pall — Cinder Row Infirmary</title></svelte:head>
 {#if status==='ready'&&character&&snapshot}
   <TutorialShell {character}
-    sceneLocation={inServiceCorridor?'Infirmary service corridor':'Cinder Row Infirmary'}
+    sceneLocation={sceneArt.place}
     clinicBackdrop compactCityVista travelLocked>
     <StitcherWardScene {snapshot} {pending} {errorMessage} {perform}/>
   </TutorialShell>
