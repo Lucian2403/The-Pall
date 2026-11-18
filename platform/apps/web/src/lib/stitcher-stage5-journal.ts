@@ -36,7 +36,7 @@ export function stage5JournalEntries(s:Stage5JournalInput):string[]{
  if(s.stage5Choice==='papers')lines.push(
   "I checked the transfer papers. Nobody had signed the man over yet. That gives us a little time, though I don't know how much."
  );
- if(s.stage5Choice==='claudia')lines.push(
+ if(s.stage5Choice==='claudia'&&s.stage5Witnessed)lines.push(
   "I went to get Claudia. She wasn't happy about the trouble, but she ordered them to leave the trolley where it was."
  );
  if(s.stage5Choice==='evidence'&&s.branch)lines.push(EVIDENCE[s.branch]);
@@ -47,7 +47,8 @@ export function stage5JournalEntries(s:Stage5JournalInput):string[]{
    "He didn't like that one bit."
   );
  }
- if(s.stage5Preparation==='reason')lines.push(
+ if(s.stage5Preparation==='reason'&&
+   (s.phase==='fight_ready'||s.phase==='door_reply'&&(s.stage5Line??0)>0))lines.push(
   "I tried explaining that the man had refused and that the attendant heard him. Owler didn't care. He'd been paid to finish the job."
  );
  if(s.stage5Preparation==='cart')lines.push(
