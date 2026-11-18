@@ -6,6 +6,8 @@
 
 The adult patient is alive. The dawn teaching demonstration has not happened. The Stitcher selected one way to investigate or block his transfer. Only **one** second job is played. The **+1 level in Industry, Commerce or Scholarship** was granted when the route was selected in Stage 3, not at task completion. Every scripted Stage 4 task gives **0 coins, 0 ordinary XP and no loot**, because this is a response to the dispute during an unpaid charity round, not a paid commission. Ordinary repeatable jobs of the same kinds still pay normally.
 
+**Stage IV visual location (approved 2026-11-18):** Both **The Signed Consent (Commerce / Contracts)** and **Notes for the Living (Scholarship / Investigation)** use the same owner-supplied infirmary records-room painting (`/locations/stitcher/notes-for-the-living-room.webp`), showing the ledger desk, shelving, and ward entrance. **The Night Trolley (Industry / Hauling)** keeps the service-corridor painting. Stage V still returns all routes to the corridor. This changes scene presentation only; actions, evidence, rewards, and dialogue are unchanged.
+
 ## A. The Night Trolley — Industry / Hauling
 
 The player stays near the patient while ward equipment and a secured transfer trolley are taken along a hospital service passage. The trolley and keys remain hospital property; it is not a player vehicle.

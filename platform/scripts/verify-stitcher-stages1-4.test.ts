@@ -117,7 +117,7 @@ test('Claudia appears only during her live exchanges in Stages I–IV',()=>{
  assert.ok(scene.includes('{#if claudiaVisible&&!claudiaArtMissing}'));
  assert.ok(!scene.includes('{#if s.stage===1&&!claudiaArtMissing&&snapshot.started}'));
 });
-test('Stitcher paints the owner-provided records room only for Stage IV Investigation',()=>{
+test('Stitcher paints the owner-provided records room for Stage IV Commerce and Investigation',()=>{
  for(const [key,minBytes] of [['service-corridor.webp',40000],['notes-for-the-living-room.webp',100000]] as const){
    const image=readFileSync(new URL('../apps/web/static/locations/stitcher/'+key,import.meta.url));
    assert.ok(image.length>minBytes,'Require the supplied painting, not a placeholder: '+key);
@@ -128,7 +128,7 @@ test('Stitcher paints the owner-provided records room only for Stage IV Investig
    assert.equal(stitcherSceneEnvironment(stage,branch),'ward');
  assert.equal(stitcherSceneEnvironment(4,null),'ward');
  assert.equal(stitcherSceneEnvironment(4,'trolley'),'corridor');
- assert.equal(stitcherSceneEnvironment(4,'consent'),'ward');
+ assert.equal(stitcherSceneEnvironment(4,'consent'),'records');
  assert.equal(stitcherSceneEnvironment(4,'notes'),'records');
  for(const branch of [null,'trolley','consent','notes']){
    assert.equal(stitcherSceneEnvironment(5,branch),'corridor',
@@ -142,7 +142,10 @@ test('Stitcher paints the owner-provided records room only for Stage IV Investig
  assert.equal(STITCHER_SCENE_ART.records.place,'Infirmary records room');
  const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
  const page=read('apps/web/src/routes/characters/[id]/stitcher/ward/+page.svelte');
- assert.ok(scene.includes('STITCHER_SCENE_ART[stitcherSceneEnvironment(s.stage,s.branch)]'));
+ assert.ok(scene.includes('STITCHER_SCENE_ART[environment]'));
+ assert.ok(scene.includes('stitcherSceneEnvironment(s.stage,s.branch)'));
+ assert.equal(stitcherSceneEnvironment(4,'consent'),stitcherSceneEnvironment(4,'notes'),
+   'Signed Consent and Notes for the Living must share the supplied records-office painting');
  assert.ok(scene.includes('src={sceneArt.image} alt={sceneArt.alt}'));
  assert.ok(scene.includes('{sceneArt.place}'));
  assert.ok(page.includes('STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch)]'));

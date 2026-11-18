@@ -24,7 +24,9 @@ export const STITCHER_SCENE_ART:Readonly<Record<StitcherSceneEnvironment,{
 export function stitcherSceneEnvironment(stage:number,branch:string|null):StitcherSceneEnvironment{
   if(stage===5)return 'corridor';
   if(stage===4&&branch==='trolley')return 'corridor';
-  if(stage===4&&branch==='notes')return 'records';
+  // Both Contracts (The Signed Consent) and Investigation (Notes for the Living)
+  // use the same approved infirmary records-room painting.
+  if(stage===4&&(branch==='consent'||branch==='notes'))return 'records';
   return 'ward';
 }
 /** Backwards compatible helper for earlier corridor-only checks. */
