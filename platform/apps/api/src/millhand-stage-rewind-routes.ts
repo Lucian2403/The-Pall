@@ -51,7 +51,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       const s=saved.rows[0]?.state;
       const consistent=!!s&&Number(saved.rows[0].revision)===s.revision&&
         s.stage===stage&&(stage===5
-          ?s.phase==='exited'&&result.rows[0].tutorial_status==='NOT_STARTED'
+          ?['IN_PROGRESS','NOT_STARTED'].includes(result.rows[0].tutorial_status)
+            &&(result.rows[0].tutorial_status!=='NOT_STARTED'||s.phase==='exited')
           :result.rows[0].tutorial_status==='IN_PROGRESS')&&
         (stage<4||!!s.branch&&s.branch in STITCHER_MAJOR);
       const level=s?.branch?result.rows[0].major_skill_bonuses[STITCHER_MAJOR[s.branch]]:null;
