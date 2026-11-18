@@ -74,9 +74,18 @@
     var(--pall-font-reading,Georgia,serif);color:#dcbc7f}
   .document-card.ready .document-action{color:#ffe1a3}
   .action-mark{display:block;flex:none;width:16px;height:16px}
-  /* Four cards keep the Bellrunner framing; on the narrower Clinic column,
-     use two rows so captions and Inspect affordances remain legible. */
+  /* Keep all four supplies in one row at ordinary Clinic panel widths.
+     Compress card padding before wrapping; reserve two rows for genuinely
+     narrow layouts where parchment captions would otherwise become illegible. */
   @container round-documents (max-width:540px){
+    .document-grid{gap:5px}
+    .document-card{padding:4px}
+    .document-image{height:clamp(52px,12cqi,64px)}
+    .document-label{min-height:30px;font-size:11px}
+    .document-action{min-height:28px;font-size:12px;gap:3px}
+    .action-mark{width:13px;height:13px}
+  }
+  @container round-documents (max-width:400px){
     .document-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
   @container round-documents (max-width:480px){

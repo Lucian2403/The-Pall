@@ -94,6 +94,9 @@ test('Stitcher reuses Bellrunner four-card Inspect affordances beneath dialogue'
   assert.match(tray,/\bInspect\s*<\/span>/);
   assert.doesNotMatch(tray,/\bUse\s*<\/span>/);
   assert.match(tray,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(tray,/@container round-documents \(max-width:540px\)/);
+  assert.match(tray,/@container round-documents \\(max-width:540px\\)/);
+  assert.match(tray,/@container round-documents \\(max-width:400px\\)/);
+  assert.match(tray, /@container round-documents \\(max-width:540px\\)\\{[\\s\\S]*?\\.document-card\\{padding:4px\\}/);
+  assert.match(tray, /@container round-documents \\(max-width:400px\\)\\{[\\s\\S]*?grid-template-columns:repeat\\(2,minmax\\(0,1fr\\)\\)/);
   assert.match(tray,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 });
