@@ -9,6 +9,7 @@ import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import type {ClinicState} from './millhand-clinic-state.js';
+import {INITIAL_STITCHER,STITCHER_MAJOR,type StitcherState} from './stitcher-work.js';
 import {auth} from './auth.js';
 import {INITIAL_PLATEWORK,planMillhandRewind,MillhandRewindInvalid,previousWageClaim,WageClaimInvalidAction} from '@the-pall/game-core';
 import type {MissingStampBranch,WageClaimState} from '@the-pall/game-core';
@@ -42,6 +43,21 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
     );
     if(!result.rowCount)return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
+    if(result.rows[0].origin==='Stitcher'){
+      if(stage<2||stage>5)return {enabled:true,canRewind:false,stage,targetStage:null};
+      const saved=await db.query<{revision:string|number;state:StitcherState}>(
+        'SELECT revision,state FROM player_character_stitcher_ward WHERE character_id=$1',
+        [req.params.id]);
+      const s=saved.rows[0]?.state;
+      const consistent=!!s&&Number(saved.rows[0].revision)===s.revision&&
+        s.stage===stage&&(stage===5
+          ?s.phase==='exited'&&result.rows[0].tutorial_status==='NOT_STARTED'
+          :result.rows[0].tutorial_status==='IN_PROGRESS')&&
+        (stage<4||!!s.branch&&s.branch in STITCHER_MAJOR);
+      const level=s?.branch?result.rows[0].major_skill_bonuses[STITCHER_MAJOR[s.branch]]:null;
+      const canRewind=!!consistent&&(stage!==4||Number.isSafeInteger(level)&&level!>=1);
+      return {enabled:true,canRewind,stage,targetStage:canRewind?stage-1:null};
+    }
     if(result.rows[0].origin==='Bellrunner'){
       const active=await db.query<{work_state:{phase:string}}>(
         'SELECT work_state FROM player_character_bellrunner_dispatch WHERE character_id=$1',
@@ -235,7 +251,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         'SELECT origin,tutorial_stage,tutorial_status,major_skill_bonuses,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
         [req.params.id,session.user.id]
       );
-      if(!c.rowCount||!['Millhand','Bellrunner'].includes(c.rows[0].origin)){
+      if(!c.rowCount||!['Millhand','Bellrunner','Stitcher'].includes(c.rows[0].origin)){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(404).send({error:'not_found'});
       }
@@ -243,6 +259,64 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       if(c.rows[0].tutorial_stage!==expectedStage){
         await client.query('ROLLBACK');transaction=false;
         return reply.code(409).send({error:'stale_stage',stage:c.rows[0].tutorial_stage});
+      }
+
+      if(c.rows[0].origin==='Stitcher'){
+        if(expectedStage<2||expectedStage>5){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'invalid_stage'});
+        }
+        const rows=await client.query<{revision:string|number;state:StitcherState}>(
+          'SELECT revision,state FROM player_character_stitcher_ward WHERE character_id=$1 FOR UPDATE',
+          [req.params.id]);
+        const saved=rows.rows[0];
+        const s=saved?.state;
+        if(!s||Number(saved.revision)!==s.revision||s.stage!==expectedStage||
+          (expectedStage===5
+            ?s.phase!=='exited'||c.rows[0].tutorial_status!=='NOT_STARTED'
+            :c.rows[0].tutorial_status!=='IN_PROGRESS')){
+          await client.query('ROLLBACK');transaction=false;
+          return reply.code(409).send({error:'unsafe_stitcher_state'});
+        }
+        let next:StitcherState;
+        let bonuses=c.rows[0].major_skill_bonuses;
+        if(expectedStage===2){
+          next={...INITIAL_STITCHER,revision:s.revision+1};
+        }else if(expectedStage===3){
+          next={...s,revision:s.revision+1,stage:2,phase:'report',reportLine:0,
+            bedObserved:false,chartRead:false,patientHeard:false,patientLine:0,
+            focus:null,claudiaLine:0};
+        }else if(expectedStage===4){
+          const key=s.branch?STITCHER_MAJOR[s.branch]:null;
+          const level=key?bonuses[key]:undefined;
+          if(!key||!Number.isSafeInteger(level)||level!<1){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_stitcher_skill_state'});
+          }
+          bonuses={...bonuses,[key]:level!-1};
+          next={...s,revision:s.revision+1,stage:3,phase:'choose',
+            branch:null,taskStep:0,routeMethod:null,openingLine:0,dialogueLine:0};
+        }else{
+          if(!s.branch||!(s.branch in STITCHER_MAJOR)){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_stitcher_state'});
+          }
+          next={...s,revision:s.revision+1,stage:4,phase:'finish'};
+        }
+        // Receipts from the erased stage must never revive stale dialogue or
+        // apply the old route's +1 a second time. Lock order: character, ward.
+        await client.query(
+          'DELETE FROM player_character_stitcher_ward_receipts WHERE character_id=$1',
+          [req.params.id]);
+        await client.query(
+          'UPDATE player_character_stitcher_ward SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,next.revision,JSON.stringify(next)]);
+        await client.query(
+          "UPDATE player_characters SET tutorial_stage=$2,tutorial_status='IN_PROGRESS',major_skill_bonuses=$3::jsonb WHERE id=$1",
+          [req.params.id,next.stage,JSON.stringify(bonuses)]);
+        await client.query('COMMIT');transaction=false;
+        return {stage:next.stage,tutorialStatus:'IN_PROGRESS',
+          route:'/characters/'+req.params.id+'/stitcher/ward',coinDelta:0};
       }
 
       if(bellrunner&&expectedStage===3){

@@ -20,7 +20,9 @@
       ?['Industry','Commerce','Scholarship'].includes(major)
       :origin==='Bellrunner'
         ?['Commerce','Medicine','Mechanics'].includes(major)
-        :false;
+        :origin==='Stitcher'
+          ?['Industry','Commerce','Scholarship'].includes(major)
+          :false;
     return routeMajor&&Number.isSafeInteger(majorSkillBonuses[major])&&
       majorSkillBonuses[major]>0;
   }
@@ -35,7 +37,9 @@
     return (origin==='Millhand'&&major==='Craftsmanship'&&skill==='Smithing'&&
       (majorSkillBonuses.Craftsmanship??0)>=3)||
       (origin==='Bellrunner'&&major==='Industry'&&skill==='Hauling'&&
-      (majorSkillBonuses.Industry??0)>=3);
+      (majorSkillBonuses.Industry??0)>=3)||
+      (origin==='Stitcher'&&major==='Medicine'&&skill==='Trauma'&&
+      (majorSkillBonuses.Medicine??0)>=3);
   }
   function specializationLabel(major:string,skill:string){
     return startingSpecialization(major,skill)?'I · starting':'—';
@@ -125,7 +129,7 @@
     <button class="window-close" type="button" data-pall-sfx="paper" aria-label="Close skills window" onclick={()=>windowElement?.close()}>×</button>
   </div>
   <div class="window-body">
-    <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline. Your chosen second-job route grants +1 to a different Major Skill, displayed as 2 / 100 over that baseline (Industry, Commerce or Scholarship for Millhand; Commerce, Medicine or Mechanics for Bellrunner). Roman I–IV specializations are planned; Smithing I and Hauling I are starting previews, not persisted training ranks.</p>
+    <p class="skill-note">Major Skills use a 100-level scale. Skills without a recorded grant display a provisional 1 / 100 baseline. Your chosen second-job route grants +1 to a different Major Skill, displayed as 2 / 100 over that baseline (Industry, Commerce or Scholarship for Millhand and Stitcher; Commerce, Medicine or Mechanics for Bellrunner). Roman I–IV specializations are planned; Smithing I, Hauling I and Trauma I are starting previews, not persisted training ranks.</p>
     <div class="window-list">
       {#each CHARACTER_SKILLS as group (group.major)}
         <section class="window-skill">

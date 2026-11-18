@@ -1,6 +1,6 @@
-# Stitcher — Stage 3: The Teaching Bed (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 3: The Teaching Bed (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial approval — 2026-11-16:** The owner approved this natural-dialogue revision for implementation. Earlier plot, clinical safeguards, evidence, branch skills and zero-wage introductory economy remain unchanged.
 
 **Status: APPROVED AND LOCKED (2026-10-16), with Claudia's revised spoken line.** The underlying patient exploitation, coerced consent, Claudia's funding justification and the three subsequent second-Major-Skill choices were already LOCKED in [Stitcher's storyline](README.md). The user approved the playable discovery, Claudia/player exchange, revised fever-ward coal line, and three immediate routes. Stages [1](opening-dialogue.md) and [2](morning-dressings-interaction.md) are APPROVED AND LOCKED.
 
@@ -96,7 +96,7 @@ After Stage 4, the common [The Empty Sheet] encounter and [The Night Door] encou
 
 **Already LOCKED:** Teaching Bed adult patient, blue surgical guide marks, awake and restrained, thumbprint claim, exact chart text, coerced medically unnecessary demonstration, Claudia's revised fever-ward coal argument and institutional motive, the three named second skills/tasks, one +1 skill level at branch selection and the shared zero-reward tutorial economy.
 
-**APPROVED IN STAGE 3 (October story approval):** physical scene staging, optional patient exchange, Claudia interaction, three route meanings and branch convergence. The November dialogue revisions above await owner review.
+**APPROVED IN STAGE 3 (October story approval):** physical scene staging, optional patient exchange, Claudia interaction, three route meanings and branch convergence. The November dialogue revisions above are approved by the owner.
 
 **TBD:** surgical procedure specifics (do not author graphic details), chart visual asset, patient identity and exact transfer time, funding contract rules beyond this single case, exact camera/staging, and procedural names in the ordinary job systems.
 

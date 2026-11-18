@@ -1,10 +1,12 @@
-# Stitcher — Stage 4: Three Second-Skill Jobs (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 4: Three Second-Skill Jobs (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial approval — 2026-11-16:** The owner approved this natural-dialogue revision for implementation. Earlier plot, clinical safeguards, evidence, branch skills and zero-wage introductory economy remain unchanged.
 
 **Status: APPROVED AND LOCKED (2026-10-16).** This follows [approved Stage 3, The Teaching Bed](teaching-bed-discovery.md), and approved [Stage 1](opening-dialogue.md) and [Stage 2](morning-dressings-interaction.md). The user approved each of the three job interaction branches, their spoken lines, evidence findings and convergence; exact numerical job systems remain TBD.
 
 The adult patient is alive. The dawn teaching demonstration has not happened. The Stitcher selected one way to investigate or block his transfer. Only **one** second job is played. The **+1 level in Industry, Commerce or Scholarship** was granted when the route was selected in Stage 3, not at task completion. Every scripted Stage 4 task gives **0 coins, 0 ordinary XP and no loot**, because this is a response to the dispute during an unpaid charity round, not a paid commission. Ordinary repeatable jobs of the same kinds still pay normally.
+
+**Stage IV visual location (approved 2026-11-18):** Both **The Signed Consent (Commerce / Contracts)** and **Notes for the Living (Scholarship / Investigation)** use the same owner-supplied infirmary records-room painting (`/locations/stitcher/notes-for-the-living-room.webp`), showing the ledger desk, shelving, and ward entrance. **The Night Trolley (Industry / Hauling)** keeps the service-corridor painting. Stage V still returns all routes to the corridor. This changes scene presentation only; actions, evidence, rewards, and dialogue are unchanged.
 
 ## A. The Night Trolley — Industry / Hauling
 

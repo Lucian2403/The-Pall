@@ -13,6 +13,7 @@
  */
 const MILLHAND_ROUTE_MAJORS=new Set(['Industry','Commerce','Scholarship']);
 const BELLRUNNER_ROUTE_MAJORS=new Set(['Commerce','Medicine','Mechanics']);
+const STITCHER_ROUTE_MAJORS=new Set(['Industry','Commerce','Scholarship']);
 
 export function majorSkillDisplayLevel(
   origin:string,major:string,bonuses:Readonly<Record<string,number>>
@@ -20,7 +21,8 @@ export function majorSkillDisplayLevel(
   const grant=bonuses[major];
   if(!Number.isSafeInteger(grant)||grant<=0)return 1;
   if((origin==='Millhand'&&MILLHAND_ROUTE_MAJORS.has(major))||
-     (origin==='Bellrunner'&&BELLRUNNER_ROUTE_MAJORS.has(major))){
+     (origin==='Bellrunner'&&BELLRUNNER_ROUTE_MAJORS.has(major))||
+     (origin==='Stitcher'&&STITCHER_ROUTE_MAJORS.has(major))){
     return Math.min(100,1+grant);
   }
   return Math.min(100,grant);

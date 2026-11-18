@@ -1,6 +1,6 @@
-# Stitcher — Stage 7: Treatment After Owler (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 7: Treatment After Owler (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial approval — 2026-11-16:** The owner approved this natural-dialogue revision for implementation. Earlier plot, clinical safeguards, evidence, branch skills and zero-wage introductory economy remain unchanged.
 
 **Status: APPROVED AND LOCKED (2026-10-16).** The user approved the exact Stitcher clinician exchange, after-Owler clinic arrival, and reusable 10-coin Care / Treatment flow. The service, patient-safe outcome and common home are already locked in [shared onboarding](../shared-structure.md), [Stitcher story](README.md) and [Owler fight](owler-fight.md). Medical mechanics and the perfectly uninjured player case remain shared-system TBD.
 

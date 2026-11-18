@@ -1,8 +1,8 @@
-# Stitcher — Stage 6: Owler at the Night Door (STORY APPROVED; DIALOGUE FOR REVIEW)
+# Stitcher — Stage 6: Owler at the Night Door (STORY AND NOVEMBER DIALOGUE APPROVED)
 
-> **Editorial revision — 2026-11-16 (owner review pending):** Spoken lines, immediate narrative beats and selected player-facing labels have been rewritten for more natural, character-specific delivery. The October 2026 approvals apply to the prior wording; this revision is proposed for approval before production integration. All stage outcomes, evidence, skill branches, medical safeguards and tutorial economics remain unchanged.
+> **Editorial approval — 2026-11-16:** The owner approved this natural-dialogue revision for implementation. Earlier plot, clinical safeguards, evidence, branch skills and zero-wage introductory economy remain unchanged.
 
-**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The October-approved encounter and earlier exact line replacements remain the story baseline; this document now proposes new wording for owner review. This follows approved [Stage 5 service-corridor interactions](owler-confrontation.md). The patient rescue, Owler's identity and common clinic/home continuation are locked; combat numbers and formulas remain TBD.
+**Status: APPROVED AND LOCKED AT ENCOUNTER LEVEL (2026-10-16).** The October-approved encounter and earlier exact line replacements remain the story baseline; the November wording is owner-approved. This follows approved [Stage 5 service-corridor interactions](owler-confrontation.md). The patient rescue, Owler's identity and common clinic/home continuation are locked; combat numbers and formulas remain TBD.
 
 ## S06-A — What the fight is actually about
 

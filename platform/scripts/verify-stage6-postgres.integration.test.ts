@@ -17,6 +17,8 @@ import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerBellrunnerDispatchRoutes} from '../apps/api/src/bellrunner-dispatch-routes.ts';
+import {registerStitcherWardRoutes} from '../apps/api/src/stitcher-ward-routes.ts';
+import {STITCHER_CLAUDIA_LINES,STITCHER_LINES} from '../apps/api/src/stitcher-work.ts';
 import {registerBellrunnerWrongBellRoutes} from '../apps/api/src/bellrunner-wrong-bell-routes.ts';
 import {registerBellrunnerSecondJobRoutes} from '../apps/api/src/bellrunner-second-job-routes.ts';
 import {registerBellrunnerDogmanRoutes} from '../apps/api/src/bellrunner-dogman-routes.ts';
@@ -49,7 +51,8 @@ const schema=[
   '0013_equipment_stats_and_clothing.sql','0014_bellrunner_stage1.sql',
   '0015_bellrunner_dispatch_work.sql',
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
-  '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql'
+  '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
+  '0020_stitcher_ward.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -62,6 +65,7 @@ const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
 const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDispatchRoutes(app,{pool:db,resolveSession});
+registerStitcherWardRoutes(app,{pool:db,resolveSession});
 registerBellrunnerWrongBellRoutes(app,{pool:db,resolveSession});
 registerBellrunnerSecondJobRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDogmanRoutes(app,{pool:db,resolveSession});
@@ -991,6 +995,131 @@ test('Chest/equipment transfers preserve identity, receipts, revisions and capac
  const coins=await db.query('SELECT coins FROM player_characters WHERE id=$1',[c.id]);
  assert.equal(Number(coins.rows[0].coins),20);
 });
+async function stitcherFixture(){
+ const id=randomUUID();
+ await db.query(
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health) VALUES($1,$2,$3,$4,'Female','Stitcher',$5::jsonb,'[]'::jsonb,'Cinder Row Infirmary',1,'NOT_STARTED',50)",
+  [id,owner,'QA Stitcher '+id.slice(0,8),'stitcher-'+id,JSON.stringify({Medicine:3})]);
+ return {id,path:base+id+'/stitcher/ward',rewind:base+id+'/dev/rewind-stage'};
+}
+async function stitcherCmd(path:string,action:string,s:{state:{revision:number}},key=randomUUID(),account:string|null=owner){
+ const result=await request('POST',path,account,{
+  action,expectedRevision:s.state.revision,requestId:key});
+ assert.equal(result.status,200,action+': '+JSON.stringify(result.body));
+ return result.body!;
+}
+test('Stitcher real PostgreSQL: Ward A/B, approved Claudia, three branch jobs, no wages/XP',async()=>{
+ for(const [branch,steps,major] of [
+  ['choose_trolley',['check_load','balance_load','route_wide','check_receiver'],'Industry'],
+  ['choose_consent',['match_consent','check_medicine','attach_record','mark_disputed'],'Commerce'],
+  ['choose_notes',['compare_admission','match_schedule','cross_reference','record_difference'],'Scholarship']
+ ] as const){
+  const c=await stitcherFixture();
+  assert.equal((await request('GET',c.path,null)).status,401);
+  assert.equal((await request('GET',c.path,stranger)).status,404);
+  assert.equal((await request('POST',c.path,stranger,{
+    action:'start',expectedRevision:0,requestId:randomUUID()
+  })).status,404);
+  let s=(await request('GET',c.path)).body!;
+  assert.equal(s.started,false);assert.equal(s.state.stage,1);
+  s=await stitcherCmd(c.path,'start',s);
+  s=await stitcherCmd(c.path,'ask_linen',s);
+  s=await stitcherCmd(c.path,'continue_intro',s);
+  s=await stitcherCmd(c.path,'continue_intro',s);
+  s=await stitcherCmd(c.path,'check_ward',s);
+  s=await stitcherCmd(c.path,'begin_round',s);
+  assert.equal(s.stage,2);
+  s=await stitcherCmd(c.path,'inspect_b',s);
+  s=await stitcherCmd(c.path,'inspect_a',s);
+  s=await stitcherCmd(c.path,'order_dirty',s);
+  s=await stitcherCmd(c.path,'prep_ready',s);
+  s=await stitcherCmd(c.path,'dress_b',s);
+  s=await stitcherCmd(c.path,'check_linen',s);
+  s=await stitcherCmd(c.path,'discard_end',s);
+  s=await stitcherCmd(c.path,'dress_a',s);
+  s=await stitcherCmd(c.path,'inspect_finished',s);
+  s=await stitcherCmd(c.path,'record_linen',s);
+  s=await stitcherCmd(c.path,'report_claudia',s);
+  s=await stitcherCmd(c.path,'continue_report',s);
+  s=await stitcherCmd(c.path,'continue_report',s);
+  s=await stitcherCmd(c.path,'close_round',s);
+  assert.equal(s.stage,3);
+  s=await stitcherCmd(c.path,'observe_bed',s);
+  s=await stitcherCmd(c.path,'ask_patient',s);
+  s=await stitcherCmd(c.path,'read_chart',s);
+  s=await stitcherCmd(c.path,'confront_claudia',s);
+  for(let i=0;i<STITCHER_CLAUDIA_LINES.length;i++)s=await stitcherCmd(c.path,'continue_claudia',s);
+  const key=randomUUID(),previous=s.state.revision;
+  const selected=await stitcherCmd(c.path,branch,s,key);
+  assert.equal(selected.stage,4);assert.equal(selected.state.branch,branch.replace('choose_','')==='trolley'?'trolley':branch==='choose_consent'?'consent':'notes');
+  const replay=await request('POST',c.path,owner,{action:branch,expectedRevision:previous,requestId:key});
+  assert.equal(replay.status,200);assert.deepEqual(replay.body,selected);
+  s=selected;
+  assert.equal(s.majorSkillBonuses[major],1);
+  assert.equal(s.majorSkillBonuses.Medicine,3);
+  assert.equal(s.coins,20);
+  s=await stitcherCmd(c.path,'continue_opening',s);
+  s=await stitcherCmd(c.path,'continue_opening',s);
+  for(const step of steps)s=await stitcherCmd(c.path,step,s);
+  for(let i=0;i<STITCHER_LINES[s.state.branch as keyof typeof STITCHER_LINES].length;i++)
+    s=await stitcherCmd(c.path,'continue_dialogue',s);
+  assert.equal(s.state.phase,'finish');
+  s=await stitcherCmd(c.path,'finish_job',s);
+  assert.equal(s.stage,5);assert.equal(s.tutorialStatus,'NOT_STARTED');
+  assert.equal(s.coins,20);
+  assert.equal((await request('GET',c.rewind)).body?.targetStage,4);
+  const back=await request('POST',c.rewind,owner,{expectedStage:5});
+  assert.equal(back.status,200,JSON.stringify(back.body));
+  assert.equal(back.body?.stage,4);
+  assert.equal((await request('GET',c.path)).body?.state.phase,'finish');
+  assert.equal((await request('POST',c.rewind,owner,{expectedStage:5})).status,409);
+  const afterJob=(await db.query<{coins:string|number;major_skill_bonuses:Record<string,number>;
+      current_health:number;tutorial_stage:number}>(
+   'SELECT coins,major_skill_bonuses,current_health,tutorial_stage FROM player_characters WHERE id=$1',[c.id])).rows[0];
+  assert.equal(Number(afterJob.coins),20);assert.equal(afterJob.current_health,50);
+  assert.equal(afterJob.major_skill_bonuses[major],1);
+  const backTo3=await request('POST',c.rewind,owner,{expectedStage:4});
+  assert.equal(backTo3.status,200,JSON.stringify(backTo3.body));
+  assert.equal(backTo3.body?.stage,3);
+  const after=(await request('GET',c.path)).body!;
+  assert.equal(after.state.phase,'choose');
+  assert.equal(after.state.branch,null);
+  assert.equal(after.majorSkillBonuses[major],0);
+  assert.equal(after.majorSkillBonuses.Medicine,3);
+  assert.equal(after.coins,20);
+  const chooseOther=await stitcherCmd(c.path,branch==='choose_notes'?'choose_trolley':'choose_notes',after);
+  assert.equal(chooseOther.stage,4);
+  assert.equal(chooseOther.majorSkillBonuses[branch==='choose_notes'?'Industry':'Scholarship'],1);
+ }
+});
+test('Stitcher local Back to Stage 2 and Stage 1 never duplicate rewards, wages or medical supplies',async()=>{
+ const c=await stitcherFixture();
+ let s=(await request('GET',c.path)).body!;
+ for(const action of ['start','continue_intro','check_ward','begin_round'])
+  s=await stitcherCmd(c.path,action,s);
+ assert.equal(s.stage,2);
+ assert.equal((await request('GET',c.rewind)).body?.targetStage,1);
+ const back=await request('POST',c.rewind,owner,{expectedStage:2});
+ assert.equal(back.status,200,JSON.stringify(back.body));
+ assert.equal((await request('GET',c.path)).body?.state.introLine,0);
+ s=(await request('GET',c.path)).body!;
+ for(const action of ['continue_intro','check_ward','begin_round',
+   'inspect_a','inspect_b','order_bleeding','prep_cut','dress_a','check_linen',
+   'trim_end','dress_b','inspect_finished','record_linen','report_claudia',
+   'continue_report','continue_report','close_round'])
+   s=await stitcherCmd(c.path,action,s);
+ assert.equal(s.stage,3);
+ assert.equal((await request('GET',c.rewind)).body?.targetStage,2);
+ const rewind=await request('POST',c.rewind,owner,{expectedStage:3});
+ assert.equal(rewind.status,200);assert.equal(rewind.body?.stage,2);
+ s=(await request('GET',c.path)).body!;
+ assert.equal(s.state.phase,'report');
+ assert.equal(s.state.reportLine,0);
+ assert.equal(s.majorSkillBonuses.Medicine,3);
+ assert.deepEqual(Object.keys(s.majorSkillBonuses),['Medicine']);
+ assert.equal(s.coins,20);
+});
+
 test('PostgreSQL enforces 10 equipped-bag slots, 4 bare slots and full chest',async()=>{
  const c=await character();
  const path=base+c.id+'/inventory';
