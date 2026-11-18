@@ -273,7 +273,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         const s=saved?.state;
         if(!s||Number(saved.revision)!==s.revision||s.stage!==expectedStage||
           (expectedStage===5
-            ?s.phase!=='exited'||c.rows[0].tutorial_status!=='NOT_STARTED'
+            ?!['NOT_STARTED','IN_PROGRESS'].includes(c.rows[0].tutorial_status)
             :c.rows[0].tutorial_status!=='IN_PROGRESS')){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'unsafe_stitcher_state'});
@@ -301,7 +301,9 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
             await client.query('ROLLBACK');transaction=false;
             return reply.code(409).send({error:'unsafe_stitcher_state'});
           }
-          next={...s,revision:s.revision+1,stage:4,phase:'finish'};
+          next={...s,revision:s.revision+1,stage:4,phase:'finish',
+            stage5Line:0,stage5Choice:null,stage5Witnessed:false,
+            stage5Hold:false,stage5Preparation:null};
         }
         // Receipts from the erased stage must never revive stale dialogue or
         // apply the old route's +1 a second time. Lock order: character, ward.

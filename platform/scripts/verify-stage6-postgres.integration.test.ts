@@ -1065,8 +1065,28 @@ test('Stitcher real PostgreSQL: Ward A/B, approved Claudia, three branch jobs, n
     s=await stitcherCmd(c.path,'continue_dialogue',s);
   assert.equal(s.state.phase,'finish');
   s=await stitcherCmd(c.path,'finish_job',s);
-  assert.equal(s.stage,5);assert.equal(s.tutorialStatus,'NOT_STARTED');
+  assert.equal(s.stage,5);assert.equal(s.tutorialStatus,'IN_PROGRESS');
   assert.equal(s.coins,20);
+  assert.equal(s.state.phase,'exited');
+  // The witness hold precedes Owler; all Stage V actions use owner-scoped receipts.
+  for(const action of ['ask_attendant','continue_attendant','continue_attendant',
+    branch==='choose_trolley'?'check_transfer':branch==='choose_consent'?'fetch_claudia':'use_finding',
+    'continue_witness','continue_witness'] as const)
+    s=await stitcherCmd(c.path,action,s);
+  assert.equal(s.state.phase,'hold');
+  assert.equal(s.state.stage5Witnessed,true);
+  assert.equal(s.state.stage5Hold,false);
+  s=await stitcherCmd(c.path,'continue_hold',s);
+  assert.equal(s.state.phase,'door');
+  assert.equal(s.state.stage5Hold,true);
+  for(const action of ['continue_owler','continue_owler','continue_owler','move_cart','continue_door'] as const)
+    s=await stitcherCmd(c.path,action,s);
+  assert.equal(s.state.phase,'fight_ready');
+  assert.equal(s.state.stage5Preparation,'cart');
+  assert.deepEqual(s.availableActions,[],'Stage VI combat cannot be forged');
+  assert.equal(s.tutorialStatus,'IN_PROGRESS');
+  assert.equal(s.coins,20);
+  assert.equal(s.majorSkillBonuses[major],1);
   assert.equal((await request('GET',c.rewind)).body?.targetStage,4);
   const back=await request('POST',c.rewind,owner,{expectedStage:5});
   assert.equal(back.status,200,JSON.stringify(back.body));

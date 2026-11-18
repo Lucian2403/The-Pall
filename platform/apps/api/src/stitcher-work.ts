@@ -3,9 +3,12 @@
  * Story actions are persistent; hovering/looking at already-inspected props
  * is read-only at the scene layer. */
 export type StitcherBranch='trolley'|'consent'|'notes';
+export type StitcherStage5Choice='papers'|'claudia'|'evidence';
+export type StitcherStage5Preparation='reason'|'cart'|'brace';
 export type StitcherPhase='intro'|'briefing'|'inspect'|'order'|'prepare'|'care'|
   'linen_check'|'linen_fix'|'verify'|'record'|'report'|'close'|
-  'discovery'|'claudia'|'choose'|'opening'|'work'|'dialogue'|'finish'|'exited';
+  'discovery'|'claudia'|'choose'|'opening'|'work'|'dialogue'|'finish'|'exited'|'attendant'|'investigate'|'witness'|
+ 'hold'|'door'|'prepare_door'|'door_reply'|'fight_ready';
 export type StitcherAction=
  'start'|'ask_linen'|'continue_intro'|'check_ward'|'begin_round'|
  'inspect_a'|'inspect_b'|'order_bleeding'|'order_dirty'|
@@ -18,7 +21,10 @@ export type StitcherAction=
  'match_consent'|'check_medicine'|'attach_record'|'bring_witness'|
  'mark_disputed'|'compare_admission'|'match_schedule'|
  'copy_pages'|'cross_reference'|'record_difference'|
- 'continue_dialogue'|'finish_job';
+ 'continue_dialogue'|'finish_job'|'ask_attendant'|'continue_attendant'|
+ 'check_transfer'|'fetch_claudia'|'use_finding'|'continue_witness'|
+ 'continue_hold'|'continue_owler'|'reason_owler'|'move_cart'|
+ 'brace_door'|'continue_door';
 export type StitcherState={
  revision:number;stage:1|2|3|4|5;phase:StitcherPhase;
  introLine:number;inspectedA:boolean;inspectedB:boolean;
@@ -28,6 +34,10 @@ export type StitcherState={
  patientLine:number;focus:'bed'|'chart'|'patient'|null;
  claudiaLine:number;branch:StitcherBranch|null;taskStep:number;
  routeMethod:string|null;openingLine:number;dialogueLine:number;
+ /** Optional for older persisted Stage IV/V snapshots. */
+ stage5Line?:number;stage5Choice?:StitcherStage5Choice|null;
+ stage5Witnessed?:boolean;stage5Hold?:boolean;
+ stage5Preparation?:StitcherStage5Preparation|null;
 };
 export const INITIAL_STITCHER:StitcherState={
  revision:0,stage:1,phase:'intro',introLine:0,
@@ -35,7 +45,9 @@ export const INITIAL_STITCHER:StitcherState={
  treatedA:false,treatedB:false,correction:null,
  reportLine:0,bedObserved:false,chartRead:false,patientHeard:false,patientLine:0,
  focus:null,claudiaLine:0,branch:null,taskStep:0,routeMethod:null,
- openingLine:0,dialogueLine:0
+ openingLine:0,dialogueLine:0,
+ stage5Line:0,stage5Choice:null,stage5Witnessed:false,
+ stage5Hold:false,stage5Preparation:null
 };
 export const STITCHER_ACTIONS:readonly StitcherAction[]=[
  'start','ask_linen','continue_intro','check_ward','begin_round',
@@ -48,7 +60,10 @@ export const STITCHER_ACTIONS:readonly StitcherAction[]=[
  'check_load','balance_load','route_short','route_wide','check_receiver',
  'match_consent','check_medicine','attach_record','bring_witness',
  'mark_disputed','compare_admission','match_schedule','copy_pages',
- 'cross_reference','record_difference','continue_dialogue','finish_job'
+ 'cross_reference','record_difference','continue_dialogue','finish_job',
+ 'ask_attendant','continue_attendant','check_transfer','fetch_claudia','use_finding',
+ 'continue_witness','continue_hold','continue_owler','reason_owler','move_cart',
+ 'brace_door','continue_door'
 ];
 export const STITCHER_MAJOR:Readonly<Record<StitcherBranch,string>>={
  trolley:'Industry',consent:'Commerce',notes:'Scholarship'
@@ -156,6 +171,19 @@ export function stitcherActions(state:StitcherState):StitcherAction[]{
    s.taskStep===1?['match_schedule']:
    s.taskStep===2?['copy_pages','cross_reference']:
    s.taskStep===3?['record_difference']:[];
+ case 5:
+  switch(s.phase){
+   case 'exited':return ['ask_attendant'];
+   case 'attendant':return ['continue_attendant'];
+   case 'investigate':return ['check_transfer','fetch_claudia','use_finding'];
+   case 'witness':return ['continue_witness'];
+   case 'hold':return ['continue_hold'];
+   case 'door':return ['continue_owler'];
+   case 'prepare_door':return ['reason_owler','move_cart','brace_door'];
+   case 'door_reply':return ['continue_door'];
+   case 'fight_ready':return []; // Stage VI combat is not implemented here.
+  }
+  return [];
  }
  return [];
 }
@@ -213,7 +241,41 @@ export function applyStitcherAction(state:StitcherState,action:StitcherAction):S
    if(s.dialogueLine<(STITCHER_LINES[s.branch!].length-1))s.dialogueLine++;
    else s.phase='finish';
    return s;
-  case 'finish_job':s.stage=5;s.phase='exited';return s;
+  case 'finish_job':
+   s.stage=5;s.phase='exited';s.stage5Line=0;s.stage5Choice=null;
+   s.stage5Witnessed=false;s.stage5Hold=false;s.stage5Preparation=null;return s;
+  case 'ask_attendant':s.phase='attendant';s.stage5Line=0;return s;
+  case 'continue_attendant':
+   if((s.stage5Line??0)===0)s.stage5Line=1;
+   else{s.phase='investigate';s.stage5Line=0;}
+   return s;
+  case 'check_transfer':case 'fetch_claudia':case 'use_finding':
+   if(!s.branch)throw new StitcherInvalidAction();
+   s.stage5Choice=action==='check_transfer'?'papers':
+     action==='fetch_claudia'?'claudia':'evidence';
+   s.phase='witness';s.stage5Line=0;return s;
+  case 'continue_witness':
+   if((s.stage5Line??0)===0)s.stage5Line=1;
+   else{s.stage5Witnessed=true;s.phase='hold';s.stage5Line=0;}
+   return s;
+  case 'continue_hold':
+   if(!s.stage5Witnessed)throw new StitcherInvalidAction();
+   s.stage5Hold=true;s.phase='door';s.stage5Line=0;return s;
+  case 'continue_owler':
+   if(!s.stage5Hold)throw new StitcherInvalidAction();
+   if((s.stage5Line??0)<2)s.stage5Line=(s.stage5Line??0)+1;
+   else{s.phase='prepare_door';s.stage5Line=0;}
+   return s;
+  case 'reason_owler':case 'move_cart':case 'brace_door':
+   if(!s.stage5Hold)throw new StitcherInvalidAction();
+   s.stage5Preparation=action==='reason_owler'?'reason':
+     action==='move_cart'?'cart':'brace';
+   s.phase='door_reply';s.stage5Line=0;return s;
+  case 'continue_door':
+   if(!s.stage5Preparation)throw new StitcherInvalidAction();
+   if(s.stage5Preparation==='reason'&&(s.stage5Line??0)===0)s.stage5Line=1;
+   else{s.phase='fight_ready';s.stage5Line=0;}
+   return s;
   default:throw new StitcherInvalidAction();
  }
 }

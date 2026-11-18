@@ -21,8 +21,11 @@ export const STITCHER_SCENE_ART:Readonly<Record<StitcherSceneEnvironment,{
     place:'Infirmary records room'
   }
 };
-export function stitcherSceneEnvironment(stage:number,branch:string|null):StitcherSceneEnvironment{
-  if(stage===5)return 'corridor';
+export function stitcherSceneEnvironment(stage:number,branch:string|null,phase?:string):StitcherSceneEnvironment{
+  // Empty bed and witness hold take place back in the ward. Owler's arrival
+  // switches to the existing service-passage painting, not before.
+  if(stage===5)return phase&&['exited','attendant','investigate','witness','hold'].includes(phase)
+    ?'ward':'corridor';
   if(stage===4&&branch==='trolley')return 'corridor';
   // Both Contracts (The Signed Consent) and Investigation (Notes for the Living)
   // use the same approved infirmary records-room painting.

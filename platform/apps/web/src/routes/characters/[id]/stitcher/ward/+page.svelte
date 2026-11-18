@@ -15,7 +15,7 @@
   let character=$state<Character|null>(null);
   let snapshot=$state<Snapshot|null>(null);
   const sceneArt=$derived(snapshot
-    ?STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch)]
+    ?STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch,snapshot.state.phase)]
     :STITCHER_SCENE_ART.ward);
   let status=$state<'loading'|'ready'|'login'|'missing'|'migration'|'unavailable'>('loading');
   let pending=$state(false),errorMessage=$state('');

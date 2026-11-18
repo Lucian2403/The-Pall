@@ -84,7 +84,7 @@ test('Stage IV three ordinary routes reach pending handoff without wages or earl
   assert.equal(s.phase,'finish');
   s=applyStitcherAction(s,'finish_job');
   assert.equal(s.stage,5);assert.equal(s.phase,'exited');
-  assert.deepEqual(stitcherActions(s),[]);
+  assert.deepEqual(stitcherActions(s),['ask_attendant']);
  }
 });
 test('Claudia appears only during her live exchanges in Stages I–IV',()=>{
@@ -143,12 +143,15 @@ test('Stitcher paints the owner-provided records room for Stage IV Commerce and 
  const scene=read('apps/web/src/lib/StitcherWardScene.svelte');
  const page=read('apps/web/src/routes/characters/[id]/stitcher/ward/+page.svelte');
  assert.ok(scene.includes('STITCHER_SCENE_ART[environment]'));
- assert.ok(scene.includes('stitcherSceneEnvironment(s.stage,s.branch)'));
+ assert.ok(scene.includes('stitcherSceneEnvironment(s.stage,s.branch,s.phase)'));
+ assert.equal(stitcherSceneEnvironment(5,'consent','exited'),'ward');
+ assert.equal(stitcherSceneEnvironment(5,'consent','hold'),'ward');
+ assert.equal(stitcherSceneEnvironment(5,'consent','door'),'corridor');
  assert.equal(stitcherSceneEnvironment(4,'consent'),stitcherSceneEnvironment(4,'notes'),
    'Signed Consent and Notes for the Living must share the supplied records-office painting');
  assert.ok(scene.includes('src={sceneArt.image} alt={sceneArt.alt}'));
  assert.ok(scene.includes('{sceneArt.place}'));
- assert.ok(page.includes('STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch)]'));
+ assert.ok(page.includes('STITCHER_SCENE_ART[stitcherSceneEnvironment(snapshot.state.stage,snapshot.state.branch,snapshot.state.phase)]'));
  assert.ok(page.includes('sceneLocation={sceneArt.place}'));
  assert.ok(page.includes('clinicBackdrop compactCityVista travelLocked'),
    'All three environments must retain the existing medical-clinic ambience');
