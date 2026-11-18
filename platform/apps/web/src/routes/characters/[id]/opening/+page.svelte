@@ -6,6 +6,7 @@
   import {APPROVED_STAGE_ONE, resolveStageOneChoice, type StageOneScene} from '$lib/approved-stage-one';
   import WorkshopScene from '$lib/WorkshopScene.svelte';
   import BellrunnerOpeningScene from '$lib/BellrunnerOpeningScene.svelte';
+  import StitcherOpeningScene from '$lib/StitcherOpeningScene.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import NpcConversation from '$lib/NpcConversation.svelte';
 
@@ -184,6 +185,14 @@
         takingRound={takingWork}
         {handoffError}
       />
+    {:else if character.origin === 'Stitcher'}
+      <StitcherOpeningScene
+        characterName={character.name}
+        {beat}
+        {advance}
+        goBack={back}
+        canGoBack={visited.length > 0}
+      />
     {:else}
       <section class="story-scene" aria-label={scene.location + ' opening'}>
         <button type="button" class="npc-access" onclick={() => {talkingToNpc=!talkingToNpc;}}>
@@ -221,7 +230,7 @@
         {/if}
       </section>
     {/if}
-    {#if character.origin!=='Bellrunner'}
+    {#if character.origin!=='Bellrunner'&&character.origin!=='Stitcher'}
       <p class="preview-note">Dialogue choices advance only when clicked. {character.origin === 'Millhand' ? 'Taking the work paper commits Stage 2 to your saved character.' : 'This opening remains a read-only preview.'}</p>
     {/if}
   </TutorialShell>

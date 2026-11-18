@@ -51,6 +51,6 @@ The normal work (Stage 2) consists of inspecting conditions, allocating genuinel
 
 **Approved in Stage 1:** exact spoken lines and scene, the short linen-clerk demonstration of Claudia's social leverage, and charity-bed cover-round presentation.
 
-**TBD:** artwork and physical appearance beyond her beauty/immaculate bearing, NPC reaction implementation, specific ward supplies, patient condition data, treatment numbers and duration.
+**Assets provided:** Claudia front/back portraits, clinic ward background, ward register and wash basin. **Implementation direction:** use clickable hotspots on the two beds already drawn in the ward background; do not commission separate bed art. **TBD:** specific ward supplies, patient condition data, treatment numbers and duration.
 
 Related: [Stitcher overview](README.md), [shared tutorial](../shared-structure.md), [spoken dialogue standard](../../interactions/dialogue-style-guide.md), [jobs and time](../../jobs/jobs-and-time.md).

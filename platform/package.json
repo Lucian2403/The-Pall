@@ -80,6 +80,7 @@
     "inventory:migrate": "node --env-file=.env scripts/inventory-migrate.mjs",
     "verify:inventory": "node --import tsx --test scripts/verify-inventory.test.ts",
     "verify:bellrunner-stage1": "node --import tsx --test scripts/verify-bellrunner-stage1.test.ts",
+    "verify:stitcher-stage1": "node --import tsx --test scripts/verify-stitcher-stage1.test.ts",
     "verify:bellrunner-stage3": "node --import tsx --test scripts/verify-bellrunner-stage3.test.ts",
     "verify:bellrunner-stage4": "node --import tsx --test scripts/verify-bellrunner-stage4.test.ts",
     "verify:bellrunner-stage5": "node --import tsx --test scripts/verify-bellrunner-stage5.test.ts",
