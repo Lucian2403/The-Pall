@@ -65,7 +65,7 @@ export const STITCHER_ROUTE_UI={
    'You come to a split in the corridor. The narrow passage is quicker, but it\'ll be harder to get the trolley through. The wider passage gives you more room, though it\'ll take longer. Both lead to the receiving door.',
    'At the receiving door, a clerk looks at the papers rather than the patient.'
   ],
-  finding:'The receiving clerk asks for the man\'s contract number without even asking his name.'
+  finding:'At the receiving door, the clerk wanted the man\'s contract number. Didn\'t even ask his name. I refused to sign him over. He\'s still in the infirmary\'s care, but I doubt that\'s the end of it.'
  },
  consent:{
   title:'The Signed Consent',
@@ -95,7 +95,7 @@ export const STITCHER_ROUTE_UI={
    'The man\'s treatment notes say nothing about another operation, but his name is on the teaching list. You want to keep a record of what you\'ve found.',
    'The records make it clear. The doctors aren\'t planning another operation to treat the man. They only want to use him for a teaching lesson.'
   ],
-  finding:'The casebook shows no need for another operation; the new procedure is scheduled for instruction alone.'
+  finding:'I\'ve checked the man\'s treatment notes against the teaching schedule. He doesn\'t need another operation. The doctors want to use him to teach their students. They\'re planning to cut him open for a lesson. And Claudia knows about it. I haven\'t signed him over, but they could still come for him.'
  }
 } as const;
 export const STITCHER_STAGE_TITLES:Record<number,string>={
