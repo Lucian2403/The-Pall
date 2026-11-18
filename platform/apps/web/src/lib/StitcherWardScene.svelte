@@ -8,7 +8,8 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
-  import {stitcherItemActions} from '$lib/stitcher-ward-items';
+  import {STITCHER_WARD_ITEMS,stitcherItemActions,stitcherWardSuppliesVisible,
+    type StitcherWardItemKey} from '$lib/stitcher-ward-items';
   import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
   import '$lib/pall-story-landscape.css';
   import '$lib/workshop-object-labels.css';
@@ -121,7 +122,29 @@
     {id:'choose_notes',line:"Let me see the surgeon's notes.",skill:'Scholarship / Investigation',disabled:pending}
   ]);
   const interactiveBeds=$derived(s.stage===2&&(s.phase==='inspect'||s.phase==='care')||s.stage===3&&s.phase==='discovery'&&!s.bedObserved);
-  const sceneArt=$derived(STITCHER_SCENE_ART[stitcherSceneEnvironment(s.stage,s.branch)]);
+  const environment=$derived(stitcherSceneEnvironment(s.stage,s.branch));
+  const sceneArt=$derived(STITCHER_SCENE_ART[environment]);
+  // The same four ward tools remain accessible throughout every Clinic beat
+  // in Stages I–III, including the Matron's optional dialogue.
+  const showWardSupplies=$derived(stitcherWardSuppliesVisible(s.stage,environment));
+  let inspectedItem=$state<{
+    key:StitcherWardItemKey;revision:number;stage:number;phase:string
+  }|null>(null);
+  const selectedWardItem=$derived(inspectedItem&&inspectedItem.revision===s.revision&&
+    inspectedItem.stage===s.stage&&inspectedItem.phase===s.phase
+    ?STITCHER_WARD_ITEMS.find(item=>item.key===inspectedItem?.key)??null:null);
+  function inspectWardItem(key:StitcherWardItemKey){
+    if(pending||!showWardSupplies)return;
+    const action=itemChoices.find(item=>item.key===key)?.action;
+    if(action&&!claudiaTalkOpen){
+      inspectedItem=null;
+      act(action);
+      return;
+    }
+    inspectedItem=selectedWardItem?.key===key?null:{
+      key,revision:s.revision,stage:s.stage,phase:s.phase
+    };
+  }
   // Claudia can be called to the ward during either of the first two stages.
   // Optional talk is client-only: opening/closing it cannot alter the saved
   // action list, revision, inspection, rewards or any other gameplay state.
@@ -326,14 +349,27 @@
             </div>
           {/if}
           {/if}
+          {#if selectedWardItem&&showWardSupplies}
+            <section class="ward-inspection" aria-label="Ward item inspection">
+              <p class="speaker">WARD SUPPLIES · INSPECTION</p>
+              <p class="finding"><strong>{selectedWardItem.label}.</strong> {selectedWardItem.observation}</p>
+              <div class="actions">
+                <button type="button" class="secondary-choice" onclick={()=>{inspectedItem=null;}}>
+                  Return to the dialogue
+                </button>
+              </div>
+            </section>
+          {/if}
           {#if errorMessage}<p class="error" role="alert">{errorMessage}</p>{/if}
           {#if pending}<p role="status" class="saving">Recording the work…</p>{/if}
         </div>
       </section>
     {/snippet}
     {#snippet supplement()}
-      {#if itemChoices.length&&!claudiaTalkOpen}
-        <StitcherWardItemTray items={itemChoices} busy={pending} onChoose={act}/>
+      {#if showWardSupplies}
+        <StitcherWardItemTray items={STITCHER_WARD_ITEMS} busy={pending}
+          activeKeys={itemChoices.map(item=>item.key)}
+          selected={selectedWardItem?.key??null} onChoose={inspectWardItem}/>
       {/if}
     {/snippet}
   </ActivityLayout>
@@ -400,6 +436,9 @@
   .bed-b{left:53%;top:38%;width:14%;height:20%}
   .teaching-bed{left:31%;top:42%;width:25%;height:22%}
   .item-instruction{font:600 13px/1.4 var(--pall-font-reading,Georgia,serif);color:#5d412b;margin:6px 0 0}
+  .ward-inspection{border-top:1px solid #9e815955;padding-top:10px;margin:14px 0 0}
+  .ward-inspection .finding{margin-bottom:0}
+  .ward-inspection .actions{margin-top:10px}
   .work-card{box-sizing:border-box;width:100%;min-width:0;margin:0}
   .eyebrow{font:600 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.08em;color:#614029;margin:0 0 13px;padding-bottom:10px;

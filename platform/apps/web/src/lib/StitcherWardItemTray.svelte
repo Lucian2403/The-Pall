@@ -1,10 +1,11 @@
 <script lang="ts">
-  import type {StitcherWardItem} from '$lib/stitcher-ward-items';
-  import {STITCHER_ACTION_LABEL} from '$lib/stitcher-ward-copy';
-  let {items,busy,onChoose}:{
+  import type {StitcherWardItem,StitcherWardItemKey} from '$lib/stitcher-ward-items';
+  let {items,activeKeys,selected=null,busy=false,onChoose}:{
     items:readonly StitcherWardItem[];
-    busy:boolean;
-    onChoose:(action:string)=>void;
+    activeKeys:readonly StitcherWardItemKey[];
+    selected?:StitcherWardItemKey|null;
+    busy?:boolean;
+    onChoose:(key:StitcherWardItemKey)=>void;
   }=$props();
 </script>
 
@@ -13,11 +14,12 @@
     <span class="title-mark" aria-hidden="true">▣</span>
     Ward Supplies
   </h2>
-  <div class="document-grid" class:single={items.length===1}>
-    {#each items as item (item.action)}
+  <div class="document-grid">
+    {#each items as item (item.key)}
       <button type="button" class="document-card" data-workshop-object
-        aria-label={STITCHER_ACTION_LABEL[item.action]??'Use '+item.label}
-        disabled={busy} onclick={()=>onChoose(item.action)}>
+        class:ready={activeKeys.includes(item.key)} class:selected={selected===item.key}
+        aria-label={'Inspect '+item.label} aria-pressed={selected===item.key}
+        disabled={busy} onclick={()=>onChoose(item.key)}>
         <span class="document-image">
           <img src={item.image} alt="" loading="eager" draggable="false"/>
         </span>
@@ -25,9 +27,10 @@
         <span class="document-action">
           <svg class="action-mark" aria-hidden="true" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14m-6-6 6 6-6 6"/>
+            <circle cx="10.5" cy="10.5" r="6.5"/>
+            <path d="m16 16 5 5"/>
           </svg>
-          Use
+          Inspect
         </span>
       </button>
     {/each}
@@ -45,9 +48,8 @@
     color:#ecd2a1;font:700 clamp(15px,2cqi,19px)/1.3
     var(--pall-font-reading,Georgia,serif)}
   .title-mark{color:#d4a966;font:22px/1 Arial,sans-serif}
-  .document-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:clamp(6px,1.1cqi,12px);max-width:440px;margin-inline:auto}
-  .document-grid.single{grid-template-columns:minmax(0,1fr);max-width:214px}
+  .document-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:clamp(6px,1.1cqi,12px)}
   .document-card{appearance:none;display:flex;flex-direction:column;
     align-items:stretch;min-width:0;padding:6px;
     border:1px solid #674731;border-radius:4px;
@@ -72,6 +74,11 @@
     var(--pall-font-reading,Georgia,serif);color:#dcbc7f}
   .document-card.ready .document-action{color:#ffe1a3}
   .action-mark{display:block;flex:none;width:16px;height:16px}
+  /* Four cards keep the Bellrunner framing; on the narrower Clinic column,
+     use two rows so captions and Inspect affordances remain legible. */
+  @container round-documents (max-width:540px){
+    .document-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
   @container round-documents (max-width:480px){
     .round-documents{padding:9px 7px 12px}
     .document-grid{gap:5px}
