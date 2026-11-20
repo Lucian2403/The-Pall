@@ -104,7 +104,7 @@
   // actual entries stay below the illustrated clinic.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,title:"The Clinic",entries:[journal],toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
   let journalElement:HTMLElement|undefined;
