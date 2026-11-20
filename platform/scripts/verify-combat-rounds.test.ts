@@ -148,12 +148,30 @@ test('two actual hits become one round card in the true event order',()=>{
    event('damage',{actor:'player',target:'enemy',damage:5,raw:5}),
    event('damage',{actor:'enemy',target:'player',damage:12,raw:12})];
  const result=summary(events,s);
- assert.match(result.line,/You hit Gutter Wolf.*Gutter Wolf also hits you/);
+ assert.match(result.line,/You hit Gutter Wolf, but Gutter Wolf hits you back/);
  assert.doesNotMatch(result.line,/future warning/);
  assert.match(result.detail||'',/5 damage to Gutter Wolf · 12 damage to you/);
  assert.deepEqual(result.actions.map(x=>x.eventRef),[1,2]);
 });
 
+test('two recorded Openings connect without repeating the same phrase twice',()=>{
+ const enemy=state('Dogman');
+ const r=summary([
+  event('damage',{actor:'player',target:'enemy',zone:'head',hitPart:'jaw',
+    hitPartPreposition:'in',damage:9,raw:9,
+    openingDamageBonus:3,narration:{openingUsed:true}}),
+  event('damage',{actor:'enemy',target:'player',zone:'torso',hitPart:'ribs',
+    hitPartPreposition:'in',damage:15,raw:15,
+    openingDamageBonus:4,narration:{openingUsed:true}})
+ ],enemy);
+ assert.match(r.line,/You take the opening and hit Dogman in the jaw/);
+ assert.match(r.line,/but Dogman hits you back in the ribs/);
+ assert.equal((r.line.match(/takes? the opening/g)||[]).length,1);
+ assert.ok(r.tactical.includes('Opening used (You)'));
+ assert.ok(r.tactical.includes('Opening used (Dogman)'));
+ assert.match(r.detail||'',/9 damage to Dogman/);
+ assert.match(r.detail||'',/15 damage to you/);
+});
 test('two misses do not turn into a dodge or injury',()=>{
  const result=summary([
    event('miss',{actor:'enemy',target:'player',reason:'attack_roll'}),

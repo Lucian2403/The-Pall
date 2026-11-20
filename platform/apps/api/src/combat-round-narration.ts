@@ -436,16 +436,34 @@ export function narrateCommittedRounds(
       }
       if(next&&current.kind==='damage'&&next.kind==='damage'&&
         current.actor!==next.actor){
-        const later=result[ids[next.index]];
+        const earlier=result[ids[current.index]],later=result[ids[next.index]];
         const name=label(state,later,next.actor);
-        const nextText=next.text.includes(' again')
-          ?next.text
-          :(name==='You'&&next.text.startsWith('You hit '))
-            ?next.text.replace(/^You hit /,'You also hit ')
-            :next.text.startsWith(name+' hits ')
-              ?next.text.replace(name+' hits ',name+' also hits ')
-              :next.text;
-        combined.push(current.text+' '+nextText);
+        const used=(e:CombatEvent)=>facts(e).openingUsed===true||
+          (num(e.openingDamageBonus)??0)>0;
+        let nextText=next.text;
+        // Both fighters can really use an Opening in the same round.
+        // Describe both hits, without repeating the same lead-in twice.
+        if(used(earlier)&&used(later)){
+          nextText=nextText.replace(/^You take the opening and /,'You ')
+            .replace(name+' takes the opening and ',name+' ');
+        }
+        // A second recorded hit is a reply, not an invented counterattack.
+        // Use plain wording and preserve the actual body part and weapon.
+        if(current.actor==='player'&&next.actor==='enemy'&&
+          !current.text.includes(', but ')&&!nextText.includes(', but ')&&
+          nextText.startsWith(name+' hits you')){
+          const suffix=nextText.slice((name+' hits you').length);
+          combined.push(current.text.replace(/\.$/,'')+
+            ', but '+name+' hits you back'+suffix);
+        }else{
+          const changed=nextText.includes(' again')?nextText:
+            name==='You'&&nextText.startsWith('You hit ')
+              ?nextText.replace(/^You hit /,'You also hit ')
+              :nextText.startsWith(name+' hits ')
+                ?nextText.replace(name+' hits ',name+' also hits ')
+                :nextText;
+          combined.push(current.text+' '+changed);
+        }
         i++;continue;
       }
       if(next&&current.kind==='miss'&&next.kind==='damage'&&
