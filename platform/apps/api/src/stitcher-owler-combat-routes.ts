@@ -7,8 +7,8 @@
  */
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
-import {combatTask} from './personal-journal-tasks.js';
-import {stitcherStageJournal} from '../../web/src/lib/stitcher-journal.js';
+import {stitcherTask,combatTask} from './personal-journal-tasks.js';
+import type {StitcherState} from './stitcher-work.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import {createHash,randomBytes} from 'node:crypto';
@@ -200,13 +200,8 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
             [req.params.id,preparation,branch,JSON.stringify(state),'[]']);
           await client.query(
             "UPDATE player_characters SET tutorial_stage=6,tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
-          await archiveJournalTask(client,{
-            characterId:req.params.id,taskId:'stitcher.night-door',
-            taskInstanceId:'tutorial:stage:5',stage:5,
-            title:'The Empty Sheet / The Night Door',
-            paragraphs:stitcherStageJournal(claims.rows[0].state,5),
-            choices:{route:branch,preparation}
-          });
+          await archiveJournalTask(client,stitcherTask(
+            req.params.id,claims.rows[0].state as StitcherState,5));
         }
       }else{
         if(!saved.rowCount){
