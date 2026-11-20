@@ -3,8 +3,7 @@
  * III -> IV route commitment. No tutorial wages/XP/items or extra healing. */
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
-import {stitcherStageJournal} from '../../web/src/lib/stitcher-journal.js';
-import {STITCHER_STAGE_TITLES,STITCHER_ROUTE_UI} from '../../web/src/lib/stitcher-ward-copy.js';
+import {stitcherTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -173,14 +172,7 @@ export function registerStitcherWardRoutes(app:FastifyInstance,options:{
    // character-locked transaction as progression and idempotency receipts.
    if(next.stage>saved.state.stage){
     const stage=saved.state.stage;
-    const paragraphs=stitcherStageJournal(next,stage);
-    const title=stage===4&&next.branch
-      ?STITCHER_ROUTE_UI[next.branch].title:STITCHER_STAGE_TITLES[stage];
-    await archiveJournalTask(client,{
-     characterId:req.params.id,taskId:'stitcher.stage.'+stage,
-     taskInstanceId:'tutorial:stage:'+stage,stage,title,paragraphs,
-     choices:next.branch?{route:STITCHER_ROUTE_UI[next.branch].title}:{}
-    });
+    await archiveJournalTask(client,stitcherTask(req.params.id,next,stage as 1|2|3|4|5));
    }
    const result=view({...ch,tutorial_stage:next.stage,
     tutorial_status:nextStatus,major_skill_bonuses:granted},next,true);
