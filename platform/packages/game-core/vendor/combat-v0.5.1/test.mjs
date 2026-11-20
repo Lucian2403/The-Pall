@@ -913,7 +913,7 @@ test('Owler has a real player victory and defeat using normal combat results',()
  assert.equal(guardActuallyBlocked,true);
 });
 
-test('Owler's miss and damage events use his real name and human anatomy',()=>{
+test("Owler's miss and damage events use his real name and human anatomy",()=>{
  for(let seed=1;seed<60;seed++){
    const s=act(newEncounter('owler',{seed}),{type:'guard'},'seen-'+seed);
    for(const event of s.events.filter(e=>e.actor==='enemy'&&
