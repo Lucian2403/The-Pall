@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,focusedStanceTurns,TEST_CONFIG} from './combat.mjs';
+import {newEncounter,step,CombatError,canActAtFatigue,fatigueAccuracyPenalty,focusedStanceTurns,TEST_CONFIG,HUMAN_HIT_LOCATIONS,HUMAN_ANATOMY,BOAR_ANATOMY,hitLocationPhrase,selectHitLocation} from './combat.mjs';
 const act=(s,a,id='a')=>step(s,a,{requestId:id,expectedRevision:s.revision});
 const is = (s,t) => s.events.some(e=>e.text.includes(t));
 
@@ -703,4 +703,168 @@ test('genuine nonlethal retreat still possible when a human opponent is actually
     }
     assert.ok(yields>0,`${scene} should still be able to concede`);
   }
+});
+
+
+test('human anatomy has exactly five Head, eight Limbs and eight Torso parts',()=>{
+ const expected={
+   head:['forehead','temple','cheek','jaw','side of the head'],
+   limbs:['upper arm','elbow','forearm','hand','thigh','knee','shin','calf'],
+   torso:['chest','ribs','side','shoulder','upper back','lower back','stomach','lower abdomen']
+ };
+ assert.deepEqual(Object.keys(HUMAN_HIT_LOCATIONS).sort(),['head','limbs','torso']);
+ for(const [zone,names] of Object.entries(expected)){
+   assert.deepEqual(HUMAN_HIT_LOCATIONS[zone],names);
+   assert.equal(names.length,zone==='head'?5:8);
+   assert.equal(new Set(names).size,names.length);
+   assert.deepEqual(HUMAN_ANATOMY.zones[zone],names);
+   assert.ok(names.every(x=>hitLocationPhrase(x)===' in the '+x));
+ }
+ assert.equal(hitLocationPhrase('side of the head'),' in the side of the head');
+ assert.equal(hitLocationPhrase('lower abdomen'),' in the lower abdomen');
+ assert.equal(hitLocationPhrase('left wheel','on'),' on the left wheel');
+ assert.equal(hitLocationPhrase('left wheel','across'),' across the left wheel');
+});
+
+test('hit location is a pure choice from the target anatomy, not a combat RNG roll',()=>{
+ const s=newEncounter('flint',{seed:137,locationSeed:'location-137'});
+ const before=structuredClone(s);
+ for(const zone of ['head','torso','limbs']){
+   const first=selectHitLocation(s,'enemy',zone,'attack-1');
+   assert.deepEqual(selectHitLocation(s,'enemy',zone,'attack-1'),first);
+   assert.ok(HUMAN_HIT_LOCATIONS[zone].includes(first.name));
+   assert.equal(first.preposition,'in');
+ }
+ assert.deepEqual(s,before,'Location selection must never change RNG or state');
+ assert.equal(s.rng,before.rng);
+});
+
+test('human locations cover all listed subdivisions and match their target zones',()=>{
+ for(const zone of ['head','limbs','torso']){
+   const found=new Set();
+   for(let seed=1;seed<=420;seed++){
+     const s=newEncounter('flint',{seed,locationSeed:seed});
+     found.add(selectHitLocation(s,'enemy',zone,'attack-'+seed)?.name);
+   }
+   assert.deepEqual([...found].sort(),[...HUMAN_HIT_LOCATIONS[zone]].sort());
+ }
+});
+
+test('descriptive choices avoid recent repeats without fixed round-robin order',()=>{
+ const s=newEncounter('dogman',{seed:77});
+ const last=[];
+ for(let round=1;round<=42;round++){
+   s.round=round;
+   const chosen=selectHitLocation(s,'enemy','head','damage-1');
+   assert.ok(chosen);
+   if(last.length)assert.notEqual(chosen.name,last.at(-1));
+   const lastTwo=last.slice(-2);
+   if(lastTwo.length===2)assert.ok(!lastTwo.includes(chosen.name));
+   last.push(chosen.name);
+   s.hitLocationRecent=[...(s.hitLocationRecent||[]),
+     {target:'enemy',zone:'head',name:chosen.name}].slice(-16);
+ }
+ assert.ok(new Set(last).size>=4);
+ const saved=JSON.parse(JSON.stringify(s));
+ assert.deepEqual(selectHitLocation(saved,'enemy','head','next'),
+   selectHitLocation(s,'enemy','head','next'));
+});
+
+test('resolved hits save exactly one factual part without extra target-zone buttons',()=>{
+ const counts={head:new Set(),torso:new Set(),limbs:new Set()};
+ for(const zone of ['head','torso','limbs']){
+   for(let seed=1;seed<=210;seed++){
+     const start=newEncounter('flint',{seed,player:{
+       weapon:{damage:2,accuracy:.95,type:'blunt',reach:'contact',unarmed:true}}});
+     const after=act(start,{type:'attack',zone});
+     for(const hit of after.events.filter(x=>x.kind==='damage'&&x.actor==='player')){
+       assert.equal(hit.zone,zone);
+       assert.ok(HUMAN_HIT_LOCATIONS[zone].includes(hit.hitPart),zone+': '+hit.hitPart);
+       assert.equal(hit.hitPartPreposition,'in');
+       assert.ok(hit.text.includes(' in the '+hit.hitPart+'.'));
+       counts[zone].add(hit.hitPart);
+     }
+   }
+   assert.deepEqual([...counts[zone]].sort(),[...HUMAN_HIT_LOCATIONS[zone]].sort());
+ }
+ assert.deepEqual(Object.keys(TEST_CONFIG.aim).sort(),['head','limbs','torso']);
+});
+
+test('different anatomy and location seeds do not change rolls, AI or combat results',()=>{
+ const numericProjection=s=>{
+   const copied=structuredClone(s);
+   delete copied.locationSeed;delete copied.hitLocationRecent;
+   delete copied.narrativeRecent;
+   delete copied.player.anatomy;delete copied.enemy.anatomy;
+   copied.events=copied.events.map(e=>{
+     const {text,hitPart,hitPartPreposition,...facts}=e;
+     return facts;
+   });
+   return copied;
+ };
+ for(const seed of [1,2,4,13,31,81,317]){
+   const x=newEncounter('flint',{seed,id:'same-fight',locationSeed:'north',
+     player:{hp:500,hpMax:500,ceiling:500},
+     enemy:{hp:500,hpMax:500,ceiling:500}});
+   const y=newEncounter('flint',{seed,id:'same-fight',locationSeed:'south',
+     player:{hp:500,hpMax:500,ceiling:500},
+     enemy:{hp:500,hpMax:500,ceiling:500,anatomy:{
+       kind:'machine',zones:{head:[{name:'sensor',preposition:'on'}],
+         torso:[{name:'casing',preposition:'on'}],limbs:['wheel']}}}});
+   let a=x,b=y;
+   for(let i=0;i<14&&a.status==='active';i++){
+     const choice=a.player.fatigue>=70?{type:'recover',mode:'breath'}:
+       a.distance!=='contact'?{type:'move',to:'close'}:
+       i%5===0?{type:'recover',mode:'breath'}:i%4===1?{type:'guard'}:
+       {type:'attack',zone:['head','limbs','torso'][i%3]};
+     a=act(a,choice,'a-'+i);
+     b=act(b,choice,'a-'+i);
+     assert.deepEqual(numericProjection(a),numericProjection(b),
+       'Anatomy changed gameplay at seed '+seed+', round '+i);
+     assert.equal(a.rng,b.rng);
+   }
+ }
+});
+
+test('generated machines and animals use only supplied anatomy; absent profiles are neutral',()=>{
+ const machine=newEncounter('flint',{seed:17,enemy:{
+   name:'Blue Gear',anatomy:{kind:'machine',zones:{
+     head:[{name:'lens',preposition:'on'}],
+     torso:[{name:'casing',preposition:'on'}],
+     limbs:[{name:'left wheel',preposition:'on'}]
+   }}
+ }});
+ for(const [zone,part] of [['head','lens'],['torso','casing'],['limbs','left wheel']]){
+   assert.deepEqual(selectHitLocation(machine,'enemy',zone,'one'),
+     {name:part,preposition:'on'});
+ }
+ const unknown=newEncounter('flint',{seed:17,enemy:{name:'Unknown Shape'}});
+ assert.equal(unknown.enemy.anatomy,null);
+ assert.equal(selectHitLocation(unknown,'enemy','head','one'),null);
+ const after=act(unknown,{type:'attack',zone:'head'});
+ for(const hit of after.events.filter(e=>e.kind==='damage'&&e.actor==='player')){
+   assert.equal(hit.hitPart,undefined);
+   assert.doesNotMatch(hit.text,/temple|forehead|jaw|cheek|shoulder|rib/);
+ }
+ const boar=newEncounter('boar',{seed:31});
+ assert.deepEqual(boar.enemy.anatomy,BOAR_ANATOMY);
+ for(const zone of ['head','torso','limbs']){
+   const picked=selectHitLocation(boar,'enemy',zone,'one');
+   assert.ok(BOAR_ANATOMY.zones[zone].includes(picked.name));
+   assert.ok(!['jaw','hand','calf','knee'].includes(picked.name));
+ }
+});
+
+test('replayed and restored hits keep the same factual location and RNG',()=>{
+ for(const zone of ['head','torso','limbs']){
+   const start=newEncounter('flint',{seed:19,locationSeed:'saved-19',
+     player:{weapon:{damage:2,accuracy:.95,type:'blunt',reach:'contact',unarmed:true}}});
+   const once=act(start,{type:'attack',zone},'commit-'+zone);
+   const saved=JSON.parse(JSON.stringify(once));
+   assert.deepEqual(step(saved,{type:'attack',zone},{
+     requestId:'commit-'+zone,expectedRevision:saved.revision}),saved);
+   assert.deepEqual(once.events,saved.events);
+   assert.deepEqual(once.hitLocationRecent,saved.hitLocationRecent);
+   assert.equal(once.rng,saved.rng);
+ }
 });

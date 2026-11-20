@@ -20,6 +20,9 @@ export type CombatEventView={
   target?:'player'|'enemy';
   damage?:number;
   zone?:'head'|'torso'|'limbs';
+  /** Actual resolved part is separate from the three selectable zones. */
+  hitPart?:string;
+  hitPartPreposition?:'in'|'on'|'across';
   ability?:string|null;
   actionType?:'attack'|'guard'|'move'|'recover'|'technique'|'focus';
   actionDetail?:string;

@@ -6,7 +6,8 @@
  * describe RESOLVED actions. Metadata describing a possible ability is not
  * proof that an effect happened: effects require applied:true.
  */
-import type {CombatAction,CombatEvent,CombatState}
+import {hitLocationPhrase} from '@the-pall/game-core/combat-v0.5.1';
+import type {CombatAction,CombatEvent,CombatState,HitPartPreposition}
   from '@the-pall/game-core/combat-v0.5.1';
 
 type Side='player'|'enemy';
@@ -23,7 +24,7 @@ export type AttackFacts={
   /** No anatomy is inferred from weapon type or creature name. */
   instrument?:{name:string;kind:'weapon'|'body_part'|'other';phrase?:string};
   /** The actual struck part, not the intended aim zone. */
-  hitPart?:string;
+  hitPart?:string;hitPartPreposition?:HitPartPreposition;
 };
 export type NarrationFacts={
   actionId?:string;
@@ -133,8 +134,9 @@ function hit(event:CombatEvent,state:CombatState,index:number,last?:string):Comb
   const dmg=finite(event.damage);
   if(dmg===null)return;
   const n=facts(event),part=word(n.action?.hitPart)||word(event.hitPart);
-  // 'zone' is a chosen aim zone, not proof of a specific body part.
-  const location=part?' on the '+part:'';
+  // The resolved hitPart is factual. The selected zone never supplies anatomy.
+  const location=hitLocationPhrase(part,
+    n.action?.hitPartPreposition??event.hitPartPreposition);
   const verb=actorVerb(n.action?.verb,who);
   const byWeapon=weaponUsed(event,state,who);
   const withSource=byWeapon?' '+byWeapon:'';

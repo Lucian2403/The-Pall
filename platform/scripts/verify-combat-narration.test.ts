@@ -73,8 +73,42 @@ test('new natural attack method uses exact verb forms and supplied body-part phr
   narration:{action:{verb:{base:'lash',thirdPerson:'lashes'},
     instrument:{kind:'body_part',name:'stem',phrase:'with its stem'},hitPart:'side'}},
   text:'Hit from new attack.'})]);
- assert.match(line(hit),/Mire Bloom lashes you on the side with its stem/);
+ assert.match(line(hit),/Mire Bloom lashes you in the side with its stem/);
  assert.doesNotMatch(line(hit),/punch|club|kick/);
+});
+
+test('the event narrator uses the saved part and correct human preposition',()=>{
+ const s=fresh();s.enemy.name='New Human';
+ for(const [zone,part] of [
+   ['head','forehead'],['head','jaw'],['head','side of the head'],
+   ['limbs','upper arm'],['limbs','hand'],['torso','lower abdomen'],
+   ['torso','stomach'],['torso','lower back']
+ ] as const){
+   const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',
+     damage:6,raw:6,zone,hitPart:part,hitPartPreposition:'in',
+     text:'Committed hit.'})]);
+   assert.match(line(hit),new RegExp('in the '+part));
+   assert.doesNotMatch(line(hit),/on the (forehead|jaw|side of the head|upper arm|hand|lower abdomen|stomach|lower back)/);
+   assert.equal(info(hit),'−6 Health');
+ }
+ const [custom]=render(s,[e('damage',{actor:'player',target:'enemy',
+   zone:'torso',damage:5,raw:5,hitPart:'outer casing',hitPartPreposition:'on',
+   text:'Recorded nonhuman hit.'})]);
+ assert.match(line(custom),/on the outer casing/);
+});
+
+test('saved historical narration stays unchanged on read and re-narration',()=>{
+ const s=fresh();
+ const old=e('damage',{actor:'enemy',target:'player',
+   text:'Flint hit the temple. The original text stays.',
+   story:{version:1,line:'Flint hits you on the temple.'}});
+ const current=e('damage',{actor:'enemy',target:'player',hitPart:'jaw',
+   hitPartPreposition:'in',damage:7,raw:7,
+   story:{version:2,line:'Saved battle sentence.',detail:'−7 Health'}});
+ const result=render(s,[old,current]);
+ assert.deepEqual(result.map(x=>x.story),[old.story,current.story]);
+ assert.equal(result[0].text,old.text);
+ assert.equal(result[1].story?.line,'Saved battle sentence.');
 });
 
 test('an unfamiliar future attack verb requires no new narrator case',()=>{

@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {newEncounter,step} from '../packages/game-core/vendor/combat-v0.5.1/combat.mjs';
+import {newEncounter,step,HUMAN_HIT_LOCATIONS} from '../packages/game-core/vendor/combat-v0.5.1/combat.mjs';
 import {narrateCommittedTurn} from '../apps/api/src/combat-narration.ts';
 import {narrateCommittedRounds,type RoundStoryEvent}
   from '../apps/api/src/combat-round-narration.ts';
@@ -85,6 +85,61 @@ test('removed UI details do not delete event history, round references or replay
  assert.equal(JSON.stringify(raw),before);
  assert.deepEqual(groupCombatRounds(JSON.parse(JSON.stringify(saved))),
    grouped);
+});
+
+test('round narration uses recorded human parts, not aim zones or new random calls',()=>{
+ const s=state('Human Rival');
+ for(const [zone,part] of [
+   ['head','jaw'],['head','cheek'],['head','side of the head'],
+   ['limbs','forearm'],['limbs','shin'],['torso','upper back'],
+   ['torso','lower abdomen']
+ ] as const){
+   const saved=summary([event('damage',{actor:'player',target:'enemy',
+     zone,hitPart:part,hitPartPreposition:'in',damage:7,raw:7})],s);
+   assert.match(saved.line,new RegExp('in the '+part));
+   assert.doesNotMatch(saved.line,/on the (jaw|cheek|head|forearm|shin|back|abdomen)/);
+   assert.equal(saved.detail,'7 damage to Human Rival');
+ }
+ const withCustom=summary([event('damage',{actor:'player',target:'enemy',
+   zone:'head',hitPart:'optical sensor',hitPartPreposition:'on',
+   damage:5,raw:5})],s);
+ assert.match(withCustom.line,/on the optical sensor/);
+});
+
+test('complete Flint and Dogman histories follow saved factual hit locations',()=>{
+ for(const scene of ['flint','dogman'] as const){
+   let s=newEncounter(scene,{seed:68,
+     player:{hp:400,hpMax:400,ceiling:400},
+     enemy:{hp:400,hpMax:400,ceiling:400}}) as CombatState;
+   const history:CombatEvent[]=[];
+   let observed=0;
+   for(let i=0;i<25&&s.status==='active';i++){
+     const chosen:CombatAction=s.player.fatigue>=70
+       ?{type:'recover',mode:'breath'}
+       :s.distance!=='contact'?{type:'move',to:'close'}
+       :i%3===0?{type:'guard'}:{type:'attack',zone:['head','limbs','torso'][i%3]};
+     const next=step(s,chosen,{requestId:scene+'-location-'+i,
+       expectedRevision:s.revision}) as CombatState;
+     const damage=next.events.filter(e=>e.kind==='damage');
+     for(const ev of damage){
+       if(!ev.hitPart)continue;
+       observed++;
+       assert.ok(HUMAN_HIT_LOCATIONS[ev.zone!].includes(ev.hitPart));
+       assert.equal(ev.hitPartPreposition,'in');
+     }
+     const written=narrateCommittedRounds(
+       narrateCommittedTurn(next.events,chosen,s.intent,next,history),next,history);
+     history.push(...written);
+     s=next;
+   }
+   assert.ok(observed>=2,scene+' should record actual hit locations');
+   const cards=groupCombatRounds(history);
+   assert.ok(cards.length>5);
+   assert.ok(cards.every(c=>!c.main.match(/on the (forehead|temple|cheek|jaw|upper arm|forearm|knee|chest|stomach|lower abdomen)/)));
+   assert.ok(cards.every(c=>c.roundStory?.version===3));
+   const saved=JSON.parse(JSON.stringify(history));
+   assert.deepEqual(groupCombatRounds(saved),cards);
+ }
 });
 
 test('two actual hits become one round card in the true event order',()=>{

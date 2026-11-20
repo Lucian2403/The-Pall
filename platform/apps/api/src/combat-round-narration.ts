@@ -2,6 +2,7 @@
  * This writes display metadata to a NEW event, never changes a combat result.
  * Source event indexes are local to the saved round and preserve action order.
  */
+import {hitLocationPhrase} from '@the-pall/game-core/combat-v0.5.1';
 import type {CombatEvent,CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import type {StoryCombatEvent,NarrationFacts} from './combat-narration.js';
 
@@ -54,11 +55,10 @@ function weapon(state:CombatState,e:CombatEvent):string{
 }
 function part(e:CombatEvent):string{
   const hit=str(facts(e).action?.hitPart)||str(e.hitPart);
-  if(!hit)return '';
-  // Known plain words use familiar "in the" wording. Other creature parts
-  // use a neutral possessive without assuming human anatomy.
-  return /^(ribs|chest|side|stomach|back|head|face|arm|shoulder|leg|neck)$/i.test(hit)
-    ?' in the '+hit:' on the '+hit;
+  // This is the SAME factual location and preposition used by the engine;
+  // no re-selection, NPC-name exceptions or extra random calls.
+  return hitLocationPhrase(hit,
+    facts(e).action?.hitPartPreposition??e.hitPartPreposition);
 }
 function ability(e:CombatEvent):string|undefined{
   return str(facts(e).ability?.name)||str(e.ability);

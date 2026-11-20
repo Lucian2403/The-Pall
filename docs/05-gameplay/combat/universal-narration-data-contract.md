@@ -133,3 +133,7 @@ Only a recorded `narration.openingUsed` or positive committed Opening damage bon
 The shared Chronicle uses `roundStory.line` for the story and a single secondary line combining `roundStory.detail` with tactical statuses that the story has not already stated. The player does not see per-event descriptions, duplicated numeric output or raw engine messages in Chronicle rounds. Complete original events and applied/unapplied effect metadata remain stored verbatim for replay and for a separate technical-history view if one is added later. No saved round story, source event or historical version-1/version-2 story is rewritten by this UI change.
 
 Complete before-and-after test outputs and manual prose notes: `docs/05-gameplay/combat/round-chronicle-writing-before-after.md`.
+
+## Anatomical hit locations
+
+The engine now records a descriptive `hitPart` and `hitPartPreposition` on each resolved damage event, separate from the three existing target zones. Selection is deterministic and does not use combat RNG; a compatibility draw maintains the pre-existing combat RNG stream for Torso/Limbs hits. The event and round narrators use the recorded values through the same grammatical helper. Unspecified or incompatible anatomy has no guessed part. See `docs/05-gameplay/combat/hit-locations.md` for exact 5/8/8 human pools, custom creature profiles, RNG invariants and testing.
