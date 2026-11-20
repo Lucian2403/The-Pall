@@ -182,7 +182,7 @@ function miss(event:CombatEvent,state:CombatState,index:number,last?:string):Com
 function move(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
   if(!side(event.actor))return;
   const who=event.actor,n=facts(event);
-  const direction=n.movement?.kind||event.actionDetail;
+  const direction=n.movement?.kind||word(event.actionDetail);
   const actor=nameOf(state,who);
   const place=word(n.movement?.place);
   const lines:Record<string,[string,string]>={
