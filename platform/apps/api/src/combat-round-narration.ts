@@ -63,20 +63,60 @@ function part(e:CombatEvent):string{
 function ability(e:CombatEvent):string|undefined{
   return str(facts(e).ability?.name)||str(e.ability);
 }
+/** Read recent, resolved combat facts. Never infer past actions from prose. */
+type RecentCombat={
+  hits:Map<string,number>;misses:Map<string,number>;
+  openingsUsed:Map<string,number>;guards:Map<string,number>;
+};
+function recentCombat(events:readonly CombatEvent[],round:number):RecentCombat{
+  const hits=new Map<string,number>(),misses=new Map<string,number>();
+  const openingsUsed=new Map<string,number>(),guards=new Map<string,number>();
+  const recent=new Map<number,CombatEvent[]>();
+  for(const e of events){
+    if(e.round>=round||e.round<round-8)continue;
+    const group=recent.get(e.round)||[];
+    group.push(e);recent.set(e.round,group);
+  }
+  const actors=new Set<string>();
+  for(const group of recent.values())
+    for(const e of group)if(str(e.actor))actors.add(actorId(e));
+  for(const who of actors){
+    let canHit=true,canMiss=true,canOpen=true,canGuard=true;
+    for(let r=round-1;r>=Math.max(1,round-8);r--){
+      const group=recent.get(r)||[];
+      const attacks=group.filter(e=>actorId(e)===who&&
+        (e.kind==='damage'||e.kind==='miss'));
+      const last=attacks.at(-1);
+      const used=attacks.some(e=>facts(e).openingUsed===true||
+        (num(e.openingDamageBonus)??0)>0);
+      if(canHit&&last?.kind==='damage')hits.set(who,(hits.get(who)||0)+1);
+      else canHit=false;
+      if(canMiss&&last?.kind==='miss')misses.set(who,(misses.get(who)||0)+1);
+      else canMiss=false;
+      if(canOpen&&used)openingsUsed.set(who,(openingsUsed.get(who)||0)+1);
+      else canOpen=false;
+      if(canGuard&&group.some(e=>actorId(e)===who&&e.kind==='guard'))
+        guards.set(who,(guards.get(who)||0)+1);
+      else canGuard=false;
+      if(!canHit&&!canMiss&&!canOpen&&!canGuard)break;
+    }
+  }
+  return {hits,misses,openingsUsed,guards};
+}
 function repeatCount(history:readonly CombatRoundStory[],e:CombatEvent):number{
  const who=actorId(e),name=ability(e);
  return history.filter(r=>r.actions.some(a=>a.actorId===who&&a.kind===e.kind)&&
    (!name||r.line.includes(name))).length;
 }
 function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
-  history:readonly CombatRoundStory[]=[]):string{
+  history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string{
  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
  const verb=facts(e).action?.verb;
  const base=str(verb?.base)||'hit';
  const active=str(who==='player'?verb?.base:verb?.thirdPerson)||
    (who==='player'?'hit':'hits');
  const source=weapon(s,e),loc=part(e),namedAbility=ability(e);
- const count=repeatCount(history,e);
+ const count=recent?.hits.get(who)??0;
  let line:string;
  if(namedAbility){
    if(count%3===1)
@@ -85,14 +125,16 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
      line=from+(who==='player'?' use ':' uses ')+namedAbility+' to '+base+' '+to+loc+source;
    else line=from+(who==='player'?' use ':' uses ')+namedAbility+
      ' and '+active+' '+to+loc+source;
- }else if(count%3===1&&!verb)
-   line=who==='player'?'You strike '+to+loc+source:from+' strikes '+to+loc+source;
- else if(count%3===2&&!verb)
-   line=who==='player'?'You land a hit on '+to+loc+source:
-     from+' lands a hit on '+to+loc+source;
- else line=from+' '+active+' '+to+loc+source;
+ }else if(count>0&&!verb){
+   if(count%3===1)line=from+(who==='player'?' hit ':' hits ')+to+
+     ' again'+loc+source;
+   else if(count%3===2)line=from+(who==='player'?' land ':' lands ')+
+     'another hit on '+to+loc+source;
+   else line=from+(who==='player'?' strike ':' strikes ')+to+
+     ' again'+loc+source;
+ }else line=from+' '+active+' '+to+loc+source;
  const used=facts(e).openingUsed===true||(num(e.openingDamageBonus)??0)>0;
- if(used){
+ if(used&&(recent?.openingsUsed.get(who)??0)===0){
    line=from+(who==='player'?' take the opening and ':' takes the opening and ')+
      (namedAbility?(who==='player'?'use ':'uses ')+namedAbility+' to '+base:active)+
      ' '+to+loc+source;
@@ -105,22 +147,26 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
  return period(line);
 }
 function missLine(s:CombatState,e:CombatEvent,
-  history:readonly CombatRoundStory[]=[]):string{
+  history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string{
  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
- const spell=ability(e),count=repeatCount(history,e);
+ const spell=ability(e),count=recent?.misses.get(who)??0;
  if(e.reason==='out_of_reach')return period(spell
    ?from+(who==='player'?' use ':' uses ')+spell+', but cannot reach '+to
-   :from+' cannot reach '+to);
+   :from+' cannot reach '+to+(count?' again':''));
  if(e.reason==='old_position')return period(from+' attacks the place '+to+
    (to==='you'?' were':' was')+', but misses');
- if(spell)return period(from+(who==='player'?' use ':' uses ')+spell+' but misses '+to);
- const lines=who==='player'?[
-   'You attack '+to+' but miss','You miss '+to,'Your attack misses '+to
- ]:[
-   from+' attacks '+to+' but misses',from+' misses '+to,
-   from+' tries to hit '+to+' but misses'
- ];
- return period(lines[count%lines.length]);
+ if(spell)return period(from+(who==='player'?' use ':' uses ')+spell+
+   ' but misses '+to+(count?' again':''));
+ if(count>0){
+   if(who==='player')return period(count%3===1?'You miss '+to+' again':
+     count%3===2?'Your attack misses '+to+' again':
+       'You still cannot hit '+to);
+   return period(count%3===1?from+' misses '+to+' again':
+     count%3===2?from+' tries to hit '+to+' again, but misses':
+       from+' still cannot hit '+to);
+ }
+ return period(who==='player'?'You attack '+to+' but miss':
+   from+' attacks '+to+' but misses');
 }
 function moveLine(s:CombatState,e:CombatEvent,
   history:readonly CombatRoundStory[]=[]):string|undefined{
@@ -136,12 +182,13 @@ function moveLine(s:CombatState,e:CombatEvent,
  if(mode||n.movement)return period(from+(from==='You'?' move':' moves'));
 }
 function actionLine(s:CombatState,e:CombatEvent,prior?:CombatRoundStory,
-  history:readonly CombatRoundStory[]=[]):string|undefined{
+  history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string|undefined{
   const from=label(s,e,actorId(e));
   switch(e.kind){
-    case 'damage':return hitLine(s,e,prior,history);
-    case 'miss':return missLine(s,e,history);
-    case 'guard':return period(from+(from==='You'?' guard':' guards'));
+    case 'damage':return hitLine(s,e,prior,history,recent);
+    case 'miss':return missLine(s,e,history,recent);
+    case 'guard':return period(from+(from==='You'?' guard':' guards')+
+      ((recent?.guards.get(actorId(e))??0)>0?' again':''));
     case 'move':return moveLine(s,e,history);
     case 'focus':return period(from+(from==='You'?' focus':' focuses')+' on the next attack');
     case 'recovery':
@@ -159,8 +206,15 @@ function actionLine(s:CombatState,e:CombatEvent,prior?:CombatRoundStory,
       // Failed committed actions can matter. Intent is never treated as one.
       return str(e.text)?period(e.text):undefined;
     case 'outcome':
-      if(s.outcome==='player_victory')return 'You win the fight.';
-      if(s.outcome==='player_defeat')return 'You lose the fight.';
+      if(s.outcome==='player_victory'){
+        if(e.condition==='withdraw')return period(s.enemy.name+
+          ' stops fighting')+' You win.';
+        if(s.enemy.hp<=0)return period(s.enemy.name+
+          ' cannot continue')+' You win.';
+        return 'You win the fight.';
+      }
+      if(s.outcome==='player_defeat')
+        return s.player.hp<=0?'You cannot continue. You lose.':'You lose the fight.';
       if(s.outcome==='player_escaped')return 'You get away.';
   }
 }
@@ -212,7 +266,8 @@ function extras(e:CombatEvent,s:CombatState):string[]{
 }
 function tactical(e:CombatEvent,s:CombatState):string|undefined{
   const from=label(s,e,actorId(e));
-  if(e.kind==='miss'&&facts(e).openingUsed===true)
+  if((e.kind==='miss'||e.kind==='damage')&&
+    (facts(e).openingUsed===true||(num(e.openingDamageBonus)??0)>0))
     return 'Opening used ('+from+')';
   if(e.kind==='tactical'){
     if(e.condition==='opening_gained')return 'Opening gained ('+from+')';
@@ -239,6 +294,7 @@ export function narrateCommittedRounds(
     return r?.version===3?[r]:[];});
   let previous=memory.at(-1);
   for(const [round,ids] of groups){
+    const recent=recentCombat(prior,round);
     const last=result[ids[ids.length-1]];
     if(last.roundStory){previous=last.roundStory;memory.push(last.roundStory);continue;}
     // Every item refers to its original LOCAL event index. Do not infer an
@@ -255,7 +311,7 @@ export function narrateCommittedRounds(
     for(let k=0;k<ids.length;k++){
       const e=result[ids[k]];
       if(e.kind==='intent')continue; // Already visible before the choice.
-      let phrase=actionLine(state,e,previous,memory)||statusLine(state,e);
+      let phrase=actionLine(state,e,previous,memory,recent)||statusLine(state,e);
       if(e.kind==='warning'&&str(e.text))phrase=period(e.text);
       // A committed special attack is named on its hit/miss. If no hit/miss
       // followed it, keep the ability announcement rather than inventing one.
@@ -307,6 +363,51 @@ export function narrateCommittedRounds(
     const combined:string[]=[];
     for(let i=0;i<selected.length;i++){
       const current=selected[i],next=selected[i+1];
+      if(next&&current.actor!==next.actor&&
+        current.kind==='miss'&&next.kind==='miss'&&
+        !ability(result[ids[current.index]])&&!ability(result[ids[next.index]])&&
+        result[ids[current.index]].reason==='attack_roll'&&
+        result[ids[next.index]].reason==='attack_roll'){
+        const a=label(state,result[ids[current.index]],current.actor);
+        const b=label(state,result[ids[next.index]],next.actor);
+        const repeated=(recent.misses.get(current.actor)||0)>0&&
+          (recent.misses.get(next.actor)||0)>0;
+        combined.push(a+(a==='You'?' and ':' and ')+
+          (b==='You'?'you':b)+(repeated?' both miss again.':' both miss.'));
+        i++;continue;
+      }
+      if(next&&current.kind==='recovery'&&next.kind==='move'&&
+        current.actor!==next.actor){
+        const after=next.text.replace(/\.$/,'');
+        combined.push(current.text.replace(/\.$/,'')+' while '+
+          (after.startsWith('You ')?'you '+after.slice(4):after)+'.');
+        i++;continue;
+      }
+      if(next&&current.kind==='guard'&&next.kind==='outcome'&&
+        result[ids[next.index]].condition==='withdraw'){
+        const after=next.text.replace(/^You /,'you ');
+        combined.push(current.text.replace(/\.$/,'')+', but '+after);
+        i++;continue;
+      }
+      if(next&&current.kind==='damage'&&next.kind==='damage'&&
+        current.actor!==next.actor){
+        const later=result[ids[next.index]];
+        const name=label(state,later,next.actor);
+        const nextText=(name==='You'&&next.text.startsWith('You hit '))
+          ?next.text.replace(/^You hit /,'You also hit ')
+          :next.text.startsWith(name+' hits ')
+            ?next.text.replace(name+' hits ',name+' also hits ')
+            :next.text;
+        combined.push(current.text+' '+nextText);
+        i++;continue;
+      }
+      if(next&&current.kind==='miss'&&next.kind==='damage'&&
+        current.actor!==next.actor){
+        const after=next.text.replace(/^You /,'you ');
+        combined.push(current.text+' Then '+after);
+        // The period on the generated second sentence is already present.
+        i++;continue;
+      }
       if(next&&current.kind==='move'&&next.kind==='miss'&&
         current.actor!==next.actor&&
         ['out_of_reach','old_position'].includes(String(result[ids[next.index]].reason))&&

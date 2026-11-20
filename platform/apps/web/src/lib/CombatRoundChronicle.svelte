@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {CombatEventView} from '$lib/millhand-combat-model';
-  import {combatActionLabel,isEnemyCombatAction,groupCombatRounds}
+  import {combatActionLabel,isEnemyCombatAction,groupCombatRounds,
+    combatEventText,combatEventNumbers}
     from '$lib/millhand-combat-chronicle';
 
   let {events,emptyText}:{events:CombatEventView[];emptyText:string}=$props();
@@ -38,9 +39,15 @@
                 {#each round.events as event, i (i)}
                   <li class:enemy-action={isEnemyCombatAction(event)}>
                     <span class="event-action">[{combatActionLabel(event)}]</span>
-                    <span class="event-text">{event.text}</span>
-                    {#if event.story?.detail}
-                      <span class="event-numbers">{event.story.detail}</span>
+                    <span class="event-text">{combatEventText(event)}</span>
+                    {#if combatEventNumbers(event)}
+                      <span class="event-numbers">{combatEventNumbers(event)}</span>
+                    {/if}
+                    {#if event.story?.line && event.text !== event.story.line}
+                      <details class="source-record">
+                        <summary>Original event</summary>
+                        <span>{event.text}</span>
+                      </details>
                     {/if}
                   </li>
                 {/each}
@@ -88,6 +95,10 @@
   .event-text{flex:1 1 65%;color:#dbc7a9;font:12px/1.4 Georgia,serif}
   .event-numbers{display:block;flex:1 1 100%;margin-left:4px;color:#d9b884;
     font:11px/1.4 Arial,sans-serif}
+  .source-record{width:100%;padding:2px 0 0 7px;min-width:0}
+  .source-record summary{font:11px/1.4 Arial,sans-serif;color:#b89a78}
+  .source-record span{display:block;margin:5px 0 2px;color:#b6a58f;
+    font:11px/1.45 Arial,sans-serif;white-space:normal;overflow-wrap:anywhere}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font:13px/1.5 Georgia,serif}
 </style>

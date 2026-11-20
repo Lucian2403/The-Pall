@@ -54,6 +54,22 @@ export type CombatChronicleRound={
  key:string;round:number;main:string;detail?:string;tactical:string[];
  events:CombatEventView[];isLegacy:boolean;roundStory?:CombatRoundStoryView
 };
+/** Event presentation is separate from the saved engine record.
+ * New logs show their versioned sentence, not raw text with numbers glued on.
+ * Legacy logs have a minimal display-only cleanup; the original is retained.
+ */
+export function combatEventText(event:CombatEventView):string{
+  if(event.story?.line)return event.story.line;
+  const clean=event.text.replace(/\\\./g,'.');
+  if(event.actor!=='player')return clean;
+  return clean.replace(/^Player gains /,'You gain ')
+    .replace(/^Player loses /,'You lose ')
+    .replace(/^Player takes /,'You take ');
+}
+export function combatEventNumbers(event:CombatEventView):string|undefined{
+  return event.story?.hidden?undefined:event.story?.detail;
+}
+
 export function groupCombatRounds(events:readonly CombatEventView[]):CombatChronicleRound[]{
  const result:CombatChronicleRound[]=[];
  for(const event of events){

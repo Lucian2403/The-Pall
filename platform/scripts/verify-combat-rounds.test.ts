@@ -5,7 +5,8 @@ import {newEncounter,step} from '../packages/game-core/vendor/combat-v0.5.1/comb
 import {narrateCommittedTurn} from '../apps/api/src/combat-narration.ts';
 import {narrateCommittedRounds,type RoundStoryEvent}
   from '../apps/api/src/combat-round-narration.ts';
-import {groupCombatRounds} from '../apps/web/src/lib/millhand-combat-chronicle.ts';
+import {groupCombatRounds,combatEventText,combatEventNumbers}
+  from '../apps/web/src/lib/millhand-combat-chronicle.ts';
 import type {CombatAction,CombatEvent,CombatState} from '@the-pall/game-core/combat-v0.5.1';
 
 const state=(name='Named Rival')=>{
@@ -52,7 +53,7 @@ test('two misses do not turn into a dodge or injury',()=>{
    event('miss',{actor:'enemy',target:'player',reason:'attack_roll'}),
    event('miss',{actor:'player',target:'enemy',reason:'attack_roll'})
  ],state('Ridge Lantern'));
- assert.match(result.line,/Ridge Lantern attacks you but misses.*You attack Ridge Lantern but miss/);
+ assert.equal(result.line,'Ridge Lantern and you both miss.');
  assert.doesNotMatch(result.line,/dodge|bleed|block|wound/);
 });
 
@@ -327,6 +328,130 @@ test('a saved summary is immutable on replay and refresh',()=>{
  const second=narrateCommittedRounds(JSON.parse(bytes),s);
  assert.equal(JSON.stringify(second),bytes);
  assert.equal(n(second)[0].main,n(first)[0].main);
+});
+
+test('three consecutive misses grow into an accurate, varied account',()=>{
+ const rival=state('Glass Guardian'),history:CombatEvent[]=[];
+ const lines:string[]=[];
+ for(let round=1;round<=4;round++){
+   const raw=sample(round,[event('miss',{actor:'enemy',target:'player',
+      reason:'attack_roll'})]);
+   const saved=narrateCommittedRounds(raw,rival,history);
+   history.push(...saved);
+   lines.push(saved.at(-1)!.roundStory!.line);
+ }
+ assert.match(lines[1],/misses you again/);
+ assert.match(lines[2],/tries to hit you again, but misses/);
+ assert.match(lines[3],/still cannot hit you/);
+ assert.equal(new Set(lines).size,4);
+ assert.ok(lines.every(x=>!/(dodge|bleed|injur|falls)/i.test(x)));
+});
+
+test('multiple real hits use "again" only while the streak continues',()=>{
+ const rival=state('Marsh Clock'),history:CombatEvent[]=[];
+ const lines:string[]=[];
+ for(let round=1;round<=4;round++){
+   const kind=round===3?'miss':'damage';
+   const raw=sample(round,[event(kind,{actor:'player',target:'enemy',
+     ...(kind==='damage'?{damage:6,raw:6}:{reason:'attack_roll'})})]);
+   const saved=narrateCommittedRounds(raw,rival,history);
+   history.push(...saved);lines.push(saved.at(-1)!.roundStory!.line);
+ }
+ assert.match(lines[1],/again/);
+ assert.doesNotMatch(lines[3],/again|another/);
+ assert.match(lines[3],/You hit Marsh Clock/);
+});
+
+test('used Openings are distinct from gained and accuracy-only Openings',()=>{
+ const rival=state('Stilt Beetle'),history:CombatEvent[]=[];
+ function turn(round:number,values:CombatEvent[]){
+   const saved=narrateCommittedRounds(sample(round,values),rival,history);
+   history.push(...saved);return saved.at(-1)!.roundStory!;
+ }
+ const start=turn(1,[event('tactical',{actor:'player',
+   condition:'opening_gained'})]);
+ assert.ok(start.tactical.includes('Opening gained (You)'));
+ const plain=turn(2,[event('damage',{actor:'player',target:'enemy',
+   damage:4,raw:4})]);
+ assert.doesNotMatch(plain.line,/opening/i);
+ assert.ok(!plain.tactical.some(x=>/Opening used/.test(x)));
+ const accuracy=turn(3,[event('damage',{actor:'player',target:'enemy',
+   damage:5,raw:5,openingDamageBonus:0,narration:{openingUsed:true}})]);
+ assert.match(accuracy.line,/take the opening/);
+ assert.ok(accuracy.tactical.includes('Opening used (You)'));
+ assert.doesNotMatch(accuracy.detail||'',/Opening bonus/);
+ const bonus=turn(4,[event('damage',{actor:'player',target:'enemy',
+   damage:8,raw:8,openingDamageBonus:3,narration:{openingUsed:true}})]);
+ assert.ok(bonus.tactical.includes('Opening used (You)'));
+ assert.match(bonus.detail||'',/Opening bonus \+3/);
+ assert.doesNotMatch(bonus.line,/take the opening/);
+});
+
+test('recent enemy misses and player hits remain connected in order',()=>{
+ const rival=state('Ash Porter'),history:CombatEvent[]=[];
+ for(let round=1;round<=2;round++)
+   history.push(...narrateCommittedRounds(sample(round,[
+     event('miss',{actor:'enemy',target:'player',reason:'attack_roll'})
+   ]),rival,history));
+ const both=narrateCommittedRounds(sample(3,[
+  event('damage',{actor:'player',target:'enemy',damage:7,raw:7,hitPart:'ribs'}),
+  event('miss',{actor:'enemy',target:'player',reason:'attack_roll'})
+ ]),rival,history).at(-1)!.roundStory!;
+ assert.ok(both.line.indexOf('You hit')<both.line.indexOf('Ash Porter'));
+ assert.match(both.line,/again/);
+ assert.match(both.detail||'',/7 damage/);
+});
+
+test('a guarded hit and repeated overcommitment preserve tactical results',()=>{
+ const rival=state(),history:CombatEvent[]=[];
+ history.push(...narrateCommittedRounds([event('tactical',{
+   actor:'player',condition:'overcommitted'})],rival,history));
+ const round=narrateCommittedRounds(sample(2,[
+  event('guard',{actor:'enemy'}),
+  event('damage',{actor:'player',target:'enemy',damage:5,raw:12,guarded:true}),
+  event('tactical',{actor:'player',condition:'overcommitted'})
+ ]),rival,history).at(-1)!.roundStory!;
+ assert.match(round.line,/guards.*blocks part/);
+ assert.match(round.detail||'',/7 blocked/);
+ assert.ok(round.tactical.includes('Exposed (You)'));
+});
+
+test('a recorded withdrawal ends the exchange without an invented death',()=>{
+ const rival=state('Gate Watcher');rival.outcome='player_victory';
+ const story=summary([
+  event('guard',{actor:'player'}),
+  event('outcome',{actor:'enemy',condition:'withdraw'})
+ ],rival);
+ assert.equal(story.line,'You guard, but Gate Watcher stops fighting. You win.');
+ assert.doesNotMatch(story.line,/dies|falls|runs/);
+});
+
+test('defeat after the actual final hit reports inability to continue',()=>{
+ const rival=state('Tin Giant');
+ rival.outcome='player_defeat';rival.player.hp=0;
+ const story=summary([
+  event('miss',{actor:'player',target:'enemy',reason:'attack_roll'}),
+  event('damage',{actor:'enemy',target:'player',damage:16,raw:16}),
+  event('outcome',{actor:'enemy'})
+ ],rival);
+ assert.match(story.line,/Tin Giant hits you.*You cannot continue\. You lose\./);
+ assert.ok(story.line.indexOf('Tin Giant hits')<story.line.indexOf('You cannot'));
+});
+
+test('details show clean sentences, separate numbers and the saved raw text',()=>{
+ const raw=event('damage',{actor:'enemy',target:'player',
+   text:'Named Rival loses 5 Health.5 damage',
+   story:{version:2,line:'Named Rival hits you.',detail:'−5 Health'}});
+ assert.equal(combatEventText(raw),'Named Rival hits you.');
+ assert.equal(combatEventNumbers(raw),'−5 Health');
+ assert.equal(raw.text,'Named Rival loses 5 Health.5 damage');
+ const old=event('momentum',{actor:'player',
+   text:'Player gains 10 Momentum. The change is saved\\.'});
+ assert.equal(combatEventText(old),'You gain 10 Momentum. The change is saved.');
+ assert.equal(old.text,'Player gains 10 Momentum. The change is saved\\.');
+ const folded=event('momentum',{actor:'player',text:'Player gains 10 Momentum.',
+   story:{version:2,line:'You gain Momentum.',detail:'+10 Momentum',hidden:true}});
+ assert.equal(combatEventNumbers(folded),undefined);
 });
 
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{
