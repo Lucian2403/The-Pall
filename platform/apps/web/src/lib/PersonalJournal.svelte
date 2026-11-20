@@ -69,10 +69,11 @@
   }
 </script>
 
+<svelte:window onkeydown={handleKey}/>
 <section id="personal-journal" class="personal-journal" aria-label="Personal Journal"
-  tabindex="-1" bind:this={section} onkeydown={handleKey}>
+  tabindex="-1" bind:this={section}>
   <header class="journal-head">
-    <div><small>PERSONAL JOURNAL</small><h2>A record of your work</h2></div>
+    <div><small>PERSONAL JOURNAL</small><h2>{tab==='current'?currentTitle:'Completed Tasks'}</h2></div>
   </header>
   <div class="journal-tabs" role="group" aria-label="Journal sections">
     <button type="button" class:chosen={tab==='current'} aria-pressed={tab==='current'}
@@ -82,7 +83,7 @@
   </div>
   {#if tab==='current'}
     <div class="reading-area" aria-label="Current task journal">
-      <h3>{currentTitle}</h3>
+      <h3 class="sr-only">{currentTitle}</h3>
       {#if currentEntries.length}
         {#each currentEntries as paragraph,index (index)}
           <p>{paragraph}</p>
@@ -120,7 +121,7 @@
       {#if nextCursor&&!loading}
         <button type="button" class="load-more"
           onclick={()=>{void loadPage(characterId,nextCursor,false);}}>
-          Load earlier entries
+          Load more completed tasks
         </button>
       {/if}
     </div>
@@ -134,7 +135,7 @@
     font-family:var(--pall-font-reading,Georgia,serif)}
   .journal-head,.journal-tabs,.reading-area,.completed-area{max-width:930px;margin-inline:auto}
   .journal-head{margin-bottom:13px}
-  small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em}
+  small{font:700 14px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em}
   h2{font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);margin:5px 0}
   h3{font:600 21px/1.35 var(--pall-font-reading,Georgia,serif);margin:8px 0 15px}
   p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:9px 0 14px}
@@ -150,6 +151,8 @@
   .task-list button span{font:12px/1.35 sans-serif;white-space:nowrap}
   .reading-area{padding:2px 0 0}
   .load-more{margin-top:13px}
+  .sr-only{position:absolute;clip:rect(0 0 0 0);clip-path:inset(50%);
+    width:1px;height:1px;white-space:nowrap;overflow:hidden}
   @media(max-width:600px){.journal-tabs{gap:6px}.journal-tabs button{flex:1}
     .task-list button{align-items:flex-start;flex-direction:column;gap:3px}}
 </style>
