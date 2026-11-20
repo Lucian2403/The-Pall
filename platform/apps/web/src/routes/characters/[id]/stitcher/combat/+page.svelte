@@ -1,6 +1,5 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import MillhandCombatScene from '$lib/MillhandCombatScene.svelte';
@@ -66,12 +65,6 @@
     return releaseCombatSfx;
   });
 
-  // Navigation, not developer rewind: Stage V is read-only after the fight
-  // begins, and returning never deletes turns, Health or the outcome.
-  async function backToStageFive(){
-    await goto('/characters/'+encodeURIComponent(id)+'/stitcher/ward');
-  }
-
   async function perform(action:CombatAction){
     const previous=battle;
     const revision=battle?.revision;
@@ -116,7 +109,7 @@
 <svelte:head><title>The Pall — The Night Door, Owler</title></svelte:head>
 {#if status==='ready' && character && battle}
   <TutorialShell {character} sceneLocation="Infirmary service corridor" clinicBackdrop compactCityVista
-    {backToStageFive} travelLocked={battle.status==='active'}
+    travelLocked={battle.status==='active'}
     combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
     <MillhandCombatScene snapshot={battle} encounter="owler" characterId={id}
       {feedback} {pending} {errorMessage} {perform}/>
