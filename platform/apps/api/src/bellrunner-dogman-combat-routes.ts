@@ -6,6 +6,8 @@
  * Every resolved round and character Health update commit atomically.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {combatTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import {createHash,randomBytes} from 'node:crypto';
@@ -225,6 +227,9 @@ export function registerBellrunnerDogmanCombatRoutes(app:FastifyInstance,options
         await client.query(
           'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
           [req.params.id,state.player.hp,state.status==='finished'?'COMPLETED':'IN_PROGRESS']);
+         if(state.status==='finished'){
+           await archiveJournalTask(client,combatTask(req.params.id,'dogman',state));
+         }
       }
       const response=snapshot(record);
       await client.query(
