@@ -2,6 +2,9 @@
  * idempotency receipts, and ONE awarded different Major Skill on the Stage
  * III -> IV route commitment. No tutorial wages/XP/items or extra healing. */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {stitcherStageJournal} from '../../web/src/lib/stitcher-journal.js';
+import {STITCHER_STAGE_TITLES,STITCHER_ROUTE_UI} from '../../web/src/lib/stitcher-ward-copy.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -166,6 +169,19 @@ export function registerStitcherWardRoutes(app:FastifyInstance,options:{
    await client.query(
     'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3,major_skill_bonuses=$4::jsonb WHERE id=$1',
     [req.params.id,next.stage,nextStatus,JSON.stringify(granted)]);
+   // Archive only reducer-confirmed transitions, inside the same
+   // character-locked transaction as progression and idempotency receipts.
+   if(next.stage>saved.state.stage){
+    const stage=saved.state.stage;
+    const paragraphs=stitcherStageJournal(next,stage);
+    const title=stage===4&&next.branch
+      ?STITCHER_ROUTE_UI[next.branch].title:STITCHER_STAGE_TITLES[stage];
+    await archiveJournalTask(client,{
+     characterId:req.params.id,taskId:'stitcher.stage.'+stage,
+     taskInstanceId:'tutorial:stage:'+stage,stage,title,paragraphs,
+     choices:next.branch?{route:STITCHER_ROUTE_UI[next.branch].title}:{}
+    });
+   }
    const result=view({...ch,tutorial_stage:next.stage,
     tutorial_status:nextStatus,major_skill_bonuses:granted},next,true);
    await client.query(
