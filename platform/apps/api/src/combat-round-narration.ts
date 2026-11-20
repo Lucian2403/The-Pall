@@ -93,7 +93,7 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
  else line=from+' '+active+' '+to+loc+source;
  const used=facts(e).openingUsed===true||(num(e.openingDamageBonus)??0)>0;
  if(used){
-   line=from+' takes the opening and '+
+   line=from+(who==='player'?' take the opening and ':' takes the opening and ')+
      (namedAbility?'uses '+namedAbility+' to '+base:active)+
      ' '+to+loc+source;
  }
@@ -274,8 +274,14 @@ export function narrateCommittedRounds(
     // be inspected and no numerical effect is thrown away.
     const sentence=pieces.slice(0,3).map(x=>x.text).join(' ')||'The round ends.';
     const headline=details.filter(x=>/damage to|blocked|Opening bonus/.test(x));
-    const extrasCompact=details.filter(x=>!headline.includes(x));
-    const show=[...headline,...extrasCompact].slice(0,3);
+    // Applied ability effects outrank minor costs in the short numbers line.
+    // Future effect labels are read from metadata, not a hardcoded vocabulary.
+    const appliedNames=ids.flatMap(i=>(facts(result[i]).effects||[])
+      .filter(e=>e.applied===true&&e.kind!=='damage')
+      .map(e=>str(e.label)||str(e.kind)||'Effect'));
+    const highlighted=details.filter(x=>appliedNames.some(name=>x.startsWith(name)));
+    const extrasCompact=details.filter(x=>!headline.includes(x)&&!highlighted.includes(x));
+    const show=[...headline,...highlighted,...extrasCompact].slice(0,3);
     const summary:CombatRoundStory={
       version:3,round,encounterId:state.id,line:sentence,
       ...(show.length?{detail:show.join(' · ')}:{}),
