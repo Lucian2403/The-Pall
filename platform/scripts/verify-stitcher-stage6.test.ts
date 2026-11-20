@@ -96,12 +96,23 @@ test('shared compact Chronicle uses authoritative combat and does not mutate sta
 test('Stitcher Stage VI reuses Flint combat HUD and has correct outcome artwork',()=>{
  const ward=read('apps/web/src/lib/StitcherWardScene.svelte');
  const route=read('apps/web/src/routes/characters/[id]/stitcher/combat/+page.svelte');
+ const shell=read('apps/web/src/lib/TutorialShell.svelte');
  const shared=read('apps/web/src/lib/MillhandCombatScene.svelte');
  const engine=read('packages/game-core/vendor/combat-v0.5.1/combat.mjs');
  const api=read('apps/api/src/stitcher-owler-combat-routes.ts');
  assert.match(ward,/Confront Owler/);
  assert.match(route,/encounter="owler"/);
  assert.match(route,/MillhandCombatScene/);
+ assert.match(route,/async function backToStageFive\(\)/);
+ assert.match(route,/\{backToStageFive\}/);
+ assert.ok(shell.includes("(character.origin==='Millhand'||character.origin==='Bellrunner'||character.origin==='Stitcher') && character.tutorial.stage===6 && backToStageFive"));
+ assert.match(shell,/Review the saved Stage 5 night-door preparation/);
+ const journalStart=shared.indexOf('<section id="combat-personal-journal"');
+ const layoutEnd=shared.indexOf('</ActivityLayout>');
+ assert.ok(layoutEnd>=0&&journalStart>layoutEnd,
+   'Combat journal must render full-width after ActivityLayout, as in Stage V');
+ assert.match(shared,/class="journal-toggle"/);
+ assert.match(shared,/scroll-margin-top:56px/);
  assert.match(shared,/locations\/stitcher\/service-corridor.webp/);
  assert.match(shared,/locations\/stitcher\/owler-defeated.webp/);
  assert.match(shared,/locations\/stitcher\/owler.webp/);
