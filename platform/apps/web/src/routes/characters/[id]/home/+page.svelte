@@ -135,7 +135,7 @@
 {#if status==='ready'&&character&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
     journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal,
-      title:'Rented Home',entries:[homeJournalIntro]}}>
+      title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
