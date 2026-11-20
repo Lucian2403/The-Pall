@@ -320,8 +320,11 @@ export function narrateCommittedRounds(
           const subject=label(state,result[ids[next.index]],next.actor);
           combined.push(current.text+' Your dodge fails, but '+
             (subject==='You'?'you':subject)+' still '+(subject==='You'?'miss':'misses')+'.');
-        }else combined.push(first+', and '+
-          (second.startsWith('You ')?'you '+second.slice(4):second)+'.');
+        }else if(next.actor==='player'){
+          const reason=result[ids[next.index]].reason;
+          combined.push(first+', and '+(reason==='out_of_reach'
+            ?'your attack falls short':'your attack misses')+'.');
+        }else combined.push(first+', and '+second+'.');
         i++;continue;
       }
       combined.push(current.text);
@@ -339,11 +342,8 @@ export function narrateCommittedRounds(
     const rest=details.filter(v=>!isHarm(v)&&!injury(v));
     const ordered=[...prominent,...effects,...rest];
     const compact=ordered.slice(0,3);
-    if(ordered.length>compact.length&&!statuses.includes('More results in details'))
-      statuses.push('More results in details');
-    if(pieces.some(p=>p.priority>=2&&!selected.includes(p))&&
-      !statuses.includes('More actions in details'))
-      statuses.push('More actions in details');
+    // The expandable Details section is always present. Do not fill the
+    // short Chronicle with a repeated "More details" warning.
     const summary:CombatRoundStory={
       version:3,round,encounterId:state.id,line:sentence,
       ...(compact.length?{detail:compact.join(' · ')}:{}),
