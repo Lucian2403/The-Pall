@@ -348,7 +348,7 @@ for(const expected of [
   'focusedBonus=focusedStanceTurns(s,who)>0'
 ])assert.ok(engine.includes(expected),'Focused Stance must be real and expire after three turns: '+expected);
 assert.ok(api.includes("case 'guard':case 'focus':") &&
-  api.includes("['damage','miss','guard','move','recovery','technique','focus']") &&
+  read('apps/api/src/combat-narration.ts').includes("['damage','miss','guard','move','recovery','technique','focus']") &&
   view.includes("...(focusCanBeUsed?['focus']:[])") &&
   view.includes('focusedStanceTurns(state') &&
   view.includes('focusedStanceAccuracyBonus:0') &&
