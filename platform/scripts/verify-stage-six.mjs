@@ -23,6 +23,7 @@ const characterRoutes=read('apps/api/src/character-routes.ts');
 const pgTest=read('scripts/verify-stage6-postgres.integration.test.ts');
 const view=read('apps/api/src/millhand-combat-view.ts');
 const scene=read('apps/web/src/lib/MillhandCombatScene.svelte');
+const sharedChronicle=read('apps/web/src/lib/CombatRoundChronicle.svelte');
 const page=read('apps/web/src/routes/characters/[id]/millhand/combat/+page.svelte');
 const five=read('apps/web/src/routes/characters/[id]/millhand/wage-claim/+page.svelte');
 const claim=read('apps/api/src/millhand-wage-claim-routes.ts');
@@ -135,7 +136,6 @@ assert.ok(scene.includes('class="action-zone"') &&
 // numerical options and use live server facts, not hardcoded UI guesses.
 const model=read('apps/web/src/lib/millhand-combat-model.ts');
 const chronicle=read('apps/web/src/lib/millhand-combat-chronicle.ts');
-const sharedChronicle=read('apps/web/src/lib/CombatRoundChronicle.svelte');
 const roundNarrator=read('apps/api/src/combat-round-narration.ts');
 const dogmanScene=read('apps/web/src/lib/BellrunnerDogmanCombatScene.svelte');
 const dogmanApi=read('apps/api/src/bellrunner-dogman-combat-routes.ts');

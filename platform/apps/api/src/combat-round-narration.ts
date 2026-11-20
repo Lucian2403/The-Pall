@@ -49,7 +49,7 @@ function weapon(state:CombatState,e:CombatEvent):string{
   }
   // Existing prototype has a label for equipped weapons. No assumption about anatomy.
   const a=actorId(e)==='player'?state.player:actorId(e)==='enemy'?state.enemy:null;
-  return a?.weapon.unarmed!==true&&str(a?.weapon.label)
+  return a!==null&&a.weapon.unarmed!==true&&str(a.weapon.label)
     ?actorId(e)==='player'?' with your '+a.weapon.label:' with a '+a.weapon.label:'';
 }
 function part(e:CombatEvent):string{
