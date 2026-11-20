@@ -34,7 +34,7 @@ test('Momentum and Fatigue appear once beneath the action that caused them',()=>
  assert.equal(events[1].story?.hidden,true);
  assert.equal(events[4].story?.hidden,true);
  assert.equal(events[5].story?.hidden,true);
- assert.equal(detail(events[2]),'Guard active · +3 Fatigue');
+ assert.equal(detail(events[2]),'Guard active · +3 Fatigue · 3/100 total');
  assert.equal(detail(events[3]),
   '−6 Health · 9 blocked · +10 Momentum (Flint) · +8 Momentum (You)');
  assert.equal(events[4].amount,10);
