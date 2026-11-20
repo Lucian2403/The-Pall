@@ -41,6 +41,7 @@ const actor = (name, opts = {}) => ({
   readiness: opts.readiness ?? 0,
   focusedUntilRound:opts.focusedUntilRound??0,
   weapon: opts.weapon ?? {damage: 6,accuracy: .70,type: 'blunt',reach: 'contact',unarmed:true},
+  anatomy:opts.anatomy??null,
 });
 function rng(state) {
   // Deterministic LCG. Not secure; replaced by server-owned RNG in production.
@@ -62,7 +63,7 @@ function freshPhrase(s, key, alternatives) {
 }
 function opening(s, who, reason) {
   s.openings[who]={expires:s.round+1,reason};
-  log(s,`${s[who].name==='Player'?'You notice':s[who].name+' notices'} an opening: ${reason}.`,'tactical',{actor:who});
+  log(s,`${s[who].name==='Player'?'You notice':s[who].name+' notices'} an opening: ${reason}.`,'tactical',{actor:who,condition:'opening_gained',reason});
 }
 function hasOpening(s,who) {return (s.openings?.[who]?.expires??0)>=s.round;}
 function repeatedStrikes(s,who) { const actions=who==='player'?s.lastPlayerActions:s.lastEnemyActions;return (actions??[]).slice(-2).length===2 && actions.slice(-2).every(x=>x==='attack'); }
@@ -95,10 +96,79 @@ function setBoarPosition(s,to){
   s.pathOpen=hasClearBoarExit(s); // compatibility only; never set directly on any Move
 }
 
-function woundName(s, who, zone) {
-  if (zone === 'head') return 'temple';
-  if (zone === 'limbs') return choose(s, ['forearm', 'leg', 'shoulder']);
-  return choose(s, ['ribs', 'chest', 'side']);
+/** Narrative subdivisions of the three EXISTING target zones. */
+export const HUMAN_HIT_LOCATIONS=Object.freeze({
+  head:Object.freeze(['forehead','temple','cheek','jaw','side of the head']),
+  limbs:Object.freeze(['upper arm','elbow','forearm','hand','thigh','knee','shin','calf']),
+  torso:Object.freeze(['chest','ribs','side','shoulder','upper back','lower back',
+    'stomach','lower abdomen'])
+});
+export const HUMAN_ANATOMY=Object.freeze({
+  kind:'human',zones:HUMAN_HIT_LOCATIONS
+});
+/** Metadata for the existing boar fixture, not a rule for all animals. */
+export const BOAR_ANATOMY=Object.freeze({
+  kind:'quadruped',
+  zones:Object.freeze({
+    head:Object.freeze(['snout','ear','forehead']),
+    limbs:Object.freeze(['front leg','hind leg']),
+    torso:Object.freeze(['flank','shoulder','back','belly'])
+  })
+});
+const partName=x=>typeof x==='string'?x:
+  x&&typeof x==='object'&&typeof x.name==='string'?x.name:null;
+const partPreposition=x=>x&&typeof x==='object'&&
+  ['in','on','across'].includes(x.preposition)?x.preposition:'in';
+/** The same safe preposition is used in engine and Battle Chronicle text. */
+export function hitLocationPhrase(part,preposition){
+  if(typeof part!=='string'||!part.trim())return '';
+  const knownHuman=Object.values(HUMAN_HIT_LOCATIONS)
+    .some(pool=>pool.includes(part.trim()));
+  const defaultPrep=knownHuman?'in':'on';
+  const prep=['in','on','across'].includes(preposition)?preposition:defaultPrep;
+  return ' '+prep+' the '+part.trim();
+}
+/** FNV-1a hash of stable encounter facts. Never reads or advances state.rng. */
+function locationHash(value){
+  let h=2166136261;
+  for(let i=0;i<value.length;i++)
+    h=Math.imul(h^value.charCodeAt(i),16777619)>>>0;
+  // Avalanche the stable hash before taking modulo: common seeds and
+  // similarly named events must not cluster in half the available pool.
+  h^=h>>>16;h=Math.imul(h,0x85ebca6b);
+  h^=h>>>13;h=Math.imul(h,0xc2b2ae35);
+  h^=h>>>16;
+  return h>>>0;
+}
+/** Pure descriptive choice using the TARGET's actual anatomy.
+ * Avoid the last part, and the last two when enough alternatives exist.
+ */
+export function selectHitLocation(state,target,zone,eventIdentity=''){
+  const pool=state?.[target]?.anatomy?.zones?.[zone];
+  if(!Array.isArray(pool)||!pool.length)return null;
+  const valid=pool.filter(x=>typeof partName(x)==='string'&&partName(x).trim());
+  if(!valid.length)return null;
+  const recent=Array.isArray(state.hitLocationRecent)?state.hitLocationRecent:[];
+  const last=recent.filter(x=>x.target===target&&x.zone===zone)
+    .slice(-2).map(x=>x.name);
+  let available=valid;
+  if(valid.length>1){
+    const distinct=valid.filter(x=>partName(x)!==last.at(-1));
+    if(distinct.length)available=distinct;
+    if(valid.length>2&&last.length>1){
+      const excludingBoth=valid.filter(x=>!last.includes(partName(x)));
+      if(excludingBoth.length)available=excludingBoth;
+    }
+  }
+  const key=[state.id,state.locationSeed??'',state.round,state.revision,
+    target,zone,eventIdentity].join('|');
+  const chosen=available[locationHash(key)%available.length];
+  return {name:partName(chosen),preposition:partPreposition(chosen)};
+}
+function rememberHitLocation(s,target,zone,part){
+  if(!part)return;
+  const recent=Array.isArray(s.hitLocationRecent)?s.hitLocationRecent:[];
+  s.hitLocationRecent=[...recent,{target,zone,name:part.name}].slice(-16);
 }
 /** The shared action legality contract is used by player validation, enemy AI,
  * and the public view. 70–99 permits Move or Recover; 100 permits Recover only.
@@ -150,10 +220,10 @@ function grant(state, who, amount) {
   a.momentum = Math.min(100, a.momentum + amount);
   log(state, `${a.name} gains ${amount} Momentum.`,'momentum',{actor:who,amount});
 }
-function result(state, outcome, explanation) {
+function result(state, outcome, explanation, facts={}) {
   state.status = 'finished'; state.outcome = outcome; state.intent = null;
   const label=({player_victory:'The fight ends',player_defeat:'You are defeated',player_escaped:'You get away'})[outcome]??'Encounter ends';
-  log(state, `${label}. ${explanation}`,'outcome');
+  log(state, `${label}. ${explanation}`,'outcome',facts);
 }
 function downed(state) {
   if (state.player.hp <= 0) { result(state, 'player_defeat', 'You fall, unable to carry on. The encounter is lost.'); return true; }
@@ -279,15 +349,15 @@ export function newEncounter(scene, opts = {}) {
   const approach=opts.approach??'hold';
   if(scene==='boar'&&!['hold','fence','embankment'].includes(approach))throw new CombatError('Unknown boar staging');
   const enemies = {
-    flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,
-      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
-    dogman: {name:'Dogman', hp:50, hpMax:50, ceiling:50,readiness:0,
+    flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,anatomy:HUMAN_ANATOMY,
+      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact',label:'heavy club'}},
+    dogman: {name:'Dogman', hp:50, hpMax:50, ceiling:50,readiness:0,anatomy:HUMAN_ANATOMY,
       // 12–15 vs Flint's 14–17; a lighter and quicker blunt weapon.
-      weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
-    boar: {name:'Young Injured Wild Boar', hp:30,hpMax:65,ceiling:65, readiness:1,
+      weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact',label:'light club'}},
+    boar: {name:'Young Injured Wild Boar', hp:30,hpMax:65,ceiling:65, readiness:1,anatomy:BOAR_ANATOMY,
       weapon:{damage:12,accuracy:.70,guardMitigation:.30,type:'blunt',reach:'contact'}},
-    silas: {name:'Silas Pumpard', hp:50,hpMax:50,ceiling:50,readiness:0,
-      weapon:{damage:8,accuracy:.68,guardMitigation:.50,type:'sharp',reach:'contact'}},
+    silas: {name:'Silas Pumpard', hp:50,hpMax:50,ceiling:50,readiness:0,anatomy:HUMAN_ANATOMY,
+      weapon:{damage:8,accuracy:.68,guardMitigation:.50,type:'sharp',reach:'contact',label:'iron hook'}},
   };
   const state = {
     id:opts.id ?? `test-${scene}`, scene, round:1, revision:0, rng:opts.seed ?? 123,
@@ -295,7 +365,11 @@ export function newEncounter(scene, opts = {}) {
     approach:scene==='boar'?approach:null,
     terrain:scene==='boar'?{playerSpot:approach==='fence'?'fence':approach==='embankment'?'shoulder':'lane',laneClear:approach!=='hold',mouthClear:false,fenceBlocked:false}:null,
     openings:{player:null,enemy:null},lastPlayerActions:[],lastEnemyActions:[],narrativeRecent:[],
-    player:actor('Player', opts.player), enemy:actor(enemies[scene].name, {...enemies[scene], ...opts.enemy}),
+    locationSeed:opts.locationSeed??opts.seed??123,hitLocationRecent:[],
+    player:actor('Player',{...opts.player,
+      anatomy:opts.player?.anatomy??(opts.player?.name?null:HUMAN_ANATOMY)}),
+    enemy:actor(opts.enemy?.name??enemies[scene].name,{...enemies[scene],...opts.enemy,
+      anatomy:opts.enemy?.anatomy??(opts.enemy?.name?null:enemies[scene].anatomy)}),
     intent:null, events:[], receipts:[],
   };
   if(scene==='boar'){
@@ -341,7 +415,7 @@ function tryAttack(s, who, a) {
     const spend=a.momentumCost??20;
     if(src.momentum<spend) { log(s,`${src.name} cannot muster the Momentum for ${ability}.`,'warning');return; }
     src.momentum-=spend;
-    log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend});
+    log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend,ability});
   }
   // The chance advertised before confirming an action uses the fighter's
   // starting Fatigue. The action's new exertion applies on the next attack,
@@ -354,7 +428,7 @@ function tryAttack(s, who, a) {
     s.dodgeAttempt?.attempted===true&&!s.dodgeAttempt.success;
   if(!caughtDodging&&(s.distance==='far' ||
     (s.distance==='near' && !(s.scene==='boar' && who==='enemy')))){
-    log(s,`${src.name}'s committed ${special?'maneuver':'strike'} falls short. The target is no longer within reach.`,'miss',{actor:who});
+    log(s,`${src.name}'s committed ${special?'maneuver':'strike'} falls short. The target is no longer within reach.`,'miss',{actor:who,reason:'out_of_reach',ability:special?ability:null});
     return;
   }
   if(s.scene==='boar'&&who==='enemy'&&a.targetSpot&&s.terrain.playerSpot!==a.targetSpot){
@@ -383,7 +457,8 @@ function tryAttack(s, who, a) {
         ? ["The boar rushes past, hooves scraping at the ground.","Its head drives through the gap you have already left behind."]
         :["The coal hook catches nothing but air.","Silas lunges, but the curved iron passes clear of you."];
     log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',
-      {actor:who,zone,damage:0,focusedBonusPercent:Math.round(focusedBonus*100)});
+      {actor:who,zone,damage:0,reason:'attack_roll',ability:special?ability:null,
+        narration:{openingUsed:exploited},focusedBonusPercent:Math.round(focusedBonus*100)});
     if(targetWho==='player' && (s.scene==='flint'||s.scene==='dogman'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
     return;
   }
@@ -405,27 +480,44 @@ function tryAttack(s, who, a) {
       TEST_CONFIG.guardReduction.min):0;
   const damage=Math.max(0,Math.round(raw*(1-reduction)));
   dst.hp=Math.max(0,dst.hp-damage);
-  const part=woundName(s,who,zone);
+  // Preserve the historical RNG sequence: woundName consumed one draw for
+  // Torso/Limbs hits and none for Head. This draw NEVER chooses the new part;
+  // omitting it would alter later rolls, AI decisions and results.
+  if(zone!=='head')rng(s);
+  const selectedPart=selectHitLocation(s,targetWho,zone,
+    who+'|'+String(s.events.length));
+  rememberHitLocation(s,targetWho,zone,selectedPart);
+  const part=selectedPart?.name;
+  const hitPartPreposition=selectedPart?.preposition;
+  const loc=hitLocationPhrase(part,hitPartPreposition);
   let narrative;
-  if (who==='player') narrative=freshPhrase(s,`hit-${who}-${s.scene}`,[
-    `Your fist catches ${dst.name} across the ${part}.`,
-    `You catch ${dst.name} off balance with a blow to the ${part}.`,
-    `Your strike connects with ${dst.name}'s ${part}.`]);
-  else if (s.scene==='flint') narrative=freshPhrase(s,'hit-flint',[
-    `Flint's club slams into your ${part}.`,
-    `The cudgel catches your ${part} with a dull thud.`,
-    `Flint steps through the swing. The heavy wood strikes your ${part}.`]);
-  else if (s.scene==='dogman') narrative=freshPhrase(s,'hit-dogman',[
-    `Dogman's club snaps against your ${part}.`,
-    `The thin cudgel catches your ${part}.`,
-    `Dogman darts in and clips your ${part} with the club.`]);
-  else if (s.scene==='boar') narrative=freshPhrase(s,'hit-boar',[
-    `The boar's weight catches you hard across the ${part}.`,
-    `The animal's charge collides with your ${part}.`]);
+  if(who==='player'){
+    const first=isUnarmedWeapon(src.weapon)?`You punch ${dst.name}${loc}.`:
+      `You hit ${dst.name}${loc}.`;
+    narrative=freshPhrase(s,`hit-${who}-${s.scene}`,[
+      first,
+      `You strike ${dst.name}${loc}.`,
+      `Your attack hits ${dst.name}${loc}.`
+    ]);
+  }else if(s.scene==='flint')narrative=freshPhrase(s,'hit-flint',[
+    `Flint's club hits you${loc}.`,
+    `Flint strikes you${loc} with his club.`,
+    `The club hits you${loc}.`
+  ]);
+  else if(s.scene==='dogman')narrative=freshPhrase(s,'hit-dogman',[
+    `Dogman's club hits you${loc}.`,
+    `Dogman strikes you${loc} with his club.`,
+    `The light club hits you${loc}.`
+  ]);
+  else if(s.scene==='boar')narrative=freshPhrase(s,'hit-boar',[
+    `The boar hits you${loc}.`,
+    `The animal strikes you${loc}.`
+  ]);
   else narrative=freshPhrase(s,'hit-silas',[
-    `Silas's iron hook clips your ${part}.`,
-    `The curved work iron strikes along your ${part}.`,
-    `Silas catches you with the hook as he steps inside your reach.`]);
+    `Silas's iron hook hits you${loc}.`,
+    `Silas strikes you${loc} with his hook.`,
+    `The hook catches you${loc}.`
+  ]);
   if(exploited)narrative=`${src.name==='Player'?'You take the opening.':src.name+' exploits the opening.'} ${narrative}`;
   // Explain exceptional damage within the same persisted event. The roll and
   // opening bonus are distinct; Guard may still reduce the resulting total.
@@ -439,21 +531,23 @@ function tryAttack(s, who, a) {
     :who==='player'&&s.enemy.hp<s.enemy.hpMax/2?' The opponent is plainly struggling now.':'';
   const guardText=dst.guard?` ${dst.name==='Player'?'Your guard':'Their guard'} absorbs ${raw-damage} of the impact.`:'';
   log(s,`${narrative}${damageBreakdown}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
-      'damage',{actor:who,target:targetWho,zone,raw,damage,
+      'damage',{actor:who,target:targetWho,zone,
+        ...(part?{hitPart:part,hitPartPreposition}:{}),raw,damage,
         baseDamage:rolled,openingDamageBonus,guarded:dst.guard,
+        narration:{openingUsed:exploited},
         focusedBonusPercent:Math.round(focusedBonus*100),
         guardReductionPercent:dst.guard?Math.round(reduction*100):0,
         ability:special?ability:null});
   if(src.weapon.type==='sharp' && damage>=6 && dst.bleed===0) {
     dst.bleed=1;dst.wounds.push({type:'cut',zone,severity:'minor'});
-    log(s,`${dst.name==='Player'?'A shallow cut opens.':'A shallow cut opens on '+dst.name+'.'} Light bleeding begins.`,'wound',{actor:targetWho});
+    log(s,`${dst.name==='Player'?'A shallow cut opens.':'A shallow cut opens on '+dst.name+'.'} Light bleeding begins.`,'wound',{actor:targetWho,condition:'bleed_started',zone});
   }
   // The stronger ordinary Flint hit isn't automatically a serious wound.
   // Trial serious thresholds reflect impact type; still NOT final injury balance.
   if(damage >= (src.weapon.type==='blunt'?19:15)){
     dst.ceiling=Math.max(1,dst.hpMax-8);dst.hp=Math.min(dst.hp,dst.ceiling);
     if(!dst.wounds.some(w=>w.severity==='serious'))dst.wounds.push({type:'impact',zone,severity:'serious'});
-    log(s,`${dst.name} suffers a severe impact. Their effective Health ceiling is reduced.`,'wound',{actor:targetWho});
+    log(s,`${dst.name} suffers a severe impact. Their effective Health ceiling is reduced.`,'wound',{actor:targetWho,condition:'serious_wound',zone});
   }
   if(damage>0&&zone==='limbs'){
     dst.armHits=(dst.armHits??0)+1;
@@ -544,7 +638,7 @@ function perform(s,who,a) {
       cost(s,who,TEST_CONFIG.useCost,'use');x.bandages--;x.bleed=0;
       log(s,`${x.name==='Player'?'You bind the wound firmly.':x.name+' binds a wound.'} Bleeding is controlled, but the injury remains.`,'wound');break;
     case 'withdraw':
-      if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':s.scene==='dogman'?'Dogman lowers his club and gets out of the way of the public street.':'Silas gives ground and ends the assault, remaining by the locked coal box.');
+      if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':s.scene==='dogman'?'Dogman lowers his club and gets out of the way of the public street.':'Silas gives ground and ends the assault, remaining by the locked coal box.',{actor:'enemy',condition:'withdraw'});
       else if(s.distance==='far') result(s,'player_escaped','You put enough distance between yourself and the threat to leave the fight.');
       else log(s,'You try to break away, but your opponent is still close enough to bar the route.','warning');break;
     default: throw new CombatError('Unsupported resolved action');

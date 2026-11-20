@@ -6,6 +6,12 @@ export type CombatActorView={
   wounds:Array<{type:string;zone?:string;severity:string}>;
   armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
 };
+/** Saved round-level projection. Original events are preserved beside it. */
+export type CombatRoundStoryView={
+  version:3;round:number;encounterId:string;line:string;detail?:string;
+  eventRefs:number[];tactical:string[];
+  actions:Array<{actorId:string;targetId?:string;kind:string;eventRef:number;actionId?:string}>;
+};
 export type CombatEventView={
   round:number;
   text:string;
@@ -14,10 +20,18 @@ export type CombatEventView={
   target?:'player'|'enemy';
   damage?:number;
   zone?:'head'|'torso'|'limbs';
+  /** Actual resolved part is separate from the three selectable zones. */
+  hitPart?:string;
+  hitPartPreposition?:'in'|'on'|'across';
   ability?:string|null;
   actionType?:'attack'|'guard'|'move'|'recover'|'technique'|'focus';
   actionDetail?:string;
   actionName?:string;
+  /** Committed, versioned story. Missing on legacy history (use original text). */
+  story?:{version:1|2;line:string;detail?:string;hidden?:boolean};
+  /** Optional factual effect outcome metadata from the saved event. */
+  narration?:{effects?:Array<{kind:string;label?:string;applied:boolean}>};
+  roundStory?:CombatRoundStoryView;
 };
 export type CombatSnapshot={
   status:'active'|'finished';outcome:string|null;stance:'brace'|'moving'|'cart';

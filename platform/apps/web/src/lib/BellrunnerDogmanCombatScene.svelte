@@ -4,7 +4,7 @@
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
-  import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
+  import CombatRoundChronicle from '$lib/CombatRoundChronicle.svelte';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/pall-story-landscape.css';
@@ -27,7 +27,6 @@
   let zone = $state<'head'|'torso'|'limbs'>('torso');
   let destination = $state<'side'|'close'|'cover'|'back'>('side');
   let reserve = $state<'breath'|'nerves'>('breath');
-  let logOpen = $state(false);
   let fatigueInfoDialog:HTMLDialogElement|undefined;
   const fatigueMilestones=[0,20,40,60,80,100] as const;
   function openFatigueInfo(){
@@ -55,7 +54,6 @@
 
   // Disabled actions remain inspectable; only Confirm is blocked.
   const visibleSelection = $derived(selected);
-  const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-6));
   const actionName = $derived({
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
     recover: 'Recover', technique: 'Press Advantage',focus:'Focused Stance'
@@ -458,39 +456,7 @@
   <!-- Chronicle and the player's own condition: beside the battlefield when
        it keeps its tuned width, otherwise directly beneath it. -->
   <div class="combat-console">
-    <section class="chronicle" aria-label="Battle Chronicle">
-      <div class="chronicle-heading">
-        <h3>Battle Chronicle</h3>
-        <button type="button" onclick={() => logOpen = !logOpen}
-          aria-expanded={logOpen} aria-controls="combat-chronicle-list">
-          {logOpen ? 'Latest only' : 'Full history'}
-        </button>
-      </div>
-      <div id="combat-chronicle-list" class="log-window" role="log" aria-live="off" aria-relevant="additions">
-        {#if snapshot.events.length === 0}
-          <p class="no-events">Dogman approaches. The first turn has not been committed.</p>
-        {:else}
-          <ol>
-            {#each recentEvents as event, i (i)}
-              <li class:latest={i === recentEvents.length - 1}
-                class:impact={event.kind === 'damage'} class:evaded={event.kind === 'miss'}>
-                <span class="round">{String(event.round).padStart(2, '0')}</span>
-                <span class="event-body">
-                  <span class="event-action" class:enemy-action={isEnemyCombatAction(event)}>
-                    [{combatActionLabel(event)}]
-                  </span>
-                  <span>{event.text}</span>
-                </span>
-              </li>
-            {/each}
-          </ol>
-        {/if}
-      </div>
-      {#if !logOpen && snapshot.events.length > 6}
-        <p class="history-hint">Latest 6 of {snapshot.events.length} entries.</p>
-      {/if}
-    </section>
-
+    <CombatRoundChronicle events={snapshot.events} emptyText="Dogman approaches. The first turn has not been committed."/>
     <section class="player-status" aria-label="Player combat condition">
       {@render combatant(snapshot.player, 'You', false)}
       {#each feedback.filter(item => item.target === 'player') as cue (cue.id)}
@@ -797,26 +763,6 @@
     .player-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .player-status .resource+.resource{border-left:0;padding-left:0}
   }
-  .chronicle-heading{display:flex;align-items:center;justify-content:space-between;
-    gap:10px;margin-bottom:10px}
-  .chronicle-heading button{padding:7px 12px;background:#271f19;color:#eed4ae;
-    border:1px solid #927453;cursor:pointer;font:13px/1.2 Georgia,serif;white-space:nowrap}
-  .chronicle-heading button:hover{background:#403124}
-  .log-window{min-height:150px;max-height:310px;overflow:auto;scrollbar-color:#947651 #30281f;scrollbar-width:thin}
-  .log-window ol{margin:0;padding:0;list-style:none}
-  .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
-    font:13px/1.35 Georgia,serif;color:#ecd1a8}
-  .log-window li.latest{background:#39291f;color:#ffdfb1;font-weight:700}
-  .log-window li.impact{border-left:3px solid #ce5d4c;padding-left:7px;color:#ffd4c8;
-    background:#552a2580}
-  .log-window li.evaded{border-left:3px solid #d7b97b;padding-left:7px;
-    color:#f4e1bf;background:#493c2b72}
-  .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
-  .event-body{min-width:0;display:flex;align-items:baseline;flex-wrap:wrap;column-gap:6px;row-gap:2px}
-  .event-action{flex:none;font:700 12px/1.35 Georgia,serif;color:#e6d3a9}
-  .event-action.enemy-action{color:#ff7468;text-shadow:0 1px 2px #200804}
-  .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
-  .no-events{font-size:13px;line-height:1.5}
   .clinic-link{position:relative;z-index:1;max-width:100%;margin:12px 0 1px;pointer-events:auto}
   /* Transient hit/miss overlays are anchored to the target, never to a guessed
      attack roll. Actual damage comes from the committed combat Chronicle. */

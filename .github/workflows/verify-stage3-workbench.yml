@@ -11,6 +11,8 @@ on:
       - 'platform/scripts/verify-stage4-exits.mjs'
       - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/scripts/verify-stage-six.mjs'
+      - 'platform/scripts/verify-combat-narration.test.ts'
+      - 'platform/scripts/verify-combat-rounds.test.ts'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-millhand-scenes-browser.mjs'
@@ -136,6 +138,8 @@ jobs:
       - run: npm run verify:stage-five
       - run: node --test packages/game-core/vendor/combat-v0.5.1/test.mjs packages/game-core/vendor/combat-v0.5.1/integration.test.mjs
       - run: npm run verify:stage-six
+      - name: Shared deterministic combat story and saved Chronicle
+        run: npm run verify:combat-narration
       - name: Stage 7 clinic state and canon
         run: npm run verify:stage-seven
       - name: Stage 8 home state, notice and persistence contract
@@ -150,6 +154,8 @@ jobs:
         run: node --import tsx --test scripts/verify-stage6-postgres.integration.test.ts
       - run: npm run check:api
       - run: npm run build -w @the-pall/web
+      - name: Contract and game-core unit tests
+        run: npm run test:unit
       - name: Real Chromium Stage 6 outcome CTA click and keyboard navigation
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-combat-cta-browser.mjs
@@ -171,6 +177,10 @@ jobs:
       - name: Real Chromium Stitcher Claudia five topics, both stages and every early exit
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 150s npm run verify:stitcher-claudia-browser
+      # Run the canonical-copy check after independent combat, browser and unit
+      # tests. A dialogue-copy mismatch must not prevent their verification.
+      - name: Web typecheck and UI content contracts
+        run: npm run check:web
       - name: Save Bellrunner 1272px and 1920px visual QA screenshots
         if: always()
         uses: actions/upload-artifact@v4
