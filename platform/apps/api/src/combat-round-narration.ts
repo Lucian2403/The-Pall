@@ -82,13 +82,16 @@ function recentCombat(events:readonly CombatEvent[],round:number):RecentCombat{
   const repetitions=new Map<string,number>();
   const recent=new Map<number,CombatEvent[]>();
   for(const e of events){
-    if(e.round>=round||e.round<round-8)continue;
-    const group=recent.get(e.round)||[];
-    group.push(e);recent.set(e.round,group);
+    if(e.round>=round)continue;
+    // Count all earlier uses for natural variation over a long fight.
+    // Streaks still require the last few rounds, without gaps.
     if(['damage','miss','guard','move','recovery','focus','technique'].includes(e.kind)){
       const key=signature(e);
       repetitions.set(key,(repetitions.get(key)||0)+1);
     }
+    if(e.round<round-8)continue;
+    const group=recent.get(e.round)||[];
+    group.push(e);recent.set(e.round,group);
   }
   const actors=new Set<string>();
   for(const group of recent.values())
@@ -435,11 +438,13 @@ export function narrateCommittedRounds(
         current.actor!==next.actor){
         const later=result[ids[next.index]];
         const name=label(state,later,next.actor);
-        const nextText=(name==='You'&&next.text.startsWith('You hit '))
-          ?next.text.replace(/^You hit /,'You also hit ')
-          :next.text.startsWith(name+' hits ')
-            ?next.text.replace(name+' hits ',name+' also hits ')
-            :next.text;
+        const nextText=next.text.includes(' again')
+          ?next.text
+          :(name==='You'&&next.text.startsWith('You hit '))
+            ?next.text.replace(/^You hit /,'You also hit ')
+            :next.text.startsWith(name+' hits ')
+              ?next.text.replace(name+' hits ',name+' also hits ')
+              :next.text;
         combined.push(current.text+' '+nextText);
         i++;continue;
       }
@@ -467,6 +472,10 @@ export function narrateCommittedRounds(
           const reason=result[ids[next.index]].reason;
           combined.push(first+', and '+(reason==='out_of_reach'
             ?'your attack falls short':'your attack misses')+'.');
+        }else if(ability(result[ids[next.index]])){
+          // A named ability already needs its own short sentence. Avoid
+          // "and ... but" chains which are hard for new English readers.
+          combined.push(current.text+' '+next.text);
         }else combined.push(first+', and '+second+'.');
         i++;continue;
       }

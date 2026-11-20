@@ -580,6 +580,28 @@ test('the final story includes the actual finishing hit when many facts occur',(
  assert.deepEqual(saved.at(-1)!.roundStory!.eventRefs,[0,1,2,3]);
 });
 
+test('two hits do not produce the awkward "also hits again" phrase',()=>{
+ const s=state('Rail Hand');
+ const prior=narrateCommittedRounds([event('damage',{
+  actor:'enemy',target:'player',damage:6
+ })],s);
+ const fresh=narrateCommittedRounds(sample(2,[
+  event('damage',{actor:'player',target:'enemy',damage:5}),
+  event('damage',{actor:'enemy',target:'player',damage:7})
+ ]),s,prior).at(-1)!.roundStory!;
+ assert.match(fresh.line,/Rail Hand hits you again/);
+ assert.doesNotMatch(fresh.line,/also hits you again/);
+});
+test('a generated ranged ability follows movement without a double-but sentence',()=>{
+ const s=state('Ink Machine');
+ const round=summary([
+  event('move',{actor:'player',actionDetail:'side'}),
+  event('miss',{actor:'enemy',target:'player',reason:'out_of_reach',
+    ability:'Ink Thread'})
+ ],s);
+ assert.match(round.line,/You step aside\. Ink Machine uses Ink Thread/);
+ assert.doesNotMatch(round.line,/and Ink Machine uses Ink Thread, but/);
+});
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{
  for(const kind of ['flint','dogman'] as const){
   let s=newEncounter(kind,{seed:199,player:{hp:2000,hpMax:2000,ceiling:2000,
