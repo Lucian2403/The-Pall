@@ -12,6 +12,7 @@ on:
       - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/scripts/verify-stage-six.mjs'
       - 'platform/scripts/verify-combat-narration.test.ts'
+      - 'platform/scripts/verify-combat-rounds.test.ts'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-millhand-scenes-browser.mjs'
@@ -153,6 +154,10 @@ jobs:
         run: node --import tsx --test scripts/verify-stage6-postgres.integration.test.ts
       - run: npm run check:api
       - run: npm run build -w @the-pall/web
+      - name: Web typecheck and UI content contracts
+        run: npm run check:web
+      - name: Contract and game-core unit tests
+        run: npm run test:unit
       - name: Real Chromium Stage 6 outcome CTA click and keyboard navigation
         timeout-minutes: 3
         run: timeout --signal=TERM --kill-after=5s 120s node scripts/verify-combat-cta-browser.mjs
