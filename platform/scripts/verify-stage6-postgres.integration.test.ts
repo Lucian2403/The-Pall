@@ -18,6 +18,8 @@ import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-rout
 import {registerCharacterRoutes} from '../apps/api/src/character-routes.ts';
 import {registerBellrunnerDispatchRoutes} from '../apps/api/src/bellrunner-dispatch-routes.ts';
 import {registerStitcherWardRoutes} from '../apps/api/src/stitcher-ward-routes.ts';
+import {registerStitcherOwlerCombatRoutes} from '../apps/api/src/stitcher-owler-combat-routes.ts';
+import {INITIAL_STITCHER} from '../apps/api/src/stitcher-work.ts';
 import {STITCHER_CLAUDIA_LINES,STITCHER_LINES} from '../apps/api/src/stitcher-work.ts';
 import {registerBellrunnerWrongBellRoutes} from '../apps/api/src/bellrunner-wrong-bell-routes.ts';
 import {registerBellrunnerSecondJobRoutes} from '../apps/api/src/bellrunner-second-job-routes.ts';
@@ -52,7 +54,7 @@ const schema=[
   '0015_bellrunner_dispatch_work.sql',
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
-  '0020_stitcher_ward.sql'
+  '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -66,6 +68,7 @@ const app=Fastify({logger:false});
 registerCharacterRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDispatchRoutes(app,{pool:db,resolveSession});
 registerStitcherWardRoutes(app,{pool:db,resolveSession});
+registerStitcherOwlerCombatRoutes(app,{pool:db,resolveSession,seed:()=>47});
 registerBellrunnerWrongBellRoutes(app,{pool:db,resolveSession});
 registerBellrunnerSecondJobRoutes(app,{pool:db,resolveSession});
 registerBellrunnerDogmanRoutes(app,{pool:db,resolveSession});
@@ -2558,5 +2561,151 @@ test('Stage 8 Back to Stage 7 works during notice reading and after completion',
    assert.equal(fromClinic.body!.phase,'PAID');
    assert.equal((await request('GET',route)).status,409,
      'Old completed Stage 8 is erased and inaccessible until clinic departure');
+ }
+});
+
+
+async function stitcherAtNightDoor(
+ preparation:'reason'|'cart'|'brace',branch:'trolley'|'consent'|'notes'='trolley',
+ ready=true,health=50
+){
+ const id=randomUUID();
+ await db.query(
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health,max_health) VALUES($1,$2,'Stage VI Stitcher',$3,'Female','Stitcher',$4::jsonb,'[]'::jsonb,'Cinder Row Infirmary',5,'IN_PROGRESS',$5,$5)",
+  [id,owner,'owler-'+id,JSON.stringify({Medicine:3,
+    [branch==='trolley'?'Industry':branch==='consent'?'Commerce':'Scholarship']:1}),health]
+ );
+ const ward={...INITIAL_STITCHER,revision:37,stage:5,
+  phase:ready?'fight_ready':'prepare_door',branch,
+  stage5Witnessed:ready,stage5Hold:ready,stage5Preparation:preparation};
+ await db.query(
+  'INSERT INTO player_character_stitcher_ward(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+  [id,37,JSON.stringify(ward)]
+ );
+ return {id,path:base+id+'/stitcher/combat',ward:base+id+'/stitcher/ward'};
+}
+
+test('Owler Stage VI rejects unwitnessed start, strangers, and invalid commands',async()=>{
+ const c=await stitcherAtNightDoor('reason','consent',false);
+ assert.equal((await request('GET',c.path,null)).status,401);
+ assert.equal((await request('GET',c.path,stranger)).status,404);
+ assert.equal((await request('GET',c.path)).status,409);
+ const blocked=await request('POST',c.path,owner,{kind:'start',requestId:randomUUID()});
+ assert.equal(blocked.status,409);
+ assert.equal(Number((await db.query(
+  'SELECT count(*)::int n FROM player_character_owler_combat WHERE character_id=$1',
+  [c.id])).rows[0].n),0);
+ assert.equal((await request('POST',c.path,owner,{kind:'turn',
+  expectedRevision:0,requestId:randomUUID(),action:{type:'attack',zone:'heart'}})).status,400);
+ assert.equal((await request('POST',c.path,owner,{kind:'start',requestId:'not-a-uuid'})).status,400);
+});
+
+test('Owler three door preparations start a real saved encounter once, without rewards',async()=>{
+ for(const [prep,branch] of [
+  ['reason','trolley'],['cart','consent'],['brace','notes']
+ ] as const){
+  const c=await stitcherAtNightDoor(prep,branch);
+  const first=await request('GET',c.path);
+  assert.equal(first.status,200);
+  assert.deepEqual(first.body,{needsStart:true,stage:6});
+  const requestId=randomUUID();
+  const begun=await request('POST',c.path,owner,{kind:'start',requestId});
+  assert.equal(begun.status,200,JSON.stringify(begun.body));
+  assert.equal(begun.body?.stage,6);
+  assert.equal(begun.body?.preparation,prep);
+  assert.equal(begun.body?.branch,branch);
+  assert.equal(begun.body?.enemy.name,'Owler');
+  assert.equal(begun.body?.status,'active');
+  assert.equal(begun.body?.patientSafe,false);
+  assert.equal(begun.body?.transferCancelled,false);
+  assert.equal(begun.body?.distance,prep==='cart'?'far':'contact');
+  assert.equal(begun.body?.player.hp,50);
+  if(prep==='cart')assert.match(begun.body?.enemyIntent||'',/ward cart/);
+  assert.deepEqual((await request('POST',c.path,owner,{kind:'start',requestId})).body,begun.body);
+  assert.deepEqual((await request('GET',c.path)).body,begun.body);
+  const saved=await db.query(
+   'SELECT preparation,branch,history,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1',
+   [c.id]);
+  assert.equal(saved.rows[0].preparation,prep);
+  assert.equal(saved.rows[0].branch,branch);
+  assert.deepEqual(saved.rows[0].history,[]);
+  assert.equal(saved.rows[0].patient_safe,false);
+  const character=await db.query(
+   'SELECT tutorial_stage,tutorial_status,coins,major_skill_bonuses FROM player_characters WHERE id=$1',
+   [c.id]);
+  assert.equal(character.rows[0].tutorial_stage,6);
+  assert.equal(character.rows[0].tutorial_status,'IN_PROGRESS');
+  assert.equal(Number(character.rows[0].coins),20);
+  assert.equal(character.rows[0].major_skill_bonuses.Medicine,3);
+  assert.equal(Object.values(character.rows[0].major_skill_bonuses).filter(x=>x===1).length,1);
+  assert.equal((await request('POST',c.ward,owner,
+   {action:'continue_door',requestId:randomUUID(),expectedRevision:37})).status,409);
+ }
+});
+
+test('Owler turn is owner-scoped, replay-safe and preserves the Chronicle event stream',async()=>{
+ const c=await stitcherAtNightDoor('brace');
+ let state=(await request('POST',c.path,owner,{kind:'start',requestId:randomUUID()})).body!;
+ const cmd={kind:'turn',expectedRevision:state.revision,
+   requestId:randomUUID(),action:{type:'guard'}};
+ assert.equal((await request('POST',c.path,stranger,cmd)).status,404);
+ const resolved=await request('POST',c.path,owner,cmd);
+ assert.equal(resolved.status,200,JSON.stringify(resolved.body));
+ state=resolved.body!;
+ assert.equal(state.revision,1);
+ assert.ok(state.turnEvents.length>0);
+ assert.ok(state.events.length>0);
+ assert.equal(state.events.at(-1).roundStory.version,3);
+ assert.deepEqual((await request('POST',c.path,owner,cmd)).body,state);
+ assert.equal((await request('POST',c.path,owner,
+   {...cmd,action:{type:'attack',zone:'torso'}})).status,409);
+ assert.equal((await request('POST',c.path,owner,
+   {...cmd,requestId:randomUUID()})).status,409);
+ assert.deepEqual((await request('GET',c.path)).body,state);
+ const stored=await db.query('SELECT revision,state,history FROM player_character_owler_combat WHERE character_id=$1',[c.id]);
+ assert.equal(Number(stored.rows[0].revision),state.revision);
+ assert.deepEqual(stored.rows[0].history,state.events);
+ assert.deepEqual(stored.rows[0].state.events,state.turnEvents);
+});
+
+test('Owler victory and defeat are real, and either outcome saves the patient',async()=>{
+ for(const [mode,health] of [['victory',500],['defeat',1]] as const){
+  const c=await stitcherAtNightDoor('reason','notes',true,health);
+  let state=(await request('POST',c.path,owner,{kind:'start',requestId:randomUUID()})).body!;
+  if(mode==='victory'){
+   await db.query(
+    "UPDATE player_character_owler_combat SET state=jsonb_set(state,'{enemy,hp}','1'::jsonb) WHERE character_id=$1",
+    [c.id]
+   );
+   state=(await request('GET',c.path)).body!;
+  }
+  for(let i=0;i<85&&state.status==='active';i++){
+   const action=mode==='victory'
+     ?state.player.fatigue>=70?{type:'recover',mode:'breath'}
+      :state.distance==='contact'?{type:'attack',zone:'torso'}:{type:'move',to:'close'}
+     :{type:'guard'};
+   const res=await request('POST',c.path,owner,{kind:'turn',requestId:randomUUID(),
+      expectedRevision:state.revision,action});
+   assert.equal(res.status,200,JSON.stringify(res.body));
+   state=res.body!;
+  }
+  assert.equal(state.status,'finished');
+  assert.equal(state.outcome,mode==='victory'?'player_victory':'player_defeat');
+  assert.equal(state.patientSafe,true);
+  assert.equal(state.transferCancelled,true);
+  assert.deepEqual((await request('GET',c.path)).body,state);
+  const stored=await db.query(
+   'SELECT outcome,patient_safe,transfer_cancelled,history FROM player_character_owler_combat WHERE character_id=$1',[c.id]);
+  assert.equal(stored.rows[0].outcome,state.outcome);
+  assert.equal(stored.rows[0].patient_safe,true);
+  assert.equal(stored.rows[0].transfer_cancelled,true);
+  assert.equal(stored.rows[0].history.at(-1).roundStory.version,3);
+  const person=await db.query(
+    'SELECT current_health,coins,tutorial_stage,tutorial_status,major_skill_bonuses FROM player_characters WHERE id=$1',[c.id]);
+  assert.equal(person.rows[0].current_health,state.player.hp);
+  assert.equal(person.rows[0].tutorial_stage,6);
+  assert.equal(person.rows[0].tutorial_status,'COMPLETED');
+  assert.equal(Number(person.rows[0].coins),20);
+  assert.equal(person.rows[0].major_skill_bonuses.Medicine,3);
  }
 });

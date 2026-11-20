@@ -1,0 +1,256 @@
+/**
+ * Stitcher Stage 6 — Owler. This is the authenticated PostgreSQL adapter for
+ * the exact v0.5.1 engine, NOT a new combat implementation.
+ *
+ * Lock order: owned character -> witnessed Stage V hold -> combat row -> receipt.
+ * Every resolved round and character Health update commit atomically.
+ */
+import type {FastifyInstance} from 'fastify';
+import {fromNodeHeaders} from 'better-auth/node';
+import type {IncomingHttpHeaders} from 'node:http';
+import {createHash,randomBytes} from 'node:crypto';
+import pg from 'pg';
+import {auth} from './auth.js';
+import {step,CombatError} from '@the-pall/game-core/combat-v0.5.1';
+import {initializeOwlerCombat,type OwlerPreparation} from './stitcher-owler-combat-opening.js';
+import type {CombatAction,CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
+import {combatView} from './millhand-combat-view.js';
+import {narrateCommittedTurn} from './combat-narration.js';
+import {narrateCommittedRounds} from './combat-round-narration.js';
+
+
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+type Params={id:string};
+type Character={origin:string;tutorial_stage:number;tutorial_status:string;
+  current_health:number;max_health:number};
+type Claim={state:{stage:number;phase:string;stage5Witnessed?:boolean;stage5Hold?:boolean;
+  stage5Preparation?:OwlerPreparation|null;branch?:'trolley'|'consent'|'notes'|null}};
+type CombatRecord={state:CombatState;history:CombatEvent[];preparation:OwlerPreparation;
+  branch:'trolley'|'consent'|'notes';patient_safe:boolean;transfer_cancelled:boolean};
+type Command={kind:'start';requestId:string}|{
+  kind:'turn';requestId:string;expectedRevision:number;action:CombatAction
+};
+const allowedMove=['side','close','cover','back'];
+const allowedZone=['head','torso','limbs'];
+
+function parseCommand(value:unknown):Command{
+  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('invalid_body');
+  const v=value as Record<string,unknown>;
+  if(typeof v.requestId!=='string'||!UUID.test(v.requestId))throw Error('invalid_request_id');
+  if(v.kind==='start'){
+    if(Object.keys(v).sort().join(',')!=='kind,requestId')throw Error('invalid_fields');
+    return {kind:'start',requestId:v.requestId};
+  }
+  if(v.kind!=='turn'||Object.keys(v).sort().join(',')!=='action,expectedRevision,kind,requestId')
+    throw Error('invalid_fields');
+  if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)
+    throw Error('invalid_revision');
+  if(!v.action||typeof v.action!=='object'||Array.isArray(v.action))throw Error('invalid_action');
+  const a=v.action as Record<string,unknown>;
+  const keys=Object.keys(a).sort().join(',');
+  let action:CombatAction;
+  switch(a.type){
+    case 'attack':case 'technique':
+      if(keys!=='type,zone'||!allowedZone.includes(a.zone as string))throw Error('invalid_action');
+      action={type:a.type,zone:a.zone as 'head'|'torso'|'limbs'};break;
+    case 'move':
+      if(keys!=='to,type'||!allowedMove.includes(a.to as string))throw Error('invalid_action');
+      action={type:'move',to:a.to as 'side'|'close'|'cover'|'back'};break;
+    case 'recover':
+      if(keys!=='mode,type'||(a.mode!=='breath'&&a.mode!=='nerves'))throw Error('invalid_action');
+      action={type:'recover',mode:a.mode};break;
+    case 'guard':case 'focus':
+      if(keys!=='type')throw Error('invalid_action');
+      action={type:a.type};break;
+    default:
+      // No client override for speed, AI intent, damage, consumables or escape.
+      throw Error('invalid_action');
+  }
+  return {kind:'turn',requestId:v.requestId,expectedRevision:v.expectedRevision as number,action};
+}
+
+function readyPreparation(claim:Claim|undefined):OwlerPreparation|null{
+  const st=claim?.state;
+  if(st?.stage!==5||st.phase!=='fight_ready'||
+    st.stage5Witnessed!==true||st.stage5Hold!==true||!st.branch)return null;
+  const chosen=st.stage5Preparation;
+  return chosen==='reason'||chosen==='cart'||chosen==='brace'?chosen:null;
+}
+function snapshot(record:CombatRecord){
+  const viewStance=record.preparation==='reason'?'moving'
+    :record.preparation==='brace'?'brace':'cart';
+  return {...combatView(record.state,record.history,viewStance),
+    preparation:record.preparation,branch:record.branch,
+    patientSafe:record.patient_safe,transferCancelled:record.transfer_cancelled};
+}
+function databaseSetupError(error:unknown){return (error as {code?:string})?.code==='42P01';}
+
+type SessionAccount={user:{id:string;emailVerified:boolean}}|null;
+type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
+
+/**
+ * Production uses the real Better Auth session, a private PostgreSQL pool,
+ * and cryptographic seeds. Dependencies can be supplied only by the in-process
+ * PostgreSQL integration harness; no HTTP header can enable this substitution.
+ */
+export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
+  pool?:pg.Pool;
+  resolveSession?:SessionResolver;
+  seed?:()=>number;
+}={}){
+  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
+    auth.api.getSession({headers:fromNodeHeaders(headers)}));
+  const seed=options.seed??(()=>randomBytes(4).readUInt32BE(0));
+  app.addHook('onClose',async()=>{if(!options.pool)await db.end();});
+
+  app.get<{Params:Params}>('/api/characters/:id/stitcher/combat',async(req,reply)=>{
+    reply.header('Cache-Control','no-store');
+    const session=await resolveSession(req.headers);
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+    const c=await db.query<Character>(
+      'SELECT origin,tutorial_stage,tutorial_status,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2',
+      [req.params.id,session.user.id]);
+    if(!c.rowCount||c.rows[0].origin!=='Stitcher')return reply.code(404).send({error:'not_found'});
+    if(c.rows[0].tutorial_stage<5)return reply.code(409).send({error:'stage_six_not_ready'});
+    try{
+      const claim=await db.query<Claim>('SELECT state FROM player_character_stitcher_ward WHERE character_id=$1 FOR UPDATE',[req.params.id]);
+      const preparation=readyPreparation(claim.rows[0]);
+      if(!preparation)return reply.code(409).send({error:'preparation_not_recorded'});
+      const saved=await db.query<CombatRecord>(
+        'SELECT state,history,preparation,branch,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1',[req.params.id]);
+      if(!saved.rowCount){
+        if(c.rows[0].tutorial_stage!==5)return reply.code(409).send({error:'combat_not_found'});
+        return {needsStart:true,stage:6};
+      }
+      if(saved.rows[0].preparation!==preparation||saved.rows[0].branch!==claim.rows[0].state.branch)
+         return reply.code(409).send({error:'combat_preparation_mismatch'});
+      return snapshot(saved.rows[0]);
+    }catch(error){
+      if(databaseSetupError(error))return reply.code(503).send({error:'owler_combat_schema_missing',setup:'npm run stitcher:migrate'});
+      throw error;
+    }
+  });
+
+  app.post<{Params:Params}>('/api/characters/:id/stitcher/combat',async(req,reply)=>{
+    reply.header('Cache-Control','no-store');
+    const session=await resolveSession(req.headers);
+    if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+    if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+    if(req.headers.origin&&req.headers.origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))
+      return reply.code(403).send({error:'invalid_origin'});
+    if(!req.headers['content-type']?.toLowerCase().startsWith('application/json'))
+      return reply.code(415).send({error:'json_required'});
+    let command:Command;
+    try{command=parseCommand(req.body);}catch(error){
+      return reply.code(400).send({error:error instanceof Error?error.message:'invalid_action'});
+    }
+    const hash=createHash('sha256').update(JSON.stringify(command)).digest('hex');
+    const client=await db.connect();let inTransaction=false;
+    try{
+      await client.query('BEGIN');inTransaction=true;
+      const characters=await client.query<Character>(
+        'SELECT origin,tutorial_stage,tutorial_status,current_health,max_health FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
+        [req.params.id,session.user.id]);
+      if(!characters.rowCount||characters.rows[0].origin!=='Stitcher'){
+        await client.query('ROLLBACK');inTransaction=false;
+        return reply.code(404).send({error:'not_found'});
+      }
+      const receipt=await client.query<{request_hash:string;response:unknown}>(
+        'SELECT request_hash,response FROM player_character_owler_combat_receipts WHERE character_id=$1 AND request_id=$2',
+        [req.params.id,command.requestId]);
+      if(receipt.rowCount){
+        await client.query('COMMIT');inTransaction=false;
+        return receipt.rows[0].request_hash===hash?receipt.rows[0].response
+          :reply.code(409).send({error:'idempotency_key_reuse'});
+      }
+      const ch=characters.rows[0];
+      if(ch.tutorial_stage!==5&&ch.tutorial_stage!==6){
+        await client.query('ROLLBACK');inTransaction=false;
+        return reply.code(409).send({error:'stage_six_not_ready'});
+      }
+      const claims=await client.query<Claim>(
+        'SELECT state FROM player_character_stitcher_ward WHERE character_id=$1',[req.params.id]);
+      const preparation=readyPreparation(claims.rows[0]);
+      if(!preparation){
+        await client.query('ROLLBACK');inTransaction=false;
+        return reply.code(409).send({error:'preparation_not_recorded'});
+      }
+      const saved=await client.query<CombatRecord>(
+        'SELECT state,history,preparation,branch,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1 FOR UPDATE',
+        [req.params.id]);
+      let record:CombatRecord;
+      if(command.kind==='start'){
+        if(saved.rowCount)record=saved.rows[0];
+        else{
+          if(ch.tutorial_stage!==5){
+            await client.query('ROLLBACK');inTransaction=false;
+            return reply.code(409).send({error:'combat_not_initialized'});
+          }
+          const branch=claims.rows[0].state.branch;
+          if(!branch)throw Error('missing_recorded_branch');
+          const state=initializeOwlerCombat(req.params.id,ch,preparation,seed());
+          record={state,history:[],preparation,branch,patient_safe:false,transfer_cancelled:false};
+          await client.query(
+            'INSERT INTO player_character_owler_combat(character_id,revision,preparation,branch,state,history) VALUES($1,0,$2,$3,$4::jsonb,$5::jsonb)',
+            [req.params.id,preparation,branch,JSON.stringify(state),'[]']);
+          await client.query(
+            "UPDATE player_characters SET tutorial_stage=6,tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
+        }
+      }else{
+        if(!saved.rowCount){
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(409).send({error:'combat_not_initialized'});
+        }
+        record=saved.rows[0];
+        if(ch.tutorial_stage!==6||record.preparation!==preparation||
+           record.branch!==claims.rows[0].state.branch){
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(409).send({error:'combat_preparation_mismatch'});
+        }
+        if(record.state.revision!==command.expectedRevision){
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(409).send({error:'stale_revision',currentRevision:record.state.revision});
+        }
+        let state:CombatState;
+        try{
+          state=step(record.state,command.action,{
+            expectedRevision:command.expectedRevision,requestId:command.requestId});
+        }catch(error){
+          if(!(error instanceof CombatError))throw error;
+          await client.query('ROLLBACK');inTransaction=false;
+          return reply.code(422).send({error:'invalid_combat_action',detail:error.message});
+        }
+        if(state.status==='finished'&&state.outcome!=='player_victory'&&state.outcome!=='player_defeat')
+          throw new Error('unexpected_encounter_outcome');
+        // Enemy intention was committed before resolving this turn. Keep it
+        // exclusively in historical log metadata; never reveal future AI.
+        state.events=narrateCommittedRounds(
+          narrateCommittedTurn(state.events,command.action,record.state.intent,
+            state,record.history),state,record.history);
+        const finished=state.status==='finished';
+        record={...record,state,history:[...record.history,...state.events],
+          patient_safe:finished,transfer_cancelled:finished};
+        await client.query(
+          'UPDATE player_character_owler_combat SET revision=$2,state=$3::jsonb,history=$4::jsonb,outcome=$5,patient_safe=$6,transfer_cancelled=$7,updated_at=NOW() WHERE character_id=$1',
+          [req.params.id,state.revision,JSON.stringify(state),JSON.stringify(record.history),
+            state.outcome,record.patient_safe,record.transfer_cancelled]);
+        // No automatic wound type, recovery, coins, XP or tutorial clinic fee.
+        await client.query(
+          'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
+          [req.params.id,state.player.hp,state.status==='finished'?'COMPLETED':'IN_PROGRESS']);
+      }
+      const response=snapshot(record);
+      await client.query(
+        'INSERT INTO player_character_owler_combat_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
+        [req.params.id,command.requestId,hash,JSON.stringify(response)]);
+      await client.query('COMMIT');inTransaction=false;
+      return response;
+    }catch(error){
+      if(inTransaction){try{await client.query('ROLLBACK');}catch{/* preserve original */}}
+      if(databaseSetupError(error))return reply.code(503).send({error:'owler_combat_schema_missing',setup:'npm run stitcher:migrate'});
+      throw error;
+    }finally{client.release();}
+  });
+}

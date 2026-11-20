@@ -34,7 +34,8 @@
   };
   type Snapshot={stage:number;tutorialStatus:string;state:State;
     started:boolean;availableActions:string[]};
-  let {snapshot,pending,errorMessage,perform}:{
+  let {snapshot,pending,errorMessage,perform,characterId}:{
+    characterId:string;
     snapshot:Snapshot;pending:boolean;errorMessage:string;
     perform:(action:string)=>Promise<void>;
   }=$props();
@@ -404,7 +405,8 @@
               {/if}
             {:else if s.phase==='fight_ready'}
               <p class="narration">Owler lowers his shoulder and tries to push through toward the trolley. You hold the doorway while the attendant keeps the patient back.</p>
-              <p class="instruction">Stage VI is the turn-based encounter with Owler. Combat is not yet connected; no result, injury or reward has been recorded.</p>
+              <p class="instruction">The patient stays behind the attendant. Owler is ready to force his way through. The fight will be resolved with the normal combat rules.</p>
+              <a class="pall-framed-button primary-choice" href={'/characters/'+encodeURIComponent(characterId)+'/stitcher/combat'}>Confront Owler</a>
             {/if}
           {/if}
           {#if itemChoices.length}<p class="item-instruction">Use the indicated item.</p>{/if}

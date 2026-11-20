@@ -8,9 +8,10 @@
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
 
-  let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
+  let {snapshot, feedback, pending, errorMessage, perform, characterId, encounter='flint'}: {
     snapshot: CombatSnapshot;
     characterId: string;
+    encounter?:'flint'|'owler';
     feedback: CombatFloatingFeedback[];
     pending: boolean;
     errorMessage: string;
@@ -19,6 +20,7 @@
 
   // The server determines every value, legal action, and actual result.
   const ended = $derived(snapshot.status === 'finished');
+  const isOwler=$derived(encounter==='owler');
   const flintDefeated = $derived(ended && snapshot.outcome === 'player_victory');
 
   let selected = $state<'attack'|'guard'|'move'|'recover'|'technique'|'focus'>('guard');
@@ -66,19 +68,33 @@
   const openingBonus=$derived(snapshot.rules.openingDamageBonus);
   const damageMin=$derived(selectedDamage.min+openingBonus);
   const damageMax=$derived(selectedDamage.max+openingBonus);
-  const stanceText = $derived(snapshot.stance === 'brace'
-    ? 'You raise your arms and brace yourself as Flint approaches.'
-    : snapshot.stance === 'moving'
-      ? 'You move along the side of the passage, looking for space to get past Flint.'
-      : 'You begin the fight with the work cart between you and Flint.');
-  const resultText = $derived(snapshot.outcome === 'player_defeat'
+  const stanceText = $derived(isOwler
+    ? snapshot.stance==='brace'
+      ?'You brace at the infirmary door. Owler is close, but you are ready to guard.'
+      :snapshot.stance==='cart'
+        ?'An empty ward cart blocks the doorway. Owler must go round it.'
+        :'You face Owler at the night door. No barrier stands between you.'
+    :snapshot.stance === 'brace'
+      ? 'You raise your arms and brace yourself as Flint approaches.'
+      : snapshot.stance === 'moving'
+        ? 'You move along the side of the passage, looking for space to get past Flint.'
+        : 'You begin the fight with the work cart between you and Flint.');
+  const resultText = $derived(isOwler
+    ?snapshot.outcome==='player_defeat'
+      ?'Owler overpowers you and you fall against the door frame. The attendant pulls the patient trolley back inside. Ward staff gather and stop Owler from taking the man.'
+      :'Owler backs away from the doorway, breathing hard. He sees the attendant standing with the patient and the ward staff gathering nearby.'
+    :snapshot.outcome === 'player_defeat'
     ? 'You go down hard on the stones. You try getting up, but your legs give out. A few workers come round the corner, and Flint takes one look before buggering off. Didn\'t get a coin out of you.\nOne of the lads grabs you under the arm and hauls you up. You lean on his shoulder as he helps you hobble towards the clinic.'
     : snapshot.enemy.hp <= 0
       ? 'Flint is on the ground and cannot stop you. You move past him and leave the passage.You\'re battered and aching all over. Better get yourself to the clinic'
       : 'Flint finally gets out of your way. You keep an eye on him as you walk past, then head down the passage. You\'re battered and aching all over. Better get yourself to the clinic.');
   const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
     snapshot.player.wounds.some(wound => wound.severity === 'serious'));
-  const journal = $derived(snapshot.outcome === 'player_defeat'
+  const journal = $derived(isOwler
+    ?snapshot.outcome==='player_defeat'
+      ?"Owler was stronger than I expected. I went down at the night door. The attendant pulled the trolley back, and the ward staff would not let Owler take the man. Claudia told him to leave. I lost the fight, but the man's transfer was cancelled."
+      :"Owler tried to force his way past me. I held him off until he backed away. He said he would tell the school I stopped the transfer. I told him to tell them the patient refused. Claudia cancelled this one transfer, and the man stayed in the ward."
+    :snapshot.outcome === 'player_defeat'
     ? "Flint beat me. Damn it. I thought I could get past him, but I couldn't. Other workers came when they heard the fight, and he left without taking my money. One of them helped me get to medical care. Still not a coin from the council for those plates. A fine day I've had."
     : toughVictory
       ? "I beat Flint and got past him. That was tough. For a moment I didn't think I'd manage it, not with that club of his. Everybody knows how hard he is to beat. Well, he didn't get a coin out of me. And after all that, the council still hasn't paid us for those plates."
@@ -193,22 +209,26 @@
   </div>
 {/snippet}
 
-<section class="battle" aria-label="Stage 6, the fight with Flint">
+<section class="battle" aria-label={isOwler?'Stage 6, the fight with Owler':'Stage 6, the fight with Flint'}>
   <ActivityLayout mode="workspace">
   {#snippet stage()}
-  <div class="alley">
+  <div class="alley" class:owler-scene={isOwler}>
     <div class="stage-scenery">
       <div class="flint" role="img"
-        aria-label={flintDefeated ? 'Flint defeated in the passage' : 'Flint holding his club'}>
-        <img src={flintDefeated
-          ? '/characters/flint/flint-defeated.webp'
-          : '/characters/flint/flint-standing.webp'} alt="" />
-        <span class="scene-label flint-label">FLINT · CONTRACTOR'S COLLECTOR</span>
+        aria-label={isOwler
+          ?(flintDefeated?'Owler defeated at the night door':'Owler guarding the night door')
+          :(flintDefeated?'Flint defeated in the passage':'Flint holding his club')}>
+        <img src={isOwler
+          ?(flintDefeated?'/locations/stitcher/owler-defeated.webp':'/locations/stitcher/owler.webp')
+          :(flintDefeated?'/characters/flint/flint-defeated.webp':'/characters/flint/flint-standing.webp')} alt="" />
+        <span class="scene-label flint-label">{isOwler?'OWLER · NIGHT PORTER':"FLINT · CONTRACTOR'S COLLECTOR"}</span>
         {#each feedback.filter(item => item.target === 'enemy') as cue (cue.id)}
           <span class="combat-float" class:missed={cue.kind === 'miss'} aria-hidden="true">{cue.label}</span>
         {/each}
       </div>
-      <span class="cart-marker scene-label">WORK CART</span>
+      {#if !isOwler||snapshot.stance==='cart'}
+        <span class="cart-marker scene-label">{isOwler?'EMPTY WARD CART':'WORK CART'}</span>
+       {/if}
 
       <aside class="parchment" aria-label="Current encounter situation">
         <div class="encounter-line">
@@ -217,13 +237,28 @@
         </div>
         {#if snapshot.round === 1 && !ended}<p class="stance">{stanceText}</p>{/if}
         {#if ended}
-          <p class="outcome">{snapshot.outcome === 'player_defeat'
-            ? 'Flint defeated you. Other workers intervened.' : 'You defeated Flint.'}</p>
+          <p class="outcome">{isOwler
+            ?snapshot.outcome==='player_defeat'?'Owler defeated you. The staff stopped the transfer.':'You defeated Owler.'
+            :snapshot.outcome==='player_defeat'?'Flint defeated you. Other workers intervened.':'You defeated Flint.'}</p>
           <p>{resultText}</p>
-          <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
-          <a class="pall-framed-button clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
+          {#if isOwler}
+            {#if snapshot.outcome==='player_victory'}
+              <p><strong>OWLER:</strong> “Fine. I'll tell them you stopped the transfer.”</p>
+              <p><strong>YOU:</strong> “Tell them he refused.”</p>
+            {:else}
+              <p><strong>ATTENDANT:</strong> “He said no. We all heard him. You're not taking him.”</p>
+              <p><strong>CLAUDIA:</strong> “That's enough. You're not moving him past these witnesses.”</p>
+              <p><strong>OWLER:</strong> “You'll have to answer to the school.”</p>
+              <p><strong>CLAUDIA:</strong> “I'll speak to them myself. Now get out of my infirmary.”</p>
+            {/if}
+            <p><strong>CLAUDIA:</strong> “He stays here. I'm cancelling this transfer. The school can take it up with me.”</p>
+            <p class="after">The patient stays in ordinary care. This one transfer is cancelled. Your actual Health and wounds are saved. Medical care follows in Stage VII.</p>
+          {:else}
+            <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
+            <a class="pall-framed-button clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
+          {/if}
         {:else}
-          <p class="telegraph-title">FLINT'S OBSERVABLE INTENTION</p>
+          <p class="telegraph-title">{isOwler?"OWLER'S OBSERVABLE INTENTION":"FLINT'S OBSERVABLE INTENTION"}</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
           <p class="position">Opening stance: {snapshot.stance === 'cart'
             ? 'work cart' : snapshot.stance === 'moving' ? 'moving along passage' : 'braced'}.</p>
@@ -232,8 +267,8 @@
     </div>
 
     <!-- Enemy status belongs to Flint and stays near him on wide screens. -->
-    <section class="enemy-status" aria-label="Flint combat condition">
-      {@render combatant(snapshot.enemy, 'Flint', true)}
+    <section class="enemy-status" aria-label={isOwler?'Owler combat condition':'Flint combat condition'}>
+      {@render combatant(snapshot.enemy, isOwler?'Owler':'Flint', true)}
     </section>
 
     {#if !ended}
@@ -370,7 +405,7 @@
               Steady your breathing and focus on your timing. Your attacks are
               more accurate for three turns, including misses and special attacks.
               Damage does not increase. Focused Stance does not stack or protect
-              you while preparing; Flint may still strike normally.
+              you while preparing; {isOwler?'Owler':'Flint'} may still strike normally.
             </p>
             {#if focusedTurns>0}
               <p class="detail-note">Focused Stance active: {focusedTurns} turns remaining.</p>
@@ -393,7 +428,7 @@
             </div>
             <p class="action-explanation">Move sideways to attempt a dodge, or fall back
               to increase distance from your opponent. A dodge roll applies only when
-              you move before Flint's committed attack. Close distance gives no dodge chance.</p>
+              you move before {isOwler?"Owler's":"Flint's"} committed attack. Close distance gives no dodge chance.</p>
           {:else}
             <div class="stat-line">
               <span><b>Current Fatigue:</b> {snapshot.player.fatigue}</span>
@@ -428,8 +463,8 @@
               adding Stamina and shake off some Fatigue. The more exhausted you are,
               the harder it is to regain your strength.</p>
             {#if snapshot.distance==='contact'}
-              <p class="recovery-risk">Flint is in striking range.
-                Recover is not Guard: his club can still hit you for full,
+              <p class="recovery-risk">{isOwler?'Owler':'Flint'} is in striking range.
+                Recover is not Guard: {isOwler?'his heavy strikes':'his club'} can still hit you for full,
                 unguarded damage.</p>
             {/if}
           {/if}
@@ -445,7 +480,8 @@
   <!-- Chronicle and the player's own condition: beside the battlefield when
        it keeps its tuned width, otherwise directly beneath it. -->
   <div class="combat-console">
-    <CombatRoundChronicle events={snapshot.events} emptyText="Flint approaches. The first turn has not been committed."/>
+    <CombatRoundChronicle events={snapshot.events}
+      emptyText={isOwler?'Owler stands at the night door. The fight has not started.':'Flint approaches. The first turn has not been committed.'}/>
     <section class="player-status" aria-label="Player combat condition">
       {@render combatant(snapshot.player, 'You', false)}
       {#each feedback.filter(item => item.target === 'player') as cue (cue.id)}
@@ -455,19 +491,19 @@
 
     {#if journalOpen}
       <section id="combat-personal-journal" class="aftermath"
-        bind:this={journalElement} aria-label="The Fight with Flint personal journal">
+        bind:this={journalElement} aria-label={isOwler?'The Fight with Owler personal journal':'The Fight with Flint personal journal'}>
         <header class="journal-head">
           <div>
             <small>PERSONAL JOURNAL</small>
-            <h2>The Fight with Flint</h2>
+            <h2>{isOwler?'The Fight with Owler':'The Fight with Flint'}</h2>
           </div>
         </header>
         <div class="journal-entries">
           {#if ended}
-            <p>Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.</p>
+            <p>{isOwler?'Owler tried to force the patient through the night door. I stood in his way, and we fought.':"Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought."}</p>
             <p>{journal}</p>
           {:else}
-            <p>The fight with Flint is still going on. I haven't recorded how it ends.</p>
+            <p>{isOwler?"The fight with Owler is still going on. I haven't recorded how it ends.":"The fight with Flint is still going on. I haven't recorded how it ends."}</p>
           {/if}
         </div>
       </section>
@@ -517,7 +553,8 @@
     --activity-padding:0;--activity-gap:0}
   .alley{position:relative;min-height:clamp(505px,36vw,625px);isolation:isolate;overflow:hidden;
     background:#1b222b url('/locations/alley/alley-background.webp') center/cover no-repeat}
-  .alley::after{content:'';position:absolute;inset:auto 0 0;height:235px;
+  .alley.owler-scene{background:#191c1f url('/locations/stitcher/service-corridor.webp') center/cover no-repeat}
+   .alley::after{content:'';position:absolute;inset:auto 0 0;height:235px;
     background:linear-gradient(transparent,#161410aa 65%,#181512f0);pointer-events:none;z-index:1}
   /* Scenery remains non-interactive; its framed outcome card must receive
      real pointer hits, including all descendants and the clinic link. */

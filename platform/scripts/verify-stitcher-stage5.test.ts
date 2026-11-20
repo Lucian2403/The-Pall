@@ -101,7 +101,9 @@ test('the UI uses the two correct paintings and approved standing Owler artwork'
  assert.ok(page.includes('snapshot.state.branch,snapshot.state.phase'));
  assert.ok(scene.includes('src="/locations/stitcher/owler.webp"'));
  assert.ok(scene.includes("['door','prepare_door','door_reply','fight_ready'].includes(s.phase)"));
- assert.ok(scene.includes('Stage VI is the turn-based encounter'));
+ assert.ok(scene.includes('Confront Owler'));
+ assert.ok(scene.includes('stage5Preparation'));
+ assert.ok(!scene.includes('Combat is not yet connected'));
  assert.ok(env.includes("'exited','attendant','investigate','witness','hold'"));
  assert.ok(env.includes("if(stage===4&&(branch==='consent'||branch==='notes'))return 'records'"));
  assert.ok(routes.includes("const nextStatus='IN_PROGRESS'"));

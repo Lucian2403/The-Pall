@@ -100,3 +100,48 @@ The clinic may take place using the normal Cinder Row medical service (if availa
 **Previously approved in Stage 6:** telegraphed shove/strike, obstacle-dependent battle entry, Owler's two narrow outcome scenes, ward intervention on defeat, Claudia's cold institutional cancellation and final patient safety. The October 2026 exact line replacements have now been superseded by the pending November 2026 editorial candidate; do not treat the new words as owner-approved until reviewed.
 
 Related: [Stage 5 approved](owler-confrontation.md), [Stitcher master](README.md), [shared Stage 8](../shared-home-rent-ending.md), [Millhand encounter reference](../millhand/flint-fight.md).
+
+## Stage VI implementation — 20 November 2026
+
+The player begins this new combat stage only after the Stage V patient refusal
+has been witnessed, the attendant/Matron hold is recorded, and one doorway
+preparation (`reason`, `cart` or `brace`) is saved. Those facts are verified
+under the same account lock used to create the first combat turn. Stage V itself
+cannot determine the outcome or award a combat reward.
+
+**Owler uses the exact same baseline strike statistics as Flint:** 50 Health,
+14–17 standard damage, 49% base accuracy, contact-range forceful blows,
+the shared heavy-technique cost, fatigue/Guard/Momentum/Opening logic and
+initiative system. He has **no invented truncheon or strap**; the prototype
+treats his shoves and blows as blunt unarmed strikes. His only AI difference
+is a higher preference for choosing the existing `guard` action on later turns
+(34% baseline guard check, with an additional 35% opportunity after repeated
+player attacks). Guard still uses the normal mitigation roll. No guaranteed
+success, invulnerability or hidden defence modifier is introduced.
+
+The three saved preparations use existing encounter geometry:
+
+- **Reason:** contact range, no free combat bonus.
+- **Cart:** far range, with the empty cart in the doorway; Owler must use
+  the standard Move action to get close. The patient trolley is separate.
+- **Brace:** contact range and the same +2 normal player readiness used by
+  the Flint encounter; no automatic Guard.
+
+Owler is a legitimate single-opponent PvE fight. A victory comes from normal
+damage or withdrawal; defeat is a real loss. A completed outcome saves both
+the actual `player_victory` / `player_defeat` and the patient's protection:
+`patient_safe=true` and `transfer_cancelled=true`. On defeat, the staff
+and Claudia enforce the already witnessed stop, without crediting the fallen
+player with a win. Both endings cancel **this patient's** transfer only and
+do not fix hospital funding or punish the school.
+
+The existing shared Battle Chronicle, actions, resource HUD, 21 human
+descriptive hit locations and replay persistence are reused. Each round has
+one readable story plus one compact numerical summary, with no nested event
+lists. The Stage V service-corridor art, standing Owler image and defeated
+Owler image are reused. The route does not give loot, pay, XP or a new skill.
+
+**Stage VII handoff:** After the fight the actual player Health, wounds and
+defeat/victory remain saved. The subsequent common 10-coin clinic service
+is not introduced as a broken link in Stage VI; implementing Stitcher's
+Stage VII clinic is the next separate stage.

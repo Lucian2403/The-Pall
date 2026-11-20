@@ -8,6 +8,7 @@ await client.connect();
 try{
  await client.query('BEGIN');
  await client.query(readFileSync(resolve(import.meta.dirname,'../db/migrations/0020_stitcher_ward.sql'),'utf8'));
+ await client.query(readFileSync(resolve(import.meta.dirname,'../db/migrations/0021_stitcher_owler_combat.sql'),'utf8'));
  await client.query('COMMIT');
- console.log('PASS: Stitcher ward stages I–IV schema created; no player progress reset.');
+ console.log('PASS: Stitcher ward and Owler combat schema created; no player progress reset.');
 }catch(e){await client.query('ROLLBACK');throw e;}finally{await client.end();}

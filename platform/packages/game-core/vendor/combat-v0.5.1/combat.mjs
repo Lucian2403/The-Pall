@@ -280,7 +280,8 @@ function makeIntent(state) {
   }
   if(scene!=='boar' && shouldHumanYield(state))
     return {type:'withdraw',speed:8,signal:'uncertain',
-      tell:scene==='flint'?'Flint draws a slow breath and glances past the cart. His grip loosens.'
+      tell:scene==='owler'?'Owler steps away from the night door. He lowers his hands.'
+      :scene==='flint'?'Flint draws a slow breath and glances past the cart. His grip loosens.'
       :scene==='dogman'?'Dogman looks toward the public street. His club hangs lower.'
       :'Silas turns towards the coal box, uncertain whether to press the quarrel.'};
   if(distance!=='contact' && !(scene==='boar' && distance==='near')){
@@ -292,7 +293,10 @@ function makeIntent(state) {
   const history=state.lastPlayerActions??[];
   const repeatedAttack=history.length>=2&&history.slice(-2).every(x=>x==='attack'||x==='technique');
   if(e.momentum>=20 && scene!=='boar' && (e.momentum>=30 || rng(state)<.70)){
-    return scene==='flint'
+    return scene==='owler'
+      ? {type:'technique',zone:'torso',speed:2,momentumCost:20,ability:'Heavy Shove',tracking:false,signal:'heavy threat',
+          tell:'Owler lowers his shoulder and puts his weight behind the next shove.'}
+      :scene==='flint'
       ? {type:'technique',zone:'torso',speed:2,momentumCost:20,ability:'Driving Blow',tracking:false,signal:'heavy threat',
           tell:'Flint sets both hands on his club and puts his weight behind the next movement. A heavy blow may follow.'}
       : scene==='dogman'
@@ -302,12 +306,18 @@ function makeIntent(state) {
           tell:'Silas sets the curved iron low and braces his stance. He looks capable of a hard, wrenching move.'};
   }
   if(scene==='silas' && state.player.momentum>=15 && state.round===1) return {type:'guard',speed:10,signal:'watchful',tell:'Silas shifts the hook across his chest, studying your movements.'};
+  // Owler uses Flint's forceful strikes but selects normal Guard more often.
+  if(scene==='owler'&&state.round>1&&
+     (rng(state)<.34||(repeatedAttack&&rng(state)<.35)))
+    return {type:'guard',speed:10,signal:'watchful',
+      tell:'Owler plants his feet and guards the doorway.'};
   // Mildly more defensive than Flint. Only committed, telegraphed actions.
   const defensiveChance=scene==='silas'?.24:scene==='dogman'?.12:scene==='flint'?.04:0;
   if(scene!=='boar' && state.round>1 && ((repeatedAttack && rng(state)<(scene==='flint'?.10:scene==='dogman'?.18:.72)) ||
         (state.player.momentum>=10 && rng(state)<defensiveChance))) {
     return {type:'guard',speed:10,signal:'watchful',
-      tell:scene==='flint'?'Flint squares his shoulders, club held across him. He watches for your commitment.'
+      tell:scene==='owler'?'Owler raises his hands and guards the doorway.'
+        :scene==='flint'?'Flint squares his shoulders, club held across him. He watches for your commitment.'
         :scene==='dogman'?'Dogman raises his light club across his chest, watching your hands.'
         :'Silas plants his boots, turning the hook slightly as he watches your hands.'};
   }
@@ -323,9 +333,13 @@ function makeIntent(state) {
       tell:'The boar limps along the fence, testing the gap again.'};
   }
   const zone=(scene==='boar'||rng(state)<.75)?'torso':'limbs';
-  return {type:'attack',zone,targetSpot:scene==='boar'?state.terrain.playerSpot:null,tracking:false,speed:scene==='flint'?1:scene==='dogman'?3:scene==='boar'?(distance==='near'?7:5):4,
+  return {type:'attack',zone,targetSpot:scene==='boar'?state.terrain.playerSpot:null,tracking:false,speed:scene==='flint'||scene==='owler'?1:scene==='dogman'?3:scene==='boar'?(distance==='near'?7:5):4,
     signal:scene==='boar'?'threatening':'watchful',
-    tell:scene==='flint'?freshPhrase(state,'flint-cue',[
+    tell:scene==='owler'?freshPhrase(state,'owler-cue',[
+        'Owler lowers his shoulder and steps towards the doorway.',
+        'Owler puts his hands out, ready to push past.',
+        'Owler watches your feet and holds his ground.'])
+      :scene==='flint'?freshPhrase(state,'flint-cue',[
       'Flint adjusts his grip on the club and leans into the passage.',
       'Flint watches your feet before shifting his own.',
       'Flint lowers the club a little. His shoulders stay tight.',
@@ -345,12 +359,16 @@ function makeIntent(state) {
 }
 
 export function newEncounter(scene, opts = {}) {
-  if (!['flint','boar','silas','dogman'].includes(scene)) throw new CombatError('Unknown fixture');
+  if (!['flint','boar','silas','dogman','owler'].includes(scene)) throw new CombatError('Unknown fixture');
   const approach=opts.approach??'hold';
   if(scene==='boar'&&!['hold','fence','embankment'].includes(approach))throw new CombatError('Unknown boar staging');
   const enemies = {
     flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,anatomy:HUMAN_ANATOMY,
       weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact',label:'heavy club'}},
+    // Identical numeric strike profile to Flint, unarmed as approved.
+    owler: {name:'Owler',hp:50,hpMax:50,ceiling:50,readiness:0,anatomy:HUMAN_ANATOMY,
+      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,
+        type:'blunt',reach:'contact',unarmed:true}},
     dogman: {name:'Dogman', hp:50, hpMax:50, ceiling:50,readiness:0,anatomy:HUMAN_ANATOMY,
       // 12–15 vs Flint's 14–17; a lighter and quicker blunt weapon.
       weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact',label:'light club'}},
@@ -424,7 +442,7 @@ function tryAttack(s, who, a) {
   cost(s,who,special?15:testAttackCost(s,who),special?'technique':'attack');
   // A failed committed dodge lets this specific club swing catch the mover
   // despite new spacing. A successful dodge uses the ordinary reach/miss path.
-  const caughtDodging=who==='enemy'&&(s.scene==='flint'||s.scene==='dogman')&&
+  const caughtDodging=who==='enemy'&&(s.scene==='flint'||s.scene==='dogman'||s.scene==='owler')&&
     s.dodgeAttempt?.attempted===true&&!s.dodgeAttempt.success;
   if(!caughtDodging&&(s.distance==='far' ||
     (s.distance==='near' && !(s.scene==='boar' && who==='enemy')))){
@@ -449,6 +467,8 @@ function tryAttack(s, who, a) {
   if (rng(s)>=chance) {
     const actions=who==='player'
       ? ["Your blow passes wide. You find nothing but air.","You commit to the strike, but the opponent slips outside its path.","You reach for an opening that closes too quickly."]
+      :s.scene==='owler'
+       ? ["Owler swings at you but misses.","Owler's shove falls short.","Owler tries to strike you but misses."]
       :s.scene==='flint'
        ? ["Flint's club whistles past you and cracks against empty cobbles.","Flint overreaches. The heavy club misses you entirely.","The club cuts the air beside your shoulder, missing by a hand's breadth."]
        :s.scene==='dogman'
@@ -459,7 +479,7 @@ function tryAttack(s, who, a) {
     log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',
       {actor:who,zone,damage:0,reason:'attack_roll',ability:special?ability:null,
         narration:{openingUsed:exploited},focusedBonusPercent:Math.round(focusedBonus*100)});
-    if(targetWho==='player' && (s.scene==='flint'||s.scene==='dogman'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
+    if(targetWho==='player' && (s.scene==='flint'||s.scene==='dogman'||s.scene==='owler'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
     return;
   }
   const base=src.weapon.damage;
@@ -499,7 +519,12 @@ function tryAttack(s, who, a) {
       `You strike ${dst.name}${loc}.`,
       `Your attack hits ${dst.name}${loc}.`
     ]);
-  }else if(s.scene==='flint')narrative=freshPhrase(s,'hit-flint',[
+  }else if(s.scene==='owler')narrative=freshPhrase(s,'hit-owler',[
+    `Owler hits you${loc}.`,
+    `Owler strikes you${loc} with his hands.`,
+    `Owler hits you hard${loc}.`
+  ]);
+  else if(s.scene==='flint')narrative=freshPhrase(s,'hit-flint',[
     `Flint's club hits you${loc}.`,
     `Flint strikes you${loc} with his club.`,
     `The club hits you${loc}.`
@@ -673,7 +698,7 @@ export function step(input, chosen, {requestId,expectedRevision}={}) {
       actionSpeed('player',t.a,s)>=actionSpeed('enemy',foe,s)){
       const outOfReach=(before==='contact'&&s.distance!=='contact'&&s.scene!=='boar') ||
         (s.scene==='boar'&&foe.targetSpot&&s.terrain.playerSpot!==foe.targetSpot);
-      if(outOfReach&&(s.scene==='flint'||s.scene==='dogman')){
+      if(outOfReach&&(s.scene==='flint'||s.scene==='dogman'||s.scene==='owler')){
         const chance=TEST_CONFIG.dodgeChance[t.a.to]??0;
         const success=rng(s)<chance;
         s.dodgeAttempt={attempted:true,success,chance};
