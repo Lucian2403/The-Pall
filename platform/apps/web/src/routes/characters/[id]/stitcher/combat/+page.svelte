@@ -53,6 +53,12 @@
       const state=await fight.json() as Snapshot|PendingStart;
       if('needsStart' in state && state.needsStart)await initialize();
       else battle=state as Snapshot;
+      // Starting Stage VI advances the server character; reflect it in the
+      // shell immediately, not only after a reload or the first saved turn.
+      if(character&&battle){
+        character={...character,tutorial:{
+          stage:6,status:battle.status==='finished'?'COMPLETED':'IN_PROGRESS'}};
+      }
       status='ready';
     }catch(error){
       status='unavailable';
@@ -88,7 +94,7 @@
         if(character){
           const p=result.player as {hp:number};
           character={...character,health:{...character.health,current:p.hp},
-            tutorial:{...character.tutorial,status:result.status==='finished'?'COMPLETED':'IN_PROGRESS'}};
+            tutorial:{stage:6,status:result.status==='finished'?'COMPLETED':'IN_PROGRESS'}};
         }
       }else{
         if(response.status===409){
