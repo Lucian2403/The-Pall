@@ -108,7 +108,9 @@ function missLine(s:CombatState,e:CombatEvent,
   history:readonly CombatRoundStory[]=[]):string{
  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
  const spell=ability(e),count=repeatCount(history,e);
- if(e.reason==='out_of_reach')return period(from+' cannot reach '+to);
+ if(e.reason==='out_of_reach')return period(spell
+   ?from+(who==='player'?' use ':' uses ')+spell+', but cannot reach '+to
+   :from+' cannot reach '+to);
  if(e.reason==='old_position')return period(from+' attacks the place '+to+
    (to==='you'?' were':' was')+', but misses');
  if(spell)return period(from+(who==='player'?' use ':' uses ')+spell+' but misses '+to);
@@ -272,7 +274,24 @@ export function narrateCommittedRounds(
     // Minor state changes have a label; serious wounds and outcomes get text.
     // Cap the main narrative at three short sentences; every source event can
     // be inspected and no numerical effect is thrown away.
-    const sentence=pieces.slice(0,3).map(x=>x.text).join(' ')||'The round ends.';
+    const selected=pieces.slice(0,3);
+    // A result or a serious injury cannot disappear merely because there were
+    // several preparatory actions before it. Keep original chronological order.
+    const essential=pieces.filter(p=>p.kind==='outcome'||
+      p.kind==='wound'&&['serious_wound','bleed_started'].includes(
+        String(result[ids[p.index]]?.condition)));
+    for(const item of essential){
+      if(selected.includes(item))continue;
+      if(selected.length>=3){
+        const expendable=selected.findIndex(p=>
+          ['guard','move','recovery','focus'].includes(p.kind));
+        if(expendable>=0)selected.splice(expendable,1);
+        else if(item.kind==='outcome')selected.shift();
+      }
+      selected.push(item);
+    }
+    selected.sort((a,b)=>a.index-b.index);
+    const sentence=selected.map(x=>x.text).join(' ')||'The round ends.';
     const headline=details.filter(x=>/damage to|blocked|Opening bonus/.test(x));
     // Applied ability effects outrank minor costs in the short numbers line.
     // Future effect labels are read from metadata, not a hardcoded vocabulary.

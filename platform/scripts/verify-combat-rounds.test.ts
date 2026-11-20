@@ -180,6 +180,22 @@ test('serious wounds and bleeding require resolved wound flags',()=>{
  assert.match(result.detail||'',/2 bleeding damage to you/);
 });
 
+test('the final outcome and a serious wound stay visible after several actions',()=>{
+ const s=state('Grit Lantern');s.outcome='player_defeat';
+ const round=summary([
+  event('guard',{actor:'player'}),
+  event('move',{actor:'enemy',actionDetail:'close'}),
+  event('damage',{actor:'enemy',target:'player',damage:18,raw:18}),
+  event('wound',{actor:'player',condition:'serious_wound'}),
+  event('outcome',{actor:'enemy',text:'You cannot continue.'})
+ ],s);
+ assert.match(round.line,/Grit Lantern hits you/);
+ assert.match(round.line,/You suffer a serious injury/);
+ assert.match(round.line,/You lose the fight\./);
+ assert.ok(round.line.indexOf('hits you')<round.line.indexOf('serious injury'));
+ assert.ok(round.line.indexOf('serious injury')<round.line.indexOf('lose the fight'));
+});
+
 test('opponent Opening grammar and linked player misses stay natural',()=>{
  const enemy=state('Dogman');
  const used=summary([event('damage',{actor:'enemy',target:'player',
