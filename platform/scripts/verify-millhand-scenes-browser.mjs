@@ -452,8 +452,14 @@ try{
   console.log('PASS: Stage 5 — Flint inspection opens in the reading column; stance choice posts '+posts[0].action);
   await open('/characters/qa-scenes-millhand/home',1280,720,'.home-artwork');
   await evalJS("document.querySelector('.hotspot.book').click()");
-  await until(()=>evalJS("document.querySelector('dialog.room-overlay')?.open===true"),4000,'journal modal');
-  console.log('PASS: Stage 8 — the journal hotspot opens the room modal above the scene');
+  await until(()=>evalJS("!!document.querySelector('#personal-journal')"),4000,'shared Journal');
+  await evalJS("document.querySelectorAll('#personal-journal .journal-tabs button')[1].click()");
+  await until(()=>evalJS("!!document.querySelector('#personal-journal .task-list button')"),4000,'Millhand archived work');
+  await evalJS("document.querySelector('#personal-journal .task-list button').click()");
+  const millhandDiary=await evalJS("document.querySelector('#personal-journal')?.innerText");
+  assert.match(millhandDiary,/Marking the Plates|council plates/);
+  assert.ok(!millhandDiary.includes('Dogman')&&!millhandDiary.includes('bell linkage'));
+  console.log('PASS: Stage VIII — one Journal interface reads only the selected character');
 
   assert.deepEqual(exceptions,[],'No uncaught page exceptions');
   console.log('PASS: Millhand scenes — '+checks+' scene/size layouts and in-scene interactions verified in real pages');
