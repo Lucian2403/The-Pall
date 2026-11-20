@@ -6,6 +6,9 @@ import {combatJournal,combatOpening,type DiaryEncounter} from '../../web/src/lib
 import {AUTHORED_MISSING_STAMP_EVIDENCE,validateMissingStampEvidence} from '@the-pall/game-core';
 import type {StitcherState} from './stitcher-work.js';
 import type {StageFourState} from './bellrunner-second-job-work.js';
+import type {DispatchState} from './bellrunner-dispatch-work.js';
+import type {BellState} from './bellrunner-wrong-bell-work.js';
+import {dispatchJournal,wrongBellJournal} from '../../web/src/lib/bellrunner-early-journal.js';
 import type {ClinicState} from './millhand-clinic-state.js';
 import {classifyCondition} from './millhand-clinic-state.js';
 import type {State as HomeState} from './shared-home-state.js';
@@ -99,4 +102,17 @@ export function homeTask(characterId:string,s:HomeState):CompletedJournalTask{
  return {...identity(characterId,8),taskId:'shared.rented-home',
   title:'Rented Home',paragraphs:[homeJournalIntro(s.origin)],
   choices:{route:s.branch},outcome:s.outcome};
+}
+
+export function bellrunnerDispatchTask(characterId:string,s:DispatchState):CompletedJournalTask{
+ if(s.phase!=='final_notice_taken')throw new Error('journal_requires_completed_courier_round');
+ return {...identity(characterId,2),taskId:'bellrunner.courier-round',
+  title:'The Council Round',paragraphs:dispatchJournal(s),
+  choices:{road:s.route??'',receipt:s.receipt??''}};
+}
+export function bellrunnerWrongBellTask(characterId:string,s:BellState):CompletedJournalTask{
+ if(s.phase!=='committed'||!s.branch)throw new Error('journal_requires_wrong_bell_decision');
+ return {...identity(characterId,3),taskId:'bellrunner.wrong-bell',
+  title:'The Wrong Bell',paragraphs:wrongBellJournal(s),
+  choices:{route:s.branch}};
 }
