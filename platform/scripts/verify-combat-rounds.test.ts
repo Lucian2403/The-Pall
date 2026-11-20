@@ -53,7 +53,7 @@ test('two misses do not turn into a dodge or injury',()=>{
    event('miss',{actor:'enemy',target:'player',reason:'attack_roll'}),
    event('miss',{actor:'player',target:'enemy',reason:'attack_roll'})
  ],state('Ridge Lantern'));
- assert.equal(result.line,'Ridge Lantern and you both miss.');
+ assert.equal(result.line,'You and Ridge Lantern both miss.');
  assert.doesNotMatch(result.line,/dodge|bleed|block|wound/);
 });
 
@@ -452,6 +452,71 @@ test('details show clean sentences, separate numbers and the saved raw text',()=
  const folded=event('momentum',{actor:'player',text:'Player gains 10 Momentum.',
    story:{version:2,line:'You gain Momentum.',detail:'+10 Momentum',hidden:true}});
  assert.equal(combatEventNumbers(folded),undefined);
+});
+
+test('Fatigue rises across rounds with exact owner and amount, not invented illness',()=>{
+ const rival=state('Copper Sentinel'),history:CombatEvent[]=[];
+ for(let round=1;round<=4;round++){
+   const amount=round*3;
+   const events=sample(round,[
+     event('guard',{actor:'player'}),
+     event('fatigue',{actor:'player',amount,fatigue:amount})
+   ]);
+   const saved=narrateCommittedRounds(events,rival,history);
+   history.push(...saved);
+   const data=saved.at(-1)!.roundStory!;
+   assert.match(data.detail||'',new RegExp('\\+'+amount+' Fatigue \\(You\\)'));
+   assert.doesNotMatch(data.line,/collapse|panic|limp|suffer|dizzy/);
+ }
+ assert.equal(history.length,8);
+ assert.equal(groupCombatRounds(history).length,4);
+});
+
+test('wound then later bleeding tick is recorded without a second invented cut',()=>{
+ const rival=state('Bone Clock'),history:CombatEvent[]=[];
+ const first=narrateCommittedRounds([
+  event('damage',{actor:'enemy',target:'player',damage:8}),
+  event('wound',{actor:'player',condition:'bleed_started'})
+ ],rival,history);
+ history.push(...first);
+ const second=narrateCommittedRounds(sample(2,[
+  event('guard',{actor:'player'}),
+  event('bleed',{actor:'player',target:'player',damage:1})
+ ]),rival,history).at(-1)!.roundStory!;
+ assert.match(first.at(-1)!.roundStory!.line,/start bleeding/);
+ assert.doesNotMatch(second.line,/start bleeding|new cut|another wound/);
+ assert.match(second.detail||'',/1 bleeding damage to you/);
+});
+
+test('repeated generated abilities are counted by saved IDs and events, not names in prose',()=>{
+ const rival=state('Stone Eel'),history:CombatEvent[]=[];
+ const first=narrateCommittedRounds([
+  event('damage',{actor:'enemy',target:'player',damage:2,
+    narration:{ability:{id:'effect-A',name:'Stone Thread'},action:{
+       verb:{base:'bind',thirdPerson:'binds'}}}})
+ ],rival,history);
+ history.push(...first);
+ // The earlier enemy name and story contain similar words, but this is a
+ // different generated ability ID. It must be narrated as a first use.
+ const second=narrateCommittedRounds(sample(2,[
+  event('damage',{actor:'enemy',target:'player',damage:3,
+    narration:{ability:{id:'effect-B',name:'Stone Thread'},action:{
+       verb:{base:'bind',thirdPerson:'binds'}}}})
+ ]),rival,history).at(-1)!.roundStory!;
+ assert.match(second.line,/uses Stone Thread and binds you/);
+ assert.doesNotMatch(second.line,/using Stone Thread|to bind you/);
+});
+
+test('narrating multiple fresh rounds at once uses the preceding raw round facts',()=>{
+ const rival=state('Loom Beast');
+ const batched=narrateCommittedRounds([
+  ...sample(1,[event('miss',{actor:'enemy',target:'player',reason:'attack_roll'})]),
+  ...sample(2,[event('miss',{actor:'enemy',target:'player',reason:'attack_roll'})])
+ ],rival);
+ const rounds=groupCombatRounds(batched);
+ assert.equal(rounds.length,2);
+ assert.match(rounds[1].main,/misses you again/);
+ assert.equal(batched.length,2);
 });
 
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{

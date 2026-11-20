@@ -67,15 +67,28 @@ function ability(e:CombatEvent):string|undefined{
 type RecentCombat={
   hits:Map<string,number>;misses:Map<string,number>;
   openingsUsed:Map<string,number>;guards:Map<string,number>;
+  repetitions:Map<string,number>;
 };
+function signature(e:CombatEvent):string{
+  const n=facts(e);
+  const spell=str(n.ability?.id)||ability(e)||'';
+  const detail=e.kind==='move'?(str(n.movement?.kind)||str(e.actionDetail)||''):
+    e.kind==='recovery'?(str(e.mode)||''):'';
+  return [actorId(e),e.kind,spell,detail].join('|');
+}
 function recentCombat(events:readonly CombatEvent[],round:number):RecentCombat{
   const hits=new Map<string,number>(),misses=new Map<string,number>();
   const openingsUsed=new Map<string,number>(),guards=new Map<string,number>();
+  const repetitions=new Map<string,number>();
   const recent=new Map<number,CombatEvent[]>();
   for(const e of events){
     if(e.round>=round||e.round<round-8)continue;
     const group=recent.get(e.round)||[];
     group.push(e);recent.set(e.round,group);
+    if(['damage','miss','guard','move','recovery','focus','technique'].includes(e.kind)){
+      const key=signature(e);
+      repetitions.set(key,(repetitions.get(key)||0)+1);
+    }
   }
   const actors=new Set<string>();
   for(const group of recent.values())
@@ -101,15 +114,12 @@ function recentCombat(events:readonly CombatEvent[],round:number):RecentCombat{
       if(!canHit&&!canMiss&&!canOpen&&!canGuard)break;
     }
   }
-  return {hits,misses,openingsUsed,guards};
+  return {hits,misses,openingsUsed,guards,repetitions};
 }
-function repeatCount(history:readonly CombatRoundStory[],e:CombatEvent):number{
- const who=actorId(e),name=ability(e);
- return history.filter(r=>r.actions.some(a=>a.actorId===who&&a.kind===e.kind)&&
-   (!name||r.line.includes(name))).length;
+function repeatCount(recent:RecentCombat|undefined,e:CombatEvent):number{
+  return recent?.repetitions.get(signature(e))??0;
 }
-function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
-  history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string{
+function hitLine(s:CombatState,e:CombatEvent,recent?:RecentCombat):string{
  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
  const verb=facts(e).action?.verb;
  const base=str(verb?.base)||'hit';
@@ -119,7 +129,7 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
  const count=recent?.hits.get(who)??0;
  // Reusing an ability is a real past fact, even when other moves broke
  // the hit streak. Only consecutive hits can be described as 'again'.
- const abilityUses=repeatCount(history,e);
+ const abilityUses=repeatCount(recent,e);
  let line:string;
  if(namedAbility){
    if(abilityUses%3===1)
@@ -149,11 +159,10 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
  }
  return period(line);
 }
-function missLine(s:CombatState,e:CombatEvent,
-  history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string{
+function missLine(s:CombatState,e:CombatEvent,recent?:RecentCombat):string{
  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
  const spell=ability(e),count=recent?.misses.get(who)??0;
- const abilityTries=repeatCount(history,e);
+ const abilityTries=repeatCount(recent,e);
  if(e.reason==='out_of_reach')return period(spell
    ?abilityTries%2===1
      ?from+(who==='player'?' try ':' tries ')+spell+', but '+to+' is out of reach'
@@ -174,10 +183,9 @@ function missLine(s:CombatState,e:CombatEvent,
  return period(who==='player'?'You attack '+to+' but miss':
    from+' attacks '+to+' but misses');
 }
-function moveLine(s:CombatState,e:CombatEvent,
-  history:readonly CombatRoundStory[]=[]):string|undefined{
+function moveLine(s:CombatState,e:CombatEvent,recent?:RecentCombat):string|undefined{
  const n=facts(e),mode=str(n.movement?.kind)||str(e.actionDetail);
- const from=label(s,e,actorId(e)),repeat=repeatCount(history,e);
+ const from=label(s,e,actorId(e)),repeat=repeatCount(recent,e);
  if(mode==='side')
    return period(from+(repeat%2===0?(from==='You'?' step':' steps')+' aside':
      (from==='You'?' move':' moves')+' to the side'));
@@ -187,19 +195,18 @@ function moveLine(s:CombatState,e:CombatEvent,
  if(mode==='leave')return period(from+(from==='You'?' leave':' leaves')+' the fight');
  if(mode||n.movement)return period(from+(from==='You'?' move':' moves'));
 }
-function actionLine(s:CombatState,e:CombatEvent,prior?:CombatRoundStory,
-  history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string|undefined{
+function actionLine(s:CombatState,e:CombatEvent,recent?:RecentCombat):string|undefined{
   const from=label(s,e,actorId(e));
   switch(e.kind){
-    case 'damage':return hitLine(s,e,prior,history,recent);
-    case 'miss':return missLine(s,e,history,recent);
+    case 'damage':return hitLine(s,e,recent);
+    case 'miss':return missLine(s,e,recent);
     case 'guard':return period(from+(from==='You'?' guard':' guards')+
       ((recent?.guards.get(actorId(e))??0)>0?' again':''));
-    case 'move':return moveLine(s,e,history);
+    case 'move':return moveLine(s,e,recent);
     case 'focus':return period(from+(from==='You'?' focus':' focuses')+' on the next attack');
     case 'recovery':
       if(e.mode==='breath'){
-        const repeated=repeatCount(history,e)%2!==0;
+        const repeated=repeatCount(recent,e)%2!==0;
         return period(from==='You'
           ?(repeated?'You rest for a moment':'You catch your breath')
           :(repeated?from+' rests for a moment':from+' catches a breath'));
@@ -296,13 +303,14 @@ export function narrateCommittedRounds(
   const result=events.map(e=>({...e} as RoundStoryEvent));
   const groups=new Map<number,number[]>();
   result.forEach((e,i)=>groups.set(e.round,[...(groups.get(e.round)||[]),i]));
-  const memory=prior.flatMap(e=>{const r=(e as RoundStoryEvent).roundStory;
-    return r?.version===3?[r]:[];});
-  let previous=memory.at(-1);
+  const seen=[...prior];
   for(const [round,ids] of groups){
-    const recent=recentCombat(prior,round);
+    const recent=recentCombat(seen,round);
     const last=result[ids[ids.length-1]];
-    if(last.roundStory){previous=last.roundStory;memory.push(last.roundStory);continue;}
+    if(last.roundStory){
+      seen.push(...ids.map(i=>result[i]));
+      continue;
+    }
     // Every item refers to its original LOCAL event index. Do not infer an
     // action from the pre-turn telegraph; the engine has already resolved it.
     const pieces:Array<{
@@ -317,7 +325,7 @@ export function narrateCommittedRounds(
     for(let k=0;k<ids.length;k++){
       const e=result[ids[k]];
       if(e.kind==='intent')continue; // Already visible before the choice.
-      let phrase=actionLine(state,e,previous,memory,recent)||statusLine(state,e);
+      let phrase=actionLine(state,e,recent)||statusLine(state,e);
       if(e.kind==='warning'&&str(e.text))phrase=period(e.text);
       // A committed special attack is named on its hit/miss. If no hit/miss
       // followed it, keep the ability announcement rather than inventing one.
@@ -378,8 +386,9 @@ export function narrateCommittedRounds(
         const b=label(state,result[ids[next.index]],next.actor);
         const repeated=(recent.misses.get(current.actor)||0)>0&&
           (recent.misses.get(next.actor)||0)>0;
-        combined.push(a+(a==='You'?' and ':' and ')+
-          (b==='You'?'you':b)+(repeated?' both miss again.':' both miss.'));
+        const both=a==='You'?'You and '+b:
+          b==='You'?'You and '+a:a+' and '+b;
+        combined.push(both+(repeated?' both miss again.':' both miss.'));
         i++;continue;
       }
       if(next&&current.kind==='recovery'&&next.kind==='move'&&
@@ -460,7 +469,7 @@ export function narrateCommittedRounds(
     // (including intent, repeated resource notices, and all exact amounts)
     // remain in their original order and keep their own v1/v2 narration.
     last.roundStory=summary;
-    previous=summary;memory.push(summary);
+    seen.push(...ids.map(i=>result[i]));
   }
   return result;
 }
