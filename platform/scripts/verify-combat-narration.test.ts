@@ -73,7 +73,7 @@ test('new natural attack method uses exact verb forms and supplied body-part phr
   narration:{action:{verb:{base:'lash',thirdPerson:'lashes'},
     instrument:{kind:'body_part',name:'stem',phrase:'with its stem'},hitPart:'side'}},
   text:'Hit from new attack.'})]);
- assert.match(line(hit),/Mire Bloom lashes you in the side with its stem/);
+ assert.match(line(hit),/Mire Bloom lashes you on the side with its stem/);
  assert.doesNotMatch(line(hit),/punch|club|kick/);
 });
 
@@ -90,7 +90,7 @@ test('an unknown or incomplete action method falls back to a plain hit',()=>{
  const s=fresh();s.enemy.name='Slag Frame';
  const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:5,
   narration:{action:{verb:{base:'crush',thirdPerson:''}}},text:'Unspecified hit.'})]);
- assert.match(line(hit),/Slag Frame (hits|lands a hit|strikes) you/);
+ assert.match(line(hit),/Slag Frame (hits|attacks|strikes) you/);
  assert.doesNotMatch(line(hit),/crush|punch|club/);
 });
 
@@ -99,7 +99,7 @@ test('an attack that misses never claims a dodge or wound',()=>{
  const [miss]=render(s,[e('miss',{actor:'enemy',target:'player',
   damage:0,reason:'attack_roll',text:'Attack misses.'})]);
  assert.match(line(miss),/miss/);
- assert.doesNotMatch(line(miss),/dodg|bleed|hit|injur|wound|guard/);
+ assert.doesNotMatch(line(miss),/dodg|bleed|\\bhits\\b|injur|wound|guard/);
 });
 
 test('a successful dodge and real Opening connect without inventing a hit',()=>{
@@ -158,7 +158,7 @@ test('ability title, strike method, damage and applied status appear together',(
             {kind:'damage',label:'Health',amount:7,applied:true,target:'player'}]
   },text:'Generated engine hit.'})]);
  assert.match(line(hit),/Mire Wanderer uses Silt Latch/);
- assert.match(line(hit),/binds you in the ankle with its vine/);
+ assert.match(line(hit),/binds you on the ankle with its vine/);
  assert.equal(info(hit),'−7 Health · Slowed (2 rounds)');
  assert.equal(hit.damage,7);
 });

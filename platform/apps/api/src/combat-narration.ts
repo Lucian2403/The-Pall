@@ -133,10 +133,10 @@ function hit(event:CombatEvent,state:CombatState,index:number,last?:string):Comb
   }else if(who==='player'){
     lines=['You hit '+them+location+withSource+'.',
       'Your attack hits '+them+location+withSource+'.',
-      'You land a hit on '+them+location+withSource+'.'];
+      'You strike '+them+location+withSource+'.'];
   }else{
     lines=[subject+' hits '+them+location+withSource+'.',
-      subject+' lands a hit on '+them+location+withSource+'.',
+      subject+' attacks '+them+location+withSource+'.',
       subject+' strikes '+them+location+withSource+'.'];
   }
   let line=pick(lines,index,last);
@@ -305,7 +305,7 @@ function fold(events:StoryCombatEvent[],state:CombatState):void{
   const direct=new Set(['damage','miss','guard','move','recovery','focus','ability','effect','status']);
   for(let i=0;i<events.length;i++){
     const e=events[i],who=e.actor;
-    if(!side(who)||!e.story||e.story.version!==2)continue;
+    if(!side(who)||!e.story||e.story.version!==2||e.story.hidden)continue;
     if(!['momentum','fatigue','technique'].includes(e.kind))continue;
     const id=word(facts(e).actionId);
     let found=-1;
