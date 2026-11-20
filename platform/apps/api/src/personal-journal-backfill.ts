@@ -6,9 +6,12 @@ import type {PlateworkState,MissingStampState,SecondJobState} from '@the-pall/ga
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import type {StitcherState} from './stitcher-work.js';
 import type {StageFourState} from './bellrunner-second-job-work.js';
+import type {DispatchState} from './bellrunner-dispatch-work.js';
+import type {BellState} from './bellrunner-wrong-bell-work.js';
 import {archiveJournalTask} from './personal-journal-store.js';
 import {stitcherTask,plateworkTask,missingStampTask,millhandSecondJobTask,
-  bellrunnerSecondJobTask,combatTask,clinicTask,homeTask} from './personal-journal-tasks.js';
+  bellrunnerSecondJobTask,combatTask,clinicTask,homeTask,
+  bellrunnerDispatchTask,bellrunnerWrongBellTask} from './personal-journal-tasks.js';
 import type {ClinicState} from './millhand-clinic-state.js';
 import type {State as HomeState} from './shared-home-state.js';
 
@@ -45,6 +48,14 @@ export async function backfillCharacterJournal(
   const flint=await savedState<CombatState>(client,'player_character_flint_combat',id);
   if(flint?.status==='finished')await archiveJournalTask(client,combatTask(id,'flint',flint));
  }else if(character.origin==='Bellrunner'){
+  const dispatch=await client.query<{work_state:DispatchState}>(
+   'SELECT work_state FROM player_character_bellrunner_dispatch WHERE character_id=$1',[id]);
+  const route=dispatch.rows[0]?.work_state;
+  if(route?.phase==='final_notice_taken')
+   await archiveJournalTask(client,bellrunnerDispatchTask(id,route));
+  const bell=await savedState<BellState>(client,'player_character_bellrunner_wrong_bell',id);
+  if(bell?.phase==='committed'&&bell.branch)
+   await archiveJournalTask(client,bellrunnerWrongBellTask(id,bell));
   const job=await savedState<StageFourState>(client,'player_character_bellrunner_second_job',id);
   if(job?.phase==='exited')await archiveJournalTask(client,bellrunnerSecondJobTask(id,job));
   const dogman=await savedState<CombatState>(client,'player_character_dogman_combat',id);
