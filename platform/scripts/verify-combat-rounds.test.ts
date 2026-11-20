@@ -549,6 +549,20 @@ test('available, expired and granted Openings require explicit engine events',()
  assert.equal(raw[0].condition,'opening_available');
 });
 
+test('generated ability range wording uses the correct player grammar',()=>{
+ const s=state('Night Engine');const history:CombatEvent[]=[];
+ history.push(...narrateCommittedRounds([
+  event('miss',{actor:'enemy',target:'player',reason:'out_of_reach',
+    narration:{ability:{id:'range-21',name:'Far Grip'}}})
+ ],s));
+ const second=narrateCommittedRounds(sample(2,[
+  event('miss',{actor:'enemy',target:'player',reason:'out_of_reach',
+    narration:{ability:{id:'range-21',name:'Far Grip'}}})
+ ]),s,history).at(-1)!.roundStory!;
+ assert.match(second.line,/you are out of reach/);
+ assert.doesNotMatch(second.line,/you is out of reach|You moves/);
+});
+
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{
  for(const kind of ['flint','dogman'] as const){
   let s=newEncounter(kind,{seed:199,player:{hp:2000,hpMax:2000,ceiling:2000,
