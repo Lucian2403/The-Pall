@@ -763,30 +763,6 @@
     .player-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .player-status .resource+.resource{border-left:0;padding-left:0}
   }
-  .chronicle-heading{display:flex;align-items:center;justify-content:space-between;
-    gap:10px;margin-bottom:10px}
-  .chronicle-heading button{padding:7px 12px;background:#271f19;color:#eed4ae;
-    border:1px solid #927453;cursor:pointer;font:13px/1.2 Georgia,serif;white-space:nowrap}
-  .chronicle-heading button:hover{background:#403124}
-  .log-window{min-height:150px;max-height:310px;overflow:auto;scrollbar-color:#947651 #30281f;scrollbar-width:thin}
-  .log-window ol{margin:0;padding:0;list-style:none}
-  .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
-    font:13px/1.35 Georgia,serif;color:#ecd1a8}
-
-  .combat-story{display:block;flex:1 1 100%;font:inherit;line-height:1.4}
-  .combat-story-detail{display:block;margin-top:3px;font:600 12px/1.4 var(--pall-font-reading,Georgia,serif);color:#d8b98e}
-  .log-window li.impact .combat-story-detail{color:#edbaab}
-  .log-window li.latest{background:#39291f;color:#ffdfb1;font-weight:700}
-  .log-window li.impact{border-left:3px solid #ce5d4c;padding-left:7px;color:#ffd4c8;
-    background:#552a2580}
-  .log-window li.evaded{border-left:3px solid #d7b97b;padding-left:7px;
-    color:#f4e1bf;background:#493c2b72}
-  .round{font:700 11px/1.6 Arial,sans-serif;color:#b99770;flex:none}
-  .event-body{min-width:0;display:flex;align-items:baseline;flex-wrap:wrap;column-gap:6px;row-gap:2px}
-  .event-action{flex:none;font:700 12px/1.35 Georgia,serif;color:#e6d3a9}
-  .event-action.enemy-action{color:#ff7468;text-shadow:0 1px 2px #200804}
-  .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
-  .no-events{font-size:13px;line-height:1.5}
   .clinic-link{position:relative;z-index:1;max-width:100%;margin:12px 0 1px;pointer-events:auto}
   /* Transient hit/miss overlays are anchored to the target, never to a guessed
      attack roll. Actual damage comes from the committed combat Chronicle. */

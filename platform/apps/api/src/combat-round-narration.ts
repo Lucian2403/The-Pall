@@ -63,67 +63,92 @@ function part(e:CombatEvent):string{
 function ability(e:CombatEvent):string|undefined{
   return str(facts(e).ability?.name)||str(e.ability);
 }
-function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory):string{
-  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
-  const verb=facts(e).action?.verb;
-  const actionWord=str(who==='player'?verb?.base:verb?.thirdPerson);
-  const source=weapon(s,e),loc=part(e);
-  let line=actionWord?from+' '+actionWord+' '+to+loc+source:
-    who==='player'?'You hit '+to+loc+source:from+' hits '+to+loc+source;
-  const used=facts(e).openingUsed===true||(num(e.openingDamageBonus)??0)>0;
-  if(used){
-    const wasOpen=previous?.tactical.some(x=>x.includes('Opening gained')&&
-      x.includes(from==='You'?'You':from));
-    line=(who==='player'?'You':' '+from).trim()+
-      (wasOpen?(who==='player'?' take the opening and ':' takes the opening and '):
-       (who==='player'?' use an opening and ':' uses an opening and '))+
-      (actionWord?actionWord:'hit')+' '+to+loc+source;
-  }
-  const namedAbility=ability(e);
-  if(namedAbility&&!used)line=(who==='player'?'You use ':from+' uses ')+namedAbility+
-      ' and '+(actionWord?actionWord:'hit')+' '+to+loc+source;
-  else if(namedAbility&&used)line=(who==='player'?'You':' '+from).trim()+
-      (who==='player'?' use ':' uses ')+namedAbility+' with the opening and '+(actionWord?actionWord:'hit')+
-      ' '+to+loc+source;
-  if(e.guarded===true&&(num(e.raw)??0)>(num(e.damage)??0)){
-    const blocker=destination(e)==='player'?'you':object(s,e,destination(e));
-    line+=blocker==='you'?', but you block part of the blow':
-      ', but '+blocker+' blocks part of the blow';
-  }
-  return period(line);
+function repeatCount(history:readonly CombatRoundStory[],e:CombatEvent):number{
+ const who=actorId(e),name=ability(e);
+ return history.filter(r=>r.actions.some(a=>a.actorId===who&&a.kind===e.kind)&&
+   (!name||r.line.includes(name))).length;
 }
-function missLine(s:CombatState,e:CombatEvent):string{
-  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
-  const spell=ability(e);
-  const action=spell?from+(who==='player'?' use ':' uses ')+spell+' but ':
-    from+(who==='player'?' attack ':' attacks ');
-  if(e.reason==='out_of_reach')
-    return period(from+(who==='player'?' cannot reach ':' cannot reach ')+to);
-  if(e.reason==='old_position')return period(from+' attacks the place '+to+
-    (to==='you'?' were':' was')+', but misses');
-  if(spell)return period(action+'misses '+to);
-  return period(from+(who==='player'?' attack ':' attacks ')+to+' but miss'+(who==='player'?'':'es'));
+function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
+  history:readonly CombatRoundStory[]=[]):string{
+ const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
+ const verb=facts(e).action?.verb;
+ const base=str(verb?.base)||'hit';
+ const active=str(who==='player'?verb?.base:verb?.thirdPerson)||
+   (who==='player'?'hit':'hits');
+ const source=weapon(s,e),loc=part(e),namedAbility=ability(e);
+ const count=repeatCount(history,e);
+ let line:string;
+ if(namedAbility){
+   if(count%3===1)
+     line=from+' '+active+' '+to+loc+source+' using '+namedAbility;
+   else if(count%3===2)
+     line=from+' uses '+namedAbility+' to '+base+' '+to+loc+source;
+   else line=from+(who==='player'?' use ':' uses ')+namedAbility+
+     ' and '+active+' '+to+loc+source;
+ }else if(count%3===1&&!verb)
+   line=who==='player'?'You strike '+to+loc+source:from+' strikes '+to+loc+source;
+ else if(count%3===2&&!verb)
+   line=who==='player'?'You land a hit on '+to+loc+source:
+     from+' lands a hit on '+to+loc+source;
+ else line=from+' '+active+' '+to+loc+source;
+ const used=facts(e).openingUsed===true||(num(e.openingDamageBonus)??0)>0;
+ if(used){
+   line=from+' takes the opening and '+
+     (namedAbility?'uses '+namedAbility+' to '+base:active)+
+     ' '+to+loc+source;
+ }
+ if(e.guarded===true&&(num(e.raw)??0)>(num(e.damage)??0)){
+   const blocker=destination(e)==='player'?'you':object(s,e,destination(e));
+   line+=blocker==='you'?', but you block part of the blow':
+     ', but '+blocker+' blocks part of the blow';
+ }
+ return period(line);
 }
-function moveLine(s:CombatState,e:CombatEvent):string|undefined{
-  const n=facts(e),mode=str(n.movement?.kind)||str(e.actionDetail);
-  const from=label(s,e,actorId(e));
-  if(mode==='side')return period(from+(from==='You'?' step':' steps')+' aside');
-  if(mode==='back')return period(from+(from==='You'?' step':' steps')+' back');
-  if(mode==='close')return period(from+(from==='You'?' move':' moves')+' closer');
-  if(mode==='cover')return period(from+(from==='You'?' move':' moves')+' behind cover');
-  if(mode==='leave')return period(from+(from==='You'?' leave':' leaves')+' the fight');
-  if(mode||n.movement)return period(from+(from==='You'?' move':' moves'));
+function missLine(s:CombatState,e:CombatEvent,
+  history:readonly CombatRoundStory[]=[]):string{
+ const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
+ const spell=ability(e),count=repeatCount(history,e);
+ if(e.reason==='out_of_reach')return period(from+' cannot reach '+to);
+ if(e.reason==='old_position')return period(from+' attacks the place '+to+
+   (to==='you'?' were':' was')+', but misses');
+ if(spell)return period(from+(who==='player'?' use ':' uses ')+spell+' but misses '+to);
+ const lines=who==='player'?[
+   'You attack '+to+' but miss','You miss '+to,'Your attack misses '+to
+ ]:[
+   from+' attacks '+to+' but misses',from+' misses '+to,
+   from+' tries to hit '+to+' but misses'
+ ];
+ return period(lines[count%lines.length]);
 }
-function actionLine(s:CombatState,e:CombatEvent,prior?:CombatRoundStory):string|undefined{
+function moveLine(s:CombatState,e:CombatEvent,
+  history:readonly CombatRoundStory[]=[]):string|undefined{
+ const n=facts(e),mode=str(n.movement?.kind)||str(e.actionDetail);
+ const from=label(s,e,actorId(e)),repeat=repeatCount(history,e);
+ if(mode==='side')
+   return period(from+(repeat%2===0?(from==='You'?' step':' steps')+' aside':
+     (from==='You'?' move':' moves')+' to the side'));
+ if(mode==='back')return period(from+(from==='You'?' step':' steps')+' back');
+ if(mode==='close')return period(from+(from==='You'?' move':' moves')+' closer');
+ if(mode==='cover')return period(from+(from==='You'?' move':' moves')+' behind cover');
+ if(mode==='leave')return period(from+(from==='You'?' leave':' leaves')+' the fight');
+ if(mode||n.movement)return period(from+(from==='You'?' move':' moves'));
+}
+function actionLine(s:CombatState,e:CombatEvent,prior?:CombatRoundStory,
+  history:readonly CombatRoundStory[]=[]):string|undefined{
   const from=label(s,e,actorId(e));
   switch(e.kind){
-    case 'damage':return hitLine(s,e,prior);
-    case 'miss':return missLine(s,e);
+    case 'damage':return hitLine(s,e,prior,history);
+    case 'miss':return missLine(s,e,history);
     case 'guard':return period(from+(from==='You'?' guard':' guards'));
-    case 'move':return moveLine(s,e);
+    case 'move':return moveLine(s,e,history);
     case 'focus':return period(from+(from==='You'?' focus':' focuses')+' on the next attack');
     case 'recovery':
-      if(e.mode==='breath')return period(from==='You'?'You catch your breath':from+' catches a breath');
+      if(e.mode==='breath'){
+        const repeated=repeatCount(history,e)%2!==0;
+        return period(from==='You'
+          ?(repeated?'You rest for a moment':'You catch your breath')
+          :(repeated?from+' rests for a moment':from+' catches a breath'));
+      }
       return period(from==='You'?'You steady yourself':from+' steadies up');
     case 'ability':case 'effect':case 'status':
       if(!ability(e))return;
@@ -180,6 +205,8 @@ function extras(e:CombatEvent,s:CombatState):string[]{
 }
 function tactical(e:CombatEvent,s:CombatState):string|undefined{
   const from=label(s,e,actorId(e));
+  if(e.kind==='miss'&&facts(e).openingUsed===true)
+    return 'Opening used ('+from+')';
   if(e.kind==='tactical'){
     if(e.condition==='opening_gained')return 'Opening gained ('+from+')';
     if(e.condition==='overcommitted')return 'Exposed ('+from+')';
@@ -201,17 +228,19 @@ export function narrateCommittedRounds(
   const result=events.map(e=>({...e} as RoundStoryEvent));
   const groups=new Map<number,number[]>();
   result.forEach((e,i)=>groups.set(e.round,[...(groups.get(e.round)||[]),i]));
-  let previous=([...prior].reverse().find(e=>(e as RoundStoryEvent).roundStory) as RoundStoryEvent|undefined)?.roundStory;
+  const memory=prior.flatMap(e=>{const r=(e as RoundStoryEvent).roundStory;
+    return r?.version===3?[r]:[];});
+  let previous=memory.at(-1);
   for(const [round,ids] of groups){
     const last=result[ids[ids.length-1]];
-    if(last.roundStory){previous=last.roundStory;continue;}
+    if(last.roundStory){previous=last.roundStory;memory.push(last.roundStory);continue;}
     const pieces:Array<{text:string;kind:string;actor:string;index:number}>=[];
     const statuses:string[]=[],details:string[]=[];
     const actions:CombatRoundStory['actions']=[];
     for(let k=0;k<ids.length;k++){
       const e=result[ids[k]],index=ids[k];
       if(e.kind==='intent')continue; // Telegraph is visible elsewhere before the turn.
-      const phrase=actionLine(state,e,previous)||statusLine(state,e);
+      const phrase=actionLine(state,e,previous,memory)||statusLine(state,e);
       if(phrase)pieces.push({text:phrase,kind:e.kind,actor:actorId(e),index:k});
       const flag=tactical(e,state);if(flag&&!statuses.includes(flag))statuses.push(flag);
       for(const value of extras(e,state))if(!details.includes(value))details.push(value);
@@ -224,14 +253,21 @@ export function narrateCommittedRounds(
     // Movement then miss can form one factual exchange in the same order.
     for(let k=0;k<pieces.length-1;k++){
       const left=pieces[k],right=pieces[k+1];
-      if(left.kind==='move'&&right.kind==='miss'&&left.actor!==right.actor){
-        const enemy=label(state,result[ids[right.index]],right.actor);
-        left.text=left.text.replace(/\.$/,'')+', and '+enemy+
-          (right.actor==='player'?' miss':' misses')+
-          (right.actor==='player'?' '+object(state,result[ids[right.index]],destination(result[ids[right.index]])):
-            ' '+object(state,result[ids[right.index]],destination(result[ids[right.index]])))+'.';
-        pieces.splice(k+1,1);
+      if(left.kind!=='move'||right.kind!=='miss'||left.actor===right.actor)continue;
+      const e=result[ids[right.index]],other=label(state,e,right.actor);
+      const failed=ids.slice(left.index+1,right.index)
+        .some(index=>result[index].condition==='dodge_failed');
+      if(failed){
+        left.text+=' Your dodge fails, but '+other+
+          (other==='You'?' still miss.':' still misses.');
+      }else if(left.actor==='player'){
+        left.text=left.text.replace(/\.$/,'')+', and '+other+' misses you.';
+      }else if(right.actor==='player'){
+        left.text=left.text.replace(/\.$/,'')+', and you miss.';
+      }else{
+        left.text=left.text.replace(/\.$/,'')+', and '+other+' misses.';
       }
+      pieces.splice(k+1,1);
     }
     // Minor state changes have a label; serious wounds and outcomes get text.
     // Cap the main narrative at three short sentences; every source event can
@@ -239,7 +275,7 @@ export function narrateCommittedRounds(
     const sentence=pieces.slice(0,3).map(x=>x.text).join(' ')||'The round ends.';
     const headline=details.filter(x=>/damage to|blocked|Opening bonus/.test(x));
     const extrasCompact=details.filter(x=>!headline.includes(x));
-    const show=[...headline,...extrasCompact].slice(0,4);
+    const show=[...headline,...extrasCompact].slice(0,3);
     const summary:CombatRoundStory={
       version:3,round,encounterId:state.id,line:sentence,
       ...(show.length?{detail:show.join(' · ')}:{}),
@@ -248,7 +284,7 @@ export function narrateCommittedRounds(
     // Preserve engine events in order. Only the last fresh event gets the
     // round-level projection. Version 1/2 and unversioned history stay intact.
     last.roundStory=summary;
-    previous=summary;
+    previous=summary;memory.push(summary);
   }
   return result;
 }

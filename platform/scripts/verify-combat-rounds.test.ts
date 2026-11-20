@@ -94,7 +94,7 @@ test('failed dodge and later miss remain separate truthful facts',()=>{
   event('tactical',{actor:'player',condition:'dodge_failed'}),
   event('miss',{actor:'enemy',target:'player',reason:'attack_roll'})
  ],state('Machine Walker'));
- assert.match(result.line,/You step aside, and Machine Walker misses you/);
+ assert.match(result.line,/You step aside\. Your dodge fails, but Machine Walker still misses\./);
  assert.ok(result.tactical.includes('Dodge failed (You)'));
  assert.doesNotMatch(result.line,/You dodge/);
 });
@@ -178,6 +178,20 @@ test('serious wounds and bleeding require resolved wound flags',()=>{
  assert.ok(result.tactical.includes('Bleeding (You)'));
  assert.ok(result.tactical.includes('Serious injury (You)'));
  assert.match(result.detail||'',/2 bleeding damage to you/);
+});
+
+test('opponent Opening grammar and linked player misses stay natural',()=>{
+ const enemy=state('Dogman');
+ const used=summary([event('damage',{actor:'enemy',target:'player',
+   damage:8,openingDamageBonus:0,narration:{openingUsed:true}})],enemy);
+ assert.match(used.line,/Dogman takes the opening and hits you/);
+ assert.doesNotMatch(used.line,/Dogman use |and hit you/);
+ const sidestep=summary([
+   event('move',{actor:'enemy',actionDetail:'side'}),
+   event('miss',{actor:'player',target:'enemy',reason:'out_of_reach'})
+ ],enemy);
+ assert.match(sidestep.line,/Dogman steps aside, and you miss\./);
+ assert.doesNotMatch(sidestep.line,/and You|You moves/);
 });
 
 test('the real outcome, not a guessed death, ends the Chronicle',()=>{
@@ -349,6 +363,8 @@ test('twelve generated-creature rounds read clearly without an enemy-specific na
  }
  const cards=n(history);
  assert.equal(cards.length,12);
+ assert.ok(new Set(cards.map(x=>x.main)).size>=6,
+   'Repeated generated actions need several faithful patterns, not one fixed line');
  assert.match(cards[0].main,/Glass-Silt Weaver/);
  assert.match(cards[0].main,/Bindwater Reach/);
  assert.ok(cards[0].detail?.includes('Held (2 rounds)'));
