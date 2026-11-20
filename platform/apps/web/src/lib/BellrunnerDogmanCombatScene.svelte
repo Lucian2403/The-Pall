@@ -48,7 +48,7 @@
     else if(!journalOpen&&dialog.open)dialog.close();
   });
   $effect(()=>{
-    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:'The Fight with Dogman',entries:ended?[journal]:[],
+    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:'The Fight with Dogman',entries:ended?[]:[combatOpening('dogman')],
       toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
