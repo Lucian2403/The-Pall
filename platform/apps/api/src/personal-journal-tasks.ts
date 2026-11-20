@@ -31,7 +31,10 @@ export function stitcherTask(
    STITCHER_STAGE_TITLES[stage];
  return {...identity(characterId,stage),taskId:'stitcher.stage.'+stage,title,
   paragraphs:stitcherStageJournal(s,stage),
-  choices:s.branch?{route:STITCHER_ROUTE_UI[s.branch].title}:{}
+  choices:s.branch?{
+   route:STITCHER_ROUTE_UI[s.branch].title,
+   ...(stage===5&&s.stage5Preparation?{preparation:s.stage5Preparation}:{})
+  }:{}
  };
 }
 export function plateworkTask(characterId:string,s:PlateworkState):CompletedJournalTask{
