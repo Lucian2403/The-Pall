@@ -3,6 +3,8 @@
  * separately gated; none of these actions grants XP, wages or quest items.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {bellrunnerDispatchTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -215,6 +217,8 @@ export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
           "UPDATE player_characters SET tutorial_stage=3,tutorial_status='NOT_STARTED' WHERE id=$1",
           [req.params.id]);
       }
+      if(next.phase==='final_notice_taken'&&current.rows[0].work_state.phase!=='final_notice_taken')
+        await archiveJournalTask(client,bellrunnerDispatchTask(req.params.id,next));
       const result=view(movesToWrongBell
         ?{...ch.rows[0],tutorial_stage:3,tutorial_status:'NOT_STARTED'}
         :ch.rows[0],true,revision+1,next);
