@@ -376,7 +376,21 @@ export function narrateCommittedRounds(
     const meaningful=pieces.filter(p=>p.priority>=2);
     const essential=meaningful.filter(p=>p.priority>=4);
     let selected:typeof pieces;
-    if(essential.length>=3)
+    if(essential.length>3&&essential.some(p=>p.kind==='outcome')){
+      // A final result must stay with the attack that preceded it. Never
+      // drop a finishing hit in favour of an earlier, less relevant hit.
+      const finishingHit=essential.filter(p=>p.kind==='damage').at(-1);
+      const injury=essential.filter(p=>p.kind==='wound').at(-1);
+      const ending=essential.filter(p=>p.kind==='outcome').at(-1);
+      selected=[finishingHit,injury,ending].filter(
+        (p):p is typeof pieces[number]=>p!==undefined);
+      if(selected.length<3){
+        for(const p of essential.slice().reverse()){
+          if(selected.length>=3)break;
+          if(!selected.includes(p))selected.push(p);
+        }
+      }
+    }else if(essential.length>=3)
       selected=essential.length===3?essential:[essential[0],...essential.slice(-2)];
     else if(essential.length===2)selected=[...essential];
     else if(essential.length===1){

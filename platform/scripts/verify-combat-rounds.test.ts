@@ -563,6 +563,23 @@ test('generated ability range wording uses the correct player grammar',()=>{
  assert.doesNotMatch(second.line,/you is out of reach|You moves/);
 });
 
+test('the final story includes the actual finishing hit when many facts occur',()=>{
+ const rival=state('Rivet Beast');
+ rival.outcome='player_defeat';rival.player.hp=0;
+ const saved=narrateCommittedRounds([
+  event('damage',{actor:'player',target:'enemy',damage:3}),
+  event('damage',{actor:'enemy',target:'player',damage:25}),
+  event('wound',{actor:'player',condition:'serious_wound'}),
+  event('outcome',{actor:'enemy'})
+ ],rival);
+ const line=saved.at(-1)!.roundStory!.line;
+ assert.match(line,/Rivet Beast hits you/);
+ assert.match(line,/serious injury/);
+ assert.match(line,/You cannot continue\. You lose/);
+ assert.doesNotMatch(line,/You hit Rivet Beast/);
+ assert.deepEqual(saved.at(-1)!.roundStory!.eventRefs,[0,1,2,3]);
+});
+
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{
  for(const kind of ['flint','dogman'] as const){
   let s=newEncounter(kind,{seed:199,player:{hp:2000,hpMax:2000,ceiling:2000,
