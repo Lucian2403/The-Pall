@@ -133,6 +133,11 @@ function locationHash(value){
   let h=2166136261;
   for(let i=0;i<value.length;i++)
     h=Math.imul(h^value.charCodeAt(i),16777619)>>>0;
+  // Avalanche the stable hash before taking modulo: common seeds and
+  // similarly named events must not cluster in half the available pool.
+  h^=h>>>16;h=Math.imul(h,0x85ebca6b);
+  h^=h>>>13;h=Math.imul(h,0xc2b2ae35);
+  h^=h>>>16;
   return h>>>0;
 }
 /** Pure descriptive choice using the TARGET's actual anatomy.
