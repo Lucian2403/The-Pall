@@ -36,6 +36,7 @@ import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
 import {backfillCharacterJournal} from '../apps/api/src/personal-journal-backfill.ts';
+import {archiveJournalTask} from '../apps/api/src/personal-journal-store.ts';
 import {INITIAL_PLATEWORK,advancePlatework,availableActions,INITIAL_MISSING_STAMP,
  advanceMissingStamp,availableMissingStampActions,AUTHORED_MISSING_STAMP_EVIDENCE}
  from '@the-pall/game-core';
@@ -2862,7 +2863,21 @@ test('Personal Journal strictly isolates one account\'s Stitcher and Millhand jo
   }catch(error){await client.query('ROLLBACK');throw error;}
   finally{client.release();}
 
-  const fetchJournal=async(id:string,principal:string|null=owner)=>
+  // The generic archive contract permits identical task IDs and instance
+  // IDs across characters without collisions, even under one account.
+  const shared=await db.connect();
+  try{
+   await shared.query('BEGIN');
+   for(const id of [a.id,b]){
+    await archiveJournalTask(shared,{
+      characterId:id,taskId:'test.shared-repair',taskInstanceId:'test:shared-repair',
+      stage:2,title:'Shared Repair',paragraphs:['I finished my own repair.']
+    });
+   }
+   await shared.query('COMMIT');
+  }catch(error){await shared.query('ROLLBACK');throw error;}
+  finally{shared.release();}
+    const fetchJournal=async(id:string,principal:string|null=owner)=>
     request('GET',base+id+'/journal?limit=20',principal);
   const aa=await fetchJournal(a.id),bb=await fetchJournal(b);
   assert.equal(aa.status,200);assert.equal(bb.status,200);
@@ -2884,6 +2899,8 @@ test('Personal Journal strictly isolates one account\'s Stitcher and Millhand jo
   assert.ok(ae.some((x:any)=>x.taskInstanceId==='tutorial:stage:2'));
   assert.ok(be.some((x:any)=>x.taskInstanceId==='tutorial:stage:2'),
     'Two characters can complete the same task instance without collision');
+  assert.equal(ae.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
+  assert.equal(be.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
 
   // Change characters repeatedly, then "reload" from the persisted database.
   assert.deepEqual((await fetchJournal(b)).body!.completed,be);
