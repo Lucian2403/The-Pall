@@ -248,7 +248,7 @@ export function narrateCommittedRounds(
     }>=[];
     const statuses:string[]=[],details:string[]=[];
     const actions:CombatRoundStory['actions']=[];
-    const meaningful=new Set([
+    const actionKinds=new Set([
       'damage','miss','guard','move','focus','recovery',
       'ability','effect','status','outcome'
     ]);
@@ -283,7 +283,7 @@ export function narrateCommittedRounds(
       // Damage and repeated effects may have the same value. Do not dedupe
       // those occurrences: each is a separate authoritative result.
       details.push(...extras(e,state));
-      if(meaningful.has(e.kind))
+      if(actionKinds.has(e.kind))
         actions.push({actorId:actorId(e),
           ...(targetId(e)?{targetId:targetId(e)}:{}),
           kind:e.kind,eventRef:k,
