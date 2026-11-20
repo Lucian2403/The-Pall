@@ -72,11 +72,11 @@ Opening gained (Dogman) · Exposed (You)
 Round 4: You guard. Dogman takes the opening and uses Committed Swing to hit you in the side with a light club, but you block part of the blow.
 9 damage to you · 8 blocked · −20 Momentum (Dogman)
 Opening gained (You)
-Round 5: Dogman steps aside, and you miss.
+Round 5: Dogman steps aside, and your attack falls short.
 Round 6: You move closer. Dogman moves closer.
 Round 7: You guard. Dogman guards.
 +3 Fatigue (You) · +3 Fatigue (Dogman)
-Round 8: Dogman steps aside, and you miss.
+Round 8: Dogman steps aside, and your attack falls short.
 +3 Fatigue (Dogman) · +3 Fatigue (You)
 Round 9: You move closer. Dogman moves closer.
 +3 Fatigue (You) · +3 Fatigue (Dogman)
@@ -96,22 +96,22 @@ Opening used (You) · Opening gained (You) · Exposed (You)
 ```text
 Round 1: Glass-Silt Weaver uses Bindwater Reach and wraps you with its filament.
 3 damage to you · Held (2 rounds)
-Round 2: You step aside, and Glass-Silt Weaver misses you.
+Round 2: You step aside, and Glass-Silt Weaver uses Bindwater Reach, but cannot reach you.
 Round 3: You catch your breath. Glass-Silt Weaver guards.
 +9 Stamina (You) · −4 Fatigue (You)
 Round 4: Glass-Silt Weaver wraps you with its filament using Bindwater Reach.
 6 damage to you
-Round 5: You move to the side, and Glass-Silt Weaver misses you.
+Round 5: You move to the side, and Glass-Silt Weaver uses Bindwater Reach, but cannot reach you.
 Round 6: You rest for a moment. Glass-Silt Weaver guards.
 +9 Stamina (You) · −4 Fatigue (You)
 Round 7: Glass-Silt Weaver uses Bindwater Reach to wrap you with its filament.
 9 damage to you
-Round 8: You step aside, and Glass-Silt Weaver misses you.
+Round 8: You step aside, and Glass-Silt Weaver uses Bindwater Reach, but cannot reach you.
 Round 9: You catch your breath. Glass-Silt Weaver guards.
 +9 Stamina (You) · −4 Fatigue (You)
 Round 10: Glass-Silt Weaver uses Bindwater Reach and wraps you with its filament.
 12 damage to you
-Round 11: You move to the side, and Glass-Silt Weaver misses you.
+Round 11: You move to the side, and Glass-Silt Weaver uses Bindwater Reach, but cannot reach you.
 Round 12: You rest for a moment. Glass-Silt Weaver guards.
 +9 Stamina (You) · −4 Fatigue (You)
 ```
