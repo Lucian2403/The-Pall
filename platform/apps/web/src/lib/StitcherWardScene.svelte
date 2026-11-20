@@ -95,7 +95,7 @@
     if(journalOpen){await tick();journalEl?.scrollIntoView({block:'start',behavior:'smooth'});}
   }
   $effect(()=>{
-    register?.({id:'stitcher-ward-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    register?.({id:'stitcher-ward-journal',open:journalOpen,title:STITCHER_STAGE_TITLES[s.stage],entries:journal,toggle:()=>{void toggleJournal();}});
     return ()=>register?.(null);
   });
   function act(action:string){
