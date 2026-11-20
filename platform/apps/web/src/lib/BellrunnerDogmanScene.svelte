@@ -33,7 +33,7 @@
   let journalElement:HTMLElement|undefined;
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'bellrunner-dogman-journal',open:journalOpen,
+    registerSceneJournal?.({id:'bellrunner-dogman-journal',open:journalOpen,title:"Show Your Papers",entries:journal,
       toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
