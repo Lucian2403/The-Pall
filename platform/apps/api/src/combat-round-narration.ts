@@ -165,7 +165,8 @@ function missLine(s:CombatState,e:CombatEvent,recent?:RecentCombat):string{
  const abilityTries=repeatCount(recent,e);
  if(e.reason==='out_of_reach')return period(spell
    ?abilityTries%2===1
-     ?from+(who==='player'?' try ':' tries ')+spell+', but '+to+' is out of reach'
+     ?from+(who==='player'?' try ':' tries ')+spell+', but '+
+       (to==='you'?'you are':to+' is')+' out of reach'
      :from+(who==='player'?' use ':' uses ')+spell+', but cannot reach '+to
    :from+' cannot reach '+to+(count?' again':''));
  if(e.reason==='old_position')return period(from+' attacks the place '+to+
