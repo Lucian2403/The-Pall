@@ -82,7 +82,7 @@
   const resultText = $derived(isOwler
     ?snapshot.outcome==='player_defeat'
       ?'Owler overpowers you and you fall against the door frame. The attendant pulls the patient trolley back inside. Ward staff gather and stop Owler from taking the man.'
-      :'Owler backs away from the doorway, breathing hard. He sees the attendant standing with the patient and the ward staff gathering nearby.'
+      :'Owler steps back from the doorway, breathing hard. He looks at the attendant beside the patient, then at the ward staff gathering behind you. He lowers his club.'
     :snapshot.outcome === 'player_defeat'
     ? 'You go down hard on the stones. You try getting up, but your legs give out. A few workers come round the corner, and Flint takes one look before buggering off. Didn\'t get a coin out of you.\nOne of the lads grabs you under the arm and hauls you up. You lean on his shoulder as he helps you hobble towards the clinic.'
     : snapshot.enemy.hp <= 0
@@ -240,18 +240,18 @@
           <p class="outcome">{isOwler
             ?snapshot.outcome==='player_defeat'?'Owler defeated you. The staff stopped the transfer.':'You defeated Owler.'
             :snapshot.outcome==='player_defeat'?'Flint defeated you. Other workers intervened.':'You defeated Flint.'}</p>
-          <p>{resultText}</p>
+          <p class="outcome">{resultText}</p>
           {#if isOwler}
             {#if snapshot.outcome==='player_victory'}
-              <p><strong>OWLER:</strong> “Fine. I'll tell them you stopped the transfer.”</p>
-              <p><strong>YOU:</strong> “Tell them he refused.”</p>
+              <p><strong>OWLER: “Fine. I'll tell them you stopped the transfer.”</strong></p>
+              <p><strong>YOU: “Tell them he said no. That's why he's staying here.”</strong></p>
             {:else}
-              <p><strong>ATTENDANT:</strong> “He said no. We all heard him. You're not taking him.”</p>
-              <p><strong>CLAUDIA:</strong> “That's enough. You're not moving him past these witnesses.”</p>
-              <p><strong>OWLER:</strong> “You'll have to answer to the school.”</p>
-              <p><strong>CLAUDIA:</strong> “I'll speak to them myself. Now get out of my infirmary.”</p>
+              <p><strong>ATTENDANT: “He said no. We all heard him. You're not taking him.”</strong></p>
+              <p><strong>CLAUDIA: “That's enough. You're not moving him past these witnesses.”</strong></p>
+              <p><strong>OWLER: “You'll have to answer to the school.”</strong></p>
+              <p><strong>CLAUDIA: “I'll speak to them myself. Now get out of my infirmary.”</strong></p>
             {/if}
-            <p><strong>CLAUDIA:</strong> “He stays here. I'm cancelling this transfer. The school can take it up with me.”</p>
+            <p><strong>CLAUDIA: “Enough. The man stays here. I'm cancelling the transfer, and if the school has a problem with that, they can speak to me.”</strong></p>
             <p class="after">The patient stays in ordinary care. This one transfer is cancelled. Your actual Health and wounds are saved. Medical care follows in Stage VII.</p>
           {:else}
             <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
