@@ -51,7 +51,7 @@
     }
   });
   $effect(()=>{
-    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,
+    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:isOwler?'The Fight with Owler':'The Fight with Flint',entries:ended?[journal]:[],
       toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
