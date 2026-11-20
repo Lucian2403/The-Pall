@@ -1,7 +1,7 @@
 /** One source of owner-approved Cinder Row diary prose, shared by the
  * live scene and server-confirmed immutable task snapshots. */
 import {stage5JournalEntries,type Stage5JournalInput} from './stitcher-stage5-journal.js';
-import {STITCHER_ROUTE_UI} from './stitcher-ward-copy';
+import {STITCHER_ROUTE_UI} from './stitcher-ward-copy.js';
 
 export type StitcherJournalState=Stage5JournalInput & {
  first?:'a'|'b'|null;prepared?:'cut'|'ready'|null;
