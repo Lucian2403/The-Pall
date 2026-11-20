@@ -120,3 +120,15 @@ task, not a reason to cut a round in half.
 **Engine boundary:** The system adds passive `openingUsed` metadata to
 already resolved attacks, including accuracy-only Openings. It does not change
 an attack roll, hit chance, decision, or damage.
+
+## History-aware wording and clean expanded events
+
+The version-3 round composer now reads **prior resolved events**, not earlier sentence text. A small recent-round record tracks consecutive hits, misses, Guard use and consumed Openings. A separate event-based count tracks past uses of the same actor, event kind and stable ability ID, so unfamiliar generated actions can vary naturally even when movement or recovery interrupts them.
+
+The narrator chooses a simple structure for meaningful exchanges: both misses, ordered hits, recovering while an opponent moves, a Guard followed by an attack, and movement followed by an out-of-reach miss. Events remain in initiative order. A failed dodge is not called a successful dodge. When an injury and outcome crowd the last round, the actual finishing hit takes priority over an earlier hit.
+
+Only a recorded `narration.openingUsed` or positive committed Opening damage bonus means an Opening was **used**. Gained, available, expired and granted Openings are shown only when their corresponding structured tactical events exist. Accuracy-only use must not claim extra damage.
+
+In the shared expanded view, the saved `story.line` is displayed separately from its `story.detail`, preventing glued-on numbers in the readable line. The exact original engine text remains available under **Original event**. Effects explicitly recorded with `applied:false` appear as **did not apply**, never as conditions that occurred. No stored event or historical version-1/version-2 story is rewritten by the presentation helpers.
+
+Complete before-and-after test outputs and manual prose notes: `docs/05-gameplay/combat/round-chronicle-writing-before-after.md`.
