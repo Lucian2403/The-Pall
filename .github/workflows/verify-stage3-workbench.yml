@@ -11,6 +11,7 @@ on:
       - 'platform/scripts/verify-stage4-exits.mjs'
       - 'platform/scripts/verify-stage-five.mjs'
       - 'platform/scripts/verify-stage-six.mjs'
+      - 'platform/scripts/verify-combat-narration.test.ts'
       - 'platform/scripts/verify-combat-cta-browser.mjs'
       - 'platform/scripts/verify-bellrunner-layout-browser.mjs'
       - 'platform/scripts/verify-millhand-scenes-browser.mjs'
@@ -136,6 +137,8 @@ jobs:
       - run: npm run verify:stage-five
       - run: node --test packages/game-core/vendor/combat-v0.5.1/test.mjs packages/game-core/vendor/combat-v0.5.1/integration.test.mjs
       - run: npm run verify:stage-six
+      - name: Shared deterministic combat story and saved Chronicle
+        run: npm run verify:combat-narration
       - name: Stage 7 clinic state and canon
         run: npm run verify:stage-seven
       - name: Stage 8 home state, notice and persistence contract

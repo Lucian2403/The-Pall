@@ -476,10 +476,15 @@
                 class:impact={event.kind === 'damage'} class:evaded={event.kind === 'miss'}>
                 <span class="round">{String(event.round).padStart(2, '0')}</span>
                 <span class="event-body">
+                  {#if !event.story}
                   <span class="event-action" class:enemy-action={isEnemyCombatAction(event)}>
                     [{combatActionLabel(event)}]
                   </span>
-                  <span>{event.text}</span>
+                {/if}
+                <span class="combat-story">{event.story?.line??event.text}</span>
+                {#if event.story?.detail}
+                  <span class="combat-story-detail">{event.story.detail}</span>
+                {/if}
                 </span>
               </li>
             {/each}
@@ -806,6 +811,10 @@
   .log-window ol{margin:0;padding:0;list-style:none}
   .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
     font:13px/1.35 Georgia,serif;color:#ecd1a8}
+
+  .combat-story{display:block;font:inherit;line-height:1.4}
+  .combat-story-detail{display:block;margin-top:3px;font:600 12px/1.4 var(--pall-font-reading,Georgia,serif);color:#d8b98e}
+  .log-window li.impact .combat-story-detail{color:#edbaab}
   .log-window li.latest{background:#39291f;color:#ffdfb1;font-weight:700}
   .log-window li.impact{border-left:3px solid #ce5d4c;padding-left:7px;color:#ffd4c8;
     background:#552a2580}

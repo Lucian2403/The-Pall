@@ -15,6 +15,7 @@ import {step,CombatError} from '@the-pall/game-core/combat-v0.5.1';
 import {initializeDogmanCombat,type DogmanStance} from './bellrunner-dogman-combat-opening.js';
 import type {CombatAction,CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
 import {combatView} from './millhand-combat-view.js';
+import {narrateCommittedTurn} from './combat-narration.js';
 
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -70,42 +71,6 @@ function readyStance(claim:Claim|undefined):DogmanStance|null{
   const stance=claim.state.stance;
   return stance==='street'||stance==='cart'||stance==='defend'?stance:null;
 }
-/** Annotate authoritative engine events with the actual chosen actions.
- * This changes presentation metadata only, never RNG, damage or resolution.
- * It also makes saved history truthful across reloads and repeated requests. */
-function describeCommittedTurn(
-  events:CombatEvent[],chosen:CombatAction,enemyIntent:CombatState['intent']
-):CombatEvent[]{
-  return events.map(event=>{
-    let who=event.actor;
-    // The v0.5.1 prototype omits actor on Recover, despite naming the
-    // recovering actor in text. Recover is the only such direct action.
-    if(event.kind==='recovery'&&!who){
-      if(event.text.startsWith('You '))who='player';
-      else if(event.text.startsWith('Dogman '))who='enemy';
-    }
-    if(who!=='player'&&who!=='enemy')return event;
-    const action=who==='player'?chosen:enemyIntent;
-    if(!action)return {...event,actor:who};
-    const direct=['damage','miss','guard','move','recovery','technique','focus'].includes(event.kind);
-    // A new opening produced by a guarded strike belongs to the actor's
-    // guard, not to a fictional extra attack.
-    const defensiveOpening=event.kind==='tactical'&&who==='player'&&
-      chosen.type==='guard'&&event.text.includes('firm guard');
-    if(!direct&&!defensiveOpening)return {...event,actor:who};
-    const type=action.type;
-    if(!['attack','technique','guard','move','recover','focus'].includes(type))return {...event,actor:who};
-    const detail='zone' in action&&typeof action.zone==='string'?action.zone:
-      'to' in action&&typeof action.to==='string'?action.to:
-      'mode' in action&&typeof action.mode==='string'?action.mode:undefined;
-    const name=type==='technique'
-      ?('ability' in action&&typeof action.ability==='string'
-          ?action.ability:'Press Advantage')
-      :undefined;
-    return {...event,actor:who,actionType:type,actionDetail:detail,actionName:name};
-  });
-}
-
 function snapshot(record:CombatRecord){
   // The common HUD uses the original brace / moving / cart vocabulary;
   // the authoritative Stage V state and combat row retain street/cart/defend.
@@ -248,7 +213,8 @@ export function registerBellrunnerDogmanCombatRoutes(app:FastifyInstance,options
           throw new Error('unexpected_encounter_outcome');
         // Enemy intention was committed before resolving this turn. Keep it
         // exclusively in historical log metadata; never reveal future AI.
-        state.events=describeCommittedTurn(state.events,command.action,record.state.intent);
+        state.events=narrateCommittedTurn(state.events,command.action,record.state.intent,
+           state,record.history);
         record={state,stance,history:[...record.history,...state.events]};
         await client.query(
           'UPDATE player_character_dogman_combat SET revision=$2,state=$3::jsonb,history=$4::jsonb,outcome=$5,updated_at=NOW() WHERE character_id=$1',

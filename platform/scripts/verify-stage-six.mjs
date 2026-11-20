@@ -169,10 +169,12 @@ assert.ok(scene.includes('snapshot.events.slice(-6)')&&
   scene.includes('class:enemy-action={isEnemyCombatAction(event)}')&&
   scene.includes('.event-action.enemy-action{color:#ff7468'),
   'Chronicle must show six latest entries, exact action labels and red enemy actions');
-assert.ok(api.includes('describeCommittedTurn')&&
-  api.includes('state.events=describeCommittedTurn(state.events,command.action,record.state.intent)')&&
-  api.includes('actionType:type,actionDetail:detail,actionName:name'),
-  'Save action types in the authoritative event history without changing combat turns');
+assert.ok(api.includes('narrateCommittedTurn')&&
+  api.includes('state.events=narrateCommittedTurn(state.events,command.action,record.state.intent')&&
+  read('apps/api/src/combat-narration.ts').includes('actionType:type,')&&
+  scene.includes('event.story?.line??event.text')&&
+  scene.includes('event.story?.detail'),
+  'Save versioned combat descriptions with exact action metadata and preserve old events');
 const {combatActionLabel,isEnemyCombatAction}=
   await import('../apps/web/src/lib/millhand-combat-chronicle.ts');
 assert.equal(combatActionLabel({kind:'damage',actor:'enemy',actionType:'attack',
