@@ -5,7 +5,7 @@ import {newEncounter,step} from '../packages/game-core/vendor/combat-v0.5.1/comb
 import {narrateCommittedTurn} from '../apps/api/src/combat-narration.ts';
 import {narrateCommittedRounds,type RoundStoryEvent}
   from '../apps/api/src/combat-round-narration.ts';
-import {groupCombatRounds,combatEventText,combatEventNumbers}
+import {groupCombatRounds,combatEventText,combatEventNumbers,combatEventFailedEffects}
   from '../apps/web/src/lib/millhand-combat-chronicle.ts';
 import type {CombatAction,CombatEvent,CombatState} from '@the-pall/game-core/combat-v0.5.1';
 
@@ -602,6 +602,19 @@ test('a generated ranged ability follows movement without a double-but sentence'
  assert.match(round.line,/You step aside\. Ink Machine uses Ink Thread/);
  assert.doesNotMatch(round.line,/and Ink Machine uses Ink Thread, but/);
 });
+test('failed generated effects are visible in details without applying them',()=>{
+ const source=event('damage',{actor:'enemy',target:'player',damage:4,
+   narration:{ability:{name:'Rust Tide'},effects:[
+     {kind:'slow',label:'Slowed',applied:false},
+     {kind:'bleed',label:'Bleeding',applied:true}
+   ]}});
+ const before=JSON.stringify(source);
+ const notes=combatEventFailedEffects(source);
+ assert.deepEqual(notes,['Slowed did not apply.']);
+ assert.doesNotMatch(notes.join(' '),/Bleeding/);
+ assert.equal(JSON.stringify(source),before);
+});
+
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{
  for(const kind of ['flint','dogman'] as const){
   let s=newEncounter(kind,{seed:199,player:{hp:2000,hpMax:2000,ceiling:2000,

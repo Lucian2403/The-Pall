@@ -1,7 +1,7 @@
 <script lang="ts">
   import type {CombatEventView} from '$lib/millhand-combat-model';
   import {combatActionLabel,isEnemyCombatAction,groupCombatRounds,
-    combatEventText,combatEventNumbers}
+    combatEventText,combatEventNumbers,combatEventFailedEffects}
     from '$lib/millhand-combat-chronicle';
 
   let {events,emptyText}:{events:CombatEventView[];emptyText:string}=$props();
@@ -43,6 +43,9 @@
                     {#if combatEventNumbers(event)}
                       <span class="event-numbers">{combatEventNumbers(event)}</span>
                     {/if}
+                    {#each combatEventFailedEffects(event) as failedEffect}
+                      <span class="event-failed-effect">{failedEffect}</span>
+                    {/each}
                     {#if event.story?.line && event.text !== event.story.line}
                       <details class="source-record">
                         <summary>Original event</summary>
@@ -95,6 +98,8 @@
   .event-text{flex:1 1 65%;color:#dbc7a9;font:12px/1.4 Georgia,serif}
   .event-numbers{display:block;flex:1 1 100%;margin-left:4px;color:#d9b884;
     font:11px/1.4 Arial,sans-serif}
+  .event-failed-effect{display:block;width:100%;color:#caa583;
+    font:11px/1.45 Arial,sans-serif}
   .source-record{width:100%;padding:2px 0 0 7px;min-width:0}
   .source-record summary{font:11px/1.4 Arial,sans-serif;color:#b89a78}
   .source-record span{display:block;margin:5px 0 2px;color:#b6a58f;

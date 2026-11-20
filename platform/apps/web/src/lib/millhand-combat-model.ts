@@ -26,6 +26,8 @@ export type CombatEventView={
   actionName?:string;
   /** Committed, versioned story. Missing on legacy history (use original text). */
   story?:{version:1|2;line:string;detail?:string;hidden?:boolean};
+  /** Optional factual effect outcome metadata from the saved event. */
+  narration?:{effects?:Array<{kind:string;label?:string;applied:boolean}>};
   roundStory?:CombatRoundStoryView;
 };
 export type CombatSnapshot={

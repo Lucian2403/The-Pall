@@ -69,6 +69,12 @@ export function combatEventText(event:CombatEventView):string{
 export function combatEventNumbers(event:CombatEventView):string|undefined{
   return event.story?.hidden?undefined:event.story?.detail;
 }
+/** Failed effects are facts too, but must never be shown as applied effects. */
+export function combatEventFailedEffects(event:CombatEventView):string[]{
+  return (event.narration?.effects||[])
+    .filter(effect=>effect.applied===false)
+    .map(effect=>(effect.label?.trim()||effect.kind||'Effect')+' did not apply.');
+}
 
 export function groupCombatRounds(events:readonly CombatEventView[]):CombatChronicleRound[]{
  const result:CombatChronicleRound[]=[];
