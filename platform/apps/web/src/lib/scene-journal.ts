@@ -7,5 +7,7 @@ export type SceneJournalController={
   id:string;
   open:boolean;
   toggle:()=>void;
+  title?:string;
+  entries?:readonly string[];
 };
 export type SceneJournalRegistrar=(controller:SceneJournalController|null)=>void;
