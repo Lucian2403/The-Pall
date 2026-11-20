@@ -6,6 +6,11 @@ import {combatJournal,combatOpening,type DiaryEncounter} from '../../web/src/lib
 import {AUTHORED_MISSING_STAMP_EVIDENCE,validateMissingStampEvidence} from '@the-pall/game-core';
 import type {StitcherState} from './stitcher-work.js';
 import type {StageFourState} from './bellrunner-second-job-work.js';
+import type {ClinicState} from './millhand-clinic-state.js';
+import {classifyCondition} from './millhand-clinic-state.js';
+import type {State as HomeState} from './shared-home-state.js';
+import {clinicJournal} from '../../web/src/lib/clinic-journal-copy.js';
+import {homeJournalIntro} from '../../web/src/lib/home-journal-copy.js';
 import type {CompletedJournalTask} from './personal-journal-store.js';
 import {stitcherStageJournal} from '../../web/src/lib/stitcher-journal.js';
 import {STITCHER_STAGE_TITLES,STITCHER_ROUTE_UI} from '../../web/src/lib/stitcher-ward-copy.js';
@@ -72,4 +77,23 @@ export function combatTask(
  return {...identity(characterId,6),taskId:encounter+'.combat',
   title,paragraphs:[combatOpening(encounter),combatJournal(encounter,s.outcome,tough)],
   outcome:s.outcome};
+}
+
+export function clinicTask(
+ characterId:string,origin:'Millhand'|'Bellrunner',s:ClinicState
+):CompletedJournalTask{
+ if(s.phase!=='LEFT'||!s.paid)throw new Error('journal_requires_paid_clinic_departure');
+ return {...identity(characterId,7),taskId:'shared.clinic',title:'The Clinic',
+  paragraphs:[clinicJournal(origin,{
+   paid:s.paid,outcome:s.outcome,conditionType:classifyCondition(s.before)
+  })],outcome:s.outcome};
+}
+
+export function homeTask(characterId:string,s:HomeState):CompletedJournalTask{
+ if(s.phase!=='COMPLETE')throw new Error('journal_requires_home_completion');
+ if(s.origin!=='Millhand'&&s.origin!=='Bellrunner')
+  throw new Error('journal_unknown_home_origin');
+ return {...identity(characterId,8),taskId:'shared.rented-home',
+  title:'Rented Home',paragraphs:[homeJournalIntro(s.origin)],
+  choices:{route:s.branch},outcome:s.outcome};
 }
