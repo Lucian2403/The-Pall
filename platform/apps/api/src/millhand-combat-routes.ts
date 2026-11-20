@@ -16,6 +16,7 @@ import {initializeFlintCombat} from './millhand-combat-opening.js';
 import type {CombatAction,CombatState,CombatEvent} from '@the-pall/game-core/combat-v0.5.1';
 import {combatView} from './millhand-combat-view.js';
 import {narrateCommittedTurn} from './combat-narration.js';
+import {narrateCommittedRounds} from './combat-round-narration.js';
 import type {StageSixStance} from './millhand-combat-view.js';
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -209,8 +210,9 @@ export function registerMillhandCombatRoutes(app:FastifyInstance,options:{
           throw new Error('unexpected_encounter_outcome');
         // Enemy intention was committed before resolving this turn. Keep it
         // exclusively in historical log metadata; never reveal future AI.
-        state.events=narrateCommittedTurn(state.events,command.action,record.state.intent,
-           state,record.history);
+        state.events=narrateCommittedRounds(
+          narrateCommittedTurn(state.events,command.action,record.state.intent,
+            state,record.history),state,record.history);
         record={state,stance,history:[...record.history,...state.events]};
         await client.query(
           'UPDATE player_character_flint_combat SET revision=$2,state=$3::jsonb,history=$4::jsonb,outcome=$5,updated_at=NOW() WHERE character_id=$1',

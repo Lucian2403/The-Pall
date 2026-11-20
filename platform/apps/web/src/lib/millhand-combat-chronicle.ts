@@ -1,4 +1,4 @@
-import type {CombatEventView} from './millhand-combat-model';
+import type {CombatEventView,CombatRoundStoryView} from './millhand-combat-model';
 
 const title=(value?:string)=>value?value[0].toUpperCase()+value.slice(1):'';
 
@@ -45,4 +45,41 @@ export function isEnemyCombatAction(event:CombatEventView):boolean{
   return event.actor==='enemy'&&
     (event.actionType!==undefined||
       ['damage','miss','guard','move','technique','recovery','focus'].includes(event.kind));
+}
+
+/** Keep every raw event under its saved round. The summary is attached to
+ * the last committed event. Earlier saves never acquire a synthetic v3 story.
+ */
+export type CombatChronicleRound={
+ key:string;round:number;main:string;detail?:string;tactical:string[];
+ events:CombatEventView[];isLegacy:boolean;roundStory?:CombatRoundStoryView
+};
+export function groupCombatRounds(events:readonly CombatEventView[]):CombatChronicleRound[]{
+ const result:CombatChronicleRound[]=[];
+ for(const event of events){
+   let current=result.at(-1);
+   if(!current||current.round!==event.round){
+     current={round:event.round,key:String(event.round)+'-'+result.length,
+       main:'',tactical:[],events:[],isLegacy:true};
+     result.push(current);
+   }
+   current.events.push(event);
+   if(event.roundStory?.version===3){
+     current.main=event.roundStory.line;
+     current.detail=event.roundStory.detail;
+     current.tactical=event.roundStory.tactical;
+     current.roundStory=event.roundStory;
+     current.isLegacy=false;
+   }
+ }
+ for(const round of result){
+   if(round.roundStory)continue;
+   // Existing v1/v2 and unversioned logs are shown EXACTLY as saved.
+   // Legacy concatenation is a compatibility display, never new narration.
+   round.main=round.events.filter(e=>!e.story?.hidden)
+     .map(e=>e.story?.line??e.text).join(' ');
+   if(!round.main)round.main='Earlier combat record.';
+   round.detail=undefined;
+ }
+ return result;
 }

@@ -67,3 +67,56 @@ For attacks and effects not covered by this contract, preserve the original engi
 ## Verification
 
 Run `npm run verify:combat-narration` and `npm run verify:stage-six` from `platform`. The existing PostgreSQL integration suite also checks versioned, receipt-backed narration and reload consistency.
+
+## Persisted round Chronicle (version 3)
+
+The API composes `narrateCommittedRounds()` **after** the combat engine and
+the existing `narrateCommittedTurn()` adapter. It uses the new round's resolved
+ordered events, not anticipated enemy intent. The last committed event in
+each round receives `roundStory`:
+
+```json
+{
+  "version": 3,
+  "round": 4,
+  "encounterId": "combat-123",
+  "line": "You step aside, and Dogman misses you.",
+  "detail": "+5 Momentum (You)",
+  "eventRefs": [0, 1, 2, 3, 4],
+  "tactical": ["Dodge successful (You)", "Opening gained (You)"],
+  "actions": [
+    {"actorId": "player", "kind": "move", "eventRef": 1},
+    {"actorId": "enemy", "kind": "miss", "eventRef": 3}
+  ]
+}
+```
+
+This is a **format example**, not a scripted combat outcome. The action order
+and all numbers are taken from the engine. Every index in `eventRefs` and
+`actions[].eventRef` is relative to the containing saved round. `actionId`
+and `targetId` are carried through when supplied by a future resolver.
+The current duel maps the two actor IDs to `You` and the enemy's saved name;
+additional IDs may supply `actorName` and `targetName`.
+
+The server saves the round summary atomically alongside the original full
+event array. It does **not** re-narrate earlier rounds on read or replay.
+The browser reads version-3 summaries and shows the latest **three complete
+rounds** by default, with a Full history control and a per-round Details
+expander. Details include **all original source events**, even intent notices,
+hidden resource notices, failed effects, and exact results. The compact
+numeric line prioritises damage, blocked damage and Opening bonuses; minor
+resource costs remain in the expanded source history. Important tactical
+status labels remain visible in the compact card.
+
+Old histories without a saved v3 summary are grouped only for layout.
+Their original text or saved version-1/version-2 story lines are displayed
+unchanged. No approximate version-3 story is generated for old rounds.
+
+Because the UI now supports inspecting every completed round, the combat
+view returns the saved history instead of cutting it at an arbitrary
+120-event boundary. Long-term server pagination is a separate scalability
+task, not a reason to cut a round in half.
+
+**Engine boundary:** The system adds passive `openingUsed` metadata to
+already resolved attacks, including accuracy-only Openings. It does not change
+an attack roll, hit chance, decision, or damage.

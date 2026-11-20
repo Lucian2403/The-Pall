@@ -384,7 +384,7 @@ function tryAttack(s, who, a) {
         :["The coal hook catches nothing but air.","Silas lunges, but the curved iron passes clear of you."];
     log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',
       {actor:who,zone,damage:0,reason:'attack_roll',ability:special?ability:null,
-        focusedBonusPercent:Math.round(focusedBonus*100)});
+        narration:{openingUsed:exploited},focusedBonusPercent:Math.round(focusedBonus*100)});
     if(targetWho==='player' && (s.scene==='flint'||s.scene==='dogman'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
     return;
   }
@@ -442,6 +442,7 @@ function tryAttack(s, who, a) {
   log(s,`${narrative}${damageBreakdown}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
       'damage',{actor:who,target:targetWho,zone,hitPart:part,raw,damage,
         baseDamage:rolled,openingDamageBonus,guarded:dst.guard,
+        narration:{openingUsed:exploited},
         focusedBonusPercent:Math.round(focusedBonus*100),
         guardReductionPercent:dst.guard?Math.round(reduction*100):0,
         ability:special?ability:null});

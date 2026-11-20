@@ -109,7 +109,7 @@ assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
   scene.includes('.action-tile.chosen{border-color:#f0c77f')&&
-  scene.includes('visibleEvents.slice(-6)')&&
+  sharedChronicle.includes('rounds.slice(-3)')&&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
 
@@ -122,7 +122,7 @@ assert.ok(scene.includes('class="action-zone"') &&
   scene.includes('class="confirm-holder"') &&
   scene.includes('class="action-details"') &&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"') &&
-  scene.includes('class="chronicle"') &&
+  sharedChronicle.includes('class="chronicle"') &&
   scene.includes('class="secondary-stats"') &&
   scene.includes('class="resources"') &&
   scene.includes('grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)') &&
@@ -135,6 +135,10 @@ assert.ok(scene.includes('class="action-zone"') &&
 // numerical options and use live server facts, not hardcoded UI guesses.
 const model=read('apps/web/src/lib/millhand-combat-model.ts');
 const chronicle=read('apps/web/src/lib/millhand-combat-chronicle.ts');
+const sharedChronicle=read('apps/web/src/lib/CombatRoundChronicle.svelte');
+const roundNarrator=read('apps/api/src/combat-round-narration.ts');
+const dogmanScene=read('apps/web/src/lib/BellrunnerDogmanCombatScene.svelte');
+const dogmanApi=read('apps/api/src/bellrunner-dogman-combat-routes.ts');
 const unarmedIcon=readFileSync(resolve(root,'apps/web/static/ui-kit/combat-actions/unarmed-fists.webp'));
 assert.equal(unarmedIcon.toString('ascii',0,4),'RIFF','Owner unarmed icon must be WebP');
 assert.equal(unarmedIcon.toString('ascii',8,12),'WEBP','Owner unarmed icon is not a valid WebP');
@@ -163,18 +167,23 @@ assert.ok(view.includes('strikeByZone:zoneRanges(false)')&&
   chronicle.includes("event.actor==='enemy'"),
   'Combat action card needs real owner balance, three selectable zones and supplied weapon artwork');
 
-assert.ok(scene.includes('visibleEvents.slice(-6)')&&
-  scene.includes('Latest 6 of {visibleEvents.length} entries.')&&
-  scene.includes('combatActionLabel(event)')&&
-  scene.includes('class:enemy-action={isEnemyCombatAction(event)}')&&
-  scene.includes('.event-action.enemy-action{color:#ff7468'),
-  'Chronicle must show six latest entries, exact action labels and red enemy actions');
-assert.ok(api.includes('narrateCommittedTurn')&&
-  api.includes('state.events=narrateCommittedTurn(state.events,command.action,record.state.intent')&&
-  read('apps/api/src/combat-narration.ts').includes('actionType:type,')&&
-  scene.includes('event.story?.line??event.text')&&
-  scene.includes('event.story?.detail'),
-  'Save versioned combat descriptions with exact action metadata and preserve old events');
+assert.ok(scene.includes('<CombatRoundChronicle events={snapshot.events}')&&
+  dogmanScene.includes('<CombatRoundChronicle events={snapshot.events}')&&
+  sharedChronicle.includes('{#each shown as round')&&
+  sharedChronicle.includes('rounds.slice(-3)')&&
+  sharedChronicle.includes('<details class="round-expanded">')&&
+  sharedChronicle.includes('event.text')&&
+  sharedChronicle.includes('Latest 3 of {rounds.length} complete rounds.')&&
+  chronicle.includes('groupCombatRounds')&&
+  !scene.includes('visibleEvents.slice(-6)'),
+  'Chronicle must show whole rounds with expandable unmodified event history');
+assert.ok(api.includes('narrateCommittedRounds(')&&
+  dogmanApi.includes('narrateCommittedRounds(')&&
+  api.includes('narrateCommittedTurn(')&&
+  roundNarrator.includes('last.roundStory=summary')&&
+  roundNarrator.includes('eventRefs:ids.map')&&
+  model.includes('roundStory?:CombatRoundStoryView'),
+  'Both encounters must persist versioned round summaries and source event references');
 const {combatActionLabel,isEnemyCombatAction}=
   await import('../apps/web/src/lib/millhand-combat-chronicle.ts');
 assert.equal(combatActionLabel({kind:'damage',actor:'enemy',actionType:'attack',
@@ -382,7 +391,7 @@ assert.ok(pgTest.includes("test('Focused Stance is an authenticated, replay-safe
 // Owner HUD: Flint beside his stats; Chronicle on the left, player on the right.
 const enemyPosition=scene.indexOf('<section class="enemy-status"');
 const actionPosition=scene.indexOf('<section class="action-zone"');
-const chroniclePosition=scene.indexOf('<section class="chronicle"');
+const chroniclePosition=scene.indexOf('<CombatRoundChronicle');
 const playerPosition=scene.indexOf('<section class="player-status"');
 assert.ok(enemyPosition>0 && enemyPosition<actionPosition &&
   actionPosition<chroniclePosition && chroniclePosition<playerPosition &&

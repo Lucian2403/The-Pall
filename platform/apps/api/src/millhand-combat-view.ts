@@ -67,10 +67,10 @@ export function combatView(state:CombatState,history:CombatEvent[],stance:StageS
     enemyIntent:state.intent?exposedIntent:null,intentType:state.intent?exposedSignal:null,
     player:visibleActor(state.player),enemy:visibleActor(state.enemy),
     legalActions,
-    // Historical Chronicle is capped for the UI. The engine separately
-    // retains the exact events of its most recently resolved turn.
-    // Never reconstruct one turn's feedback by diffing a rolling history.
-    events:history.slice(-120),
+    // Return complete saved rounds; only the default visible window is compact.
+    // Raw events and precise values are available through each expanded round.
+    // Turn feedback is never reconstructed by diffing history.
+    events:history,
     turnEvents:state.events,
     rules:{
       strikeCost:testAttackCost(state,'player'),guardCost:TEST_CONFIG.guardCost,

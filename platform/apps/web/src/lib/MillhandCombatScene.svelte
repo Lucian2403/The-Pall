@@ -4,7 +4,7 @@
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
-  import {combatActionLabel,isEnemyCombatAction} from '$lib/millhand-combat-chronicle';
+  import CombatRoundChronicle from '$lib/CombatRoundChronicle.svelte';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
 
@@ -26,7 +26,6 @@
   let zone = $state<'head'|'torso'|'limbs'>('torso');
   let destination = $state<'side'|'close'|'cover'|'back'>('side');
   let reserve = $state<'breath'|'nerves'>('breath');
-  let logOpen = $state(false);
   let fatigueInfoDialog:HTMLDialogElement|undefined;
   const fatigueMilestones=[0,20,40,60,80,100] as const;
   function openFatigueInfo(){
@@ -57,8 +56,6 @@
 
   // Disabled actions remain inspectable; only Confirm is blocked.
   const visibleSelection = $derived(selected);
-  const visibleEvents=$derived(snapshot.events.filter(e=>!e.story?.hidden));
-  const recentEvents = $derived(logOpen ? visibleEvents : visibleEvents.slice(-6));
   const actionName = $derived({
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
     recover: 'Recover', technique: 'Press Advantage',focus:'Focused Stance'
@@ -448,44 +445,7 @@
   <!-- Chronicle and the player's own condition: beside the battlefield when
        it keeps its tuned width, otherwise directly beneath it. -->
   <div class="combat-console">
-    <section class="chronicle" aria-label="Battle Chronicle">
-      <div class="chronicle-heading">
-        <h3>Battle Chronicle</h3>
-        <button type="button" onclick={() => logOpen = !logOpen}
-          aria-expanded={logOpen} aria-controls="combat-chronicle-list">
-          {logOpen ? 'Latest only' : 'Full history'}
-        </button>
-      </div>
-      <div id="combat-chronicle-list" class="log-window" role="log" aria-live="off" aria-relevant="additions">
-        {#if visibleEvents.length === 0}
-          <p class="no-events">Flint approaches. The first turn has not been committed.</p>
-        {:else}
-          <ol>
-            {#each recentEvents as event, i (i)}
-              <li class:latest={i === recentEvents.length - 1}
-                class:impact={event.kind === 'damage'} class:evaded={event.kind === 'miss'}>
-                <span class="round">{String(event.round).padStart(2, '0')}</span>
-                <span class="event-body">
-                  {#if !event.story}
-                  <span class="event-action" class:enemy-action={isEnemyCombatAction(event)}>
-                    [{combatActionLabel(event)}]
-                  </span>
-                {/if}
-                <span class="combat-story">{event.story?.line??event.text}</span>
-                {#if event.story?.detail}
-                  <span class="combat-story-detail">{event.story.detail}</span>
-                {/if}
-                </span>
-              </li>
-            {/each}
-          </ol>
-        {/if}
-      </div>
-      {#if !logOpen && visibleEvents.length > 6}
-        <p class="history-hint">Latest 6 of {visibleEvents.length} entries.</p>
-      {/if}
-    </section>
-
+    <CombatRoundChronicle events={snapshot.events} emptyText="Flint approaches. The first turn has not been committed."/>
     <section class="player-status" aria-label="Player combat condition">
       {@render combatant(snapshot.player, 'You', false)}
       {#each feedback.filter(item => item.target === 'player') as cue (cue.id)}
