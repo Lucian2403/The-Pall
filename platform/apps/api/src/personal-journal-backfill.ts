@@ -8,7 +8,9 @@ import type {StitcherState} from './stitcher-work.js';
 import type {StageFourState} from './bellrunner-second-job-work.js';
 import {archiveJournalTask} from './personal-journal-store.js';
 import {stitcherTask,plateworkTask,missingStampTask,millhandSecondJobTask,
-  bellrunnerSecondJobTask,combatTask} from './personal-journal-tasks.js';
+  bellrunnerSecondJobTask,combatTask,clinicTask,homeTask} from './personal-journal-tasks.js';
+import type {ClinicState} from './millhand-clinic-state.js';
+import type {State as HomeState} from './shared-home-state.js';
 
 async function savedState<T>(client:pg.PoolClient,table:string,id:string):Promise<T|null>{
  // The table is a fixed internal name, never a user-supplied identifier.
@@ -47,5 +49,13 @@ export async function backfillCharacterJournal(
   if(job?.phase==='exited')await archiveJournalTask(client,bellrunnerSecondJobTask(id,job));
   const dogman=await savedState<CombatState>(client,'player_character_dogman_combat',id);
   if(dogman?.status==='finished')await archiveJournalTask(client,combatTask(id,'dogman',dogman));
+ }
+ if(character.origin==='Millhand'||character.origin==='Bellrunner'){
+  const clinic=await savedState<ClinicState>(client,'player_character_clinic',id);
+  if(clinic?.phase==='LEFT'&&clinic.paid)
+   await archiveJournalTask(client,clinicTask(id,character.origin,clinic));
+  const home=await savedState<HomeState>(client,'player_character_tutorial_home',id);
+  if(home?.phase==='COMPLETE')
+   await archiveJournalTask(client,homeTask(id,home));
  }
 }
