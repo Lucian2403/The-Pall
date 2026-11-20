@@ -345,7 +345,7 @@
             {/if}
           {:else if s.stage===5}
             {#if s.phase==='exited'}
-              <p class="narration">You return to the side ward. The man's bed is empty. The sheets are still warm, and the straps hang loose from the frame. An attendant comes back from the service passage.</p>
+              <p class="narration">You return to the side ward and find the man's bed empty. The sheets are still warm, and the straps hang loose from the frame. They can't have taken him far. As you turn towards the service passage, an attendant comes through the door.</p>
             {:else if s.phase==='attendant'}
               {#if (s.stage5Line??0)===0}
                 <p class="speaker">{dialogueSpeakerLabel('YOU')}</p>
@@ -355,11 +355,11 @@
                 <p class="spoken">“Down to the night door. He's still on the trolley in the passage.”</p>
               {/if}
             {:else if s.phase==='investigate'}
-              <p class="narration">The man's still in the infirmary. Before going to the trolley, decide what to check or whom to bring. The transfer hasn't been completed.</p>
+              <p class="narration">The attendant tells you the man's still on the trolley near the night door. They haven't handed him over yet, but there's no telling how long that will last. You need to do something before they take him away.</p>
             {:else if s.phase==='witness'}
               {#if (s.stage5Line??0)===0}
                 {#if s.stage5Choice==='papers'}
-                  <p class="narration">The ward record shows no signed handover. The transfer is still pending.</p>
+                  <p class="narration">You check the ward records. No one has signed him over yet. There's still time to stop them.</p>
                 {:else if s.stage5Choice==='claudia'}
                   <p class="narration">You fetch Claudia from the ward. She is angry that the dispute has spread, but comes to the passage.</p>
                 {:else if s.branch==='trolley'}
@@ -370,17 +370,18 @@
                   <p class="narration">You explain that the surgeon's notes describe teaching, not treatment.</p>
                 {/if}
                 <p class="speaker">PATIENT</p>
-                <p class="spoken">“I'm not going with them. I never said yes.”</p>
+                <p class="spoken">“I'm not going with them. I never agreed to this.”</p>
               {:else}
                 <p class="speaker">ATTENDANT</p>
                 <p class="spoken">“I heard you. Nobody moves him until this is sorted.”</p>
               {/if}
             {:else if s.phase==='hold'}
-              <p class="narration">The attendant keeps the trolley on the ward side of the passage. The patient's refusal has been heard, and the transfer is on hold.</p>
+              <p class="narration">The attendant stays beside the trolley, keeping it inside the infirmary. They've heard the man refuse, and for now, no one's taking him anywhere.</p>
               <p class="speaker">CLAUDIA</p>
-              <p class="spoken">“Leave the trolley where it is. I've got enough trouble without an argument in front of the whole ward.”</p>
+              <p class="spoken">“Leave the trolley where it is. I've got enough trouble on my hands.”</p>
             {:else if s.phase==='door'}
-              <p class="narration">At the infirmary service corridor, Owler stands in the doorway holding the transfer papers. The patient remains behind the attendant.</p>
+              <p class="narration">At the infirmary's service corridor, Owler, the night porter, stands in the doorway holding the transfer papers. He's a broad, strong-looking man with a tired face, wearing a worn vest and a ring of keys at his belt.</p>
+              <p class="narration">He's been paid to take the patient to the school, but the man is still behind the attendant, waiting on the trolley..</p>
               <p class="speaker">{(s.stage5Line??0)===1?dialogueSpeakerLabel('YOU'):'OWLER'}</p>
               <p class="spoken">“{(s.stage5Line??0)===0
                 ?"Give me the papers. I'm here to take him over."
@@ -388,7 +389,7 @@
                   ?"He's not going anywhere."
                   :"I've already been paid to take him."}”</p>
             {:else if s.phase==='prepare_door'}
-              <p class="narration">Owler tries to get through to the patient. You have one chance to prepare before he forces the door.</p>
+              <p class="narration">Owler steps towards the doorway, trying to reach the patient on the trolley. You stand in his way, but he's determined to get through. You have only a moment to decide what to do before he tries to push past you.</p>
             {:else if s.phase==='door_reply'}
               {#if s.stage5Preparation==='reason'&&(s.stage5Line??0)===0}
                 <p class="speaker">{dialogueSpeakerLabel('YOU')}</p>
@@ -466,10 +467,10 @@
   .stitcher-ward{display:flex;flex-direction:column;min-width:0;width:100%;flex:1}
   .ward-art{position:relative;width:100%;background:#171a20}
   .infirmary{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
-  .owler{position:absolute;bottom:0;right:16%;height:90%;max-width:45%;
+  .owler{position:absolute;bottom:0;right:40%;height:90%;max-width:45%;
     object-fit:contain;object-position:bottom;filter:drop-shadow(6px 8px 12px #09070a99);
     pointer-events:none}
-  .owler-label{position:absolute;right:18%;bottom:10px;padding:5px 9px;
+  .owler-label{position:absolute;right:50%;bottom:10px;padding:5px 9px;
     border:1px solid #9e7445;background:#1b140fdb;color:#eddbbc;
     font:700 13px/1.3 var(--pall-font-reading,Georgia,serif)}
   .claudia{position:absolute;bottom:0;left:6%;height:83%;max-width:40%;
