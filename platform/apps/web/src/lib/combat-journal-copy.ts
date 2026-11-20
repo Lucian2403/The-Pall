@@ -4,7 +4,7 @@ export type DiaryEncounter='flint'|'dogman'|'owler';
 export type DiaryOutcome='player_victory'|'player_defeat';
 
 export function combatJournal(
- encounter:DiaryEncounter,outcome:DiaryOutcome|null|undefined,toughVictory:boolean
+ encounter:DiaryEncounter,outcome:string|null|undefined,toughVictory:boolean
 ):string{
  if(encounter==='owler'){
   return outcome==='player_defeat'
