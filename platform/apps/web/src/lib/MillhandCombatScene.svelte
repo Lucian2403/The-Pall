@@ -1,6 +1,6 @@
 <script lang="ts">
   import {getContext,tick} from 'svelte';
-  import {combatJournal} from '$lib/combat-journal-copy';
+  import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
@@ -495,7 +495,7 @@
       </header>
       <div class="journal-entries">
         {#if ended}
-          <p>{isOwler?'Owler tried to force the patient through the night door. I stood in his way, and we fought.':"Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought."}</p>
+          <p>{combatOpening(isOwler?'owler':'flint')}</p>
           <p>{journal}</p>
         {:else}
           <p>{isOwler?"The fight with Owler is still going on. I haven't recorded how it ends.":"The fight with Flint is still going on. I haven't recorded how it ends."}</p>
