@@ -247,7 +247,7 @@ test('Saved Home journal is the selected character\'s shared reader',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
  const reader=source('apps/web/src/lib/PersonalJournal.svelte');
- assert.ok(web.includes("title:'Rented Home',entries:[homeJournalIntro]"));
+ assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(reader.includes("encodeURIComponent(id)+'/journal"));
  assert.ok(!web.includes('id="home-journal"'));
