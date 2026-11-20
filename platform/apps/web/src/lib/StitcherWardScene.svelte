@@ -8,7 +8,7 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
-  import {stitcherFullJournal} from '$lib/stitcher-journal';
+  import {stitcherFullJournal,stitcherStageJournal} from '$lib/stitcher-journal';
   import {STITCHER_WARD_ITEMS,stitcherItemActions,stitcherWardSuppliesVisible,
     type StitcherWardItemKey} from '$lib/stitcher-ward-items';
   import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
@@ -95,7 +95,7 @@
     if(journalOpen){await tick();journalEl?.scrollIntoView({block:'start',behavior:'smooth'});}
   }
   $effect(()=>{
-    register?.({id:'stitcher-ward-journal',open:journalOpen,title:STITCHER_STAGE_TITLES[s.stage],entries:journal,toggle:()=>{void toggleJournal();}});
+    register?.({id:'stitcher-ward-journal',open:journalOpen,title:STITCHER_STAGE_TITLES[s.stage],entries:stitcherStageJournal(s,s.stage),toggle:()=>{void toggleJournal();}});
     return ()=>register?.(null);
   });
   function act(action:string){
