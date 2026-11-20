@@ -562,8 +562,8 @@ assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous
   page.includes('<MillhandCombatScene snapshot={battle} characterId={id} {feedback}') &&
   scene.includes("feedback.filter(item => item.target === 'enemy')") &&
   scene.includes("feedback.filter(item => item.target === 'player')") &&
-  scene.includes('class:impact={event.kind === \'damage\'}') &&
-  scene.includes('class:evaded={event.kind === \'miss\'}') &&
+  sharedChronicle.includes("class:impact={round.events.some(e=>e.kind==='damage')}") &&
+  sharedChronicle.includes('Details · {round.events.length} events') &&
   scene.includes('animation:combat-feedback-float 1100ms') &&
   scene.includes('@media(prefers-reduced-motion:reduce)'),
   'The short-lived floating feedback must restart every turn without replaying old events');
