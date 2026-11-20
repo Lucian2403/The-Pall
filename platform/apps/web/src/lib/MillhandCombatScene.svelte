@@ -499,8 +499,6 @@
           <small>PERSONAL JOURNAL</small>
           <h2>{isOwler?'The Fight with Owler':'The Fight with Flint'}</h2>
         </div>
-        <button type="button" class="journal-toggle" data-pall-sfx="paper"
-          onclick={()=>{void toggleJournal();}}>Close journal</button>
       </header>
       <div class="journal-entries">
         {#if ended}
@@ -801,8 +799,7 @@
   .aftermath{box-sizing:border-box;width:100%;background:#e8d6b6;color:#24160e;
     border-top:2px solid #9a7147;padding:19px clamp(16px,4vw,46px) 25px;
     scroll-margin-top:56px}
-  .journal-head{display:flex;align-items:center;justify-content:space-between;
-    gap:15px;max-width:930px;margin:0 auto 15px}
+  .journal-head{max-width:930px;margin:0 auto 15px}
   .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.09em;color:#47301d}
   .journal-head h2{margin:6px 0 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
@@ -810,14 +807,6 @@
   .journal-entries{max-width:930px;margin:0 auto}
   .journal-entries p{margin:9px 0;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
     color:#24160e}
-  .journal-toggle{box-sizing:border-box;min-height:40px;padding:3px 8px;
-    border:solid transparent;border-width:10px 17px 9px;
-    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
-    border-image-slice:50 180 45 180 fill;border-image-width:10px 17px 9px;
-    border-image-repeat:stretch;border-radius:0;background:transparent;color:#2e1d11;cursor:pointer}
-  .journal-toggle:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
-  .journal-toggle:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
-  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
 
   @media(max-width:1220px){
     .enemy-status{left:29%;width:27%;min-width:230px}
