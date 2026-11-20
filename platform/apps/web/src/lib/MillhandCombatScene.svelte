@@ -57,7 +57,8 @@
 
   // Disabled actions remain inspectable; only Confirm is blocked.
   const visibleSelection = $derived(selected);
-  const recentEvents = $derived(logOpen ? snapshot.events : snapshot.events.slice(-6));
+  const visibleEvents=$derived(snapshot.events.filter(e=>!e.story?.hidden));
+  const recentEvents = $derived(logOpen ? visibleEvents : visibleEvents.slice(-6));
   const actionName = $derived({
     attack: 'Attack', guard: 'Guard', move: 'Reposition',
     recover: 'Recover', technique: 'Press Advantage',focus:'Focused Stance'
@@ -456,7 +457,7 @@
         </button>
       </div>
       <div id="combat-chronicle-list" class="log-window" role="log" aria-live="off" aria-relevant="additions">
-        {#if snapshot.events.length === 0}
+        {#if visibleEvents.length === 0}
           <p class="no-events">Flint approaches. The first turn has not been committed.</p>
         {:else}
           <ol>
@@ -480,8 +481,8 @@
           </ol>
         {/if}
       </div>
-      {#if !logOpen && snapshot.events.length > 6}
-        <p class="history-hint">Latest 6 of {snapshot.events.length} entries.</p>
+      {#if !logOpen && visibleEvents.length > 6}
+        <p class="history-hint">Latest 6 of {visibleEvents.length} entries.</p>
       {/if}
     </section>
 

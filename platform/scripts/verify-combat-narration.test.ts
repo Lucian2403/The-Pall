@@ -20,6 +20,28 @@ const event=(kind:string,extra:Partial<CombatEvent>={}):CombatEvent=>({
 const line=(e:CombatEvent)=>e.story?.line??e.text;
 const detail=(e:CombatEvent)=>e.story?.detail??'';
 
+test('Momentum and Fatigue appear once beneath the action that caused them',()=>{
+ const s=flint();
+ const events=write(s,[
+  event('intent',{actor:'enemy',text:'Flint is ready to swing.'}),
+  event('fatigue',{actor:'player',amount:3,fatigue:3,text:'Player gains 3 Fatigue.'}),
+  event('guard',{actor:'player',text:'You raise your guard.'}),
+  event('damage',{actor:'enemy',target:'player',zone:'torso',damage:6,raw:15,
+    guarded:true,text:"Flint's club hits your ribs."}),
+  event('momentum',{actor:'enemy',amount:10,text:'Flint gains 10 Momentum.'}),
+  event('momentum',{actor:'player',amount:8,text:'Player gains 8 Momentum.'})
+ ],{type:'guard'});
+ assert.equal(events[1].story?.hidden,true);
+ assert.equal(events[4].story?.hidden,true);
+ assert.equal(events[5].story?.hidden,true);
+ assert.equal(detail(events[2]),'Guard active · +3 Fatigue');
+ assert.equal(detail(events[3]),
+  '−6 Health · 9 blocked · +10 Momentum (Flint) · +8 Momentum (You)');
+ assert.equal(events[4].amount,10);
+ assert.equal(events[5].amount,8);
+ assert.equal(events.filter(e=>!e.story?.hidden).length,3);
+});
+
 test('normal hit uses the actual attacker, target, named enemy and body part',()=>{
  const s=flint();
  const [hit]=write(s,[event('damage',{

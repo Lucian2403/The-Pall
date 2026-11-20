@@ -109,7 +109,7 @@ assert.ok(scene.includes("iconBase+'confirm-action.webp'")&&
   scene.includes('aria-label={`Select ${choice.label} action`}')&&
   scene.includes('class="action-name"')&&
   scene.includes('.action-tile.chosen{border-color:#f0c77f')&&
-  scene.includes('snapshot.events.slice(-6)')&&
+  scene.includes('visibleEvents.slice(-6)')&&
   scene.includes('class="enemy-status"') && scene.includes('class="player-status"'),
   'The UI must keep icon-first action choices, accessible labels and a compact Chronicle');
 
@@ -163,8 +163,8 @@ assert.ok(view.includes('strikeByZone:zoneRanges(false)')&&
   chronicle.includes("event.actor==='enemy'"),
   'Combat action card needs real owner balance, three selectable zones and supplied weapon artwork');
 
-assert.ok(scene.includes('snapshot.events.slice(-6)')&&
-  scene.includes('Latest 6 of {snapshot.events.length} entries.')&&
+assert.ok(scene.includes('visibleEvents.slice(-6)')&&
+  scene.includes('Latest 6 of {visibleEvents.length} entries.')&&
   scene.includes('combatActionLabel(event)')&&
   scene.includes('class:enemy-action={isEnemyCombatAction(event)}')&&
   scene.includes('.event-action.enemy-action{color:#ff7468'),

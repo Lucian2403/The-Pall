@@ -6,7 +6,7 @@
 import type {CombatAction,CombatState,CombatEvent}
   from '@the-pall/game-core/combat-v0.5.1';
 
-export type CombatStory={version:1;line:string;detail?:string};
+export type CombatStory={version:1;line:string;detail?:string;hidden?:boolean};
 export type StoryCombatEvent=CombatEvent&{story?:CombatStory};
 
 const partPattern=/\b(ribs|chest|side|temple|forearm|leg|shoulder)\b/i;
@@ -26,9 +26,9 @@ function isUnarmed(weapon:CombatState['player']['weapon']):boolean{
 function attackWeapon(state:CombatState,who:'player'|'enemy'):string|null{
   const weapon=state[who].weapon;
   if(isUnarmed(weapon))return 'fist';
-  if(state.scene==='flint'&&who==='enemy')return 'club';
-  if(state.scene==='dogman'&&who==='enemy')return 'light club';
-  if(state.scene==='silas'&&who==='enemy')return 'iron hook';
+  if(weapon.type==='blunt'&&state.scene==='flint'&&who==='enemy')return 'club';
+  if(weapon.type==='blunt'&&state.scene==='dogman'&&who==='enemy')return 'light club';
+  if(weapon.type==='sharp'&&state.scene==='silas'&&who==='enemy')return 'iron hook';
   // A generic future enemy is not assumed to carry a club or hook.
   return null;
 }
@@ -252,6 +252,48 @@ function display(event:CombatEvent,state:CombatState,slot:number,last?:string):C
   return; // Leave opaque and legacy-compatible events untouched.
 }
 
+/** Fold simple resource notices into the related action in the same round.
+ * The source events stay in history with all of their exact values, but only
+ * one number line is shown for each change.
+ */
+function foldResourceDetails(events:StoryCombatEvent[],state:CombatState):void{
+  const useful=new Set(['damage','miss','guard','move','recovery','technique','focus']);
+  for(let i=0;i<events.length;i++){
+    const ev=events[i];
+    if((ev.kind!=='momentum'&&ev.kind!=='fatigue')||
+      !ev.story?.detail||(ev.actor!=='player'&&ev.actor!=='enemy'))continue;
+    let found=-1;
+    if(ev.kind==='momentum'){
+      // A defender earns Momentum by checking a specific hit with Guard.
+      for(let j=i-1;j>=0;j--){
+        const prev=events[j];
+        if(prev.round!==ev.round)break;
+        if(prev.kind==='damage'&&prev.target===ev.actor&&prev.guarded===true){
+          found=j;break;
+        }
+        if(useful.has(prev.kind)&&prev.actor===ev.actor){
+          found=j;break;
+        }
+      }
+    }else{
+      // Fatigue is recorded before the action that spent the Stamina.
+      for(let j=i+1;j<events.length;j++){
+        const next=events[j];
+        if(next.round!==ev.round)break;
+        if(useful.has(next.kind)&&next.actor===ev.actor){found=j;break;}
+      }
+    }
+    if(found<0||!events[found].story)continue;
+    const target=events[found];
+    const suffix=ev.kind==='momentum'
+      ?' ('+(ev.actor==='player'?'You':state.enemy.name)+')':'';
+    const effect=ev.story.detail+suffix;
+    const before=target.story!.detail;
+    target.story={...target.story!,detail:before?before+' · '+effect:effect};
+    ev.story={...ev.story,hidden:true};
+  }
+}
+
 /** Add action identity and a saved versioned story to ONLY this committed turn.
  * It is idempotent, and deliberately leaves all numeric engine fields alone.
  */
@@ -297,5 +339,6 @@ export function narrateCommittedTurn(
     }
     slot++;
   }
+  foldResourceDetails(all,state);
   return all;
 }
