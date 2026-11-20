@@ -3,6 +3,14 @@
 export type DiaryEncounter='flint'|'dogman'|'owler';
 export type DiaryOutcome='player_victory'|'player_defeat';
 
+export function combatOpening(encounter:DiaryEncounter):string{
+ return encounter==='owler'
+  ?'Owler tried to force the patient through the night door. I stood in his way, and we fought.'
+  :encounter==='dogman'
+    ?'Dogman blocked my way and tried to take my papers. I told him to get lost. He pulled out his club, and that was that.'
+    :"Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought.";
+}
+
 export function combatJournal(
  encounter:DiaryEncounter,outcome:string|null|undefined,toughVictory:boolean
 ):string{
