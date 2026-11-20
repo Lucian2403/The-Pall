@@ -4,8 +4,7 @@
  */
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
-import {bellrunnerStageFourJournal} from '../../web/src/lib/bellrunner-stage4-journal.js';
-import {BELLRUNNER_STAGE_FOUR} from '../../web/src/lib/bellrunner-stage4-copy.js';
+import {bellrunnerSecondJobTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -170,12 +169,7 @@ export function registerBellrunnerSecondJobRoutes(app:FastifyInstance,options?:{
         'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3 WHERE id=$1',
         [req.params.id,character.tutorial_stage,character.tutorial_status]);
       if(next.phase==='exited'&&current.phase!=='exited'){
-         await archiveJournalTask(client,{
-          characterId:req.params.id,taskId:'bellrunner.second-job',
-          taskInstanceId:'tutorial:stage:4',stage:4,
-          title:BELLRUNNER_STAGE_FOUR[next.branch].title,
-          paragraphs:bellrunnerStageFourJournal(next),choices:{route:next.branch}
-         });
+         await archiveJournalTask(client,bellrunnerSecondJobTask(req.params.id,next));
        }
        const result=view(character,next);
       await client.query(
