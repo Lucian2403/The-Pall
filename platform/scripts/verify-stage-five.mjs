@@ -219,7 +219,7 @@ assert.ok(read('apps/web/src/routes/characters/[id]/opening/+page.svelte').inclu
   'The shell journal must be available from first opening and Stage 2 work');
 const combatJournal=read('apps/web/src/lib/MillhandCombatScene.svelte');
 assert.ok(combatJournal.includes("registerSceneJournal?.({id:'combat-personal-journal'") &&
-  combatJournal.includes('entries:ended?[journal]:[]') &&
+  combatJournal.includes("entries:ended?[]:[combatOpening(isOwler?'owler':'flint')]") &&
   read('apps/web/src/lib/TutorialShell.svelte').includes('<PersonalJournal characterId={character.id}') &&
   combatJournal.includes('{#if ended}'),
   'The fight provides its outcome to one shared Journal without opening a duplicate');
