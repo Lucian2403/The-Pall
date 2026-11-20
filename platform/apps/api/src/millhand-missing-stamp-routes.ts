@@ -1,6 +1,6 @@
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
-import {missingStampJournal} from '../../web/src/lib/approved-stage-three.js';
+import {missingStampTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
@@ -189,13 +189,7 @@ export function registerMissingStampRoutes(app:FastifyInstance) {
         );
       }
       if(next.phase==='SELECTED'&&current.phase!=='SELECTED'){
-         const record=snapshot(nextCharacter,next);
-         await archiveJournalTask(client,{
-          characterId:req.params.id,taskId:'millhand.missing-stamp',
-          taskInstanceId:'tutorial:stage:3',stage:3,title:'The Missing Stamp',
-          paragraphs:missingStampJournal(next,record.finding,record.slip,record.plate),
-          choices:next.branch?{route:next.branch}:{}
-         });
+         await archiveJournalTask(client,missingStampTask(req.params.id,next));
        }
        const result=snapshot(nextCharacter,next);
       await client.query(
