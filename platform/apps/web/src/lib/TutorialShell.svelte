@@ -455,16 +455,18 @@
         <span class="chapter-location">{sceneLocation ?? character.startingLocation}</span>
       </div>
       <div class="chapter-meta">Stage {sceneStage??character.tutorial.stage} · {character.origin}</div>
-      {#if (character.origin==='Millhand'||character.origin==='Bellrunner') && character.tutorial.stage===6 && backToStageFive && !canRewind}
+      {#if (character.origin==='Millhand'||character.origin==='Bellrunner'||character.origin==='Stitcher') && character.tutorial.stage===6 && backToStageFive && !canRewind}
         <button type="button" class="rewind-button" disabled={backStageBusy}
           title={character.origin==='Bellrunner'
             ? 'Review the saved Stage 5 confrontation. Combat turns and Health are not reset.'
-            : 'Return to the saved Stage 5 stance selection before combat begins'}
+            : character.origin==='Stitcher'
+              ? 'Review the saved Stage 5 night-door preparation. Combat turns and Health are not reset.'
+              : 'Return to the saved Stage 5 stance selection before combat begins'}
           onclick={()=>{void backToStageFive();}}>
           {backStageBusy?'Returning…':'← Back to Stage 5'}
         </button>
       {/if}
-      {#if (character.origin==='Millhand'||character.origin==='Bellrunner') && character.tutorial.stage===6 && backToStageFive && backStageError}
+      {#if (character.origin==='Millhand'||character.origin==='Bellrunner'||character.origin==='Stitcher') && character.tutorial.stage===6 && backToStageFive && backStageError}
         <span class="back-stage-error" role="alert">{backStageError}</span>
       {/if}
       {#if canRewind && rewindFromStage!==null && rewindTargetStage!==null}
