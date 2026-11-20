@@ -133,6 +133,24 @@ const stub=String.raw`(()=>{
       id:'qa-scenes-bellrunner',name:'QA Bellrunner',origin:'Bellrunner',sex:'Female',coins:20,
       welcomeSeen:true,startingLocation:'Dispatch House',health:{current:0,maximum:50},
       tutorial:{stage:stage===8?8:7,status:key==='bellHomeDone'?'COMPLETED':'IN_PROGRESS'}}}));
+    if(route.endsWith('/journal')){
+      const bellrunner=route.includes('qa-scenes-bellrunner');
+      return Promise.resolve(json({
+        characterId:bellrunner?'qa-scenes-bellrunner':'qa-scenes-millhand',
+        completed:bellrunner?[
+         {taskInstanceId:'tutorial:stage:3',taskId:'bellrunner.wrong-bell',stage:3,
+          title:'The Wrong Bell',paragraphs:['I checked the bell linkage. The retaining pin had been moved.'],
+          choices:{route:'machinery'},outcome:null,contentVersion:1,completedAt:'2026-11-20'},
+         {taskInstanceId:'tutorial:stage:6',taskId:'dogman.combat',stage:6,
+          title:'The Fight with Dogman',paragraphs:['Dogman tried to take my papers, but I got past him.'],
+          choices:{},outcome:'player_victory',contentVersion:1,completedAt:'2026-11-20'}
+        ]:[
+         {taskInstanceId:'tutorial:stage:2',taskId:'millhand.marking-plates',stage:2,
+          title:'Marking the Plates',paragraphs:['I worked on the council plates. They had to be stamped properly.'],
+          choices:{},outcome:null,contentVersion:1,completedAt:'2026-11-20'}
+        ],nextCursor:null
+      }));
+    }
     if(route.endsWith('/dev/rewind-stage'))return Promise.resolve(
       json(route.includes('qa-scenes-bellrunner')
         ?{enabled:true,canRewind:true,stage:key?.startsWith('bellHome')?8:key==='bellClinicLeft'?8:7,
@@ -325,9 +343,13 @@ try{
       text.includes('You return to your rented home'),text);
     assert.ok(!text.includes('Millhand opening complete'),text);
     await evalJS("document.querySelector('.scene-journal-button').click()");
-    await until(()=>evalJS("document.querySelector('#home-journal')!==null"),
-      5000,'Bellrunner shared-room journal');
-    const journal=await evalJS("document.querySelector('#home-journal')?.innerText");
+    await until(()=>evalJS("!!document.querySelector('#personal-journal')"),
+      5000,'Bellrunner shared character Journal');
+    await evalJS("document.querySelectorAll('#personal-journal .journal-tabs button')[1].click()");
+    await until(()=>evalJS("document.querySelectorAll('#personal-journal .task-list button').length===2"),
+      5000,'Bellrunner archived tasks');
+    await evalJS("document.querySelector('#personal-journal .task-list button').click()");
+    const journal=await evalJS("document.querySelector('#personal-journal')?.innerText");
     assert.match(journal,/retaining pin|bell linkage/);
     assert.match(journal,/Dogman/);
     assert.ok(!journal.includes('Flint')&&!journal.includes('dead worker number')&&
