@@ -1,5 +1,6 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
+  import {homeJournalIntro as homeJournalIntroText} from '$lib/home-journal-copy';
   import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -45,9 +46,7 @@
     overlayKind=null;
   }
   let retryKey:string|null=null,retryId:string|null=null;
-  const homeJournalIntro=$derived(home?.origin==='Bellrunner'
-    ?"Home at last. Ten coins left after the clinic, and now I've got a rent notice demanding a hundred and fifty. Two jobs done, not a bloody coin earned. And after everything that's happened today, I'm lucky to be home at all. I need to find work that actually pays."
-    :"Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.");
+  const homeJournalIntro=$derived(home?homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner'):'');
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
   async function openRoomOverlay(kind:'storage'){
