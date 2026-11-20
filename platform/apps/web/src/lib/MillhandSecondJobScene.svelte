@@ -27,7 +27,7 @@
   $effect(()=>{
     // Real branches register their own physical scene journal.
     if(state.branch==='restamp'||state.branch==='contracts'||state.branch==='records')return;
-    registerSceneJournal?.({id:'second-job-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({id:'second-job-journal',open:journalOpen,title:route.name,entries:journal,toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
   let journalElement:HTMLElement|undefined;
