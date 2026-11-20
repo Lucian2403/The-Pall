@@ -49,7 +49,19 @@ export const STITCHER_ACTION_LABEL:Readonly<Record<string,string>>={
  cross_reference:'Write down the matching entries',
  record_difference:'Record the difference between treatment and instruction',
  continue_dialogue:'Continue',
- finish_job:'Record the work and return to the service passage'
+ finish_job:'Record the work and return to the side ward',
+ ask_attendant:'Ask the attendant where he went',
+ continue_attendant:'Continue',
+ check_transfer:'Check the trolley seal and transfer papers',
+ fetch_claudia:'Go and get Claudia',
+ use_finding:'Tell the attendant what you found in the surgeon\'s notes',
+ continue_witness:'Continue',
+ continue_hold:'Go to the night door',
+ continue_owler:'Continue',
+ reason_owler:'Reason with Owler',
+ move_cart:'Move the empty cart across the doorway',
+ brace_door:'Brace against the door frame',
+ continue_door:'Continue'
 };
 export const STITCHER_ROUTE_UI={
  trolley:{
@@ -100,5 +112,5 @@ export const STITCHER_ROUTE_UI={
 } as const;
 export const STITCHER_STAGE_TITLES:Record<number,string>={
  1:'Claudia Cyka',2:'Morning Dressings',3:'The Teaching Bed',
- 4:'Your Second Job',5:'The Empty Sheet'
+ 4:'Your Second Job',5:'The Empty Sheet / The Night Door'
 };

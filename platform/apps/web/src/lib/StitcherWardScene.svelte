@@ -8,6 +8,7 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
+  import {stage5JournalEntries} from '$lib/stitcher-stage5-journal';
   import {STITCHER_WARD_ITEMS,stitcherItemActions,stitcherWardSuppliesVisible,
     type StitcherWardItemKey} from '$lib/stitcher-ward-items';
   import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
@@ -16,7 +17,8 @@
   type Branch='trolley'|'consent'|'notes';
   type Phase='intro'|'briefing'|'inspect'|'order'|'prepare'|'care'|'linen_check'|
     'linen_fix'|'verify'|'record'|'report'|'close'|'discovery'|'claudia'|'choose'|
-    'opening'|'work'|'dialogue'|'finish'|'exited';
+    'opening'|'work'|'dialogue'|'finish'|'exited'|'attendant'|'investigate'|
+    'witness'|'hold'|'door'|'prepare_door'|'door_reply'|'fight_ready';
   type State={
     revision:number;stage:1|2|3|4|5;phase:Phase;introLine:number;
     inspectedA:boolean;inspectedB:boolean;first:'a'|'b'|null;
@@ -25,7 +27,10 @@
     bedObserved:boolean;chartRead:boolean;patientHeard:boolean;
     patientLine:number;focus:'bed'|'chart'|'patient'|null;
     claudiaLine:number;branch:Branch|null;taskStep:number;
-    routeMethod:string|null;openingLine:number;dialogueLine:number
+    routeMethod:string|null;openingLine:number;dialogueLine:number;
+    stage5Line?:number;stage5Choice?:'papers'|'claudia'|'evidence'|null;
+    stage5Witnessed?:boolean;stage5Hold?:boolean;
+    stage5Preparation?:'reason'|'cart'|'brace'|null
   };
   type Snapshot={stage:number;tutorialStatus:string;state:State;
     started:boolean;availableActions:string[]};
@@ -99,7 +104,10 @@
       :s.branch==='consent'
         ?'I went to check the consent form. There\'s a thumbprint on it, but the man says he was asleep when they took it. I wanted to find out what really happened.'
         :"I went to look through the surgeon's notes. I needed to know why they wanted another operation when the man's wound had already been treated.");
-    if(s.stage===5&&branchData)entries.push(branchData.finding);
+    if(s.stage===5){
+      if(branchData)entries.push(branchData.finding);
+      entries.push(...stage5JournalEntries(s));
+    }
     return entries;
   });
   let journalOpen=$state(false);
@@ -122,7 +130,7 @@
     {id:'choose_notes',line:"Let me see the surgeon's notes.",skill:'Scholarship / Investigation',disabled:pending}
   ]);
   const interactiveBeds=$derived(s.stage===2&&(s.phase==='inspect'||s.phase==='care')||s.stage===3&&s.phase==='discovery'&&!s.bedObserved);
-  const environment=$derived(stitcherSceneEnvironment(s.stage,s.branch));
+  const environment=$derived(stitcherSceneEnvironment(s.stage,s.branch,s.phase));
   const sceneArt=$derived(STITCHER_SCENE_ART[environment]);
   // The same four ward tools remain accessible throughout every Clinic beat
   // in Stages I–III, including the Matron's optional dialogue.
@@ -150,7 +158,8 @@
   // action list, revision, inspection, rewards or any other gameplay state.
   let claudiaTalkOpen=$state(false);
   const canTalkClaudia=$derived(s.stage===1||s.stage===2);
-  const claudiaVisible=$derived(claudiaTalkOpen||shouldShowClaudia(s,snapshot.started));
+  const claudiaVisible=$derived(claudiaTalkOpen||shouldShowClaudia(s,snapshot.started)||
+    s.stage===5&&(s.phase==='hold'||s.phase==='witness'&&s.stage5Choice==='claudia'));
   let claudiaArtMissing=$state(false);
   $effect(()=>{
     if(!canTalkClaudia&&claudiaTalkOpen)claudiaTalkOpen=false;
@@ -164,6 +173,12 @@
         <div class="ward-art pall-story-landscape">
           <img class="infirmary" src={sceneArt.image} alt={sceneArt.alt}
             draggable="false"/>
+          {#if s.stage===5&&['door','prepare_door','door_reply','fight_ready'].includes(s.phase)}
+            <img class="owler" src="/locations/stitcher/owler.webp"
+              alt="Owler, the Night Porter, standing at the service doorway"
+              draggable="false"/>
+            <span class="owler-label">Owler · Night Porter</span>
+          {/if}
           {#if claudiaVisible&&!claudiaArtMissing}
             <!-- One approved Claudia sprite, reused only during exchanges
                  with her. Independent treatment and patient examination
@@ -329,12 +344,73 @@
               <p class="narration">He's still in the infirmary, and you haven't signed him over. You won't get a coin for all this work. Worse, they could still come for him. For now, though, you've managed to keep him here.</p>
             {/if}
           {:else if s.stage===5}
-            <p class="narration">Tired and fed up, you make your way back to the service corridor. The patient still hasn't been handed over, and you've no idea how much longer this will go on. Behind you, the ward is as busy as ever.</p>
+            {#if s.phase==='exited'}
+              <p class="narration">You return to the side ward and find the man's bed empty. The sheets are still warm, and the straps hang loose from the frame. They can't have taken him far. As you turn towards the service passage, an attendant comes through the door.</p>
+            {:else if s.phase==='attendant'}
+              {#if (s.stage5Line??0)===0}
+                <p class="speaker">{dialogueSpeakerLabel('YOU')}</p>
+                <p class="spoken">“Where've they taken him?”</p>
+              {:else}
+                <p class="speaker">ATTENDANT</p>
+                <p class="spoken">“Down to the night door. He's still on the trolley in the passage.”</p>
+              {/if}
+            {:else if s.phase==='investigate'}
+              <p class="narration">The attendant tells you the man's still on the trolley near the night door. They haven't handed him over yet, but there's no telling how long that will last. You need to do something before they take him away.</p>
+            {:else if s.phase==='witness'}
+              {#if (s.stage5Line??0)===0}
+                {#if s.stage5Choice==='papers'}
+                  <p class="narration">You check the ward records. No one has signed him over yet. There's still time to stop them.</p>
+                {:else if s.stage5Choice==='claudia'}
+                  <p class="narration">You fetch Claudia from the ward. She is angry that the dispute has spread, but comes to the passage.</p>
+                {:else if s.branch==='trolley'}
+                  <p class="narration">You explain that the receiver demanded a contract number and that you refused to sign the patient over.</p>
+                {:else if s.branch==='consent'}
+                  <p class="narration">You show that the consent has been marked disputed in the ward records.</p>
+                {:else if s.branch==='notes'}
+                  <p class="narration">You explain that the surgeon's notes describe teaching, not treatment.</p>
+                {/if}
+                <p class="speaker">PATIENT</p>
+                <p class="spoken">“I'm not going with them. I never agreed to this.”</p>
+              {:else}
+                <p class="speaker">ATTENDANT</p>
+                <p class="spoken">“I heard you. Nobody moves him until this is sorted.”</p>
+              {/if}
+            {:else if s.phase==='hold'}
+              <p class="narration">The attendant stays beside the trolley, keeping it inside the infirmary. They've heard the man refuse, and for now, no one's taking him anywhere.</p>
+              <p class="speaker">CLAUDIA</p>
+              <p class="spoken">“Leave the trolley where it is. I've got enough trouble on my hands.”</p>
+            {:else if s.phase==='door'}
+              <p class="narration">At the infirmary's service corridor, Owler, the night porter, stands in the doorway holding the transfer papers. He's a broad, strong-looking man with a tired face, wearing a worn vest and a ring of keys at his belt.</p>
+              <p class="narration">He's been paid to take the patient to the school, but the man is still behind the attendant, waiting on the trolley..</p>
+              <p class="speaker">{(s.stage5Line??0)===1?dialogueSpeakerLabel('YOU'):'OWLER'}</p>
+              <p class="spoken">“{(s.stage5Line??0)===0
+                ?"Give me the papers. I'm here to take him over."
+                :(s.stage5Line??0)===1
+                  ?"He's not going anywhere."
+                  :"I've already been paid to take him."}”</p>
+            {:else if s.phase==='prepare_door'}
+              <p class="narration">Owler steps towards the doorway, trying to reach the patient on the trolley. You stand in his way, but he's determined to get through. You have only a moment to decide what to do before he tries to push past you.</p>
+            {:else if s.phase==='door_reply'}
+              {#if s.stage5Preparation==='reason'&&(s.stage5Line??0)===0}
+                <p class="speaker">{dialogueSpeakerLabel('YOU')}</p>
+                <p class="spoken">“He said no. The attendant heard him.”</p>
+              {:else}
+                <p class="speaker">OWLER</p>
+                <p class="spoken">“{s.stage5Preparation==='reason'
+                  ?"Then take it up with the school. I've got a job to finish."
+                  :s.stage5Preparation==='cart'
+                    ?'Move that cart.'
+                    :"Move. I'm not saying it again."}”</p>
+              {/if}
+            {:else if s.phase==='fight_ready'}
+              <p class="narration">Owler lowers his shoulder and tries to push through toward the trolley. You hold the doorway while the attendant keeps the patient back.</p>
+              <p class="instruction">Stage VI is the turn-based encounter with Owler. Combat is not yet connected; no result, injury or reward has been recorded.</p>
+            {/if}
           {/if}
           {#if itemChoices.length}<p class="item-instruction">Use the indicated item.</p>{/if}
           {#if s.stage===3&&s.phase==='choose'}
             <SecondJobChoices {choices} onChoose={act}/>
-          {:else if s.stage!==5&&showTextActions}
+          {:else if showTextActions}
             <div class="actions" aria-label="Available actions">
               {#each allowed as action (action)}
                 {#if !itemChoices.some(item=>item.action===action)&&!hidesHotspotAction(action)}
@@ -391,6 +467,12 @@
   .stitcher-ward{display:flex;flex-direction:column;min-width:0;width:100%;flex:1}
   .ward-art{position:relative;width:100%;background:#171a20}
   .infirmary{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+  .owler{position:absolute;bottom:0;right:40%;height:90%;max-width:45%;
+    object-fit:contain;object-position:bottom;filter:drop-shadow(6px 8px 12px #09070a99);
+    pointer-events:none}
+  .owler-label{position:absolute;right:50%;bottom:10px;padding:5px 9px;
+    border:1px solid #9e7445;background:#1b140fdb;color:#eddbbc;
+    font:700 13px/1.3 var(--pall-font-reading,Georgia,serif)}
   .claudia{position:absolute;bottom:0;left:6%;height:83%;max-width:40%;
     object-fit:contain;object-position:bottom;filter:drop-shadow(6px 7px 10px #0b090caa);
     pointer-events:none}

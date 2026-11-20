@@ -4,6 +4,62 @@
 
 **Status: APPROVED AND LOCKED (2026-10-16).** The user approved both pre-combat interactions, their dialogue, player approaches and patient-witness hold. This follows approved [Stage 4](second-task-branches.md) and leads to approved-at-encounter-level [Stage 6](owler-fight.md), the fight with **Owler, the Night Porter**. Exact combat values remain TBD.
 
+## Stage V — journal entries (owner-provided 2026-11-18)
+
+These are first-person entries shown progressively after the corresponding saved event. The three initial investigatory responses and three doorway preparations are **mutually exclusive choices**; only the chosen optional entry appears. Stage IV contributes only the selected proof.
+
+### Returning to the ward
+
+I came back to the side ward, and the man's bed was empty. The sheets were still warm.
+
+For a moment, I thought they'd already taken him. Then an attendant told me he was still on the trolley near the night door.
+
+### The patient's refusal
+
+I found him at the service passage. He was awake and told us again that he wasn't going anywhere. He'd never agreed to the operation.
+
+This time, the attendant heard him too. He promised not to let anyone move the trolley until the matter was settled.
+
+At least someone else is standing up for him now.
+
+### Optional — checked the transfer papers
+
+I checked the transfer papers. Nobody had signed the man over yet. That gives us a little time, though I don't know how much.
+
+### Optional — fetched Claudia
+
+I went to get Claudia. She wasn't happy about the trouble, but she ordered them to leave the trolley where it was.
+
+### Optional — used the Stage IV evidence
+
+**Night Trolley:** I told the attendant what happened at the receiving door. They wanted the man's contract number, and I refused to sign him over.
+
+**Signed Consent:** I told the attendant about the disputed consent form. The clerk had already written down the objection.
+
+**Notes for the Living:** I told the attendant what I'd found in the surgeon's notes. The operation is for teaching, not treatment.
+
+### Meeting Owler
+
+Then Owler turned up at the night door. He'd been paid to take the man to the school, and he wanted the papers.
+
+I told him the patient wasn't going anywhere.
+
+He didn't like that one bit.
+
+### Optional — reasoned with Owler
+
+I tried explaining that the man had refused and that the attendant heard him. Owler didn't care. He'd been paid to finish the job.
+
+### Optional — moved the cart
+
+I pushed an empty ward cart across the doorway. It wasn't much, but at least Owler couldn't walk straight past me.
+
+### Optional — braced at the door
+
+I stood in the doorway to keep Owler from getting through. He's a strong man. This could get ugly.
+
+**Stage V background transition:** The Empty Sheet, investigation and witnessed hold use the infirmary ward artwork. Once Owler appears at the night door, the painting changes to **Infirmary service corridor** (`/locations/stitcher/service-corridor.webp`) and the existing standing Owler sprite appears (`/locations/stitcher/owler.webp`). The defeated sprite is reserved for the later Stage VI outcome; Stage V does not simulate combat or determine its result.
+
 ## Interaction I — The Empty Sheet
 
 *The Stitcher returns to the side ward. The bed is empty. Its sheets are still warm, with the straps hanging loose from the frame. A ward attendant is coming back from the service passage.*

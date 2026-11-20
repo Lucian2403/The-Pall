@@ -128,7 +128,11 @@ export function registerStitcherWardRoutes(app:FastifyInstance,options:{
    }
    const saved=old.rows[0];
    if(!saved||command.action==='start'||Number(saved.revision)!==saved.state.revision||
-     saved.state.stage!==ch.tutorial_stage||ch.tutorial_status!=='IN_PROGRESS'){
+     saved.state.stage!==ch.tutorial_stage||
+      !(ch.tutorial_status==='IN_PROGRESS'||
+        // Stage IV used to park Stage V at NOT_STARTED. Resume old saves.
+        (saved.state.stage===5&&saved.state.phase==='exited'&&
+         ch.tutorial_status==='NOT_STARTED'))){
     await client.query('ROLLBACK');open=false;
     return reply.code(409).send(notReady('wrong_work_phase'));
    }
@@ -155,7 +159,7 @@ export function registerStitcherWardRoutes(app:FastifyInstance,options:{
     }
     granted[major]=previous+1;
    }
-   const nextStatus=next.stage===5?'NOT_STARTED':'IN_PROGRESS';
+   const nextStatus='IN_PROGRESS'; // Stage V is now playable, not a parked preview.
    await client.query(
     'UPDATE player_character_stitcher_ward SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
     [req.params.id,next.revision,JSON.stringify(next)]);
