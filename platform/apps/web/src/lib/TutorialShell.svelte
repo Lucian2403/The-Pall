@@ -232,7 +232,9 @@
     if(!canRewind||rewinding||rewindFromStage===null)return;
     const fromStage=rewindFromStage;
     const warning=character.origin==='Stitcher'
-      ?'TESTING ONLY: Back to Stage '+(fromStage-1)+'? This reopens the earlier Cinder Row ward step. '+
+      ?fromStage===6
+        ?'TESTING ONLY: Back to Stage 5? This discards Owler combat and the saved Chronicle, restores your exact pre-fight Health and reopens the three night-door preparations. The witnessed refusal, hold, previous work, skills and coins stay saved.'
+        :'TESTING ONLY: Back to Stage '+(fromStage-1)+'? This reopens the earlier Cinder Row ward step. '+
         (fromStage===4?'Your chosen second job and its one-time +1 Major Skill grant will be reversed. ':
          fromStage===5?'The selected job and its +1 skill are preserved. ':
          'Earlier saved ward actions will be reopened. ')+
@@ -296,6 +298,10 @@
           rewindError='Current Health differs from the saved clinic record. Rewind was blocked to prevent duplicate care or payment.';
         }else if(response.status===409 && data.error==='unsafe_combat_initial_health'){
           rewindError='Cannot restore the original combat Health: the starting save receipt is missing. No progress was changed.';
+        }else if(response.status===409 && data.error==='unsafe_stitcher_state'){
+          rewindError='The saved ward preparation changed or is incomplete. Nothing was reset.';
+        }else if(response.status===409 && data.error==='unsafe_stitcher_combat_state'){
+          rewindError='The saved Owler fight and Stage 5 preparation disagree. Nothing was reset.';
         }else if(response.status===409 && data.error==='unsafe_combat_health_state'){
           rewindError='Character Health differs from the saved fight. Rewind was blocked to protect the character.';
         }else{

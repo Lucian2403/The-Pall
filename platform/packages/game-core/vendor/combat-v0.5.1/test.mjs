@@ -868,3 +868,62 @@ test('replayed and restored hits keep the same factual location and RNG',()=>{
    assert.equal(once.rng,saved.rng);
  }
 });
+
+
+test('Owler uses Flint strike statistics and a higher ordinary Guard preference',()=>{
+ const flint=newEncounter('flint',{seed:19}),owler=newEncounter('owler',{seed:19});
+ for(const stat of ['hp','hpMax','ceiling','readiness'])
+   assert.equal(owler.enemy[stat],flint.enemy[stat],stat);
+ for(const stat of ['damage','minDamage','maxDamage','accuracy','guardMitigation','type','reach'])
+   assert.equal(owler.enemy.weapon[stat],flint.enemy.weapon[stat],stat);
+ assert.equal(owler.enemy.weapon.unarmed,true,'Owler has no invented truncheon');
+ assert.equal(owler.enemy.name,'Owler');
+ let guardingOwler=0,guardingFlint=0;
+ for(let seed=1;seed<=300;seed++){
+   for(const [scene,register] of [['owler','owler'],['flint','flint']]){
+     const first=newEncounter(scene,{seed});
+     const next=act(first,{type:'guard'},'g-'+seed);
+     if(next.status!=='active')continue;
+     if(next.intent?.type==='guard'){
+       if(register==='owler')guardingOwler++;else guardingFlint++;
+     }
+   }
+ }
+ assert.ok(guardingOwler>60,'Owler must noticeably choose Guard');
+ assert.ok(guardingOwler>guardingFlint+40,
+   'Owler guards more often than Flint without changing Guard calculations');
+});
+
+test('Owler has a real player victory and defeat using normal combat results',()=>{
+ let victory=false,defeat=false,guardActuallyBlocked=false;
+ for(let seed=1;seed<180&&( !victory||!defeat||!guardActuallyBlocked);seed++){
+   const win=newEncounter('owler',{seed,enemy:{hp:1,hpMax:50,ceiling:50}});
+   const done=act(win,{type:'attack',zone:'torso'},'victory-'+seed);
+   if(done.status==='finished'&&done.outcome==='player_victory')victory=true;
+   const lose=newEncounter('owler',{seed,player:{hp:1,hpMax:50,ceiling:50}});
+   const down=act(lose,{type:'guard'},'defeat-'+seed);
+   if(down.status==='finished'&&down.outcome==='player_defeat')defeat=true;
+   const g=newEncounter('owler',{seed});
+   const after=act(g,{type:'guard'},'guard-'+seed);
+   if(after.events.some(e=>e.kind==='damage'&&e.guarded&&e.raw>e.damage))
+     guardActuallyBlocked=true;
+ }
+ assert.equal(victory,true);
+ assert.equal(defeat,true);
+ assert.equal(guardActuallyBlocked,true);
+});
+
+test("Owler's miss and damage events use his real name and human anatomy",()=>{
+ for(let seed=1;seed<60;seed++){
+   const s=act(newEncounter('owler',{seed}),{type:'guard'},'seen-'+seed);
+   for(const event of s.events.filter(e=>e.actor==='enemy'&&
+      (e.kind==='miss'||e.kind==='damage'))){
+     assert.ok(!/Flint|Silas|Dogman|club|hook/.test(event.text),
+       'No other opponent or invented weapon should appear');
+     if(event.kind==='damage'){
+       assert.ok(event.hitPart);
+       assert.equal(event.hitPartPreposition,'in');
+     }
+   }
+ }
+});

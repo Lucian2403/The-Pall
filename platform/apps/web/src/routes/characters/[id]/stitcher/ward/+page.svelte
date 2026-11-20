@@ -70,7 +70,7 @@
   <TutorialShell {character}
     sceneLocation={sceneArt.place}
     clinicBackdrop compactCityVista travelLocked>
-    <StitcherWardScene {snapshot} {pending} {errorMessage} {perform}/>
+    <StitcherWardScene {snapshot} {pending} {errorMessage} {perform} characterId={id}/>
   </TutorialShell>
 {:else}
   <main class="fallback" role="status">

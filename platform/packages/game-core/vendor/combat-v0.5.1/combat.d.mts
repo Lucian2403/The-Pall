@@ -43,7 +43,7 @@ export type CombatActor = {
     label?:string};
 };
 export type CombatState = {
-  id:string;scene:'flint'|'boar'|'silas'|'dogman';round:number;revision:number;rng:number;
+  id:string;scene:'flint'|'boar'|'silas'|'dogman'|'owler';round:number;revision:number;rng:number;
   status:'active'|'finished';outcome:CombatOutcome;distance:'contact'|'near'|'far';
   side:boolean;approach:string|null;player:CombatActor;enemy:CombatActor;
   locationSeed?:string|number;
@@ -75,7 +75,7 @@ export declare const TEST_CONFIG:Readonly<{
   unarmedTechnique:Readonly<Record<CombatZone,readonly [number,number]>>;
 }>;
 export declare class CombatError extends Error {}
-export declare function newEncounter(scene:'flint'|'boar'|'silas'|'dogman',opts?:{
+export declare function newEncounter(scene:'flint'|'boar'|'silas'|'dogman'|'owler',opts?:{
   id?:string;seed?:number;approach?:string;locationSeed?:string|number;
   player?:Partial<CombatActor>;enemy?:Partial<CombatActor>;
 }):CombatState;

@@ -397,9 +397,12 @@ const chroniclePosition=scene.indexOf('<CombatRoundChronicle');
 const playerPosition=scene.indexOf('<section class="player-status"');
 assert.ok(enemyPosition>0 && enemyPosition<actionPosition &&
   actionPosition<chroniclePosition && chroniclePosition<playerPosition &&
-  scene.includes("{@render combatant(snapshot.enemy, 'Flint', true)}") &&
+  scene.includes("{@render combatant(snapshot.enemy, isOwler?'Owler':'Flint', true)}") &&
   scene.includes("{@render combatant(snapshot.player, 'You', false)}") &&
   scene.includes('.enemy-status{position:absolute') &&
+  scene.includes("/locations/stitcher/owler.webp") &&
+  scene.includes("/locations/stitcher/owler-defeated.webp") &&
+  scene.includes("class:owler-scene={isOwler}") &&
   scene.includes('.combat-console{display:grid') &&
   scene.includes('@media(max-width:920px)') &&
   scene.includes('.enemy-status{position:relative'),
@@ -470,22 +473,23 @@ assert.ok(scene.includes("displayedResources=[") &&
   scene.includes('<dd>{actor[resource.key]}</dd>') &&
   scene.includes('Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100)') &&
   scene.includes('class={\'mini-fill \'+resource.key}') &&
-  scene.includes("{@render combatant(snapshot.enemy, 'Flint', true)}") &&
+  scene.includes("{@render combatant(snapshot.enemy, isOwler?'Owler':'Flint', true)}") &&
   scene.includes("{@render combatant(snapshot.player, 'You', false)}"),
   'Both combatants must display all three real resource values and compact bars');
 
-// The post-fight Journal uses the same parchment, reading width, title
-// hierarchy and paper/ink contrast already established in Stage 5.
+// Like the other story stages, combat shows its parchment Journal below
+// the complete activity, not trapped inside the narrow combat console.
 assert.ok(scene.includes('class="aftermath"') &&
   scene.includes('<small>PERSONAL JOURNAL</small>') &&
-  scene.includes('<h2>The Fight with Flint</h2>') &&
+  scene.includes("<h2>{isOwler?'The Fight with Owler':'The Fight with Flint'}</h2>") &&
   scene.includes('class="journal-entries"') &&
-  scene.includes('.aftermath{grid-column:1/-1;background:#e6d5b5;color:#24160e;') &&
-  scene.includes('max-width:960px') &&
-  scene.includes('.journal-entries p{margin:0 0 10px;font:600 16px/1.55') &&
+  scene.includes('.aftermath{box-sizing:border-box;width:100%;background:#e8d6b6;color:#24160e;') &&
+  scene.includes('max-width:930px') &&
+  scene.includes('.journal-entries p{margin:9px 0;font:600 16px/1.55') &&
+  scene.indexOf('<section id="combat-personal-journal"')>scene.indexOf('</ActivityLayout>') &&
   journalReference.includes('.journal{background:#e6d5b5;color:#25180d;') &&
   journalReference.includes('.journal-head'),
-  'Finished combat must show the established parchment Personal Journal');
+  'Finished combat must show the full-width parchment Personal Journal below combat');
 
 
 // The combat engine resets state.events at every step. Use the fresh,

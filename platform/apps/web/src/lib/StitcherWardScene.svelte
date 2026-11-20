@@ -34,7 +34,8 @@
   };
   type Snapshot={stage:number;tutorialStatus:string;state:State;
     started:boolean;availableActions:string[]};
-  let {snapshot,pending,errorMessage,perform}:{
+  let {snapshot,pending,errorMessage,perform,characterId}:{
+    characterId:string;
     snapshot:Snapshot;pending:boolean;errorMessage:string;
     perform:(action:string)=>Promise<void>;
   }=$props();
@@ -404,7 +405,8 @@
               {/if}
             {:else if s.phase==='fight_ready'}
               <p class="narration">Owler lowers his shoulder and tries to push through toward the trolley. You hold the doorway while the attendant keeps the patient back.</p>
-              <p class="instruction">Stage VI is the turn-based encounter with Owler. Combat is not yet connected; no result, injury or reward has been recorded.</p>
+              <p class="instruction">The patient stays behind the attendant. Owler is ready to force his way through. The fight will be resolved with the normal combat rules.</p>
+              <a class="pall-framed-button primary-choice" href={'/characters/'+encodeURIComponent(characterId)+'/stitcher/combat'}>Confront Owler</a>
             {/if}
           {/if}
           {#if itemChoices.length}<p class="item-instruction">Use the indicated item.</p>{/if}
@@ -455,8 +457,6 @@
       <header class="journal-heading">
         <div><span class="journal-kicker">PERSONAL JOURNAL</span>
           <h2>{STITCHER_STAGE_TITLES[s.stage]}</h2></div>
-        <button type="button" class="journal-toggle" data-pall-sfx="paper"
-          onclick={()=>{void toggleJournal();}}>Close journal</button>
       </header>
       <div class="journal-entries">{#each journal as entry,i (i)}<p>{entry}</p>{/each}</div>
     </section>
@@ -537,22 +537,13 @@
   .instruction{font-size:15px;color:#5d412b}
   .actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
   .error{color:#883522}.saving{color:#654932}
-  /* Original owner journal contract; no new palette, font or closing skin. */
+  /* Shared shell owns Review/Close; this is only the full-width parchment content. */
   .journal-panel{box-sizing:border-box;width:100%;background:#e8d6b6;color:#24160e;
     border-top:2px solid #9a7147;padding:19px clamp(16px,4vw,46px) 25px;
     scroll-margin-top:56px}
-  .journal-heading{display:flex;align-items:center;justify-content:space-between;
-    gap:15px;max-width:930px;margin:0 auto 15px}
+  .journal-heading{max-width:930px;margin:0 auto 15px}
   .journal-heading h2{margin:6px 0 0}
   .journal-entries{max-width:930px;margin:0 auto}
   .journal-entries p{margin:9px 0}
-  .journal-toggle{box-sizing:border-box;min-height:40px;padding:3px 8px;
-    border:solid transparent;border-width:10px 17px 9px;
-    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
-    border-image-slice:50 180 45 180 fill;border-image-width:10px 17px 9px;
-    border-image-repeat:stretch;border-radius:0;background:transparent;color:#2e1d11;cursor:pointer}
-  .journal-toggle:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
-  .journal-toggle:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
-  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   @container activity-panel (max-width:480px){.work-card{padding:0}}
 </style>

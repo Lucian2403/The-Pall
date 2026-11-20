@@ -109,7 +109,8 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(scene.includes('dialog.showModal()'));
   assert.ok(scene.includes('left:1.5%'));
   const shell=read('apps/web/src/lib/TutorialShell.svelte');
-  assert.ok(shell.includes("character.origin==='Bellrunner') && character.tutorial.stage===6"));
+  const backCondition=shell.match(/\{#if ([^\n]+) && character\.tutorial\.stage===6 && backToStageFive && !canRewind\}/)?.[1]??'';
+  assert.match(backCondition,/character\.origin==='Bellrunner'/);
   assert.ok(page.includes('backToStageFive'));
   assert.ok(page.includes("'/bellrunner/dogman'"));
 });

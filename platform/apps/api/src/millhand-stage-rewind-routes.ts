@@ -44,6 +44,44 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
     if(!result.rowCount)return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
     if(result.rows[0].origin==='Stitcher'){
+      if(stage===6){
+        // Back to Stage 5 is the same local-only replay capability as the
+        // other origin battles, not a link to an immutable old ward screen.
+        const ward=await db.query<{revision:string|number;state:StitcherState}>(
+          'SELECT revision,state FROM player_character_stitcher_ward WHERE character_id=$1',
+          [req.params.id]);
+        const state=ward.rows[0]?.state;
+        const prepared=!!state&&Number(ward.rows[0].revision)===state.revision&&
+          state.stage===5&&state.phase==='fight_ready'&&
+          state.stage5Witnessed===true&&state.stage5Hold===true&&
+          !!state.branch&&state.branch in STITCHER_MAJOR&&
+          ['reason','cart','brace'].includes(state.stage5Preparation??'');
+        if(!prepared)return {enabled:true,canRewind:false,stage,targetStage:null};
+        const combat=await db.query<{state:CombatState;preparation:string;branch:string;
+          patient_safe:boolean;transfer_cancelled:boolean}>(
+          'SELECT state,preparation,branch,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1',
+          [req.params.id]);
+        const fight=combat.rows[0];
+        const valid=!!fight&&fight.preparation===state.stage5Preparation&&
+          fight.branch===state.branch&&
+          fight.state.player.hp===result.rows[0].current_health&&
+          (fight.state.status==='finished'
+            ?result.rows[0].tutorial_status==='COMPLETED'&&
+              fight.patient_safe&&fight.transfer_cancelled
+            :fight.state.status==='active'&&
+              result.rows[0].tutorial_status==='IN_PROGRESS'&&
+              !fight.patient_safe&&!fight.transfer_cancelled);
+        if(!valid)return {enabled:true,canRewind:false,stage,targetStage:null};
+        const start=await db.query<{response:{revision:number;preparation:string;
+          branch:string;player:{hp:number}}}>(
+          "SELECT response FROM player_character_owler_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+          [req.params.id]);
+        const first=start.rows[0]?.response;
+        const canRewind=first?.revision===0&&first.preparation===fight.preparation&&
+          first.branch===fight.branch&&Number.isSafeInteger(first.player?.hp)&&
+          first.player.hp>0&&first.player.hp<=result.rows[0].max_health;
+        return {enabled:true,canRewind:!!canRewind,stage,targetStage:canRewind?5:null};
+      }
       if(stage<2||stage>5)return {enabled:true,canRewind:false,stage,targetStage:null};
       const saved=await db.query<{revision:string|number;state:StitcherState}>(
         'SELECT revision,state FROM player_character_stitcher_ward WHERE character_id=$1',
@@ -263,6 +301,72 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
       }
 
       if(c.rows[0].origin==='Stitcher'){
+        if(expectedStage===6){
+          // Atomically restore the pre-fight Health and the Stage V doorway
+          // choice, removing the Owler fight and every replayable request ID.
+          // The refusal, witness, hold, earlier skill and currency remain.
+          const ward=await client.query<{revision:string|number;state:StitcherState}>(
+            'SELECT revision,state FROM player_character_stitcher_ward WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          const saved=ward.rows[0]?.state;
+          if(!saved||Number(ward.rows[0].revision)!==saved.revision||
+            saved.stage!==5||saved.phase!=='fight_ready'||
+            saved.stage5Witnessed!==true||saved.stage5Hold!==true||
+            !saved.branch||!(saved.branch in STITCHER_MAJOR)||
+            !['reason','cart','brace'].includes(saved.stage5Preparation??'')){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_stitcher_state'});
+          }
+          const combat=await client.query<{state:CombatState;preparation:string;branch:string;
+            patient_safe:boolean;transfer_cancelled:boolean}>(
+            'SELECT state,preparation,branch,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          const fight=combat.rows[0];
+          if(!fight||fight.preparation!==saved.stage5Preparation||
+            fight.branch!==saved.branch||
+            !(fight.state.status==='finished'
+              ?c.rows[0].tutorial_status==='COMPLETED'&&fight.patient_safe&&fight.transfer_cancelled
+              :fight.state.status==='active'&&c.rows[0].tutorial_status==='IN_PROGRESS'&&
+                !fight.patient_safe&&!fight.transfer_cancelled)){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_stitcher_combat_state'});
+          }
+          if(fight.state.player.hp!==c.rows[0].current_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_health_state'});
+          }
+          const start=await client.query<{response:{revision:number;preparation:string;
+            branch:string;player:{hp:number}}}>(
+            "SELECT response FROM player_character_owler_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+            [req.params.id]);
+          const first=start.rows[0]?.response;
+          if(first?.revision!==0||first.preparation!==fight.preparation||
+            first.branch!==fight.branch||!Number.isSafeInteger(first.player?.hp)||
+            first.player.hp<=0||first.player.hp>c.rows[0].max_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_initial_health'});
+          }
+          await client.query(
+            'DELETE FROM player_character_owler_combat_receipts WHERE character_id=$1',
+            [req.params.id]);
+          await client.query(
+            'DELETE FROM player_character_owler_combat WHERE character_id=$1',
+            [req.params.id]);
+          await client.query(
+            'DELETE FROM player_character_stitcher_ward_receipts WHERE character_id=$1',
+            [req.params.id]);
+          const prior:StitcherState={...saved,revision:saved.revision+1,
+            phase:'prepare_door',stage5Line:0,stage5Preparation:null};
+          await client.query(
+            'UPDATE player_character_stitcher_ward SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
+            [req.params.id,prior.revision,JSON.stringify(prior)]);
+          await client.query(
+            "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS',current_health=$2 WHERE id=$1",
+            [req.params.id,first.player.hp]);
+          await client.query('COMMIT');transaction=false;
+          return {stage:5,tutorialStatus:'IN_PROGRESS',
+            route:'/characters/'+req.params.id+'/stitcher/ward',coinDelta:0};
+        }
         if(expectedStage<2||expectedStage>5){
           await client.query('ROLLBACK');transaction=false;
           return reply.code(409).send({error:'invalid_stage'});

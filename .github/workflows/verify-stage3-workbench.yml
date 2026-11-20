@@ -25,6 +25,8 @@ on:
       - 'platform/scripts/verify-bellrunner-stage8.test.ts'
       - 'platform/scripts/verify-stitcher-stages1-4.test.ts'
       - 'platform/scripts/verify-stitcher-stage5.test.ts'
+      - 'platform/scripts/verify-stitcher-stage6.test.ts'
+      - 'platform/db/migrations/0021_stitcher_owler_combat.sql'
       - 'platform/scripts/verify-stitcher-claudia-optional.test.ts'
       - 'platform/scripts/verify-stitcher-claudia-browser.mjs'
       - 'platform/apps/api/src/stitcher-*.ts'
@@ -116,6 +118,8 @@ jobs:
         run: npm run verify:stitcher-stages1-4
       - name: Stitcher Stage V Empty Sheet, witnessed pause and Night Door
         run: npm run verify:stitcher-stage5
+      - name: Stitcher Stage VI Owler combat and witnessed hold
+        run: npm run verify:stitcher-stage6
       - name: Stitcher Stage II illustrated ward item interactions
         run: npm run verify:stitcher-ward-items
       - name: Stitcher Claudia five optional dialogue topics and immutable job state
