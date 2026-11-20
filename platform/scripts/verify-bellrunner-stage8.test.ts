@@ -77,7 +77,8 @@ test('Bellrunner Stage VIII retains home artwork and uses the shared character-s
  assert.ok(web.includes("url('/locations/home/rented-room.webp')"));
  assert.ok(web.includes('src="/locations/home/notice.webp"'));
  assert.ok(web.includes("home.origin==='Bellrunner'?'Bellrunner opening complete.'"));
- assert.ok(web.includes("home?.origin==='Bellrunner'"));
+ assert.ok(web.includes("homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner')"));
+ assert.ok(read('apps/web/src/lib/home-journal-copy.ts').includes("origin==='Bellrunner'"));
  assert.ok(web.includes("title:'Rented Home',entries:[homeJournalIntro]"));
  assert.ok(web.includes("journalController={{id:'home-journal'"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
