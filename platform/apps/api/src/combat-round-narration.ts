@@ -82,7 +82,7 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
    if(count%3===1)
      line=from+' '+active+' '+to+loc+source+' using '+namedAbility;
    else if(count%3===2)
-     line=from+' uses '+namedAbility+' to '+base+' '+to+loc+source;
+     line=from+(who==='player'?' use ':' uses ')+namedAbility+' to '+base+' '+to+loc+source;
    else line=from+(who==='player'?' use ':' uses ')+namedAbility+
      ' and '+active+' '+to+loc+source;
  }else if(count%3===1&&!verb)
@@ -94,7 +94,7 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
  const used=facts(e).openingUsed===true||(num(e.openingDamageBonus)??0)>0;
  if(used){
    line=from+(who==='player'?' take the opening and ':' takes the opening and ')+
-     (namedAbility?'uses '+namedAbility+' to '+base:active)+
+     (namedAbility?(who==='player'?'use ':'uses ')+namedAbility+' to '+base:active)+
      ' '+to+loc+source;
  }
  if(e.guarded===true&&(num(e.raw)??0)>(num(e.damage)??0)){
@@ -156,8 +156,7 @@ function actionLine(s:CombatState,e:CombatEvent,prior?:CombatRoundStory,
       if(!ability(e))return;
       return period(from+(from==='You'?' use ':' uses ')+ability(e));
     case 'warning':
-      // A committed warning is the engine's report of a failed action.
-      // Unlike the enemy's intent, this can explain an important failure.
+      // Failed committed actions can matter. Intent is never treated as one.
       return str(e.text)?period(e.text):undefined;
     case 'outcome':
       if(s.outcome==='player_victory')return 'You win the fight.';
@@ -174,7 +173,9 @@ function statusLine(s:CombatState,e:CombatEvent):string|undefined{
     const outcomes=facts(e).effects?.filter(x=>x.applied===true);
     if(outcomes?.length)return period(from+' is affected');
   }
-  if(e.kind==='bleed')return period(from+(from==='You'?' keep':' keeps')+' bleeding');
+  // Repeated bleed ticks stay in numerical details. Only the start of
+  // bleeding or a serious wound needs an extra sentence.
+  if(e.kind==='bleed')return undefined;
 }
 function extras(e:CombatEvent,s:CombatState):string[]{
   const who=actorId(e),to=destination(e),from=label(s,e,who);
@@ -186,6 +187,8 @@ function extras(e:CombatEvent,s:CombatState):string[]{
     const bonus=num(e.openingDamageBonus);if(bonus&&bonus>0)entries.push('Opening bonus +'+bonus);
   }
   if(e.kind==='bleed'&&amount!==undefined)entries.push(amount+' bleeding damage to '+object(s,e,to));
+  if(e.kind==='move'&&str(facts(e).movement?.place))
+    entries.push('Position: '+facts(e).movement!.place);
   if(e.kind==='momentum'&&num(e.amount)!==undefined)
     entries.push((Number(e.amount)>=0?'+':'−')+Math.abs(Number(e.amount))+' Momentum ('+from+')');
   if(e.kind==='fatigue'&&num(e.amount)!==undefined)
@@ -201,7 +204,9 @@ function extras(e:CombatEvent,s:CombatState):string[]{
     if(effect.applied!==true||effect.kind==='damage'&&amount!==undefined)continue;
     const name=str(effect.label)||str(effect.kind)||'Effect';
     const duration=num(effect.durationRounds);
-    entries.push(name+(duration?' ('+duration+' rounds)':''));
+    const value=num(effect.amount),unit=str(effect.unit);
+    const quantity=value===undefined?'':': '+(value<0?'−':'')+Math.abs(value)+(unit?' '+unit:'');
+    entries.push(name+quantity+(duration?' ('+duration+' rounds)':''));
   }
   return entries;
 }
@@ -236,78 +241,117 @@ export function narrateCommittedRounds(
   for(const [round,ids] of groups){
     const last=result[ids[ids.length-1]];
     if(last.roundStory){previous=last.roundStory;memory.push(last.roundStory);continue;}
-    const pieces:Array<{text:string;kind:string;actor:string;index:number}>=[];
+    // Every item refers to its original LOCAL event index. Do not infer an
+    // action from the pre-turn telegraph; the engine has already resolved it.
+    const pieces:Array<{
+      text:string;kind:string;actor:string;index:number;priority:number
+    }>=[];
     const statuses:string[]=[],details:string[]=[];
     const actions:CombatRoundStory['actions']=[];
+    const meaningful=new Set([
+      'damage','miss','guard','move','focus','recovery',
+      'ability','effect','status','outcome'
+    ]);
     for(let k=0;k<ids.length;k++){
-      const e=result[ids[k]],index=ids[k];
-      if(e.kind==='intent')continue; // Telegraph is visible elsewhere before the turn.
-      const phrase=actionLine(state,e,previous,memory)||statusLine(state,e);
-      if(phrase)pieces.push({text:phrase,kind:e.kind,actor:actorId(e),index:k});
-      const flag=tactical(e,state);if(flag&&!statuses.includes(flag))statuses.push(flag);
-      for(const value of extras(e,state))if(!details.includes(value))details.push(value);
-      if(['damage','miss','guard','move','focus','recovery','ability','effect','status','outcome'].includes(e.kind))
-        actions.push({actorId:actorId(e),...(targetId(e)?{targetId:targetId(e)}:{}),
-          kind:e.kind,eventRef:k,...(str(facts(e).actionId)?{actionId:facts(e).actionId}:{})});
-    }
-    // Don't repeat "You use X" from a technique notice if its damage/miss is
-    // already recorded. Technique costs stay visible in the detail line.
-    // Movement then miss can form one factual exchange in the same order.
-    for(let k=0;k<pieces.length-1;k++){
-      const left=pieces[k],right=pieces[k+1];
-      if(left.kind!=='move'||right.kind!=='miss'||left.actor===right.actor)continue;
-      const e=result[ids[right.index]],other=label(state,e,right.actor);
-      const failed=ids.slice(left.index+1,right.index)
-        .some(index=>result[index].condition==='dodge_failed');
-      if(failed){
-        left.text+=' Your dodge fails, but '+other+
-          (other==='You'?' still miss.':' still misses.');
-      }else if(left.actor==='player'){
-        left.text=left.text.replace(/\.$/,'')+', and '+other+' misses you.';
-      }else if(right.actor==='player'){
-        left.text=left.text.replace(/\.$/,'')+', and you miss.';
-      }else{
-        left.text=left.text.replace(/\.$/,'')+', and '+other+' misses.';
+      const e=result[ids[k]];
+      if(e.kind==='intent')continue; // Already visible before the choice.
+      let phrase=actionLine(state,e,previous,memory)||statusLine(state,e);
+      if(e.kind==='warning'&&str(e.text))phrase=period(e.text);
+      // A committed special attack is named on its hit/miss. If no hit/miss
+      // followed it, keep the ability announcement rather than inventing one.
+      if(e.kind==='technique'&&str(ability(e))&&
+        !ids.slice(k+1).some(id=>{
+          const next=result[id];
+          return next.actor===e.actor&&
+            (next.kind==='damage'||next.kind==='miss')&&
+            ability(next)===ability(e);
+        })){
+        const name=label(state,e,actorId(e));
+        phrase=period(name+(name==='You'?' use ':' uses ')+ability(e));
       }
-      pieces.splice(k+1,1);
-    }
-    // Minor state changes have a label; serious wounds and outcomes get text.
-    // Cap the main narrative at three short sentences; every source event can
-    // be inspected and no numerical effect is thrown away.
-    const selected=pieces.slice(0,3);
-    // A result or a serious injury cannot disappear merely because there were
-    // several preparatory actions before it. Keep original chronological order.
-    const essential=pieces.filter(p=>p.kind==='outcome'||
-      p.kind==='wound'&&['serious_wound','bleed_started'].includes(
-        String(result[ids[p.index]]?.condition)));
-    for(const item of essential){
-      if(selected.includes(item))continue;
-      if(selected.length>=3){
-        const expendable=selected.findIndex(p=>
-          ['guard','move','recovery','focus'].includes(p.kind));
-        if(expendable>=0)selected.splice(expendable,1);
-        else if(item.kind==='outcome')selected.shift();
+      if(phrase){
+        const priority=e.kind==='outcome'?5:
+          e.kind==='damage'?4:
+          e.kind==='wound'&&
+            ['bleed_started','serious_wound','arm_impaired'].includes(String(e.condition))?4:
+          ['miss','warning'].includes(e.kind)?3:
+          ['move','guard','recovery','focus','ability','effect','status','technique'].includes(e.kind)?2:1;
+        pieces.push({text:phrase,kind:e.kind,actor:actorId(e),index:k,priority});
       }
-      selected.push(item);
+      const flag=tactical(e,state);
+      if(flag&&!statuses.includes(flag))statuses.push(flag);
+      // Damage and repeated effects may have the same value. Do not dedupe
+      // those occurrences: each is a separate authoritative result.
+      details.push(...extras(e,state));
+      if(meaningful.has(e.kind))
+        actions.push({actorId:actorId(e),
+          ...(targetId(e)?{targetId:targetId(e)}:{}),
+          kind:e.kind,eventRef:k,
+          ...(str(facts(e).actionId)?{actionId:facts(e).actionId}:{})});
     }
+    // Preserve initiative order. Wounds and the outcome deserve room even
+    // if movement or Guard happened earlier in the same exchange.
+    const meaningful=pieces.filter(p=>p.priority>=2);
+    const essential=meaningful.filter(p=>p.priority>=4);
+    let selected:typeof pieces;
+    if(essential.length>=3)
+      selected=essential.length===3?essential:[essential[0],...essential.slice(-2)];
+    else if(essential.length===2)selected=[...essential];
+    else if(essential.length===1){
+      const other=meaningful.find(p=>p.index!==essential[0].index);
+      selected=other?[other,essential[0]]:[essential[0]];
+    }else selected=meaningful.slice(0,2);
     selected.sort((a,b)=>a.index-b.index);
-    const sentence=selected.map(x=>x.text).join(' ')||'The round ends.';
-    const headline=details.filter(x=>/damage to|blocked|Opening bonus/.test(x));
-    // Applied ability effects outrank minor costs in the short numbers line.
-    // Future effect labels are read from metadata, not a hardcoded vocabulary.
-    const appliedNames=ids.flatMap(i=>(facts(result[i]).effects||[])
-      .filter(e=>e.applied===true&&e.kind!=='damage')
-      .map(e=>str(e.label)||str(e.kind)||'Effect'));
-    const highlighted=details.filter(x=>appliedNames.some(name=>x.startsWith(name)));
-    const extrasCompact=details.filter(x=>!headline.includes(x)&&!highlighted.includes(x));
-    const show=[...headline,...highlighted,...extrasCompact].slice(0,3);
+    // A move + a later out-of-range miss can form one connected sentence,
+    // but a failed dodge MUST NOT be turned into a successful dodge.
+    const combined:string[]=[];
+    for(let i=0;i<selected.length;i++){
+      const current=selected[i],next=selected[i+1];
+      if(next&&current.kind==='move'&&next.kind==='miss'&&
+        current.actor!==next.actor&&
+        ['out_of_reach','old_position'].includes(String(result[ids[next.index]].reason))&&
+        ['side','back','cover'].includes(String(facts(result[ids[current.index]]).movement?.kind||
+          result[ids[current.index]].actionDetail))){
+        const failed=ids.slice(current.index+1,next.index)
+          .some(id=>result[id].condition==='dodge_failed');
+        const first=current.text.replace(/\.$/,'');
+        const second=next.text.replace(/\.$/,'');
+        if(failed){
+          const subject=label(state,result[ids[next.index]],next.actor);
+          combined.push(current.text+' Your dodge fails, but '+
+            (subject==='You'?'you':subject)+' still '+(subject==='You'?'miss':'misses')+'.');
+        }else combined.push(first+', and '+
+          (second.startsWith('You ')?'you '+second.slice(4):second)+'.');
+        i++;continue;
+      }
+      combined.push(current.text);
+    }
+    let sentence=combined.join(' ')||'The round ends.';
+    // Short numbers: first show real harm/blocking, then actual applied
+    // conditions. All remaining values stay under each round's Details.
+    const isHarm=(v:string)=>/damage to|blocked|Opening bonus/.test(v);
+    const importantEffects=ids.flatMap(id=>(facts(result[id]).effects||[])
+      .filter(effect=>effect.applied===true&&effect.kind!=='damage')
+      .map(effect=>str(effect.label)||str(effect.kind)||'Effect'));
+    const injury=(v:string)=>importantEffects.some(name=>v.startsWith(name));
+    const prominent=details.filter(v=>isHarm(v));
+    const effects=details.filter(v=>!isHarm(v)&&injury(v));
+    const rest=details.filter(v=>!isHarm(v)&&!injury(v));
+    const ordered=[...prominent,...effects,...rest];
+    const compact=ordered.slice(0,3);
+    if(ordered.length>compact.length&&!statuses.includes('More results in details'))
+      statuses.push('More results in details');
+    if(pieces.some(p=>p.priority>=2&&!selected.includes(p))&&
+      !statuses.includes('More actions in details'))
+      statuses.push('More actions in details');
     const summary:CombatRoundStory={
       version:3,round,encounterId:state.id,line:sentence,
-      ...(show.length?{detail:show.join(' · ')}:{}),
+      ...(compact.length?{detail:compact.join(' · ')}:{}),
       eventRefs:ids.map((_,i)=>i),tactical:statuses,actions
     };
-    // Preserve engine events in order. Only the last fresh event gets the
-    // round-level projection. Version 1/2 and unversioned history stay intact.
+    // Versioned summary lives only on the last new event. The raw events
+    // (including intent, repeated resource notices, and all exact amounts)
+    // remain in their original order and keep their own v1/v2 narration.
     last.roundStory=summary;
     previous=summary;memory.push(summary);
   }

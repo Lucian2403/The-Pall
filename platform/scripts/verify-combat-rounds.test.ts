@@ -82,7 +82,7 @@ test('movement before a successful dodge and enemy miss is connected',()=>{
   event('miss',{actor:'enemy',target:'player',reason:'out_of_reach'}),
   event('tactical',{actor:'player',condition:'opening_gained'})
  ],state('Dogman'));
- assert.match(result.line,/You step aside, and Dogman misses you/);
+ assert.match(result.line,/You step aside, and Dogman cannot reach you/);
  assert.ok(result.tactical.includes('Dodge successful (You)'));
  assert.ok(result.tactical.includes('Opening gained (You)'));
  assert.equal((result.line.match(/\./g)||[]).length,1);
@@ -94,7 +94,7 @@ test('failed dodge and later miss remain separate truthful facts',()=>{
   event('tactical',{actor:'player',condition:'dodge_failed'}),
   event('miss',{actor:'enemy',target:'player',reason:'attack_roll'})
  ],state('Machine Walker'));
- assert.match(result.line,/You step aside\. Your dodge fails, but Machine Walker still misses\./);
+ assert.match(result.line,/You step aside\. Machine Walker attacks you but misses\./);
  assert.ok(result.tactical.includes('Dodge failed (You)'));
  assert.doesNotMatch(result.line,/You dodge/);
 });
@@ -149,7 +149,7 @@ test('moving out of range before an attack is not rewritten as an actual hit',()
    event('move',{actor:'player',actionDetail:'back'}),
    event('miss',{actor:'enemy',target:'player',reason:'out_of_reach'})
  ],state('Wind Clock'));
- assert.match(result.line,/You step back.*Wind Clock misses/);
+ assert.match(result.line,/You step back.*Wind Clock cannot reach you/);
  assert.doesNotMatch(result.detail||'',/damage/);
 });
 
@@ -206,7 +206,7 @@ test('opponent Opening grammar and linked player misses stay natural',()=>{
    event('move',{actor:'enemy',actionDetail:'side'}),
    event('miss',{actor:'player',target:'enemy',reason:'out_of_reach'})
  ],enemy);
- assert.match(sidestep.line,/Dogman steps aside, and you miss\./);
+ assert.match(sidestep.line,/Dogman steps aside, and you cannot reach Dogman\./);
  assert.doesNotMatch(sidestep.line,/and You|You moves/);
 });
 
