@@ -2741,8 +2741,9 @@ test('Stitcher Stage VI rewind restores the witnessed Stage V preparations and r
    state=turn.body!;
   }
   // A changed Health total must block erasure rather than invent healing.
+  const changedHealth=state.player.hp===50?49:state.player.hp+1;
   await db.query('UPDATE player_characters SET current_health=$2 WHERE id=$1',
-   [c.id,state.player.hp+1]);
+   [c.id,changedHealth]);
   assert.equal((await request('GET',rewind)).body?.canRewind,false);
   const unsafe=await request('POST',rewind,owner,{expectedStage:6});
   assert.equal(unsafe.status,409);
