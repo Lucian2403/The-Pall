@@ -105,6 +105,9 @@ test('Stitcher Stage VI reuses Flint combat HUD and has correct outcome artwork'
  assert.match(route,/MillhandCombatScene/);
  assert.doesNotMatch(route,/backToStageFive/,
    'Stage 6 must use actual developer rewind, not read-only Stage V navigation');
+ assert.match(route,/stage:6,status:battle.status==='finished'/,
+   'Combat start must immediately update the shell stage so Back to Stage 5 can appear');
+ assert.match(route,/tutorial:\{stage:6,status:result.status==='finished'/);
  assert.match(shell,/canRewind && rewindFromStage!==null && rewindTargetStage!==null/);
  assert.match(shell,/This discards Owler combat and the saved Chronicle/);
  const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
