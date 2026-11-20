@@ -192,7 +192,7 @@ test('new mechanics can report movement and resources with their own labels',()=
       {kind:'composure',label:'Composure',applied:true,amount:-5,unit:'Composure'}]},
   text:'Pushed with custom effects.'})]);
  assert.match(line(hit),/Eel Cart pushes you/);
- assert.equal(info(hit),'−4 Health · +2 steps · -5 Composure');
+ assert.equal(info(hit),'−4 Health · Pushed back: 2 steps · −5 Composure');
 });
 
 test('move around obstacles describes only recorded position changes',()=>{
@@ -270,6 +270,21 @@ test('related Momentum, Fatigue and ability costs appear once under the real att
  assert.match(line(done[2]),/Twist Wire/);
  assert.equal(info(done[2]),'12 damage · +3 Fatigue · 5/100 total · −20 Momentum · +10 Momentum');
  assert.equal(done.length,4);
+});
+
+test('a generated self-targeting ability never changes who took damage',()=>{
+ const state=fresh();state.enemy.name='Folding Engine';
+ const [selfHit,playerSelfHit]=render(state,[
+  e('damage',{actor:'enemy',target:'enemy',damage:5,raw:5,
+    narration:{ability:{name:'Broken Return'},action:{}},text:'Self hit.'}),
+  e('damage',{actor:'player',target:'player',damage:2,raw:2,
+    narration:{ability:{name:'Recoil'},action:{}},text:'Player recoil.'})
+ ]);
+ assert.doesNotMatch(line(selfHit),/hits you|attacks you|strikes you/);
+ assert.match(line(selfHit),/Folding Engine/);
+ assert.equal(info(selfHit),'5 damage');
+ assert.match(line(playerSelfHit),/yourself/);
+ assert.equal(info(playerSelfHit),'−2 Health');
 });
 
 test('a new action id stops resource folding across independent attacks',()=>{

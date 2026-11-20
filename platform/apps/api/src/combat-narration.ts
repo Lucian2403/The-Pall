@@ -57,8 +57,16 @@ const caps=(text:string):string=>text[0].toUpperCase()+text.slice(1);
 const number=(n:number,label:string,sign=''):string=>sign+String(n)+' '+label;
 const nameOf=(state:CombatState,who:Side):string=>
   who==='player'?'You':state.enemy.name;
-const targetOf=(state:CombatState,who:Side):string=>
-  who==='player'?state.enemy.name:'you';
+function targetSide(who:Side,target:unknown):Side{
+  // The prototype duel can infer the other side when old events lack a target.
+  // New resolvers should always send target, especially for self-affecting abilities.
+  return side(target)?target:who==='player'?'enemy':'player';
+}
+function targetOf(state:CombatState,who:Side,target:unknown):string{
+  const resolved=targetSide(who,target);
+  if(resolved===who)return who==='player'?'yourself':state.enemy.name;
+  return resolved==='player'?'you':state.enemy.name;
+}
 function facts(event:CombatEvent):NarrationFacts{
   const raw=event.narration;
   return raw&&typeof raw==='object'&&!Array.isArray(raw)?raw as NarrationFacts:{};
@@ -101,7 +109,13 @@ function detailEffects(event:CombatEvent):{parts:string[];text?:string}{
     const amount=finite(e.amount);
     const unit=word(e.unit);
     const duration=finite(e.durationRounds);
-    let part=amount===null?label:(amount>0?'+':'')+String(amount)+' '+(unit||label);
+    // Keep a custom effect's meaning beside its number: "+2 steps" alone
+    // would hide whether the target was pushed, pulled or moved sideways.
+    let part:string;
+    if(amount===null)part=label;
+    else if(unit&&label.toLowerCase()!==unit.toLowerCase())
+      part=label+': '+(amount<0?'−':'')+Math.abs(amount)+' '+unit;
+    else part=(amount>0?'+':amount<0?'−':'')+Math.abs(amount)+' '+(unit||label);
     if(duration!==null&&duration>0)part+=' ('+duration+' rounds)';
     if(!parts.includes(part))parts.push(part);
     if(!sentence&&safe(e.text))sentence=e.text!.trim();
@@ -115,7 +129,7 @@ function story(line:string,parts:string[]=[],extra?:string):CombatStory{
 }
 function hit(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
   if(!side(event.actor))return;
-  const who=event.actor,them=targetOf(state,who);
+  const who=event.actor,them=targetOf(state,who,event.target);
   const dmg=finite(event.damage);
   if(dmg===null)return;
   const n=facts(event),part=word(n.action?.hitPart)||word(event.hitPart);
@@ -143,12 +157,14 @@ function hit(event:CombatEvent,state:CombatState,index:number,last?:string):Comb
   const opening=n.openingUsed===true||((finite(event.openingDamageBonus)??0)>0);
   if(opening)line=(who==='player'?'You use the opening. ':subject+' uses the opening. ')+line;
   if(usedAbility)line=(who==='player'?'You use ':subject+' uses ')+usedAbility+'. '+line;
-  const details=[who==='player'?number(dmg,'damage'):number(dmg,'Health','−')];
+  const details=[targetSide(who,event.target)==='player'
+    ?number(dmg,'Health','−'):number(dmg,'damage')];
   if(event.guarded===true){
     const raw=finite(event.raw);
     if(raw!==null&&raw>dmg){
       details.push(number(raw-dmg,'blocked'));
-      line=line.replace(/\.$/,'')+(who==='player'?', but part of the blow is blocked.':', but your guard blocks part of the hit.');
+      line=line.replace(/\.$/,'')+(targetSide(who,event.target)==='player'
+        ?', but your guard blocks part of the hit.':', but part of the blow is blocked.');
     }
   }
   const bonus=finite(event.openingDamageBonus);
@@ -158,7 +174,7 @@ function hit(event:CombatEvent,state:CombatState,index:number,last?:string):Comb
 }
 function miss(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
   if(!side(event.actor))return;
-  const who=event.actor,subject=nameOf(state,who),them=targetOf(state,who);
+  const who=event.actor,subject=nameOf(state,who),them=targetOf(state,who,event.target);
   const n=facts(event),verb=actorVerb(n.action?.verb,who);
   const ability=word(n.ability?.name)||word(event.ability);
   let result:string;

@@ -49,6 +49,8 @@ This yields a plain description with the real name, real action and real ability
 - `narration.movement.kind`: resolved `side`, `back`, `close`, `cover`, `leave` or `other`. A place may be shown only if recorded. Unknown kinds get `moves`, not fabricated climbing, dodging or retreating.
 - `narration.openingUsed:true`: a consumed Opening. A positive authoritative `openingDamageBonus` also proves one was used. Merely **having** an Opening does not mean it was used.
 - `narration.outcome`: optionally records actual surrender, withdrawal, incapacitation, escape or stopping. Without it the narrator reports only the authoritative win/loss/escape, not an invented retreat or death.
+- `event.target`: use the actual resolved target, including self-targeted abilities. The narrator reads this before assuming the other fighter in older two-person encounters. Damage to the player is shown as lost Health even when it is self-inflicted.
+- When a custom effect has a label and a different numeric unit, show both (for example `Pushed back: 2 steps` rather than an unexplained `+2 steps`). Signed resource changes remain signed.
 - `narration.actionId`: optional identifier for grouping the cost/resource events with the action that caused them. An ID mismatch prevents folding. Older prototype events can use their known within-turn event order when IDs are not present.
 
 For attacks and effects not covered by this contract, preserve the original engine text. Do not silently interpret free-form descriptions as evidence for wounds, movement or creature abilities.
