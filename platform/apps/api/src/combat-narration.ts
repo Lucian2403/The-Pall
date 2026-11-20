@@ -243,10 +243,18 @@ function display(event:CombatEvent,state:CombatState,slot:number,last?:string):C
     if(outcome==='player_escaped')
       return {version:1,line:'You get away from the fight.'};
     if(outcome==='player_victory'){
-      const leaving=/backs away|gets out of|disappears|gives ground|ends the assault/i.test(event.text);
-      return {version:1,line:leaving
-        ?state.enemy.name+' backs away. You win.'
-        :state.enemy.name+' can no longer fight. You win.'};
+      // A retreat is not always the same movement. Keep the actual outcome.
+      if(state.scene==='boar'&&/limps.*opening/i.test(event.text))
+        return {version:1,line:'The injured boar limps through the opening and leaves. You win.'};
+      if(state.scene==='silas'&&/gives ground/i.test(event.text))
+        return {version:1,line:'Silas steps back and stops attacking. You win.'};
+      if(state.scene==='dogman'&&/gets out of/i.test(event.text))
+        return {version:1,line:'Dogman moves aside and stops fighting. You win.'};
+      if(/backs away/i.test(event.text))
+        return {version:1,line:state.enemy.name+' backs away. You win.'};
+      if(/ends the assault/i.test(event.text))
+        return {version:1,line:state.enemy.name+' stops fighting. You win.'};
+      return {version:1,line:state.enemy.name+' can no longer fight. You win.'};
     }
   }
   return; // Leave opaque and legacy-compatible events untouched.

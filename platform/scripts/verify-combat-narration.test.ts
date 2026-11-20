@@ -187,6 +187,19 @@ test('a retreat, surrender, win, and loss never become an invented kill',()=>{
  assert.match(line(e),/get away/);
 });
 
+test('boar leaves through the actual opening; Silas stays by the coal box',()=>{
+ const b=boar();b.outcome='player_victory';
+ const [be]=write(b,[event('outcome',{
+  text:'The fight ends. The wounded boar limps through the opening and disappears beyond the fence.'})]);
+ assert.match(line(be),/limps through the opening/);
+ assert.doesNotMatch(line(be),/backs away|falls|dies/);
+ const s=silas();s.outcome='player_victory';
+ const [se]=write(s,[event('outcome',{
+  text:'The fight ends. Silas gives ground and ends the assault, remaining by the locked coal box.'})]);
+ assert.match(line(se),/stops attacking/);
+ assert.doesNotMatch(line(se),/leaves|runs away/);
+});
+
 test('Silas uses his iron hook, boar does not invent a weapon, Owler needs a real weapon flag',()=>{
  const hook=write(silas(),[event('damage',{actor:'enemy',target:'player',
   zone:'limbs',text:"Silas's iron hook clips your forearm.",damage:5,raw:5})])[0];
