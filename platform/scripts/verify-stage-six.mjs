@@ -397,9 +397,12 @@ const chroniclePosition=scene.indexOf('<CombatRoundChronicle');
 const playerPosition=scene.indexOf('<section class="player-status"');
 assert.ok(enemyPosition>0 && enemyPosition<actionPosition &&
   actionPosition<chroniclePosition && chroniclePosition<playerPosition &&
-  scene.includes("{@render combatant(snapshot.enemy, 'Flint', true)}") &&
+  scene.includes("{@render combatant(snapshot.enemy, isOwler?'Owler':'Flint', true)}") &&
   scene.includes("{@render combatant(snapshot.player, 'You', false)}") &&
   scene.includes('.enemy-status{position:absolute') &&
+  scene.includes("/locations/stitcher/owler.webp") &&
+  scene.includes("/locations/stitcher/owler-defeated.webp") &&
+  scene.includes("class:owler-scene={isOwler}") &&
   scene.includes('.combat-console{display:grid') &&
   scene.includes('@media(max-width:920px)') &&
   scene.includes('.enemy-status{position:relative'),
@@ -470,7 +473,7 @@ assert.ok(scene.includes("displayedResources=[") &&
   scene.includes('<dd>{actor[resource.key]}</dd>') &&
   scene.includes('Math.min(100,scaled/COMBAT_RESOURCE_SCALE*100)') &&
   scene.includes('class={\'mini-fill \'+resource.key}') &&
-  scene.includes("{@render combatant(snapshot.enemy, 'Flint', true)}") &&
+  scene.includes("{@render combatant(snapshot.enemy, isOwler?'Owler':'Flint', true)}") &&
   scene.includes("{@render combatant(snapshot.player, 'You', false)}"),
   'Both combatants must display all three real resource values and compact bars');
 
@@ -478,7 +481,7 @@ assert.ok(scene.includes("displayedResources=[") &&
 // hierarchy and paper/ink contrast already established in Stage 5.
 assert.ok(scene.includes('class="aftermath"') &&
   scene.includes('<small>PERSONAL JOURNAL</small>') &&
-  scene.includes('<h2>The Fight with Flint</h2>') &&
+  scene.includes("<h2>{isOwler?'The Fight with Owler':'The Fight with Flint'}</h2>") &&
   scene.includes('class="journal-entries"') &&
   scene.includes('.aftermath{grid-column:1/-1;background:#e6d5b5;color:#24160e;') &&
   scene.includes('max-width:960px') &&
