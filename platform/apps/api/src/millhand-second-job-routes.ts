@@ -5,7 +5,7 @@
  */
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
-import {secondJobJournal,STAGE_FOUR_ROUTES} from '../../web/src/lib/approved-stage-four.js';
+import {millhandSecondJobTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
@@ -167,12 +167,7 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
         [req.params.id,nextCharacter.tutorial_stage,nextCharacter.tutorial_status]
       );
       if(next.phase==='EXITED'&&current.phase!=='EXITED'){
-         await archiveJournalTask(client,{
-          characterId:req.params.id,taskId:'millhand.second-job',
-          taskInstanceId:'tutorial:stage:4',stage:4,
-          title:STAGE_FOUR_ROUTES[next.branch].name,
-          paragraphs:secondJobJournal(next),choices:{route:next.branch}
-         });
+         await archiveJournalTask(client,millhandSecondJobTask(req.params.id,next));
        }
        const result=snapshot(nextCharacter,next);
       await client.query(
