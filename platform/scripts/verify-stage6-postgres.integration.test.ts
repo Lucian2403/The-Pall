@@ -2571,7 +2571,7 @@ async function stitcherAtNightDoor(
 ){
  const id=randomUUID();
  await db.query(
-  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health,max_health) VALUES($1,$2,'Stage VI Stitcher',$3,'Female','Stitcher',$4::jsonb,'[]'::jsonb,'Cinder Row Infirmary',5,'IN_PROGRESS',$5,$5)",
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health,max_health) VALUES($1,$2,'Stage VI Stitcher',$3,'Female','Stitcher',$4::jsonb,'[]'::jsonb,'Cinder Row Infirmary',5,'IN_PROGRESS',$5,50)",
   [id,owner,'owler-'+id,JSON.stringify({Medicine:3,
     [branch==='trolley'?'Industry':branch==='consent'?'Commerce':'Scholarship']:1}),health]
  );
