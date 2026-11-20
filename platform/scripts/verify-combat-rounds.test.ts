@@ -519,6 +519,36 @@ test('narrating multiple fresh rounds at once uses the preceding raw round facts
  assert.equal(batched.length,2);
 });
 
+test('surrender and metadata-based withdrawal only describe recorded endings',()=>{
+ const s=state('Tin Sparrow');s.outcome='player_victory';
+ const surrender=summary([event('outcome',{actor:'enemy',
+   narration:{outcome:'surrender'}})],s);
+ assert.equal(surrender.line,'Tin Sparrow gives up. You win.');
+ const withdrawn=summary([
+  event('guard',{actor:'player'}),
+  event('outcome',{actor:'enemy',narration:{outcome:'withdraw'}})
+ ],s);
+ assert.equal(withdrawn.line,'You guard, but Tin Sparrow stops fighting. You win.');
+ const unknown=summary([event('outcome',{actor:'enemy'})],s);
+ assert.equal(unknown.line,'You win the fight.');
+ assert.doesNotMatch(unknown.line,/surrender|retreat|falls|die/);
+});
+
+test('available, expired and granted Openings require explicit engine events',()=>{
+ const s=state('New Creature');
+ const raw=[
+  event('tactical',{actor:'player',condition:'opening_available'}),
+  event('tactical',{actor:'player',condition:'opening_expired'}),
+  event('tactical',{actor:'enemy',target:'player',condition:'opening_granted'})
+ ];
+ const round=summary(raw,s);
+ assert.ok(round.tactical.includes('Opening available (You)'));
+ assert.ok(round.tactical.includes('Opening expired (You)'));
+ assert.ok(round.tactical.includes('Opening granted (You)'));
+ assert.doesNotMatch(round.line,/opening/);
+ assert.equal(raw[0].condition,'opening_available');
+});
+
 test('ten real resolved Flint and Dogman rounds produce readable saved Chronicle examples',()=>{
  for(const kind of ['flint','dogman'] as const){
   let s=newEncounter(kind,{seed:199,player:{hp:2000,hpMax:2000,ceiling:2000,

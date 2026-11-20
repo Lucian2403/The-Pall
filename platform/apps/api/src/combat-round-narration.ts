@@ -220,10 +220,15 @@ function actionLine(s:CombatState,e:CombatEvent,recent?:RecentCombat):string|und
       return str(e.text)?period(e.text):undefined;
     case 'outcome':
       if(s.outcome==='player_victory'){
-        if(e.condition==='withdraw')return period(s.enemy.name+
-          ' stops fighting')+' You win.';
-        if(s.enemy.hp<=0)return period(s.enemy.name+
-          ' cannot continue')+' You win.';
+        // Only claim withdrawal, surrender or defeat when the engine
+        // recorded that outcome. There is no assumed death or flight.
+        const reason=str(facts(e).outcome)||str(e.condition);
+        if(reason==='withdraw'||reason==='stopped')
+          return period(s.enemy.name+' stops fighting')+' You win.';
+        if(reason==='surrender')
+          return period(s.enemy.name+' gives up')+' You win.';
+        if(reason==='downed'||s.enemy.hp<=0)
+          return period(s.enemy.name+' cannot continue')+' You win.';
         return 'You win the fight.';
       }
       if(s.outcome==='player_defeat')
@@ -284,6 +289,12 @@ function tactical(e:CombatEvent,s:CombatState):string|undefined{
     return 'Opening used ('+from+')';
   if(e.kind==='tactical'){
     if(e.condition==='opening_gained')return 'Opening gained ('+from+')';
+    if(e.condition==='opening_expired')return 'Opening expired ('+from+')';
+    if(e.condition==='opening_available')return 'Opening available ('+from+')';
+    if(e.condition==='opening_granted'){
+      const receiver=targetId(e);
+      return receiver?'Opening granted ('+label(s,e,receiver)+')':undefined;
+    }
     if(e.condition==='overcommitted')return 'Exposed ('+from+')';
     if(e.condition==='dodge_success')return 'Dodge successful ('+from+')';
     if(e.condition==='dodge_failed')return 'Dodge failed ('+from+')';
@@ -399,7 +410,8 @@ export function narrateCommittedRounds(
         i++;continue;
       }
       if(next&&current.kind==='guard'&&next.kind==='outcome'&&
-        result[ids[next.index]].condition==='withdraw'){
+        (result[ids[next.index]].condition==='withdraw'||
+          facts(result[ids[next.index]]).outcome==='withdraw')){
         const after=next.text.replace(/^You /,'you ');
         combined.push(current.text.replace(/\.$/,'')+', but '+after);
         i++;continue;
