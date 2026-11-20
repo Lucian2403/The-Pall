@@ -1,7 +1,6 @@
 <script lang="ts">
   import type {CombatEventView} from '$lib/millhand-combat-model';
-  import {combatActionLabel,isEnemyCombatAction,groupCombatRounds,
-    combatEventText,combatEventNumbers,combatEventFailedEffects}
+  import {groupCombatRounds,combatRoundResults}
     from '$lib/millhand-combat-chronicle';
 
   let {events,emptyText}:{events:CombatEventView[];emptyText:string}=$props();
@@ -16,7 +15,7 @@
     <h3>Battle Chronicle</h3>
     <button type="button" onclick={()=>fullHistory=!fullHistory}
       aria-expanded={fullHistory} aria-controls="combat-chronicle-list">
-      {fullHistory?'Latest rounds':'Full history'}
+      {fullHistory?'Latest rounds':'All rounds'}
     </button>
   </div>
   <div id="combat-chronicle-list" class="log-window" role="log" aria-live="off" aria-relevant="additions">
@@ -29,33 +28,9 @@
             class:latest={round.key===rounds.at(-1)?.key}>
             <div class="round-heading">Round {String(round.round).padStart(2,'0')}</div>
             <p class="round-story">{round.main}</p>
-            {#if round.detail}<p class="round-numbers">{round.detail}</p>{/if}
-            {#if round.tactical.length}
-              <p class="round-tactics">{round.tactical.join(' · ')}</p>
+            {#if combatRoundResults(round)}
+              <p class="round-numbers">{combatRoundResults(round)}</p>
             {/if}
-            <details class="round-expanded">
-              <summary>Details · {round.events.length} events</summary>
-              <ol>
-                {#each round.events as event, i (i)}
-                  <li class:enemy-action={isEnemyCombatAction(event)}>
-                    <span class="event-action">[{combatActionLabel(event)}]</span>
-                    <span class="event-text">{combatEventText(event)}</span>
-                    {#if combatEventNumbers(event)}
-                      <span class="event-numbers">{combatEventNumbers(event)}</span>
-                    {/if}
-                    {#each combatEventFailedEffects(event) as failedEffect}
-                      <span class="event-failed-effect">{failedEffect}</span>
-                    {/each}
-                    {#if event.story?.line && event.text !== event.story.line}
-                      <details class="source-record">
-                        <summary>Original event</summary>
-                        <span>{event.text}</span>
-                      </details>
-                    {/if}
-                  </li>
-                {/each}
-              </ol>
-            </details>
           </li>
         {/each}
       </ol>
@@ -85,25 +60,6 @@
   .round-heading{font:700 11px/1.6 Arial,sans-serif;color:#c49a66;letter-spacing:.04em}
   .round-story{margin:4px 0;color:#f5dcba;font:14px/1.48 Georgia,serif}
   .round-numbers{margin:5px 0 0;color:#e0b882;font:700 12px/1.55 Georgia,serif}
-  .round-tactics{margin:5px 0 0;color:#d9c49e;font:12px/1.45 Arial,sans-serif}
-  .round-expanded{margin:8px 0 0;border-top:1px solid #4e3e31}
-  .round-expanded summary{padding:7px 2px 3px;cursor:pointer;color:#d1b48d;
-    font:700 12px/1.4 Georgia,serif}
-  .round-expanded summary:hover{color:#fff1d6}
-  .round-expanded ol{padding:2px 0 0 8px}
-  .round-expanded li{padding:5px 3px;border-bottom:1px solid #3c322b;
-    display:flex;flex-wrap:wrap;gap:3px 7px}
-  .event-action{color:#dec39e;font:700 11px/1.4 Arial,sans-serif;flex:none}
-  .enemy-action .event-action{color:#ef9782}
-  .event-text{flex:1 1 65%;color:#dbc7a9;font:12px/1.4 Georgia,serif}
-  .event-numbers{display:block;flex:1 1 100%;margin-left:4px;color:#d9b884;
-    font:11px/1.4 Arial,sans-serif}
-  .event-failed-effect{display:block;width:100%;color:#caa583;
-    font:11px/1.45 Arial,sans-serif}
-  .source-record{width:100%;padding:2px 0 0 7px;min-width:0}
-  .source-record summary{font:11px/1.4 Arial,sans-serif;color:#b89a78}
-  .source-record span{display:block;margin:5px 0 2px;color:#b6a58f;
-    font:11px/1.45 Arial,sans-serif;white-space:normal;overflow-wrap:anywhere}
   .history-hint{margin:8px 0 0;color:#b49773;font:11px/1.2 Arial,sans-serif}
   .no-events{font:13px/1.5 Georgia,serif}
 </style>

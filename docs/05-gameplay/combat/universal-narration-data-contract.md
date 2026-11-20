@@ -7,7 +7,7 @@ Status: implemented as a presentation adapter in PR #60. **This document does no
 1. A combat resolver commits its action and calculates movement, hits, protection, wounds, abilities and effects. All combat numbers remain authoritative.
 2. It emits events with the normal `round`, `kind`, `actor`, `target`, `damage`, `raw`, `guarded`, `condition` and any applicable factual `narration` metadata.
 3. `narrateCommittedTurn` adds a saved `story: {version:2,line,detail,hidden?}` without changing an original event field. A source event's original `text` remains intact.
-4. The API saves the complete events in the same transaction as the turn. The UI shows `story.line`, then `story.detail`. Older v1 stories and events with no story are displayed as recorded.
+4. The API saves the complete events in the same transaction as the turn. The Battle Chronicle displays a single saved round narrative and one compact results line, not the underlying event list. Older v1 stories and unversioned events remain available as recorded in saved history.
 5. Two fighters currently use this adapter: Flint and Dogman. A future encounter including Owler can call the same adapter once its own combat resolver produces events.
 
 ### Factual event sample (a generated ability)
@@ -101,12 +101,13 @@ additional IDs may supply `actorName` and `targetName`.
 The server saves the round summary atomically alongside the original full
 event array. It does **not** re-narrate earlier rounds on read or replay.
 The browser reads version-3 summaries and shows the latest **three complete
-rounds** by default, with a Full history control and a per-round Details
-expander. Details include **all original source events**, even intent notices,
-hidden resource notices, failed effects, and exact results. The compact
-numeric line prioritises damage, blocked damage and Opening bonuses; minor
-resource costs remain in the expanded source history. Important tactical
-status labels remain visible in the compact card.
+rounds** by default, with an **All rounds** control for the entire readable
+Chronicle. Each round shows one story and one compact results line. Numerical
+changes and nonredundant tactical statuses share that line. The Chronicle has
+no expandable event list, nested Details panel or Original event section.
+Every original event, intent notice, resource change and applied/failed effect
+still exists unchanged in persisted and replayable history. A future technical
+Combat History view, if needed, must be separate from the Battle Chronicle.
 
 Old histories without a saved v3 summary are grouped only for layout.
 Their original text or saved version-1/version-2 story lines are displayed
@@ -121,7 +122,7 @@ task, not a reason to cut a round in half.
 already resolved attacks, including accuracy-only Openings. It does not change
 an attack roll, hit chance, decision, or damage.
 
-## History-aware wording and clean expanded events
+## History-aware wording and compact presentation
 
 The version-3 round composer now reads **prior resolved events**, not earlier sentence text. A small recent-round record tracks consecutive hits, misses, Guard use and consumed Openings. A separate event-based count tracks past uses of the same actor, event kind and stable ability ID, so unfamiliar generated actions can vary naturally even when movement or recovery interrupts them.
 
@@ -129,6 +130,6 @@ The narrator chooses a simple structure for meaningful exchanges: both misses, o
 
 Only a recorded `narration.openingUsed` or positive committed Opening damage bonus means an Opening was **used**. Gained, available, expired and granted Openings are shown only when their corresponding structured tactical events exist. Accuracy-only use must not claim extra damage.
 
-In the shared expanded view, the saved `story.line` is displayed separately from its `story.detail`, preventing glued-on numbers in the readable line. The exact original engine text remains available under **Original event**. Effects explicitly recorded with `applied:false` appear as **did not apply**, never as conditions that occurred. No stored event or historical version-1/version-2 story is rewritten by the presentation helpers.
+The shared Chronicle uses `roundStory.line` for the story and a single secondary line combining `roundStory.detail` with tactical statuses that the story has not already stated. The player does not see per-event descriptions, duplicated numeric output or raw engine messages in Chronicle rounds. Complete original events and applied/unapplied effect metadata remain stored verbatim for replay and for a separate technical-history view if one is added later. No saved round story, source event or historical version-1/version-2 story is rewritten by this UI change.
 
 Complete before-and-after test outputs and manual prose notes: `docs/05-gameplay/combat/round-chronicle-writing-before-after.md`.

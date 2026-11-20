@@ -54,6 +54,41 @@ export type CombatChronicleRound={
  key:string;round:number;main:string;detail?:string;tactical:string[];
  events:CombatEventView[];isLegacy:boolean;roundStory?:CombatRoundStoryView
 };
+/** Display only the round narrative and one compact results line.
+ * Source events remain in CombatChronicleRound.events and saved history; the
+ * readable Chronicle does not present the technical event stream.
+ */
+export function combatRoundResults(
+  round:Pick<CombatChronicleRound,'main'|'detail'|'tactical'>
+):string{
+  const parts:string[]=round.detail?.trim()?[round.detail.trim()]:[];
+  for(const status of round.tactical){
+    const tag=status.trim();
+    if(!tag||parts.includes(tag))continue;
+    // A tactical label is redundant when the same specific action is already
+    // described in the story. Other tactical changes remain visible.
+    const used=tag.match(/^Opening used \((.+)\)$/);
+    if(used){
+      const subject=used[1]==='You'?'You':used[1];
+      const verbs=subject==='You'?['take','use']:['takes','uses'];
+      const described=verbs.some(verb=>round.main.includes(subject+' '+verb+' the opening'));
+      if(described)continue;
+    }
+    const bleeding=tag.match(/^Bleeding \((.+)\)$/);
+    if(bleeding){
+      const subject=bleeding[1];
+      if(round.main.includes(subject+(subject==='You'?' start':' starts')+' bleeding'))continue;
+    }
+    const wound=tag.match(/^Serious injury \((.+)\)$/);
+    if(wound){
+      const subject=wound[1];
+      if(round.main.includes(subject+(subject==='You'?' suffer':' suffers')+' a serious injury'))continue;
+    }
+    parts.push(tag);
+  }
+  return parts.join(' · ');
+}
+
 /** Event presentation is separate from the saved engine record.
  * New logs show their versioned sentence, not raw text with numbers glued on.
  * Legacy logs have a minimal display-only cleanup; the original is retained.

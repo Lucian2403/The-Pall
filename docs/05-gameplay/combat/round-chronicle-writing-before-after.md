@@ -4,7 +4,7 @@ These are **real test outputs**, not imagined fight dialogue. The Before texts a
 
 Flint and Dogman use the actual `combat-v0.5.1` resolver, seed `199`, and high-Health **test-only** fixtures to keep the fights active for twelve rounds. These values are not gameplay balancing changes. The Glass-Silt Weaver trace is twelve **simulated committed events** with an unfamiliar ability. It is not a playable procedural encounter. Both columns use the same event sequence for each fight.
 
-The numerical data, tactical labels and source event order are not edited for style. Complete original events remain available in the expanded Chronicle.
+The numerical data, tactical labels and source event order are not edited for style. Complete original events remain preserved in saved combat history; the Battle Chronicle shows only the round story and its compact results line.
 
 ## Flint — real engine, 12 rounds
 

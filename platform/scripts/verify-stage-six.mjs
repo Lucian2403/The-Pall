@@ -171,12 +171,14 @@ assert.ok(scene.includes('<CombatRoundChronicle events={snapshot.events}')&&
   dogmanScene.includes('<CombatRoundChronicle events={snapshot.events}')&&
   sharedChronicle.includes('{#each shown as round')&&
   sharedChronicle.includes('rounds.slice(-3)')&&
-  sharedChronicle.includes('<details class="round-expanded">')&&
-  sharedChronicle.includes('event.text')&&
+  sharedChronicle.includes('combatRoundResults(round)')&&
+  !sharedChronicle.includes('<details')&&
+  !sharedChronicle.includes('Original event')&&
+  !sharedChronicle.includes('event.text')&&
   sharedChronicle.includes('Latest 3 of {rounds.length} complete rounds.')&&
   chronicle.includes('groupCombatRounds')&&
   !scene.includes('visibleEvents.slice(-6)'),
-  'Chronicle must show whole rounds with expandable unmodified event history');
+  'Chronicle must show only complete round stories and compact results; original events stay in saved history');
 assert.ok(api.includes('narrateCommittedRounds(')&&
   dogmanApi.includes('narrateCommittedRounds(')&&
   api.includes('narrateCommittedTurn(')&&
@@ -563,7 +565,8 @@ assert.ok(page.includes('feedback=previous?floatingFeedbackForSavedTurn(previous
   scene.includes("feedback.filter(item => item.target === 'enemy')") &&
   scene.includes("feedback.filter(item => item.target === 'player')") &&
   sharedChronicle.includes("class:impact={round.events.some(e=>e.kind==='damage')}") &&
-  sharedChronicle.includes('Details · {round.events.length} events') &&
+  !sharedChronicle.includes('Details · {round.events.length} events') &&
+  !sharedChronicle.includes('class="round-expanded"') &&
   scene.includes('animation:combat-feedback-float 1100ms') &&
   scene.includes('@media(prefers-reduced-motion:reduce)'),
   'The short-lived floating feedback must restart every turn without replaying old events');

@@ -5,7 +5,7 @@ import {newEncounter,step} from '../packages/game-core/vendor/combat-v0.5.1/comb
 import {narrateCommittedTurn} from '../apps/api/src/combat-narration.ts';
 import {narrateCommittedRounds,type RoundStoryEvent}
   from '../apps/api/src/combat-round-narration.ts';
-import {groupCombatRounds,combatEventText,combatEventNumbers,combatEventFailedEffects}
+import {groupCombatRounds,combatRoundResults,combatEventText,combatEventNumbers,combatEventFailedEffects}
   from '../apps/web/src/lib/millhand-combat-chronicle.ts';
 import type {CombatAction,CombatEvent,CombatState} from '@the-pall/game-core/combat-v0.5.1';
 
@@ -35,6 +35,57 @@ function makeRound(s:CombatState,events:CombatEvent[],history:CombatEvent[]=[]){
 }
 const sample=(round:number,records:CombatEvent[])=>records.map(x=>({...x,round}));
 const n=(events:CombatEvent[])=>groupCombatRounds(events);
+
+test('Battle Chronicle contains no nested Details or Original event panels',()=>{
+ const source=readFileSync(
+   new URL('../apps/web/src/lib/CombatRoundChronicle.svelte',import.meta.url),'utf8');
+ assert.match(source,/<p class="round-story">\{round.main\}<\/p>/);
+ assert.match(source,/<p class="round-numbers">\{combatRoundResults\(round\)\}<\/p>/);
+ assert.match(source,/rounds.slice\(-3\)/);
+ assert.match(source,/All rounds/);
+ assert.doesNotMatch(source,/<details|<summary|Original event|#each round\.events/);
+ assert.doesNotMatch(source,/event\.text|event\.story\?\.line|round-expanded/);
+ assert.equal((source.match(/class="round-story"/g)||[]).length,1);
+ assert.equal((source.match(/class="round-numbers"/g)||[]).length,1);
+});
+
+test('one round result line retains numerical data and nonduplicate tactical changes',()=>{
+ const round={main:'You take the opening and hit Flint in the ribs.',
+   detail:'12 damage to Flint · Opening bonus +5',
+   tactical:['Opening used (You)','Opening gained (You)','Exposed (You)']};
+ assert.equal(combatRoundResults(round),
+   '12 damage to Flint · Opening bonus +5 · Opening gained (You) · Exposed (You)');
+ const empty={main:'You move closer.',detail:undefined,tactical:[]};
+ assert.equal(combatRoundResults(empty),'');
+ const wound={main:'You start bleeding.',detail:'2 damage to you',
+   tactical:['Bleeding (You)','Opening available (Flint)']};
+ assert.equal(combatRoundResults(wound),
+   '2 damage to you · Opening available (Flint)');
+ const guard={main:'You guard. Flint hits you in the side.',
+   detail:'10 damage to you · 4 blocked',tactical:['Opening gained (You)']};
+ assert.equal(combatRoundResults(guard),
+   '10 damage to you · 4 blocked · Opening gained (You)');
+});
+
+test('removed UI details do not delete event history, round references or replay data',()=>{
+ const s=state('Archive Opponent');
+ const raw=[
+   event('intent',{actor:'enemy',text:'Original intent'}),
+   event('damage',{actor:'enemy',target:'player',damage:7,raw:12,guarded:true,
+     text:'Original engine strike'}),
+   event('momentum',{actor:'enemy',amount:10,text:'Original Momentum change'})
+ ];
+ const before=JSON.stringify(raw);
+ const saved=narrateCommittedRounds(raw,s);
+ const grouped=groupCombatRounds(saved);
+ assert.equal(grouped.length,1);
+ assert.equal(grouped[0].events.length,3);
+ assert.deepEqual(grouped[0].roundStory?.eventRefs,[0,1,2]);
+ assert.deepEqual(grouped[0].events.map(e=>e.text),raw.map(e=>e.text));
+ assert.equal(JSON.stringify(raw),before);
+ assert.deepEqual(groupCombatRounds(JSON.parse(JSON.stringify(saved))),
+   grouped);
+});
 
 test('two actual hits become one round card in the true event order',()=>{
  const s=state('Gutter Wolf');

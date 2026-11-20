@@ -16,8 +16,9 @@ current combat prototype has no procedural encounter generator; this is a
 universal-narrator acceptance test, not a claim that the creature is playable.
 
 The compact numbers line highlights damage, blocking and applied conditions.
-Other costs, failed effects and exact source events remain in each round's
-expandable Details section in the actual UI.
+Other costs, failed effects and exact original events remain in authoritative
+saved combat history. They are not repeated in expandable sections inside
+the Battle Chronicle; technical inspection belongs in a separate view.
 
 ## Flint — real engine, 12 rounds
 
