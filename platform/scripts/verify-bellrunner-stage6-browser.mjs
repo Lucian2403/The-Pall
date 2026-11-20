@@ -214,23 +214,20 @@ try{
     }
   }
   await navigate('victory',1366,900);
-  assert.equal(await evalJS('document.querySelector("#combat-personal-journal")?.open'),false,
-    'The completed fight should remain visible until the journal is requested');
+  assert.equal(await evalJS('document.querySelector("#personal-journal")===null'),true,
+    'The completed fight remains visible until Journal is requested');
   await evalJS('document.querySelector(".scene-journal-button").click()');
-  await until(()=>evalJS('document.querySelector("#combat-personal-journal")?.open'),
-    5000,'journal modal opens');
-  const journal=await evalJS('(()=>{const j=document.querySelector("#combat-personal-journal");'+
-    'const r=j.getBoundingClientRect();return {left:r.left,right:r.right,width:r.width,height:r.height,'+
-    'viewport:innerWidth,viewportHeight:innerHeight,readable:j.textContent.includes("The Fight with Dogman")};})()');
-  assert.ok(journal.readable&&journal.width>=680,'Journal must use a readable width: '+JSON.stringify(journal));
-  assert.ok(Math.abs(journal.left-(journal.viewport-journal.width)/2)<25,
-    'Journal must be centred at this viewport: '+JSON.stringify(journal));
-  assert.ok(journal.height<=journal.viewportHeight-40,
-    'Journal must fit vertically: '+JSON.stringify(journal));
+  await until(()=>evalJS('!!document.querySelector("#personal-journal .reading-area p")'),
+    5000,'character Journal opens');
+  const journal=await evalJS('(()=>{const j=document.querySelector("#personal-journal");'+
+    'const r=j.getBoundingClientRect();return {width:r.width,'+
+    'viewport:innerWidth,readable:j.textContent.includes("The Fight with Dogman")};})()');
+  assert.ok(journal.readable&&journal.width>=680,
+    'Shared character Journal must be legible below combat: '+JSON.stringify(journal));
   await screenshot('dogman-victory-journal-1366');
-  await evalJS('document.querySelector(".journal-close").click()');
-  await until(()=>evalJS('!document.querySelector("#combat-personal-journal")?.open'),
-    4000,'journal closes');
+  await evalJS('document.querySelector(".scene-journal-button").click()');
+  await until(()=>evalJS('!document.querySelector("#personal-journal")'),
+    4000,'shared Journal closes');
   await navigate('active',1280,900);
   await evalJS('document.querySelector(".battle .commit").click()');
   await until(()=>evalJS('window.__dogmanCombatPosts.length>0'),
