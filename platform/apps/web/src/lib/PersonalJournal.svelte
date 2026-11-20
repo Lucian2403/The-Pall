@@ -16,7 +16,7 @@
     onClose:()=>void;
   }=$props();
 
-  let section:HTMLElement;
+  let section=$state<HTMLElement|undefined>();
   let tab=$state<'current'|'completed'>('current');
   let completed=$state<CompletedTask[]>([]);
   let nextCursor=$state<string|null>(null);
