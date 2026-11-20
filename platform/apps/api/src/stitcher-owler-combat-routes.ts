@@ -7,6 +7,7 @@
  */
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
+import {combatTask} from './personal-journal-tasks.js';
 import {stitcherStageJournal} from '../../web/src/lib/stitcher-journal.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
@@ -249,6 +250,9 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
         await client.query(
           'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
           [req.params.id,state.player.hp,state.status==='finished'?'COMPLETED':'IN_PROGRESS']);
+         if(state.status==='finished'){
+           await archiveJournalTask(client,combatTask(req.params.id,'owler',state));
+         }
       }
       const response=snapshot(record);
       await client.query(
