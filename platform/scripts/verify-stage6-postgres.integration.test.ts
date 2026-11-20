@@ -2709,3 +2709,83 @@ test('Owler victory and defeat are real, and either outcome saves the patient',a
   assert.equal(person.rows[0].major_skill_bonuses.Medicine,3);
  }
 });
+
+
+test('Stitcher Stage VI rewind restores the witnessed Stage V preparations and real pre-fight Health',async()=>{
+ for(const [mode,health] of [['ongoing',50],['defeat',1]] as const){
+  const c=await stitcherAtNightDoor('brace','consent',true,health);
+  const rewind=base+c.id+'/dev/rewind-stage';
+  const originalStart=randomUUID();
+  let state=(await request('POST',c.path,owner,{kind:'start',requestId:originalStart})).body!;
+  assert.deepEqual((await request('GET',rewind)).body,
+   {enabled:true,canRewind:true,stage:6,targetStage:5});
+  assert.equal((await request('GET',rewind,stranger)).status,404);
+  assert.equal((await request('POST',rewind,stranger,{expectedStage:6})).status,404);
+  assert.equal((await request('POST',rewind,owner,{expectedStage:5})).status,409);
+  if(mode==='defeat'){
+   for(let round=0;round<80&&state.status==='active';round++){
+    const turn=await request('POST',c.path,owner,{
+     kind:'turn',requestId:randomUUID(),expectedRevision:state.revision,
+     action:{type:'guard'}});
+    assert.equal(turn.status,200,JSON.stringify(turn.body));
+    state=turn.body!;
+   }
+   assert.equal(state.status,'finished');
+   assert.equal(state.outcome,'player_defeat');
+   assert.equal((await request('GET',rewind)).body?.canRewind,true);
+  }else{
+   const turn=await request('POST',c.path,owner,{
+    kind:'turn',requestId:randomUUID(),expectedRevision:state.revision,
+    action:{type:'guard'}});
+   assert.equal(turn.status,200,JSON.stringify(turn.body));
+   state=turn.body!;
+  }
+  // A changed Health total must block erasure rather than invent healing.
+  await db.query('UPDATE player_characters SET current_health=$2 WHERE id=$1',
+   [c.id,state.player.hp+1]);
+  assert.equal((await request('GET',rewind)).body?.canRewind,false);
+  const unsafe=await request('POST',rewind,owner,{expectedStage:6});
+  assert.equal(unsafe.status,409);
+  assert.equal(unsafe.body?.error,'unsafe_combat_health_state');
+  assert.equal(Number((await db.query(
+   'SELECT count(*)::int n FROM player_character_owler_combat WHERE character_id=$1',
+   [c.id])).rows[0].n),1,'Unsafe rewind may not erase combat');
+  await db.query('UPDATE player_characters SET current_health=$2 WHERE id=$1',
+   [c.id,state.player.hp]);
+  const back=await request('POST',rewind,owner,{expectedStage:6});
+  assert.equal(back.status,200,JSON.stringify(back.body));
+  assert.equal(back.body?.stage,5);
+  assert.equal(back.body?.route,'/characters/'+c.id+'/stitcher/ward');
+  assert.equal((await request('POST',rewind,owner,{expectedStage:6})).status,409);
+  const ward=(await request('GET',c.ward)).body!;
+  assert.equal(ward.stage,5);
+  assert.equal(ward.state.phase,'prepare_door');
+  assert.equal(ward.state.stage5Witnessed,true);
+  assert.equal(ward.state.stage5Hold,true);
+  assert.equal(ward.state.stage5Preparation,null);
+  assert.equal(ward.state.branch,'consent');
+  assert.ok(ward.availableActions.includes('reason_owler'));
+  assert.ok(ward.availableActions.includes('move_cart'));
+  assert.ok(ward.availableActions.includes('brace_door'));
+  const char=(await db.query<{current_health:number;coins:string;
+   tutorial_stage:number;tutorial_status:string;major_skill_bonuses:Record<string,number>}>(
+   'SELECT current_health,coins,tutorial_stage,tutorial_status,major_skill_bonuses FROM player_characters WHERE id=$1',
+   [c.id])).rows[0];
+  assert.equal(char.current_health,health,'Restore original HP, not current or maximum');
+  assert.equal(char.tutorial_stage,5);
+  assert.equal(char.tutorial_status,'IN_PROGRESS');
+  assert.equal(Number(char.coins),20);
+  assert.equal(char.major_skill_bonuses.Medicine,3);
+  assert.equal(char.major_skill_bonuses.Commerce,1);
+  for(const table of ['player_character_owler_combat','player_character_owler_combat_receipts',
+   'player_character_stitcher_ward_receipts']){
+   const rows=await db.query('SELECT count(*)::int n FROM '+table+' WHERE character_id=$1',[c.id]);
+   assert.equal(rows.rows[0].n,0,'Rewind must discard old state/receipts: '+table);
+  }
+  assert.equal((await request('POST',c.path,owner,
+   {kind:'start',requestId:originalStart})).status,409,
+   'Old start command cannot silently replay the erased Stage VI');
+  assert.equal((await request('GET',rewind)).body?.targetStage,4,
+   'Stage 5 now uses the existing previous-stage rewind contract');
+ }
+});
