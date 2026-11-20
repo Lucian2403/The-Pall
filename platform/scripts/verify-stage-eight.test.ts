@@ -115,7 +115,8 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !web.includes('class="rent-status"')&&
   !web.includes('class="paper-object"')&&
   !web.includes('background:#f5d18b24')&&
-  web.includes('id="home-journal"')&&
+  web.includes("journalController={{id:'home-journal'")&&
+  !web.includes('id="home-journal"')&&
   web.includes("if(home.phase==='HOME')void perform('read_notice')")&&
   web.includes("home.phase==='COMPLETE'")&&
   web.includes('Further game systems are not available in this prototype.'));
