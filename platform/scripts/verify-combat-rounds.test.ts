@@ -206,7 +206,7 @@ test('opponent Opening grammar and linked player misses stay natural',()=>{
    event('move',{actor:'enemy',actionDetail:'side'}),
    event('miss',{actor:'player',target:'enemy',reason:'out_of_reach'})
  ],enemy);
- assert.match(sidestep.line,/Dogman steps aside, and you cannot reach Dogman\./);
+ assert.match(sidestep.line,/Dogman steps aside, and your attack falls short\./);
  assert.doesNotMatch(sidestep.line,/and You|You moves/);
 });
 
