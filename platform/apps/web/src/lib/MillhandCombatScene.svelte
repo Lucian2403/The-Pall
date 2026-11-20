@@ -36,21 +36,13 @@
   }
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
-  let completedJournalShown=$state(false);
+
   async function toggleJournal(){
     journalOpen=!journalOpen;
     await tick();
     if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
   }
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
-  // Preserve the existing automatic outcome journal once, but allow the
-  // persistent shell control to close or reopen it during/after combat.
-  $effect(()=>{
-    if(ended&&!completedJournalShown){
-      journalOpen=true;
-      completedJournalShown=true;
-    }
-  });
   $effect(()=>{
     registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:isOwler?'The Fight with Owler':'The Fight with Flint',entries:ended?[journal]:[],
       toggle:()=>{void toggleJournal();}});
