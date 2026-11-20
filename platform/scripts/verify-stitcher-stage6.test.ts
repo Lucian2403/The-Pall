@@ -103,15 +103,23 @@ test('Stitcher Stage VI reuses Flint combat HUD and has correct outcome artwork'
  assert.match(ward,/Confront Owler/);
  assert.match(route,/encounter="owler"/);
  assert.match(route,/MillhandCombatScene/);
- assert.match(route,/async function backToStageFive\(\)/);
- assert.match(route,/\{backToStageFive\}/);
- assert.ok(shell.includes("(character.origin==='Millhand'||character.origin==='Bellrunner'||character.origin==='Stitcher') && character.tutorial.stage===6 && backToStageFive"));
- assert.match(shell,/Review the saved Stage 5 night-door preparation/);
+ assert.doesNotMatch(route,/backToStageFive/,
+   'Stage 6 must use actual developer rewind, not read-only Stage V navigation');
+ assert.match(shell,/canRewind && rewindFromStage!==null && rewindTargetStage!==null/);
+ assert.match(shell,/This discards Owler combat and the saved Chronicle/);
+ const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
+ assert.match(rewind,/if\(expectedStage===6\)\{/);
+ assert.match(rewind,/DELETE FROM player_character_owler_combat_receipts/);
+ assert.match(rewind,/DELETE FROM player_character_owler_combat WHERE/);
+ assert.match(rewind,/phase:'prepare_door',stage5Line:0,stage5Preparation:null/);
+ assert.match(rewind,/current_health=\$2/);
+ assert.match(shell,/class="scene-journal-button"/);
  const journalStart=shared.indexOf('<section id="combat-personal-journal"');
  const layoutEnd=shared.indexOf('</ActivityLayout>');
  assert.ok(layoutEnd>=0&&journalStart>layoutEnd,
    'Combat journal must render full-width after ActivityLayout, as in Stage V');
- assert.match(shared,/class="journal-toggle"/);
+ assert.doesNotMatch(shared,/class="journal-toggle"/);
+ assert.doesNotMatch(ward,/class="journal-toggle"/);
  assert.match(shared,/scroll-margin-top:56px/);
  assert.match(shared,/locations\/stitcher\/service-corridor.webp/);
  assert.match(shared,/locations\/stitcher\/owler-defeated.webp/);
