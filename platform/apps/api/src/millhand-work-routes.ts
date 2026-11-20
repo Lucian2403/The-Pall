@@ -1,4 +1,6 @@
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {stageTwoJournal} from '../../web/src/lib/millhand-work-copy.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
@@ -144,6 +146,14 @@ export function registerMillhandWorkRoutes(app: FastifyInstance) {
           'UPDATE player_character_platework SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
           [req.params.id,next.revision,JSON.stringify(next)]
         );
+      }
+      if(command.action!=='take_work_paper'&&current?.phase!=='COMPLETE'&&
+          next.phase==='COMPLETE'){
+        await archiveJournalTask(client,{
+          characterId:req.params.id,taskId:'millhand.marking-plates',
+          taskInstanceId:'tutorial:stage:2',stage:2,title:'Marking the Plates',
+          paragraphs:stageTwoJournal(next)
+        });
       }
       const result = snapshot(nextChar,next);
       await client.query(
