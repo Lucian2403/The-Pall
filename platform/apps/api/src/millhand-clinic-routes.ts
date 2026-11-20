@@ -3,6 +3,8 @@
  * No modification of the immutable saved fight, history, skills or items.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {clinicTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -205,6 +207,7 @@ function registerSharedClinicRoutes(
               "UPDATE player_characters SET tutorial_stage=8,tutorial_status='NOT_STARTED' WHERE id=$1",
               [req.params.id]
             );
+            await archiveJournalTask(db,clinicTask(req.params.id,origin,state));
           }
           await db.query(
             'UPDATE player_character_clinic SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',

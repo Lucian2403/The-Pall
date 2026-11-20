@@ -218,9 +218,10 @@ assert.ok(read('apps/web/src/routes/characters/[id]/opening/+page.svelte').inclu
   read('apps/web/src/routes/characters/[id]/millhand/work/+page.svelte').includes('<TutorialShell'),
   'The shell journal must be available from first opening and Stage 2 work');
 const combatJournal=read('apps/web/src/lib/MillhandCombatScene.svelte');
-assert.ok(combatJournal.includes('if(ended&&!completedJournalShown)') &&
-  combatJournal.includes('{#if journalOpen}') &&
+assert.ok(combatJournal.includes("registerSceneJournal?.({id:'combat-personal-journal'") &&
+  combatJournal.includes("entries:ended?[]:[combatOpening(isOwler?'owler':'flint')]") &&
+  read('apps/web/src/lib/TutorialShell.svelte').includes('<PersonalJournal characterId={character.id}') &&
   combatJournal.includes('{#if ended}'),
-  'The active fight can show its journal without losing the completed outcome');
+  'The fight provides its outcome to one shared Journal without opening a duplicate');
 
 console.log('PASS: Stage 4→5 handoff, approved Flint dialogue, durable route evidence, stance and combat boundary.');

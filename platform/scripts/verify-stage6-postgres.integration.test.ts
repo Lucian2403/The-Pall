@@ -34,6 +34,12 @@ import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes} from '../ap
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
+import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
+import {backfillCharacterJournal} from '../apps/api/src/personal-journal-backfill.ts';
+import {archiveJournalTask} from '../apps/api/src/personal-journal-store.ts';
+import {INITIAL_PLATEWORK,advancePlatework,availableActions,INITIAL_MISSING_STAMP,
+ advanceMissingStamp,availableMissingStampActions,AUTHORED_MISSING_STAMP_EVIDENCE}
+ from '@the-pall/game-core';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -54,7 +60,8 @@ const schema=[
   '0015_bellrunner_dispatch_work.sql',
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
-  '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql'
+  '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
+  '0022_personal_journal.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -79,6 +86,7 @@ registerBellrunnerClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
+registerPersonalJournalRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
@@ -2789,4 +2797,140 @@ test('Stitcher Stage VI rewind restores the witnessed Stage V preparations and r
   assert.equal((await request('GET',rewind)).body?.targetStage,4,
    'Stage 5 now uses the existing previous-stage rewind contract');
  }
+});
+
+
+test('Personal Journal strictly isolates one account\'s Stitcher and Millhand journals',async()=>{
+  const a=await stitcherFixture();
+  const empty=(await request('GET',base+a.id+'/journal')).body!;
+  assert.deepEqual(empty,{characterId:a.id,completed:[],nextCursor:null});
+  let st=(await request('GET',a.path)).body!;
+  for(const action of ['start','ask_linen','continue_intro','continue_intro',
+    'check_ward','begin_round','inspect_b','inspect_a','order_dirty',
+    'prep_ready','dress_b','check_linen','discard_end','dress_a',
+    'inspect_finished','record_linen','report_claudia',
+    'continue_report','continue_report','close_round',
+    'observe_bed','ask_patient','read_chart','confront_claudia'] as const)
+    st=await stitcherCmd(a.path,action,st);
+  for(let k=0;k<STITCHER_CLAUDIA_LINES.length;k++)
+    st=await stitcherCmd(a.path,'continue_claudia',st);
+  st=await stitcherCmd(a.path,'choose_notes',st);
+  for(const action of ['continue_opening','continue_opening',
+    'compare_admission','match_schedule','cross_reference','record_difference'] as const)
+    st=await stitcherCmd(a.path,action,st);
+  for(let k=0;k<STITCHER_LINES.notes.length;k++)
+    st=await stitcherCmd(a.path,'continue_dialogue',st);
+  st=await stitcherCmd(a.path,'finish_job',st);
+  assert.equal(st.stage,5);
+
+  // Separate character, SAME account, SAME task-instance IDs.
+  const b=randomUUID();
+  await db.query(
+    "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health) VALUES($1,$2,'Millhand Journal Test',$3,'Male','Millhand','{\"Craftsmanship\":3,\"Industry\":1}'::jsonb,'[]'::jsonb,'Smithing workshop',1,'NOT_STARTED',50)",
+    [b,owner,'millhand-journal-'+b]
+  );
+  // Run the actual saved-state reducers. The Millhand work routes use their
+  // own auth pool, so this harness persists their verified outputs and runs
+  // the same idempotent archive/backfill function as the migration.
+  let plate={...INITIAL_PLATEWORK};
+  for(let count=0;count<24&&plate.phase!=='COMPLETE';count++){
+   const actions=availableActions(plate);
+   assert.ok(actions.length,'Platework must expose a legal next step');
+   const action=actions.includes('straighten')?'straighten'
+     :actions.includes('fix_mark')?'fix_mark':actions[0];
+   plate=advancePlatework(plate,action);
+  }
+  assert.equal(plate.phase,'COMPLETE');
+  let stamp={...INITIAL_MISSING_STAMP};
+  for(let count=0;count<75&&stamp.phase!=='SELECTED';count++){
+   const actions=availableMissingStampActions(stamp,AUTHORED_MISSING_STAMP_EVIDENCE);
+   assert.ok(actions.length,'Missing Stamp must expose a legal next step');
+   const action=actions.includes('choose_contracts')?'choose_contracts':actions[0];
+   stamp=advanceMissingStamp(stamp,action,AUTHORED_MISSING_STAMP_EVIDENCE);
+  }
+  assert.equal(stamp.phase,'SELECTED');
+  assert.equal(stamp.branch,'contracts');
+  const client=await db.connect();
+  try{
+   await client.query('BEGIN');
+   await client.query('INSERT INTO player_character_platework(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [b,plate.revision,JSON.stringify(plate)]);
+   await client.query('INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [b,stamp.revision,JSON.stringify(stamp)]);
+   await client.query("UPDATE player_characters SET tutorial_stage=4,tutorial_status='NOT_STARTED' WHERE id=$1",[b]);
+   await backfillCharacterJournal(client,{id:b,origin:'Millhand',tutorial_stage:4});
+   await client.query('COMMIT');
+  }catch(error){await client.query('ROLLBACK');throw error;}
+  finally{client.release();}
+
+  // The generic archive contract permits identical task IDs and instance
+  // IDs across characters without collisions, even under one account.
+  const shared=await db.connect();
+  try{
+   await shared.query('BEGIN');
+   for(const id of [a.id,b]){
+    await archiveJournalTask(shared,{
+      characterId:id,taskId:'test.shared-repair',taskInstanceId:'test:shared-repair',
+      stage:2,title:'Shared Repair',paragraphs:['I finished my own repair.']
+    });
+   }
+   // Repeated completion cannot edit the first immutable diary snapshot.
+   await archiveJournalTask(shared,{
+    characterId:a.id,taskId:'test.shared-repair',taskInstanceId:'test:shared-repair',
+    stage:2,title:'Should Never Replace',paragraphs:['This must not overwrite.']
+   });
+   await shared.query('COMMIT');
+  }catch(error){await shared.query('ROLLBACK');throw error;}
+  finally{shared.release();}
+    const fetchJournal=async(id:string,principal:string|null=owner)=>
+    request('GET',base+id+'/journal?limit=20',principal);
+  const aa=await fetchJournal(a.id),bb=await fetchJournal(b);
+  assert.equal(aa.status,200);assert.equal(bb.status,200);
+  const ae=aa.body!.completed,be=bb.body!.completed;
+  assert.ok(ae.some((x:any)=>x.title==='Morning Dressings'));
+  assert.ok(ae.some((x:any)=>x.title==='The Teaching Bed'));
+  assert.ok(ae.some((x:any)=>x.title==='Notes for the Living'));
+  assert.ok(be.some((x:any)=>x.title==='Marking the Plates'));
+  assert.ok(be.some((x:any)=>x.title==='The Missing Stamp'));
+  assert.ok(ae.every((x:any)=>!['Marking the Plates','The Missing Stamp'].includes(x.title)));
+  assert.ok(be.every((x:any)=>!['Morning Dressings','The Teaching Bed',
+    'Notes for the Living'].includes(x.title)));
+  assert.ok(ae.find((x:any)=>x.title==='Notes for the Living').paragraphs
+    .join(' ').includes('teaching schedule'));
+  assert.ok(!ae.some((x:any)=>x.title==='The Night Trolley'));
+  assert.ok(!ae.some((x:any)=>x.title==='The Signed Consent'));
+  assert.ok(be.find((x:any)=>x.title==='The Missing Stamp').paragraphs
+    .join(' ').includes("Contracts office"));
+  assert.ok(ae.some((x:any)=>x.taskInstanceId==='tutorial:stage:2'));
+  assert.ok(be.some((x:any)=>x.taskInstanceId==='tutorial:stage:2'),
+    'Two characters can complete the same task instance without collision');
+  assert.equal(ae.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
+  assert.equal(be.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
+  assert.equal(ae.find((x:any)=>x.taskId==='test.shared-repair').title,'Shared Repair');
+
+  // Change characters repeatedly, then "reload" from the persisted database.
+  assert.deepEqual((await fetchJournal(b)).body!.completed,be);
+  assert.deepEqual((await fetchJournal(a.id)).body!.completed,ae);
+  assert.equal((await fetchJournal(a.id,stranger)).status,404);
+  assert.equal((await fetchJournal(b,stranger)).status,404);
+  assert.equal((await fetchJournal(a.id,null)).status,401);
+  const first=(await request('GET',base+a.id+'/journal?limit=1')).body!;
+  assert.equal(first.completed.length,1);
+  assert.ok(first.nextCursor);
+  const second=(await request('GET',base+a.id+'/journal?limit=1&after='+first.nextCursor)).body!;
+  assert.equal(second.completed.length,1);
+  assert.notEqual(first.completed[0].taskInstanceId,second.completed[0].taskInstanceId);
+  assert.equal((await request('GET',base+a.id+'/journal?limit=101')).status,400);
+
+  // Rewind A's Stage V after archiving Stage IV. B's entire history survives.
+  const rewound=await request('POST',a.rewind,owner,{expectedStage:5});
+  assert.equal(rewound.status,200,JSON.stringify(rewound.body));
+  const newer=(await fetchJournal(a.id)).body!.completed;
+  assert.ok(!newer.some((x:any)=>x.title==='Notes for the Living'));
+  assert.ok(newer.some((x:any)=>x.title==='Morning Dressings'));
+  assert.deepEqual((await fetchJournal(b)).body!.completed,be);
+
+  // Reaching Stage VIII does not erase B's earlier Stage II diary.
+  await db.query("UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",[b]);
+  assert.deepEqual((await fetchJournal(b)).body!.completed,be);
 });

@@ -1,4 +1,6 @@
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {plateworkTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
@@ -144,6 +146,10 @@ export function registerMillhandWorkRoutes(app: FastifyInstance) {
           'UPDATE player_character_platework SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
           [req.params.id,next.revision,JSON.stringify(next)]
         );
+      }
+      if(command.action!=='take_work_paper'&&current?.phase!=='COMPLETE'&&
+          next.phase==='COMPLETE'){
+        await archiveJournalTask(client,plateworkTask(req.params.id,next));
       }
       const result = snapshot(nextChar,next);
       await client.query(

@@ -20,6 +20,7 @@ import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes} from './mil
 import {registerTutorialHomeRoutes} from './tutorial-home-routes.js';
 import {registerInventoryRoutes} from './inventory-routes.js';
 import {registerMillhandStageRewindRoutes} from './millhand-stage-rewind-routes.js';
+import {registerPersonalJournalRoutes} from './personal-journal-routes.js';
 import {parseFixtureAction} from '@the-pall/contracts';
 import {advanceFixture} from '@the-pall/game-core';
 
@@ -47,6 +48,7 @@ registerBellrunnerClinicRoutes(api);
 registerTutorialHomeRoutes(api);
 registerInventoryRoutes(api);
 registerMillhandStageRewindRoutes(api);
+registerPersonalJournalRoutes(api);
 api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
 api.get('/api/fixture', async () => {
   const {rows} = await pool.query('SELECT revision, value FROM dev_action_state WHERE actor_id = $1', [ACTOR]);

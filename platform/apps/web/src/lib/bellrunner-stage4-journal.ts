@@ -5,7 +5,7 @@
  * Each entry must be justified by a persisted Stage 4 choice or discovery.
  * This is presentation copy, not a source of gameplay rewards or state.
  */
-import type {StageFourBranch,StageFourPhase} from '$lib/bellrunner-stage4-copy';
+import type {StageFourBranch,StageFourPhase} from './bellrunner-stage4-copy.js';
 
 export type BellrunnerJournalState={
   branch:StageFourBranch;

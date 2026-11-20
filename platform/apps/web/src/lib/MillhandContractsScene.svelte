@@ -64,7 +64,7 @@
   // The persistent corner control is owned by TutorialShell, not this dialogue.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'contracts-job-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({id:'contracts-job-journal',open:journalOpen,title:"Disputed Docket",entries:journal,toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
   let journalElement: HTMLElement | undefined;

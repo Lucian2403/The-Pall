@@ -3,6 +3,8 @@
  * skill level or changes coins, XP, inventory, health or unapproved clock values.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {bellrunnerSecondJobTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -166,7 +168,10 @@ export function registerBellrunnerSecondJobRoutes(app:FastifyInstance,options?:{
       await client.query(
         'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3 WHERE id=$1',
         [req.params.id,character.tutorial_stage,character.tutorial_status]);
-      const result=view(character,next);
+      if(next.phase==='exited'&&current.phase!=='exited'){
+         await archiveJournalTask(client,bellrunnerSecondJobTask(req.params.id,next));
+       }
+       const result=view(character,next);
       await client.query(
         'INSERT INTO player_character_bellrunner_second_job_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,cmd.requestId,hash,JSON.stringify(result)]);

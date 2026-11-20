@@ -37,7 +37,7 @@
   let journalElement:HTMLElement|undefined;
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'stage-two-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({id:'stage-two-journal',open:journalOpen,title:"Marking the Plates",entries:journalEntries,toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
   async function toggleJournal(){
