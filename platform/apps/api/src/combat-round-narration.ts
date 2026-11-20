@@ -453,8 +453,12 @@ export function narrateCommittedRounds(
           !current.text.includes(', but ')&&!nextText.includes(', but ')&&
           nextText.startsWith(name+' hits you')){
           const suffix=nextText.slice((name+' hits you').length);
+          // An existing "again" refers to a prior round. Do not produce
+          // "back again", which repeats the same idea awkwardly.
+          const reply=nextText.includes(' again')?nextText:
+            name+' hits you back'+suffix;
           combined.push(current.text.replace(/\.$/,'')+
-            ', but '+name+' hits you back'+suffix);
+            ', but '+reply);
         }else{
           const changed=nextText.includes(' again')?nextText:
             name==='You'&&nextText.startsWith('You hit ')
