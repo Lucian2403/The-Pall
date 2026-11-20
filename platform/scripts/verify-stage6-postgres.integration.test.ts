@@ -571,7 +571,7 @@ test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe
   assert.equal(record.rows[0].state.revision,1);
   assert.equal(record.rows[0].stance,stance);
   assert.ok(record.rows[0].history.length>0,'Committed battle events persisted');
-  assert.ok(record.rows[0].history.some((e:any)=>e.story?.version===1),
+  assert.ok(record.rows[0].history.some((e:any)=>e.story?.version===2),
     'Dogman must save the shared story with actual engine events');
   assert.deepEqual((await request('GET',path)).body?.events,turn.body?.events,
     'Dogman story wording and numbers must survive a reload');
@@ -1541,7 +1541,7 @@ test('Combat rules report exact unarmed ranges and saved Chronicle action identi
   assert.equal(persisted.status,200);
   assert.deepEqual(persisted.body!.events,guarded.body!.events,
     'Action metadata and versioned story remain unchanged across reloads');
-  assert.ok(guarded.body!.turnEvents.some((e:any)=>e.story?.version===1),
+  assert.ok(guarded.body!.turnEvents.some((e:any)=>e.story?.version===2),
     'Flint must save the shared story inside the committed turn');
   assert.ok(guarded.body!.turnEvents.every((e:any)=>!e.story||
     typeof e.story.line==='string'),

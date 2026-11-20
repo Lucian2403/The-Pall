@@ -62,7 +62,7 @@ function freshPhrase(s, key, alternatives) {
 }
 function opening(s, who, reason) {
   s.openings[who]={expires:s.round+1,reason};
-  log(s,`${s[who].name==='Player'?'You notice':s[who].name+' notices'} an opening: ${reason}.`,'tactical',{actor:who});
+  log(s,`${s[who].name==='Player'?'You notice':s[who].name+' notices'} an opening: ${reason}.`,'tactical',{actor:who,condition:'opening_gained',reason});
 }
 function hasOpening(s,who) {return (s.openings?.[who]?.expires??0)>=s.round;}
 function repeatedStrikes(s,who) { const actions=who==='player'?s.lastPlayerActions:s.lastEnemyActions;return (actions??[]).slice(-2).length===2 && actions.slice(-2).every(x=>x==='attack'); }
@@ -150,10 +150,10 @@ function grant(state, who, amount) {
   a.momentum = Math.min(100, a.momentum + amount);
   log(state, `${a.name} gains ${amount} Momentum.`,'momentum',{actor:who,amount});
 }
-function result(state, outcome, explanation) {
+function result(state, outcome, explanation, facts={}) {
   state.status = 'finished'; state.outcome = outcome; state.intent = null;
   const label=({player_victory:'The fight ends',player_defeat:'You are defeated',player_escaped:'You get away'})[outcome]??'Encounter ends';
-  log(state, `${label}. ${explanation}`,'outcome');
+  log(state, `${label}. ${explanation}`,'outcome',facts);
 }
 function downed(state) {
   if (state.player.hp <= 0) { result(state, 'player_defeat', 'You fall, unable to carry on. The encounter is lost.'); return true; }
@@ -280,14 +280,14 @@ export function newEncounter(scene, opts = {}) {
   if(scene==='boar'&&!['hold','fence','embankment'].includes(approach))throw new CombatError('Unknown boar staging');
   const enemies = {
     flint: {name:'Flint', hp:50, hpMax:50, ceiling:50,readiness:0,
-      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
+      weapon:{damage:15,minDamage:14,maxDamage:17,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact',label:'heavy club'}},
     dogman: {name:'Dogman', hp:50, hpMax:50, ceiling:50,readiness:0,
       // 12–15 vs Flint's 14–17; a lighter and quicker blunt weapon.
-      weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact'}},
+      weapon:{damage:13,minDamage:12,maxDamage:15,accuracy:.49,guardMitigation:.60,type:'blunt',reach:'contact',label:'light club'}},
     boar: {name:'Young Injured Wild Boar', hp:30,hpMax:65,ceiling:65, readiness:1,
       weapon:{damage:12,accuracy:.70,guardMitigation:.30,type:'blunt',reach:'contact'}},
     silas: {name:'Silas Pumpard', hp:50,hpMax:50,ceiling:50,readiness:0,
-      weapon:{damage:8,accuracy:.68,guardMitigation:.50,type:'sharp',reach:'contact'}},
+      weapon:{damage:8,accuracy:.68,guardMitigation:.50,type:'sharp',reach:'contact',label:'iron hook'}},
   };
   const state = {
     id:opts.id ?? `test-${scene}`, scene, round:1, revision:0, rng:opts.seed ?? 123,
@@ -341,7 +341,7 @@ function tryAttack(s, who, a) {
     const spend=a.momentumCost??20;
     if(src.momentum<spend) { log(s,`${src.name} cannot muster the Momentum for ${ability}.`,'warning');return; }
     src.momentum-=spend;
-    log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend});
+    log(s,`${src.name} commits ${spend} Momentum to ${ability}.`,'technique',{actor:who,amount:-spend,ability});
   }
   // The chance advertised before confirming an action uses the fighter's
   // starting Fatigue. The action's new exertion applies on the next attack,
@@ -354,7 +354,7 @@ function tryAttack(s, who, a) {
     s.dodgeAttempt?.attempted===true&&!s.dodgeAttempt.success;
   if(!caughtDodging&&(s.distance==='far' ||
     (s.distance==='near' && !(s.scene==='boar' && who==='enemy')))){
-    log(s,`${src.name}'s committed ${special?'maneuver':'strike'} falls short. The target is no longer within reach.`,'miss',{actor:who});
+    log(s,`${src.name}'s committed ${special?'maneuver':'strike'} falls short. The target is no longer within reach.`,'miss',{actor:who,reason:'out_of_reach',ability:special?ability:null});
     return;
   }
   if(s.scene==='boar'&&who==='enemy'&&a.targetSpot&&s.terrain.playerSpot!==a.targetSpot){
@@ -383,7 +383,8 @@ function tryAttack(s, who, a) {
         ? ["The boar rushes past, hooves scraping at the ground.","Its head drives through the gap you have already left behind."]
         :["The coal hook catches nothing but air.","Silas lunges, but the curved iron passes clear of you."];
     log(s,freshPhrase(s,`miss-${who}-${s.scene}`,actions),'miss',
-      {actor:who,zone,damage:0,focusedBonusPercent:Math.round(focusedBonus*100)});
+      {actor:who,zone,damage:0,reason:'attack_roll',ability:special?ability:null,
+        focusedBonusPercent:Math.round(focusedBonus*100)});
     if(targetWho==='player' && (s.scene==='flint'||s.scene==='dogman'||special))opening(s,'player',special?'the committed heavy swing goes wide':'the swing runs past your guard');
     return;
   }
@@ -439,21 +440,21 @@ function tryAttack(s, who, a) {
     :who==='player'&&s.enemy.hp<s.enemy.hpMax/2?' The opponent is plainly struggling now.':'';
   const guardText=dst.guard?` ${dst.name==='Player'?'Your guard':'Their guard'} absorbs ${raw-damage} of the impact.`:'';
   log(s,`${narrative}${damageBreakdown}${guardText} ${dst.name==='Player'?'You lose':dst.name+' loses'} ${damage} Health.${contextual}`,
-      'damage',{actor:who,target:targetWho,zone,raw,damage,
+      'damage',{actor:who,target:targetWho,zone,hitPart:part,raw,damage,
         baseDamage:rolled,openingDamageBonus,guarded:dst.guard,
         focusedBonusPercent:Math.round(focusedBonus*100),
         guardReductionPercent:dst.guard?Math.round(reduction*100):0,
         ability:special?ability:null});
   if(src.weapon.type==='sharp' && damage>=6 && dst.bleed===0) {
     dst.bleed=1;dst.wounds.push({type:'cut',zone,severity:'minor'});
-    log(s,`${dst.name==='Player'?'A shallow cut opens.':'A shallow cut opens on '+dst.name+'.'} Light bleeding begins.`,'wound',{actor:targetWho});
+    log(s,`${dst.name==='Player'?'A shallow cut opens.':'A shallow cut opens on '+dst.name+'.'} Light bleeding begins.`,'wound',{actor:targetWho,condition:'bleed_started',zone});
   }
   // The stronger ordinary Flint hit isn't automatically a serious wound.
   // Trial serious thresholds reflect impact type; still NOT final injury balance.
   if(damage >= (src.weapon.type==='blunt'?19:15)){
     dst.ceiling=Math.max(1,dst.hpMax-8);dst.hp=Math.min(dst.hp,dst.ceiling);
     if(!dst.wounds.some(w=>w.severity==='serious'))dst.wounds.push({type:'impact',zone,severity:'serious'});
-    log(s,`${dst.name} suffers a severe impact. Their effective Health ceiling is reduced.`,'wound',{actor:targetWho});
+    log(s,`${dst.name} suffers a severe impact. Their effective Health ceiling is reduced.`,'wound',{actor:targetWho,condition:'serious_wound',zone});
   }
   if(damage>0&&zone==='limbs'){
     dst.armHits=(dst.armHits??0)+1;
@@ -544,7 +545,7 @@ function perform(s,who,a) {
       cost(s,who,TEST_CONFIG.useCost,'use');x.bandages--;x.bleed=0;
       log(s,`${x.name==='Player'?'You bind the wound firmly.':x.name+' binds a wound.'} Bleeding is controlled, but the injury remains.`,'wound');break;
     case 'withdraw':
-      if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':s.scene==='dogman'?'Dogman lowers his club and gets out of the way of the public street.':'Silas gives ground and ends the assault, remaining by the locked coal box.');
+      if(who==='enemy') result(s,'player_victory',s.scene==='boar'?'The wounded boar limps through the opening and disappears beyond the fence.':s.scene==='flint'?'Flint lowers his club and backs away from the passage.':s.scene==='dogman'?'Dogman lowers his club and gets out of the way of the public street.':'Silas gives ground and ends the assault, remaining by the locked coal box.',{actor:'enemy',condition:'withdraw'});
       else if(s.distance==='far') result(s,'player_escaped','You put enough distance between yourself and the threat to leave the fight.');
       else log(s,'You try to break away, but your opponent is still close enough to bar the route.','warning');break;
     default: throw new CombatError('Unsupported resolved action');

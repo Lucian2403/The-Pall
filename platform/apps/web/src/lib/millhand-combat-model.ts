@@ -19,7 +19,7 @@ export type CombatEventView={
   actionDetail?:string;
   actionName?:string;
   /** Committed, versioned story. Missing on legacy history (use original text). */
-  story?:{version:1;line:string;detail?:string;hidden?:boolean};
+  story?:{version:1|2;line:string;detail?:string;hidden?:boolean};
 };
 export type CombatSnapshot={
   status:'active'|'finished';outcome:string|null;stance:'brace'|'moving'|'cart';

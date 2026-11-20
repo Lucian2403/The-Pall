@@ -1,275 +1,375 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {newEncounter,step} from '../packages/game-core/vendor/combat-v0.5.1/combat.mjs';
-import {narrateCommittedTurn} from '../apps/api/src/combat-narration.ts';
+import {narrateCommittedTurn,type StoryCombatEvent}
+  from '../apps/api/src/combat-narration.ts';
 import type {CombatAction,CombatEvent,CombatState}
   from '@the-pall/game-core/combat-v0.5.1';
 
-const flint=()=>newEncounter('flint',{seed:17}) as CombatState;
-const dogman=()=>newEncounter('dogman',{seed:17}) as CombatState;
-const boar=()=>newEncounter('boar',{seed:17}) as CombatState;
-const silas=()=>newEncounter('silas',{seed:17}) as CombatState;
-const action:CombatAction={type:'attack',zone:'torso'};
-function write(state:CombatState,events:CombatEvent[],
-  chosen:CombatAction=action,history:CombatEvent[]=[]){
-  return narrateCommittedTurn(events,chosen,state.intent,state,history);
-}
-const event=(kind:string,extra:Partial<CombatEvent>={}):CombatEvent=>({
- round:2,text:'An attack occurs.',kind,...extra
+const fresh=(scene:'flint'|'dogman'|'silas'|'boar'='flint')=>
+  newEncounter(scene,{seed:45}) as CombatState;
+const act:CombatAction={type:'attack',zone:'torso'};
+const e=(kind:string,props:Partial<CombatEvent>={}):CombatEvent=>({
+  kind,round:1,text:'Resolved action.',...props
 });
-const line=(e:CombatEvent)=>e.story?.line??e.text;
-const detail=(e:CombatEvent)=>e.story?.detail??'';
+const render=(state:CombatState,events:CombatEvent[],
+  chosen:CombatAction=act,previous:CombatEvent[]=[]) =>
+  narrateCommittedTurn(events,chosen,state.intent,state,previous);
+const line=(event:StoryCombatEvent)=>event.story?.line??event.text;
+const info=(event:StoryCombatEvent)=>event.story?.detail??'';
+const json=<T>(a:T):T=>JSON.parse(JSON.stringify(a));
 
-test('Momentum and Fatigue appear once beneath the action that caused them',()=>{
- const s=flint();
- const events=write(s,[
-  event('intent',{actor:'enemy',text:'Flint is ready to swing.'}),
-  event('fatigue',{actor:'player',amount:3,fatigue:3,text:'Player gains 3 Fatigue.'}),
-  event('guard',{actor:'player',text:'You raise your guard.'}),
-  event('damage',{actor:'enemy',target:'player',zone:'torso',damage:6,raw:15,
-    guarded:true,text:"Flint's club hits your ribs."}),
-  event('momentum',{actor:'enemy',amount:10,text:'Flint gains 10 Momentum.'}),
-  event('momentum',{actor:'player',amount:8,text:'Player gains 8 Momentum.'})
- ],{type:'guard'});
- assert.equal(events[1].story?.hidden,true);
- assert.equal(events[4].story?.hidden,true);
- assert.equal(events[5].story?.hidden,true);
- assert.equal(detail(events[2]),'Guard active · +3 Fatigue · 3/100 total');
- assert.equal(detail(events[3]),
-  '−6 Health · 9 blocked · +10 Momentum (Flint) · +8 Momentum (You)');
- assert.equal(events[4].amount,10);
- assert.equal(events[5].amount,8);
- assert.equal(events.filter(e=>!e.story?.hidden).length,3);
-});
-
-test('normal hit uses the actual attacker, target, named enemy and body part',()=>{
- const s=flint();
- const [hit]=write(s,[event('damage',{
-  actor:'player',target:'enemy',zone:'torso',damage:11,raw:11,
-  text:"Your fist catches Flint across the ribs."})]);
- assert.match(line(hit),/^You /);
- assert.match(line(hit),/Flint/);
- assert.match(line(hit),/ribs/);
- assert.equal(detail(hit),'11 damage');
- assert.equal(hit.damage,11);
- assert.equal(hit.text,"Your fist catches Flint across the ribs.");
-});
-
-test('normal miss does not invent a dodge, wound or block',()=>{
- const s=flint();
- for(const who of ['player','enemy'] as const){
-  const [miss]=write(s,[event('miss',{actor:who,zone:'torso',damage:0,text:'Attack misses'})]);
-  assert.match(line(miss),/miss/i);
-  assert.doesNotMatch(line(miss),/dodg|bleed|wound|block|fall/i);
+test('the narrator has no enemy, scene, weapon, creature or ability name switch',()=>{
+ const s=readFileSync(new URL('../apps/api/src/combat-narration.ts',import.meta.url),'utf8');
+ for(const word of ['Flint','Dogman','Silas','boar','Owler','iron hook','heavy club',
+   "state.scene===","weapon.type==='",'woundName(']){
+  assert.ok(!s.includes(word),'Narrator cannot know a fixture name or its equipment: '+word);
  }
+ assert.ok(s.includes('narration?:NarrationFacts'));
 });
 
-test('Guard damage shows the exact Health loss and blocked amount once',()=>{
- const s=flint();
- const events=write(s,[event('damage',{
-  actor:'enemy',target:'player',zone:'limbs',damage:6,raw:15,guarded:true,
-  text:"Flint's club hits your shoulder."})]);
- assert.match(line(events[0]),/shoulder/);
- assert.match(line(events[0]),/guard/);
- assert.equal(detail(events[0]),'−6 Health · 9 blocked');
- assert.doesNotMatch(line(events[0]),/9|15|6/);
+test('a named enemy and named weapon come from state and recorded attack data',()=>{
+ const s=fresh();
+ s.enemy.name='Gutter Sentinel 318';
+ s.enemy.weapon.label='copper staff';
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:9,raw:9,
+   hitPart:'back',text:'Engine records a hit.'})]);
+ assert.match(line(hit),/Gutter Sentinel 318/);
+ assert.match(line(hit),/copper staff/);
+ assert.match(line(hit),/back/);
+ assert.equal(info(hit),'−9 Health');
+ assert.equal(hit.damage,9);
+ assert.equal(hit.text,'Engine records a hit.');
 });
 
-test('successful dodge and a real opening connect without claiming an extra hit',()=>{
- const s=dogman();
- const events=write(s,[
-  event('tactical',{actor:'player',condition:'dodge_success',chance:.4,
-    text:"You dodge Dogman's committed swing."}),
-  event('miss',{actor:'enemy',reason:'out_of_reach',damage:0,
-    text:"Dogman's committed strike falls short. The target is no longer within reach."}),
-  event('tactical',{actor:'player',
-    text:'You notice an opening: the swing runs past your guard.'})
+test('recorded hit part is used; an unrecorded part is never guessed from aim zone',()=>{
+ const s=fresh();
+ const [a,b]=render(s,[
+  e('damage',{actor:'player',target:'enemy',zone:'head',damage:11,text:'A hit.'}),
+  e('damage',{actor:'player',target:'enemy',zone:'limbs',damage:6,hitPart:'left wing',
+   text:'A hit to the left wing.'})
  ]);
- assert.match(line(events[0]),/dodge Dogman/);
+ assert.doesNotMatch(line(a),/head|temple|arm|wing|ribs/);
+ assert.match(line(b),/left wing/);
+});
+
+test('animals, machines and new body types never inherit fists, arms or clubs',()=>{
+ const s=fresh();
+ s.enemy.name='Seven-Legged Bell';
+ s.enemy.weapon.unarmed=true;
+ const [hit,guard]=render(s,[
+  e('damage',{actor:'enemy',target:'player',damage:4,text:'Hit.'}),
+  e('guard',{actor:'enemy',text:'Guarded.'})
+ ]);
+ assert.match(line(hit),/Seven-Legged Bell/);
+ assert.doesNotMatch(line(hit)+' '+line(guard),/fist|punch|raise|\\barm\\b|club|jaw/);
+ assert.match(line(guard),/guards/);
+});
+
+test('new natural attack method uses exact verb forms and supplied body-part phrase',()=>{
+ const s=fresh();s.enemy.name='Mire Bloom';s.enemy.weapon.unarmed=true;
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:8,raw:8,
+  narration:{action:{verb:{base:'lash',thirdPerson:'lashes'},
+    instrument:{kind:'body_part',name:'stem',phrase:'with its stem'},hitPart:'side'}},
+  text:'Hit from new attack.'})]);
+ assert.match(line(hit),/Mire Bloom lashes you in the side with its stem/);
+ assert.doesNotMatch(line(hit),/punch|club|kick/);
+});
+
+test('an unfamiliar future attack verb requires no new narrator case',()=>{
+ const s=fresh();s.enemy.name='Clockwork Grain';
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:3,
+  narration:{action:{verb:{base:'tangle',thirdPerson:'tangles'}}},
+  text:'Flicker resolves.'})]);
+ assert.match(line(hit),/Clockwork Grain tangles you/);
+ assert.equal(info(hit),'−3 Health');
+});
+
+test('an unknown or incomplete action method falls back to a plain hit',()=>{
+ const s=fresh();s.enemy.name='Slag Frame';
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:5,
+  narration:{action:{verb:{base:'crush',thirdPerson:''}}},text:'Unspecified hit.'})]);
+ assert.match(line(hit),/Slag Frame (hits|lands a hit|strikes) you/);
+ assert.doesNotMatch(line(hit),/crush|punch|club/);
+});
+
+test('an attack that misses never claims a dodge or wound',()=>{
+ const s=fresh();s.enemy.name='Ridge Moth';
+ const [miss]=render(s,[e('miss',{actor:'enemy',target:'player',
+  damage:0,reason:'attack_roll',text:'Attack misses.'})]);
+ assert.match(line(miss),/miss/);
+ assert.doesNotMatch(line(miss),/dodg|bleed|hit|injur|wound|guard/);
+});
+
+test('a successful dodge and real Opening connect without inventing a hit',()=>{
+ const s=fresh();s.enemy.name='Bridge Hound';
+ const events=render(s,[
+  e('tactical',{actor:'player',condition:'dodge_success'}),
+  e('miss',{actor:'enemy',reason:'out_of_reach',damage:0}),
+  e('tactical',{actor:'player',condition:'opening_gained',
+    reason:'the enemy misses after you move'})
+ ]);
+ assert.match(line(events[0]),/dodge Bridge Hound/);
  assert.match(line(events[1]),/out of reach/);
- assert.match(line(events[2]),/opening/i);
- assert.ok(events.every(x=>!/damage|Health|bleed/i.test(detail(x))));
+ assert.match(line(events[2]),/opening/);
+ assert.ok(events.every(x=>!info(x).includes('Health')));
 });
 
-test('failed dodge is NOT automatically called a successful hit',()=>{
- const s=dogman();
- const entries=write(s,[
-  event('tactical',{actor:'player',condition:'dodge_failed',
-    text:'Your reposition does not evade the committed swing.'}),
-  event('miss',{actor:'enemy',zone:'torso',damage:0,text:'Dogman misses.'})
+test('a failed dodge followed by a miss is still a miss',()=>{
+ const s=fresh();
+ const [fail,miss]=render(s,[
+  e('tactical',{actor:'player',condition:'dodge_failed'}),
+  e('miss',{actor:'enemy',damage:0,reason:'attack_roll'})
  ]);
- assert.match(line(entries[0]),/do not get clear/);
- assert.match(line(entries[1]),/miss/i);
- assert.doesNotMatch(entries.map(line).join(' '),/hits you|takes .*Health/);
+ assert.match(line(fail),/do not get clear/);
+ assert.match(line(miss),/miss/);
+ assert.doesNotMatch(line(miss),/hit you|punch/);
 });
 
-test('two consecutive strikes only describe the recorded exposed stance',()=>{
- const [exposed]=write(flint(),[event('tactical',{
-  actor:'player',condition:'overcommitted',
-  text:'You have pressed forward with consecutive strikes. Your guard is left open.'})]);
- assert.match(line(exposed),/leaves you open/i);
- assert.doesNotMatch(line(exposed),/stagger|stun|wound|panic/);
+test('damage, Guard and an accuracy-only Opening remain exact',()=>{
+ const s=fresh();s.enemy.name='North Loom';
+ const [hit]=render(s,[e('damage',{actor:'player',target:'enemy',
+  damage:6,raw:15,guarded:true,openingDamageBonus:0,
+  narration:{openingUsed:true,action:{hitPart:'hull'}},
+  text:'Strike landed with guard.'})]);
+ assert.match(line(hit),/use the opening/);
+ assert.match(line(hit),/hull/);
+ assert.match(line(hit),/part of the blow is blocked/);
+ assert.equal(info(hit),'6 damage · 9 blocked');
 });
 
-test('special attack uses recorded Momentum and Opening bonus',()=>{
- const s=flint();
- const events=write(s,[
-  event('technique',{actor:'player',amount:-20,
-    text:'Player commits 20 Momentum to Press Advantage.'}),
-  event('damage',{actor:'player',target:'enemy',zone:'head',
-    text:"Your fist catches Flint across the temple.",damage:15,raw:20,openingDamageBonus:5})
- ],{type:'technique',zone:'head'});
- assert.match(line(events[1]),/opening/i);
- assert.match(line(events[1]),/temple/);
- assert.equal(detail(events[0]),'−20 Momentum');
- assert.equal(detail(events[1]),'15 damage · +5 Opening bonus');
+test('an unrecorded Opening never appears just because a hit dealt damage',()=>{
+ const s=fresh();
+ const [hit]=render(s,[e('damage',{actor:'player',target:'enemy',damage:11,
+  raw:11,text:'Hit.'})]);
+ assert.doesNotMatch(line(hit),/opening/);
 });
 
-test('Stamina and Composure recover from exact committed amounts',()=>{
- const s=flint();
- const [breath]=write(s,[event('recovery',{actor:'player',mode:'breath',
-  staminaRestored:20,fatigueRemoved:15,text:'You recover.'})],
-  {type:'recover',mode:'breath'});
- const [nerves]=write(s,[event('recovery',{actor:'player',mode:'nerves',
-  composureRestored:12,fatigueRemoved:30,text:'You recover.'})],
-  {type:'recover',mode:'nerves'});
- assert.match(line(breath),/catch your breath/);
- assert.equal(detail(breath),'+20 Stamina · −15 Fatigue');
- assert.equal(detail(nerves),'+12 Composure · −30 Fatigue');
+test('ability title, strike method, damage and applied status appear together',()=>{
+ const s=fresh();s.enemy.name='Mire Wanderer';
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:7,raw:7,
+  narration:{
+   actionId:'a-203',
+   ability:{id:'generated-729',name:'Silt Latch',category:'close attack'},
+   action:{verb:{base:'bind',thirdPerson:'binds'},
+      instrument:{kind:'body_part',name:'vine',phrase:'with its vine'},hitPart:'ankle'},
+   effects:[{kind:'status',label:'Slowed',applied:true,target:'player',durationRounds:2},
+            {kind:'damage',label:'Health',amount:7,applied:true,target:'player'}]
+  },text:'Generated engine hit.'})]);
+ assert.match(line(hit),/Mire Wanderer uses Silt Latch/);
+ assert.match(line(hit),/binds you in the ankle with its vine/);
+ assert.equal(info(hit),'−7 Health · Slowed (2 rounds)');
+ assert.equal(hit.damage,7);
 });
 
-test('Fatigue reports only actual measured increases',()=>{
- const [e]=write(dogman(),[event('fatigue',{actor:'enemy',amount:10,fatigue:80,
-  text:'Dogman gains 10 Fatigue from exhausted exertion.'})]);
- assert.equal(detail(e),'+10 Fatigue · 80/100 total');
- assert.match(line(e),/Dogman/);
+test('unapplied effects are never narrated as injuries or conditions',()=>{
+ const s=fresh();s.enemy.name='River Spur';
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:4,
+  narration:{ability:{name:'Drowned Reach'},effects:[
+    {kind:'bleeding',label:'Bleeding',applied:false},
+    {kind:'slow',label:'Slow',applied:false}]},text:'Hit without statuses.'})]);
+ assert.doesNotMatch(info(hit)+' '+line(hit),/Bleeding|Slow/);
+ assert.equal(info(hit),'−4 Health');
 });
 
-test('bleeding, serious impact and impaired arm are kept separate',()=>{
- const s=silas();
- const entries=write(s,[
-  event('wound',{actor:'player',text:'A shallow cut opens. Light bleeding begins.'}),
-  event('bleed',{actor:'player',target:'player',damage:1,text:'Blood seeps from your injury.'}),
-  event('wound',{actor:'enemy',text:'Silas Pumpard suffers a severe impact. Their effective Health ceiling is reduced.'}),
-  event('wound',{actor:'player',zone:'limbs',condition:'arm_impaired',
-    text:'Player has taken repeated arm strikes. Attack accuracy is reduced.'})
+test('a new ability can apply an unfamiliar effect without causing damage',()=>{
+ const s=fresh();s.enemy.name='Tin Drifter';
+ const [effect]=render(s,[e('effect',{actor:'enemy',target:'player',
+  narration:{ability:{name:'Anchor Thread'},
+    effects:[{kind:'tether',label:'Tethered',applied:true,durationRounds:3}]},
+  text:'Engine applied tether.'})]);
+ assert.match(line(effect),/Tin Drifter uses Anchor Thread/);
+ assert.equal(info(effect),'Tethered (3 rounds)');
+});
+
+test('new mechanics can report movement and resources with their own labels',()=>{
+ const s=fresh();s.enemy.name='Eel Cart';
+ const [hit]=render(s,[e('damage',{actor:'enemy',target:'player',damage:4,
+  narration:{action:{verb:{base:'push',thirdPerson:'pushes'}},
+    effects:[{kind:'forced_move',label:'Pushed back',applied:true,
+       amount:2,unit:'steps'},
+      {kind:'composure',label:'Composure',applied:true,amount:-5,unit:'Composure'}]},
+  text:'Pushed with custom effects.'})]);
+ assert.match(line(hit),/Eel Cart pushes you/);
+ assert.equal(info(hit),'−4 Health · +2 steps · -5 Composure');
+});
+
+test('move around obstacles describes only recorded position changes',()=>{
+ const s=fresh();s.enemy.name='Cinder Wind';
+ const [close,side,other]=render(s,[
+  e('move',{actor:'player',actionDetail:'close',text:'Closer.'}),
+  e('move',{actor:'enemy',narration:{movement:{kind:'side',place:'beside the gate'}},
+    text:'Side.'}),
+  e('move',{actor:'enemy',narration:{movement:{kind:'other',place:'near the wall'}},
+    text:'Unknown move.'})
+ ],{type:'move',to:'close'});
+ assert.match(line(close),/closer|closes the distance/);
+ assert.match(line(side),/side/);
+ assert.match(info(side),/beside the gate/);
+ assert.match(line(other),/moves/);
+ assert.doesNotMatch(line(other),/dodges|jump|charge|runs/);
+});
+
+test('committed recovery and Fatigue include exact resource values',()=>{
+ const s=fresh();
+ const [recovery,fatigue]=render(s,[
+  e('recovery',{actor:'player',mode:'breath',
+    staminaRestored:20,fatigueRemoved:15,text:'Recovered.'}),
+  e('fatigue',{actor:'enemy',amount:9,fatigue:72,text:'Fatigue.'})
+ ],{type:'recover',mode:'breath'});
+ assert.match(line(recovery),/catch your breath/);
+ assert.equal(info(recovery),'+20 Stamina · −15 Fatigue');
+ assert.equal(info(fatigue),'+9 Fatigue · 72/100 total');
+});
+
+test('wounds, bleeding and impaired limbs require explicit resolved conditions',()=>{
+ const s=fresh();s.enemy.name='Old Bell';
+ const [bleed,serious,limb,tick]=render(s,[
+  e('wound',{actor:'enemy',condition:'bleed_started'}),
+  e('wound',{actor:'player',condition:'serious_wound'}),
+  e('wound',{actor:'player',condition:'arm_impaired'}),
+  e('bleed',{actor:'enemy',damage:2})
  ]);
- assert.match(line(entries[0]),/start bleeding/);
- assert.equal(detail(entries[1]),'−1 Health');
- assert.match(line(entries[2]),/serious injury/);
- assert.match(line(entries[3]),/arm is hurt/);
+ assert.match(line(bleed),/starts bleeding/);
+ assert.match(line(serious),/serious injury/);
+ assert.match(line(limb),/arm is injured/);
+ assert.equal(info(tick),'−2 Health');
 });
 
-test('movement and obstacle descriptions use actual committed movement',()=>{
- const s=dogman();
- const [side]=write(s,[event('move',{actor:'player',text:'You move sideways.'})],
-  {type:'move',to:'side'});
- assert.match(line(side),/sideways|side/);
- const [cover]=write(s,[event('move',{actor:'player',text:'You duck behind the obstruction.'})],
-  {type:'move',to:'cover'});
- assert.match(line(cover),/cover/);
- const [near]=write(s,[event('move',{actor:'enemy',text:'Dogman steps around the obstruction.'})]);
- assert.match(line(near),/closer/);
-});
-
-test('a retreat, surrender, win, and loss never become an invented kill',()=>{
- const s=flint();
+test('surrender, withdrawal, defeat and escape do not invent deaths or flight',()=>{
+ const s=fresh();s.enemy.name='Sable Beetle';
  s.outcome='player_victory';
- let [e]=write(s,[event('outcome',{text:'The fight ends. Flint lowers his club and backs away from the passage.'})]);
- assert.match(line(e),/backs away.*You win/);
- assert.doesNotMatch(line(e),/kill|dead/);
+ const [surrender,withdraw]=render(s,[
+  e('outcome',{actor:'enemy',condition:'surrender'}),
+  e('outcome',{actor:'enemy',condition:'withdraw'})
+ ]);
+ assert.match(line(surrender),/Sable Beetle gives up/);
+ assert.match(line(withdraw),/stops fighting/);
  s.outcome='player_defeat';
- [e]=write(s,[event('outcome',{text:'You are defeated. You fall, unable to carry on.'})]);
- assert.match(line(e),/You lose/);
- assert.doesNotMatch(line(e),/win/);
+ const [lose]=render(s,[e('outcome',{text:'Lost.'})]);
+ assert.match(line(lose),/You lose/);
  s.outcome='player_escaped';
- [e]=write(s,[event('outcome',{text:'You get away. You leave the passage.'})]);
- assert.match(line(e),/get away/);
+ const [escape]=render(s,[e('outcome',{text:'Left.'})]);
+ assert.match(line(escape),/get away/);
+ for(const v of [surrender,withdraw,lose,escape])
+  assert.doesNotMatch(line(v),/killed|dead|fear|scream/);
 });
 
-test('boar leaves through the actual opening; Silas stays by the coal box',()=>{
- const b=boar();b.outcome='player_victory';
- const [be]=write(b,[event('outcome',{
-  text:'The fight ends. The wounded boar limps through the opening and disappears beyond the fence.'})]);
- assert.match(line(be),/limps through the opening/);
- assert.doesNotMatch(line(be),/backs away|falls|dies/);
- const s=silas();s.outcome='player_victory';
- const [se]=write(s,[event('outcome',{
-  text:'The fight ends. Silas gives ground and ends the assault, remaining by the locked coal box.'})]);
- assert.match(line(se),/stops attacking/);
- assert.doesNotMatch(line(se),/leaves|runs away/);
+test('related Momentum, Fatigue and ability costs appear once under the real attack',()=>{
+ const s=fresh();s.enemy.name='Ribbon Guard';
+ const done=render(s,[
+  e('fatigue',{actor:'player',amount:3,fatigue:5}),
+  e('technique',{actor:'player',amount:-20,ability:'Twist Wire'}),
+  e('damage',{actor:'player',target:'enemy',damage:12,raw:12,ability:'Twist Wire'}),
+  e('momentum',{actor:'player',amount:10})
+ ],{type:'technique',zone:'torso'});
+ assert.equal(done[0].story?.hidden,true);
+ assert.equal(done[1].story?.hidden,true);
+ assert.equal(done[3].story?.hidden,true);
+ assert.match(line(done[2]),/Twist Wire/);
+ assert.equal(info(done[2]),'12 damage · +3 Fatigue · 5/100 total · −20 Momentum · +10 Momentum');
+ assert.equal(done.length,4);
 });
 
-test('Silas uses his iron hook, boar does not invent a weapon, Owler needs a real weapon flag',()=>{
- const hook=write(silas(),[event('damage',{actor:'enemy',target:'player',
-  zone:'limbs',text:"Silas's iron hook clips your forearm.",damage:5,raw:5})])[0];
- assert.match(line(hook),/iron hook/);
- const pig=write(boar(),[event('damage',{actor:'enemy',target:'player',
-  zone:'torso',text:'The animal strikes your ribs.',damage:6,raw:6})])[0];
- assert.match(line(pig),/boar/);
- assert.doesNotMatch(line(pig),/club|hook|punch/);
- const future=flint();
- future.enemy.name='Owler';
- future.enemy.weapon.unarmed=true;
- const owler=write(future,[event('damage',{actor:'enemy',target:'player',
-  zone:'torso',text:'Owler strikes your side.',damage:4,raw:4})])[0];
- assert.match(line(owler),/Owler/);
- assert.doesNotMatch(line(owler),/club|hook|shov/);
+test('a new action id stops resource folding across independent attacks',()=>{
+ const s=fresh();
+ const done=render(s,[
+  e('damage',{actor:'player',damage:4,
+    narration:{actionId:'first'},text:'First attack.'}),
+  e('momentum',{actor:'player',amount:10,
+    narration:{actionId:'other'},text:'Different action.'})
+ ]);
+ assert.equal(done[1].story?.hidden,undefined);
+ assert.equal(info(done[0]),'4 damage');
+ assert.equal(info(done[1]),'+10 Momentum');
 });
 
-test('older saved logs without a story are still readable',()=>{
- const old=event('damage',{text:'Original Flint hit. You lose 9 Health.',damage:9});
- assert.equal(old.story,undefined);
- assert.equal(line(old),old.text);
+test('existing v1 stories and unversioned saved events are never rewritten',()=>{
+ const s=fresh();
+ const older=e('damage',{actor:'enemy',damage:9,text:'Old Chronicle wording.'});
+ const v1=e('damage',{actor:'enemy',damage:8,text:'Saved v1 wording.',
+  story:{version:1,line:'Older narration.',detail:'−8 Health'}});
+ const [a,b]=render(s,[older,v1]);
+ assert.equal(a.text,'Old Chronicle wording.');
+ assert.equal(b.story?.version,1);
+ assert.equal(line(b),'Older narration.');
+ assert.equal(older.story,undefined);
 });
 
-test('narrating a resolved turn does not change game state, RNG, damage or event fields',()=>{
- const s=newEncounter('flint',{seed:913}) as CombatState;
- const next=step(s,{type:'guard'},{requestId:'round-1',expectedRevision:s.revision}) as CombatState;
- const before=structuredClone(next);
- const result=write(next,next.events,{type:'guard'},[]);
- const copy=structuredClone(next);
- assert.deepEqual(copy,before,'Narration may not mutate the engine state');
- for(let i=0;i<next.events.length;i++){
-  const {story,actionType,actionDetail,actionName,...rest}=result[i];
-  assert.deepEqual(rest,next.events[i],'Original event must remain intact');
-  if(story)assert.equal(story.version,1);
- }
- assert.equal(result.length,next.events.length);
-});
-
-test('save and reload produce the same chronicle with no new rolls',()=>{
- const initial=newEncounter('dogman',{seed:71}) as CombatState;
- const next=step(initial,{type:'guard'},{requestId:'round-1',expectedRevision:0}) as CombatState;
- const events=write(next,next.events,{type:'guard'},[]);
- const saved=JSON.stringify({state:{...next,events},history:events});
- const reloaded=JSON.parse(saved);
- const exactJSON=JSON.parse(JSON.stringify(events));
- assert.deepEqual(reloaded.history,exactJSON);
- assert.deepEqual(reloaded.state.events,exactJSON);
- const replay=write(next,next.events,{type:'guard'},[]);
- assert.deepEqual(JSON.parse(JSON.stringify(replay)),exactJSON);
-});
-
-test('a full real multi-round history reads in order with deterministic varied sentences',()=>{
- let s=newEncounter('flint',{seed:142}) as CombatState;
- let history:CombatEvent[]=[];
- for(let i=0;i<14&&s.status==='active';i++){
-  const chosen:CombatAction=s.player.fatigue>=70
-    ?{type:'recover',mode:'breath'}
+test('actual deterministic engine fights change no RNG, damage, AI or stored state',()=>{
+ let s=fresh();
+ for(let round=0;round<8&&s.status==='active';round++){
+  const action:CombatAction=s.player.fatigue>=70?{type:'recover',mode:'breath'}
     :s.distance!=='contact'?{type:'move',to:'close'}
-    :i%3===0?{type:'guard'}:{type:'attack',zone:'torso'};
-  const intent=s.intent;
-  const next=step(s,chosen,{requestId:'round-'+String(i),expectedRevision:s.revision}) as CombatState;
-  const rendered=narrateCommittedTurn(next.events,chosen,intent,next,history);
-  history=[...history,...rendered];
+    :round%3===0?{type:'guard'}:{type:'attack',zone:'torso'};
+  const next=step(s,action,{requestId:'real-'+round,expectedRevision:s.revision}) as CombatState;
+  const copy=json(next);
+  const committed=render(next,next.events,action);
+  assert.deepEqual(json(next),copy);
+  assert.equal(committed.length,next.events.length);
+  committed.forEach((x,i)=>{
+    const {story,actionType,actionName,actionDetail,...original}=x;
+    assert.deepEqual(original,next.events[i]);
+    assert.ok(!story||story.version===2);
+  });
   s=next;
  }
- assert.ok(history.length>20,'Expected multiple connected action events');
- assert.ok(history.every((e,i)=>i===0||history[i-1].round<=e.round));
- assert.ok(history.some(e=>e.kind==='damage'||e.kind==='miss'));
- assert.ok(history.some(e=>e.story?.detail));
- assert.ok(new Set(history.filter(e=>e.kind==='damage').map(e=>e.story?.line)).size>=2,
-  'Consecutive strikes must not all reuse one sentence');
- assert.ok(!history.some(e=>e.story?.line.includes('Enemy NPC')));
+});
+
+test('new generated enemy and new generated ability stay correct over six rounds',()=>{
+ // This deterministic event trace represents a future resolver's committed
+ // results. The prototype combat AI cannot generate new abilities, and is not
+ // changed or faked here.
+ const s=fresh();s.enemy.name='Glass-Silt Weaver';s.enemy.weapon.unarmed=true;
+ const history:CombatEvent[]=[];
+ const record=(events:CombatEvent[],choice:CombatAction=act)=>{
+  const committed=render(s,events,choice,history);
+  history.push(...json(committed));return committed;
+ };
+ const ability={id:'ability.gen.881',name:'Bindwater Reach',category:'control'};
+ for(let round=1;round<=6;round++){
+  const r=round;
+  if(round%3===1){
+    record([e('damage',{round:r,actor:'enemy',target:'player',damage:round+2,
+      raw:round+2,narration:{ability,action:{verb:{base:'wrap',thirdPerson:'wraps'},
+       instrument:{kind:'body_part',name:'filament',phrase:'with its filament'}},
+       effects:[{kind:'new_condition',label:'Held',applied:round===1,
+          durationRounds:2}]},text:'A real generated hit.'})]);
+  }else if(round%3===2){
+    record([e('miss',{round:r,actor:'enemy',damage:0,reason:'attack_roll',
+      narration:{ability,action:{verb:{base:'wrap',thirdPerson:'wraps'}}},
+      text:'A generated attack missed.'})]);
+  }else{
+    record([e('move',{round:r,actor:'enemy',narration:{
+      movement:{kind:'side',place:'along the broken pipe'}},text:'Moved.'})]);
+  }
+ }
+ const saved=json(history), displayed=saved.filter(x=>!x.story?.hidden)
+  .map(x=>x.story?.line||x.text).join(' ');
+ assert.equal(history.length,6);
+ assert.ok(saved.every((e,i)=>e.round===i+1));
+ assert.match(displayed,/Glass-Silt Weaver/);
+ assert.match(displayed,/Bindwater Reach/);
+ assert.match(displayed,/filament/);
+ assert.match(saved[0].story?.detail||'',/Held \(2 rounds\)/);
+ assert.doesNotMatch(saved[3].story?.detail||'',/Held/);
+ assert.doesNotMatch(displayed,/punch|fist|club|fear|arm|injured/);
+ assert.ok(new Set(displayed.split('. ').filter(Boolean)).size>=4);
+ assert.deepEqual(json(history),saved);
+});
+
+test('replaying a committed history produces byte-for-byte stable new descriptions',()=>{
+ const s=fresh();
+ const events=[
+  e('damage',{actor:'enemy',damage:9,raw:9,hitPart:'left flank',
+    narration:{action:{hitPart:'left flank'}}}),
+  e('momentum',{actor:'enemy',amount:10}),
+  e('tactical',{actor:'player',condition:'opening_gained'})
+ ];
+ const first=render(s,events,act,[]);
+ const second=render(s,events,act,[]);
+ assert.equal(JSON.stringify(first),JSON.stringify(second));
+ const serialized=json(first);
+ assert.deepEqual(render(s,serialized,act,[]),serialized);
 });

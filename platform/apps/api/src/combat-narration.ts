@@ -1,309 +1,356 @@
-/** Combat log presentation v1. The engine remains the source of every fact.
- * Runs inside the same transaction as the combat turn, before history is saved.
- * The existing 'text' is retained for old clients and old saved battles.
- * No random calls, changes to combat state, or guessed injuries.
+/** Universal presentation adapter for resolved combat events.
+ * The combat engine owns actions and results. Nothing here rolls, resolves or
+ * edits a fighter. The complete story is saved on each committed event.
+ *
+ * A future combat resolver may put 'narration' facts on an event. All fields
+ * describe RESOLVED actions. Metadata describing a possible ability is not
+ * proof that an effect happened: effects require applied:true.
  */
-import type {CombatAction,CombatState,CombatEvent}
+import type {CombatAction,CombatEvent,CombatState}
   from '@the-pall/game-core/combat-v0.5.1';
 
-export type CombatStory={version:1;line:string;detail?:string;hidden?:boolean};
-export type StoryCombatEvent=CombatEvent&{story?:CombatStory};
+type Side='player'|'enemy';
+export type ResolvedEffect={
+  kind:string; label?:string; applied:boolean; target?:Side;
+  amount?:number; unit?:string; durationRounds?:number;
+  /** Optional plain-English result supplied by the resolver, not the narrator. */
+  text?:string;
+};
+export type AttackFacts={
+  /** Both verb forms are supplied by the resolver/ability data.
+   * This also allows verbs the narrator has never seen before. */
+  verb?:{base:string;thirdPerson:string};
+  /** No anatomy is inferred from weapon type or creature name. */
+  instrument?:{name:string;kind:'weapon'|'body_part'|'other';phrase?:string};
+  /** The actual struck part, not the intended aim zone. */
+  hitPart?:string;
+};
+export type NarrationFacts={
+  actionId?:string;
+  action?:AttackFacts;
+  ability?:{id?:string;name:string;category?:string};
+  /** Movement that actually happened, not a possible destination. */
+  movement?:{kind:'side'|'close'|'back'|'cover'|'leave'|'other';place?:string};
+  /** Explicitly consumed opening, including accuracy-only openings. */
+  openingUsed?:boolean;
+  /** Only effects with applied:true are described as outcomes. */
+  effects?:ResolvedEffect[];
+  /** Only an observed ending, not a guessed motive. */
+  outcome?:'withdraw'|'surrender'|'downed'|'escaped'|'stopped';
+};
+export type CombatStory={version:2;line:string;detail?:string;hidden?:boolean};
+export type StoryCombatEvent=CombatEvent&{
+  narration?:NarrationFacts;
+  story?:CombatStory|{version:1;line:string;detail?:string;hidden?:boolean};
+};
 
-const partPattern=/\b(ribs|chest|side|temple|forearm|leg|shoulder)\b/i;
-function bodyPart(event:CombatEvent):string{
-  const found=event.text.match(partPattern)?.[1]?.toLowerCase();
-  if(found)return 'in the '+found;
-  if(event.zone==='head')return 'in the head';
-  if(event.zone==='torso')return 'in the body';
-  if(event.zone==='limbs')return 'in the limbs';
-  return '';
+const finite=(x:unknown):number|null=>
+  typeof x==='number'&&Number.isFinite(x)?x:null;
+const side=(x:unknown):x is Side=>x==='player'||x==='enemy';
+const safe=(x:unknown):string|undefined=>
+  typeof x==='string'&&x.trim().length>0?x.trim():undefined;
+const word=(x:unknown):string|undefined=>{
+  const s=safe(x);
+  return s&&s.length<=90?s:undefined;
+};
+const caps=(text:string):string=>text[0].toUpperCase()+text.slice(1);
+const number=(n:number,label:string,sign=''):string=>sign+String(n)+' '+label;
+const nameOf=(state:CombatState,who:Side):string=>
+  who==='player'?'You':state.enemy.name;
+const targetOf=(state:CombatState,who:Side):string=>
+  who==='player'?state.enemy.name:'you';
+function facts(event:CombatEvent):NarrationFacts{
+  const raw=event.narration;
+  return raw&&typeof raw==='object'&&!Array.isArray(raw)?raw as NarrationFacts:{};
 }
-function isUnarmed(weapon:CombatState['player']['weapon']):boolean{
-  return weapon.unarmed===true||
-    (weapon.unarmed===undefined&&weapon.damage===6&&
-     weapon.accuracy===.70&&weapon.type==='blunt');
+function pick(lines:string[],index:number,last?:string):string{
+  let i=((index%lines.length)+lines.length)%lines.length;
+  if(lines.length>1&&lines[i]===last)i=(i+1)%lines.length;
+  return lines[i];
 }
-function attackWeapon(state:CombatState,who:'player'|'enemy'):string|null{
-  const weapon=state[who].weapon;
-  if(isUnarmed(weapon))return 'fist';
-  if(weapon.type==='blunt'&&state.scene==='flint'&&who==='enemy')return 'club';
-  if(weapon.type==='blunt'&&state.scene==='dogman'&&who==='enemy')return 'light club';
-  if(weapon.type==='sharp'&&state.scene==='silas'&&who==='enemy')return 'iron hook';
-  // A generic future enemy is not assumed to carry a club or hook.
-  return null;
+function actorVerb(verb:AttackFacts['verb']|undefined,who:Side):string|undefined{
+  return who==='player'?word(verb?.base):word(verb?.thirdPerson);
 }
-function actorName(state:CombatState,actor:'player'|'enemy'):string{
-  return actor==='player'?'You':state.enemy.name;
+function weaponUsed(event:CombatEvent,state:CombatState,who:Side):string|undefined{
+  const attack=facts(event).action;
+  if(attack){
+    const i=attack.instrument;
+    if(!i)return;
+    if(safe(i.phrase))return i.phrase!.trim();
+    if(i.kind==='weapon'&&word(i.name))
+      return who==='player'?'with your '+i.name:'with a '+i.name;
+    // A body part may be a tail, jaw, wing or tentacle. Never guess its owner.
+    return;
+  }
+  // Only this existing prototype's committed weapon attack can use its fitted
+  // weapon label. Old saved weapons without labels fall back to a plain hit.
+  const weapon=state[who].weapon as CombatState['player']['weapon']&{label?:string};
+  if(word(weapon.label)&&weapon.unarmed!==true)
+    return who==='player'?'with your '+weapon.label:'with a '+weapon.label;
 }
-function term(value:number,unit:string,sign=''):string{
-  return sign+String(value)+' '+unit;
+function detailEffects(event:CombatEvent):{parts:string[];text?:string}{
+  const found=facts(event).effects;
+  if(!Array.isArray(found))return {parts:[]};
+  const parts:string[]=[];
+  let sentence: string|undefined;
+  for(const e of found){
+    if(!e||e.applied!==true)continue;
+    // Existing damage is shown once, from the authoritative damage field.
+    if(e.kind==='damage'&&finite(event.damage)!==null)continue;
+    const label=word(e.label)||word(e.kind)||'Effect';
+    const amount=finite(e.amount);
+    const unit=word(e.unit);
+    const duration=finite(e.durationRounds);
+    let part=amount===null?label:(amount>0?'+':'')+String(amount)+' '+(unit||label);
+    if(duration!==null&&duration>0)part+=' ('+duration+' rounds)';
+    if(!parts.includes(part))parts.push(part);
+    if(!sentence&&safe(e.text))sentence=e.text!.trim();
+  }
+  return {parts,text:sentence};
 }
-function shown(value:unknown):number|null{
-  return typeof value==='number'&&Number.isFinite(value)?value:null;
+function story(line:string,parts:string[]=[],extra?:string):CombatStory{
+  const clean=line.replace(/\s+/g,' ').trim();
+  const result=extra?clean+' '+extra.trim():clean;
+  return {version:2,line:result, ...(parts.length?{detail:parts.join(' · ')}:{})};
 }
-function variant(lines:string[],slot:number,last?:string):string{
-  let selection=((slot%lines.length)+lines.length)%lines.length;
-  if(lines.length>1&&lines[selection]===last)
-    selection=(selection+1)%lines.length;
-  return lines[selection];
-}
-function hit(event:CombatEvent,state:CombatState,slot:number,last?:string):CombatStory|undefined{
-  if(event.actor!=='player'&&event.actor!=='enemy')return;
-  const dmg=shown(event.damage);
+function hit(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
+  if(!side(event.actor))return;
+  const who=event.actor,them=targetOf(state,who);
+  const dmg=finite(event.damage);
   if(dmg===null)return;
-  const enemy=state.enemy.name;
-  const loc=bodyPart(event);
-  const suffix=loc?' '+loc:'';
-  const weapon=attackWeapon(state,event.actor);
-  const isPlayer=event.actor==='player';
-  let possibilities:string[];
-  if(isPlayer){
-    if(weapon==='fist'){
-      possibilities=[
-        'You punch '+enemy+suffix+'.',
-        'Your punch hits '+enemy+(loc?' '+loc:'')+'.',
-        'You hit '+enemy+suffix+' with your fist.'
-      ];
-    }else{
-      const equipped=weapon?' with your '+weapon:'';
-      possibilities=[
-        'You hit '+enemy+suffix+equipped+'.',
-        'Your attack hits '+enemy+suffix+'.',
-        'You strike '+enemy+suffix+equipped+'.'
-      ];
-    }
-  }else if(state.scene==='boar'){
-    possibilities=[
-      'The boar hits you'+suffix+'.',
-      'The injured boar strikes you'+suffix+'.'
-    ];
-  }else if(weapon==='fist'){
-    possibilities=[
-      enemy+' punches you'+suffix+'.',
-      enemy+' hits you'+suffix+' with a fist.',
-      enemy+' lands a punch'+(loc?' '+loc:'')+'.'
-    ];
+  const n=facts(event),part=word(n.action?.hitPart)||word(event.hitPart);
+  // 'zone' is a chosen aim zone, not proof of a specific body part.
+  const location=part?' on the '+part:'';
+  const verb=actorVerb(n.action?.verb,who);
+  const byWeapon=weaponUsed(event,state,who);
+  const withSource=byWeapon?' '+byWeapon:'';
+  const subject=nameOf(state,who);
+  const usedAbility=word(n.ability?.name)||word(event.ability);
+  let lines:string[];
+  if(verb){
+    lines=[subject+' '+verb+' '+them+location+withSource+'.',
+      subject+' '+verb+' '+them+location+withSource+'.'];
+  }else if(who==='player'){
+    lines=['You hit '+them+location+withSource+'.',
+      'Your attack hits '+them+location+withSource+'.',
+      'You land a hit on '+them+location+withSource+'.'];
   }else{
-    const withWeapon=weapon?' with a '+weapon:'';
-    possibilities=[
-      enemy+' hits you'+suffix+withWeapon+'.',
-      enemy+' strikes you'+suffix+withWeapon+'.',
-      weapon?enemy+'\'s '+weapon+' hits you'+suffix+'.':enemy+' lands a hit'+suffix+'.'
-    ];
+    lines=[subject+' hits '+them+location+withSource+'.',
+      subject+' lands a hit on '+them+location+withSource+'.',
+      subject+' strikes '+them+location+withSource+'.'];
   }
-  let line=variant(possibilities,slot,last);
-  const opening=shown(event.openingDamageBonus);
-  if(opening!==null&&opening>0){
-    // This bonus is the proof the Opening was actually used.
-    // Keep it in the same sentence, even when Guard also blocked damage.
-    const withWeapon=weapon?(isPlayer?' with your ':' with a ')+weapon:'';
-    line=isPlayer?'You take the opening and hit '+enemy+suffix+withWeapon+'.':
-      enemy+' takes the opening and hits you'+suffix+withWeapon+'.';
-  }
-  const parts=[isPlayer?term(dmg,'damage'):term(dmg,'Health','−')];
+  let line=pick(lines,index,last);
+  const opening=n.openingUsed===true||((finite(event.openingDamageBonus)??0)>0);
+  if(opening)line=(who==='player'?'You use the opening. ':subject+' uses the opening. ')+line;
+  if(usedAbility)line=(who==='player'?'You use ':subject+' uses ')+usedAbility+'. '+line;
+  const details=[who==='player'?number(dmg,'damage'):number(dmg,'Health','−')];
   if(event.guarded===true){
-    const raw=shown(event.raw);
-    const blocked=raw===null?null:Math.max(0,raw-dmg);
-    if(blocked!==null&&blocked>0){
-      line+=' '+(isPlayer?enemy+' blocks part of the blow.':'Your guard takes part of the blow.');
-      parts.push(term(blocked,'blocked'));
+    const raw=finite(event.raw);
+    if(raw!==null&&raw>dmg){
+      details.push(number(raw-dmg,'blocked'));
+      line=line.replace(/\.$/,'')+(who==='player'?', but part of the blow is blocked.':', but your guard blocks part of the hit.');
     }
   }
-  if(opening!==null&&opening>0)parts.push(term(opening,'Opening bonus','+'));
-  return {version:1,line,detail:parts.join(' · ')};
+  const bonus=finite(event.openingDamageBonus);
+  if(bonus!==null&&bonus>0)details.push(number(bonus,'Opening bonus','+'));
+  const effects=detailEffects(event);
+  return story(line,[...details,...effects.parts],effects.text);
 }
-function miss(event:CombatEvent,state:CombatState,slot:number,last?:string):CombatStory|undefined{
-  if(event.actor!=='player'&&event.actor!=='enemy')return;
-  const who=event.actor;
-  const enemy=state.enemy.name;
-  const weapon=attackWeapon(state,who);
-  if(event.reason==='old_position'&&state.scene==='boar')
-    return {version:1,line:'The boar charges at where you were standing. It misses.'};
-  if(event.text.includes('no longer within reach')||event.text.includes('falls short')){
-    return {version:1,line:who==='player'
-      ?'You strike, but '+enemy+' is out of reach.'
-      :enemy+' tries to strike, but you are out of reach.'};
-  }
-  const sentences=who==='player'
-    ?['You swing and miss '+enemy+'.','Your attack misses '+enemy+'.',
-      'You try to hit '+enemy+', but miss.']
-    :state.scene==='boar'
-      ?['The boar rushes past you.','The boar attacks and misses.']
-      :[enemy+' swings and misses.',enemy+' tries to hit you but misses.',
-         weapon===null?enemy+' attacks but misses.':enemy+' misses with the '+weapon+'.'];
-  return {version:1,line:variant(sentences,slot,last)};
+function miss(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
+  if(!side(event.actor))return;
+  const who=event.actor,subject=nameOf(state,who),them=targetOf(state,who);
+  const n=facts(event),verb=actorVerb(n.action?.verb,who);
+  const ability=word(n.ability?.name)||word(event.ability);
+  let result:string;
+  if(event.reason==='old_position')
+    result=subject+' attacks the place '+(who==='player'?them+' was':'you were')+'. The attack misses.';
+  else if(event.reason==='out_of_reach')
+    result=subject+' attacks, but '+them+' is out of reach.';
+  else if(verb&&word(n.action?.verb?.base))
+    result=subject+' tries to '+n.action!.verb!.base+' '+them+', but misses.';
+  else result=pick(who==='player'?[
+    'You attack '+them+' but miss.','Your attack misses '+them+'.',
+    'You try to hit '+them+' but miss.'
+  ]:[
+    subject+' attacks but misses.',subject+' tries to hit you but misses.',
+    subject+' misses you.'
+  ],index,last);
+  if(ability)result=subject+' uses '+ability+'. '+result;
+  const effects=detailEffects(event);
+  return story(result,effects.parts,effects.text);
 }
-function display(event:CombatEvent,state:CombatState,slot:number,last?:string):CombatStory|undefined{
-  const who=event.actor;
-  const name=who==='player'?'You':state.enemy.name;
-  const his=who==='player'?'Your':state.enemy.name+'\'s';
-  if(event.kind==='damage')return hit(event,state,slot,last);
-  if(event.kind==='miss')return miss(event,state,slot,last);
-  if(event.kind==='guard'&&(who==='player'||who==='enemy'))
-    return {version:1,line:who==='player'?'You raise your guard.':name+' raises a guard.',
-      detail:'Guard active'};
-  if(event.kind==='move'&&(who==='player'||who==='enemy')){
-    const to=event.actionDetail;
-    const lines=to==='side'?['You step to the side.','You move sideways.']:
-      to==='cover'?['You move behind cover.','You step behind cover.']:
-      to==='back'?['You step back.','You move away.']:
-      to==='close'?['You move closer.','You step closer.']:null;
-    if(who==='player'&&lines)return {version:1,line:variant(lines,slot,last)};
-    if(who==='enemy'){
-      return {version:1,line:to==='side'?name+' steps to the side.':
-        name+' moves closer.'};
-    }
-  }
+function move(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
+  if(!side(event.actor))return;
+  const who=event.actor,n=facts(event);
+  const direction=n.movement?.kind||event.actionDetail;
+  const actor=nameOf(state,who);
+  const place=word(n.movement?.place);
+  const lines:Record<string,[string,string]>={
+    side:[actor+' moves to the side.',actor+' shifts to the side.'],
+    back:[actor+' steps back.',actor+' moves back.'],
+    close:[actor+' moves closer.',actor+' closes the distance.'],
+    cover:[actor+' moves behind cover.',actor+' takes cover.'],
+    leave:[actor+' leaves the fight.',actor+' moves away from the fight.']
+  };
+  if(!direction)return; // Keep the authoritative event text, not a guessed move.
+  const variants=lines[direction];
+  const line=variants?pick(variants,index,last):actor+' moves.';
+  return story(line,place?['Position: '+place]:[]);
+}
+function display(event:CombatEvent,state:CombatState,index:number,last?:string):CombatStory|undefined{
+  const who=event.actor,n=facts(event),named=side(who)?nameOf(state,who):'';
+  if(event.kind==='damage')return hit(event,state,index,last);
+  if(event.kind==='miss')return miss(event,state,index,last);
+  if(event.kind==='move')return move(event,state,index,last);
+  if(event.kind==='guard'&&side(who))
+    return story(who==='player'?'You guard.':named+' guards.',['Guard active']);
   if(event.kind==='tactical'){
     if(who==='player'&&event.condition==='dodge_success')
-      return {version:1,line:'You dodge '+state.enemy.name+'\'s attack.',
-        detail:'Dodge successful'};
+      return story('You dodge '+state.enemy.name+"'s attack.",['Dodge successful']);
     if(who==='player'&&event.condition==='dodge_failed')
-      return {version:1,line:'You try to dodge but do not get clear.',
-        detail:'Dodge failed'};
+      return story('You try to dodge but do not get clear.',['Dodge failed']);
     if(event.condition==='overcommitted')
-      return {version:1,line:'You attack again without changing your stance. This leaves you open.',
-        detail:'Opening given to '+state.enemy.name};
-    if(event.text.includes('an opening:')&&(who==='player'||who==='enemy'))
-      return {version:1,
-        line:who==='player'?'You see an opening in '+state.enemy.name+'\'s guard.':
-          state.enemy.name+' sees an opening in your guard.',
-        detail:'Opening gained'};
-    return; // Unknown tactical events keep the exact original explanation.
+      return story(who==='player'?'You attack again. This leaves you open.':
+        named+' attacks again and is left open.',['Opening given']);
+    if(event.condition==='opening_gained'&&side(who))
+      return story(who==='player'?'You see an opening.':named+' sees an opening.',['Opening gained']);
+    return; // Unknown tactical claims retain original event wording.
   }
-  if(event.kind==='recovery'&&(who==='player'||who==='enemy')){
+  if(event.kind==='recovery'&&side(who)){
     const mode=event.mode;
-    const line=mode==='breath'
-      ?(who==='player'?'You catch your breath.':name+' stops to catch a breath.')
-      :(who==='player'?'You steady yourself.':name+' takes a moment to steady up.');
-    const changes:string[]=[];
-    const stamina=shown(event.staminaRestored);
-    const composure=shown(event.composureRestored);
-    const fatigue=shown(event.fatigueRemoved);
-    if(stamina!==null&&stamina>0)changes.push(term(stamina,'Stamina','+'));
-    if(composure!==null&&composure>0)changes.push(term(composure,'Composure','+'));
-    if(fatigue!==null&&fatigue>0)changes.push(term(fatigue,'Fatigue','−'));
-    return {version:1,line,detail:changes.join(' · ')||undefined};
+    const line=mode==='breath'?(who==='player'?'You catch your breath.':named+' catches a breath.'):
+      mode==='nerves'?(who==='player'?'You steady yourself.':named+' steadies up.'):
+      (who==='player'?'You recover.':named+' recovers.');
+    const parts:string[]=[];
+    const gains:[unknown,string][]=[
+      [event.staminaRestored,'Stamina'],[event.composureRestored,'Composure']];
+    for(const [amount,label] of gains){const v=finite(amount);if(v!==null&&v>0)parts.push(number(v,label,'+'));}
+    const fatigue=finite(event.fatigueRemoved);
+    if(fatigue!==null&&fatigue>0)parts.push(number(fatigue,'Fatigue','−'));
+    return story(line,parts);
   }
-  if(event.kind==='momentum'&&(who==='player'||who==='enemy')){
-    const amount=shown(event.amount);
-    return {version:1,line:his+' Momentum rises.',
-      detail:amount===null?undefined:term(Math.abs(amount),'Momentum',amount>=0?'+':'−')};
+  if(event.kind==='technique'&&side(who)){
+    const ability=word(n.ability?.name)||word(event.ability)||word(event.actionName);
+    const amount=finite(event.amount);
+    const effect=detailEffects(event);
+    const parts=amount!==null?[number(Math.abs(amount),'Momentum',amount<0?'−':'+')]:[];
+    return story(ability?(who==='player'?'You use ':named+' uses ')+ability+'.':
+      (who==='player'?'You use a special attack.':named+' uses a special attack.'),
+      [...parts,...effect.parts],effect.text);
   }
-  if(event.kind==='fatigue'&&(who==='player'||who==='enemy')){
-    const added=shown(event.amount);
-    const total=shown(event.fatigue);
-    return {version:1,line:who==='player'?'You are getting more tired.':name+' is getting more tired.',
-      detail:added===null?undefined:term(added,'Fatigue','+')+
-        (total!==null?' · '+String(total)+'/100 total':'')};
+  if((event.kind==='ability'||event.kind==='effect'||event.kind==='status')&&side(who)){
+    const ability=word(n.ability?.name)||word(event.ability);
+    const effect=detailEffects(event);
+    if(effect.parts.length===0&&!effect.text&&!ability)return;
+    const line=(who==='player'?'You use ':named+' uses ')+(ability||'an ability')+'.';
+    return story(line,effect.parts,effect.text);
   }
-  if(event.kind==='focus'&&(who==='player'||who==='enemy')){
-    const cost=shown(event.composureCost);
-    const duration=shown(event.duration);
-    const bonus=shown(event.accuracyBonusPercent);
-    const parts=[];
-    if(cost!==null)parts.push(term(cost,'Composure','−'));
-    if(bonus!==null)parts.push(term(bonus,'% accuracy','+'));
-    if(duration!==null)parts.push(String(duration)+' rounds');
-    return {version:1,line:who==='player'?'You focus on your next attacks.':
-      name+' focuses on the next attacks.',detail:parts.join(' · ')};
+  if(event.kind==='momentum'&&side(who)){
+    const value=finite(event.amount);if(value===null)return;
+    return story(who==='player'?'You gain Momentum.':named+' gains Momentum.',
+      [number(Math.abs(value),'Momentum',value<0?'−':'+')]);
   }
-  if(event.kind==='technique'&&(who==='player'||who==='enemy')){
-    const value=shown(event.amount);
-    const label=(event.actionName||event.ability);
-    const line=who==='player'?'You put more force into your next attack.':
-      name+' prepares a stronger attack.';
-    return {version:1,line:label?line+' '+label+'.':line,
-      detail:value===null?undefined:term(Math.abs(value),'Momentum',value<0?'−':'+')};
+  if(event.kind==='fatigue'&&side(who)){
+    const value=finite(event.amount);if(value===null)return;
+    const total=finite(event.fatigue);
+    return story(who==='player'?'You become more tired.':named+' becomes more tired.',
+      [number(value,'Fatigue','+')+(total!==null?' · '+String(total)+'/100 total':'')]);
+  }
+  if(event.kind==='focus'&&side(who)){
+    const parts:string[]=[];
+    const cost=finite(event.composureCost);
+    const bonus=finite(event.accuracyBonusPercent);
+    const duration=finite(event.duration);
+    if(cost!==null)parts.push(number(cost,'Composure','−'));
+    if(bonus!==null)parts.push('+'+bonus+'% accuracy');
+    if(duration!==null)parts.push(duration+' rounds');
+    return story(who==='player'?'You focus on your attacks.':named+' focuses on the next attacks.',parts);
   }
   if(event.kind==='wound'){
+    if(!side(who))return;
+    if(event.condition==='bleed_started')
+      return story(who==='player'?'You start bleeding.':named+' starts bleeding.',['Bleeding started']);
+    if(event.condition==='serious_wound')
+      return story(who==='player'?'You suffer a serious injury.':named+' suffers a serious injury.',
+        ['Health limit reduced']);
     if(event.condition==='arm_impaired')
-      return {version:1,line:who==='player'
-        ?'Your arm is hurt. Your attacks are less accurate.'
-        :name+' has an injured arm. Attacks are less accurate.',
-        detail:'Arm impaired'};
-    if(event.text.includes('Light bleeding begins'))
-      return {version:1,line:who==='player'?'You start bleeding.':name+' starts bleeding.',
-        detail:'Bleeding started'};
-    if(event.text.includes('severe impact'))
-      return {version:1,line:who==='player'?'You suffer a serious injury.':
-        name+' suffers a serious injury.',detail:'Health limit reduced'};
-    // Bandages and unknown wound results keep their real engine wording.
+      return story(who==='player'?'Your arm is injured.':named+"'s arm is injured.",['Arm impaired']);
+    const applied=detailEffects(event);
+    if(applied.parts.length)return story(who==='player'?'You are injured.':named+' is injured.',
+      applied.parts,applied.text);
+    return;
   }
-  if(event.kind==='bleed'){
-    const damage=shown(event.damage);
-    return {version:1,line:who==='player'?'Your wound keeps bleeding.':
-      name+' continues to bleed.',
-      detail:damage===null?undefined:term(damage,'Health','−')};
+  if(event.kind==='bleed'&&side(who)){
+    const amount=finite(event.damage);
+    return story(who==='player'?'Your wound keeps bleeding.':named+' continues to bleed.',
+      amount!==null?[number(amount,'Health','−')]:[]);
   }
   if(event.kind==='outcome'){
-    const outcome=state.outcome;
-    if(outcome==='player_defeat')
-      return {version:1,line:'You fall and cannot go on. You lose.'};
-    if(outcome==='player_escaped')
-      return {version:1,line:'You get away from the fight.'};
-    if(outcome==='player_victory'){
-      // A retreat is not always the same movement. Keep the actual outcome.
-      if(state.scene==='boar'&&/limps.*opening/i.test(event.text))
-        return {version:1,line:'The injured boar limps through the opening and leaves. You win.'};
-      if(state.scene==='silas'&&/gives ground/i.test(event.text))
-        return {version:1,line:'Silas steps back and stops attacking. You win.'};
-      if(state.scene==='dogman'&&/gets out of/i.test(event.text))
-        return {version:1,line:'Dogman moves aside and stops fighting. You win.'};
-      if(/backs away/i.test(event.text))
-        return {version:1,line:state.enemy.name+' backs away. You win.'};
-      if(/ends the assault/i.test(event.text))
-        return {version:1,line:state.enemy.name+' stops fighting. You win.'};
-      return {version:1,line:state.enemy.name+' can no longer fight. You win.'};
+    if(state.outcome==='player_defeat')return story('You lose the fight.');
+    if(state.outcome==='player_escaped')return story('You get away from the fight.');
+    if(state.outcome==='player_victory'){
+      const ending=n.outcome||event.condition;
+      const fact=ending==='withdraw'?' stops fighting.':
+        ending==='surrender'?' gives up.':
+        ending==='downed'?' cannot continue.':null;
+      return story(fact?state.enemy.name+fact+' You win.':'You win the fight.');
     }
   }
-  return; // Leave opaque and legacy-compatible events untouched.
+  return;
 }
-
-/** Fold simple resource notices into the related action in the same round.
- * The source events stay in history with all of their exact values, but only
- * one number line is shown for each change.
+/** Only merge causes and results that belong to the same resolved action.
+ * The engine still keeps every event (and every number) in saved history.
  */
-function foldResourceDetails(events:StoryCombatEvent[],state:CombatState):void{
-  const useful=new Set(['damage','miss','guard','move','recovery','technique','focus']);
+function fold(events:StoryCombatEvent[],state:CombatState):void{
+  const direct=new Set(['damage','miss','guard','move','recovery','focus','ability','effect','status']);
   for(let i=0;i<events.length;i++){
-    const ev=events[i];
-    if((ev.kind!=='momentum'&&ev.kind!=='fatigue')||
-      !ev.story?.detail||(ev.actor!=='player'&&ev.actor!=='enemy'))continue;
+    const e=events[i],who=e.actor;
+    if(!side(who)||!e.story||e.story.version!==2)continue;
+    if(!['momentum','fatigue','technique'].includes(e.kind))continue;
+    const id=word(facts(e).actionId);
     let found=-1;
-    if(ev.kind==='momentum'){
-      // A defender earns Momentum by checking a specific hit with Guard.
-      for(let j=i-1;j>=0;j--){
-        const prev=events[j];
-        if(prev.round!==ev.round)break;
-        if(prev.kind==='damage'&&prev.target===ev.actor&&prev.guarded===true){
-          found=j;break;
-        }
-        if(useful.has(prev.kind)&&prev.actor===ev.actor){
-          found=j;break;
-        }
+    if(e.kind==='fatigue'){
+      for(let j=i+1;j<events.length;j++){
+        const t=events[j];
+        if(t.round!==e.round)break;
+        if(t.actor!==who||!direct.has(t.kind))continue;
+        if(id&&facts(t).actionId!==id)continue;
+        found=j;break;
+      }
+    }else if(e.kind==='technique'){
+      for(let j=i+1;j<events.length;j++){
+        const t=events[j];
+        if(t.round!==e.round)break;
+        if(t.actor!==who||!(t.kind==='damage'||t.kind==='miss'))continue;
+        if(id&&facts(t).actionId!==id)continue;
+        // The committed ability must also be named on the result before
+        // hiding this separate technique event.
+        if(!word(facts(t).ability?.name)&&!word(t.ability))continue;
+        found=j;break;
       }
     }else{
-      // Fatigue is recorded before the action that spent the Stamina.
-      for(let j=i+1;j<events.length;j++){
-        const next=events[j];
-        if(next.round!==ev.round)break;
-        if(useful.has(next.kind)&&next.actor===ev.actor){found=j;break;}
+      for(let j=i-1;j>=0;j--){
+        const t=events[j];
+        if(t.round!==e.round)break;
+        if(id&&facts(t).actionId!==id)continue;
+        if(t.kind==='damage'&&t.target===who&&t.guarded===true){found=j;break;}
+        if(t.actor===who&&direct.has(t.kind)){found=j;break;}
       }
     }
-    if(found<0||!events[found].story)continue;
-    const target=events[found];
-    const suffix=ev.kind==='momentum'
-      ?' ('+(ev.actor==='player'?'You':state.enemy.name)+')':'';
-    const effect=ev.story.detail+suffix;
-    const before=target.story!.detail;
-    target.story={...target.story!,detail:before?before+' · '+effect:effect};
-    ev.story={...ev.story,hidden:true};
+    if(found<0)continue;
+    const target=events[found],from=e.story,to=target.story;
+    if(!to||to.version!==2||to.hidden)continue;
+    // Keep resource owners clear when folded beneath another fighter's hit.
+    const tag=e.kind==='momentum'&&target.actor!==who
+      ?' ('+(who==='player'?'You':state.enemy.name)+')':'';
+    const piece=from.detail;
+    if(!piece)continue;
+    target.story={...to,detail:(to.detail?to.detail+' · ':'')+piece+tag};
+    e.story={...from,hidden:true};
   }
 }
-
-/** Add action identity and a saved versioned story to ONLY this committed turn.
- * It is idempotent, and deliberately leaves all numeric engine fields alone.
+/** Do not change already-versioned entries. Save only newly committed facts.
+ * History controls deterministic variation; no random call is made.
  */
 export function narrateCommittedTurn(
   events:readonly CombatEvent[],chosen:CombatAction,
@@ -311,42 +358,36 @@ export function narrateCommittedTurn(
   previousHistory:readonly CombatEvent[]=[]
 ):StoryCombatEvent[]{
   const all=events.map((event):StoryCombatEvent=>{
-    let who=event.actor;
-    if(event.kind==='recovery'&&!who){
-      if(event.text.startsWith('You '))who='player';
-      else if(event.text.startsWith(state.enemy.name+' '))who='enemy';
-    }
-    if(who!=='player'&&who!=='enemy')return {...event};
-    const action=who==='player'?chosen:enemyIntent;
-    if(!action)return {...event,actor:who};
-    const direct=['damage','miss','guard','move','recovery','technique','focus'].includes(event.kind);
-    const defensiveOpening=event.kind==='tactical'&&who==='player'&&
-      chosen.type==='guard'&&event.text.includes('firm guard');
-    if(!direct&&!defensiveOpening)return {...event,actor:who};
+    const current={...event} as StoryCombatEvent;
+    if(current.story)return current;
+    if(!side(current.actor))return current;
+    const action=current.actor==='player'?chosen:enemyIntent;
+    if(!action)return current;
+    const direct=['damage','miss','guard','move','recovery','technique','focus'].includes(current.kind);
+    const defensiveOpening=current.kind==='tactical'&&current.actor==='player'&&
+      chosen.type==='guard'&&current.condition==='opening_gained';
+    if(!direct&&!defensiveOpening)return current;
     const type=action.type;
-    if(!['attack','technique','guard','move','recover','focus'].includes(type))
-      return {...event,actor:who};
-    const detail=('zone' in action&&typeof action.zone==='string')?action.zone:
+    if(!['attack','technique','guard','move','recover','focus'].includes(type))return current;
+    const part=('zone' in action&&typeof action.zone==='string')?action.zone:
       ('to' in action&&typeof action.to==='string')?action.to:
-        ('mode' in action&&typeof action.mode==='string')?action.mode:undefined;
-    const actionName=type==='technique'
-      ?('ability' in action&&typeof action.ability==='string'
-        ?action.ability:'Press Advantage'):undefined;
-    return {...event,actor:who,actionType:type,
-      ...(detail?{actionDetail:detail}:{}),
-      ...(actionName?{actionName}: {})};
+      ('mode' in action&&typeof action.mode==='string')?action.mode:undefined;
+    const actionName=type==='technique'&&'ability' in action&&typeof action.ability==='string'
+      ?action.ability:undefined;
+    return {...current,actionType:type,
+      ...(part?{actionDetail:part}:{}),...(actionName?{actionName}:{})};
   });
-  let previous='';
-  let slot=previousHistory.length;
+  const lines=previousHistory.slice(-12).map(e=>(e as StoryCombatEvent).story?.line).filter(
+    (x):x is string=>typeof x==='string');
+  let previous=lines.at(-1)||'';
+  let index=previousHistory.length;
   for(const event of all){
-    // Event metadata and saved history, not RNG, determine the variation.
-    const story=display(event,state,slot,previous);
-    if(story){
-      event.story=story;
-      previous=story.line;
+    if(!event.story){
+      const item=display(event,state,index+event.round,previous);
+      if(item){event.story=item;previous=item.line;}
     }
-    slot++;
+    index++;
   }
-  foldResourceDetails(all,state);
+  fold(all,state);
   return all;
 }

@@ -22,7 +22,9 @@ export type CombatActor = {
   bleed:number;bandages:number;guard:boolean;readiness:number;
   armHits?:number;armImpaired?:boolean;reloadSlowdownPercent?:number;
   weapon:{damage:number;accuracy:number;type:string;reach:string;
-    minDamage?:number;maxDamage?:number;guardMitigation?:number;unarmed?:boolean};
+    minDamage?:number;maxDamage?:number;guardMitigation?:number;unarmed?:boolean;
+    /** Display-only equipment name. Combat resolution never reads this field. */
+    label?:string};
 };
 export type CombatState = {
   id:string;scene:'flint'|'boar'|'silas'|'dogman';round:number;revision:number;rng:number;
