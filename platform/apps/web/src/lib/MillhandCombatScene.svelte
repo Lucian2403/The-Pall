@@ -488,8 +488,6 @@
         <span class="combat-float" class:missed={cue.kind === 'miss'} aria-hidden="true">{cue.label}</span>
       {/each}
     </section>
-
-    {/if}
   </div>
   {/snippet}
   </ActivityLayout>
