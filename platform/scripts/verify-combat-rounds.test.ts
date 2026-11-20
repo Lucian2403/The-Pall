@@ -42,7 +42,7 @@ test('two actual hits become one round card in the true event order',()=>{
    event('damage',{actor:'player',target:'enemy',damage:5,raw:5}),
    event('damage',{actor:'enemy',target:'player',damage:12,raw:12})];
  const result=summary(events,s);
- assert.match(result.line,/You hit Gutter Wolf.*Gutter Wolf hits you/);
+ assert.match(result.line,/You hit Gutter Wolf.*Gutter Wolf also hits you/);
  assert.doesNotMatch(result.line,/future warning/);
  assert.match(result.detail||'',/5 damage to Gutter Wolf · 12 damage to you/);
  assert.deepEqual(result.actions.map(x=>x.eventRef),[1,2]);

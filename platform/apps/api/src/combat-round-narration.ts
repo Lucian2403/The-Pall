@@ -117,11 +117,14 @@ function hitLine(s:CombatState,e:CombatEvent,previous?:CombatRoundStory,
    (who==='player'?'hit':'hits');
  const source=weapon(s,e),loc=part(e),namedAbility=ability(e);
  const count=recent?.hits.get(who)??0;
+ // Reusing an ability is a real past fact, even when other moves broke
+ // the hit streak. Only consecutive hits can be described as 'again'.
+ const abilityUses=repeatCount(history,e);
  let line:string;
  if(namedAbility){
-   if(count%3===1)
+   if(abilityUses%3===1)
      line=from+' '+active+' '+to+loc+source+' using '+namedAbility;
-   else if(count%3===2)
+   else if(abilityUses%3===2)
      line=from+(who==='player'?' use ':' uses ')+namedAbility+' to '+base+' '+to+loc+source;
    else line=from+(who==='player'?' use ':' uses ')+namedAbility+
      ' and '+active+' '+to+loc+source;
@@ -150,8 +153,11 @@ function missLine(s:CombatState,e:CombatEvent,
   history:readonly CombatRoundStory[]=[],recent?:RecentCombat):string{
  const who=actorId(e),from=label(s,e,who),to=object(s,e,destination(e));
  const spell=ability(e),count=recent?.misses.get(who)??0;
+ const abilityTries=repeatCount(history,e);
  if(e.reason==='out_of_reach')return period(spell
-   ?from+(who==='player'?' use ':' uses ')+spell+', but cannot reach '+to
+   ?abilityTries%2===1
+     ?from+(who==='player'?' try ':' tries ')+spell+', but '+to+' is out of reach'
+     :from+(who==='player'?' use ':' uses ')+spell+', but cannot reach '+to
    :from+' cannot reach '+to+(count?' again':''));
  if(e.reason==='old_position')return period(from+' attacks the place '+to+
    (to==='you'?' were':' was')+', but misses');
