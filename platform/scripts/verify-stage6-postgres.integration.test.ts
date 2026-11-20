@@ -571,6 +571,10 @@ test('Bellrunner Dogman Stage VI: authenticated start, saved stance, replay-safe
   assert.equal(record.rows[0].state.revision,1);
   assert.equal(record.rows[0].stance,stance);
   assert.ok(record.rows[0].history.length>0,'Committed battle events persisted');
+  assert.ok(record.rows[0].history.some((e:any)=>e.story?.version===1),
+    'Dogman must save the shared story with actual engine events');
+  assert.deepEqual((await request('GET',path)).body?.events,turn.body?.events,
+    'Dogman story wording and numbers must survive a reload');
   assert.equal((await request('GET',base+id+'/dev/rewind-stage')).body?.canRewind,true,
     'Local developer rewind restores receipt-backed HP even after combat starts');
   const rewritten=await request('POST',base+id+'/dev/rewind-stage',owner,{expectedStage:6});
@@ -1536,7 +1540,12 @@ test('Combat rules report exact unarmed ranges and saved Chronicle action identi
   const persisted=await request('GET',c.path);
   assert.equal(persisted.status,200);
   assert.deepEqual(persisted.body!.events,guarded.body!.events,
-    'Action metadata remains part of saved combat history across reloads');
+    'Action metadata and versioned story remain unchanged across reloads');
+  assert.ok(guarded.body!.turnEvents.some((e:any)=>e.story?.version===1),
+    'Flint must save the shared story inside the committed turn');
+  assert.ok(guarded.body!.turnEvents.every((e:any)=>!e.story||
+    typeof e.story.line==='string'),
+    'Every narrated Flint event retains a readable main sentence');
   const recovered=await turn(c,guarded.body!,{type:'recover',mode:'breath'});
   assert.equal(recovered.status,200,JSON.stringify(recovered.body));
   assert.ok(recovered.body!.turnEvents.some((e:any)=>

@@ -93,8 +93,13 @@ function hit(event:CombatEvent,state:CombatState,slot:number,last?:string):Comba
   }
   let line=variant(possibilities,slot,last);
   const opening=shown(event.openingDamageBonus);
-  if(opening!==null&&opening>0)
-    line=(isPlayer?'You use the opening. ':'The opening helps '+enemy+' strike. ')+line;
+  if(opening!==null&&opening>0){
+    // This bonus is the proof the Opening was actually used.
+    // Keep it in the same sentence, even when Guard also blocked damage.
+    const withWeapon=weapon?(isPlayer?' with your ':' with a ')+weapon:'';
+    line=isPlayer?'You take the opening and hit '+enemy+suffix+withWeapon+'.':
+      enemy+' takes the opening and hits you'+suffix+withWeapon+'.';
+  }
   const parts=[isPlayer?term(dmg,'damage'):term(dmg,'Health','−')];
   if(event.guarded===true){
     const raw=shown(event.raw);
@@ -278,7 +283,8 @@ export function narrateCommittedTurn(
       ?('ability' in action&&typeof action.ability==='string'
         ?action.ability:'Press Advantage'):undefined;
     return {...event,actor:who,actionType:type,
-      actionDetail:detail,actionName};
+      ...(detail?{actionDetail:detail}:{}),
+      ...(actionName?{actionName}: {})};
   });
   let previous='';
   let slot=previousHistory.length;

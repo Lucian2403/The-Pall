@@ -209,10 +209,11 @@ test('save and reload produce the same chronicle with no new rolls',()=>{
  const events=write(next,next.events,{type:'guard'},[]);
  const saved=JSON.stringify({state:{...next,events},history:events});
  const reloaded=JSON.parse(saved);
- assert.deepEqual(reloaded.history,events);
- assert.deepEqual(reloaded.state.events,events);
+ const exactJSON=JSON.parse(JSON.stringify(events));
+ assert.deepEqual(reloaded.history,exactJSON);
+ assert.deepEqual(reloaded.state.events,exactJSON);
  const replay=write(next,next.events,{type:'guard'},[]);
- assert.deepEqual(replay,events);
+ assert.deepEqual(JSON.parse(JSON.stringify(replay)),exactJSON);
 });
 
 test('a full real multi-round history reads in order with deterministic varied sentences',()=>{

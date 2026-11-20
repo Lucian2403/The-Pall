@@ -812,7 +812,7 @@
   .log-window li{display:flex;gap:12px;padding:7px 4px;border-bottom:1px solid #49392f;
     font:13px/1.35 Georgia,serif;color:#ecd1a8}
 
-  .combat-story{display:block;font:inherit;line-height:1.4}
+  .combat-story{display:block;flex:1 1 100%;font:inherit;line-height:1.4}
   .combat-story-detail{display:block;margin-top:3px;font:600 12px/1.4 var(--pall-font-reading,Georgia,serif);color:#d8b98e}
   .log-window li.impact .combat-story-detail{color:#edbaab}
   .log-window li.latest{background:#39291f;color:#ffdfb1;font-weight:700}
