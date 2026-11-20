@@ -35,6 +35,10 @@ import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.t
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
+import {backfillCharacterJournal} from '../apps/api/src/personal-journal-backfill.ts';
+import {INITIAL_PLATEWORK,advancePlatework,availableActions,INITIAL_MISSING_STAMP,
+ advanceMissingStamp,availableMissingStampActions,AUTHORED_MISSING_STAMP_EVIDENCE}
+ from '@the-pall/game-core';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -2824,33 +2828,39 @@ test('Personal Journal strictly isolates one account\'s Stitcher and Millhand jo
     "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health) VALUES($1,$2,'Millhand Journal Test',$3,'Male','Millhand','{\"Craftsmanship\":3,\"Industry\":1}'::jsonb,'[]'::jsonb,'Smithing workshop',1,'NOT_STARTED',50)",
     [b,owner,'millhand-journal-'+b]
   );
-  const work=base+b+'/millhand/work';
-  let mw=(await request('POST',work,owner,{action:'take_work_paper',
-    expectedRevision:0,requestId:randomUUID()})).body!;
-  assert.ok(mw.work,'Work must start before any archived record exists');
-  for(let count=0;count<24&&mw.work.phase!=='COMPLETE';count++){
-    const options=mw.availableActions as string[];
-    assert.ok(options.length,'Platework must expose a real legal action');
-    const choice=options.includes('straighten')?'straighten'
-      :options.includes('fix_mark')?'fix_mark':options[0];
-    const response=await request('POST',work,owner,{action:choice,
-      expectedRevision:mw.work.revision,requestId:randomUUID()});
-    assert.equal(response.status,200,choice+': '+JSON.stringify(response.body));
-    mw=response.body!;
+  // Run the actual saved-state reducers. The Millhand work routes use their
+  // own auth pool, so this harness persists their verified outputs and runs
+  // the same idempotent archive/backfill function as the migration.
+  let plate={...INITIAL_PLATEWORK};
+  for(let count=0;count<24&&plate.phase!=='COMPLETE';count++){
+   const actions=availableActions(plate);
+   assert.ok(actions.length,'Platework must expose a legal next step');
+   const action=actions.includes('straighten')?'straighten'
+     :actions.includes('fix_mark')?'fix_mark':actions[0];
+   plate=advancePlatework(plate,action);
   }
-  assert.equal(mw.work.phase,'COMPLETE');
-  let stamp=(await request('GET',base+b+'/millhand/missing-stamp')).body!;
-  for(let count=0;count<75&&stamp.stage!==4;count++){
-    const options=stamp.availableActions as string[];
-    assert.ok(options.length,'Missing Stamp must expose a real legal action');
-    const choice=options.includes('choose_contracts')?'choose_contracts':options[0];
-    const result=await request('POST',base+b+'/millhand/missing-stamp',owner,
-      {action:choice,expectedRevision:stamp.state.revision,requestId:randomUUID()});
-    assert.equal(result.status,200,choice+': '+JSON.stringify(result.body));
-    stamp=result.body!;
+  assert.equal(plate.phase,'COMPLETE');
+  let stamp={...INITIAL_MISSING_STAMP};
+  for(let count=0;count<75&&stamp.phase!=='SELECTED';count++){
+   const actions=availableMissingStampActions(stamp,AUTHORED_MISSING_STAMP_EVIDENCE);
+   assert.ok(actions.length,'Missing Stamp must expose a legal next step');
+   const action=actions.includes('choose_contracts')?'choose_contracts':actions[0];
+   stamp=advanceMissingStamp(stamp,action,AUTHORED_MISSING_STAMP_EVIDENCE);
   }
-  assert.equal(stamp.stage,4);
-  assert.equal(stamp.state.branch,'contracts');
+  assert.equal(stamp.phase,'SELECTED');
+  assert.equal(stamp.branch,'contracts');
+  const client=await db.connect();
+  try{
+   await client.query('BEGIN');
+   await client.query('INSERT INTO player_character_platework(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [b,plate.revision,JSON.stringify(plate)]);
+   await client.query('INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [b,stamp.revision,JSON.stringify(stamp)]);
+   await client.query("UPDATE player_characters SET tutorial_stage=4,tutorial_status='NOT_STARTED' WHERE id=$1",[b]);
+   await backfillCharacterJournal(client,{id:b,origin:'Millhand',tutorial_stage:4});
+   await client.query('COMMIT');
+  }catch(error){await client.query('ROLLBACK');throw error;}
+  finally{client.release();}
 
   const fetchJournal=async(id:string,principal:string|null=owner)=>
     request('GET',base+id+'/journal?limit=20',principal);
