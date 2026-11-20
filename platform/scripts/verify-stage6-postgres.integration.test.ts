@@ -34,6 +34,7 @@ import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes} from '../ap
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
+import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -80,6 +81,7 @@ registerBellrunnerClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
+registerPersonalJournalRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
