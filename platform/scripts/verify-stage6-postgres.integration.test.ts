@@ -2874,6 +2874,11 @@ test('Personal Journal strictly isolates one account\'s Stitcher and Millhand jo
       stage:2,title:'Shared Repair',paragraphs:['I finished my own repair.']
     });
    }
+   // Repeated completion cannot edit the first immutable diary snapshot.
+   await archiveJournalTask(shared,{
+    characterId:a.id,taskId:'test.shared-repair',taskInstanceId:'test:shared-repair',
+    stage:2,title:'Should Never Replace',paragraphs:['This must not overwrite.']
+   });
    await shared.query('COMMIT');
   }catch(error){await shared.query('ROLLBACK');throw error;}
   finally{shared.release();}
@@ -2901,6 +2906,7 @@ test('Personal Journal strictly isolates one account\'s Stitcher and Millhand jo
     'Two characters can complete the same task instance without collision');
   assert.equal(ae.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
   assert.equal(be.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
+  assert.equal(ae.find((x:any)=>x.taskId==='test.shared-repair').title,'Shared Repair');
 
   // Change characters repeatedly, then "reload" from the persisted database.
   assert.deepEqual((await fetchJournal(b)).body!.completed,be);
