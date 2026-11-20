@@ -1,6 +1,8 @@
 /** Canonical task identity + diary copy used for live archival and legacy
  * reconstruction. No stage transitions, grants or independent completion logic. */
 import type {PlateworkState,MissingStampState,SecondJobState} from '@the-pall/game-core';
+import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
+import {combatJournal,combatOpening,type DiaryEncounter} from '../../web/src/lib/combat-journal-copy.js';
 import {AUTHORED_MISSING_STAMP_EVIDENCE,validateMissingStampEvidence} from '@the-pall/game-core';
 import type {StitcherState} from './stitcher-work.js';
 import type {StageFourState} from './bellrunner-second-job-work.js';
@@ -56,4 +58,18 @@ export function bellrunnerSecondJobTask(characterId:string,s:StageFourState):Com
  return {...identity(characterId,4),taskId:'bellrunner.second-job',
   title:BELLRUNNER_STAGE_FOUR[s.branch].title,
   paragraphs:bellrunnerStageFourJournal(s),choices:{route:s.branch}};
+}
+
+export function combatTask(
+ characterId:string,encounter:DiaryEncounter,s:CombatState
+):CompletedJournalTask{
+ if(s.status!=='finished'||(s.outcome!=='player_victory'&&s.outcome!=='player_defeat'))
+  throw new Error('journal_requires_committed_combat_outcome');
+ const tough=s.player.hp<=s.player.hpMax/2||
+  s.player.wounds.some(wound=>wound.severity==='serious');
+ const title=encounter==='owler'?'The Fight with Owler'
+  :encounter==='dogman'?'The Fight with Dogman':'The Fight with Flint';
+ return {...identity(characterId,6),taskId:encounter+'.combat',
+  title,paragraphs:[combatOpening(encounter),combatJournal(encounter,s.outcome,tough)],
+  outcome:s.outcome};
 }
