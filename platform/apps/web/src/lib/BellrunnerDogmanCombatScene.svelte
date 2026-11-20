@@ -1,6 +1,6 @@
 <script lang="ts">
   import {getContext} from 'svelte';
-  import {combatJournal} from '$lib/combat-journal-copy';
+  import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
@@ -477,7 +477,7 @@
       </header>
       <div class="journal-entries">
         {#if ended}
-          <p>Dogman blocked my way and tried to take my papers. I told him to get lost. He pulled out his club, and that was that.</p>
+          <p>{combatOpening('dogman')}</p>
           <p>{journal}</p>
         {:else}
           <p>The fight with Dogman is still going on. I haven't recorded how it ends.</p>
