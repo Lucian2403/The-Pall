@@ -2669,7 +2669,7 @@ test('Owler turn is owner-scoped, replay-safe and preserves the Chronicle event 
 });
 
 test('Owler victory and defeat are real, and either outcome saves the patient',async()=>{
- for(const [mode,health] of [['victory',500],['defeat',1]] as const){
+ for(const [mode,health] of [['victory',50],['defeat',1]] as const){
   const c=await stitcherAtNightDoor('reason','notes',true,health);
   let state=(await request('POST',c.path,owner,{kind:'start',requestId:randomUUID()})).body!;
   if(mode==='victory'){
