@@ -10,6 +10,7 @@ import {
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import {clinicJournalEntries} from '../apps/web/src/lib/clinic-journal-copy.ts';
 import {clinicTask} from '../apps/api/src/personal-journal-tasks.ts';
+import {clinicHref,FINALE_ORIGINS} from '../apps/web/src/lib/shared-finale-origins.ts';
 import {
   clinicianAssessment,clinicianDischarge,clinicianFatigue
 } from '../apps/web/src/lib/millhand-clinic-dialogue.ts';
@@ -233,7 +234,8 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(web.includes('Review the price'));
   assert.ok(web.includes('Pay 10 coins'));
   assert.ok(clinician.includes('No injuries found. No treatment needed.'));
-  assert.ok(battle.includes('Continue to medical care'));
+  assert.ok(battle.includes('<CombatClinicContinuation {characterId} {origin}/>'));
+  assert.ok(source('apps/web/src/lib/CombatClinicContinuation.svelte').includes('Continue to medical care'));
   const shared=source('apps/web/src/lib/pall-owner-ui.css');
   const wage=source('apps/web/src/lib/MillhandWageClaimScene.svelte');
   assert.ok(web.includes('class="pall-framed-button advance primary-choice"'));
@@ -312,5 +314,30 @@ test('Shared Stage VII Journal is phase-aware and archives the exact character r
     assert.equal(archive.taskInstanceId,'tutorial:stage:7');
     assert.deepEqual(archive.paragraphs,read(),'Live and completed are one copy function');
     assert.ok(origin!=='Stitcher'||archive.paragraphs.join(' ').includes('Owler'));
+  }
+});
+
+test('One background-independent Stage VI continuation serves every saved finale origin',()=>{
+  const control=source('apps/web/src/lib/CombatClinicContinuation.svelte');
+  const millhand=source('apps/web/src/lib/MillhandCombatScene.svelte');
+  const dogman=source('apps/web/src/lib/BellrunnerDogmanCombatScene.svelte');
+  const sharedTag='<CombatClinicContinuation {characterId} {origin}/>';
+  assert.ok(control.includes('href={clinicHref(characterId,origin)}'));
+  assert.ok(control.includes('Continue to medical care'));
+  assert.ok(control.includes('pointer-events:auto'));
+  for(const scene of [millhand,dogman]){
+    assert.equal(scene.split(sharedTag).length-1,1,'One continuation per finished scene');
+    assert.ok(scene.includes(sharedTag+'\n        {:else}'),
+      'The CTA must be outside outcome-specific conditions and inside finished combat');
+    assert.ok(!scene.includes('/millhand/clinic')&&!scene.includes('/bellrunner/clinic')&&
+      !scene.includes('/stitcher/clinic'),'Scene markup cannot hardcode origin routes');
+  }
+  for(const origin of Object.keys(FINALE_ORIGINS) as (keyof typeof FINALE_ORIGINS)[]){
+    const path=origin.toLowerCase();
+    const page=source('apps/web/src/routes/characters/[id]/'+path+'/combat/+page.svelte');
+    assert.ok(page.includes('origin={character.origin}'),
+      'The persisted character chooses the clinic for '+origin);
+    assert.equal(clinicHref('player id',origin),
+      '/characters/player%20id/'+FINALE_ORIGINS[origin].clinicPath);
   }
 });

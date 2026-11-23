@@ -85,11 +85,12 @@ test('Both origins reuse one clinic API, state table, paid transaction and UI',(
   assert.ok(web.includes('FINALE_ORIGINS[origin].clinicPath'));
   assert.ok(web.includes("playCoinTransactionSfx()"));
   assert.ok(web.includes("origin==='Millhand'"));
-  assert.ok(combat.includes("'/bellrunner/clinic'"));
+  assert.ok(combat.includes('<CombatClinicContinuation {characterId} {origin}/>'));
   // The transition inherits the actual Millhand nine-slice primary frame,
   // not a one-off dark CSS rectangle.
-  assert.ok(combat.includes('class="pall-story-dialogue-section combat-outcome-actions"'));
-  assert.ok(combat.includes('class="pall-framed-button primary-choice clinic-transition"'));
+  const continuation=read('apps/web/src/lib/CombatClinicContinuation.svelte');
+  assert.ok(continuation.includes('class="pall-story-dialogue-section combat-outcome-actions"'));
+  assert.ok(continuation.includes('class="pall-framed-button primary-choice clinic-transition"'));
   assert.ok(!combat.includes('background:#3b291a'));
   const nineSlice=read('apps/web/src/lib/pall-story-landscape.css');
   assert.ok(nineSlice.includes("url('/ui-kit/buttons/button-normal-trim.png')"));

@@ -75,9 +75,8 @@ assert.ok(scene.includes('snapshot.enemyIntent') &&
   scene.includes('snapshot.rules') &&
   scene.includes('snapshot.player.wounds.some') &&
   scene.includes('snapshot.outcome') &&
-  scene.includes('Continue to medical care') &&
-  scene.includes("clinicHref(characterId,isOwler?'Stitcher':'Millhand')") &&
-  scene.includes("import {clinicHref} from '$lib/shared-finale-origins'"),
+  scene.includes('<CombatClinicContinuation {characterId} {origin}/>') &&
+  scene.includes("import CombatClinicContinuation from '$lib/CombatClinicContinuation.svelte'"),
   'Combat must route to the real, origin-specific shared Clinic without duplicating its screen');
 assert.ok(view.includes('TEST_CONFIG')&&view.includes('testAttackCost'));
 assert.ok(mig.includes('player_character_flint_combat_receipts')&&mig.includes('history JSONB'));
@@ -580,8 +579,11 @@ const wageScene=read('apps/web/src/lib/MillhandWageClaimScene.svelte');
 assert.ok(
   scene.includes('.stage-scenery{position:absolute;inset:0;pointer-events:none}') &&
   scene.includes('pointer-events:auto;filter:drop-shadow(0 6px 10px #0008)') &&
-  scene.includes('<a class="pall-framed-button clinic-link" href=') &&
-  scene.includes('.clinic-link{position:relative;z-index:1;') &&
+  scene.includes('<CombatClinicContinuation {characterId} {origin}/>') &&
+  read('apps/web/src/lib/CombatClinicContinuation.svelte').includes(
+    'href={clinicHref(characterId,origin)}') &&
+  read('apps/web/src/lib/CombatClinicContinuation.svelte').includes(
+    'class="pall-framed-button primary-choice clinic-transition"') &&
   wageScene.includes('<a class="pall-framed-button combat-link primary-choice" href=') &&
   framedStyles.includes('.pall-framed-button {') &&
   framedStyles.includes("url('/ui-kit/buttons/button-normal-trim.png')") &&

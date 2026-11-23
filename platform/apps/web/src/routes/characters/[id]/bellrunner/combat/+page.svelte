@@ -3,6 +3,7 @@
   import {goto} from '$app/navigation';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import BellrunnerDogmanCombatScene from '$lib/BellrunnerDogmanCombatScene.svelte';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatSnapshot} from '$lib/millhand-combat-model';
@@ -12,7 +13,7 @@
   import {floatingFeedbackForSavedTurn} from '$lib/millhand-combat-feedback';
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
 
-  type Character={id:string;name:string;origin:string;sex:string;
+  type Character={id:string;name:string;origin:FinaleOrigin;sex:string;
     avatarId?:string|null;coins:number;health:{current:number;maximum:number};
     startingLocation:string;tutorial:{stage:number;status:string}};
   type Snapshot=CombatSnapshot;
@@ -118,7 +119,7 @@
   <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}
     {backToStageFive} travelLocked={battle.status==='active'}
     combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}>
-    <BellrunnerDogmanCombatScene snapshot={battle} characterId={id} {feedback} {pending} {errorMessage} {perform}/>
+    <BellrunnerDogmanCombatScene snapshot={battle} characterId={id} {feedback} {pending} {errorMessage} {perform} origin={character.origin}/>
   </TutorialShell>
 {:else}
   <main class="fallback">
