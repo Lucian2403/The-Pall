@@ -374,3 +374,54 @@ export function dogmanCombatJournal(snapshot:JournalCombatView):string{
       ? "I got past him, but he landed a few good hits. Bastard was quicker than he looked. He finally backed off when he realised he couldn't stop me. At least I kept my papers.\nThe factory's still shut, the night shift's still being called in, and I've no idea who's going to answer for any of it."
       : "Dogman tried to stop me with that thin club. I managed to drive him back and get through the passage. I've still got my bag and route sheet. I don't imagine the Shift Marshal will be pleased, but that doesn't make Dogman a city guard.";
 }
+
+/** Original clinic diary copy shared by client and authoritative completion. */
+export type ClinicJournalView={paid:boolean;conditionType:'unhurt'|'cut'|'other';outcome:'player_victory'|'player_defeat'};
+export function clinicJournal(origin:'Millhand'|'Bellrunner',clinic:ClinicJournalView|null):string{
+ return origin==='Bellrunner'
+    ?clinic?.paid
+      ?clinic.conditionType==='unhurt'
+        ?"After Dogman, the clinician found no injuries. Ten coins for the examination, even though I needed no treatment. My papers are safe, and I've ten coins left."
+        :"The clinic examined the injuries I took in the fight with Dogman and provided the basic care I needed. It cost ten coins. I've still got my bag and papers."
+      :clinic?.outcome==='player_defeat'
+        ?"After Dogman knocked me down, a passerby helped me reach the city clinic. I've still got my papers. I'd better have my condition checked."
+        :"I got past Dogman and walked to the city clinic. He didn't take my papers. I'll have myself checked before going home."
+    :clinic?.paid
+      ?clinic?.conditionType==='unhurt'
+        ?"They couldn't find anything wrong with me. Good. Still cost ten coins just to be examined. Half my money gone, and I haven't earned a thing today."
+        :clinic?.conditionType==='cut'
+          ?"The clinician checked me over and treated what they could. Ten coins for the examination and care. I needed the help, but that's half my money gone. Still nothing paid for the council work."
+          :"The clinician examined what the fight had done to me. Ten coins for the examination and getting me fit to leave. Half my money gone, and still nothing earned from the council."
+      :"Made it to the clinic after the fight with Flint. I've not got much money left, but I ought to get checked.";
+}
+
+/** Exact saved home diary copy, shared with completed Stage VIII archive. */
+export type HomeJournalView={origin:'Millhand'|'Bellrunner';branch:'restamp'|'contracts'|'records'|'trauma'|'machinery';outcome:'player_victory'|'player_defeat'};
+export function homeJournal(home:HomeJournalView|null){
+ const routeEntry=home?.origin==='Bellrunner'
+    ?home.branch==='contracts'
+      ?"The register called workers who refused the condemned building voluntarily absent. They lost their wages for staying out."
+      :home.branch==='trauma'
+        ?"The medical register called the workers' complaints non-work illness. They were left paying for their own treatment."
+        :home.branch==='machinery'
+          ?"The safety shutoff was engaged, but the bell linkage was left connected. Someone moved that retaining pin. I don't know who."
+          :null
+    :home?.branch==='restamp'
+      ?'The depot recorded metal plates, though the original manifest called them a transfer of workers.'
+      :home?.branch==='contracts'
+        ?'Two contradictory official classifications were sealed for the same dead worker number. I lodged an objection.'
+        :home?.branch==='records'
+          ?'The cancelled worker number appears in a later wage tally. A correction in the records had been scraped away.':null;
+ const combatEntry=home?.origin==='Bellrunner'
+    ?home.outcome==='player_victory'
+      ?"Dogman tried to take my papers, but he backed off when I got past him. I've still got them."
+      :"Dogman knocked me down by the service gate and tried to get into my bag. Luckily, some workers came down the street, and the bastard cleared off. A passerby helped me to the clinic. At least I've still got my route sheet."
+    :home?.outcome==='player_victory'
+      ?'Flint backed away from the passage after our fight.'
+      :home?.outcome==='player_defeat'
+        ?'Flint beat me. Another worker helped me get to the clinic.':null;
+ const homeJournalIntro=home?.origin==='Bellrunner'
+    ?"Home at last. Ten coins left after the clinic, and now I've got a rent notice demanding a hundred and fifty. Two jobs done, not a bloody coin earned. And after everything that's happened today, I'm lucky to be home at all. I need to find work that actually pays."
+    :"Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.";
+ return {routeEntry,combatEntry,homeJournalIntro};
+}
