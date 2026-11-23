@@ -243,7 +243,7 @@
                 <button class="pall-framed-button" type="button" data-pall-sfx="paper"
                   onclick={closeRoomOverlay}>Close journal</button>
               </header>
-              <div class="journal-body">
+              <div class="journal-body" id="home-current-journal">
                 <h3>Current</h3>
                 <p>{homeJournalIntro}</p>
                 {#if routeEntry}<p>{routeEntry}</p>{/if}
@@ -251,7 +251,8 @@
               </div>
               {#if character}
                 {#key character.id}
-                  <PersonalJournalHistory characterId={character.id} open={journalOpen}/>
+                  <PersonalJournalHistory characterId={character.id} open={journalOpen}
+                    currentJournalId="home-current-journal"/>
                 {/key}
               {/if}
             </section>
