@@ -2896,8 +2896,8 @@ test('two characters on one account never share their Personal Journals',async()
  assert.equal(page2.body?.tasks.length,2);
  assert.ok(page2.body?.tasks.every((x:any)=>x.stage>=3));
  const crossCursor=await request('GET',journalB+'?limit=5&cursor='+encodeURIComponent(two.body!.nextCursor));
- assert.equal(crossCursor.status,200);
- assert.ok(crossCursor.body!.tasks.every((x:any)=>!x.title.includes('Dressings')));
+ assert.equal(crossCursor.status,400,'A cursor from A must not paginate B');
+ assert.equal(crossCursor.body?.error,'invalid_cursor');
 
  // A's developer rewind may invalidate A's Stage IV only. Not B's task
  // with the same task ID and NEVER B's stored prose.
