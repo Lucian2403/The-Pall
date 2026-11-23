@@ -23,3 +23,6 @@ export type {SecondJobState,SecondJobPhase,SecondJobAction,SecondJobChoice} from
 
 export {WAGE_CLAIM_ACTIONS,WAGE_CLAIM_DIALOGUE_COUNTS,initialWageClaim,availableWageClaimActions,previousWageClaim,advanceWageClaim,WageClaimInvalidAction} from './millhand-wage-claim.js';
 export type {WageClaimState,WageClaimPhase,WageClaimAction,WageClaimApproach,WageClaimStance} from './millhand-wage-claim.js';
+
+export {stageTwoJournal,missingStampJournal,secondJobJournal,stage5JournalEntries,bellrunnerStageFourJournal,stitcherWardJournal} from './journal-copy.js';
+export type {Stage5JournalInput,BellrunnerJournalState,StitcherJournalState,ReadableMissingStampEvidence} from './journal-copy.js';
