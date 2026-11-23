@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {getContext,tick} from 'svelte';
+  import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {PlateworkState, PlateworkAction} from '@the-pall/game-core';
   import {WORK_ACTION_OBJECT} from '@the-pall/game-core';
@@ -33,18 +33,11 @@
   const instruction = $derived(PHASE_INSTRUCTION[work.phase]);
   const observation = $derived(selected ? observeObject(selected,work) : null);
   const journalEntries=$derived(stageTwoJournal(work));
-  let journalOpen=$state(false);
-  let journalElement:HTMLElement|undefined;
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'stage-two-journal',open:journalOpen,title:"Marking the Plates",entries:journalEntries,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:'Marking the Plates',entries:journalEntries});
     return ()=>registerSceneJournal?.(null);
   });
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
 
   async function commitAction(action: PlateworkAction) {
     if (!available.includes(action) || pending) return;
@@ -137,19 +130,7 @@
   {/snippet}
   </ActivityLayout>
   <p class="footnote">The council has not paid for this work. The tools and metal remain at the workshop.</p>
-  {#if journalOpen}
-    <section class="stage-two-journal" id="stage-two-journal"
-      bind:this={journalElement} aria-label="Marking the Plates personal journal">
-      <header class="journal-head">
-        <div><small>PERSONAL JOURNAL</small><h2>Marking the Plates</h2></div>
-        <button type="button" class="journal-close" data-pall-sfx="paper"
-          onclick={()=>{void toggleJournal();}}>Close journal</button>
-      </header>
-      <div class="journal-entries">
-        {#each journalEntries as entry,i (i)}<p>{entry}</p>{/each}
-      </div>
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -193,17 +174,6 @@
   .small{font-size:14px;line-height:1.45;color:#614e39}
   .error{font:13px/1.45 sans-serif;color:#873523}
   .footnote{padding:9px 14px;background:#201c17;border-top:1px solid #594229;color:#cbb8a0;font:12px/1.5 sans-serif;margin:0}
-  .stage-two-journal{background:#e6d5b5;color:#24160e;padding:23px clamp(16px,3vw,45px);
-    border-top:2px solid #94704a;scroll-margin-top:65px}
-  .journal-head{max-width:960px;display:flex;justify-content:space-between;
-    gap:12px;align-items:center;margin:0 auto 15px}
-  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif)}
-  .journal-head h2{margin:4px 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .journal-close{background:#e5d1ae;border:1px solid #906c49;cursor:pointer;
-    padding:7px 12px;color:#352414;font:600 14px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .journal-close:is(:hover,:focus-visible){background:#f6e4c3}
-  .journal-entries{max-width:960px;margin:0 auto}
-  .journal-entries p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 10px}
   /* Narrow stage: the original 4:3 close crop keeps the tools tappable. */
   @container activity-stage (max-width:600px){
     .illustration{aspect-ratio:4 / 3}

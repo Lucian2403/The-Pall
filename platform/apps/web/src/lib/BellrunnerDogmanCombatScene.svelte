@@ -1,5 +1,6 @@
 <script lang="ts">
   import {getContext} from 'svelte';
+
   import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
@@ -33,23 +34,10 @@
   function openFatigueInfo(){
     if(fatigueInfoDialog&&!fatigueInfoDialog.open)fatigueInfoDialog.showModal();
   }
-  let journalOpen=$state(false);
-  let journalDialog=$state<HTMLDialogElement|undefined>(undefined);
-  function toggleJournal(){
-    journalOpen=!journalOpen;
-  }
+
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
-  // The journal is a top-layer, keyboard-accessible modal at any viewport
-  // width. Do not automatically cover the saved combat outcome on victory.
   $effect(()=>{
-    const dialog=journalDialog;
-    if(!dialog)return;
-    if(journalOpen&&!dialog.open)dialog.showModal();
-    else if(!journalOpen&&dialog.open)dialog.close();
-  });
-  $effect(()=>{
-    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:'The Fight with Dogman',entries:ended?[]:[combatOpening('dogman')],
-      toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:'The Fight with Dogman',entries:ended?[combatOpening('dogman'),journal]:["The fight with Dogman is still going on. I haven't recorded how it ends."]});
     return ()=>registerSceneJournal?.(null);
   });
 
@@ -464,27 +452,7 @@
   </div>
   {/snippet}
   </ActivityLayout>
-  <dialog id="combat-personal-journal" class="journal-dialog" bind:this={journalDialog}
-    aria-labelledby="dogman-journal-heading" onclose={()=>journalOpen=false}>
-    <section class="aftermath" aria-label="The Fight with Dogman personal journal">
-      <header class="journal-head">
-        <div>
-          <small>PERSONAL JOURNAL</small>
-          <h2 id="dogman-journal-heading">The Fight with Dogman</h2>
-        </div>
-        <button type="button" class="journal-close" data-pall-sfx="paper"
-          onclick={()=>journalOpen=false} aria-label="Close personal journal">Close journal</button>
-      </header>
-      <div class="journal-entries">
-        {#if ended}
-          <p>{combatOpening('dogman')}</p>
-          <p>{journal}</p>
-        {:else}
-          <p>The fight with Dogman is still going on. I haven't recorded how it ends.</p>
-        {/if}
-      </div>
-    </section>
-  </dialog>
+
 </section>
 
 {#if snapshot.rules.fatigue}
@@ -784,31 +752,8 @@
   }
   /* The personal journal uses a centred viewport dialog, not the skinny
      chronicle column. It remains readable at 1366px and on narrow screens. */
-  .journal-dialog{box-sizing:border-box;width:min(820px,calc(100vw - 32px));
-    max-width:820px;max-height:calc(100dvh - 56px);margin:auto;padding:0;
-    overflow:auto;overscroll-behavior:contain;border:2px solid #8f6c46;
-    background:#e6d5b5;color:#24160e;box-shadow:0 20px 75px #000c}
-  .journal-dialog::backdrop{background:#0d0b09b8}
-  .aftermath{background:#e6d5b5;color:#24160e;
-    padding:clamp(22px,4vw,42px)}
-  .journal-head{display:flex;align-items:start;justify-content:space-between;
-    gap:20px;max-width:960px;margin:0 auto 15px}
-  .journal-close{flex:none;cursor:pointer;padding:7px 13px;
-    background:#3a2a1b;color:#f1d8b2;border:1px solid #aa7841;
-    font:600 13px/1.3 var(--pall-font-reading,Georgia,serif)}
-  .journal-close:hover,.journal-close:focus-visible{background:#634126;
-    outline:2px solid #d0a678;outline-offset:2px}
   @media(max-width:500px){
-    .journal-head{flex-wrap:wrap;gap:12px}
-    .journal-close{min-height:40px}
   }
-  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.09em;color:#47301d}
-  .journal-head h2{margin:4px 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
-    color:#25170f}
-  .journal-entries{max-width:960px;margin:0 auto}
-  .journal-entries p{margin:0 0 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
-    color:#24160e}
 
   @media(max-width:1220px){
     .enemy-status{left:1.5%;width:min(28%,280px);min-width:230px}

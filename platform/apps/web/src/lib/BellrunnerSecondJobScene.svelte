@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {getContext,tick} from 'svelte';
+  import {getContext} from 'svelte';
+
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import BellrunnerChoiceIcon from '$lib/BellrunnerChoiceIcon.svelte';
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
@@ -42,18 +43,12 @@
     :state.branch==='trauma'&&['confirm','choose','revelation','finish'].includes(state.phase)
       ?'The Medical Register':copy.title);
   const actions=$derived(snapshot.availableActions);
-  let journalOpen=$state(false);
-  let journalElement:HTMLElement|undefined;
   const registerJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerJournal?.({id:'bellrunner-second-job-journal',open:journalOpen,title:copy.title,entries:journal,
-      toggle:()=>{void toggleJournal();}});
+    registerJournal?.({title:copy.title,entries:journal});
     return ()=>registerJournal?.(null);
   });
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    if(journalOpen){await tick();journalElement?.scrollIntoView({block:'start',behavior:'smooth'});}
-  }
+
   function act(action:StageFourAction){if(!pending&&actions.includes(action))void perform(action);}
 </script>
 
@@ -150,24 +145,7 @@
       </section>
     {/snippet}
   </ActivityLayout>
-  {#if journalOpen}
-    <section id="bellrunner-second-job-journal" class="journal-panel"
-      bind:this={journalElement} aria-label={'Personal journal — '+copy.title}>
-      <header class="journal-heading">
-        <div>
-          <span class="journal-kicker">PERSONAL JOURNAL</span>
-          <h2>{copy.title}</h2>
-        </div>
-        <button type="button" class="journal-toggle" data-pall-sfx="paper"
-          onclick={()=>{void toggleJournal();}}>Close journal</button>
-      </header>
-      <div class="journal-entries">
-        {#each journal as entry,i (i)}
-          <p>{entry}</p>
-        {/each}
-      </div>
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -197,24 +175,5 @@
   /* Match the original Millhand Stage 3 journal panel. Typography
      (New Standard 16px/600, title 24px/600, Bebas label 14px/700)
      comes from the shared pall-owner-ui.css, not a Bellrunner override. */
-  .journal-panel{width:100%;box-sizing:border-box;
-    padding:19px clamp(16px,4vw,46px) 25px;background:#e8d6b6;
-    color:#24160e;border-top:2px solid #9a7147;
-    font-synthesis:weight;scroll-margin-top:56px}
-  .journal-heading{display:flex;align-items:center;justify-content:space-between;
-    gap:15px;max-width:930px;margin:0 auto 15px}
-  .journal-heading h2{margin:6px 0 0}
-  .journal-entries{max-width:930px;margin:0 auto}
-  .journal-entries p{margin:9px 0}
-  .journal-toggle{box-sizing:border-box;min-height:40px;padding:3px 8px;
-    border:solid transparent;border-width:10px 17px 9px;
-    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
-    border-image-slice:50 180 45 180 fill;border-image-width:10px 17px 9px;
-    border-image-repeat:stretch;border-radius:0;background:transparent;
-    color:#2e1d11;cursor:pointer}
-  .journal-toggle:is(:hover,:focus-visible){
-    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');color:#24170d}
-  .journal-toggle:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
-  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   @container activity-panel (max-width:480px){.work-card{padding:18px 15px}}
 </style>

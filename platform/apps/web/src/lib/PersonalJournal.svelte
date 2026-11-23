@@ -73,7 +73,7 @@
 <section id="personal-journal" class="personal-journal" aria-label="Personal Journal"
   tabindex="-1" bind:this={section}>
   <header class="journal-head">
-    <div><small>PERSONAL JOURNAL</small><h2>{tab==='current'?currentTitle:'Completed Tasks'}</h2></div>
+    <div><small>PERSONAL JOURNAL</small><h2>{tab==='current'?'Current Tasks':'Completed Tasks'}</h2></div>
   </header>
   <div class="journal-tabs" role="group" aria-label="Journal sections">
     <button type="button" class:chosen={tab==='current'} aria-pressed={tab==='current'}
@@ -82,18 +82,7 @@
       onclick={()=>tab='completed'}>Completed Tasks</button>
   </div>
   <div class="ornament-rule" aria-hidden="true">✥</div>
-  {#if tab==='current'}
-    <div class="reading-area" aria-label="Current task journal">
-      <h3 class="sr-only">{currentTitle}</h3>
-      {#if currentEntries.length}
-        {#each currentEntries as paragraph,index (index)}
-          <p>{paragraph}</p>
-        {/each}
-      {:else}
-        <p>Nothing has been recorded for this task yet.</p>
-      {/if}
-    </div>
-  {:else}
+  {#if tab==='completed'}
     <div class="completed-area" aria-label="Completed task history">
       {#if completed.length}
         <nav class="task-list" aria-label="Completed tasks">
@@ -108,15 +97,27 @@
       {:else if !loading&&!error}
         <p>No completed tasks yet.</p>
       {/if}
-      {#if selected}
-        <article class="reading-area" aria-label={selected.title+' journal entry'}>
-          <small>COMPLETED · STAGE {selected.stage}</small>
-          <h3>{selected.title}</h3>
-          {#each selected.paragraphs as paragraph,index (index)}
-            <p>{paragraph}</p>
-          {/each}
-        </article>
+    </div>
+  {/if}
+  {#if tab==='current'||selected}
+    <!-- The only diary reader. Both tabs share identical text styles. -->
+    <article id="journal-reading" class="reading-area journal-reading"
+      aria-label={tab==='current'?'Current task journal':selected?.title+' journal entry'}>
+      {#if tab==='completed'&&selected}
+        <small>COMPLETED · STAGE {selected.stage}</small>
       {/if}
+      <h3>{tab==='current'?currentTitle:selected?.title}</h3>
+      {#if tab==='current'&&!currentEntries.length}
+        <p>Nothing has been recorded for this task yet.</p>
+      {:else}
+        {#each (tab==='current'?currentEntries:selected?.paragraphs??[]) as paragraph,index (index)}
+          <p>{paragraph}</p>
+        {/each}
+      {/if}
+    </article>
+  {/if}
+  {#if tab==='completed'}
+    <div class="completed-area">
       {#if error}<p role="alert">{error}</p>{/if}
       {#if loading}<p role="status">Reading saved entries…</p>{/if}
       {#if nextCursor&&!loading}
@@ -152,14 +153,14 @@
     border:1px solid rgba(105,75,43,.5);border-radius:7px;
   }
   .journal-head,.journal-tabs,.completed-area{max-width:1150px;margin-inline:auto}
-  .journal-head{margin-bottom:22px}
+  .journal-head{margin-bottom:15px}
   .journal-head small{
     font:700 14px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
     letter-spacing:.19em;color:#60462d;
   }
-  h2{font:600 clamp(29px,3.1vw,43px)/1.16 var(--pall-font-reading,Georgia,serif);
+  h2{font:600 clamp(23px,2.2vw,29px)/1.2 var(--pall-font-reading,Georgia,serif);
     margin:6px 0 0}
-  h3{font:600 clamp(23px,2.5vw,34px)/1.24 var(--pall-font-reading,Georgia,serif);
+  h3{font:600 clamp(19px,1.7vw,23px)/1.3 var(--pall-font-reading,Georgia,serif);
     margin:7px 0 18px}
   p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:9px 0 14px}
   .journal-tabs{display:flex;gap:10px;flex-wrap:wrap}
@@ -186,7 +187,9 @@
     background:linear-gradient(90deg,transparent,var(--journal-rule) 9%,
       var(--journal-rule) 91%,transparent);
   }
-  .reading-area{max-width:930px;margin-inline:auto}
+  .reading-area{box-sizing:border-box;max-width:930px;width:100%;margin:24px auto 0;padding-top:15px}
+  .reading-area p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 12px}
+  .reading-area small{display:block;margin-bottom:11px;font:700 12px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.1em;color:#59432d}
   .completed-area{min-width:0}
   .task-list{display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
   .task-list button{
@@ -210,15 +213,8 @@
     font:italic 16px/1.3 var(--pall-font-reading,Georgia,serif);color:#5e442c;
   }
   .task-list button.chosen span{color:#f4e0bc}
-  .completed-area > .reading-area{
-    padding:24px 0 0;margin-top:28px;border-top:1px solid rgba(142,101,57,.7);
-  }
-  .completed-area > .reading-area small{
-    display:block;margin:0 0 18px;
-    font:700 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.17em;color:#59432d;
-  }
-  .completed-area > .reading-area p{margin-bottom:16px}
+  .completed-area + .journal-reading{margin-top:25px;padding-top:17px;
+    border-top:1px solid rgba(142,101,57,.7)}
   .load-more{
     display:inline-flex;align-items:center;margin-top:12px;padding:10px 18px;
     min-height:44px;border:1px solid #93714a;border-radius:3px;
@@ -236,7 +232,7 @@
     .task-list button{align-items:flex-start;flex-direction:column;gap:5px}
     .task-list button span{margin-left:0;font-size:14px}
     .ornament-rule{margin-bottom:19px}
-    .completed-area > .reading-area{margin-top:25px;padding-top:20px}
+    .completed-area + .journal-reading{margin-top:22px;padding-top:15px}
   }
   @media(prefers-reduced-motion:no-preference){
     .journal-tabs button,.task-list button,.load-more{

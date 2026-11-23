@@ -3,7 +3,7 @@
   import '$lib/pall-story-landscape.css';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import {tick} from 'svelte';
+
   import MillhandDepotScene from '$lib/MillhandDepotScene.svelte';
   import MillhandContractsScene from '$lib/MillhandContractsScene.svelte';
   import MillhandRecordsScene from '$lib/MillhandRecordsScene.svelte';
@@ -22,15 +22,13 @@
     perform:(action:SecondJobAction)=>Promise<void>;
     travelConfirmed:boolean;confirmTravel:()=>void
   }=$props();
-  let journalOpen=$state(false);
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
     // Real branches register their own physical scene journal.
     if(state.branch==='restamp'||state.branch==='contracts'||state.branch==='records')return;
-    registerSceneJournal?.({id:'second-job-journal',open:journalOpen,title:route.name,entries:journal,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:route.name,entries:journal});
     return ()=>registerSceneJournal?.(null);
   });
-  let journalElement:HTMLElement|undefined;
   const state=$derived(snapshot.state);
   const route=$derived(STAGE_FOUR_ROUTES[state.branch]);
   const dialogue=$derived(STAGE_FOUR_DIALOGUE[state.branch]);
@@ -41,11 +39,7 @@
   const actions=$derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
   const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
   const committed=$derived((state.phase==='DONE'||state.phase==='EXITED'));
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
+
   // The generic schematic is now limited to the as-yet-unillustrated
   // Investigation route. Depot and Contracts have their own physical scenes.
   const sceneObjects=['Death register','Wage records','Scraped line','Shift book'] as const;
@@ -114,18 +108,7 @@
       {#if pending}<p role="status" class="saving">Saving the work…</p>{/if}
     </aside>
   </div>
-  {#if journalOpen}
-    <section id="second-job-journal" class="journal" bind:this={journalElement} aria-label="Stage 4 personal journal">
-      <header class="journal-head"><div><small>PERSONAL JOURNAL</small><h2>{route.name}</h2></div>
-        <button type="button" class="journal-button" onclick={() => {void toggleJournal();}}>Close journal</button>
-      </header>
-      {#if journal.length}
-        {#each journal as entry,i (i)}<p>{entry}</p>{/each}
-      {:else}
-        <p>You have not recorded any findings from this job yet.</p>
-      {/if}
-    </section>
-  {/if}
+
 </section>
 {/if}
 
@@ -166,14 +149,6 @@
   .actions{display:flex;flex-direction:column;gap:8px;margin:14px 0}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
-  .journal-trigger{margin-top:19px;padding-top:12px;border-top:1px solid #c2a98b}
-  .journal-button{background:#dbcaab;border:1px solid #8c6d50;color:#3a281b;padding:7px 10px;font:12px sans-serif;cursor:pointer}
-  .journal-button:hover,.journal-button:focus-visible{background:#eedabc}
-  .journal{background:#e6d5b5;color:#2b211a;padding:24px clamp(15px,3vw,48px);border-top:2px solid #98714c;scroll-margin-top:12px}
-  .journal-head{max-width:960px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 auto 18px}
-  .journal-head small{font:10px sans-serif;letter-spacing:.12em;color:#6f583e}
-  .journal-head h2{font:normal 23px var(--pall-font-reading,Georgia,serif);margin:5px 0}
-  .journal>p{max-width:960px;margin:0 auto 10px;font:15px/1.6 var(--pall-font-reading,Georgia,serif)}
   @media(max-width:760px){
     .chapter-scene{display:flex;flex-direction:column;min-height:0}
     .scene-heading{padding:16px}

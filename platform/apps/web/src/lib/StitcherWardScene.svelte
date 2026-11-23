@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {getContext,tick} from 'svelte';
+  import {getContext} from 'svelte';
+
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import StitcherWardItemTray from '$lib/StitcherWardItemTray.svelte';
   import SecondJobChoices from '$lib/SecondJobChoices.svelte';
@@ -8,7 +9,7 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
-  import {stitcherFullJournal,stitcherStageJournal} from '$lib/stitcher-journal';
+  import {stitcherStageJournal} from '$lib/stitcher-journal';
   import {STITCHER_WARD_ITEMS,stitcherItemActions,stitcherWardSuppliesVisible,
     type StitcherWardItemKey} from '$lib/stitcher-ward-items';
   import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
@@ -86,16 +87,10 @@
   ] as const;
   const currentLine=$derived(s.phase==='claudia'?claudiaLines[s.claudiaLine]:
     s.phase==='dialogue'&&s.branch?branchDialogues[s.branch][s.dialogueLine]:null);
-  const journal=$derived(stitcherFullJournal(s));
-  let journalOpen=$state(false);
-  let journalEl:HTMLElement|undefined;
   const register=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    if(journalOpen){await tick();journalEl?.scrollIntoView({block:'start',behavior:'smooth'});}
-  }
+
   $effect(()=>{
-    register?.({id:'stitcher-ward-journal',open:journalOpen,title:STITCHER_STAGE_TITLES[s.stage],entries:stitcherStageJournal(s,s.stage),toggle:()=>{void toggleJournal();}});
+    register?.({title:STITCHER_STAGE_TITLES[s.stage],entries:stitcherStageJournal(s,s.stage)});
     return ()=>register?.(null);
   });
   function act(action:string){
@@ -427,16 +422,7 @@
       {/if}
     {/snippet}
   </ActivityLayout>
-  {#if journalOpen}
-    <section id="stitcher-ward-journal" class="journal-panel" bind:this={journalEl}
-      aria-label="Personal journal — Cinder Row Infirmary">
-      <header class="journal-heading">
-        <div><span class="journal-kicker">PERSONAL JOURNAL</span>
-          <h2>{STITCHER_STAGE_TITLES[s.stage]}</h2></div>
-      </header>
-      <div class="journal-entries">{#each journal as entry,i (i)}<p>{entry}</p>{/each}</div>
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -514,12 +500,5 @@
   .actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
   .error{color:#883522}.saving{color:#654932}
   /* Shared shell owns Review/Close; this is only the full-width parchment content. */
-  .journal-panel{box-sizing:border-box;width:100%;background:#e8d6b6;color:#24160e;
-    border-top:2px solid #9a7147;padding:19px clamp(16px,4vw,46px) 25px;
-    scroll-margin-top:56px}
-  .journal-heading{max-width:930px;margin:0 auto 15px}
-  .journal-heading h2{margin:6px 0 0}
-  .journal-entries{max-width:930px;margin:0 auto}
-  .journal-entries p{margin:9px 0}
   @container activity-panel (max-width:480px){.work-card{padding:0}}
 </style>

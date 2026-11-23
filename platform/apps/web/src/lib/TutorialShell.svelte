@@ -1,7 +1,7 @@
 <script lang="ts">
   import type {Snippet} from 'svelte';
   import {onMount,setContext} from 'svelte';
-  import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRegistrar} from '$lib/scene-journal';
+  import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRecord,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
@@ -34,7 +34,7 @@
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
     industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
-    cityMap,travelLocked = false,services = {},dock,journalController
+    cityMap,travelLocked = false,services = {},dock,journalController,journalContent
   }:{
     character:SavedCharacter;
     children:Snippet;
@@ -70,6 +70,8 @@
     /** For pages that mount TutorialShell themselves instead of beneath it.
      * All existing descendant-scene journal context registration still works. */
     journalController?:SceneJournalController;
+    /** Pages which render TutorialShell directly register current prose here. */
+    journalContent?:SceneJournalRecord;
   }=$props();
   // The City header is the future map gateway. It only becomes a link when the
   // server-confirmed introduction is complete, travel is not locked by the
@@ -152,8 +154,8 @@
 
   // Every playable scene shares one permanent upper-right journal control.
   // Scene components register their already-existing journals through context.
-  let sceneJournal=$state<SceneJournalController|null>(null);
-  const activeSceneJournal=$derived(journalController??sceneJournal);
+  let sceneJournal=$state<SceneJournalRecord|null>(null);
+  const activeSceneJournal=$derived(journalController??journalContent??sceneJournal);
   let journalVisible=$state(false);
   const journalExpanded=$derived(journalController?journalController.open:journalVisible);
   const registerJournal:SceneJournalRegistrar=(controller)=>{sceneJournal=controller;};
@@ -162,17 +164,14 @@
     if(journalController)journalController.toggle();
     else journalVisible=!journalVisible;
   }
-  let journalOwner=$state<string|null>(null);
+  let journalOwner=$state(character.id);
   $effect(()=>{
-    // The first mount must NOT erase a descendant's registered Journal.
-    // Only an actual character switch resets the former character's data.
     const currentId=character.id;
-    if(journalOwner===null){journalOwner=currentId;return;}
-    if(journalOwner!==currentId){
-      journalOwner=currentId;
-      journalVisible=false;
-      sceneJournal=null;
-    }
+    if(currentId===journalOwner)return;
+    // Initial scene registrations survive; a real character switch clears data.
+    journalOwner=currentId;
+    journalVisible=false;
+    sceneJournal=null;
   });
 
   // Audio scope belongs to the *actual mounted game shell*, not a guess
@@ -734,7 +733,7 @@
   .scene-journal-button:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .scene-journal-button:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
-  .chapter-content :global([id$="-journal"]){scroll-margin-top:56px}
+  /* The sole Journal anchor is #personal-journal, outside activity. */
   .journal-nav{appearance:none;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left;width:100%}
   .onboarding-footer{border-top:1px solid #4d3928;padding:10px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .shell-dock{position:sticky;top:0;align-self:start;height:100vh;height:100dvh;min-width:0;overflow:auto;

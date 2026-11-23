@@ -2,8 +2,7 @@
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {clinicJournal} from '$lib/clinic-journal-copy';
   // Both origins share this exact clinic stage, layout and medical state.
-  import {onMount,tick,getContext} from 'svelte';
-  import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
+  import {onMount} from 'svelte';
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -100,15 +99,9 @@
     if(pending||clinic?.phase!=='PRICED'||pricedAtEnd)return;
     pricedDialogueIndex+=1;
   }
-  let journalOpen=$state(false);
   // The only visible journal toggle lives in TutorialShell; the journal's
   // actual entries stay below the illustrated clinic.
-  const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
-  $effect(()=>{
-    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,title:"The Clinic",entries:[journal],toggle:()=>{void toggleJournal();}});
-    return ()=>registerSceneJournal?.(null);
-  });
-  let journalElement:HTMLElement|undefined;
+
   const assessment=$derived(clinic
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
   const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
@@ -117,11 +110,6 @@
     paid:clinic.paid,outcome:clinic.outcome,conditionType:clinic.conditionType
   }):'');
 
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
 
   async function start(){
     const response=await fetch(route,{method:'POST',headers:{'content-type':'application/json'},
@@ -213,7 +201,8 @@
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
 {#if status==='ready' && character && clinic}
   <TutorialShell {character} sceneLocation="City clinic" sceneStage={7} clinicBackdrop={true}
-    combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}>
+    combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}
+    journalContent={{title:'The Clinic',entries:[journal,...(clinic?.phase==='LEFT'?["I've got ten coins left. Time to head home."]:[])]}}>
     <section class="clinic" aria-label="Stage 7 clinic">
       <!-- Shared scene layout: the clinic painting is the stage (native
            1672x941); the clinician conversation is the reading column and
@@ -348,20 +337,7 @@
       {/snippet}
       </ActivityLayout>
 
-      {#if journalOpen}
-        <section id="clinic-journal" class="journal" bind:this={journalElement}
-          aria-label="Personal Journal">
-          <header class="journal-head">
-            <div><small>PERSONAL JOURNAL</small><h2>The Clinic</h2></div>
-            <button type="button" class="journal-button" data-pall-sfx="paper"
-              onclick={()=>{void toggleJournal();}}>Close journal</button>
-          </header>
-          <div class="journal-entries">
-            <p>{journal}</p>
-            {#if clinic.phase==='LEFT'}<p>I've got ten coins left. Time to head home.</p>{/if}
-          </div>
-        </section>
-      {/if}
+
     </section>
   </TutorialShell>
 {:else}
@@ -445,22 +421,6 @@
   .medical-record p{margin:8px 0}
   .medical-record ul{margin:8px 0;padding-left:23px}
   /* Match the full-width personal journals used in Stages 5 and 6. */
-  .journal{background:#e6d5b5;color:#24160e;
-    padding:23px clamp(16px,3vw,45px);border-top:2px solid #94704a;
-    scroll-margin-top:14px}
-  .journal-head{max-width:960px;display:flex;justify-content:space-between;
-    align-items:center;margin:0 auto 15px;gap:12px}
-  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.09em;color:#47301d}
-  .journal-head h2{margin:4px 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
-    color:#25170f}
-  .journal-entries{max-width:960px;margin:0 auto}
-  .journal-entries p{margin:0 0 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
-    color:#24160e}
-  .journal-button{background:#e5d1ae;border:1px solid #906c49;padding:6px 10px;
-    font:600 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#352414;cursor:pointer}
-  .journal-button:is(:hover,:focus-visible){background:#f6e4c3}
-  .journal-button:focus-visible{outline:2px solid #614022;outline-offset:2px}
   .fallback{max-width:760px;margin:8vh auto;padding:30px;background:#28221d;
     border:1px solid #866546;color:#eadfcf}
   .fallback a{color:#eac498}

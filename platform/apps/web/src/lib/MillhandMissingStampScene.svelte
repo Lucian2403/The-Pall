@@ -2,7 +2,7 @@
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import { tick } from "svelte";
+
   import type {
     MissingStampAction,
     MissingStampState,
@@ -67,25 +67,17 @@
   // Present the route briefing and route choices as separate local beats.
   // This never rewrites the saved Missing Stamp phase or automatically selects a route.
   let decisionStep = $state<0 | 1>(0);
-  let journalOpen = $state(false);
   // The persistent corner control is owned by TutorialShell, not this dialogue.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'stage-three-journal',open:journalOpen,title:'The Missing Stamp',entries:journal,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:'The Missing Stamp',entries:journal});
     return ()=>registerSceneJournal?.(null);
   });
   let sceneElement: HTMLDivElement | undefined;
-  let journalElement: HTMLElement | undefined;
 
   // The journal lives outside the workshop scene. Expanding it must never
   // enlarge the NPC's small dialogue popup or push objects beneath it.
-  async function toggleJournal() {
-    journalOpen = !journalOpen;
-    await tick();
-    if (journalOpen)
-      journalElement?.scrollIntoView({ block: "start", behavior: "smooth" });
-    else sceneElement?.scrollIntoView({ block: "start", behavior: "smooth" });
-  }
+
   const state = $derived(snapshot.state);
   $effect(() => {
     if (state.phase !== "DECISION") decisionStep = 0;
@@ -450,33 +442,7 @@
   {/snippet}
   </ActivityLayout>
   </div>
-  {#if journalOpen}
-    <section
-      id="stage-three-journal"
-      class="journal-panel"
-      bind:this={journalElement}
-      aria-label="The Missing Stamp journal"
-    >
-      <div class="journal-heading">
-        <div>
-          <span class="journal-kicker">WORKER'S JOURNAL</span>
-          <h2>The Missing Stamp</h2>
-        </div>
-        <button
-          type="button"
-          class="journal-toggle"
-          onclick={() => {
-            void toggleJournal();
-          }}>Close journal</button
-        >
-      </div>
-      <div class="journal-entries">
-        {#each journal as entry, i (i)}
-          <p>{entry}</p>
-        {/each}
-      </div>
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -699,62 +665,8 @@
     font: 12px/1.45 sans-serif;
     color: #614e39;
   }
-  .journal-outside {
-    position:absolute;z-index:7;top:10px;right:clamp(8px,1vw,18px);
-    max-width:10.5%;min-width:100px;min-height:40px;white-space:normal;
-  }
-  .journal-toggle {
-    box-sizing:border-box;min-height:40px;padding:3px 8px;
-    border:solid transparent;border-width:10px 17px 9px;
-    border-image-source:url('/ui-kit/buttons/button-normal-trim.png');
-    border-image-slice:50 180 45 180 fill;border-image-width:10px 17px 9px;
-    border-image-repeat:stretch;border-radius:0;background:transparent;
-    color:#2e1d11;cursor:pointer;
-    font:600 15px/1.3 var(--pall-font-reading,Georgia,serif);
-  }
-  .journal-toggle:hover,.journal-toggle:focus-visible {
-    border-image-source:url('/ui-kit/buttons/button-hover-trim.png');color:#24170d;
-  }
-  .journal-toggle:active{border-image-source:url('/ui-kit/buttons/button-pressed-trim.png')}
-  .journal-toggle:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   /* A separate page-flow journal: it cannot stretch the floating dialogue
      or move the tabletop props. The page scrolls; neither panel has a scrollbar. */
-  .journal-panel {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 19px clamp(16px, 4vw, 46px) 25px;
-    background: #e8d6b6;
-    color: #24160e;
-    border-top: 2px solid #9a7147;
-    font-synthesis: weight;
-  }
-  .journal-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    max-width: 930px;
-    margin: 0 auto 15px;
-  }
-  .journal-kicker {
-    font: 700 14px/1.25 var(--pall-font-label, "Arial Narrow", sans-serif);
-    letter-spacing: 0.09em;
-    color: #47301d;
-  }
-  .journal-heading h2 {
-    font: 600 24px/1.25 var(--pall-font-reading, Georgia, serif);
-    color: #25170f;
-    margin: 6px 0 0;
-  }
-  .journal-entries {
-    max-width: 930px;
-    margin: 0 auto;
-    font: 600 16px/1.55 var(--pall-font-reading, Georgia, serif);
-    color: #24160e;
-  }
-  .journal-entries p {
-    margin: 9px 0;
-  }
   .error {
     font: 13px/1.4 sans-serif;
     color: #873523;
@@ -798,19 +710,7 @@
     }
   }
   @media (max-width: 700px) {
-    .journal-heading h2 {
-      font-size: 20px;
-    }
-    .journal-entries {
-      font-size: 14px;
-    }
   }
   @media (max-width: 375px) {
-    .journal-heading {
-      align-items: start;
-    }
-    .journal-heading h2 {
-      font-size: 18px;
-    }
   }
 </style>
