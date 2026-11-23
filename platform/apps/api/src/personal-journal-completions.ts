@@ -17,18 +17,18 @@ export async function archiveStitcherMilestones(db:JournalWriter,id:string,
  if(before.stage===next.stage)return;
  if(before.stage===1&&next.stage===2){
   await archiveJournalTask(db,id,{taskId:'stitcher-opening',taskInstanceId:intro('stitcher','opening'),
-   stage:1,title:'Claudia Cyka',paragraphs:stitcherWardJournal({...next,stage:1})});
+   stage:1,title:'Claudia Cyka',paragraphs:stitcherWardJournal({...next,stage:1,branch:null})});
  }
  if(before.stage===2&&next.stage===3){
-  const earlier=stitcherWardJournal({...next,stage:1});
-  const complete=stitcherWardJournal({...next,stage:2});
+  const earlier=stitcherWardJournal({...next,stage:1,branch:null});
+  const complete=stitcherWardJournal({...next,stage:2,branch:null});
   await archiveJournalTask(db,id,{taskId:'morning-dressings',
    taskInstanceId:intro('stitcher','morning-dressings'),stage:2,title:'Morning Dressings',
    paragraphs:complete.slice(earlier.length),
    choices:{patientOrder:next.first??'',linen:next.prepared??'',correction:next.correction??''}});
  }
  if(before.stage===3&&next.stage===4){
-  const earlier=stitcherWardJournal({...next,stage:2});
+  const earlier=stitcherWardJournal({...next,stage:2,branch:null});
   const complete=stitcherWardJournal({...next,stage:3,phase:'choose'});
   await archiveJournalTask(db,id,{taskId:'teaching-bed',
    taskInstanceId:intro('stitcher','teaching-bed'),stage:3,title:'The Teaching Bed',
