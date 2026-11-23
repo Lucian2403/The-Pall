@@ -31,3 +31,6 @@ export {STITCHER_STAGE_FINDINGS} from './journal-copy.js';
 
 export {wageClaimJournal,dogmanJournal} from './journal-copy.js';
 export type {DogmanViewState} from './journal-copy.js';
+
+export {flintOwlerCombatJournal,dogmanCombatJournal} from './journal-copy.js';
+export type {JournalCombatView} from './journal-copy.js';
