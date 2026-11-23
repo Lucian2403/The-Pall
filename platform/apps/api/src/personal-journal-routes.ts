@@ -32,13 +32,15 @@ export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
       return reply.code(400).send({error:'invalid_limit'});
     let afterDate:Date|null=null,afterId:string|null=null;
     if(req.query.cursor){
+      if(req.query.cursor.length>512)return reply.code(400).send({error:'invalid_cursor'});
       try{
         const decoded=JSON.parse(Buffer.from(req.query.cursor,'base64url').toString('utf8')) as unknown;
-        if(!Array.isArray(decoded)||decoded.length!==2||
-          typeof decoded[0]!=='string'||typeof decoded[1]!=='string'||
-          decoded[1].length>160||!Number.isFinite(Date.parse(decoded[0])))
+        if(!Array.isArray(decoded)||decoded.length!==3||
+          decoded[0]!==req.params.id||
+          typeof decoded[1]!=='string'||typeof decoded[2]!=='string'||
+          decoded[2].length>160||!Number.isFinite(Date.parse(decoded[1])))
           throw Error('invalid_cursor');
-        afterDate=new Date(decoded[0]);afterId=decoded[1];
+        afterDate=new Date(decoded[1]);afterId=decoded[2];
       }catch{return reply.code(400).send({error:'invalid_cursor'});}
     }
     // Ownership is checked before ANY journal query. Two owned characters
@@ -67,7 +69,7 @@ export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
       choices:row.choices,outcome:row.outcome,contentVersion:row.content_version,
       completedAt:row.completed_at
     })),nextCursor:history.rows.length>limit&&last
-      ?Buffer.from(JSON.stringify([last.completed_at.toISOString(),last.task_instance_id])).toString('base64url')
+      ?Buffer.from(JSON.stringify([req.params.id,last.completed_at.toISOString(),last.task_instance_id])).toString('base64url')
       :null};
   });
 }
