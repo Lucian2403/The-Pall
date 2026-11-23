@@ -1,3 +1,4 @@
+import {invalidateJournalFromStage} from './personal-journal-store.js';
 /**
  * Local developer tool for replaying Millhand and Bellrunner introduction stages with one
  * existing character. Registered only when the API binds to loopback AND
@@ -363,7 +364,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           await client.query(
             "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS',current_health=$2 WHERE id=$1",
             [req.params.id,first.player.hp]);
-          await client.query('COMMIT');transaction=false;
+          await invalidateJournalFromStage(client,req.params.id,5);
+        await client.query('COMMIT');transaction=false;
           return {stage:5,tutorialStatus:'IN_PROGRESS',
             route:'/characters/'+req.params.id+'/stitcher/ward',coinDelta:0};
         }
@@ -421,6 +423,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=$2,tutorial_status='IN_PROGRESS',major_skill_bonuses=$3::jsonb WHERE id=$1",
           [req.params.id,next.stage,JSON.stringify(bonuses)]);
+        await invalidateJournalFromStage(client,req.params.id,next.stage);
         await client.query('COMMIT');transaction=false;
         return {stage:next.stage,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/stitcher/ward',coinDelta:0};
@@ -461,6 +464,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=2,tutorial_status='IN_PROGRESS' WHERE id=$1",
           [req.params.id]);
+        await invalidateJournalFromStage(client,req.params.id,3);
         await client.query('COMMIT');transaction=false;
         return {stage:2,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/dispatch',coinDelta:0};
@@ -525,6 +529,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=3,tutorial_status='IN_PROGRESS',major_skill_bonuses=$2::jsonb WHERE id=$1",
           [req.params.id,JSON.stringify(bonuses)]);
+        await invalidateJournalFromStage(client,req.params.id,3);
         await client.query('COMMIT');transaction=false;
         return {stage:3,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/wrong-bell',coinDelta:0};
@@ -571,6 +576,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=4,tutorial_status='IN_PROGRESS' WHERE id=$1",
           [req.params.id]);
+        await invalidateJournalFromStage(client,req.params.id,5);
         await client.query('COMMIT');transaction=false;
         return {stage:4,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
@@ -637,6 +643,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
           [req.params.id]
         );
+        await invalidateJournalFromStage(client,req.params.id,8);
         await client.query('COMMIT');transaction=false;
         return {
           stage:7,tutorialStatus:'IN_PROGRESS',
@@ -722,6 +729,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=6,tutorial_status='NOT_STARTED',current_health=$2,coins=coins+$3 WHERE id=$1",
           [req.params.id,original.player.hp,paid?10:0]);
+        await invalidateJournalFromStage(client,req.params.id,6);
         await client.query('COMMIT');transaction=false;
         return {stage:6,tutorialStatus:'NOT_STARTED',
           route:'/characters/'+req.params.id+'/bellrunner/combat',
@@ -789,6 +797,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS',current_health=$2 WHERE id=$1",
           [req.params.id,restoredHealth]);
+        await invalidateJournalFromStage(client,req.params.id,5);
         await client.query('COMMIT');transaction=false;
         return {stage:5,tutorialStatus:'IN_PROGRESS',
           route:'/characters/'+req.params.id+'/bellrunner/dogman',coinDelta:0};
@@ -818,6 +827,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query(
           "UPDATE player_characters SET tutorial_stage=1,tutorial_status='NOT_STARTED' WHERE id=$1",
           [req.params.id]);
+        await invalidateJournalFromStage(client,req.params.id,2);
         await client.query('COMMIT');transaction=false;
         return {stage:1,tutorialStatus:'NOT_STARTED',
           route:'/characters/'+req.params.id+'/opening',coinDelta:0};
@@ -900,6 +910,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           "UPDATE player_characters SET tutorial_stage=6,tutorial_status='NOT_STARTED',current_health=$2,coins=coins+$3 WHERE id=$1",
           [req.params.id,first.player.hp,wasPaid?10:0]
         );
+        await invalidateJournalFromStage(client,req.params.id,6);
         await client.query('COMMIT');transaction=false;
         return {
           stage:6,tutorialStatus:'NOT_STARTED',
@@ -986,6 +997,7 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           "UPDATE player_characters SET tutorial_stage=5,tutorial_status='IN_PROGRESS',current_health=$2 WHERE id=$1",
           [req.params.id,restoredHealth]
         );
+        await invalidateJournalFromStage(client,req.params.id,5);
         await client.query('COMMIT');transaction=false;
         return {
           stage:5,tutorialStatus:'IN_PROGRESS',
@@ -1054,7 +1066,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3,major_skill_bonuses=$4::jsonb WHERE id=$1',
         [req.params.id,plan.toStage,status,JSON.stringify(plan.nextBonuses)]
       );
-      await client.query('COMMIT');transaction=false;
+      await invalidateJournalFromStage(client,req.params.id,plan.toStage);
+        await client.query('COMMIT');transaction=false;
       const route=plan.toStage===1?'opening':plan.toStage===2?'millhand/work':plan.toStage===3?'millhand/missing-stamp':'millhand/second-job';
       return {stage:plan.toStage,tutorialStatus:status,route:'/characters/'+req.params.id+'/'+route};
     } catch(e) {
