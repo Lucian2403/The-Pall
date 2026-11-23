@@ -76,8 +76,9 @@ assert.ok(scene.includes('snapshot.enemyIntent') &&
   scene.includes('snapshot.player.wounds.some') &&
   scene.includes('snapshot.outcome') &&
   scene.includes('Continue to medical care') &&
-  scene.includes('/millhand/clinic'),
-  'UI must use real combat state and avoid fake clinic');
+  scene.includes("clinicHref(characterId,isOwler?'Stitcher':'Millhand')") &&
+  scene.includes("import {clinicHref} from '$lib/shared-finale-origins'"),
+  'Combat must route to the real, origin-specific shared Clinic without duplicating its screen');
 assert.ok(view.includes('TEST_CONFIG')&&view.includes('testAttackCost'));
 assert.ok(mig.includes('player_character_flint_combat_receipts')&&mig.includes('history JSONB'));
 assert.ok(!api.includes('UPDATE player_characters SET coins') &&
