@@ -234,7 +234,6 @@
               <p><strong>CLAUDIA: “I'll speak to them myself. Now get out of my infirmary.”</strong></p>
             {/if}
             <p><strong>CLAUDIA: “Enough. The man stays here. I'm cancelling the transfer, and if the school has a problem with that, they can speak to me.”</strong></p>
-            <p class="after">The patient stays in ordinary care. This one transfer is cancelled. Your actual Health and wounds are saved. Medical care follows in Stage VII.</p>
           {:else}
             <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
           {/if}

@@ -8,8 +8,8 @@
 
 <div class="pall-story-dialogue-section combat-outcome-actions">
   <div class="actions">
-    <a class="pall-framed-button primary-choice clinic-transition"
-      href={clinicHref(characterId,origin)}>Continue to medical care</a>
+    <strong><a class="pall-framed-button primary-choice clinic-transition"
+      href={clinicHref(characterId,origin)}>Continue to medical care</a></strong>
   </div>
 </div>
 
