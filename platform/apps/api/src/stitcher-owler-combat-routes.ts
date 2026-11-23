@@ -1,3 +1,4 @@
+import {archiveStitcherDoor} from './personal-journal-completions.js';
 /**
  * Stitcher Stage 6 — Owler. This is the authenticated PostgreSQL adapter for
  * the exact v0.5.1 engine, NOT a new combat implementation.
@@ -197,6 +198,7 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
             [req.params.id,preparation,branch,JSON.stringify(state),'[]']);
           await client.query(
             "UPDATE player_characters SET tutorial_stage=6,tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
+          await archiveStitcherDoor(client,req.params.id,claims.rows[0].state);
         }
       }else{
         if(!saved.rowCount){
