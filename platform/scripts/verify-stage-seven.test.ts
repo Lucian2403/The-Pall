@@ -341,3 +341,20 @@ test('One background-independent Stage VI continuation serves every saved finale
       '/characters/player%20id/'+FINALE_ORIGINS[origin].clinicPath);
   }
 });
+
+test('Stitcher Stage VII presents arrival and clinician speech in two local steps',()=>{
+  const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
+  assert.ok(web.includes("origin==='Stitcher'?0:-1"),
+    'Stitcher arrival must have one local Continue before the examination');
+  assert.match(web, /\{:else if origin==='Stitcher'\}\s*\{#if arrivalIndex<0\}/);
+  assert.ok(web.includes('A clinician sees you come in and points to an examination chair.'));
+  assert.ok(web.includes('Owler tried to take one of the patients away. I stood in his way.'));
+  assert.ok(web.includes("{#if clinic.phase==='ARRIVAL'&&!arrivalAtEnd}"));
+  assert.ok(web.includes("action==='examine'&&!arrivalAtEnd"),
+    'Examination cannot begin before the presentation reaches its second step');
+  assert.ok(web.includes('onclick={advanceArrival}>Continue</button>'));
+  assert.ok(web.includes("if(clinic?.phase!=='ARRIVAL')arrivalIndex=-1;"),
+    'Leaving the arrival phase resets its local cursor');
+  assert.ok(web.includes('pricedDialogueIndex=0;arrivalIndex=-1;'),
+    'Switching character must not carry over the previous arrival step');
+});

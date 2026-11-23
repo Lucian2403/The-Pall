@@ -68,11 +68,16 @@
     tutorial:{stage:number;status:string};
   };
   let character=$state<Character|null>(null);
+  // One shared, presentation-only arrival cursor. Stitcher has two panels
+  // (arrival, then dialogue); Bellrunner keeps its existing sequential beats.
+  // Millhand goes directly to the examination action.
   let arrivalIndex=$state(-1);
-  const arrivalAtEnd=$derived(arrivalIndex>=BELLRUNNER_ARRIVAL_BEATS.length-1);
+  const arrivalLastIndex=$derived(origin==='Bellrunner'
+    ?BELLRUNNER_ARRIVAL_BEATS.length-1:origin==='Stitcher'?0:-1);
+  const arrivalAtEnd=$derived(arrivalIndex>=arrivalLastIndex);
   const arrivalBeat=$derived(BELLRUNNER_ARRIVAL_BEATS[arrivalIndex]??null);
   function advanceArrival(){
-    if(pending||clinic?.phase!=='ARRIVAL'||origin!=='Bellrunner'||arrivalAtEnd)return;
+    if(pending||clinic?.phase!=='ARRIVAL'||arrivalAtEnd)return;
     arrivalIndex+=1;
   }
   let clinic=$state<Clinic|null>(null);
@@ -170,7 +175,8 @@
     return ()=>{requestGeneration++;};
   });
   async function perform(action:Action){
-    if(pending||!clinic||next!==action||(action==='pay'&&!pricedAtEnd))return;
+    if(pending||!clinic||next!==action||
+      (action==='examine'&&!arrivalAtEnd)||(action==='pay'&&!pricedAtEnd))return;
     const actingId=id,actingGeneration=requestGeneration;
     const current=()=>actingId===id&&actingGeneration===requestGeneration;
     pending=true;errorMessage='';
@@ -269,16 +275,19 @@
                 {/if}
               {/if}
             {:else if origin==='Stitcher'}
-              <p class="narration">{clinic.outcome==='player_defeat'
-                ?'An unnamed ward worker helps you into the ordinary treatment area after Owler knocks you down. The patient is still in the ward, where the staff can look after him.'
-                :'You return to the infirmary after the fight with Owler. The patient is still in the ward, where the staff can look after him.'}</p>
-              <p class="narration">A clinician sees you come in and points to an examination chair.</p>
-              <p class="speaker">CLINICIAN</p>
-              <p class="speech">“Come on, sit down. What happened out there?”</p>
-              <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
-              <p class="speech">“Owler tried to take one of the patients away. I stood in his way.”</p>
-              <p class="speaker">CLINICIAN</p>
-              <p class="speech">“I see. Well, let's have a look at you.”</p>
+              {#if arrivalIndex<0}
+                <p class="narration">{clinic.outcome==='player_defeat'
+                  ?'An unnamed ward worker helps you into the ordinary treatment area after Owler knocks you down. The patient is still in the ward, where the staff can look after him.'
+                  :'You return to the infirmary after the fight with Owler. The patient is still in the ward, where the staff can look after him.'}</p>
+                <p class="narration">A clinician sees you come in and points to an examination chair.</p>
+              {:else}
+                <p class="speaker">CLINICIAN</p>
+                <p class="speech">“Come on, sit down. What happened out there?”</p>
+                <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
+                <p class="speech">“Owler tried to take one of the patients away. I stood in his way.”</p>
+                <p class="speaker">CLINICIAN</p>
+                <p class="speech">“I see. Well, let's have a look at you.”</p>
+              {/if}
             {:else}
               <p class="narration">{clinic.outcome==='player_defeat'
                 ?'Another worker helps you reach the clinic after Flint defeats you.'
@@ -335,7 +344,7 @@
 
           {#if next}
             <div class="actions">
-              {#if clinic.phase==='ARRIVAL'&&origin==='Bellrunner'&&!arrivalAtEnd}
+              {#if clinic.phase==='ARRIVAL'&&!arrivalAtEnd}
                 <button class="pall-framed-button advance primary-choice" type="button"
                   disabled={pending} onclick={advanceArrival}>Continue</button>
               {:else if clinic.phase==='PRICED' && !pricedAtEnd}
