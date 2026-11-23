@@ -4,6 +4,7 @@
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
+  import PersonalJournalHistory from '$lib/PersonalJournalHistory.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/pall-story-landscape.css';
 
@@ -263,10 +264,16 @@
                   onclick={closeRoomOverlay}>Close journal</button>
               </header>
               <div class="journal-body">
+                <h3>Current</h3>
                 <p>{homeJournalIntro}</p>
                 {#if routeEntry}<p>{routeEntry}</p>{/if}
                 {#if combatEntry}<p>{combatEntry}</p>{/if}
               </div>
+              {#if character}
+                {#key character.id}
+                  <PersonalJournalHistory characterId={character.id} open={journalOpen}/>
+                {/key}
+              {/if}
             </section>
           {/if}
         </dialog>
