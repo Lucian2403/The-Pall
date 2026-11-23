@@ -2,6 +2,8 @@
  * The Stage 2 sealed order is a task prop. No coins, ordinary XP or loot.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {bellrunnerWrongBellTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -168,7 +170,9 @@ export function registerBellrunnerWrongBellRoutes(app:FastifyInstance,options?:{
         'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3,major_skill_bonuses=$4::jsonb WHERE id=$1',
         [req.params.id,character.tutorial_stage,character.tutorial_status,
           JSON.stringify(character.major_skill_bonuses)]);
-      const result=view(character,next);
+      if(next.phase==='committed'&&current.phase!=='committed')
+         await archiveJournalTask(client,bellrunnerWrongBellTask(req.params.id,next));
+       const result=view(character,next);
       await client.query(
         'INSERT INTO player_character_bellrunner_wrong_bell_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,cmd.requestId,hash,JSON.stringify(result)]);

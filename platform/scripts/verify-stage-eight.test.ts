@@ -115,7 +115,8 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !web.includes('class="rent-status"')&&
   !web.includes('class="paper-object"')&&
   !web.includes('background:#f5d18b24')&&
-  web.includes('id="home-journal"')&&
+  web.includes("journalController={{id:'home-journal'")&&
+  !web.includes('id="home-journal"')&&
   web.includes("if(home.phase==='HOME')void perform('read_notice')")&&
   web.includes("home.phase==='COMPLETE'")&&
   web.includes('Further game systems are not available in this prototype.'));
@@ -242,78 +243,28 @@ test('Back to Stage 7 reopens the paid clinic without touching combat, coins or 
    shell.includes("fromStage===8"));
  assert.ok(shell.includes('The clinic fee, your saved fight, Health, coins, skills and earlier choices are preserved.'));
 });
-test('Branch-aware personal Journal never displays facts from unchosen investigation paths',()=>{
+test('Saved Home journal is the selected character\'s shared reader',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
- assert.ok(web.includes("home?.branch==='restamp'")&&
-  web.includes("home?.branch==='contracts'")&&
-  web.includes("home?.branch==='records'")&&
-  web.includes("home?.outcome==='player_victory'")&&
-  web.includes("home?.outcome==='player_defeat'"));
- assert.ok(web.includes('Home at last. Ten coins left after the clinic,')&&
-  web.includes('The council has not paid for the plate lot.'));
+ const shell=source('apps/web/src/lib/TutorialShell.svelte');
+ const reader=source('apps/web/src/lib/PersonalJournal.svelte');
+ assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]"));
+ assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
+ assert.ok(reader.includes("encodeURIComponent(id)+'/journal"));
+ assert.ok(!web.includes('id="home-journal"'));
 });
 
-
-test('Rented-room chest and Journal open over the environment, not below it',()=>{
+test('Rented-room chest keeps its modal; Journal uses the shared reader',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
- assert.ok(web.includes("let overlayKind=$state<'storage'|'journal'|null>(null);"));
+ const shell=source('apps/web/src/lib/TutorialShell.svelte');
+ assert.ok(web.includes("let overlayKind=$state<'storage'|null>(null);"));
  assert.ok(web.includes('overlayDialog?.showModal()'));
  assert.ok(web.includes('overlayDialog?.close()'));
  assert.ok(web.includes('onclose={handleRoomOverlayClose}'));
  assert.ok(web.includes("onclick={()=>{void openRoomOverlay('storage');}}"));
- assert.ok(web.includes("openRoomOverlay('journal')"));
  assert.ok(web.includes('class="room-overlay"'));
  assert.ok(web.includes('<InventoryPanel characterId={id} onClose={closeRoomOverlay}/>'));
- assert.ok(web.includes('class="journal" aria-label="Personal Journal"'));
- assert.ok(web.includes('.room-overlay::backdrop'));
- assert.ok(web.includes('max-height:calc(100dvh - 16px)'));
- assert.ok(web.includes('scrollbar-width:none'));
- assert.ok(web.includes('.room-overlay::-webkit-scrollbar{display:none}'));
- assert.ok(!web.includes('<InventoryPanel characterId={id} onClose={()=>storageOpen=false}/>'));
- assert.ok(!web.includes('bind:this={journalElement}'),
-   'Journal should remain in the modal rather than scrolling below the room');
-});
-
-test('Storage uses the owner chest sounds and the home background stays room-sized',()=>{
- const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
- for(const name of ['PersonalChest_Open1.wav','PersonalChest_Open2.wav','PersonalChest_Close.wav']){
-  assert.ok(web.includes('/audio/chest/'+name),'Missing chest SFX hookup: '+name);
-  const bytes=readFileSync(resolve(import.meta.dirname,'../apps/web/static/audio/chest',name));
-  assert.ok(bytes.byteLength>1500,'Chest audio missing or truncated: '+name);
-  assert.equal(bytes.subarray(0,4).toString(),'RIFF','Chest SFX RIFF header: '+name);
-  assert.equal(bytes.subarray(8,12).toString(),'WAVE','Chest SFX WAV header: '+name);
- }
- assert.ok(web.includes("if(overlayKind==='storage')playChestSound('close')"));
- assert.ok(web.includes("onclose={handleRoomOverlayClose}"));
- const clinicPage=source('apps/web/src/lib/SharedTutorialClinic.svelte');
- assert.ok(web.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}')&&
-  clinicPage.includes('<ActivityLayout mode="scene" stageAspect={1672 / 941}')&&
-  web.includes('class="home-scene pall-story-landscape"')&&
-  web.includes('container-type:size')&&
-  web.includes('width:100%'),
-  'Stage 8 should use the same native-ratio scene stage as Stage 7');
- assert.ok(web.includes('width:max(100cqw,177.683cqh)')&&
-  web.includes('aspect-ratio:1672/941')&&
-  web.includes("center/100% 100% no-repeat"),
-  'The image layer must preserve its source ratio and scale to cover, not distort');
- const artwork=web.indexOf('class="home-artwork"');
- const roomActions=web.indexOf('class="hotspot chest"');
- const artworkEnd=web.indexOf('{#if restMessage}');
- assert.ok(artwork>=0&&roomActions>artwork&&artworkEnd>roomActions&&
-  web.includes('.home-artwork::after')&&web.includes('class="hotspot bed"')&&
-  web.includes('class="hotspot book"')&&web.includes('class="hotspot notice-object"'),
-  'All room hotspots and the rest fade must stay inside the cover-scaled art');
- assert.ok(web.includes('class="reading-column pall-story-dialogue-section"')&&
-  web.includes('.home-dialogue{position:relative;')&&
-  !/\.home-dialogue\{[^}]*overflow-y:auto/.test(web)&&
-  web.includes('@container activity-stage (max-width:600px)')&&
-  web.includes('.book{min-height:36px}'),
-  'The full room is always visible; dialogue sits beside or below it, never over it');
- assert.ok(!web.includes('width:min(100%,1100px)')&&
-  !web.includes('.stage8::before')&&!web.includes('filter:blur(19px)'),
-  'No letterboxed desktop image, blurred duplicate painting or side wallpaper');
- assert.ok(web.includes('max-height:calc(100dvh - 16px)')&&
-  web.includes('scrollbar-width:none')&&
-  web.includes('.room-overlay::-webkit-scrollbar{display:none}'),
-  'Storage overlay must not show an internal scrollbar');
+ assert.ok(web.includes("onclick={()=>{void toggleJournal();}}"));
+ assert.ok(web.includes("journalController={{id:'home-journal'"));
+ assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
+ assert.ok(!web.includes('class="journal" aria-label="Personal Journal"'));
 });

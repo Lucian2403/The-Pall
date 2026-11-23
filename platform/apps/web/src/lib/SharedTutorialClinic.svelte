@@ -1,5 +1,6 @@
 <script lang="ts">
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
+  import {clinicJournal} from '$lib/clinic-journal-copy';
   // Both origins share this exact clinic stage, layout and medical state.
   import {onMount,tick,getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
@@ -104,7 +105,7 @@
   // actual entries stay below the illustrated clinic.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,title:"The Clinic",entries:[journal],toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
   let journalElement:HTMLElement|undefined;
@@ -112,21 +113,9 @@
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
   const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
   const departure=$derived(clinic?clinicianDischarge(clinic.conditionType):'');
-  const journal=$derived(origin==='Bellrunner'
-    ?clinic?.paid
-      ?clinic.conditionType==='unhurt'
-        ?"After Dogman, the clinician found no injuries. Ten coins for the examination, even though I needed no treatment. My papers are safe, and I've ten coins left."
-        :"The clinic examined the injuries I took in the fight with Dogman and provided the basic care I needed. It cost ten coins. I've still got my bag and papers."
-      :clinic?.outcome==='player_defeat'
-        ?"After Dogman knocked me down, a passerby helped me reach the city clinic. I've still got my papers. I'd better have my condition checked."
-        :"I got past Dogman and walked to the city clinic. He didn't take my papers. I'll have myself checked before going home."
-    :clinic?.paid
-      ?clinic?.conditionType==='unhurt'
-        ?"They couldn't find anything wrong with me. Good. Still cost ten coins just to be examined. Half my money gone, and I haven't earned a thing today."
-        :clinic?.conditionType==='cut'
-          ?"The clinician checked me over and treated what they could. Ten coins for the examination and care. I needed the help, but that's half my money gone. Still nothing paid for the council work."
-          :"The clinician examined what the fight had done to me. Ten coins for the examination and getting me fit to leave. Half my money gone, and still nothing earned from the council."
-      :"Made it to the clinic after the fight with Flint. I've not got much money left, but I ought to get checked.");
+  const journal=$derived(clinic?clinicJournal(origin,{
+    paid:clinic.paid,outcome:clinic.outcome,conditionType:clinic.conditionType
+  }):'');
 
   async function toggleJournal(){
     journalOpen=!journalOpen;

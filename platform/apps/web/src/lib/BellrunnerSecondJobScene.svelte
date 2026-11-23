@@ -46,7 +46,7 @@
   let journalElement:HTMLElement|undefined;
   const registerJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerJournal?.({id:'bellrunner-second-job-journal',open:journalOpen,
+    registerJournal?.({id:'bellrunner-second-job-journal',open:journalOpen,title:copy.title,entries:journal,
       toggle:()=>{void toggleJournal();}});
     return ()=>registerJournal?.(null);
   });

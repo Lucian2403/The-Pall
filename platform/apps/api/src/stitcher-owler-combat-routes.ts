@@ -6,6 +6,9 @@
  * Every resolved round and character Health update commit atomically.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {stitcherTask,combatTask} from './personal-journal-tasks.js';
+import type {StitcherState} from './stitcher-work.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import {createHash,randomBytes} from 'node:crypto';
@@ -197,6 +200,8 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
             [req.params.id,preparation,branch,JSON.stringify(state),'[]']);
           await client.query(
             "UPDATE player_characters SET tutorial_stage=6,tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
+          await archiveJournalTask(client,stitcherTask(
+            req.params.id,claims.rows[0].state as StitcherState,5));
         }
       }else{
         if(!saved.rowCount){
@@ -240,6 +245,9 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
         await client.query(
           'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
           [req.params.id,state.player.hp,state.status==='finished'?'COMPLETED':'IN_PROGRESS']);
+         if(state.status==='finished'){
+           await archiveJournalTask(client,combatTask(req.params.id,'owler',state));
+         }
       }
       const response=snapshot(record);
       await client.query(

@@ -1,4 +1,6 @@
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {missingStampTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
@@ -186,7 +188,10 @@ export function registerMissingStampRoutes(app:FastifyInstance) {
           "UPDATE player_characters SET tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]
         );
       }
-      const result=snapshot(nextCharacter,next);
+      if(next.phase==='SELECTED'&&current.phase!=='SELECTED'){
+         await archiveJournalTask(client,missingStampTask(req.params.id,next));
+       }
+       const result=snapshot(nextCharacter,next);
       await client.query(
         'INSERT INTO player_character_missing_stamp_receipts(character_id,request_id,request_hash,result) VALUES ($1,$2,$3,$4::jsonb)',
         [req.params.id,command.requestId,hash,JSON.stringify(result)]

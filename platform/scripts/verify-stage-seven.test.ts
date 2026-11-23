@@ -226,7 +226,9 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(api.includes('tutorial_stage=8'));
   assert.ok(!api.includes('UPDATE player_character_flint_combat'));
   assert.ok(!api.includes('ordinary_xp'));
-  assert.ok(web.includes("clinic?.conditionType==='cut'"));
+  const journalCopy=source('apps/web/src/lib/clinic-journal-copy.ts');
+  assert.ok(web.includes('clinicJournal(origin,{'));
+  assert.ok(journalCopy.includes("clinic.conditionType==='cut'"));
   assert.ok(web.includes('Examine condition'));
   assert.ok(web.includes('Review the price'));
   assert.ok(web.includes('Pay 10 coins'));

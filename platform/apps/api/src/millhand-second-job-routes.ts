@@ -4,6 +4,8 @@
  * a different branch. No skill award, coins, XP, inventory or timer mutation.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {millhandSecondJobTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
@@ -164,7 +166,10 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
         'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3 WHERE id=$1',
         [req.params.id,nextCharacter.tutorial_stage,nextCharacter.tutorial_status]
       );
-      const result=snapshot(nextCharacter,next);
+      if(next.phase==='EXITED'&&current.phase!=='EXITED'){
+         await archiveJournalTask(client,millhandSecondJobTask(req.params.id,next));
+       }
+       const result=snapshot(nextCharacter,next);
       await client.query(
         'INSERT INTO player_character_second_job_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,cmd.requestId,hash,JSON.stringify(result)]

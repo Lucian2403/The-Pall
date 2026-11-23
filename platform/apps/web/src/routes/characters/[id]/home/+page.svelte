@@ -1,5 +1,6 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
+  import {homeJournalIntro as homeJournalIntroText} from '$lib/home-journal-copy';
   import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -26,7 +27,8 @@
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
   let noticeExpanded=$state(false);
-  let overlayKind=$state<'storage'|'journal'|null>(null);
+  let overlayKind=$state<'storage'|null>(null);
+  let journalOpen=$state(false);
   let overlayDialog:HTMLDialogElement|undefined;
   let nextOpenSound=0;
   const chestOpenSounds=['/audio/chest/PersonalChest_Open1.wav',
@@ -43,52 +45,23 @@
     if(overlayKind==='storage')playChestSound('close');
     overlayKind=null;
   }
-  const journalOpen=$derived(overlayKind==='journal');
   let retryKey:string|null=null,retryId:string|null=null;
-  // Exactly one local Stage IV finding from the persisted route. Keep the
-  // incident unresolved. Never reveal discoveries from unchosen branches.
-  const routeEntry=$derived(home?.origin==='Bellrunner'
-    ?home.branch==='contracts'
-      ?"The register called workers who refused the condemned building voluntarily absent. They lost their wages for staying out."
-      :home.branch==='trauma'
-        ?"The medical register called the workers' complaints non-work illness. They were left paying for their own treatment."
-        :home.branch==='machinery'
-          ?"The safety shutoff was engaged, but the bell linkage was left connected. Someone moved that retaining pin. I don't know who."
-          :null
-    :home?.branch==='restamp'
-      ?'The depot recorded metal plates, though the original manifest called them a transfer of workers.'
-      :home?.branch==='contracts'
-        ?'Two contradictory official classifications were sealed for the same dead worker number. I lodged an objection.'
-        :home?.branch==='records'
-          ?'The cancelled worker number appears in a later wage tally. A correction in the records had been scraped away.':null);
-  const combatEntry=$derived(home?.origin==='Bellrunner'
-    ?home.outcome==='player_victory'
-      ?"Dogman tried to take my papers, but he backed off when I got past him. I've still got them."
-      :"Dogman knocked me down by the service gate and tried to get into my bag. Luckily, some workers came down the street, and the bastard cleared off. A passerby helped me to the clinic. At least I've still got my route sheet."
-    :home?.outcome==='player_victory'
-      ?'Flint backed away from the passage after our fight.'
-      :home?.outcome==='player_defeat'
-        ?'Flint beat me. Another worker helped me get to the clinic.':null);
-  const homeJournalIntro=$derived(home?.origin==='Bellrunner'
-    ?"Home at last. Ten coins left after the clinic, and now I've got a rent notice demanding a hundred and fifty. Two jobs done, not a bloody coin earned. And after everything that's happened today, I'm lucky to be home at all. I need to find work that actually pays."
-    :"Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.");
+  const homeJournalIntro=$derived(home?homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner'):'');
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
-  async function openRoomOverlay(kind:'storage'|'journal'){
+  async function openRoomOverlay(kind:'storage'){
     overlayKind=kind;
     await tick();
     if(!overlayDialog?.open){
       overlayDialog?.showModal();
-      if(kind==='storage')playChestSound('open');
+      playChestSound('open');
     }
   }
   function closeRoomOverlay(){
     overlayDialog?.close();
   }
-  function toggleJournal(){
-    if(journalOpen)closeRoomOverlay();
-    else void openRoomOverlay('journal');
-  }
+  function toggleJournal(){journalOpen=!journalOpen;}
+  $effect(()=>{const currentId=id;journalOpen=false;void currentId;});
   async function refresh(){
     status='loading';errorMessage='';restMessage='';
     try{
@@ -161,7 +134,8 @@
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
-    journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal}}>
+    journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal,
+      title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
@@ -251,23 +225,9 @@
       {/snippet}
       </ActivityLayout>
         <dialog bind:this={overlayDialog} class="room-overlay"
-          aria-label={overlayKind==='storage'?'Inventory and Home Chest':'Personal Journal'}
-          onclose={handleRoomOverlayClose}>
+          aria-label="Inventory and Home Chest" onclose={handleRoomOverlayClose}>
           {#if overlayKind==='storage'}
             <InventoryPanel characterId={id} onClose={closeRoomOverlay}/>
-          {:else if overlayKind==='journal'}
-            <section id="home-journal" class="journal" aria-label="Personal Journal">
-              <header class="journal-heading">
-                <div><small>YOUR RECORD</small><h2>Personal Journal</h2></div>
-                <button class="pall-framed-button" type="button" data-pall-sfx="paper"
-                  onclick={closeRoomOverlay}>Close journal</button>
-              </header>
-              <div class="journal-body">
-                <p>{homeJournalIntro}</p>
-                {#if routeEntry}<p>{routeEntry}</p>{/if}
-                {#if combatEntry}<p>{combatEntry}</p>{/if}
-              </div>
-            </section>
           {/if}
         </dialog>
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
