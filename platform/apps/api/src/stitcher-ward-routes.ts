@@ -1,3 +1,4 @@
+import {archiveStitcherMilestones} from './personal-journal-completions.js';
 /** Authenticated Stitcher Stages I–IV. One revisioned ward state, shared
  * idempotency receipts, and ONE awarded different Major Skill on the Stage
  * III -> IV route commitment. No tutorial wages/XP/items or extra healing. */
@@ -171,6 +172,7 @@ export function registerStitcherWardRoutes(app:FastifyInstance,options:{
    await client.query(
     'INSERT INTO player_character_stitcher_ward_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
     [req.params.id,command.requestId,hash,JSON.stringify(result)]);
+   await archiveStitcherMilestones(client,req.params.id,saved.state,next);
    await client.query('COMMIT');open=false;
    return result;
   }catch(e){
