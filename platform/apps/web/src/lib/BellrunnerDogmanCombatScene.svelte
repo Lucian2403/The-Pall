@@ -2,6 +2,7 @@
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
+  import {dogmanCombatJournal} from '@the-pall/game-core';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import CombatRoundChronicle from '$lib/CombatRoundChronicle.svelte';
@@ -70,13 +71,7 @@
       ? 'You have stepped toward the public street, with room between you and Dogman.'
       : 'You begin with the work cart between you and Dogman; he must go around it.');
   const resultText = 'Dogman stumbles back and lowers the club. He looks toward the public street, then gets out of the way. You keep hold of your bag and walk past him.';
-  const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
-    snapshot.player.wounds.some(wound => wound.severity === 'serious'));
-  const journal = $derived(snapshot.outcome === 'player_defeat'
-    ? "He beat me badly. I went down by the service gate, and the bastard tried to get into my bag. Luckily, some people were coming down the street, and he cleared off before they got too close. Someone helped me towards the clinic. I could barely stand, but at least I still had my route sheet. \nWhatever's going on at that factory, it isn't over yet."
-    : toughVictory
-      ? "I got past him, but he landed a few good hits. Bastard was quicker than he looked. He finally backed off when he realised he couldn't stop me. At least I kept my papers.\nThe factory's still shut, the night shift's still being called in, and I've no idea who's going to answer for any of it."
-      : "Dogman tried to stop me with that thin club. I managed to drive him back and get through the passage. I've still got my bag and route sheet. I don't imagine the Shift Marshal will be pleased, but that doesn't make Dogman a city guard.");
+  const journal=$derived(dogmanCombatJournal(snapshot));
 
   const iconBase = '/ui-kit/combat-actions/';
   const displayedResources=[
