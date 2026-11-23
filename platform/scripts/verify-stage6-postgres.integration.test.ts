@@ -35,6 +35,9 @@ import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.t
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
+import {registerMillhandWorkRoutes} from '../apps/api/src/millhand-work-routes.ts';
+import {registerMissingStampRoutes} from '../apps/api/src/millhand-missing-stamp-routes.ts';
+import {registerMillhandSecondJobRoutes} from '../apps/api/src/millhand-second-job-routes.ts';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -82,6 +85,9 @@ registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 registerPersonalJournalRoutes(app,{pool:db,resolveSession});
+registerMillhandWorkRoutes(app,{pool:db,resolveSession});
+registerMissingStampRoutes(app,{pool:db,resolveSession});
+registerMillhandSecondJobRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
