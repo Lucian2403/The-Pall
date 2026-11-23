@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
+  import {dialogueSpeakerLabel,PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {clinicJournalEntries} from '$lib/clinic-journal-copy';
   import {FINALE_ORIGINS,type FinaleOrigin} from '$lib/shared-finale-origins';
   // One treatment workflow; only approved arrival and dialogue lines vary by origin.
@@ -251,7 +251,7 @@
               <p class="narration">An ordinary clinician points toward an examination seat.</p>
               <p class="speaker">CLINICIAN</p>
               <p class="speech">“Sit down. What happened?”</p>
-              <p class="speaker">YOU</p>
+              <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
               <p class="speech">“Owler tried to take a patient. I got in his way.”</p>
               <p class="speaker">CLINICIAN</p>
               <p class="speech">“All right. Let me have a look.”</p>
