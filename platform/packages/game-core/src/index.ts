@@ -26,3 +26,5 @@ export type {WageClaimState,WageClaimPhase,WageClaimAction,WageClaimApproach,Wag
 
 export {stageTwoJournal,missingStampJournal,secondJobJournal,stage5JournalEntries,bellrunnerStageFourJournal,stitcherWardJournal} from './journal-copy.js';
 export type {Stage5JournalInput,BellrunnerJournalState,StitcherJournalState,ReadableMissingStampEvidence} from './journal-copy.js';
+
+export {STITCHER_STAGE_FINDINGS} from './journal-copy.js';
