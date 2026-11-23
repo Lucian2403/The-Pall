@@ -2,7 +2,7 @@
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {homeJournalEntries} from '$lib/home-journal-copy';
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
-  import {onMount,tick} from 'svelte';
+  import {tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
@@ -63,58 +63,89 @@
   }
   function toggleJournal(){journalOpen=!journalOpen;}
   $effect(()=>{const currentId=id;journalOpen=false;void currentId;});
-  async function refresh(){
-    status='loading';errorMessage='';restMessage='';
+  // A reused route cannot carry another character's Home or Journal state.
+  let requestGeneration=0;
+  async function refresh(requestedId:string){
+    const generation=++requestGeneration;
+    const requestedApi='/api/characters/'+encodeURIComponent(requestedId)+'/tutorial/home';
+    const current=()=>generation===requestGeneration&&requestedId===id;
+    character=null;home=null;status='loading';pending=false;
+    errorMessage='';restMessage='';retryKey=null;retryId=null;
+    noticeExpanded=false;overlayKind=null;
+    if(overlayDialog?.open)overlayDialog.close();
     try{
-      const [c,r]=await Promise.all([
-        fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
-        fetch(api,{cache:'no-store'})]);
-      if(c.status===401||r.status===401){status='unauthorized';return;}
-      if(c.status===404||r.status===404){status='missing';return;}
+      const [person,r]=await Promise.all([
+        fetch('/api/characters/'+encodeURIComponent(requestedId),{cache:'no-store'}),
+        fetch(requestedApi,{cache:'no-store'})
+      ]);
+      if(!current())return;
+      if(person.status===401||r.status===401){status='unauthorized';return;}
+      if(person.status===404||r.status===404){status='missing';return;}
       if(r.status===503){status='schema';return;}
       if(r.status===409){status='prerequisite';return;}
-      if(!c.ok||!r.ok)throw Error('home_unavailable');
-      character=(await c.json() as {character:Character}).character;
+      if(!person.ok||!r.ok)throw Error('home_unavailable');
+      const savedCharacter=(await person.json() as {character:Character}).character;
       const result=await r.json() as Home|{needsStart:true};
+      if(!current())return;
+      let savedHome:Home;
       if('needsStart' in result){
-        const started=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},
+        const started=await fetch(requestedApi,{method:'POST',
+          headers:{'content-type':'application/json'},
           body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
         if(!started.ok)throw Error('home_start_failed');
-        home=await started.json() as Home;
-      }else home=result;
-      noticeExpanded=home.phase==='NOTICE';
-      if(character&&home)character={...character,tutorial:{stage:8,
-        status:home.completed?'COMPLETED':'IN_PROGRESS'}};
+        savedHome=await started.json() as Home;
+      }else savedHome=result;
+      if(!current())return;
+      home=savedHome;noticeExpanded=savedHome.phase==='NOTICE';
+      character={...savedCharacter,tutorial:{stage:8,
+        status:savedHome.completed?'COMPLETED':'IN_PROGRESS'}};
       status='ready';
-    }catch(e){errorMessage=e instanceof Error?e.message:'Home unavailable';status='error';}
+    }catch(error){
+      if(!current())return;
+      errorMessage=error instanceof Error?error.message:'Home unavailable';
+      status='error';
+    }
   }
-  onMount(()=>{void refresh();});
+  $effect(()=>{
+    const requestedId=id;
+    void refresh(requestedId);
+    return ()=>{requestGeneration++;};
+  });
   async function perform(action:Action):Promise<boolean>{
     if(pending||!home||(home.completed&&action!=='rest'))return false;
+    const actingId=id,actingGeneration=requestGeneration;
+    const current=()=>actingId===id&&actingGeneration===requestGeneration;
+    const actingApi='/api/characters/'+encodeURIComponent(actingId)+'/tutorial/home';
     const key=home.revision+':'+action;
     if(key!==retryKey||!retryId){retryKey=key;retryId=crypto.randomUUID();}
     pending=true;errorMessage='';
     try{
-      const response=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},
+      const response=await fetch(actingApi,{method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({kind:'action',action,requestId:retryId,expectedRevision:home.revision})});
+      if(!current())return false;
       if(response.status===409){
         retryId=null;retryKey=null;
-        const latest=await fetch(api,{cache:'no-store'});
-        if(latest.ok){home=await latest.json() as Home;noticeExpanded=home.phase==='NOTICE';}
+        const latest=await fetch(actingApi,{cache:'no-store'});
+        if(latest.ok){
+          const updated=await latest.json() as Home;
+          if(!current())return false;
+          home=updated;noticeExpanded=updated.phase==='NOTICE';
+        }
         errorMessage='The saved scene changed. Current progress has been reloaded.';
         return false;
       }
       if(!response.ok)throw Error('home_action_failed');
-      home=await response.json() as Home;
-      noticeExpanded=home.phase==='NOTICE';
+      const result=await response.json() as Home;
+      if(!current())return false;
+      home=result;noticeExpanded=result.phase==='NOTICE';
       retryId=null;retryKey=null;
       if(character)character={...character,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
       return true;
     }catch{
-      errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';
+      if(current())errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';
       return false;
     }
-    finally{pending=false;}
+    finally{if(current())pending=false;}
   }
   async function restInBed(){
     if(restAnimating||pending||!home)return;
@@ -133,7 +164,7 @@
   }
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
-{#if status==='ready'&&character&&home}
+{#if status==='ready'&&character?.id===id&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}>

@@ -3,7 +3,7 @@
   import {clinicJournalEntries} from '$lib/clinic-journal-copy';
   import {FINALE_ORIGINS,type FinaleOrigin} from '$lib/shared-finale-origins';
   // One treatment workflow; only approved arrival and dialogue lines vary by origin.
-  import {onMount} from 'svelte';
+
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -119,56 +119,75 @@
   }):[]);
 
 
-  async function start(){
-    const response=await fetch(route,{method:'POST',headers:{'content-type':'application/json'},
-      body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
-    if(!response.ok)throw Error('clinic_start_failed_'+response.status);
-    clinic=await response.json() as Clinic;
-  }
-  async function refresh(){
-    status='loading';errorMessage='';
+  // A reused character route must never show or apply another character's
+  // previous Clinic snapshot. The shared Journal reader is keyed separately.
+  let requestGeneration=0;
+  async function refresh(requestedId:string){
+    const generation=++requestGeneration;
+    const requestedRoute='/api/characters/'+encodeURIComponent(requestedId)+
+      '/'+FINALE_ORIGINS[origin].clinicPath;
+    const current=()=>generation===requestGeneration&&requestedId===id;
+    character=null;clinic=null;status='loading';pending=false;
+    errorMessage='';retryId=null;retrySignature=null;
+    pricedDialogueIndex=0;arrivalIndex=-1;
     try{
       const [person,visit]=await Promise.all([
-        fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
-        fetch(route,{cache:'no-store'})
+        fetch('/api/characters/'+encodeURIComponent(requestedId),{cache:'no-store'}),
+        fetch(requestedRoute,{cache:'no-store'})
       ]);
+      if(!current())return;
       if(person.status===401||visit.status===401){status='login';return;}
       if(person.status===404||visit.status===404){status='missing';return;}
       if(visit.status===503){status='schema';return;}
       if(visit.status===409){status='prerequisite';return;}
       if(!person.ok||!visit.ok)throw Error('clinic_fetch_failed');
-      character=(await person.json() as {character:Character}).character;
+      const savedCharacter=(await person.json() as {character:Character}).character;
       const result=await visit.json() as Clinic|{needsStart:true};
-      if('needsStart' in result)await start();
-      else clinic=result;
-      // Starting the clinic already advances the saved character to Stage 7.
-      // Keep the mounted shell in sync so its dev-only Back to Stage 6
-      // control appears immediately, not only after a full page reload.
-      if(clinic&&character)
-        character={...character,tutorial:clinic.phase==='LEFT'
-          ?{stage:8,status:'NOT_STARTED'}
-          :{stage:7,status:'IN_PROGRESS'}};
+      if(!current())return;
+      let savedClinic:Clinic;
+      if('needsStart' in result){
+        const started=await fetch(requestedRoute,{method:'POST',
+          headers:{'content-type':'application/json'},
+          body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
+        if(!started.ok)throw Error('clinic_start_failed_'+started.status);
+        savedClinic=await started.json() as Clinic;
+      }else savedClinic=result;
+      if(!current())return;
+      clinic=savedClinic;
+      character={...savedCharacter,tutorial:savedClinic.phase==='LEFT'
+        ?{stage:8,status:'NOT_STARTED'}
+        :{stage:7,status:'IN_PROGRESS'}};
       status='ready';
     }catch(error){
+      if(!current())return;
       status='error';
       errorMessage=error instanceof Error?error.message:'Clinic record unavailable';
     }
   }
-  onMount(()=>{void refresh();});
+  $effect(()=>{
+    const requestedId=id;
+    void refresh(requestedId);
+    return ()=>{requestGeneration++;};
+  });
   async function perform(action:Action){
     if(pending||!clinic||next!==action||(action==='pay'&&!pricedAtEnd))return;
+    const actingId=id,actingGeneration=requestGeneration;
+    const current=()=>actingId===id&&actingGeneration===requestGeneration;
     pending=true;errorMessage='';
     const signature=clinic.revision+':'+action;
     if(signature!==retrySignature||!retryId){
       retrySignature=signature;retryId=crypto.randomUUID();
     }
     try{
-      const response=await fetch(route,{method:'POST',headers:{'content-type':'application/json'},
+      const response=await fetch('/api/characters/'+encodeURIComponent(actingId)+
+        '/'+FINALE_ORIGINS[origin].clinicPath,{method:'POST',
+        headers:{'content-type':'application/json'},
         body:JSON.stringify({
           kind:'action',requestId:retryId,expectedRevision:clinic.revision,action
         })
       });
       const result=await response.json() as Clinic&{error?:string};
+      if(!current())return;
       if(response.ok){
         // Only a newly confirmed, balance-changing payment receives the coin cue.
         const paidNow=action==='pay'&&result.paid===true&&result.coins<clinic.coins;
@@ -191,8 +210,13 @@
       }else{
         if(response.status===409){
           retryId=null;retrySignature=null;
-          const current=await fetch(route,{cache:'no-store'});
-          if(current.ok)clinic=await current.json() as Clinic;
+          const reloaded=await fetch('/api/characters/'+encodeURIComponent(actingId)+
+            '/'+FINALE_ORIGINS[origin].clinicPath,{cache:'no-store'});
+          if(reloaded.ok){
+            const latest=await reloaded.json() as Clinic;
+            if(!current())return;
+            clinic=latest;
+          }
         }
         errorMessage=result.error==='stale_revision'
           ?'The clinic was updated in another tab. The saved examination has been reloaded.'
@@ -201,13 +225,13 @@
           :'The clinic action was not saved: '+(result.error??response.status);
       }
     }catch{
-      errorMessage='Connection interrupted. Retry the same action; the fee cannot be charged twice.';
-    }finally{pending=false;}
+      if(current())errorMessage='Connection interrupted. Retry the same action; the fee cannot be charged twice.';
+    }finally{if(current())pending=false;}
   }
 </script>
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
-{#if status==='ready' && character && clinic}
+{#if status==='ready' && character?.id===id && clinic}
   <TutorialShell {character} sceneLocation={FINALE_ORIGINS[origin].location} sceneStage={7} clinicBackdrop={true}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}
     journalContent={{title:'The Clinic',entries:journalEntries}}>
