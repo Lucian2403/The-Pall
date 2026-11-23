@@ -237,7 +237,7 @@ try{
         await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Completed Tasks')?.click();true");
         await until(()=>evalJS("!!document.querySelector('#personal-journal .task-list button.chosen')"),
           8000,'saved completed task');
-        const visual=await evalJS("(()=>{const root=document.querySelector('#personal-journal');const r=root.getBoundingClientRect();const css=getComputedStyle(root);return {width:r.width,screen:document.documentElement.clientWidth,border:css.borderTopColor,texture:css.backgroundImage,tabs:root.querySelectorAll('.journal-tabs button').length,entries:root.querySelectorAll('.task-list button').length,selected:root.querySelector('.task-list button.chosen')?.innerText,diary:root.querySelector('.completed-area > .reading-area')?.innerText,closeButtons:document.querySelectorAll('.scene-journal-button').length};})()");
+        const visual=await evalJS("(()=>{const root=document.querySelector('#personal-journal');const r=root.getBoundingClientRect();const css=getComputedStyle(root);return {width:r.width,screen:document.documentElement.clientWidth,border:css.borderTopColor,texture:css.backgroundImage,tabs:root.querySelectorAll('.journal-tabs button').length,entries:root.querySelectorAll('.task-list button').length,selected:root.querySelector('.task-list button.chosen')?.innerText,diary:root.querySelector('#journal-reading')?.innerText,closeButtons:document.querySelectorAll('.scene-journal-button').length};})()");
         assert.ok(visual.width<=visual.screen,'Journal overflow at '+width+'px');
         assert.equal(visual.border,'rgb(51, 36, 27)','Original Pall dark frame');
         assert.ok(visual.texture.includes('radial-gradient'),'Aged parchment');
@@ -246,6 +246,19 @@ try{
         assert.equal(visual.closeButtons,1,'One shared Close Journal button');
         assert.ok(visual.selected?.includes('The Council Round'),'First saved task selected');
         assert.ok(visual.diary?.includes('I carried the sealed notice'),'First-person diary visible');
+        assert.equal(await evalJS("document.querySelectorAll('#personal-journal .journal-reading').length"),1,
+          'Exactly one shared diary reading area');
+        await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Current')?.click();true");
+        await until(()=>evalJS("document.querySelector('#journal-reading')?.textContent.includes('Attendance')"),
+          5000,'current first-person text beneath Current tab');
+        const current=await evalJS("(()=>{const j=document.querySelector('#personal-journal');const tabs=j.querySelector('.journal-tabs');const reader=j.querySelector('#journal-reading');const p=reader?.querySelector('p');const css=p?getComputedStyle(p):null;return {y:reader?.getBoundingClientRect().top,tabsBottom:tabs.getBoundingClientRect().bottom,text:reader?.innerText,weight:css?.fontWeight,size:css?.fontSize,line:css?.lineHeight,readers:j.querySelectorAll('.journal-reading').length};})()");
+        assert.ok(current.y>=current.tabsBottom&&current.readers===1,
+          'Current entries render only in the one reading area beneath the tabs');
+        assert.ok(current.text&&current.weight==='600'&&current.size==='16px',
+          'Current text uses the same diary typography as Completed entries');
+        await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Completed Tasks')?.click();true");
+        await until(()=>evalJS("document.querySelector('#journal-reading')?.textContent.includes('I carried the sealed notice')"),
+          5000,'completed diary after switching back');
         await screenshot('stage4-framed-personal-journal-'+width);
         await evalJS("document.querySelector('.scene-journal-button')?.click();true");
         await until(()=>evalJS("!document.querySelector('#personal-journal')"),5000,
