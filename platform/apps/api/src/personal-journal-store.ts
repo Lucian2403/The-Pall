@@ -42,3 +42,14 @@ export async function invalidateJournalStages(
     'DELETE FROM player_character_journal_tasks WHERE character_id=$1 AND stage=ANY($2::int[])',
     [characterId,stages]);
 }
+
+/** Replay-only invalidation; never called for ordinary travel or visits. */
+export async function invalidateJournalFromStage(
+  db:JournalWriter,characterId:string,firstInvalidStage:number
+):Promise<void>{
+  if(!Number.isSafeInteger(firstInvalidStage)||firstInvalidStage<1)
+    throw new Error('invalid_journal_rewind_stage');
+  await db.query(
+    'DELETE FROM player_character_journal_tasks WHERE character_id=$1 AND stage >= $2',
+    [characterId,firstInvalidStage]);
+}
