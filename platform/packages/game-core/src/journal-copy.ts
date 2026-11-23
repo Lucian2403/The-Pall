@@ -3,6 +3,7 @@
  * A stored snapshot is never recomputed after completion. */
 import type {PlateworkState} from './millhand-platework.js';
 import type {SecondJobState} from './millhand-second-job.js';
+import type {WageClaimState,WageClaimPhase} from './millhand-wage-claim.js';
 export type ReadableMissingStampEvidence = Readonly<{
  workerNumber:string|null;recordedDeathDate:string|null;inspectionDate:string|null;
 }>;
@@ -286,3 +287,60 @@ export const STITCHER_STAGE_FINDINGS={
   consent:'The records show that the man was asleep when they took his thumbprint. Someone also heard him say he never agreed to the operation. For now, they can\'t move him.',
   notes:'I\'ve checked the man\'s treatment notes against the teaching schedule. He doesn\'t need another operation. The doctors want to use him to teach their students. They\'re planning to cut him open for a lesson. And Claudia knows about it. I haven\'t signed him over, but they could still come for him.'
 } as const;
+
+/** Completion text for saved Stage V encounters (readable before combat). */
+const WAGE_STAGES=[
+  'APPROACHING','OPENING','CHOOSE_APPROACH','APPROACH_EXCHANGE','COMMON_EXCHANGE',
+  'CHOOSE_EVIDENCE','EVIDENCE_EXCHANGE','LEAVING','CORNERED_EXCHANGE','CHOOSE_STANCE','DONE'
+] as const;
+const STAGES:WageClaimPhase[]=WAGE_STAGES.slice();
+export function wageClaimJournal(s:WageClaimState):string[]{
+  const entries:string[]=[];
+  const reached=(phase:WageClaimPhase)=>STAGES.indexOf(s.phase)>=STAGES.indexOf(phase);
+  if(reached('CHOOSE_APPROACH'))
+    entries.push("I was heading home when Flint stopped me in the passage. The contractor wants money because the council held up Anvil's plates. What a fine business. They haven't paid us, and now they want me to pay them.");
+  if(s.approach && reached('COMMON_EXCHANGE'))
+    entries.push("I checked the contractor's paper. They've put the charge against me, and there's that same dead worker's number again. Flint wasn't sent by the council. The contractor sent him. He came for money, nothing else.");
+  if(reached('LEAVING')){
+    entries.push(s.branch==='restamp'
+      ?"I told Flint I delivered metal plates. The depot clerk recorded them properly, and I have the receipt. The contractor's paper had workers written on it. Still no answer for that."
+      :s.branch==='contracts'
+      ?"I told him about the two council records and the complaint I made. Nobody had told him. Seems he was only given enough information to collect the money."
+      :"I told him about the wages entered after the man's death. Flint didn't know who made those entries. I don't think he much cared, either.");
+  }
+  if(reached('CHOOSE_STANCE'))
+    entries.push("I told him I was going home. He wouldn't move. Took hold of his club instead. I had to decide how to get past him.");
+  if(s.stance)entries.push(s.stance==='brace'?'I braced myself.'
+    :s.stance==='moving'?'I tried to move around him.':'I used the nearby work cart as cover.');
+  return entries;
+}
+
+export type DogmanViewState={
+ branch:'contracts'|'trauma'|'machinery';
+ phase:'arrival'|'papers'|'reply'|'demand'|'gate'|'done';line:number;
+ reply:'ask_orders'|'keep_sheet'|'tell_him'|null;
+ stance:'street'|'cart'|'defend'|null;
+};
+export function dogmanJournal(s:DogmanViewState):readonly string[]{
+  const entries:string[]=[
+    "I turned back toward the public street and met a rough-looking man at the service gate. The worksite hands call him Dogman."
+  ];
+  if(s.phase==='arrival')return entries;
+  entries.push("He calls himself Dogman. Says he works for the Shift Marshal, but he isn't one of the city guards. He wants my route sheet and anything I've written down.");
+  if(s.reply==='ask_orders')entries.push("I asked him for an order in writing. He couldn't show me one.");
+  if(s.reply==='keep_sheet')entries.push("I kept hold of my route sheet. I wasn't about to hand it over to a man who couldn't say what right he had to it.");
+  if(s.reply==='tell_him'){
+    if(s.branch==='contracts')entries.push("I told him about the workers marked absent because they wouldn't enter the closed factory. He said it wasn't my business.");
+    if(s.branch==='trauma')entries.push("I told him about the men coughing outside the closed factory and how I'd helped at the infirmary. He didn't like the warning I'd given them.");
+    if(s.branch==='machinery')entries.push("I told him the shutoff was down but the bell still worked. He said I should have left it to the mechanic.");
+  }
+  if(s.phase==='gate'||s.phase==='done')
+    entries.push("Dogman blocked the street, reached for my bag and drew a club. I pulled away. He wouldn't let me through.");
+  if(s.stance){
+    const move=s.stance==='street'?'stepped back toward the street'
+      :s.stance==='cart'?'moved behind the work cart':'stood my ground and held my bag close';
+    entries.push("I "+move+". The fight hasn't been settled.");
+  }
+  return entries;
+}
+
