@@ -234,14 +234,32 @@ try{
         const journalSize=await evalJS(`(()=>{
           const root=document.querySelector('#personal-journal-history');
           const r=root.getBoundingClientRect();
+          const css=getComputedStyle(root);
           return {width:r.width,screen:document.documentElement.clientWidth,
-            buttons:root.querySelectorAll('.task-list button').length};
+            buttons:root.querySelectorAll('.task-list button').length,
+            frame:css.borderTopColor,texture:css.backgroundImage,
+            activeTab:root.querySelector('.journal-tab.active')?.textContent.trim(),
+            currentTab:root.querySelector('button.journal-tab')?.textContent.trim(),
+            selected:root.querySelector('.task-list button.chosen')?.textContent,
+            diary:root.querySelector('.diary')?.textContent};
         })()`);
         assert.ok(journalSize.width<=journalSize.screen,
           'Personal Journal must not overflow '+width+'px');
         assert.equal(journalSize.buttons,1,'One completed task, not duplicate cards');
+        assert.equal(journalSize.frame,'rgb(51, 36, 27)','Use the framed Pall parchment');
+        assert.ok(journalSize.texture.includes('radial-gradient'),'Subtle parchment tint is CSS-only');
+        assert.equal(journalSize.activeTab,'Completed Tasks');
+        assert.equal(journalSize.currentTab,'Current');
+        assert.ok(journalSize.selected?.includes('Old Courier Round'),
+          'Opening the Journal selects the first completed task');
+        assert.ok(journalSize.diary?.includes('I carried the sealed notice'),
+          'The saved first-person diary opens without an extra click');
         await evalJS("document.querySelector('#personal-journal-history .task-list button')?.click()");
-        assert.equal(await evalJS("!!document.querySelector('#personal-journal-history .diary')?.textContent.includes('I carried the sealed notice')"),true);
+        assert.equal(await evalJS("!!document.querySelector('#personal-journal-history .diary')"),false,
+          'Selected task can be collapsed');
+        await evalJS("document.querySelector('#personal-journal-history .task-list button')?.click()");
+        assert.equal(await evalJS("!!document.querySelector('#personal-journal-history .diary')"),true,
+          'Selecting the task again reopens its immutable diary');
         await screenshot('stage4-personal-journal-history-'+width);
         await evalJS("document.querySelector('.scene-journal-button')?.click()");
         await until(()=>evalJS("!document.querySelector('#personal-journal-history')"),5000,
