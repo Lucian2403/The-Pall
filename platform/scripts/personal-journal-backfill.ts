@@ -7,7 +7,9 @@ import {resolve} from 'node:path';
 import type {PlateworkState,MissingStampState,SecondJobState} from '@the-pall/game-core';
 import type {StitcherState} from '../apps/api/src/stitcher-work.js';
 import {archiveStitcherMilestones,archiveStitcherDoor,archiveMillhandWork,
-  archiveMillhandMissingStamp,archiveMillhandSecondJob,archiveBellrunnerSecondJob}
+  archiveMillhandMissingStamp,archiveMillhandSecondJob,archiveBellrunnerSecondJob,
+  archiveMillhandConfrontation,archiveBellrunnerConfrontation,
+  archiveFinishedCombat,archiveCompletedClinic,archiveCompletedHome}
   from '../apps/api/src/personal-journal-completions.js';
 
 if(!process.env.DATABASE_URL)throw Error('DATABASE_URL required');
@@ -44,7 +46,10 @@ try{
        {...saved,stage:stage as 1|2|3|4},
        {...saved,stage:(stage+1) as 2|3|4|5});
      const combat=await findState(client,'player_character_owler_combat',id);
-     if(combat)await archiveStitcherDoor(client,id,saved);
+     if(combat){
+      await archiveStitcherDoor(client,id,saved);
+      await archiveFinishedCombat(client,id,'Stitcher',combat as Parameters<typeof archiveFinishedCombat>[3]);
+     }
     }
    }else if(origin==='Millhand'){
     const plate=await findState(client,'player_character_platework',id);
@@ -53,10 +58,32 @@ try{
     if(missing)await archiveMillhandMissingStamp(client,id,missing as MissingStampState);
     const second=await findState(client,'player_character_second_job',id);
     if(second)await archiveMillhandSecondJob(client,id,second as SecondJobState);
+    const claim=await findState(client,'player_character_wage_claim',id);
+    if(claim)await archiveMillhandConfrontation(client,id,
+      claim as Parameters<typeof archiveMillhandConfrontation>[2]);
+    const combat=await findState(client,'player_character_flint_combat',id);
+    if(combat)await archiveFinishedCombat(client,id,'Millhand',
+      combat as Parameters<typeof archiveFinishedCombat>[3]);
+
    }else if(origin==='Bellrunner'){
     const second=await findState(client,'player_character_bellrunner_second_job',id);
     if(second)await archiveBellrunnerSecondJob(client,id,
       second as Parameters<typeof archiveBellrunnerSecondJob>[2]);
+    const claim=await findState(client,'player_character_bellrunner_dogman',id);
+    if(claim)await archiveBellrunnerConfrontation(client,id,
+      claim as Parameters<typeof archiveBellrunnerConfrontation>[2]);
+    const combat=await findState(client,'player_character_dogman_combat',id);
+    if(combat)await archiveFinishedCombat(client,id,'Bellrunner',
+      combat as Parameters<typeof archiveFinishedCombat>[3]);
+
+   }
+   if(origin==='Bellrunner'||origin==='Millhand'){
+    const clinic=await findState(client,'player_character_clinic',id);
+    if(clinic)await archiveCompletedClinic(client,id,origin,
+      clinic as Parameters<typeof archiveCompletedClinic>[3]);
+    const home=await findState(client,'player_character_tutorial_home',id);
+    if(home)await archiveCompletedHome(client,id,
+      home as Parameters<typeof archiveCompletedHome>[2]);
    }
    await client.query('COMMIT');completed++;
   }catch(error){
