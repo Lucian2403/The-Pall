@@ -1,3 +1,4 @@
+import {archiveCompletedClinic} from './personal-journal-completions.js';
 /** Shared Stage 7 — authenticated, once-paid examination after the recorded fight.
  * A clinic state and the character's coins/Health advance atomically.
  * No modification of the immutable saved fight, history, skills or items.
@@ -211,6 +212,7 @@ function registerSharedClinicRoutes(
             [req.params.id,state.revision,JSON.stringify(state)]
           );
         }
+        if(state.phase==='LEFT')await archiveCompletedClinic(db,req.params.id,origin,state);
         const result=clinicView(state,coins);
         await db.query(
           'INSERT INTO player_character_clinic_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
