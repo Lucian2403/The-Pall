@@ -347,7 +347,7 @@ export function dogmanJournal(s:DogmanViewState):readonly string[]{
 
 /** Immutable combat diary text, shared by completion writers and live scenes. */
 export type JournalCombatView={
- outcome:'player_victory'|'player_defeat'|null;
+ outcome:string|null;
  player:{hp:number;hpMax:number;wounds:readonly {severity:string}[]};
 };
 
@@ -396,7 +396,7 @@ export function clinicJournal(origin:'Millhand'|'Bellrunner',clinic:ClinicJourna
 }
 
 /** Exact saved home diary copy, shared with completed Stage VIII archive. */
-export type HomeJournalView={origin:'Millhand'|'Bellrunner';branch:'restamp'|'contracts'|'records'|'trauma'|'machinery';outcome:'player_victory'|'player_defeat'};
+export type HomeJournalView={origin:string;branch:'restamp'|'contracts'|'records'|'trauma'|'machinery';outcome:'player_victory'|'player_defeat'};
 export function homeJournal(home:HomeJournalView|null){
  const routeEntry=home?.origin==='Bellrunner'
     ?home.branch==='contracts'
