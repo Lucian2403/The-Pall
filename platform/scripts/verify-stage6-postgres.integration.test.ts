@@ -35,6 +35,7 @@ import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.t
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
+import {archiveJournalTask} from '../apps/api/src/personal-journal-store.ts';
 import {registerMillhandWorkRoutes} from '../apps/api/src/millhand-work-routes.ts';
 import {registerMissingStampRoutes} from '../apps/api/src/millhand-missing-stamp-routes.ts';
 import {registerMillhandSecondJobRoutes} from '../apps/api/src/millhand-second-job-routes.ts';
@@ -2905,4 +2906,29 @@ test('two characters on one account never share their Personal Journals',async()
  const afterA=await readTasks(journalA);
  assert.ok(!afterA.tasks.some((x:any)=>x.stage===4));
  assert.deepEqual((await readTasks(journalB)).tasks,other.tasks);
+
+ // The exact SAME task AND instance identifiers are legal for different
+ // characters. The composite PK prevents same-account overwrites.
+ const sharedId='world-event/first-instance';
+ const tx=await db.connect();
+ try{
+  await tx.query('BEGIN');
+  await archiveJournalTask(tx,a.id,{taskId:'world-event',taskInstanceId:sharedId,
+   stage:4,title:'A Private Stitcher Event',
+   paragraphs:['I remember what happened by the infirmary door.']});
+  await archiveJournalTask(tx,bId,{taskId:'world-event',taskInstanceId:sharedId,
+   stage:4,title:'A Private Millhand Event',
+   paragraphs:['I remember what happened at Guther’s workshop.']});
+  await archiveJournalTask(tx,a.id,{taskId:'world-event',taskInstanceId:sharedId,
+   stage:4,title:'Overwriting Attempt',
+   paragraphs:['This second completion must not change the saved diary.']});
+  await tx.query('COMMIT');
+ }catch(error){await tx.query('ROLLBACK');throw error;}finally{tx.release();}
+ const finalA=await readTasks(journalA),finalB=await readTasks(journalB);
+ assert.equal(finalA.tasks.find((x:any)=>x.taskInstanceId===sharedId)?.title,
+  'A Private Stitcher Event');
+ assert.equal(finalB.tasks.find((x:any)=>x.taskInstanceId===sharedId)?.title,
+  'A Private Millhand Event');
+ assert.ok(!finalA.tasks.some((x:any)=>x.title==='A Private Millhand Event'));
+ assert.ok(!finalB.tasks.some((x:any)=>x.title==='A Private Stitcher Event'));
 });
