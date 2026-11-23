@@ -120,7 +120,8 @@ export async function archiveBellrunnerConfrontation(db:JournalWriter,id:string,
 type CombatJournalState=Parameters<typeof flintOwlerCombatJournal>[0] & {status:string};
 export async function archiveFinishedCombat(db:JournalWriter,id:string,
  origin:'Millhand'|'Bellrunner'|'Stitcher',state:CombatJournalState):Promise<void>{
- if(state.status!=='finished'||!state.outcome)return;
+ if(state.status!=='finished'||!
+   (state.outcome==='player_victory'||state.outcome==='player_defeat'))return;
  const title=origin==='Millhand'?'The Fight with Flint':
   origin==='Bellrunner'?'The Fight with Dogman':'The Fight with Owler';
  const introLine=origin==='Millhand'
@@ -150,7 +151,8 @@ export async function archiveCompletedClinic(db:JournalWriter,id:string,
 }
 export async function archiveCompletedHome(db:JournalWriter,id:string,
  state:Parameters<typeof homeJournal>[0] & {phase:string}):Promise<void>{
- if(!state||state.phase!=='COMPLETE')return;
+ if(!state||state.phase!=='COMPLETE'||
+   (state.origin!=='Millhand'&&state.origin!=='Bellrunner'))return;
  const origin=state.origin.toLowerCase();
  const diary=homeJournal(state);
  await archiveJournalTask(db,id,{taskId:'rented-home',
