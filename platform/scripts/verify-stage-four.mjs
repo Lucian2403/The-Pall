@@ -213,28 +213,24 @@ console.log('PASS: Distinct transport narration/journal; shared table labels; no
 
 console.log('PASS: Owner depot art, real objects, post-transport location and Stage2 duplicate-text guard.');
 
-const sharedJournalCss=read('apps/web/src/lib/pall-owner-ui.css');
-assert.ok(sharedJournalCss.includes("font:600 16px/1.55 var(--pall-font-reading") &&
-  sharedJournalCss.includes("font:600 15px/1.3 var(--pall-font-reading") &&
-  sharedJournalCss.includes("color:#24160e"),
-  "Journal body and controls must use the owner's reading face with strong dark-ink contrast");
+const sharedJournal=read('apps/web/src/lib/PersonalJournal.svelte');
+assert.ok(sharedJournal.includes('font:600 16px/1.55 var(--pall-font-reading') &&
+  sharedJournal.includes('color:var(--journal-ink)') &&
+  sharedJournal.includes('class="reading-area journal-reading"'),
+  'Current and Completed diary paragraphs share the same readable ink/type');
 for(const name of [
   'MillhandDepotScene.svelte','MillhandContractsScene.svelte','MillhandRecordsScene.svelte'
 ]){
   const scene=read('apps/web/src/lib/'+name);
-  assert.ok(norm(scene).includes(norm('font:600 15px/1.3 var(--pall-font-reading')) &&
-    norm(scene).includes(norm('font:600 16px/1.55 var(--pall-font-reading')) &&
-    norm(scene).includes('color:#24160e'),
-    name+' must style journal buttons and prose with New Standard and high contrast');
-  assert.ok(norm(scene).includes(norm('registerSceneJournal?.({id:')) &&
-    norm(scene).includes(norm('void toggleJournal()')),
-    name+' must register the existing journal with the shared shell control');
+  assert.ok(scene.includes('registerSceneJournal?.({title:')&&scene.includes('entries:journal'),
+    name+' must register the saved prose with TutorialShell');
+  assert.ok(!/journalOpen|toggleJournal|class="journal-entries"|class="journal-button"/.test(scene),
+    name+' must not render scene-local Journal controls or styles');
 }
 const missingStampJournal=read('apps/web/src/lib/MillhandMissingStampScene.svelte');
-assert.ok(norm(missingStampJournal).includes(norm('font:600 15px/1.3 var(--pall-font-reading')) &&
-  norm(missingStampJournal).includes(norm('font:600 16px/1.55 var(--pall-font-reading')) &&
-  norm(missingStampJournal).includes('color:#24160e'),
-  'Stage3 journal must match the Stage4 text and button typography');
-console.log('PASS: Stage3 and all Stage4 journals share dark readable text and owner-typeface controls.');
+assert.ok(missingStampJournal.includes("registerSceneJournal?.({title:'The Missing Stamp',entries:journal})")&&
+  !missingStampJournal.includes('id="stage-three-journal"'),
+  'Stages 3 and 4 share the same Journal reader, not parallel implementations');
+console.log('PASS: All stage journals register one source of prose with the shared reader');
 
 console.log('PASS: Stage4 approved dialogue, three jobs, persistent/owned API, navigation and rewind boundaries.');

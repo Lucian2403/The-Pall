@@ -46,7 +46,7 @@
          id!==characterId||page.characterId!==id)return;
       completed=reset?page.completed:[...completed,...page.completed];
       nextCursor=page.nextCursor;
-      if(reset)selectedId=null;
+      if(reset)selectedId=page.completed[0]?.taskInstanceId??null;
     }catch(cause){
       if(!controller.signal.aborted&&request===requestSequence)
         error=cause instanceof Error?cause.message:'Journal unavailable';
@@ -73,7 +73,7 @@
 <section id="personal-journal" class="personal-journal" aria-label="Personal Journal"
   tabindex="-1" bind:this={section}>
   <header class="journal-head">
-    <div><small>PERSONAL JOURNAL</small><h2>{tab==='current'?currentTitle:'Completed Tasks'}</h2></div>
+    <div><small>PERSONAL JOURNAL</small><h2>{tab==='current'?'Current Tasks':'Completed Tasks'}</h2></div>
   </header>
   <div class="journal-tabs" role="group" aria-label="Journal sections">
     <button type="button" class:chosen={tab==='current'} aria-pressed={tab==='current'}
@@ -81,18 +81,8 @@
     <button type="button" class:chosen={tab==='completed'} aria-pressed={tab==='completed'}
       onclick={()=>tab='completed'}>Completed Tasks</button>
   </div>
-  {#if tab==='current'}
-    <div class="reading-area" aria-label="Current task journal">
-      <h3 class="sr-only">{currentTitle}</h3>
-      {#if currentEntries.length}
-        {#each currentEntries as paragraph,index (index)}
-          <p>{paragraph}</p>
-        {/each}
-      {:else}
-        <p>Nothing has been recorded for this task yet.</p>
-      {/if}
-    </div>
-  {:else}
+  <div class="ornament-rule" aria-hidden="true">✥</div>
+  {#if tab==='completed'}
     <div class="completed-area" aria-label="Completed task history">
       {#if completed.length}
         <nav class="task-list" aria-label="Completed tasks">
@@ -107,15 +97,27 @@
       {:else if !loading&&!error}
         <p>No completed tasks yet.</p>
       {/if}
-      {#if selected}
-        <article class="reading-area" aria-label={selected.title+' journal entry'}>
-          <small>COMPLETED · STAGE {selected.stage}</small>
-          <h3>{selected.title}</h3>
-          {#each selected.paragraphs as paragraph,index (index)}
-            <p>{paragraph}</p>
-          {/each}
-        </article>
+    </div>
+  {/if}
+  {#if tab==='current'||selected}
+    <!-- The only diary reader. Both tabs share identical text styles. -->
+    <article id="journal-reading" class="reading-area journal-reading"
+      aria-label={tab==='current'?'Current task journal':selected?.title+' journal entry'}>
+      {#if tab==='completed'&&selected}
+        <small>COMPLETED · STAGE {selected.stage}</small>
       {/if}
+      <h3>{tab==='current'?currentTitle:selected?.title}</h3>
+      {#if tab==='current'&&!currentEntries.length}
+        <p>Nothing has been recorded for this task yet.</p>
+      {:else}
+        {#each (tab==='current'?currentEntries:selected?.paragraphs??[]) as paragraph,index (index)}
+          <p>{paragraph}</p>
+        {/each}
+      {/if}
+    </article>
+  {/if}
+  {#if tab==='completed'}
+    <div class="completed-area">
       {#if error}<p role="alert">{error}</p>{/if}
       {#if loading}<p role="status">Reading saved entries…</p>{/if}
       {#if nextCursor&&!loading}
@@ -129,30 +131,112 @@
 </section>
 
 <style>
-  .personal-journal{box-sizing:border-box;width:100%;background:#e8d6b6;
-    color:#24160e;padding:20px clamp(16px,4vw,46px) 28px;
-    border-top:2px solid #9a7147;scroll-margin-top:56px;outline-offset:-3px;
-    font-family:var(--pall-font-reading,Georgia,serif)}
-  .journal-head,.journal-tabs,.reading-area,.completed-area{max-width:930px;margin-inline:auto}
-  .journal-head{margin-bottom:13px}
-  small{font:700 14px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em}
-  h2{font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);margin:5px 0}
-  h3{font:600 21px/1.35 var(--pall-font-reading,Georgia,serif);margin:8px 0 15px}
+  /* One shared Journal: presentation only. #62 remains the sole archive owner. */
+  .personal-journal{
+    --journal-ink:#302114;--journal-rule:#97754d;
+    box-sizing:border-box;position:relative;isolation:isolate;
+    width:100%;min-width:0;color:var(--journal-ink);
+    background-color:#ead8b8;
+    background-image:
+      radial-gradient(ellipse at 5% 6%,rgba(130,84,36,.11),transparent 45%),
+      radial-gradient(ellipse at 94% 90%,rgba(128,83,39,.12),transparent 36%),
+      linear-gradient(90deg,rgba(89,52,26,.06),transparent 8%,transparent 92%,rgba(89,52,26,.06));
+    padding:clamp(25px,3.6vw,54px);
+    border:6px solid #33241b;
+    box-shadow:inset 0 0 0 2px #a88453,
+      inset 0 0 0 7px rgba(252,234,201,.8),0 7px 25px rgba(0,0,0,.24);
+    scroll-margin-top:56px;outline-offset:-3px;
+    font-family:var(--pall-font-reading,Georgia,serif);
+  }
+  .personal-journal::before{
+    content:'';position:absolute;inset:11px;pointer-events:none;
+    border:1px solid rgba(105,75,43,.5);border-radius:7px;
+  }
+  .journal-head,.journal-tabs,.completed-area{max-width:1150px;margin-inline:auto}
+  .journal-head{margin-bottom:15px}
+  .journal-head small{
+    font:700 14px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
+    letter-spacing:.19em;color:#60462d;
+  }
+  h2{font:600 clamp(23px,2.2vw,29px)/1.2 var(--pall-font-reading,Georgia,serif);
+    margin:6px 0 0}
+  h3{font:600 clamp(19px,1.7vw,23px)/1.3 var(--pall-font-reading,Georgia,serif);
+    margin:7px 0 18px}
   p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:9px 0 14px}
-  .journal-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:19px}
-  button{cursor:pointer;background:#dbc39e;border:1px solid #86694b;color:#26190f;
-    font:700 15px/1.4 var(--pall-font-reading,Georgia,serif);padding:8px 14px;
-    min-height:42px;text-align:left}
-  button.chosen{background:#b58c59}
-  button:focus-visible{outline:2px solid #52351b;outline-offset:3px}
-  .task-list{display:flex;flex-direction:column;gap:5px;margin-bottom:19px}
-  .task-list button{display:flex;align-items:center;justify-content:space-between;
-    gap:16px;width:100%}
-  .task-list button span{font:12px/1.35 sans-serif;white-space:nowrap}
-  .reading-area{padding:2px 0 0}
-  .load-more{margin-top:13px}
+  .journal-tabs{display:flex;gap:10px;flex-wrap:wrap}
+  button{appearance:none;cursor:pointer;min-height:44px;text-align:left;
+    font:600 16px/1.35 var(--pall-font-reading,Georgia,serif)}
+  .journal-tabs button{
+    padding:10px clamp(13px,1.7vw,24px);border:1px solid #96714b;
+    border-radius:3px 3px 0 0;background:rgba(252,237,205,.35);
+    color:var(--journal-ink);box-shadow:inset 0 0 0 1px rgba(255,241,211,.3);
+  }
+  .journal-tabs button:hover:not(.chosen){background:rgba(245,217,174,.68)}
+  .journal-tabs button.chosen{
+    border-color:#9e7841;color:#f7e8cc;
+    background:linear-gradient(165deg,#96703f,#694622 82%);
+    box-shadow:inset 0 0 0 2px rgba(215,176,103,.75),
+      inset 0 0 0 4px rgba(49,31,16,.25);
+  }
+  .ornament-rule{
+    display:flex;align-items:center;gap:12px;
+    max-width:1150px;margin:12px auto 24px;color:#646b53;font:18px/1 Georgia,serif;
+  }
+  .ornament-rule::before,.ornament-rule::after{
+    content:'';height:1px;flex:1;
+    background:linear-gradient(90deg,transparent,var(--journal-rule) 9%,
+      var(--journal-rule) 91%,transparent);
+  }
+  .reading-area{box-sizing:border-box;max-width:930px;width:100%;margin:24px auto 0;padding-top:15px}
+  .reading-area p{font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);margin:0 0 12px}
+  .reading-area small{display:block;margin-bottom:11px;font:700 12px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.1em;color:#59432d}
+  .completed-area{min-width:0}
+  .task-list{display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
+  .task-list button{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:8px 18px;width:100%;min-width:0;min-height:51px;
+    padding:11px clamp(13px,2vw,27px);border:1px solid rgba(110,76,41,.76);
+    border-radius:3px;background:rgba(247,231,199,.24);
+    color:var(--journal-ink);box-shadow:inset 0 0 0 1px rgba(255,244,216,.18);
+  }
+  .task-list button:hover:not(.chosen){background:rgba(248,229,190,.73)}
+  .task-list button.chosen{
+    border-color:#9f7541;color:#f7e7c7;
+    background:linear-gradient(160deg,#956d3d,#78502b 78%);
+    box-shadow:inset 0 0 0 2px rgba(218,179,106,.72),
+      inset 0 0 0 4px rgba(54,31,13,.2);
+  }
+  .task-list strong{min-width:0;overflow-wrap:anywhere;
+    font:600 clamp(17px,1.7vw,22px)/1.3 var(--pall-font-reading,Georgia,serif)}
+  .task-list button span{
+    margin-left:auto;white-space:nowrap;
+    font:italic 16px/1.3 var(--pall-font-reading,Georgia,serif);color:#5e442c;
+  }
+  .task-list button.chosen span{color:#f4e0bc}
+  .completed-area + .journal-reading{margin-top:25px;padding-top:17px;
+    border-top:1px solid rgba(142,101,57,.7)}
+  .load-more{
+    display:inline-flex;align-items:center;margin-top:12px;padding:10px 18px;
+    min-height:44px;border:1px solid #93714a;border-radius:3px;
+    background:#e0c69d;color:var(--journal-ink);
+  }
+  .load-more:hover{background:#eed5ac}
+  button:focus-visible{outline:3px solid #4c634c;outline-offset:3px}
   .sr-only{position:absolute;clip:rect(0 0 0 0);clip-path:inset(50%);
     width:1px;height:1px;white-space:nowrap;overflow:hidden}
-  @media(max-width:600px){.journal-tabs{gap:6px}.journal-tabs button{flex:1}
-    .task-list button{align-items:flex-start;flex-direction:column;gap:3px}}
+  @media(max-width:600px){
+    .personal-journal{padding:25px 18px;border-width:4px}
+    .personal-journal::before{inset:7px}
+    .journal-tabs{gap:7px}
+    .journal-tabs button{flex:1;padding:9px 11px;font-size:15px;text-align:center}
+    .task-list button{align-items:flex-start;flex-direction:column;gap:5px}
+    .task-list button span{margin-left:0;font-size:14px}
+    .ornament-rule{margin-bottom:19px}
+    .completed-area + .journal-reading{margin-top:22px;padding-top:15px}
+  }
+  @media(prefers-reduced-motion:no-preference){
+    .journal-tabs button,.task-list button,.load-more{
+      transition:background-color .15s,border-color .15s
+    }
+  }
 </style>

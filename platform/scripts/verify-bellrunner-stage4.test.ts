@@ -246,37 +246,24 @@ test('approved NPC lines and existing, reusable artwork are the only scene depen
   assert.ok(api.includes('FOR UPDATE')&&api.includes('request_hash'));
 });
 
-test('Bellrunner Stage 4 journal matches canonical Millhand diary, not a status worksheet',()=>{
-  const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerSecondJobScene.svelte',
-    import.meta.url),'utf8');
-  const millhand=readFileSync(new URL('../apps/web/src/lib/MillhandMissingStampScene.svelte',
-    import.meta.url),'utf8');
-  const owner=readFileSync(new URL('../apps/web/src/lib/pall-owner-ui.css',
-    import.meta.url),'utf8');
-  for(const expected of [
-    'class="journal-panel"','class="journal-heading"','class="journal-kicker"',
-    'class="journal-entries"','class="journal-toggle"'
-  ]){
-    assert.ok(scene.includes(expected),'Bellrunner must reuse Millhand journal structure: '+expected);
-    assert.ok(millhand.includes(expected),
-      'Journal structure must come from original Millhand, not new UI: '+expected);
-  }
-  assert.match(scene,/\{#each journal as entry,\s*i \(i\)\}/);
-  assert.match(millhand,/\{#each journal as entry,\s*i \(i\)\}/);
-  assert.ok(scene.includes('PERSONAL JOURNAL')&&scene.includes('data-pall-sfx="paper"'),
-    'Keep the existing Stage 4 Journal label and paper sound');
-  assert.ok(owner.includes('font:600 16px/1.55 var(--pall-font-reading,Georgia,serif)')&&
-    owner.includes('font:600 24px/1.25 var(--pall-font-reading,Georgia,serif)')&&
-    owner.includes('font:700 14px/1.25 var(--pall-font-label'),
-    'Keep canonical font sizes, weight and New Standard/Bebas roles in owner CSS');
-  assert.ok(!scene.includes('class="job-journal"')&&!scene.includes('class="journal-top"'),
-    'Do not return to Bellrunner-only journal frame or dark square close button');
-  const rendered=scene.split('</script>')[1]?.split('<style>')[0]??'';
-  for(const forbidden of ['Work:','Location:','Status:','Method:','Recorded check:',
-    'Local finding:','PERSONAL JOURNAL · STAGE IV']){
-    assert.ok(!rendered.includes(forbidden),
-      'No technical field labels in rendered story journal: '+forbidden);
-  }
+test('Bellrunner and Millhand share one Journal reader with no duplicated scene panels',()=>{
+ const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerSecondJobScene.svelte',import.meta.url),'utf8');
+ const millhand=readFileSync(new URL('../apps/web/src/lib/MillhandMissingStampScene.svelte',import.meta.url),'utf8');
+ const shared=readFileSync(new URL('../apps/web/src/lib/PersonalJournal.svelte',import.meta.url),'utf8');
+ const shell=readFileSync(new URL('../apps/web/src/lib/TutorialShell.svelte',import.meta.url),'utf8');
+ assert.ok(scene.includes('entries:journal')&&millhand.includes('entries:journal'));
+ assert.ok(shell.includes('<PersonalJournal characterId={character.id}')&&
+   shared.includes('class="reading-area journal-reading"')&&
+   shared.includes("tab==='current'?currentTitle:selected?.title"));
+ for(const component of [scene,millhand])
+   assert.doesNotMatch(component,/journalOpen|toggleJournal|class="journal-entries"|class="journal-toggle"/,
+     'Scene-local Journal state, markup and Close controls must be absent');
+ assert.ok(shared.includes('font:600 16px/1.55 var(--pall-font-reading')&&
+   shell.includes('data-pall-sfx="paper"'));
+ const rendered=scene.split('</script>')[1]?.split('<style>')[0]??'';
+ for(const forbidden of ['Work:','Location:','Status:','Method:','Recorded check:',
+   'Local finding:','PERSONAL JOURNAL · STAGE IV'])
+   assert.ok(!rendered.includes(forbidden),'No technical field labels: '+forbidden);
 });
 test('Bellrunner journal records actual discoveries and choices as first-person entries',()=>{
   for(const branch of ['contracts','trauma','machinery'] as const){

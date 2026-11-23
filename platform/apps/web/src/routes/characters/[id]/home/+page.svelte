@@ -134,7 +134,7 @@
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
-    journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal,
+    journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
@@ -345,14 +345,12 @@
     scrollbar-width:none;-ms-overflow-style:none}
   .room-overlay::-webkit-scrollbar{display:none}
   .room-overlay::backdrop{background:rgba(11,8,6,.58);backdrop-filter:blur(1.5px)}
-  .journal{padding:25px clamp(18px,4vw,54px);
-    background:#e6d5b5;color:#24160e;border:1px solid #94704a}
-  .journal-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    margin:0 auto 15px;max-width:960px}
-  .journal-heading h2{font:600 24px Georgia,serif;margin:5px 0}
-  .journal-heading small{font:700 12px Arial,sans-serif;letter-spacing:.1em}
-  .journal-body{max-width:960px;margin:auto;font:600 16px/1.55 Georgia,serif}
-  .journal-body p{margin:0 0 12px}
+
+
+
+
+
+
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
   /* Narrow stage (by its own width): the whole room is always visible, so
      only the small journal and notice targets grow to a tappable size. */
@@ -369,7 +367,7 @@
   /* The storage/journal modal sits in the top layer, sized to the window. */
   @media(max-width:650px){
     .room-overlay{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
-    .journal{padding:18px 16px}
-    .journal-heading{align-items:flex-start;flex-wrap:wrap}
+
+
   }
 </style>

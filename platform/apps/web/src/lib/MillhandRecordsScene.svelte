@@ -2,7 +2,7 @@
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import { tick } from "svelte";
+
   import type { SecondJobAction, SecondJobState } from "@the-pall/game-core";
   import {
     STAGE_FOUR_ROUTES,
@@ -54,14 +54,12 @@
   // No scraped writing or additional shift-book sprite has been fabricated.
   let inspected = $state<"death" | "wage" | null>(null);
   let inspectionNote = $state<string | null>(null);
-  let journalOpen = $state(false);
   // The persistent corner control is owned by TutorialShell, not this dialogue.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'records-job-journal',open:journalOpen,title:"Ledger Reconciliation",entries:journal,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:'Ledger Reconciliation',entries:journal});
     return ()=>registerSceneJournal?.(null);
   });
-  let journalElement: HTMLElement | undefined;
 
   const readingPhase = $derived(
     state.phase === "READ_DEATH_REGISTER" ||
@@ -128,12 +126,7 @@
         : "The later wage records remain on the counter.";
   }
 
-  async function toggleJournal() {
-    journalOpen = !journalOpen;
-    await tick();
-    if (journalOpen)
-      journalElement?.scrollIntoView({ block: "start", behavior: "smooth" });
-  }
+
 </script>
 
 <section
@@ -271,33 +264,7 @@
     >
   </div>
 
-  {#if journalOpen}
-    <section
-      id="records-job-journal"
-      class="journal"
-      bind:this={journalElement}
-      aria-label="Ledger Reconciliation personal journal"
-    >
-      <header class="journal-head">
-        <div>
-          <small>PERSONAL JOURNAL</small>
-          <h2>Ledger Reconciliation</h2>
-        </div>
-        <button
-          type="button"
-          class="journal-button"
-          onclick={() => {
-            void toggleJournal();
-          }}>Close journal</button
-        >
-      </header>
-      {#if journal.length}
-        {#each journal as entry, i (i)}<p>{entry}</p>{/each}
-      {:else}
-        <p>You have not recorded any findings from this job yet.</p>
-      {/if}
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -464,49 +431,6 @@
     background: #201c17;
     color: #c9b393;
     font: 12px/1.4 sans-serif;
-  }
-  .journal-button {
-    border: 1px solid #987652;
-    background: #d7c5a5;
-    color: #332214;
-    padding: 7px 11px;
-    white-space: nowrap;
-    cursor: pointer;
-    font: 600 15px/1.3 var(--pall-font-reading, Georgia, serif);
-  }
-  .journal-button:is(:hover, :focus-visible) {
-    background: #efddbd;
-  }
-  .journal {
-    background: #e6d5b5;
-    color: #24160e;
-    padding: 22px clamp(14px, 3vw, 46px);
-    border-top: 2px solid #917048;
-    scroll-margin-top: 12px;
-  }
-  .journal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    max-width: 950px;
-    margin: 0 auto 17px;
-  }
-  .journal-head small {
-    font: 700 14px/1.25 var(--pall-font-label, "Arial Narrow", sans-serif);
-    letter-spacing: 0.09em;
-    color: #47301d;
-  }
-  .journal-head h2 {
-    margin: 5px 0;
-    font: 600 24px/1.25 var(--pall-font-reading, Georgia, serif);
-    color: #25170f;
-  }
-  .journal > p {
-    max-width: 950px;
-    margin: 0 auto 10px;
-    font: 600 16px/1.55 var(--pall-font-reading, Georgia, serif);
-    color: #24160e;
   }
   /* Narrow stage: books get their own row overlapping the counter edge so
      both stay tappable (same treatment as before, decided by stage width). */

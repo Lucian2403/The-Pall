@@ -2,7 +2,7 @@
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import {tick} from 'svelte';
+
   import type {SecondJobAction, SecondJobState} from '@the-pall/game-core';
   import {
     STAGE_FOUR_ROUTES,STAGE_FOUR_DIALOGUE,STAGE_FOUR_INSTRUCTIONS,
@@ -44,21 +44,15 @@
   const instruction=$derived(STAGE_FOUR_INSTRUCTIONS[state.phase]);
   const journal=$derived(secondJobJournal(state));
   let selected=$state<'plates'|'paper'|null>(null);
-  let journalOpen=$state(false);
   // The persistent corner control is owned by TutorialShell, not this dialogue.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'depot-job-journal',open:journalOpen,title:"Depot Intake Run",entries:journal,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:'Depot Intake Run',entries:journal});
     return ()=>registerSceneJournal?.(null);
   });
-  let journalElement:HTMLElement|undefined;
 
   function inspect(which:'plates'|'paper'){selected=selected===which?null:which;}
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
+
 </script>
 
 <section class="second-job depot-job" aria-label="Depot Intake Run, Stage 4">
@@ -158,20 +152,7 @@
   </div>
   {/snippet}
   </ActivityLayout>
-  {#if journalOpen}
-    <section id="depot-job-journal" class="journal" bind:this={journalElement}
-      aria-label="Depot Intake Run personal journal">
-      <header class="journal-head">
-        <div><small>PERSONAL JOURNAL</small><h2>Depot Intake Run</h2></div>
-        <button type="button" class="journal-button" onclick={() => {void toggleJournal();}}>Close journal</button>
-      </header>
-      {#if journal.length}
-        {#each journal as entry,i (i)}<p>{entry}</p>{/each}
-      {:else}
-        <p>You have not recorded any findings from this job yet.</p>
-      {/if}
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -222,17 +203,6 @@
   .transport-verification{margin-top:0}
   .error{font:13px/1.4 sans-serif;color:#842c19}
   .saving{font:12px sans-serif;color:#6c5133}
-  .journal-trigger{padding-top:11px;margin-top:17px;border-top:1px solid #bca482}
-  .journal-button{background:#dbcaab;border:1px solid #8c6d50;color:#3a281b;
-    padding:7px 10px;font:600 15px/1.3 var(--pall-font-reading,Georgia,serif);cursor:pointer}
-  .journal-button:is(:hover,:focus-visible){background:#eedabc}
-  .journal{background:#e6d5b5;color:#24160e;padding:24px clamp(15px,3vw,48px);
-    border-top:2px solid #98714c;scroll-margin-top:12px}
-  .journal-head{max-width:960px;display:flex;justify-content:space-between;align-items:center;
-    gap:12px;margin:0 auto 17px}
-  .journal-head small{font:700 14px/1.25 var(--pall-font-label,'Arial Narrow',sans-serif);letter-spacing:.09em;color:#47301d}
-  .journal-head h2{font:600 24px/1.25 var(--pall-font-reading,Georgia,serif);color:#25170f;margin:5px 0}
-  .journal>p{max-width:960px;margin:0 auto 10px;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);color:#24160e}
   /* Narrow stage: the props get their own row overlapping the counter edge,
      so both stay large enough to tap (same treatment as before, by stage width). */
   @container activity-stage (max-width:600px){

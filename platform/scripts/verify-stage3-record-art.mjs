@@ -29,14 +29,15 @@ assert.ok(flat.includes('evidencePage===1') &&
   scene.includes('class="record-illustration"') &&
   flat.includes('max-height:240px'),
   'Owner record images must appear only in the compact second inspection page');
-// Shared scene layout: the dialogue is a content-height reading column beside
-// the workbench, and the journal stays outside the scene in page flow.
+// Shared scene layout: the dialogue is a content-height reading column.
+// Journal entries are registered with TutorialShell, not rendered over artwork.
 assert.ok(flat.replace(/;\}/g,'}').includes('.dialogue.record-view{max-height:none;overflow:visible}') &&
   flat.includes('max-height:none;overflow:visible;') &&
   !flat.includes('overflow-y:auto') &&
   scene.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
-  scene.indexOf('id="stage-three-journal"')>scene.indexOf('</ActivityLayout>'),
-  'All Stage3 dialogue beats must be scrollbar-free; the journal remains outside the scene');
+  scene.includes("registerSceneJournal?.({title:'The Missing Stamp',entries:journal});") &&
+  !scene.includes('id="stage-three-journal"'),
+  'Stage3 dialogue remains scrollbar-free and the Journal has one shared owner');
 const stageStart=scene.indexOf('{#snippet stage()}'),stageEnd=scene.indexOf('{/snippet}',stageStart);
 assert.ok(flat.includes('.evidence{position:absolute;z-index:4;left:24%;bottom:3%;width:52%;') &&
   scene.indexOf('class="evidence"')>stageStart && scene.indexOf('class="evidence"')<stageEnd &&

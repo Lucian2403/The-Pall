@@ -448,7 +448,7 @@ assert.ok(page.includes('claimCombatSfx()') &&
 // Stage 6 reads the actual combat snapshot's Stamina in the shared header.
 // Earlier stages retain their existing saved-resource or provisional behavior.
 const combatModel=read('apps/web/src/lib/millhand-combat-model.ts');
-const journalReference=read('apps/web/src/lib/MillhandWageClaimScene.svelte');
+const journalReference=read('apps/web/src/lib/PersonalJournal.svelte');
 assert.ok(page.includes('combatStamina={{current:battle.player.stamina,maximum:COMBAT_RESOURCE_SCALE}}') &&
   page.includes("import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model'") &&
   combatModel.includes('export const COMBAT_RESOURCE_SCALE=100') &&
@@ -477,20 +477,15 @@ assert.ok(scene.includes("displayedResources=[") &&
   scene.includes("{@render combatant(snapshot.player, 'You', false)}"),
   'Both combatants must display all three real resource values and compact bars');
 
-// Like the other story stages, combat shows its parchment Journal below
-// the complete activity, not trapped inside the narrow combat console.
-assert.ok(scene.includes('class="aftermath"') &&
-  scene.includes('<small>PERSONAL JOURNAL</small>') &&
-  scene.includes("<h2>{isOwler?'The Fight with Owler':'The Fight with Flint'}</h2>") &&
-  scene.includes('class="journal-entries"') &&
-  scene.includes('.aftermath{box-sizing:border-box;width:100%;background:#e8d6b6;color:#24160e;') &&
-  scene.includes('max-width:930px') &&
-  scene.includes('.journal-entries p{margin:9px 0;font:600 16px/1.55') &&
-  scene.indexOf('<section id="combat-personal-journal"')>scene.indexOf('</ActivityLayout>') &&
-  journalReference.includes('.journal{background:#e6d5b5;color:#25180d;') &&
-  journalReference.includes('.journal-head'),
-  'Finished combat must show the full-width parchment Personal Journal below combat');
-
+// One shared parchment Journal is rendered after the activity by TutorialShell.
+assert.ok(scene.includes("registerSceneJournal?.({title:") &&
+  scene.includes("entries:ended?[combatOpening(isOwler?'owler':'flint'),journal]") &&
+  !scene.includes('id="combat-personal-journal"') &&
+  !scene.includes('class="journal-entries"') &&
+  journalReference.includes('id="personal-journal"') &&
+  journalReference.includes('class="reading-area journal-reading"') &&
+  journalReference.includes('font:600 16px/1.55 var(--pall-font-reading'),
+  'Combat journals must have one Current/Completed reading area with identical prose type');
 
 // The combat engine resets state.events at every step. Use the fresh,
 // authoritative turnEvents rather than comparing a growing Chronicle.

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {getContext,tick} from 'svelte';
+  import {getContext} from 'svelte';
+
   import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
@@ -34,18 +35,11 @@
   function openFatigueInfo(){
     if(fatigueInfoDialog&&!fatigueInfoDialog.open)fatigueInfoDialog.showModal();
   }
-  let journalOpen=$state(false);
-  let journalElement:HTMLElement|undefined;
 
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
+
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:isOwler?'The Fight with Owler':'The Fight with Flint',entries:ended?[]:[combatOpening(isOwler?'owler':'flint')],
-      toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:isOwler?'The Fight with Owler':'The Fight with Flint',entries:ended?[combatOpening(isOwler?'owler':'flint'),journal]:[isOwler?"The fight with Owler is still going on. I haven't recorded how it ends.":"The fight with Flint is still going on. I haven't recorded how it ends."]});
     return ()=>registerSceneJournal?.(null);
   });
 
@@ -476,25 +470,7 @@
   </div>
   {/snippet}
   </ActivityLayout>
-  {#if journalOpen}
-    <section id="combat-personal-journal" class="aftermath"
-      bind:this={journalElement} aria-label={isOwler?'The Fight with Owler personal journal':'The Fight with Flint personal journal'}>
-      <header class="journal-head">
-        <div>
-          <small>PERSONAL JOURNAL</small>
-          <h2>{isOwler?'The Fight with Owler':'The Fight with Flint'}</h2>
-        </div>
-      </header>
-      <div class="journal-entries">
-        {#if ended}
-          <p>{combatOpening(isOwler?'owler':'flint')}</p>
-          <p>{journal}</p>
-        {:else}
-          <p>{isOwler?"The fight with Owler is still going on. I haven't recorded how it ends.":"The fight with Flint is still going on. I haven't recorded how it ends."}</p>
-        {/if}
-      </div>
-    </section>
-  {/if}
+
 </section>
 
 {#if snapshot.rules.fatigue}
@@ -781,17 +757,6 @@
   }
   /* Like the earlier story stages, the personal Journal spans the entire
      activity below the scene and console—not the narrow workspace side panel. */
-  .aftermath{box-sizing:border-box;width:100%;background:#e8d6b6;color:#24160e;
-    border-top:2px solid #9a7147;padding:19px clamp(16px,4vw,46px) 25px;
-    scroll-margin-top:56px}
-  .journal-head{max-width:930px;margin:0 auto 15px}
-  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.09em;color:#47301d}
-  .journal-head h2{margin:6px 0 0;font:600 24px/1.3 var(--pall-font-reading,Georgia,serif);
-    color:#25170f}
-  .journal-entries{max-width:930px;margin:0 auto}
-  .journal-entries p{margin:9px 0;font:600 16px/1.55 var(--pall-font-reading,Georgia,serif);
-    color:#24160e}
 
   @media(max-width:1220px){
     .enemy-status{left:29%;width:27%;min-width:230px}

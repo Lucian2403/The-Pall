@@ -2,7 +2,7 @@
   import {dialogueSpeakerLabel,PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import {tick} from 'svelte';
+
   import {page} from '$app/state';
   import type {WageClaimState,WageClaimAction} from '@the-pall/game-core';
   import {
@@ -40,14 +40,12 @@
     state.phase==='CORNERED_EXCHANGE'||state.phase==='CHOOSE_STANCE'||state.phase==='DONE');
   let inspected=$state<'bill'|'club'|'cart'|null>(null);
   let inspectionNote=$state('');
-  let journalOpen=$state(false);
   // The persistent corner control is owned by TutorialShell, not this dialogue.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'wage-claim-journal',open:journalOpen,title:approaching?'On the way home':'The Wage Claim',entries:journal,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({title:approaching?'On the way home':'The Wage Claim',entries:journal});
     return ()=>registerSceneJournal?.(null);
   });
-  let journalElement:HTMLElement|undefined;
 
   function inspect(which:'bill'|'club'|'cart'){
     if(pending)return;
@@ -63,11 +61,7 @@
     }else if(which==='club')inspectionNote=WAGE_CLAIM_CLUB_INSPECTION;
     else inspectionNote=WAGE_CLAIM_CART_INSPECTION;
   }
-  async function toggleJournal(){
-    journalOpen=!journalOpen;
-    await tick();
-    if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
-  }
+
   function choose(action:WageClaimAction){
     inspected=null;inspectionNote='';
     void perform(action);
@@ -185,21 +179,7 @@
   {/snippet}
   </ActivityLayout>
 
-  {#if journalOpen}
-    <section id="wage-claim-journal" class="journal" bind:this={journalElement}
-      aria-label={approaching?'Personal journal':'The Wage Claim personal journal'}>
-      <header class="journal-head">
-        <div><small>PERSONAL JOURNAL</small><h2>{approaching?'On the way home':'The Wage Claim'}</h2></div>
-        <button type="button" class="journal-button" data-pall-sfx="paper"
-          onclick={()=>{void toggleJournal();}}>Close journal</button>
-      </header>
-      {#if journal.length}
-        {#each journal as entry,i (i)}<p>{entry}</p>{/each}
-      {:else}
-        <p>You have not recorded anything from this meeting yet.</p>
-      {/if}
-    </section>
-  {/if}
+
 </section>
 
 <style>
@@ -283,20 +263,9 @@
     font:600 14px/1.3 var(--pall-font-reading,Georgia,serif)}
   .back-button:is(:hover,:focus-visible){background:#f3dfc0;border-color:#6a4a31}
   .back-button:disabled{opacity:.55;cursor:default}
-  .journal-trigger{border-top:1px solid #bfa889;margin-top:12px;padding-top:10px}
-  .journal-button{background:#e5d1ae;border:1px solid #906c49;padding:6px 10px;
-    font:600 14px/1.3 var(--pall-font-reading,Georgia,serif);color:#352414;cursor:pointer}
-  .journal-button:is(:hover,:focus-visible){background:#f6e4c3}
   .saving{font:12px sans-serif;color:#6b4e32}
   .error{color:#862d22;font:13px/1.4 sans-serif}
   .boundary{font-size:13px}
-  .journal{background:#e6d5b5;color:#25180d;padding:23px clamp(16px,3vw,45px);
-    border-top:2px solid #94704a;scroll-margin-top:14px}
-  .journal-head{max-width:960px;display:flex;justify-content:space-between;align-items:center;
-    margin:0 auto 15px;gap:12px}
-  .journal-head small{font:700 13px/1.3 var(--pall-font-label,'Arial Narrow',sans-serif)}
-  .journal-head h2{margin:4px 0;font:600 24px/1.3 Georgia,serif}
-  .journal>p{max-width:960px;margin:0 auto 10px;font:600 16px/1.55 Georgia,serif}
   /* Narrow stage (by its own width, not the window): a 4:3 crop keeps Flint
      tall enough to tap, with the painting shifted so the painted cart stays
      in view beside its label; captions drop their wide-screen minimum. */

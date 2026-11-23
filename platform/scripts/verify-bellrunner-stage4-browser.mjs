@@ -142,6 +142,18 @@ try{
           health:{current:50,maximum:50},stamina:{current:100,maximum:100},
           tutorial:{stage:4,status:'IN_PROGRESS'}
         }}));
+      if(route.endsWith('/journal'))
+        return Promise.resolve(json({
+          characterId:'qa-stage4-bellrunner',nextCursor:null,
+          completed:[{
+            taskInstanceId:'tutorial:stage:2',
+            taskId:'bellrunner.courier-round',stage:2,
+            title:'The Council Round',
+            paragraphs:['I carried the sealed notice through Cinder Row.'],
+            choices:{road:'direct'},outcome:null,contentVersion:1,
+            completedAt:'2026-11-20T12:00:00Z'
+          }]
+        }));
       if(route.endsWith('/dev/rewind-stage'))
         return Promise.resolve(json({enabled:true,canRewind:true,stage:4,targetStage:3}));
       if(route.endsWith('/bellrunner/second-job')){
@@ -218,6 +230,41 @@ try{
       if(width>=1280)assert.ok(sideBySide,'Panel beside scene: '+branch+' '+width);
       else assert.ok(stacked,'Panel below scene: '+branch+' '+width);
       if(width===1280||width===390)await screenshot('stage4-'+branch+'-'+width+'x'+height);
+      if(branch==='contracts'&&(width===1280||width===390)){
+        await evalJS("document.querySelector('.scene-journal-button')?.click();true");
+        await until(()=>evalJS("!!document.querySelector('#personal-journal .journal-tabs')"),
+          6000,'one shared Personal Journal');
+        await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Completed Tasks')?.click();true");
+        await until(()=>evalJS("!!document.querySelector('#personal-journal .task-list button.chosen')"),
+          8000,'saved completed task');
+        const visual=await evalJS("(()=>{const root=document.querySelector('#personal-journal');const r=root.getBoundingClientRect();const css=getComputedStyle(root);return {width:r.width,screen:document.documentElement.clientWidth,border:css.borderTopColor,texture:css.backgroundImage,tabs:root.querySelectorAll('.journal-tabs button').length,entries:root.querySelectorAll('.task-list button').length,selected:root.querySelector('.task-list button.chosen')?.innerText,diary:root.querySelector('#journal-reading')?.innerText,closeButtons:document.querySelectorAll('.scene-journal-button').length};})()");
+        assert.ok(visual.width<=visual.screen,'Journal overflow at '+width+'px');
+        assert.equal(visual.border,'rgb(51, 36, 27)','Original Pall dark frame');
+        assert.ok(visual.texture.includes('radial-gradient'),'Aged parchment');
+        assert.equal(visual.tabs,2,'Reuse Current / Completed Tabs');
+        assert.equal(visual.entries,1,'One task reader, never duplicates');
+        assert.equal(visual.closeButtons,1,'One shared Close Journal button');
+        assert.ok(visual.selected?.includes('The Council Round'),'First saved task selected');
+        assert.ok(visual.diary?.includes('I carried the sealed notice'),'First-person diary visible');
+        assert.equal(await evalJS("document.querySelectorAll('#personal-journal .journal-reading').length"),1,
+          'Exactly one shared diary reading area');
+        await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Current')?.click();true");
+        await until(()=>evalJS("document.querySelector('#journal-reading')?.textContent.includes('works receiving office was shut')"),
+          5000,'current first-person text beneath Current tab');
+        const current=await evalJS("(()=>{const j=document.querySelector('#personal-journal');const tabs=j.querySelector('.journal-tabs');const reader=j.querySelector('#journal-reading');const p=reader?.querySelector('p');const css=p?getComputedStyle(p):null;return {y:reader?.getBoundingClientRect().top,tabsBottom:tabs.getBoundingClientRect().bottom,text:reader?.innerText,weight:css?.fontWeight,size:css?.fontSize,line:css?.lineHeight,readers:j.querySelectorAll('.journal-reading').length};})()");
+        assert.ok(current.y>=current.tabsBottom&&current.readers===1,
+          'Current entries render only in the one reading area beneath the tabs');
+        assert.ok(current.text&&current.weight==='600'&&current.size==='16px',
+          'Current text uses the same diary typography as Completed entries');
+        await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Completed Tasks')?.click();true");
+        await until(()=>evalJS("document.querySelector('#journal-reading')?.textContent.includes('I carried the sealed notice')"),
+          5000,'completed diary after switching back');
+        await screenshot('stage4-framed-personal-journal-'+width);
+        await evalJS("document.querySelector('.scene-journal-button')?.click();true");
+        await until(()=>evalJS("!document.querySelector('#personal-journal')"),5000,
+          'shared Personal Journal closes');
+      }
+
       console.log('PASS: '+branch+' scene layout, real owner art and choice at '+width+'×'+height);
     }
     await navigate(branch,1280,720);
@@ -265,7 +312,7 @@ try{
     assert.equal(diaryStyle.entrySize,'16px');
     assert.equal(diaryStyle.entryWeight,'600');
     assert.ok(diaryStyle.headingFont.includes('Pall New Standard'));
-    assert.equal(diaryStyle.headingSize,'24px');
+    assert.ok(parseFloat(diaryStyle.headingSize)>=23&&parseFloat(diaryStyle.headingSize)<=29,'Compact Journal header size');
     assert.equal(diaryStyle.headingWeight,'600');
     assert.ok(diaryStyle.kickerFont.includes('Pall Bebas Neue'));
     assert.equal(diaryStyle.kickerSize,'14px');

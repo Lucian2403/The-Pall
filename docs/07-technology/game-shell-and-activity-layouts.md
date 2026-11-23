@@ -83,8 +83,9 @@ its own art, props and mechanics, but uses the same scene layout:
   an internal scroller. Item inspections render inside the active dialogue frame
   (`WorkshopItemPopover placement="inline"`).
 - **Supplement** holds optional papers under the conversation (the clinic's
-  examination record). Personal journals stay below the layout; Home's
-  storage and journal stay native `<dialog>` modals.
+  examination record). The Journal is rendered **once**, after the activity,
+  by `TutorialShell` using `PersonalJournal.svelte`. Only Home storage uses
+  a native `<dialog>`; its book hotspot opens the same shared Journal.
 - **Narrow stage = 600px container**, not a viewport breakpoint
   (`@container activity-stage (max-width:600px)`). Below it, Workshop scenes
   and the alley use a 4:3 crop, the depot and council rooms move their props
@@ -139,47 +140,35 @@ Journal is canonical:
   `docs/05-gameplay/onboarding/millhand/stages-1-4-approved-journal.md`.
   Do not output `Work:`, `Location:`, `Status:`, `Method:`,
   `Recorded check:`, `Local finding:` or any other debug schema keys.
-- Reuse the original **Millhand Stage 3** journal structure and classes:
-  `.journal-panel`, `.journal-heading`, `.journal-kicker`,
-  `.journal-entries`, `.journal-toggle`. The heading is
-  `PERSONAL JOURNAL` plus the actual scene title. The content is a
-  centered, readable 930px column, not a full-width wall of text.
-- **Typography comes from `pall-owner-ui.css`, never a scene-local
-  Bellrunner variation:** `Pall New Standard` at 16px/600 for diary
-  paragraphs; 24px/600 for the heading. `Pall Bebas Neue` at
-  14px/700 for the kicker. Ink is dark on parchment.
-  The close control uses the same owner-provided normal/hover/pressed
-  nine-slice art, not a black rectangle.
-- The persistent HUD `Review journal` control continues to use
-  `SCENE_JOURNAL_CONTEXT`. Opening the Journal reveals the page-flow
-  section without resizing the scene/dialogue. Preserve saved work
-  state and journal facts independently of the prose.
-- The Stage 4 Bellrunner reducer/journal and Chromium tests check
-  first-person state-grounded entries, original Millhand CSS classes,
-  computed fonts, original button artwork and the absence of status
-  worksheets. Apply the same checks to future stages.
-
-## 3. Canonical player speaker label
-
-**Owner decision, 2026-11-12: the speaker heading for every spoken player
-line is always `YOU`, uppercase, across all origins, tutorial stages and
-future activities.** Never display the player's custom character name,
-`Player`, `PLAYER` or mixed-case `You` as a dialogue speaker caption.
-
-- Import `dialogueSpeakerLabel` from `$lib/dialogue-speaker` for dynamic
-  script speaker IDs, or `PLAYER_SPEAKER_LABEL` for an explicit player
-  speech caption. Use the same convention in any new stage and shared
-  dialogue component; do not create origin-specific speaker formatting.
-- Approved scripts and game-core types may continue storing `'Player'`
-  as an internal speaker identifier. Normalise **only when rendering**;
-  rewriting canonical dialogue, quest state or API data is prohibited.
-- NPC names and labels are unchanged. The player's chosen character name
-  still appears in HUD, Character Sheet, narration and NPC speech where
-  authored. Narrative second-person sentences (`You reach the gate`) and
-  buttons such as `Your response` are not speaker headings.
-- The `verify:dialogue-speakers` test checks the shared formatter and
-  scans all current Svelte scenes for inconsistent dialogue headings.
-  It is part of `npm run check:web` to catch regressions in future stages.
+- **One DOM renderer:** `PersonalJournal.svelte` is the only Journal panel
+  and the only reading surface. `TutorialShell` owns the upper-row
+  Review/Close button, visibility, current character key, and the completed
+  archive reader. Scenes may **only** register `{title,entries}` using
+  `SCENE_JOURNAL_CONTEXT`. Pages that create their own shell, such as the
+  clinic, supply `journalContent` directly. Home's book hotspot controls the
+  same shell reader.
+- **No local Journal duplicates:** do not recreate `journalOpen`,
+  `toggleJournal()`, a second `<section id="...-journal">`, a separate
+  `journal-dialog`, `journal-panel`, `journal-entries`, local Close buttons,
+  or their per-scene CSS. Unrelated scene dialogue, combat and inventory
+  controls retain their own independent state.
+- **Layout:** Current entries appear only when the player clicks **Current**,
+  directly below the tabs in the shared parchment frame. Completed Tasks
+  shows saved character-only task choices and a selected first-person entry
+  in the same reading area. Both paths use the same `.reading-area p`
+  typography: **Pall New Standard, 16px/600, 1.55 line-height**, dark sepia
+  ink. The category heading is compact (23–29px), the chapter title is
+  smaller (19–23px), and the kicker uses **Pall Bebas Neue**. The bronze task
+  selection and shallow dark/brass frame are defined in the shared component,
+  never independently in a Bellrunner, Stitcher or Millhand scene.
+- The Journal remains character-specific: every saved entry is selected by
+  authenticated `character_id`; switching characters resets the reader,
+  selection and requests. Stage rewind and task completion keep the
+  transaction boundaries of PR #62.
+- Regression tests verify registration and the absence of repeated Journal
+  markup, IDs, attributes, toggle functions or CSS; Chromium checks verify
+  visibility, readability, mobile layout, one Close control and the same
+  prose display for both tabs.
 
 ### Dialogue and action outcomes must remain in-world
 

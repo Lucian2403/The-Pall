@@ -105,9 +105,11 @@ test('Dogman combat persistence, route and no premature care',()=>{
   assert.ok(!scene.includes('/millhand/clinic'));
   assert.ok(!scene.includes('Your battle outcome and actual Health are saved.'));
   assert.ok(!scene.includes('Stage VII is not implemented'));
-  assert.ok(scene.includes('class="journal-dialog"'));
-  assert.ok(scene.includes('dialog.showModal()'));
-  assert.ok(scene.includes('left:1.5%'));
+  assert.ok(scene.includes("registerSceneJournal?.({title:'The Fight with Dogman'")&&
+   scene.includes("entries:ended?[combatOpening('dogman'),journal]"));
+ assert.doesNotMatch(scene,/journalOpen|journalDialog|class="journal-dialog"|journal-close/,
+   'Stage VI uses one shared Journal rather than a second native dialog');
+ assert.ok(scene.includes('left:1.5%'));
   const shell=read('apps/web/src/lib/TutorialShell.svelte');
   const backCondition=shell.match(/\{#if ([^\n]+) && character\.tutorial\.stage===6 && backToStageFive && !canRewind\}/)?.[1]??'';
   assert.match(backCondition,/character\.origin==='Bellrunner'/);

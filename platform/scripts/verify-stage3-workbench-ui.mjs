@@ -25,10 +25,12 @@ assert.match(s,/class:seen=\{state\.slipRead\}/);
 // Evidence props scale with the scene stage (container units), not the window.
 assert.match(s,/clamp\(64px, 13cqi, 180px\)/);
 assert.doesNotMatch(s,/scene-footer|Council-owned evidence\. No wages/);
-assert.ok(s.includes("registerSceneJournal?.({id:'stage-three-journal'"));
-assert.ok(!s.includes('class="journal-toggle journal-outside"'),
-  'The shell now owns the single journal control, not the local scene');
-assert.match(s,/id="stage-three-journal"/);
+assert.ok(s.includes("registerSceneJournal?.({title:'The Missing Stamp',entries:journal});"));
+assert.doesNotMatch(s,/journalOpen|toggleJournal|id="stage-three-journal"|class="journal-entries"/,
+  'Stage 3 supplies diary text but must never create a second Journal panel');
+const shared=read('apps/web/src/lib/PersonalJournal.svelte');
+assert.ok(shared.includes('id="personal-journal"')&&shared.includes('class="reading-area journal-reading"'),
+  'One shared Journal renders live and completed diary text');
 assert.match(s,/continueToJob/);
 assert.match(s,/snapshot\.availableActions/);
 console.log('PASS: Guther, Stage3 evidence and in-scene journal retain their interactions.');
