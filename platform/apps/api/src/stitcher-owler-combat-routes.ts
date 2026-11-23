@@ -1,5 +1,3 @@
-import {archiveFinishedCombat} from './personal-journal-completions.js';
-import {archiveStitcherDoor} from './personal-journal-completions.js';
 /**
  * Stitcher Stage 6 — Owler. This is the authenticated PostgreSQL adapter for
  * the exact v0.5.1 engine, NOT a new combat implementation.
@@ -8,6 +6,9 @@ import {archiveStitcherDoor} from './personal-journal-completions.js';
  * Every resolved round and character Health update commit atomically.
  */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {stitcherTask,combatTask} from './personal-journal-tasks.js';
+import type {StitcherState} from './stitcher-work.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import {createHash,randomBytes} from 'node:crypto';
@@ -199,7 +200,8 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
             [req.params.id,preparation,branch,JSON.stringify(state),'[]']);
           await client.query(
             "UPDATE player_characters SET tutorial_stage=6,tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
-          await archiveStitcherDoor(client,req.params.id,claims.rows[0].state);
+          await archiveJournalTask(client,stitcherTask(
+            req.params.id,claims.rows[0].state as StitcherState,5));
         }
       }else{
         if(!saved.rowCount){
@@ -233,7 +235,6 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
           narrateCommittedTurn(state.events,command.action,record.state.intent,
             state,record.history),state,record.history);
         const finished=state.status==='finished';
-        if(finished)await archiveFinishedCombat(client,req.params.id,'Stitcher',state);
         record={...record,state,history:[...record.history,...state.events],
           patient_safe:finished,transfer_cancelled:finished};
         await client.query(
@@ -244,6 +245,9 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
         await client.query(
           'UPDATE player_characters SET current_health=$2,tutorial_status=$3 WHERE id=$1',
           [req.params.id,state.player.hp,state.status==='finished'?'COMPLETED':'IN_PROGRESS']);
+         if(state.status==='finished'){
+           await archiveJournalTask(client,combatTask(req.params.id,'owler',state));
+         }
       }
       const response=snapshot(record);
       await client.query(

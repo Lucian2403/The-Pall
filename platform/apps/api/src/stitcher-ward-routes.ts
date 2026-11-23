@@ -1,8 +1,9 @@
-import {archiveStitcherMilestones} from './personal-journal-completions.js';
 /** Authenticated Stitcher Stages I–IV. One revisioned ward state, shared
  * idempotency receipts, and ONE awarded different Major Skill on the Stage
  * III -> IV route commitment. No tutorial wages/XP/items or extra healing. */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {stitcherTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -167,12 +168,17 @@ export function registerStitcherWardRoutes(app:FastifyInstance,options:{
    await client.query(
     'UPDATE player_characters SET tutorial_stage=$2,tutorial_status=$3,major_skill_bonuses=$4::jsonb WHERE id=$1',
     [req.params.id,next.stage,nextStatus,JSON.stringify(granted)]);
+   // Archive only reducer-confirmed transitions, inside the same
+   // character-locked transaction as progression and idempotency receipts.
+   if(next.stage>saved.state.stage){
+    const stage=saved.state.stage;
+    await archiveJournalTask(client,stitcherTask(req.params.id,next,stage as 1|2|3|4|5));
+   }
    const result=view({...ch,tutorial_stage:next.stage,
     tutorial_status:nextStatus,major_skill_bonuses:granted},next,true);
    await client.query(
     'INSERT INTO player_character_stitcher_ward_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
     [req.params.id,command.requestId,hash,JSON.stringify(result)]);
-   await archiveStitcherMilestones(client,req.params.id,saved.state,next);
    await client.query('COMMIT');open=false;
    return result;
   }catch(e){

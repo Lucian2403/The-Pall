@@ -8,7 +8,7 @@
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {STITCHER_ACTION_LABEL,STITCHER_ROUTE_UI,STITCHER_STAGE_TITLES} from '$lib/stitcher-ward-copy';
   import {shouldShowClaudia} from '$lib/stitcher-claudia-presence';
-  import {stitcherWardJournal} from '@the-pall/game-core';
+  import {stitcherFullJournal,stitcherStageJournal} from '$lib/stitcher-journal';
   import {STITCHER_WARD_ITEMS,stitcherItemActions,stitcherWardSuppliesVisible,
     type StitcherWardItemKey} from '$lib/stitcher-ward-items';
   import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
@@ -86,7 +86,7 @@
   ] as const;
   const currentLine=$derived(s.phase==='claudia'?claudiaLines[s.claudiaLine]:
     s.phase==='dialogue'&&s.branch?branchDialogues[s.branch][s.dialogueLine]:null);
-  const journal=$derived(stitcherWardJournal(s,branchData?.finding));
+  const journal=$derived(stitcherFullJournal(s));
   let journalOpen=$state(false);
   let journalEl:HTMLElement|undefined;
   const register=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
@@ -95,7 +95,7 @@
     if(journalOpen){await tick();journalEl?.scrollIntoView({block:'start',behavior:'smooth'});}
   }
   $effect(()=>{
-    register?.({id:'stitcher-ward-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    register?.({id:'stitcher-ward-journal',open:journalOpen,title:STITCHER_STAGE_TITLES[s.stage],entries:stitcherStageJournal(s,s.stage),toggle:()=>{void toggleJournal();}});
     return ()=>register?.(null);
   });
   function act(action:string){

@@ -1,4 +1,3 @@
-import {STITCHER_STAGE_FINDINGS} from '@the-pall/game-core';
 /** Owner-approved 16 Nov Stitcher narration and actions; UI presentation only.
  * The API reducer decides whether the action can be saved. */
 export const STITCHER_ACTION_LABEL:Readonly<Record<string,string>>={
@@ -78,7 +77,7 @@ export const STITCHER_ROUTE_UI={
    'You come to a split in the corridor. The narrow passage is quicker, but it\'ll be harder to get the trolley through. The wider passage gives you more room, though it\'ll take longer. Both lead to the receiving door.',
    'At the receiving door, a clerk looks at the papers rather than the patient.'
   ],
-  finding:STITCHER_STAGE_FINDINGS.trolley
+  finding:'At the receiving door, the clerk wanted the man\'s contract number. Didn\'t even ask his name. I refused to sign him over. He\'s still in the infirmary\'s care, but I doubt that\'s the end of it.'
  },
  consent:{
   title:'The Signed Consent',
@@ -93,7 +92,7 @@ export const STITCHER_ROUTE_UI={
    'You can use the timing entry or ask for a witness to mark an honest objection.',
    'The clerk writes down your complaint and marks the transfer as disputed. He leaves the original form alone, so there\'s no doubt about what was written on it.'
   ],
-  finding:STITCHER_STAGE_FINDINGS.consent
+  finding:'The records show that the man was asleep when they took his thumbprint. Someone also heard him say he never agreed to the operation. For now, they can\'t move him.'
  },
  notes:{
   title:'Notes for the Living',
@@ -108,7 +107,7 @@ export const STITCHER_ROUTE_UI={
    'The man\'s treatment notes say nothing about another operation, but his name is on the teaching list. You want to keep a record of what you\'ve found.',
    'The records make it clear. The doctors aren\'t planning another operation to treat the man. They only want to use him for a teaching lesson.'
   ],
-  finding:STITCHER_STAGE_FINDINGS.notes
+  finding:'I\'ve checked the man\'s treatment notes against the teaching schedule. He doesn\'t need another operation. The doctors want to use him to teach their students. They\'re planning to cut him open for a lesson. And Claudia knows about it. I haven\'t signed him over, but they could still come for him.'
  }
 } as const;
 export const STITCHER_STAGE_TITLES:Record<number,string>={

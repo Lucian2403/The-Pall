@@ -1,8 +1,8 @@
 <script lang="ts">
   import {getContext,tick} from 'svelte';
+  import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
-  import {flintOwlerCombatJournal} from '@the-pall/game-core';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import CombatRoundChronicle from '$lib/CombatRoundChronicle.svelte';
@@ -36,23 +36,15 @@
   }
   let journalOpen=$state(false);
   let journalElement:HTMLElement|undefined;
-  let completedJournalShown=$state(false);
+
   async function toggleJournal(){
     journalOpen=!journalOpen;
     await tick();
     if(journalOpen)journalElement?.scrollIntoView({block:'start',behavior:'smooth'});
   }
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
-  // Preserve the existing automatic outcome journal once, but allow the
-  // persistent shell control to close or reopen it during/after combat.
   $effect(()=>{
-    if(ended&&!completedJournalShown){
-      journalOpen=true;
-      completedJournalShown=true;
-    }
-  });
-  $effect(()=>{
-    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,
+    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:isOwler?'The Fight with Owler':'The Fight with Flint',entries:ended?[]:[combatOpening(isOwler?'owler':'flint')],
       toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
@@ -89,7 +81,9 @@
     : snapshot.enemy.hp <= 0
       ? 'Flint is on the ground and cannot stop you. You move past him and leave the passage.You\'re battered and aching all over. Better get yourself to the clinic'
       : 'Flint finally gets out of your way. You keep an eye on him as you walk past, then head down the passage. You\'re battered and aching all over. Better get yourself to the clinic.');
-  const journal=$derived(flintOwlerCombatJournal(snapshot,isOwler));
+  const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
+    snapshot.player.wounds.some(wound => wound.severity === 'serious'));
+  const journal=$derived(combatJournal(encounter,snapshot.outcome,toughVictory));
 
   const iconBase = '/ui-kit/combat-actions/';
   const displayedResources=[
@@ -493,7 +487,7 @@
       </header>
       <div class="journal-entries">
         {#if ended}
-          <p>{isOwler?'Owler tried to force the patient through the night door. I stood in his way, and we fought.':"Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought."}</p>
+          <p>{combatOpening(isOwler?'owler':'flint')}</p>
           <p>{journal}</p>
         {:else}
           <p>{isOwler?"The fight with Owler is still going on. I haven't recorded how it ends.":"The fight with Flint is still going on. I haven't recorded how it ends."}</p>

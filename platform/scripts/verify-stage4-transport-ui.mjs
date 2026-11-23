@@ -14,12 +14,9 @@ assert.match(labels,/\.record-prop/);
 const copy=read('apps/web/src/lib/approved-stage-four.ts');
 const scene=read('apps/web/src/lib/MillhandDepotScene.svelte');
 const core=read('packages/game-core/src/millhand-second-job.ts');
-const diary=read('packages/game-core/src/journal-copy.ts');
-for(const term of ['STAGE_FOUR_TRANSPORT_HINTS','STAGE_FOUR_TRANSPORT_VERIFICATION','Fewer trips. A heavier load','More trips. Less weight','plates have remained properly aligned','count through the stacks again']){
+for(const term of ['STAGE_FOUR_TRANSPORT_HINTS','STAGE_FOUR_TRANSPORT_VERIFICATION','Fewer trips. A heavier load','More trips. Less weight','plates have remained properly aligned','count through the stacks again','I secured the plates together and carried them to the depot as one load','I carried the plates in smaller groups']){
  assert.ok(copy.includes(term),'Missing '+term);
 }
-for(const entry of ['I secured the plates together and carried them to the depot as one load',
- 'I carried the plates in smaller groups'])assert.ok(diary.includes(entry),'Missing shared Journal copy: '+entry);
 assert.match(scene,/STAGE_FOUR_TRANSPORT_HINTS\[action\]/);
 assert.match(scene,/STAGE_FOUR_TRANSPORT_VERIFICATION\[state\.transport\]/);
 assert.match(scene,/Continue to the depot/);

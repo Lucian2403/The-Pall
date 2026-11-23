@@ -1,8 +1,8 @@
 <script lang="ts">
   import {getContext} from 'svelte';
+  import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
-  import {dogmanCombatJournal} from '@the-pall/game-core';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import CombatRoundChronicle from '$lib/CombatRoundChronicle.svelte';
@@ -48,7 +48,7 @@
     else if(!journalOpen&&dialog.open)dialog.close();
   });
   $effect(()=>{
-    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,
+    registerSceneJournal?.({id:'combat-personal-journal',open:journalOpen,title:'The Fight with Dogman',entries:ended?[]:[combatOpening('dogman')],
       toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
@@ -71,7 +71,9 @@
       ? 'You have stepped toward the public street, with room between you and Dogman.'
       : 'You begin with the work cart between you and Dogman; he must go around it.');
   const resultText = 'Dogman stumbles back and lowers the club. He looks toward the public street, then gets out of the way. You keep hold of your bag and walk past him.';
-  const journal=$derived(dogmanCombatJournal(snapshot));
+  const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
+    snapshot.player.wounds.some(wound => wound.severity === 'serious'));
+  const journal=$derived(combatJournal('dogman',snapshot.outcome,toughVictory));
 
   const iconBase = '/ui-kit/combat-actions/';
   const displayedResources=[
@@ -475,7 +477,7 @@
       </header>
       <div class="journal-entries">
         {#if ended}
-          <p>Dogman blocked my way and tried to take my papers. I told him to get lost. He pulled out his club, and that was that.</p>
+          <p>{combatOpening('dogman')}</p>
           <p>{journal}</p>
         {:else}
           <p>The fight with Dogman is still going on. I haven't recorded how it ends.</p>

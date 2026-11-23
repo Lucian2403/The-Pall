@@ -258,7 +258,6 @@ export function registerCharacterRoutes(app:FastifyInstance,options:{
       // Child rows have ON DELETE RESTRICT. Explicitly clear only this owned
       // character's receipts and chapter states, then its creation receipts.
       for(const table of [
-        'player_character_journal_tasks',
         'player_character_tutorial_home_receipts','player_character_tutorial_home',
         'player_character_clinic_receipts','player_character_clinic',
         'player_character_flint_combat_receipts','player_character_flint_combat',

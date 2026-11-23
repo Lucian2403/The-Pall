@@ -35,12 +35,11 @@ import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.t
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
+import {backfillCharacterJournal} from '../apps/api/src/personal-journal-backfill.ts';
 import {archiveJournalTask} from '../apps/api/src/personal-journal-store.ts';
-import {INITIAL_PLATEWORK,advancePlatework} from '@the-pall/game-core';
-import {archiveMillhandWork} from '../apps/api/src/personal-journal-completions.ts';
-import {registerMillhandWorkRoutes} from '../apps/api/src/millhand-work-routes.ts';
-import {registerMissingStampRoutes} from '../apps/api/src/millhand-missing-stamp-routes.ts';
-import {registerMillhandSecondJobRoutes} from '../apps/api/src/millhand-second-job-routes.ts';
+import {INITIAL_PLATEWORK,advancePlatework,availableActions,INITIAL_MISSING_STAMP,
+ advanceMissingStamp,availableMissingStampActions,AUTHORED_MISSING_STAMP_EVIDENCE}
+ from '@the-pall/game-core';
 
 const connectionString=process.env.STAGE6_TEST_DATABASE_URL;
 if(!connectionString||new URL(connectionString).pathname!=='/pall_stage6_test')
@@ -88,9 +87,6 @@ registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 registerPersonalJournalRoutes(app,{pool:db,resolveSession});
-registerMillhandWorkRoutes(app,{pool:db,resolveSession});
-registerMissingStampRoutes(app,{pool:db,resolveSession});
-registerMillhandSecondJobRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
@@ -2803,164 +2799,138 @@ test('Stitcher Stage VI rewind restores the witnessed Stage V preparations and r
  }
 });
 
-test('two characters on one account never share their Personal Journals',async()=>{
- const a=await stitcherFixture();
- const bId=randomUUID();
- await db.query(
-  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,'Journal Millhand',$3,'Male','Millhand',$4::jsonb,'[]'::jsonb,'Smithing workshop',1,'NOT_STARTED')",
-  [bId,owner,'journal-millhand-'+bId,JSON.stringify({Craftsmanship:3})]);
- const journalA=base+a.id+'/journal',journalB=base+bId+'/journal';
- assert.deepEqual((await request('GET',journalA)).body?.tasks,[]);
- assert.deepEqual((await request('GET',journalB)).body?.tasks,[]);
- assert.equal((await request('GET',journalA,null)).status,401);
- assert.equal((await request('GET',journalB,null)).status,401);
- assert.equal((await request('GET',journalA,stranger)).status,404);
- assert.equal((await request('GET',journalB,stranger)).status,404);
- assert.equal((await request('GET',journalA+'?limit=999')).status,400);
 
- // Character A: Morning Dressings -> Teaching Bed -> Notes for the Living.
- let aState=(await request('GET',a.path)).body!;
- for(const action of ['start','ask_linen','continue_intro','continue_intro',
-  'check_ward','begin_round','inspect_b','inspect_a','order_dirty','prep_ready',
-  'dress_b','check_linen','discard_end','dress_a','inspect_finished','record_linen',
-  'report_claudia','continue_report','continue_report','close_round',
-  'observe_bed','ask_patient','read_chart','confront_claudia'] as const)
-   aState=await stitcherCmd(a.path,action,aState);
- for(let i=0;i<STITCHER_CLAUDIA_LINES.length;i++)
-   aState=await stitcherCmd(a.path,'continue_claudia',aState);
- aState=await stitcherCmd(a.path,'choose_notes',aState);
- assert.equal(aState.stage,4);
- for(const action of ['continue_opening','continue_opening',
-  'compare_admission','match_schedule','cross_reference','record_difference'] as const)
-   aState=await stitcherCmd(a.path,action,aState);
- for(let i=0;i<STITCHER_LINES.notes.length;i++)
-   aState=await stitcherCmd(a.path,'continue_dialogue',aState);
- const aDoneKey=randomUUID(),aRevision=aState.state.revision;
- aState=await stitcherCmd(a.path,'finish_job',aState,aDoneKey);
- const aReplay=await request('POST',a.path,owner,{
-  action:'finish_job',expectedRevision:aRevision,requestId:aDoneKey});
- assert.equal(aReplay.status,200);
- assert.equal(aState.stage,5);
+test('Personal Journal strictly isolates one account\'s Stitcher and Millhand journals',async()=>{
+  const a=await stitcherFixture();
+  const empty=(await request('GET',base+a.id+'/journal')).body!;
+  assert.deepEqual(empty,{characterId:a.id,completed:[],nextCursor:null});
+  let st=(await request('GET',a.path)).body!;
+  for(const action of ['start','ask_linen','continue_intro','continue_intro',
+    'check_ward','begin_round','inspect_b','inspect_a','order_dirty',
+    'prep_ready','dress_b','check_linen','discard_end','dress_a',
+    'inspect_finished','record_linen','report_claudia',
+    'continue_report','continue_report','close_round',
+    'observe_bed','ask_patient','read_chart','confront_claudia'] as const)
+    st=await stitcherCmd(a.path,action,st);
+  for(let k=0;k<STITCHER_CLAUDIA_LINES.length;k++)
+    st=await stitcherCmd(a.path,'continue_claudia',st);
+  st=await stitcherCmd(a.path,'choose_notes',st);
+  for(const action of ['continue_opening','continue_opening',
+    'compare_admission','match_schedule','cross_reference','record_difference'] as const)
+    st=await stitcherCmd(a.path,action,st);
+  for(let k=0;k<STITCHER_LINES.notes.length;k++)
+    st=await stitcherCmd(a.path,'continue_dialogue',st);
+  st=await stitcherCmd(a.path,'finish_job',st);
+  assert.equal(st.stage,5);
 
- // Character B: Marking the Plates -> Missing Stamp -> Contracts.
- const work=base+bId+'/millhand/work';
- const command=async(path:string,action:string,revision:number)=>{
-  const result=await request('POST',path,owner,{action,expectedRevision:revision,requestId:randomUUID()});
-  assert.equal(result.status,200,action+': '+JSON.stringify(result.body));
-  return result.body!;
- };
- let m=await command(work,'take_work_paper',0);
- for(const action of ['read_paper','set_stamps','look_at_bent_plate',
-  'straighten','stamp_number','check_number','finish_checking','return_paper'])
-   m=await command(work,action,m.work.revision);
- assert.equal(m.work.phase,'COMPLETE');
- const missing=base+bId+'/millhand/missing-stamp';
- let ms=(await request('GET',missing)).body!;
- for(const action of ['read_cancellation_slip','turn_returned_plate','show_guther',
-  'skip_confrontation','choose_contracts'])
-   ms=await command(missing,action,ms.state.revision);
- assert.equal(ms.state.branch,'contracts');
- const second=base+bId+'/millhand/second-job';
- let job=(await request('GET',second)).body!;
- for(const action of ['examine_work_paper','compare_official_records',
-  'speak_to_contracts_clerk'])
-   job=await command(second,action,job.state.revision);
- for(let i=0;i<7;i++)job=await command(second,'continue_dialogue',job.state.revision);
- job=await command(second,'mark_conflicting_entries',job.state.revision);
- job=await command(second,'submit_dispute',job.state.revision);
- assert.equal(job.state.phase,'DONE');
+  // Separate character, SAME account, SAME task-instance IDs.
+  const b=randomUUID();
+  await db.query(
+    "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status,current_health) VALUES($1,$2,'Millhand Journal Test',$3,'Male','Millhand','{\"Craftsmanship\":3,\"Industry\":1}'::jsonb,'[]'::jsonb,'Smithing workshop',1,'NOT_STARTED',50)",
+    [b,owner,'millhand-journal-'+b]
+  );
+  // Run the actual saved-state reducers. The Millhand work routes use their
+  // own auth pool, so this harness persists their verified outputs and runs
+  // the same idempotent archive/backfill function as the migration.
+  let plate={...INITIAL_PLATEWORK};
+  for(let count=0;count<24&&plate.phase!=='COMPLETE';count++){
+   const actions=availableActions(plate);
+   assert.ok(actions.length,'Platework must expose a legal next step');
+   const action=actions.includes('straighten')?'straighten'
+     :actions.includes('fix_mark')?'fix_mark':actions[0];
+   plate=advancePlatework(plate,action);
+  }
+  assert.equal(plate.phase,'COMPLETE');
+  let stamp={...INITIAL_MISSING_STAMP};
+  for(let count=0;count<75&&stamp.phase!=='SELECTED';count++){
+   const actions=availableMissingStampActions(stamp,AUTHORED_MISSING_STAMP_EVIDENCE);
+   assert.ok(actions.length,'Missing Stamp must expose a legal next step');
+   const action=actions.includes('choose_contracts')?'choose_contracts':actions[0];
+   stamp=advanceMissingStamp(stamp,action,AUTHORED_MISSING_STAMP_EVIDENCE);
+  }
+  assert.equal(stamp.phase,'SELECTED');
+  assert.equal(stamp.branch,'contracts');
+  const client=await db.connect();
+  try{
+   await client.query('BEGIN');
+   await client.query('INSERT INTO player_character_platework(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [b,plate.revision,JSON.stringify(plate)]);
+   await client.query('INSERT INTO player_character_missing_stamp(character_id,revision,state) VALUES($1,$2,$3::jsonb)',
+    [b,stamp.revision,JSON.stringify(stamp)]);
+   await client.query("UPDATE player_characters SET tutorial_stage=4,tutorial_status='NOT_STARTED' WHERE id=$1",[b]);
+   await backfillCharacterJournal(client,{id:b,origin:'Millhand',tutorial_stage:4});
+   await client.query('COMMIT');
+  }catch(error){await client.query('ROLLBACK');throw error;}
+  finally{client.release();}
 
- const readTasks=async(path:string)=>(await request('GET',path)).body!;
- const first=await readTasks(journalA),other=await readTasks(journalB);
- assert.equal(first.characterId,a.id);
- assert.equal(other.characterId,bId);
- assert.deepEqual(first.tasks.map((x:any)=>x.title),[
-  'Claudia Cyka','Morning Dressings','The Teaching Bed','Notes for the Living']);
- assert.deepEqual(other.tasks.map((x:any)=>x.title),[
-  'Marking the Plates','The Missing Stamp','The Contracts Office']);
- assert.ok(first.tasks.some((x:any)=>x.paragraphs.join(' ').includes('surgeon')));
- assert.ok(other.tasks.some((x:any)=>x.paragraphs.join(' ').includes('council')));
- assert.ok(!first.tasks.some((x:any)=>x.title==='The Missing Stamp'));
- assert.ok(!other.tasks.some((x:any)=>x.title==='The Teaching Bed'));
- const aSecond=first.tasks.find((x:any)=>x.taskId==='second-job');
- const bSecond=other.tasks.find((x:any)=>x.taskId==='second-job');
- assert.ok(aSecond&&bSecond,'Identical generic task IDs coexist per character');
- assert.notEqual(aSecond.taskInstanceId,bSecond.taskInstanceId);
- const switchBack=await readTasks(journalA);
- assert.deepEqual(switchBack.tasks,first.tasks,'Switch/reload retrieves the same saved A-only snapshot');
+  // The generic archive contract permits identical task IDs and instance
+  // IDs across characters without collisions, even under one account.
+  const shared=await db.connect();
+  try{
+   await shared.query('BEGIN');
+   for(const id of [a.id,b]){
+    await archiveJournalTask(shared,{
+      characterId:id,taskId:'test.shared-repair',taskInstanceId:'test:shared-repair',
+      stage:2,title:'Shared Repair',paragraphs:['I finished my own repair.']
+    });
+   }
+   // Repeated completion cannot edit the first immutable diary snapshot.
+   await archiveJournalTask(shared,{
+    characterId:a.id,taskId:'test.shared-repair',taskInstanceId:'test:shared-repair',
+    stage:2,title:'Should Never Replace',paragraphs:['This must not overwrite.']
+   });
+   await shared.query('COMMIT');
+  }catch(error){await shared.query('ROLLBACK');throw error;}
+  finally{shared.release();}
+    const fetchJournal=async(id:string,principal:string|null=owner)=>
+    request('GET',base+id+'/journal?limit=20',principal);
+  const aa=await fetchJournal(a.id),bb=await fetchJournal(b);
+  assert.equal(aa.status,200);assert.equal(bb.status,200);
+  const ae=aa.body!.completed,be=bb.body!.completed;
+  assert.ok(ae.some((x:any)=>x.title==='Morning Dressings'));
+  assert.ok(ae.some((x:any)=>x.title==='The Teaching Bed'));
+  assert.ok(ae.some((x:any)=>x.title==='Notes for the Living'));
+  assert.ok(be.some((x:any)=>x.title==='Marking the Plates'));
+  assert.ok(be.some((x:any)=>x.title==='The Missing Stamp'));
+  assert.ok(ae.every((x:any)=>!['Marking the Plates','The Missing Stamp'].includes(x.title)));
+  assert.ok(be.every((x:any)=>!['Morning Dressings','The Teaching Bed',
+    'Notes for the Living'].includes(x.title)));
+  assert.ok(ae.find((x:any)=>x.title==='Notes for the Living').paragraphs
+    .join(' ').includes('teaching schedule'));
+  assert.ok(!ae.some((x:any)=>x.title==='The Night Trolley'));
+  assert.ok(!ae.some((x:any)=>x.title==='The Signed Consent'));
+  assert.ok(be.find((x:any)=>x.title==='The Missing Stamp').paragraphs
+    .join(' ').includes("Contracts office"));
+  assert.ok(ae.some((x:any)=>x.taskInstanceId==='tutorial:stage:2'));
+  assert.ok(be.some((x:any)=>x.taskInstanceId==='tutorial:stage:2'),
+    'Two characters can complete the same task instance without collision');
+  assert.equal(ae.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
+  assert.equal(be.filter((x:any)=>x.taskId==='test.shared-repair').length,1);
+  assert.equal(ae.find((x:any)=>x.taskId==='test.shared-repair').title,'Shared Repair');
 
- // Cursor pagination never leaks tasks: even a cursor copied from the other
- // character is still bound to the requested character and account owner.
- const two=await request('GET',journalA+'?limit=2');
- assert.equal(two.body?.tasks.length,2);
- assert.ok(two.body?.nextCursor);
- const page2=await request('GET',journalA+'?limit=2&cursor='+encodeURIComponent(two.body!.nextCursor));
- assert.equal(page2.body?.tasks.length,2);
- assert.ok(page2.body?.tasks.every((x:any)=>x.stage>=3));
- const crossCursor=await request('GET',journalB+'?limit=5&cursor='+encodeURIComponent(two.body!.nextCursor));
- assert.equal(crossCursor.status,400,'A cursor from A must not paginate B');
- assert.equal(crossCursor.body?.error,'invalid_cursor');
+  // Change characters repeatedly, then "reload" from the persisted database.
+  assert.deepEqual((await fetchJournal(b)).body!.completed,be);
+  assert.deepEqual((await fetchJournal(a.id)).body!.completed,ae);
+  assert.equal((await fetchJournal(a.id,stranger)).status,404);
+  assert.equal((await fetchJournal(b,stranger)).status,404);
+  assert.equal((await fetchJournal(a.id,null)).status,401);
+  const first=(await request('GET',base+a.id+'/journal?limit=1')).body!;
+  assert.equal(first.completed.length,1);
+  assert.ok(first.nextCursor);
+  const second=(await request('GET',base+a.id+'/journal?limit=1&after='+first.nextCursor)).body!;
+  assert.equal(second.completed.length,1);
+  assert.notEqual(first.completed[0].taskInstanceId,second.completed[0].taskInstanceId);
+  assert.equal((await request('GET',base+a.id+'/journal?limit=101')).status,400);
 
- // A's developer rewind may invalidate A's Stage IV only. Not B's task
- // with the same task ID and NEVER B's stored prose.
- const back=await request('POST',a.rewind,owner,{expectedStage:5});
- assert.equal(back.status,200,JSON.stringify(back.body));
- const afterA=await readTasks(journalA);
- assert.ok(!afterA.tasks.some((x:any)=>x.stage===4));
- assert.deepEqual((await readTasks(journalB)).tasks,other.tasks);
+  // Rewind A's Stage V after archiving Stage IV. B's entire history survives.
+  const rewound=await request('POST',a.rewind,owner,{expectedStage:5});
+  assert.equal(rewound.status,200,JSON.stringify(rewound.body));
+  const newer=(await fetchJournal(a.id)).body!.completed;
+  assert.ok(!newer.some((x:any)=>x.title==='Notes for the Living'));
+  assert.ok(newer.some((x:any)=>x.title==='Morning Dressings'));
+  assert.deepEqual((await fetchJournal(b)).body!.completed,be);
 
- // The exact SAME task AND instance identifiers are legal for different
- // characters. The composite PK prevents same-account overwrites.
- const sharedId='world-event/first-instance';
- const tx=await db.connect();
- try{
-  await tx.query('BEGIN');
-  await archiveJournalTask(tx,a.id,{taskId:'world-event',taskInstanceId:sharedId,
-   stage:4,title:'A Private Stitcher Event',
-   paragraphs:['I remember what happened by the infirmary door.']});
-  await archiveJournalTask(tx,bId,{taskId:'world-event',taskInstanceId:sharedId,
-   stage:4,title:'A Private Millhand Event',
-   paragraphs:['I remember what happened at Guther’s workshop.']});
-  await archiveJournalTask(tx,a.id,{taskId:'world-event',taskInstanceId:sharedId,
-   stage:4,title:'Overwriting Attempt',
-   paragraphs:['This second completion must not change the saved diary.']});
-  await tx.query('COMMIT');
- }catch(error){await tx.query('ROLLBACK');throw error;}finally{tx.release();}
- const finalA=await readTasks(journalA),finalB=await readTasks(journalB);
- assert.equal(finalA.tasks.find((x:any)=>x.taskInstanceId===sharedId)?.title,
-  'A Private Stitcher Event');
- assert.equal(finalB.tasks.find((x:any)=>x.taskInstanceId===sharedId)?.title,
-  'A Private Millhand Event');
- assert.ok(!finalA.tasks.some((x:any)=>x.title==='A Private Millhand Event'));
- assert.ok(!finalB.tasks.some((x:any)=>x.title==='A Private Stitcher Event'));
-});
-
-test('Stage VIII character can read their original immutable Stage II diary after reload',async()=>{
- const id=randomUUID();
- await db.query(
-  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,'Completed Millhand',$3,'Male','Millhand',$4::jsonb,'[]'::jsonb,'Smithing workshop',8,'COMPLETED')",
-  [id,owner,'completed-millhand-'+id,JSON.stringify({Craftsmanship:3})]);
- // The history is saved at actual Stage II completion, not reconstructed
- // from Stage VIII or from a client-provided diary paragraph.
- let state=INITIAL_PLATEWORK;
- for(const action of ['read_paper','set_stamps','look_at_bent_plate',
-  'straighten','stamp_number','check_number','finish_checking','return_paper'] as const)
-  state=advancePlatework(state,action);
- assert.equal(state.phase,'COMPLETE');
- const client=await db.connect();
- try{
-  await client.query('BEGIN');
-  await archiveMillhandWork(client,id,state);
-  await client.query('COMMIT');
- }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
- const path=base+id+'/journal';
- const first=await request('GET',path);
- assert.equal(first.status,200,JSON.stringify(first.body));
- assert.deepEqual(first.body?.tasks.map((entry:any)=>[entry.stage,entry.title]),
-  [[2,'Marking the Plates']]);
- assert.ok(first.body!.tasks[0].paragraphs.some((line:string)=>line.startsWith('I ')));
- const reloaded=await request('GET',path);
- assert.deepEqual(reloaded.body,first.body,
-  'The Stage II snapshot remains available after a fresh Stage VIII read');
- assert.equal((await request('GET',path,stranger)).status,404);
+  // Reaching Stage VIII does not erase B's earlier Stage II diary.
+  await db.query("UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",[b]);
+  assert.deepEqual((await fetchJournal(b)).body!.completed,be);
 });

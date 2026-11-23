@@ -140,5 +140,36 @@ export const STAGE_FOUR_FINAL = {
 } as const;
 
 /** Factual personal journal, limited to the route and actions actually committed. */
-
-export {secondJobJournal} from '@the-pall/game-core';
+export function secondJobJournal(s: SecondJobState): readonly string[] {
+  const result: string[] = [];
+  if (s.branch === 'restamp') {
+    result.push("I stamped the worker number once more at Guther's bench. I did not touch the council inspector's mark.");
+    if (s.revision > 0) result.push('I checked the plates and compared the load with the work paper.');
+    if (s.transport === 'secured') result.push('I secured the plates together and carried them to the depot as one load.');
+    if (s.transport === 'smaller_loads') result.push('I carried the plates in smaller groups. It took more trips, but each load was easier to handle.');
+    if (s.phase === 'SPEAK_DEPOT' || s.phase === 'DEPOT_DIALOGUE' || s.phase === 'CHOOSE_RECEIPT' || s.phase === 'COMPLETE_DELIVERY' || s.phase === 'DONE' || s.phase === 'EXITED')
+      result.push("Delivered metal plates to the depot. Someone had entered “workers” on the delivery list. Workers! The clerk could see what I'd brought.");
+    if (s.receipt === 'recorded_plates') result.push('I recorded the received goods as plates.');
+    if (s.receipt === 'requested_correction') result.push('I asked the depot clerk to check the incorrect entry before I signed.');
+    if ((s.phase === 'DONE' || s.phase === 'EXITED')) result.push("The depot recorded the goods as plates in the end. I've got a receipt, but I still don't know why that other entry was wrong. No pay for this job, either.");
+  }
+  if (s.branch === 'contracts') {
+    if (!['EXAMINE_PAPER', 'COMPARE_RECORDS'].includes(s.phase))
+      result.push('One entry treats the man as dead for compensation. In the other they still charge for him as if he were alive. Both have council seals. How can they accept both?');
+    if (s.challenge === 'seal_check') result.push('I asked the clerk to check both seals. Both entries had been accepted. Still no explanation.');
+    if (s.challenge === 'written_complaint') result.push('I marked what was wrong on the work paper. The clerk recorded my complaint.');
+    if ((s.phase === 'DONE' || s.phase === 'EXITED')) result.push("Got the complaint recorded, but the clerk couldn't change either entry or approve the plate lot. Still the same question, and still no wages.");
+  }
+  if (s.branch === 'records') {
+    if (!['READ_DEATH_REGISTER', 'READ_WAGE_RECORD'].includes(s.phase))
+      result.push('Found the worker in the death register. Then I found the same number in later wage records. They were still using it after he died.');
+    if (s.phase === 'SPEAK_ARCHIVE' || s.phase === 'ARCHIVE_DIALOGUE')
+      result.push('Someone had scraped part of an entry from the page. I could not tell what was written there.');
+    if (['CHOOSE_SOURCE', 'RECORD_FINDING', 'DONE','EXITED'].includes(s.phase))
+      result.push("Someone scraped writing from an entry. The archive assistant didn't know who had done it. I wasn't going to damage the page any further.");
+    if (s.source === 'neighbouring_entries') result.push('I compared the entries around the damaged one. The number is still there in the later wage record.');
+    if (s.source === 'shift_book') result.push('I checked the shift book against the wage record. Both have that number after the recorded death.');
+    if ((s.phase === 'DONE' || s.phase === 'EXITED')) result.push("Wrote down what I found. Death, wages afterward, and that scraped line. No idea who changed it. I doubt anyone in that room will explain it to me.");
+  }
+  return result;
+}

@@ -74,5 +74,32 @@ export const MISSING_STAMP_ROUTES: Readonly<Record<MissingStampBranch, {
  * Approved factual first-person journal, derived from persisted inspections.
  * Never substitute example dates or unapproved bracket placeholders in-game.
  */
-
-export {missingStampJournal} from '@the-pall/game-core';
+export function missingStampJournal(
+  state: { slipRead: boolean; plateRead: boolean; phase: string; branch: string | null },
+  evidence: ReadableMissingStampEvidence | null,
+  slip: { workerNumber: string | null; recordedDeathDate: string | null } | null,
+  plate: { workerNumber: string | null; inspectionDate: string | null } | null
+): readonly string[] {
+  const entries: string[] = [
+    'I returned the finished work paper to Guther. A returned plate and a folded cancellation slip were with the council\'s papers.'
+  ];
+  if (slip && state.slipRead)
+    entries.push('I read the cancellation slip. The council recorded a worker as dead after a fire in a locked workshop.' +
+      (slip.workerNumber ? ' The worker number was ' + slip.workerNumber + '.' : '') +
+      (slip.recordedDeathDate ? ' The recorded death date was ' + slip.recordedDeathDate + '.' : ''));
+  if (plate && state.plateRead)
+    entries.push("I examined a returned plate with a council inspector's mark." +
+      (plate.workerNumber ? ' The worker number was ' + plate.workerNumber + '.' : '') +
+      (plate.inspectionDate ? ' The mark was dated ' + plate.inspectionDate + '.' : ''));
+  if (evidence && state.slipRead && state.plateRead)
+    entries.push('Both records carry the same worker number as a plate I stamped. The inspection date is later than the recorded death.');
+  if (state.phase === 'DECISION' || state.branch !== null)
+    entries.push('I showed Guther the records. He could not explain the dates. He would not approve the disputed lot, and the council had not paid us.');
+  if (state.branch === 'restamp')
+    entries.push('I chose to stamp the worker number again and deliver the lot to the depot. The inspector\'s mark is not part of my work.');
+  if (state.branch === 'contracts')
+    entries.push('I chose to take the disputed work paper to the council\'s Contracts office.');
+  if (state.branch === 'records')
+    entries.push('I wrote down the worker number and chose to check the council\'s records.');
+  return entries;
+}

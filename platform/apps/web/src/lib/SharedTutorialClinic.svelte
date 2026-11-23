@@ -1,9 +1,9 @@
 <script lang="ts">
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
+  import {clinicJournal} from '$lib/clinic-journal-copy';
   // Both origins share this exact clinic stage, layout and medical state.
   import {onMount,tick,getContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import {clinicJournal} from '@the-pall/game-core';
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -105,7 +105,7 @@
   // actual entries stay below the illustrated clinic.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
   $effect(()=>{
-    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,toggle:()=>{void toggleJournal();}});
+    registerSceneJournal?.({id:'clinic-journal',open:journalOpen,title:"The Clinic",entries:[journal],toggle:()=>{void toggleJournal();}});
     return ()=>registerSceneJournal?.(null);
   });
   let journalElement:HTMLElement|undefined;
@@ -113,7 +113,9 @@
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
   const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
   const departure=$derived(clinic?clinicianDischarge(clinic.conditionType):'');
-  const journal=$derived(clinicJournal(origin,clinic));
+  const journal=$derived(clinic?clinicJournal(origin,{
+    paid:clinic.paid,outcome:clinic.outcome,conditionType:clinic.conditionType
+  }):'');
 
   async function toggleJournal(){
     journalOpen=!journalOpen;

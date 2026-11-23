@@ -1,11 +1,10 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
+  import {homeJournalIntro as homeJournalIntroText} from '$lib/home-journal-copy';
   import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
-  import {homeJournal} from '@the-pall/game-core';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
-  import PersonalJournalHistory from '$lib/PersonalJournalHistory.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/pall-story-landscape.css';
 
@@ -28,7 +27,8 @@
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
   let noticeExpanded=$state(false);
-  let overlayKind=$state<'storage'|'journal'|null>(null);
+  let overlayKind=$state<'storage'|null>(null);
+  let journalOpen=$state(false);
   let overlayDialog:HTMLDialogElement|undefined;
   let nextOpenSound=0;
   const chestOpenSounds=['/audio/chest/PersonalChest_Open1.wav',
@@ -45,31 +45,23 @@
     if(overlayKind==='storage')playChestSound('close');
     overlayKind=null;
   }
-  const journalOpen=$derived(overlayKind==='journal');
   let retryKey:string|null=null,retryId:string|null=null;
-  // Exactly one local Stage IV finding from the persisted route. Keep the
-  // incident unresolved. Never reveal discoveries from unchosen branches.
-  const homeDiary=$derived(homeJournal(home));
-  const routeEntry=$derived(homeDiary.routeEntry);
-  const combatEntry=$derived(homeDiary.combatEntry);
-  const homeJournalIntro=$derived(homeDiary.homeJournalIntro);
+  const homeJournalIntro=$derived(home?homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner'):'');
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
-  async function openRoomOverlay(kind:'storage'|'journal'){
+  async function openRoomOverlay(kind:'storage'){
     overlayKind=kind;
     await tick();
     if(!overlayDialog?.open){
       overlayDialog?.showModal();
-      if(kind==='storage')playChestSound('open');
+      playChestSound('open');
     }
   }
   function closeRoomOverlay(){
     overlayDialog?.close();
   }
-  function toggleJournal(){
-    if(journalOpen)closeRoomOverlay();
-    else void openRoomOverlay('journal');
-  }
+  function toggleJournal(){journalOpen=!journalOpen;}
+  $effect(()=>{const currentId=id;journalOpen=false;void currentId;});
   async function refresh(){
     status='loading';errorMessage='';restMessage='';
     try{
@@ -142,7 +134,8 @@
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
-    journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal}}>
+    journalController={{id:'home-journal',open:journalOpen,toggle:toggleJournal,
+      title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
@@ -232,30 +225,9 @@
       {/snippet}
       </ActivityLayout>
         <dialog bind:this={overlayDialog} class="room-overlay"
-          aria-label={overlayKind==='storage'?'Inventory and Home Chest':'Personal Journal'}
-          onclose={handleRoomOverlayClose}>
+          aria-label="Inventory and Home Chest" onclose={handleRoomOverlayClose}>
           {#if overlayKind==='storage'}
             <InventoryPanel characterId={id} onClose={closeRoomOverlay}/>
-          {:else if overlayKind==='journal'}
-            <section id="home-journal" class="journal" aria-label="Personal Journal">
-              <header class="journal-heading">
-                <div><small>YOUR RECORD</small><h2>Personal Journal</h2></div>
-                <button class="pall-framed-button" type="button" data-pall-sfx="paper"
-                  onclick={closeRoomOverlay}>Close journal</button>
-              </header>
-              <div class="journal-body" id="home-current-journal">
-                <h3>Current</h3>
-                <p>{homeJournalIntro}</p>
-                {#if routeEntry}<p>{routeEntry}</p>{/if}
-                {#if combatEntry}<p>{combatEntry}</p>{/if}
-              </div>
-              {#if character}
-                {#key character.id}
-                  <PersonalJournalHistory characterId={character.id} open={journalOpen}
-                    currentJournalId="home-current-journal"/>
-                {/key}
-              {/if}
-            </section>
           {/if}
         </dialog>
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}

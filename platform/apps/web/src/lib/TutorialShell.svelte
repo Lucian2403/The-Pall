@@ -1,14 +1,14 @@
 <script lang="ts">
   import type {Snippet} from 'svelte';
-  import {onMount,setContext,tick} from 'svelte';
+  import {onMount,setContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRegistrar} from '$lib/scene-journal';
-  import PersonalJournalHistory from '$lib/PersonalJournalHistory.svelte';
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
   import ShellServiceControl,{type ShellService} from '$lib/ShellServiceControl.svelte';
   import WelcomeToThePall from '$lib/WelcomeToThePall.svelte';
+  import PersonalJournal from '$lib/PersonalJournal.svelte';
   import {setPallAudioScene,claimSmithingWorkshopAmbience,stopSmithingWorkshopAmbience,claimCouncilOfficeAmbience,stopCouncilOfficeAmbience,claimNightAlleyAmbience,stopNightAlleyAmbience,claimDepotAmbience,stopDepotAmbience,claimMedicalClinicAmbience,stopMedicalClinicAmbience,playCoinTransactionSfx} from '$lib/pall-audio';
 
   type SavedCharacter = {
@@ -154,28 +154,21 @@
   // Scene components register their already-existing journals through context.
   let sceneJournal=$state<SceneJournalController|null>(null);
   const activeSceneJournal=$derived(journalController??sceneJournal);
-  const journalExpanded=$derived(activeSceneJournal?.open??emptyJournalOpen);
-  function togglePersonalJournal(){
-    if(activeSceneJournal)activeSceneJournal.toggle();
-    else void toggleEmptyJournal();
-  }
-  // Clear any prior character's scene journal controller on character changes.
-  let journalOwner=$state(character.id);
-  $effect(()=>{
-    if(character.id!==journalOwner){
-      journalOwner=character.id;sceneJournal=null;emptyJournalOpen=false;
-    }
-  });
-  let emptyJournalOpen=$state(false);
+  let journalVisible=$state(false);
+  const journalExpanded=$derived(journalController?journalController.open:journalVisible);
   const registerJournal:SceneJournalRegistrar=(controller)=>{sceneJournal=controller;};
   setContext(SCENE_JOURNAL_CONTEXT,registerJournal);
-  async function toggleEmptyJournal(){
-    emptyJournalOpen=!emptyJournalOpen;
-    if(emptyJournalOpen){
-      await tick();
-      document.getElementById('scene-empty-journal')?.scrollIntoView({block:'start',behavior:'smooth'});
-    }
+  function togglePersonalJournal(){
+    if(journalController)journalController.toggle();
+    else journalVisible=!journalVisible;
   }
+  $effect(()=>{
+    // Prevent any previous character's journal/controller surviving a switch.
+    const currentId=character.id;
+    journalVisible=false;
+    sceneJournal=null;
+    void currentId;
+  });
 
   // Audio scope belongs to the *actual mounted game shell*, not a guess
   // about the URL in a separate root layout. All HUD controls are therefore
@@ -357,13 +350,14 @@
       <a class:active={activePage === 'character'} class="nav-entry" href={detail} title="Character" aria-current={activePage === 'character' ? 'page' : undefined}>
         <span class="nav-icon" aria-hidden="true">◈</span><span class="nav-text">Character</span>
       </a>
+      <button type="button" class="nav-entry journal-nav" class:active={journalExpanded}
+        aria-controls="personal-journal" aria-expanded={journalExpanded}
+        onclick={togglePersonalJournal}>
+        <span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Journal</span>
+      </button>
       <a class="nav-entry" href="/characters" title="Characters">
         <span class="nav-icon" aria-hidden="true">☰</span><span class="nav-text">Characters</span>
       </a>
-      <button type="button" class="nav-entry journal-nav" aria-expanded={journalExpanded}
-        aria-controls="personal-journal-history" onclick={togglePersonalJournal}>
-        <span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Journal</span>
-      </button>
     </nav>
     <div class="nav-rule"></div>
     <p class="locked-heading">AFTER YOUR INTRODUCTION</p>
@@ -499,7 +493,7 @@
       <div class="scene-journal-bar" aria-label="Personal journal controls">
         <button type="button" class="scene-journal-button" data-pall-sfx="paper"
           aria-expanded={journalExpanded}
-          aria-controls={activeSceneJournal?.id??'scene-empty-journal'}
+          aria-controls="personal-journal"
           onclick={togglePersonalJournal}>
           {journalExpanded?'Close journal':'Review journal'}
         </button>
@@ -512,17 +506,12 @@
       {@render children()}
     </div>
 
-    {#if !sceneJournal && emptyJournalOpen}
-      <section class="empty-journal" id="scene-empty-journal" aria-label="Personal Journal">
-        <small>PERSONAL JOURNAL</small>
-        <h2>Current scene</h2>
-        <p>No journal entry has been recorded for this scene yet.</p>
-      </section>
-    {/if}
-    {#if journalExpanded&&!journalController}
+    {#if journalExpanded}
       {#key character.id}
-        <PersonalJournalHistory characterId={character.id} open={journalExpanded}
-          currentJournalId={activeSceneJournal?.id??'scene-empty-journal'}/>
+        <PersonalJournal characterId={character.id}
+          currentTitle={activeSceneJournal?.title??'Current task'}
+          currentEntries={activeSceneJournal?.entries??[]}
+          onClose={togglePersonalJournal}/>
       {/key}
     {/if}
 
@@ -730,8 +719,6 @@
   .rewind-error{margin:0;padding:9px 16px;background:#34231c;color:#f0b7a0;font:13px/1.4 sans-serif}
   /* One stable location for Review/Close journal through every illustrated
      scene, conversation, physical task, clinic and active combat. */
-  .journal-nav{width:100%;text-align:left;cursor:pointer;border:0;background:transparent;color:inherit}
-  .journal-nav:focus-visible{outline:2px solid #efd092;outline-offset:-2px}
   .scene-journal-bar{display:flex;align-items:center;margin-left:auto}
   .scene-journal-button{appearance:none;cursor:pointer;min-height:38px;
     border:solid transparent;border-width:8px 13px;
@@ -741,12 +728,9 @@
     font:700 14px/1.3 var(--pall-font-reading,Georgia,serif)}
   .scene-journal-button:is(:hover,:focus-visible){border-image-source:url('/ui-kit/buttons/button-hover-trim.png')}
   .scene-journal-button:focus-visible{outline:2px solid #efd092;outline-offset:2px}
-  .empty-journal{padding:22px clamp(16px,3vw,45px);background:#e6d5b5;color:#24160e;border-top:2px solid #94704a;scroll-margin-top:56px}
-  .empty-journal small{font:700 13px var(--pall-font-label,'Arial Narrow',sans-serif)}
-  .empty-journal h2{margin:5px 0 10px;font:600 23px Georgia,serif}
-  .empty-journal p{font:600 16px/1.55 Georgia,serif}
   .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
   .chapter-content :global([id$="-journal"]){scroll-margin-top:56px}
+  .journal-nav{appearance:none;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left;width:100%}
   .onboarding-footer{border-top:1px solid #4d3928;padding:10px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .shell-dock{position:sticky;top:0;align-self:start;height:100vh;height:100dvh;min-width:0;overflow:auto;
     border-left:1px solid #56412d;background:#171715}

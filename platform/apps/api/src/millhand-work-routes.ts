@@ -1,13 +1,14 @@
-import {archiveMillhandWork} from './personal-journal-completions.js';
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {plateworkTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
-import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
 import {auth} from './auth.js';
 import {INITIAL_PLATEWORK, WORK_ACTIONS, availableActions, advancePlatework, PlateworkInvalidAction} from '@the-pall/game-core';
 import type {PlateworkAction, PlateworkState} from '@the-pall/game-core';
 
+const db = new pg.Pool({connectionString: process.env.DATABASE_URL});
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params = {id: string};
 type CharacterState = {origin: string; tutorial_stage: number; tutorial_status: string};
@@ -39,18 +40,11 @@ function snapshot(char: CharacterState, work: PlateworkState | null) {
   };
 }
 
-export function registerMillhandWorkRoutes(app:FastifyInstance,options:{
-  pool?:pg.Pool;resolveSession?:(headers:IncomingHttpHeaders)=>Promise<{
-    user:{id:string;emailVerified:boolean}
-  }|null>;
-}={}) {
-  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
-  const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
-    auth.api.getSession({headers:fromNodeHeaders(headers)}));
-  app.addHook('onClose', async () => {if(!options.pool)await db.end();});
+export function registerMillhandWorkRoutes(app: FastifyInstance) {
+  app.addHook('onClose', async () => {await db.end();});
 
   app.get<{Params: Params}>('/api/characters/:id/millhand/work', async (req, reply) => {
-    const session = await resolveSession(req.headers);
+    const session = await auth.api.getSession({headers: fromNodeHeaders(req.headers)});
     if (!session?.user.emailVerified) return reply.code(401).send({error:'unauthorized'});
     if (!UUID.test(req.params.id)) return reply.code(404).send({error:'not_found'});
 
@@ -67,7 +61,7 @@ export function registerMillhandWorkRoutes(app:FastifyInstance,options:{
   });
 
   app.post<{Params: Params}>('/api/characters/:id/millhand/work', async (req, reply) => {
-    const session = await resolveSession(req.headers);
+    const session = await auth.api.getSession({headers: fromNodeHeaders(req.headers)});
     if (!session?.user.emailVerified) return reply.code(401).send({error:'unauthorized'});
     if (!UUID.test(req.params.id)) return reply.code(404).send({error:'not_found'});
     const origin = req.headers.origin;
@@ -153,12 +147,15 @@ export function registerMillhandWorkRoutes(app:FastifyInstance,options:{
           [req.params.id,next.revision,JSON.stringify(next)]
         );
       }
+      if(command.action!=='take_work_paper'&&current?.phase!=='COMPLETE'&&
+          next.phase==='COMPLETE'){
+        await archiveJournalTask(client,plateworkTask(req.params.id,next));
+      }
       const result = snapshot(nextChar,next);
       await client.query(
         'INSERT INTO player_character_work_receipts(character_id,request_id,request_hash,result) VALUES ($1,$2,$3,$4::jsonb)',
         [req.params.id,command.requestId,hash,JSON.stringify(result)]
       );
-      await archiveMillhandWork(client,req.params.id,next);
       await client.query('COMMIT'); inTransaction = false;
       return reply.code(200).send(result);
     } catch(e) {

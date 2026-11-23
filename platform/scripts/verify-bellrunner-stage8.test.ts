@@ -58,14 +58,13 @@ test('Both backgrounds share exact rented-room notice, rent, closing speech and 
   assert.equal(view(state,'Courier',10).completed,true);
  }
 });
-test('Bellrunner Stage VIII reuses actual home art and takes only selected finding to journal',()=>{
+test('Bellrunner Stage VIII retains home artwork and uses the shared character-specific journal',()=>{
  const api=read('apps/api/src/tutorial-home-routes.ts');
  const web=read('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const clinic=read('apps/web/src/lib/SharedTutorialClinic.svelte');
  const home=read('apps/web/src/lib/CharacterHome.svelte');
  const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
  const shell=read('apps/web/src/lib/TutorialShell.svelte');
- const diary=read('packages/game-core/src/journal-copy.ts');
  assert.ok(api.includes("!['Millhand','Bellrunner'].includes(c.origin)"));
  assert.ok(api.includes('player_character_bellrunner_wrong_bell'));
  assert.ok(api.includes('player_character_bellrunner_second_job'));
@@ -78,11 +77,14 @@ test('Bellrunner Stage VIII reuses actual home art and takes only selected findi
  assert.ok(web.includes("url('/locations/home/rented-room.webp')"));
  assert.ok(web.includes('src="/locations/home/notice.webp"'));
  assert.ok(web.includes("home.origin==='Bellrunner'?'Bellrunner opening complete.'"));
- assert.ok(diary.includes("home?.origin==='Bellrunner'"));
- assert.ok(diary.includes("home.branch==='contracts'"));
- assert.ok(diary.includes("home.branch==='trauma'"));
- assert.ok(diary.includes("home.branch==='machinery'"));
- assert.ok(diary.includes("home.outcome==='player_victory'"));
+ assert.ok(web.includes("homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner')"));
+ assert.ok(read('apps/web/src/lib/home-journal-copy.ts').includes("origin==='Bellrunner'"));
+ assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]"));
+ assert.ok(web.includes("journalController={{id:'home-journal'"));
+ assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
+ assert.ok(shell.includes('character.id'));
+ assert.ok(!web.includes('id="home-journal"'),
+   'Home must not create a second competing Journal overlay');
  assert.ok(web.includes('class="hotspot bed"'));
  assert.ok(web.includes('class="hotspot chest"'));
  assert.ok(web.includes('class="hotspot book"'));

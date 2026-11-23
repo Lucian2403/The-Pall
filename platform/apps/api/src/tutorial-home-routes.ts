@@ -1,7 +1,8 @@
-import {archiveCompletedHome} from './personal-journal-completions.js';
 /** Authenticated, idempotent Stage 8 home shared by Millhand and Bellrunner.
  * The rented room, rent, closing speech, storage and Home state are identical. */
 import type {FastifyInstance} from 'fastify';
+import {archiveJournalTask} from './personal-journal-store.js';
+import {homeTask} from './personal-journal-tasks.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -155,12 +156,13 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
      if(!(error instanceof HomeInvalidAction))throw error;
      await db.query('ROLLBACK');open=false;return reply.code(409).send({error:error.message});
     }
-    if(state.phase==='COMPLETE')
+    if(state.phase==='COMPLETE'&&old.phase!=='COMPLETE'){
      await db.query("UPDATE player_characters SET tutorial_status='COMPLETED' WHERE id=$1",[c.id]);
+     await archiveJournalTask(db,homeTask(c.id,state));
+    }
     await db.query('UPDATE player_character_tutorial_home SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
      [c.id,state.revision,JSON.stringify(state)]);
    }
-   if(state.phase==='COMPLETE')await archiveCompletedHome(db,c.id,state);
    const result=view(state,c.name,Number(c.coins));
    await db.query('INSERT INTO player_character_tutorial_home_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [c.id,cmd.requestId,hash,JSON.stringify(result)]);
