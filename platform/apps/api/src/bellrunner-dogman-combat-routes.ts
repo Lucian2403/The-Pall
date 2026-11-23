@@ -1,3 +1,4 @@
+import {archiveBellrunnerConfrontation,archiveFinishedCombat} from './personal-journal-completions.js';
 /**
  * Bellrunner Stage 6 — Dogman. This is the authenticated PostgreSQL adapter for
  * the exact v0.5.1 engine, NOT a new combat implementation.
@@ -186,6 +187,7 @@ export function registerBellrunnerDogmanCombatRoutes(app:FastifyInstance,options
             [req.params.id,stance,JSON.stringify(state),'[]']);
           await client.query(
             "UPDATE player_characters SET tutorial_status='IN_PROGRESS' WHERE id=$1",[req.params.id]);
+          await archiveBellrunnerConfrontation(client,req.params.id,claims.rows[0].state as Parameters<typeof archiveBellrunnerConfrontation>[2]);
         }
       }else{
         if(!saved.rowCount){
@@ -218,6 +220,7 @@ export function registerBellrunnerDogmanCombatRoutes(app:FastifyInstance,options
           narrateCommittedTurn(state.events,command.action,record.state.intent,
             state,record.history),state,record.history);
         record={state,stance,history:[...record.history,...state.events]};
+        if(state.status==='finished')await archiveFinishedCombat(client,req.params.id,'Bellrunner',state);
         await client.query(
           'UPDATE player_character_dogman_combat SET revision=$2,state=$3::jsonb,history=$4::jsonb,outcome=$5,updated_at=NOW() WHERE character_id=$1',
           [req.params.id,state.revision,JSON.stringify(state),JSON.stringify(record.history),state.outcome]);
