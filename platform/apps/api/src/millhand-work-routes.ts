@@ -1,13 +1,13 @@
 import {archiveMillhandWork} from './personal-journal-completions.js';
 import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
+import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
 import {createHash} from 'node:crypto';
 import {auth} from './auth.js';
 import {INITIAL_PLATEWORK, WORK_ACTIONS, availableActions, advancePlatework, PlateworkInvalidAction} from '@the-pall/game-core';
 import type {PlateworkAction, PlateworkState} from '@the-pall/game-core';
 
-const db = new pg.Pool({connectionString: process.env.DATABASE_URL});
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params = {id: string};
 type CharacterState = {origin: string; tutorial_stage: number; tutorial_status: string};
@@ -39,11 +39,18 @@ function snapshot(char: CharacterState, work: PlateworkState | null) {
   };
 }
 
-export function registerMillhandWorkRoutes(app: FastifyInstance) {
-  app.addHook('onClose', async () => {await db.end();});
+export function registerMillhandWorkRoutes(app:FastifyInstance,options:{
+  pool?:pg.Pool;resolveSession?:(headers:IncomingHttpHeaders)=>Promise<{
+    user:{id:string;emailVerified:boolean}
+  }|null>;
+}={}) {
+  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
+    auth.api.getSession({headers:fromNodeHeaders(headers)}));
+  app.addHook('onClose', async () => {if(!options.pool)await db.end();});
 
   app.get<{Params: Params}>('/api/characters/:id/millhand/work', async (req, reply) => {
-    const session = await auth.api.getSession({headers: fromNodeHeaders(req.headers)});
+    const session = await resolveSession(req.headers);
     if (!session?.user.emailVerified) return reply.code(401).send({error:'unauthorized'});
     if (!UUID.test(req.params.id)) return reply.code(404).send({error:'not_found'});
 
@@ -60,7 +67,7 @@ export function registerMillhandWorkRoutes(app: FastifyInstance) {
   });
 
   app.post<{Params: Params}>('/api/characters/:id/millhand/work', async (req, reply) => {
-    const session = await auth.api.getSession({headers: fromNodeHeaders(req.headers)});
+    const session = await resolveSession(req.headers);
     if (!session?.user.emailVerified) return reply.code(401).send({error:'unauthorized'});
     if (!UUID.test(req.params.id)) return reply.code(404).send({error:'not_found'});
     const origin = req.headers.origin;
