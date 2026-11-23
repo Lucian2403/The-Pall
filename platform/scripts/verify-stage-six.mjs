@@ -73,7 +73,8 @@ assert.ok(home.includes('/millhand/combat')&&shell.includes('/millhand/combat'))
 assert.ok(scene.includes('snapshot.enemyIntent') &&
   scene.includes('snapshot.events') &&
   scene.includes('snapshot.rules') &&
-  scene.includes('snapshot.player.wounds.some') &&
+  (scene.includes('snapshot.player.wounds.some') ||
+     scene.includes('flintOwlerCombatJournal(snapshot,isOwler)')) &&
   scene.includes('snapshot.outcome') &&
   scene.includes('Continue to medical care') &&
   scene.includes('/millhand/clinic'),
