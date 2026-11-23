@@ -148,13 +148,14 @@ incorrect. It used a bespoke font/size, a full-width status sheet
 (`Work / Location / Status / Method / Recorded check / Local finding`)
 and a black square close button. None of that was owner-approved.
 
-The corrected Journal follows the exact existing Millhand Stage 3
-presentation: page-flow parchment `.journal-panel`, centered 930px
-`.journal-entries`, original Journal heading/close artwork and the
-**Pall New Standard 16px/600** reading typeface, **24px/600** title,
-and **Pall Bebas Neue 14px/700** kicker from
-`platform/apps/web/src/lib/pall-owner-ui.css`. Typography is not
-redefined by a Bellrunner scene.
+Bellrunner now shares the **same** `PersonalJournal.svelte` frame,
+Current/Completed tabs, compact titles and 16px first-person reading text as
+every origin. There are no scene-local `.journal-panel`,
+`.journal-entries`, bespoke Close buttons, or duplicated open state. The
+scene registers only its authenticated, stage-grounded `title` and
+`entries` through `SCENE_JOURNAL_CONTEXT`. TutorialShell owns the single
+Journal renderer and click behavior. The Current text always appears below
+the Current tab; completed tasks reuse the same text style.
 
 `bellrunner-stage4-journal.ts` derives short **first-person** diary
 paragraphs from the saved branch, actions, inspected discrepancy,
@@ -167,8 +168,9 @@ choice or awards rewards. This implements the already-approved
 voice contract for Bellrunner as well.
 
 `verify:bellrunner-stage4` and the Stage 4 Chromium workflow check
-the voice, timing, markup, computed fonts and journal geometry.
-All future origin/stage journals must reuse this contract.
+the first-person voice, stage-grounded entry timing, shared tab layout,
+computed fonts and archive isolation. All origins must use the same component
+and must not recreate local Journal markup or controls.
 
 ## Stage 4 — do not echo the story in data cards
 

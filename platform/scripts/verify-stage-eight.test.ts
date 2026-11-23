@@ -115,7 +115,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !web.includes('class="rent-status"')&&
   !web.includes('class="paper-object"')&&
   !web.includes('background:#f5d18b24')&&
-  web.includes("journalController={{id:'home-journal'")&&
+  web.includes("journalController={{open:journalOpen")&&
   !web.includes('id="home-journal"')&&
   web.includes("if(home.phase==='HOME')void perform('read_notice')")&&
   web.includes("home.phase==='COMPLETE'")&&
@@ -264,7 +264,7 @@ test('Rented-room chest keeps its modal; Journal uses the shared reader',()=>{
  assert.ok(web.includes('class="room-overlay"'));
  assert.ok(web.includes('<InventoryPanel characterId={id} onClose={closeRoomOverlay}/>'));
  assert.ok(web.includes("onclick={()=>{void toggleJournal();}}"));
- assert.ok(web.includes("journalController={{id:'home-journal'"));
+ assert.ok(web.includes("journalController={{open:journalOpen"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(!web.includes('class="journal" aria-label="Personal Journal"'));
 });

@@ -203,12 +203,18 @@ for(const sourcePath of [
   'apps/web/src/lib/MillhandRecordsScene.svelte',
   'apps/web/src/lib/MillhandWageClaimScene.svelte',
   'apps/web/src/lib/SharedTutorialClinic.svelte',
-  'apps/web/src/lib/MillhandCombatScene.svelte'
+  'apps/web/src/lib/MillhandCombatScene.svelte',
+  'apps/web/src/lib/MillhandWorkScene.svelte',
+  'apps/web/src/lib/MillhandSecondJobScene.svelte',
+  'apps/web/src/lib/StitcherWardScene.svelte',
+  'apps/web/src/lib/BellrunnerSecondJobScene.svelte',
+  'apps/web/src/lib/BellrunnerDogmanScene.svelte',
+  'apps/web/src/lib/BellrunnerDogmanCombatScene.svelte'
 ]){
   const source=read(sourcePath);
   const clinic=sourcePath.includes('Clinic');
   assert.ok(clinic?source.includes("journalContent={{title:'The Clinic'"):
-    source.includes('registerSceneJournal?.({title:'),
+    /register(?:SceneJournal|Journal)?\?\.\(\{title:/.test(source),
     sourcePath+' must provide current prose to the one shared Journal');
   assert.ok(!/journalOpen|toggleJournal|class="journal-entries"|class="journal-toggle"|class="journal-close"/.test(source),
     sourcePath+' must not own a duplicate Journal panel, ID or toggle');
