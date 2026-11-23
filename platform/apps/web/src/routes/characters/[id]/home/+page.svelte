@@ -3,6 +3,7 @@
   import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import {homeJournal} from '@the-pall/game-core';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
   import PersonalJournalHistory from '$lib/PersonalJournalHistory.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
@@ -48,31 +49,10 @@
   let retryKey:string|null=null,retryId:string|null=null;
   // Exactly one local Stage IV finding from the persisted route. Keep the
   // incident unresolved. Never reveal discoveries from unchosen branches.
-  const routeEntry=$derived(home?.origin==='Bellrunner'
-    ?home.branch==='contracts'
-      ?"The register called workers who refused the condemned building voluntarily absent. They lost their wages for staying out."
-      :home.branch==='trauma'
-        ?"The medical register called the workers' complaints non-work illness. They were left paying for their own treatment."
-        :home.branch==='machinery'
-          ?"The safety shutoff was engaged, but the bell linkage was left connected. Someone moved that retaining pin. I don't know who."
-          :null
-    :home?.branch==='restamp'
-      ?'The depot recorded metal plates, though the original manifest called them a transfer of workers.'
-      :home?.branch==='contracts'
-        ?'Two contradictory official classifications were sealed for the same dead worker number. I lodged an objection.'
-        :home?.branch==='records'
-          ?'The cancelled worker number appears in a later wage tally. A correction in the records had been scraped away.':null);
-  const combatEntry=$derived(home?.origin==='Bellrunner'
-    ?home.outcome==='player_victory'
-      ?"Dogman tried to take my papers, but he backed off when I got past him. I've still got them."
-      :"Dogman knocked me down by the service gate and tried to get into my bag. Luckily, some workers came down the street, and the bastard cleared off. A passerby helped me to the clinic. At least I've still got my route sheet."
-    :home?.outcome==='player_victory'
-      ?'Flint backed away from the passage after our fight.'
-      :home?.outcome==='player_defeat'
-        ?'Flint beat me. Another worker helped me get to the clinic.':null);
-  const homeJournalIntro=$derived(home?.origin==='Bellrunner'
-    ?"Home at last. Ten coins left after the clinic, and now I've got a rent notice demanding a hundred and fifty. Two jobs done, not a bloody coin earned. And after everything that's happened today, I'm lucky to be home at all. I need to find work that actually pays."
-    :"Home at last. Ten coins left after the clinic, and now the rent is a hundred and fifty. Lovely. Two jobs, no wages, and a fight with Flint on top of it. Need to find some work that actually pays.");
+  const homeDiary=$derived(homeJournal(home));
+  const routeEntry=$derived(homeDiary.routeEntry);
+  const combatEntry=$derived(homeDiary.combatEntry);
+  const homeJournalIntro=$derived(homeDiary.homeJournalIntro);
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
   async function openRoomOverlay(kind:'storage'|'journal'){
