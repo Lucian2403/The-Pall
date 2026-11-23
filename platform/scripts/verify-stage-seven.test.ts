@@ -216,6 +216,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   const api=source('apps/api/src/millhand-clinic-routes.ts');
   const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
   const clinician=source('apps/web/src/lib/millhand-clinic-dialogue.ts');
+  const journalCopy=source('packages/game-core/src/journal-copy.ts');
   const battle=source('apps/web/src/lib/MillhandCombatScene.svelte');
   const migration=source('db/migrations/0008_millhand_clinic.sql');
   const boot=source('apps/api/src/index.ts');
@@ -226,7 +227,8 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(api.includes('tutorial_stage=8'));
   assert.ok(!api.includes('UPDATE player_character_flint_combat'));
   assert.ok(!api.includes('ordinary_xp'));
-  assert.ok(web.includes("clinic?.conditionType==='cut'"));
+  assert.ok(journalCopy.includes("clinic?.conditionType==='cut'"));
+   assert.ok(web.includes('clinicJournal(origin,clinic)'));
   assert.ok(web.includes('Examine condition'));
   assert.ok(web.includes('Review the price'));
   assert.ok(web.includes('Pay 10 coins'));
