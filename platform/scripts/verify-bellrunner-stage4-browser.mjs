@@ -249,7 +249,7 @@ try{
         assert.equal(await evalJS("document.querySelectorAll('#personal-journal .journal-reading').length"),1,
           'Exactly one shared diary reading area');
         await evalJS("Array.from(document.querySelectorAll('#personal-journal .journal-tabs button')).find(b=>b.textContent?.trim()==='Current')?.click();true");
-        await until(()=>evalJS("document.querySelector('#journal-reading')?.textContent.includes('Attendance')"),
+        await until(()=>evalJS("document.querySelector('#journal-reading')?.textContent.includes('works receiving office was shut')"),
           5000,'current first-person text beneath Current tab');
         const current=await evalJS("(()=>{const j=document.querySelector('#personal-journal');const tabs=j.querySelector('.journal-tabs');const reader=j.querySelector('#journal-reading');const p=reader?.querySelector('p');const css=p?getComputedStyle(p):null;return {y:reader?.getBoundingClientRect().top,tabsBottom:tabs.getBoundingClientRect().bottom,text:reader?.innerText,weight:css?.fontWeight,size:css?.fontSize,line:css?.lineHeight,readers:j.querySelectorAll('.journal-reading').length};})()");
         assert.ok(current.y>=current.tabsBottom&&current.readers===1,
