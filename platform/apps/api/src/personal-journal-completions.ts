@@ -1,7 +1,7 @@
 /** Authoritative task milestones, shared immutable diary copy.
  * These helpers are called only AFTER the saved reducer confirms completion,
  * inside the character row's existing transaction. No browser archive writes. */
-import type {PlateworkState,MissingStampState,SecondJobState} from '@the-pall/game-core';
+import type {PlateworkState,MissingStampState,SecondJobState,Stage5JournalInput} from '@the-pall/game-core';
 import {AUTHORED_MISSING_STAMP_EVIDENCE,stageTwoJournal,missingStampJournal,
  secondJobJournal,stitcherWardJournal,stage5JournalEntries,
  STITCHER_STAGE_FINDINGS,bellrunnerStageFourJournal} from '@the-pall/game-core';
@@ -42,7 +42,7 @@ export async function archiveStitcherMilestones(db:JournalWriter,id:string,
  }
 }
 export async function archiveStitcherDoor(db:JournalWriter,id:string,
- state:StitcherState):Promise<void>{
+ state:Stage5JournalInput):Promise<void>{
  if(state.stage!==5||state.phase!=='fight_ready'||!state.stage5Hold||
    !state.stage5Witnessed||!state.stage5Preparation)return;
  await archiveJournalTask(db,id,{taskId:'night-door',
