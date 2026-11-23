@@ -270,15 +270,15 @@
               {/if}
             {:else if origin==='Stitcher'}
               <p class="narration">{clinic.outcome==='player_defeat'
-                ?'An unnamed ward worker helps you into the ordinary treatment area after Owler knocks you down. The patient remains in normal care.'
-                :'You return from the night door to the infirmary treatment area. The patient remains in ordinary care.'}</p>
-              <p class="narration">An ordinary clinician points toward an examination seat.</p>
+                ?'An unnamed ward worker helps you into the ordinary treatment area after Owler knocks you down. The patient is still in the ward, where the staff can look after him.'
+                :'You return to the infirmary after the fight with Owler. The patient is still in the ward, where the staff can look after him.'}</p>
+              <p class="narration">A clinician sees you come in and points to an examination chair.</p>
               <p class="speaker">CLINICIAN</p>
-              <p class="speech">“Sit down. What happened?”</p>
+              <p class="speech">“Come on, sit down. What happened out there?”</p>
               <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
-              <p class="speech">“Owler tried to take a patient. I got in his way.”</p>
+              <p class="speech">“Owler tried to take one of the patients away. I stood in his way.”</p>
               <p class="speaker">CLINICIAN</p>
-              <p class="speech">“All right. Let me have a look.”</p>
+              <p class="speech">“I see. Well, let's have a look at you.”</p>
             {:else}
               <p class="narration">{clinic.outcome==='player_defeat'
                 ?'Another worker helps you reach the clinic after Flint defeats you.'
