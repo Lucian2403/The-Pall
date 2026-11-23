@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import {initial,advance,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
-import {homeJournalEntries} from '../apps/web/src/lib/home-journal-copy.ts';
+import {homeJournalEntries,homeCompletionSummary} from '../apps/web/src/lib/home-journal-copy.ts';
 import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
 const root=resolve(import.meta.dirname,'..');
 const source=(p:string)=>readFileSync(resolve(root,p),'utf8');
@@ -291,4 +291,27 @@ test('Every implemented origin archives the same Stage VIII diary shown while pl
    assert.ok(origin!=='Stitcher'||saved.paragraphs.join(' ').includes('Owler'));
    assert.equal(view(state,'Ada',10).closingSpeech,CLOSING_SPEECH);
  }
+});
+
+test('Each supported finale uses its own Stage VIII completion prose',()=>{
+ const expected={
+  Millhand:'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.',
+  Bellrunner:'The condemned worksite remains closed, and your local findings have not been resolved.',
+  Stitcher:'The patient remains in the ward under the staff’s care. Owler’s attempted transfer was stopped, but the school may still demand an explanation.'
+ } as const;
+ const endings=Object.entries(expected);
+ for(const [origin,prose] of endings){
+  assert.equal(homeCompletionSummary(origin as keyof typeof expected),prose);
+  for(const [other,otherText] of endings){
+   if(other!==origin)assert.notEqual(prose,otherText,origin+' must not reuse '+other+' history');
+  }
+ }
+ const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ const copy=source('apps/web/src/lib/home-journal-copy.ts');
+ assert.ok(home.includes('homeCompletionSummary(home.origin)'),
+  'The shared completion screen reads its own persisted origin');
+ assert.ok(!home.includes('plate lot')&&!home.includes('condemned worksite')&&
+   !home.includes('Owler'), 'Story-dependent ending text belongs in a shared copy module');
+ assert.match(copy,/COMPLETION_SUMMARIES:Record<FinaleOrigin,string>/,
+  'Require an exhaustive map for every finale origin');
 });

@@ -1,6 +1,6 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
-  import {homeJournalEntries} from '$lib/home-journal-copy';
+  import {homeJournalEntries,homeCompletionSummary} from '$lib/home-journal-copy';
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {tick} from 'svelte';
   import {page} from '$app/state';
@@ -247,9 +247,7 @@
           <aside class="home-dialogue completion" aria-label="Stage eight completion">
             <p class="eyebrow">STAGE VIII · COMPLETE</p>
             <h1>{home.origin+' opening complete.'}</h1>
-            <p>{home.origin==='Bellrunner'
-              ?'The condemned worksite remains closed, and your local findings have not been resolved.'
-              :'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.'}</p>
+            <p class="completion-copy">{homeCompletionSummary(home.origin)}</p>
             <p><strong>{home.coins} coins remaining. Rent notice: {home.rent} coins.</strong></p>
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
           </aside>

@@ -1,6 +1,17 @@
 /** Stage VIII diary from saved progress. The home, rent and closing speech
  * are shared; only the protagonist's earlier history differs by origin. */
 import type {FinaleOrigin} from './shared-finale-origins.js';
+
+// One shared ending screen, but each playable origin has its own unfinished
+// story. An exhaustive record prevents an unrelated origin using Millhand copy.
+const COMPLETION_SUMMARIES:Record<FinaleOrigin,string>={
+ Millhand:'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.',
+ Bellrunner:'The condemned worksite remains closed, and your local findings have not been resolved.',
+ Stitcher:'The patient remains in the ward under the staff’s care. Owler’s attempted transfer was stopped, but the school may still demand an explanation.'
+};
+export function homeCompletionSummary(origin:FinaleOrigin):string{
+ return COMPLETION_SUMMARIES[origin];
+}
 export function homeJournalIntro(origin:FinaleOrigin):string{
  if(origin==='Stitcher')
   return "Home at last. Ten coins left after the examination at Cinder Row, and now the rent is a hundred and fifty. I stopped Owler from taking the patient, but I haven't earned a coin for the work. I need paying jobs, or something I can make and sell.";

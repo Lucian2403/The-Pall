@@ -68,9 +68,16 @@ const bellHomeStart=homeState.initial('Bellrunner','machinery','player_victory')
 let bellHomeDone=bellHomeStart;
 for(const action of ['read_notice','put_down','finish'])
   bellHomeDone=homeState.advance(bellHomeDone,action);
+const completedHome=(origin,branch)=>{
+  let state=homeState.initial(origin,branch,'player_victory');
+  for(const action of ['read_notice','put_down','finish'])state=homeState.advance(state,action);
+  return homeState.view(state,'QA '+origin,10);
+};
 const fixtures={
   bellHome:homeState.view(bellHomeStart,'QA Bellrunner',10),
   bellHomeDone:homeState.view(bellHomeDone,'QA Bellrunner',10),
+  millHomeDone:completedHome('Millhand','restamp'),
+  stitcherHomeDone:completedHome('Stitcher','notes'),
   work:{stage:2,tutorialStatus:'IN_PROGRESS',work,availableActions:[...core.availableActions(work)],tutorialPayout:payout},
   stamp:{stage:3,tutorialStatus:'IN_PROGRESS',majorSkillBonuses:{},state:stamp,
     availableActions:[...core.availableMissingStampActions(stamp,evidence)],contentReady:true,
@@ -109,7 +116,9 @@ const scenes=[
   ['Stitcher Stage 7 defeat','/characters/qa-scenes-stitcher/stitcher/clinic?qa=stitcherClinicDefeat',7,'.clinic-dialogue','.clinic-scene',A],
   ['Stage 8 home','/characters/qa-scenes-millhand/home',8,'.home-artwork','.home-scene',A],
   ['Bellrunner Stage 8 shared home','/characters/qa-scenes-bellrunner/home?qa=bellHome',8,'.home-artwork','.home-scene',A],
-  ['Bellrunner Stage 8 complete','/characters/qa-scenes-bellrunner/home?qa=bellHomeDone',8,'.home-artwork','.home-scene',A]
+  ['Bellrunner Stage 8 complete','/characters/qa-scenes-bellrunner/home?qa=bellHomeDone',8,'.home-artwork','.home-scene',A],
+  ['Millhand Stage 8 complete','/characters/qa-scenes-millhand/home?qa=millHomeDone',8,'.home-artwork','.home-scene',A],
+  ['Stitcher Stage 8 complete','/characters/qa-scenes-stitcher/home?qa=stitcherHomeDone',8,'.home-artwork','.home-scene',A]
 ];
 const sizes=[[1920,1080],[1280,720],[1024,768],[390,844]];
 
@@ -141,7 +150,7 @@ const stub=String.raw`(()=>{
     if(route==='/api/characters/qa-scenes-stitcher')return Promise.resolve(json({character:{
       id:'qa-scenes-stitcher',name:'QA Stitcher',origin:'Stitcher',sex:'Female',coins:20,
       welcomeSeen:true,startingLocation:'Cinder Row Infirmary',health:{current:0,maximum:50},
-      tutorial:{stage:7,status:'IN_PROGRESS'}}}));
+      tutorial:{stage,status:stage===8?'COMPLETED':'IN_PROGRESS'}}}));
     if(route.endsWith('/journal')){
       const bellrunner=route.includes('qa-scenes-bellrunner');
       return Promise.resolve(json({
@@ -170,7 +179,8 @@ const stub=String.raw`(()=>{
       return Promise.resolve(json({error:'qa_stub_no_write'},503));
     }
     if(route.endsWith('/tutorial/home')){
-      if(key?.startsWith('bellHome'))return Promise.resolve(json(fx[key]));
+      if(key?.startsWith('bellHome')||key==='millHomeDone'||key==='stitcherHomeDone')
+        return Promise.resolve(json(fx[key]));
       return Promise.resolve(json({stage:8,revision:0,phase:'HOME',
        homeId:'qa-home',origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Millhand',
        coins:10,rent:150,shortfall:140,noticeTitle:'Notice',noticeText:'Rent is due.',closingSpeech:'Right.',
@@ -367,6 +377,29 @@ try{
   }
   console.log('PASS: Bellrunner Stage VIII uses same rented room with Back to Stage VII and one chosen journal finding.');
   
+  // The final frame is one common component, with origin-specific endings.
+  const completeCases=[
+    {key:'millHomeDone',id:'qa-scenes-millhand',origin:'Millhand',
+      expected:'The council has not paid for the plate lot.'},
+    {key:'bellHomeDone',id:'qa-scenes-bellrunner',origin:'Bellrunner',
+      expected:'The condemned worksite remains closed'},
+    {key:'stitcherHomeDone',id:'qa-scenes-stitcher',origin:'Stitcher',
+      expected:'Owler’s attempted transfer was stopped'}
+  ];
+  for(const chosen of completeCases){
+    await open('/characters/'+chosen.id+'/home?qa='+chosen.key,
+      1280,720,'.home-dialogue.completion');
+    const copy=await evalJS("document.querySelector('.home-dialogue.completion')?.innerText");
+    assert.ok(copy.includes(chosen.origin+' opening complete.'),copy);
+    assert.ok(copy.includes(chosen.expected),copy);
+    for(const other of completeCases){
+      if(other.origin!==chosen.origin)assert.ok(!copy.includes(other.expected),
+        chosen.origin+' displayed '+other.origin+' ending: '+copy);
+    }
+    assert.match(copy,/10 coins remaining. Rent notice: 150 coins./);
+  }
+  console.log('PASS: Stage VIII shows the correct ending for Millhand, Bellrunner and Stitcher.');
+
   // Stitcher's arrival is two panels. Continue is local; only Examine posts.
   for(const outcome of ['Victory','Defeat']){
     await open('/characters/qa-scenes-stitcher/stitcher/clinic?qa=stitcherClinic'+outcome,
