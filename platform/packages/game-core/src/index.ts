@@ -34,3 +34,6 @@ export type {DogmanViewState} from './journal-copy.js';
 
 export {flintOwlerCombatJournal,dogmanCombatJournal} from './journal-copy.js';
 export type {JournalCombatView} from './journal-copy.js';
+
+export {clinicJournal,homeJournal} from './journal-copy.js';
+export type {ClinicJournalView,HomeJournalView} from './journal-copy.js';
