@@ -94,25 +94,5 @@ export function dogmanLine(s:DogmanViewState):DogmanLine|null{
   if(s.phase==='gate')return DOGMAN_GATE[s.line]??null;
   return null;
 }
-export function dogmanJournal(s:DogmanViewState):readonly string[]{
-  const entries:string[]=[
-    "I turned back toward the public street and met a rough-looking man at the service gate. The worksite hands call him Dogman."
-  ];
-  if(s.phase==='arrival')return entries;
-  entries.push("He calls himself Dogman. Says he works for the Shift Marshal, but he isn't one of the city guards. He wants my route sheet and anything I've written down.");
-  if(s.reply==='ask_orders')entries.push("I asked him for an order in writing. He couldn't show me one.");
-  if(s.reply==='keep_sheet')entries.push("I kept hold of my route sheet. I wasn't about to hand it over to a man who couldn't say what right he had to it.");
-  if(s.reply==='tell_him'){
-    if(s.branch==='contracts')entries.push("I told him about the workers marked absent because they wouldn't enter the closed factory. He said it wasn't my business.");
-    if(s.branch==='trauma')entries.push("I told him about the men coughing outside the closed factory and how I'd helped at the infirmary. He didn't like the warning I'd given them.");
-    if(s.branch==='machinery')entries.push("I told him the shutoff was down but the bell still worked. He said I should have left it to the mechanic.");
-  }
-  if(s.phase==='gate'||s.phase==='done')
-    entries.push("Dogman blocked the street, reached for my bag and drew a club. I pulled away. He wouldn't let me through.");
-  if(s.stance){
-    const move=s.stance==='street'?'stepped back toward the street'
-      :s.stance==='cart'?'moved behind the work cart':'stood my ground and held my bag close';
-    entries.push("I "+move+". The fight hasn't been settled.");
-  }
-  return entries;
-}
+
+export {dogmanJournal} from '@the-pall/game-core';
