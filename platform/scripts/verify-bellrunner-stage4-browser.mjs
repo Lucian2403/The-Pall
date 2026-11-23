@@ -144,6 +144,13 @@ try{
         }}));
       if(route.endsWith('/dev/rewind-stage'))
         return Promise.resolve(json({enabled:true,canRewind:true,stage:4,targetStage:3}));
+      if(route.endsWith('/journal'))
+        return Promise.resolve(json({characterId:'qa-stage4-bellrunner',tasks:[{
+          taskId:'old-courier-round',taskInstanceId:'intro/bellrunner/old-round',
+          title:'Old Courier Round',stage:2,contentVersion:1,
+          completedAt:'2026-11-20T12:00:00.000000Z',outcome:null,
+          choices:{},paragraphs:['I carried the sealed notice through Cinder Row.']
+        }],nextCursor:null}));
       if(route.endsWith('/bellrunner/second-job')){
         if(options?.method==='POST'){
           window.__stage4Posts.push(JSON.parse(options.body||'{}'));
@@ -218,6 +225,29 @@ try{
       if(width>=1280)assert.ok(sideBySide,'Panel beside scene: '+branch+' '+width);
       else assert.ok(stacked,'Panel below scene: '+branch+' '+width);
       if(width===1280||width===390)await screenshot('stage4-'+branch+'-'+width+'x'+height);
+      if(branch==='contracts'&&(width===1280||width===390)){
+        await evalJS("document.querySelector('.scene-journal-button')?.click()");
+        await until(()=>evalJS(`(()=>{
+          const section=document.querySelector('#personal-journal-history');
+          return !!section&&section.textContent.includes('Old Courier Round');
+        })()`),12000,'archived personal Journal on '+width+'px');
+        const journalSize=await evalJS(`(()=>{
+          const root=document.querySelector('#personal-journal-history');
+          const r=root.getBoundingClientRect();
+          return {width:r.width,screen:document.documentElement.clientWidth,
+            buttons:root.querySelectorAll('.task-list button').length};
+        })()`);
+        assert.ok(journalSize.width<=journalSize.screen,
+          'Personal Journal must not overflow '+width+'px');
+        assert.equal(journalSize.buttons,1,'One completed task, not duplicate cards');
+        await evalJS("document.querySelector('#personal-journal-history .task-list button')?.click()");
+        assert.equal(await evalJS("!!document.querySelector('#personal-journal-history .diary')?.textContent.includes('I carried the sealed notice')"),true);
+        await screenshot('stage4-personal-journal-history-'+width);
+        await evalJS("document.querySelector('.scene-journal-button')?.click()");
+        await until(()=>evalJS("!document.querySelector('#personal-journal-history')"),5000,
+          'the one shared Journal closes');
+        console.log('PASS: real Chromium archived Journal at '+width+'px, one reader and one closing action');
+      }
       console.log('PASS: '+branch+' scene layout, real owner art and choice at '+width+'×'+height);
     }
     await navigate(branch,1280,720);
