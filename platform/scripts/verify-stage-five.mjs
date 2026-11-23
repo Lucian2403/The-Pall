@@ -196,32 +196,31 @@ assert.ok(shell.includes('class="scene-journal-bar"') &&
   shell.includes('data-pall-sfx="paper"') &&
   shell.includes('SCENE_JOURNAL_CONTEXT'),
   'The persistent, accessible, parchment-styled corner journal must be in TutorialShell');
-for(const [sourcePath,recordId] of [
-  ['apps/web/src/lib/MillhandMissingStampScene.svelte','stage-three-journal'],
-  ['apps/web/src/lib/MillhandDepotScene.svelte','depot-job-journal'],
-  ['apps/web/src/lib/MillhandContractsScene.svelte','contracts-job-journal'],
-  ['apps/web/src/lib/MillhandRecordsScene.svelte','records-job-journal'],
-  ['apps/web/src/lib/MillhandWageClaimScene.svelte','wage-claim-journal'],
-  ['apps/web/src/lib/SharedTutorialClinic.svelte','clinic-journal'],
-  ['apps/web/src/lib/MillhandCombatScene.svelte','combat-personal-journal']
+for(const sourcePath of [
+  'apps/web/src/lib/MillhandMissingStampScene.svelte',
+  'apps/web/src/lib/MillhandDepotScene.svelte',
+  'apps/web/src/lib/MillhandContractsScene.svelte',
+  'apps/web/src/lib/MillhandRecordsScene.svelte',
+  'apps/web/src/lib/MillhandWageClaimScene.svelte',
+  'apps/web/src/lib/SharedTutorialClinic.svelte',
+  'apps/web/src/lib/MillhandCombatScene.svelte'
 ]){
   const source=read(sourcePath);
-  assert.ok(source.includes("id:'"+recordId+"'") &&
-    source.includes('registerSceneJournal') &&
-    source.includes('journalOpen'),
-    sourcePath+' must connect its local entries to the shared corner toggle');
-  assert.ok(!source.includes("'Review journal'</button>") &&
-    !source.includes('class="journal-toggle journal-outside"'),
-    sourcePath+' must not leave duplicate local Review actions');
+  const clinic=sourcePath.includes('Clinic');
+  assert.ok(clinic?source.includes("journalContent={{title:'The Clinic'"):
+    source.includes('registerSceneJournal?.({title:'),
+    sourcePath+' must provide current prose to the one shared Journal');
+  assert.ok(!/journalOpen|toggleJournal|class="journal-entries"|class="journal-toggle"|class="journal-close"/.test(source),
+    sourcePath+' must not own a duplicate Journal panel, ID or toggle');
 }
 assert.ok(read('apps/web/src/routes/characters/[id]/opening/+page.svelte').includes('<TutorialShell') &&
   read('apps/web/src/routes/characters/[id]/millhand/work/+page.svelte').includes('<TutorialShell'),
-  'The shell journal must be available from first opening and Stage 2 work');
+  'The same shell Journal must remain available from opening through work');
 const combatJournal=read('apps/web/src/lib/MillhandCombatScene.svelte');
-assert.ok(combatJournal.includes("registerSceneJournal?.({id:'combat-personal-journal'") &&
-  combatJournal.includes("entries:ended?[]:[combatOpening(isOwler?'owler':'flint')]") &&
-  read('apps/web/src/lib/TutorialShell.svelte').includes('<PersonalJournal characterId={character.id}') &&
-  combatJournal.includes('{#if ended}'),
-  'The fight provides its outcome to one shared Journal without opening a duplicate');
+const shared=read('apps/web/src/lib/PersonalJournal.svelte');
+assert.ok(combatJournal.includes("entries:ended?[combatOpening(isOwler?'owler':'flint'),journal]")&&
+  shared.includes('<article id="journal-reading"') &&
+  shared.includes("tab==='current'?currentTitle:selected?.title"),
+  'Combat outcome and current text must share the same lower reading area');
 
 console.log('PASS: Stage 4→5 handoff, approved Flint dialogue, durable route evidence, stance and combat boundary.');

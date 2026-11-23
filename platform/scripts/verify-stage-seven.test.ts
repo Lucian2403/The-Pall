@@ -119,15 +119,13 @@ test('Clinic dialogue and journal match earlier stage presentation',()=>{
   assert.ok(web.includes("color:#21150e;margin:0 0 13px}") &&
     web.includes('font:var(--dialogue-text,17px)/1.55 var(--pall-font-reading,Georgia,serif)'),
     'Keep the dialogue contrast and use the shared fixed dialogue type scale');
-  assert.ok(web.includes('bind:this={journalElement}') &&
-    web.includes('class="journal-entries"') &&
-    !web.includes('.journal{position:absolute') &&
-    web.indexOf('id="clinic-journal"') > web.indexOf('</aside>'),
-    'The optional journal belongs below the painted scene, not over the clinic');
-  assert.ok(web.includes('background:#e6d5b5;color:#24160e;') &&
-    web.includes('border-top:2px solid #94704a') &&
-    web.includes('font:600 16px/1.55 var(--pall-font-reading,Georgia,serif)'),
-    'The journal uses the established full-width parchment and reading typography');
+  const shared=source('apps/web/src/lib/PersonalJournal.svelte');
+  assert.ok(web.includes("journalContent={{title:'The Clinic'") &&
+    !/journalOpen|journalElement|class="journal-entries"/.test(web),
+    'Clinic passes its actual examination prose to TutorialShell, without a local panel');
+  assert.ok(shared.includes('class="reading-area journal-reading"') &&
+    shared.includes('font:600 16px/1.55 var(--pall-font-reading,Georgia,serif)'),
+    'Clinic Current and Completed entries use the shared established reading type');
 });
 
 test('Priced clinic conversation advances one owner-approved beat at a time before payment',()=>{
@@ -175,9 +173,9 @@ test('Clinic record is separate from scene dialogue; payment and ambience are co
   const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
   const dialogue=web.slice(web.indexOf('<aside class="clinic-dialogue"'),web.indexOf('</aside>'));
   const record=web.indexOf('<section class="medical-record-wrapper"');
-  const journal=web.indexOf('{#if journalOpen}');
-  assert.ok(record>web.indexOf('</aside>') && record<web.indexOf('id="clinic-journal"'),
-    'Optional numerical record belongs below the scene but before the journal');
+  assert.ok(record>web.indexOf('</aside>') &&
+    web.includes("journalContent={{title:'The Clinic'"),
+    'Optional numerical record belongs below the scene; Journal prose belongs to the shell');
   assert.ok(!dialogue.includes('medical-record') && !dialogue.includes('Health after the fight:'),
     'Do not repeat the clinician\'s condition inside the speech frame');
   assert.ok(web.includes('<details class="medical-record">') &&
@@ -258,8 +256,8 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     !/\.clinic-dialogue\{[^}]*overflow-y:auto/.test(web) &&
     web.includes("url('/ui-kit/frames/dialogue-frame-trim.png')") &&
     web.includes('class="medical-record"') &&
-    web.includes('class="journal"') &&
-    web.includes("registerSceneJournal?.({id:'clinic-journal'") &&
+    web.includes("journalContent={{title:'The Clinic'") &&
+    !web.includes('class="journal"') &&
     !web.includes('class="pall-framed-button journal-toggle"') &&
     !web.includes('class="clinic-layout"') &&
     !web.includes('class="small-stats"') &&

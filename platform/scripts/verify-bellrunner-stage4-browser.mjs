@@ -299,7 +299,7 @@ try{
     assert.equal(diaryStyle.entrySize,'16px');
     assert.equal(diaryStyle.entryWeight,'600');
     assert.ok(diaryStyle.headingFont.includes('Pall New Standard'));
-    assert.ok(parseFloat(diaryStyle.headingSize)>=29,'Revised Journal heading hierarchy');
+    assert.ok(parseFloat(diaryStyle.headingSize)>=23&&parseFloat(diaryStyle.headingSize)<=29,'Compact Journal header size');
     assert.equal(diaryStyle.headingWeight,'600');
     assert.ok(diaryStyle.kickerFont.includes('Pall Bebas Neue'));
     assert.equal(diaryStyle.kickerSize,'14px');

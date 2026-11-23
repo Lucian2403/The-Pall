@@ -117,13 +117,14 @@ test('Stitcher Stage VI reuses Flint combat HUD and has correct outcome artwork'
  assert.match(rewind,/phase:'prepare_door',stage5Line:0,stage5Preparation:null/);
  assert.match(rewind,/current_health=\$2/);
  assert.match(shell,/class="scene-journal-button"/);
- const journalStart=shared.indexOf('<section id="combat-personal-journal"');
- const layoutEnd=shared.indexOf('</ActivityLayout>');
- assert.ok(layoutEnd>=0&&journalStart>layoutEnd,
-   'Combat journal must render full-width after ActivityLayout, as in Stage V');
- assert.doesNotMatch(shared,/class="journal-toggle"/);
- assert.doesNotMatch(ward,/class="journal-toggle"/);
- assert.match(shared,/scroll-margin-top:56px/);
+ const journal=read('apps/web/src/lib/PersonalJournal.svelte');
+ assert.ok(shared.includes('registerSceneJournal?.({title:isOwler')&&
+   shared.includes('entries:ended?[combatOpening')&&
+   journal.includes('id="personal-journal"')&&
+   journal.includes('class="reading-area journal-reading"'),
+   'Current fight text must be displayed beneath the shared Current tab');
+ assert.doesNotMatch(shared,/id="combat-personal-journal"|journalOpen|class="journal-entries"/);
+ assert.doesNotMatch(ward,/id="stitcher-ward-journal"|journalOpen|class="journal-entries"/);
  assert.match(shared,/locations\/stitcher\/service-corridor.webp/);
  assert.match(shared,/locations\/stitcher\/owler-defeated.webp/);
  assert.match(shared,/locations\/stitcher\/owler.webp/);

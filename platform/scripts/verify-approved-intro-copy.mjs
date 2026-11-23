@@ -184,15 +184,15 @@ const stage3DialogueEnd = stage3SceneSource.indexOf('</aside>');
 const stage3SceneEnd = stage3SceneSource.indexOf('</ActivityLayout>',stage3DialogueEnd);
 const stage3StageStart = stage3SceneSource.indexOf('{#snippet stage()}');
 const stage3StageEnd = stage3SceneSource.indexOf('{/snippet}',stage3StageStart);
-const journalPanelStart = stage3SceneSource.indexOf('id="stage-three-journal"');
+const journalRegistry = stage3SceneSource.indexOf("registerSceneJournal?.({title:'The Missing Stamp'");
 assert.ok(stage3DialogueEnd>=0 && stage3SceneEnd>stage3DialogueEnd,'Missing Stamp scene shape changed');
 assert.ok(stage3SceneSource.indexOf('<div class="evidence"')>stage3StageStart &&
   stage3SceneSource.indexOf('<div class="evidence"')<stage3StageEnd,
   'Evidence must stay on the painted workbench (scene stage), never inside the dialogue');
 assert.ok(stage3SceneSource.indexOf('<aside')>stage3StageEnd,
   'The dialogue is the adjacent reading column, not an overlay inside the illustration');
-assert.ok(journalPanelStart>stage3SceneEnd,
-  'Stage3 journal entries must be outside the workshop scene and NPC popup');
+assert.ok(journalRegistry>=0 && !stage3SceneSource.includes('id="stage-three-journal"'),
+  'Stage3 must register current diary entries without rendering duplicate Journal markup');
 assert.ok(stage3SceneSource.includes('<ActivityLayout mode="scene" stageAspect={2}') &&
   stage3Flat.includes('aspect-ratio:2/1') &&
   !stage3Flat.includes('height:clamp(610px,68vh,690px)'),
@@ -227,9 +227,11 @@ assert.ok(stage3SceneSource.includes('snapshot.slip.workerNumber || snapshot.sli
 
 assert.ok(!stage3SceneSource.includes('<div class="journal-entries" aria-label'),
   'Stage3 journal must not be nested inside the NPC dialogue box');
-assert.ok(stage3SceneSource.includes('scrollIntoView') &&
-  stage3Flat.includes('import{tick}from"svelte";'),
-  'Opening the separate journal should expose it using page scrolling');
+const sharedJournal = readFileSync(resolve(root,'apps/web/src/lib/PersonalJournal.svelte'),'utf8');
+assert.ok(sharedJournal.includes('id="personal-journal"') &&
+  sharedJournal.includes("tab==='current'") &&
+  sharedJournal.includes('class="reading-area journal-reading"'),
+  'Both tabs must render their text inside the one shared Journal reader');
 assert.ok(stage3Flat.includes('letevidencePage=$state(0)') &&
   stage3Flat.includes('inspectedView=which;evidencePage=0;'),
   'Each item inspection must restart its authored local reading sequence');
