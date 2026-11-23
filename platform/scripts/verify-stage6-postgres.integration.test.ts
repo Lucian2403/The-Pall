@@ -2799,3 +2799,110 @@ test('Stitcher Stage VI rewind restores the witnessed Stage V preparations and r
    'Stage 5 now uses the existing previous-stage rewind contract');
  }
 });
+
+test('two characters on one account never share their Personal Journals',async()=>{
+ const a=await stitcherFixture();
+ const bId=randomUUID();
+ await db.query(
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,'Journal Millhand',$3,'Male','Millhand',$4::jsonb,'[]'::jsonb,'Smithing workshop',1,'NOT_STARTED')",
+  [bId,owner,'journal-millhand-'+bId,JSON.stringify({Craftsmanship:3})]);
+ const journalA=base+a.id+'/journal',journalB=base+bId+'/journal';
+ assert.deepEqual((await request('GET',journalA)).body?.tasks,[]);
+ assert.deepEqual((await request('GET',journalB)).body?.tasks,[]);
+ assert.equal((await request('GET',journalA,null)).status,401);
+ assert.equal((await request('GET',journalB,null)).status,401);
+ assert.equal((await request('GET',journalA,stranger)).status,404);
+ assert.equal((await request('GET',journalB,stranger)).status,404);
+ assert.equal((await request('GET',journalA+'?limit=999')).status,400);
+
+ // Character A: Morning Dressings -> Teaching Bed -> Notes for the Living.
+ let aState=(await request('GET',a.path)).body!;
+ for(const action of ['start','ask_linen','continue_intro','continue_intro',
+  'check_ward','begin_round','inspect_b','inspect_a','order_dirty','prep_ready',
+  'dress_b','check_linen','discard_end','dress_a','inspect_finished','record_linen',
+  'report_claudia','continue_report','continue_report','close_round',
+  'observe_bed','ask_patient','read_chart','confront_claudia'] as const)
+   aState=await stitcherCmd(a.path,action,aState);
+ for(let i=0;i<STITCHER_CLAUDIA_LINES.length;i++)
+   aState=await stitcherCmd(a.path,'continue_claudia',aState);
+ aState=await stitcherCmd(a.path,'choose_notes',aState);
+ assert.equal(aState.stage,4);
+ for(const action of ['continue_opening','continue_opening',
+  'compare_admission','match_schedule','cross_reference','record_difference'] as const)
+   aState=await stitcherCmd(a.path,action,aState);
+ for(let i=0;i<STITCHER_LINES.notes.length;i++)
+   aState=await stitcherCmd(a.path,'continue_dialogue',aState);
+ const aDoneKey=randomUUID(),aRevision=aState.state.revision;
+ aState=await stitcherCmd(a.path,'finish_job',aState,aDoneKey);
+ const aReplay=await request('POST',a.path,owner,{
+  action:'finish_job',expectedRevision:aRevision,requestId:aDoneKey});
+ assert.equal(aReplay.status,200);
+ assert.equal(aState.stage,5);
+
+ // Character B: Marking the Plates -> Missing Stamp -> Contracts.
+ const work=base+bId+'/millhand/work';
+ const command=async(path:string,action:string,revision:number)=>{
+  const result=await request('POST',path,owner,{action,expectedRevision:revision,requestId:randomUUID()});
+  assert.equal(result.status,200,action+': '+JSON.stringify(result.body));
+  return result.body!;
+ };
+ let m=await command(work,'take_work_paper',0);
+ for(const action of ['read_paper','set_stamps','look_at_bent_plate',
+  'straighten','stamp_number','check_number','finish_checking','return_paper'])
+   m=await command(work,action,m.work.revision);
+ assert.equal(m.work.phase,'COMPLETE');
+ const missing=base+bId+'/millhand/missing-stamp';
+ let ms=(await request('GET',missing)).body!;
+ for(const action of ['read_cancellation_slip','turn_returned_plate','show_guther',
+  'skip_confrontation','choose_contracts'])
+   ms=await command(missing,action,ms.state.revision);
+ assert.equal(ms.state.branch,'contracts');
+ const second=base+bId+'/millhand/second-job';
+ let job=(await request('GET',second)).body!;
+ for(const action of ['examine_work_paper','compare_official_records',
+  'speak_to_contracts_clerk'])
+   job=await command(second,action,job.state.revision);
+ for(let i=0;i<7;i++)job=await command(second,'continue_dialogue',job.state.revision);
+ job=await command(second,'mark_conflicting_entries',job.state.revision);
+ job=await command(second,'submit_dispute',job.state.revision);
+ assert.equal(job.state.phase,'DONE');
+
+ const readTasks=async(path:string)=>(await request('GET',path)).body!;
+ const first=await readTasks(journalA),other=await readTasks(journalB);
+ assert.equal(first.characterId,a.id);
+ assert.equal(other.characterId,bId);
+ assert.deepEqual(first.tasks.map((x:any)=>x.title),[
+  'Claudia Cyka','Morning Dressings','The Teaching Bed','Notes for the Living']);
+ assert.deepEqual(other.tasks.map((x:any)=>x.title),[
+  'Marking the Plates','The Missing Stamp','The Contracts Office']);
+ assert.ok(first.tasks.some((x:any)=>x.paragraphs.join(' ').includes('surgeon')));
+ assert.ok(other.tasks.some((x:any)=>x.paragraphs.join(' ').includes('council')));
+ assert.ok(!first.tasks.some((x:any)=>x.title==='The Missing Stamp'));
+ assert.ok(!other.tasks.some((x:any)=>x.title==='The Teaching Bed'));
+ const aSecond=first.tasks.find((x:any)=>x.taskId==='second-job');
+ const bSecond=other.tasks.find((x:any)=>x.taskId==='second-job');
+ assert.ok(aSecond&&bSecond,'Identical generic task IDs coexist per character');
+ assert.notEqual(aSecond.taskInstanceId,bSecond.taskInstanceId);
+ const switchBack=await readTasks(journalA);
+ assert.deepEqual(switchBack.tasks,first.tasks,'Switch/reload retrieves the same saved A-only snapshot');
+
+ // Cursor pagination never leaks tasks: even a cursor copied from the other
+ // character is still bound to the requested character and account owner.
+ const two=await request('GET',journalA+'?limit=2');
+ assert.equal(two.body?.tasks.length,2);
+ assert.ok(two.body?.nextCursor);
+ const page2=await request('GET',journalA+'?limit=2&cursor='+encodeURIComponent(two.body!.nextCursor));
+ assert.equal(page2.body?.tasks.length,2);
+ assert.ok(page2.body?.tasks.every((x:any)=>x.stage>=3));
+ const crossCursor=await request('GET',journalB+'?limit=5&cursor='+encodeURIComponent(two.body!.nextCursor));
+ assert.equal(crossCursor.status,200);
+ assert.ok(crossCursor.body!.tasks.every((x:any)=>!x.title.includes('Dressings')));
+
+ // A's developer rewind may invalidate A's Stage IV only. Not B's task
+ // with the same task ID and NEVER B's stored prose.
+ const back=await request('POST',a.rewind,owner,{expectedStage:5});
+ assert.equal(back.status,200,JSON.stringify(back.body));
+ const afterA=await readTasks(journalA);
+ assert.ok(!afterA.tasks.some((x:any)=>x.stage===4));
+ assert.deepEqual((await readTasks(journalB)).tasks,other.tasks);
+});
