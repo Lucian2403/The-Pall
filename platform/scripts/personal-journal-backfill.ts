@@ -19,13 +19,11 @@ type Data={state:Record<string,unknown>};
 
 async function findState(client:pg.PoolClient,table:string,id:string){
  // Table names are source constants; never interpolate a request field.
- try{
-  const result=await client.query<Data>('SELECT state FROM '+table+' WHERE character_id=$1',[id]);
-  return result.rows[0]?.state??null;
- }catch(error){
-  if((error as {code?:string})?.code==='42P01')return null;
-  throw error;
- }
+ const exists=await client.query<{table_name:string|null}>(
+  'SELECT to_regclass($1)::text AS table_name',[table]);
+ if(!exists.rows[0]?.table_name)return null;
+ const result=await client.query<Data>('SELECT state FROM '+table+' WHERE character_id=$1',[id]);
+ return result.rows[0]?.state??null;
 }
 let completed=0,skipped=0;
 try{
