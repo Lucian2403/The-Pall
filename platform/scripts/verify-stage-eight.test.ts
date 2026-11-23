@@ -244,12 +244,14 @@ test('Back to Stage 7 reopens the paid clinic without touching combat, coins or 
 });
 test('Branch-aware personal Journal never displays facts from unchosen investigation paths',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
- assert.ok(web.includes("home?.branch==='restamp'")&&
-  web.includes("home?.branch==='contracts'")&&
-  web.includes("home?.branch==='records'")&&
-  web.includes("home?.outcome==='player_victory'")&&
-  web.includes("home?.outcome==='player_defeat'"));
- assert.ok(web.includes('Home at last. Ten coins left after the clinic,')&&
+ const diary=source('packages/game-core/src/journal-copy.ts');
+ assert.ok(web.includes('homeJournal(home)'));
+ assert.ok(diary.includes("home?.branch==='restamp'")&&
+  diary.includes("home?.branch==='contracts'")&&
+  diary.includes("home?.branch==='records'")&&
+  diary.includes("home?.outcome==='player_victory'")&&
+  diary.includes("home?.outcome==='player_defeat'"));
+ assert.ok(diary.includes('Home at last. Ten coins left after the clinic,')&&
   web.includes('The council has not paid for the plate lot.'));
 });
 
