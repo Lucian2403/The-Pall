@@ -77,11 +77,11 @@ test('Bellrunner Stage VIII reuses actual home art and takes only selected findi
  assert.ok(web.includes("url('/locations/home/rented-room.webp')"));
  assert.ok(web.includes('src="/locations/home/notice.webp"'));
  assert.ok(web.includes("home.origin==='Bellrunner'?'Bellrunner opening complete.'"));
- assert.ok(web.includes("home?.origin==='Bellrunner'"));
- assert.ok(web.includes("home.branch==='contracts'"));
- assert.ok(web.includes("home.branch==='trauma'"));
- assert.ok(web.includes("home.branch==='machinery'"));
- assert.ok(web.includes("home.outcome==='player_victory'"));
+ assert.ok(diary.includes("home?.origin==='Bellrunner'"));
+ assert.ok(diary.includes("home.branch==='contracts'"));
+ assert.ok(diary.includes("home.branch==='trauma'"));
+ assert.ok(diary.includes("home.branch==='machinery'"));
+ assert.ok(diary.includes("home.outcome==='player_victory'"));
  assert.ok(web.includes('class="hotspot bed"'));
  assert.ok(web.includes('class="hotspot chest"'));
  assert.ok(web.includes('class="hotspot book"'));
