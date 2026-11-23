@@ -65,6 +65,7 @@ test('Bellrunner Stage VIII reuses actual home art and takes only selected findi
  const home=read('apps/web/src/lib/CharacterHome.svelte');
  const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
  const shell=read('apps/web/src/lib/TutorialShell.svelte');
+ const diary=read('packages/game-core/src/journal-copy.ts');
  assert.ok(api.includes("!['Millhand','Bellrunner'].includes(c.origin)"));
  assert.ok(api.includes('player_character_bellrunner_wrong_bell'));
  assert.ok(api.includes('player_character_bellrunner_second_job'));
