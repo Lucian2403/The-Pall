@@ -17,24 +17,29 @@ const intro=(origin:string,name:string)=>'intro/'+origin+'/'+name;
 export async function archiveStitcherMilestones(db:JournalWriter,id:string,
  before:StitcherState,next:StitcherState):Promise<void>{
  if(before.stage===next.stage)return;
+ // Reconstruct each stage using only facts possible during that stage,
+ // even when backfilling a saved character who has reached later chapters.
+ const firstStage={...next,stage:1,branch:null,first:null,prepared:null,
+   correction:null,chartRead:false,patientHeard:false};
+ const firstEntries=stitcherWardJournal(firstStage);
+ const secondEntries=stitcherWardJournal({...next,stage:2,branch:null,
+   chartRead:false,patientHeard:false});
  if(before.stage===1&&next.stage===2){
   await archiveJournalTask(db,id,{taskId:'stitcher-opening',taskInstanceId:intro('stitcher','opening'),
-   stage:1,title:'Claudia Cyka',paragraphs:stitcherWardJournal({...next,stage:1,branch:null})});
+   stage:1,title:'Claudia Cyka',paragraphs:firstEntries});
  }
  if(before.stage===2&&next.stage===3){
-  const earlier=stitcherWardJournal({...next,stage:1,branch:null});
-  const complete=stitcherWardJournal({...next,stage:2,branch:null});
+  const complete=secondEntries;
   await archiveJournalTask(db,id,{taskId:'morning-dressings',
    taskInstanceId:intro('stitcher','morning-dressings'),stage:2,title:'Morning Dressings',
-   paragraphs:complete.slice(earlier.length),
+   paragraphs:complete.slice(firstEntries.length),
    choices:{patientOrder:next.first??'',linen:next.prepared??'',correction:next.correction??''}});
  }
  if(before.stage===3&&next.stage===4){
-  const earlier=stitcherWardJournal({...next,stage:2,branch:null});
   const complete=stitcherWardJournal({...next,stage:3,phase:'choose'});
   await archiveJournalTask(db,id,{taskId:'teaching-bed',
    taskInstanceId:intro('stitcher','teaching-bed'),stage:3,title:'The Teaching Bed',
-   paragraphs:complete.slice(earlier.length),choices:{route:next.branch??''}});
+   paragraphs:complete.slice(secondEntries.length),choices:{route:next.branch??''}});
  }
  if(before.stage===4&&next.stage===5&&next.branch){
   await archiveJournalTask(db,id,{taskId:'second-job',
