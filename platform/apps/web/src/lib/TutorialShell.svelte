@@ -162,12 +162,17 @@
     if(journalController)journalController.toggle();
     else journalVisible=!journalVisible;
   }
+  let journalOwner=$state<string|null>(null);
   $effect(()=>{
-    // Prevent any previous character's journal/controller surviving a switch.
+    // The first mount must NOT erase a descendant's registered Journal.
+    // Only an actual character switch resets the former character's data.
     const currentId=character.id;
-    journalVisible=false;
-    sceneJournal=null;
-    void currentId;
+    if(journalOwner===null){journalOwner=currentId;return;}
+    if(journalOwner!==currentId){
+      journalOwner=currentId;
+      journalVisible=false;
+      sceneJournal=null;
+    }
   });
 
   // Audio scope belongs to the *actual mounted game shell*, not a guess
