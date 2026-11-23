@@ -1,3 +1,4 @@
+import {archiveFinishedCombat} from './personal-journal-completions.js';
 import {archiveStitcherDoor} from './personal-journal-completions.js';
 /**
  * Stitcher Stage 6 — Owler. This is the authenticated PostgreSQL adapter for
@@ -232,6 +233,7 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
           narrateCommittedTurn(state.events,command.action,record.state.intent,
             state,record.history),state,record.history);
         const finished=state.status==='finished';
+        if(finished)await archiveFinishedCombat(client,req.params.id,'Stitcher',state);
         record={...record,state,history:[...record.history,...state.events],
           patient_safe:finished,transfer_cancelled:finished};
         await client.query(
