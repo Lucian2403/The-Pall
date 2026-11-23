@@ -4,7 +4,9 @@
 import type {PlateworkState,MissingStampState,SecondJobState,Stage5JournalInput} from '@the-pall/game-core';
 import {AUTHORED_MISSING_STAMP_EVIDENCE,stageTwoJournal,missingStampJournal,
  secondJobJournal,stitcherWardJournal,stage5JournalEntries,
- STITCHER_STAGE_FINDINGS,bellrunnerStageFourJournal} from '@the-pall/game-core';
+ STITCHER_STAGE_FINDINGS,bellrunnerStageFourJournal,
+ wageClaimJournal,dogmanJournal,flintOwlerCombatJournal,dogmanCombatJournal,
+ clinicJournal,homeJournal} from '@the-pall/game-core';
 import type {StitcherState} from './stitcher-work.js';
 import {STITCHER_JOB} from './stitcher-work.js';
 import type {JournalWriter} from './personal-journal-store.js';
@@ -96,4 +98,64 @@ export async function archiveBellrunnerSecondJob(db:JournalWriter,id:string,
   taskInstanceId:intro('bellrunner','second-job'),stage:4,title,
   paragraphs:bellrunnerStageFourJournal(state),
   choices:{route:state.branch,method:state.method??''}});
+}
+
+/** Server-confirmed confrontation, not merely advancing a stage number. */
+export async function archiveMillhandConfrontation(db:JournalWriter,id:string,
+ state:Parameters<typeof wageClaimJournal>[0]):Promise<void>{
+ if(state.phase!=='DONE'||!state.stance)return;
+ await archiveJournalTask(db,id,{taskId:'confrontation',
+  taskInstanceId:intro('millhand','confrontation'),stage:5,title:'The Wage Claim',
+  paragraphs:wageClaimJournal(state),
+  choices:{route:state.branch,stance:state.stance,approach:state.approach??''}});
+}
+export async function archiveBellrunnerConfrontation(db:JournalWriter,id:string,
+ state:Parameters<typeof dogmanJournal>[0]):Promise<void>{
+ if(state.phase!=='done'||!state.stance)return;
+ await archiveJournalTask(db,id,{taskId:'confrontation',
+  taskInstanceId:intro('bellrunner','confrontation'),stage:5,title:'Show Your Papers',
+  paragraphs:dogmanJournal(state),
+  choices:{route:state.branch,stance:state.stance,reply:state.reply??''}});
+}
+type CombatJournalState=Parameters<typeof flintOwlerCombatJournal>[0] & {status:string};
+export async function archiveFinishedCombat(db:JournalWriter,id:string,
+ origin:'Millhand'|'Bellrunner'|'Stitcher',state:CombatJournalState):Promise<void>{
+ if(state.status!=='finished'||!state.outcome)return;
+ const title=origin==='Millhand'?'The Fight with Flint':
+  origin==='Bellrunner'?'The Fight with Dogman':'The Fight with Owler';
+ const introLine=origin==='Millhand'
+  ?"Flint blocked the way home with his club. I told him to move. He wouldn't. So we fought."
+  :origin==='Bellrunner'
+   ?"Dogman blocked the service gate. He wouldn't let me past, and we fought."
+   :"Owler tried to force the patient through the night door. I stood in his way, and we fought.";
+ const body=origin==='Bellrunner'?dogmanCombatJournal(state):
+  flintOwlerCombatJournal(state,origin==='Stitcher');
+ await archiveJournalTask(db,id,{taskId:'combat',
+  taskInstanceId:intro(origin.toLowerCase(),'combat'),stage:6,title,
+  paragraphs:[introLine,body],choices:{opponent:title},
+  outcome:state.outcome});
+}
+type ClinicSave={phase:string;paid:boolean;outcome:'player_victory'|'player_defeat';
+ before:{hp:number;hpMax:number;bleed:number;wounds:readonly {type:string}[]}};
+export async function archiveCompletedClinic(db:JournalWriter,id:string,
+ origin:'Millhand'|'Bellrunner',state:ClinicSave):Promise<void>{
+ if(state.phase!=='LEFT'||!state.paid)return;
+ const conditionType=state.before.hp===state.before.hpMax&&
+  state.before.bleed===0&&state.before.wounds.length===0?'unhurt':
+  state.before.wounds.some(w=>w.type==='cut')?'cut':'other';
+ await archiveJournalTask(db,id,{taskId:'clinic',
+  taskInstanceId:intro(origin.toLowerCase(),'clinic'),stage:7,title:'The Clinic',
+  paragraphs:[clinicJournal(origin,{paid:true,conditionType,outcome:state.outcome})],
+  choices:{care:conditionType,paid:'10 coins'},outcome:state.outcome});
+}
+export async function archiveCompletedHome(db:JournalWriter,id:string,
+ state:Parameters<typeof homeJournal>[0] & {phase:string}):Promise<void>{
+ if(!state||state.phase!=='COMPLETE')return;
+ const origin=state.origin.toLowerCase();
+ const diary=homeJournal(state);
+ await archiveJournalTask(db,id,{taskId:'rented-home',
+  taskInstanceId:intro(origin,'home'),stage:8,title:'The Rented Home',
+  paragraphs:[diary.homeJournalIntro,...[diary.routeEntry,diary.combatEntry].filter(
+    (entry):entry is string=>typeof entry==='string')],
+  choices:{route:state.branch},outcome:state.outcome});
 }
