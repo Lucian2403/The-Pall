@@ -1,3 +1,4 @@
+import {archiveBellrunnerSecondJob} from './personal-journal-completions.js';
 /** Bellrunner Stage 4 — branch-owned, persistent, replay-safe workplace tasks.
  * Stage 3 determines the branch/skill. This endpoint NEVER awards another
  * skill level or changes coins, XP, inventory, health or unapproved clock values.
@@ -170,6 +171,7 @@ export function registerBellrunnerSecondJobRoutes(app:FastifyInstance,options?:{
       await client.query(
         'INSERT INTO player_character_bellrunner_second_job_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,cmd.requestId,hash,JSON.stringify(result)]);
+      await archiveBellrunnerSecondJob(client,req.params.id,next);
       await client.query('COMMIT');open=false;
       return result;
     }catch(e){
