@@ -70,7 +70,7 @@
     const requestedApi='/api/characters/'+encodeURIComponent(requestedId)+'/tutorial/home';
     const current=()=>generation===requestGeneration&&requestedId===id;
     character=null;home=null;status='loading';pending=false;
-    errorMessage='';restMessage='';retryKey=null;retryId=null;
+    errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
     noticeExpanded=false;overlayKind=null;
     if(overlayDialog?.open)overlayDialog.close();
     try{
@@ -149,11 +149,13 @@
   }
   async function restInBed(){
     if(restAnimating||pending||!home)return;
+    const actingId=id,actingGeneration=requestGeneration;
     restAnimating=true;restMessage='';
-    // This is only a one-second visual transition; the server still owns Rest.
+    // Only the confirmed server Rest changes character condition.
     const fade=new Promise<void>(resolve=>setTimeout(resolve,1000));
     const saved=await perform('rest');
     await fade;
+    if(actingId!==id||actingGeneration!==requestGeneration)return;
     restAnimating=false;
     if(saved)restMessage='Rested. Stamina and Composure are full; Fatigue and Stress cleared.';
   }
