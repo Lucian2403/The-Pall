@@ -2,6 +2,7 @@
   import type {Snippet} from 'svelte';
   import {onMount,setContext,tick} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRegistrar} from '$lib/scene-journal';
+  import PersonalJournalHistory from '$lib/PersonalJournalHistory.svelte';
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
@@ -153,6 +154,18 @@
   // Scene components register their already-existing journals through context.
   let sceneJournal=$state<SceneJournalController|null>(null);
   const activeSceneJournal=$derived(journalController??sceneJournal);
+  const journalExpanded=$derived(activeSceneJournal?.open??emptyJournalOpen);
+  function togglePersonalJournal(){
+    if(activeSceneJournal)activeSceneJournal.toggle();
+    else void toggleEmptyJournal();
+  }
+  // Clear any prior character's scene journal controller on character changes.
+  let journalOwner=$state(character.id);
+  $effect(()=>{
+    if(character.id!==journalOwner){
+      journalOwner=character.id;sceneJournal=null;emptyJournalOpen=false;
+    }
+  });
   let emptyJournalOpen=$state(false);
   const registerJournal:SceneJournalRegistrar=(controller)=>{sceneJournal=controller;};
   setContext(SCENE_JOURNAL_CONTEXT,registerJournal);
@@ -323,7 +336,6 @@
   const lockedSections = [
     {name: 'City', icon: '▥'},
     {name: 'Inventory', icon: '▣'},
-    {name: 'Journal', icon: '▤'},
     {name: 'Jobs', icon: '⚒'},
     {name: 'Market', icon: '⚖'},
     {name: 'Contracts', icon: '≡'},
@@ -348,6 +360,10 @@
       <a class="nav-entry" href="/characters" title="Characters">
         <span class="nav-icon" aria-hidden="true">☰</span><span class="nav-text">Characters</span>
       </a>
+      <button type="button" class="nav-entry journal-nav" aria-expanded={journalExpanded}
+        aria-controls="personal-journal-history" onclick={togglePersonalJournal}>
+        <span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Journal</span>
+      </button>
     </nav>
     <div class="nav-rule"></div>
     <p class="locked-heading">AFTER YOUR INTRODUCTION</p>
@@ -482,13 +498,10 @@
       {/if}
       <div class="scene-journal-bar" aria-label="Personal journal controls">
         <button type="button" class="scene-journal-button" data-pall-sfx="paper"
-          aria-expanded={activeSceneJournal?.open??emptyJournalOpen}
+          aria-expanded={journalExpanded}
           aria-controls={activeSceneJournal?.id??'scene-empty-journal'}
-          onclick={()=>{
-            if(activeSceneJournal)activeSceneJournal.toggle();
-            else void toggleEmptyJournal();
-          }}>
-          {(activeSceneJournal?.open??emptyJournalOpen)?'Close journal':'Review journal'}
+          onclick={togglePersonalJournal}>
+          {journalExpanded?'Close journal':'Review journal'}
         </button>
       </div>
       <a href="/characters" class="exit-link">Character selection</a>
@@ -505,6 +518,11 @@
         <h2>Current scene</h2>
         <p>No journal entry has been recorded for this scene yet.</p>
       </section>
+    {/if}
+    {#if journalExpanded&&!journalController}
+      {#key character.id}
+        <PersonalJournalHistory characterId={character.id} open={journalExpanded}/>
+      {/key}
     {/if}
 
     <footer class="onboarding-footer">GUIDED CHAPTER · Other game systems are still in development.</footer>
@@ -711,6 +729,8 @@
   .rewind-error{margin:0;padding:9px 16px;background:#34231c;color:#f0b7a0;font:13px/1.4 sans-serif}
   /* One stable location for Review/Close journal through every illustrated
      scene, conversation, physical task, clinic and active combat. */
+  .journal-nav{width:100%;text-align:left;cursor:pointer;border:0;background:transparent;color:inherit}
+  .journal-nav:focus-visible{outline:2px solid #efd092;outline-offset:-2px}
   .scene-journal-bar{display:flex;align-items:center;margin-left:auto}
   .scene-journal-button{appearance:none;cursor:pointer;min-height:38px;
     border:solid transparent;border-width:8px 13px;
