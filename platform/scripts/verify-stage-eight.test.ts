@@ -238,7 +238,7 @@ test('Back to Stage 7 reopens the paid clinic without touching combat, coins or 
    api.includes('DELETE FROM player_character_tutorial_home_receipts') &&
    api.includes('DELETE FROM player_character_tutorial_home WHERE character_id') &&
    api.includes("tutorial_stage=7,tutorial_status='IN_PROGRESS'") &&
-   api.includes("(bellrunner?'bellrunner':'millhand')+'/clinic'") &&
+   api.includes("clinicHref(req.params.id,isFinaleOrigin(c.rows[0].origin)") &&
    api.includes('coinDelta:0'),
    'Stage 8 back button should return to the paid clinic, not replay Flint');
  assert.ok(shell.includes("'← Back to Stage '+rewindTargetStage") &&

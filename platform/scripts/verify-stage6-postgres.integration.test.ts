@@ -3034,4 +3034,37 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
  }catch(error){await dbClient.query('ROLLBACK');throw error;}finally{dbClient.release();}
  assert.equal(JSON.stringify((await request('GET',base+characters[1].id+'/journal')).body!.completed),before,
   'Backfilling one character cannot mutate a sibling character Journal');
+
+ // Shared Stage VIII -> VII rewind removes only the selected Home state.
+ // A subsequent Stage VII -> VI rewind refunds only that character's 10-coin
+ // clinic fee and restores the true pre-fight HP from its original receipt.
+ const selected=characters[0];
+ const rewind=base+selected.id+'/dev/rewind-stage';
+ const sibling=characters[1];
+ const siblingSnapshot=JSON.stringify((await request('GET',base+sibling.id+'/journal')).body!.completed);
+ assert.equal((await request('GET',rewind)).body!.targetStage,7);
+ assert.equal((await request('POST',rewind,stranger,{expectedStage:8})).status,404);
+ const backHome=await request('POST',rewind,owner,{expectedStage:8});
+ assert.equal(backHome.status,200,JSON.stringify(backHome.body));
+ assert.equal(backHome.body!.route,'/characters/'+selected.id+'/stitcher/clinic');
+ assert.equal(backHome.body!.coinDelta,0);
+ assert.equal((await request('GET',rewind)).body!.targetStage,6);
+ assert.equal((await request('GET',selected.clinicPath)).body!.phase,'PAID');
+ assert.equal((await request('GET',selected.homePath)).status,409);
+ const backFight=await request('POST',rewind,owner,{expectedStage:7});
+ assert.equal(backFight.status,200,JSON.stringify(backFight.body));
+ assert.equal(backFight.body!.stage,6);
+ assert.equal(backFight.body!.route,'/characters/'+selected.id+'/stitcher/combat');
+ assert.equal(backFight.body!.coinDelta,10);
+ assert.equal((await request('GET',selected.clinicPath)).status,409);
+ const person=(await db.query<{coins:number;current_health:number;tutorial_stage:number}>(
+  'SELECT coins,current_health,tutorial_stage FROM player_characters WHERE id=$1',
+  [selected.id])).rows[0];
+ assert.equal(Number(person.coins),20,'Exactly one paid examination was refunded');
+ assert.equal(person.current_health,1,'Rewind restores saved pre-fight Health, not full Health');
+ assert.equal(person.tutorial_stage,6);
+ assert.equal((await request('POST',rewind,owner,{expectedStage:7})).status,409);
+ assert.equal(JSON.stringify((await request('GET',base+sibling.id+'/journal')).body!.completed),siblingSnapshot,
+  'Rewinding Stitcher must not touch another character on the same account');
+ assert.equal((await request('GET',sibling.homePath)).body!.phase,'COMPLETE');
 });

@@ -92,6 +92,6 @@ test('Bellrunner Stage VIII retains home artwork and uses the shared character-s
  assert.ok(rewind.includes("const homeExists=await client.query("));
  assert.ok(rewind.includes("if(stage===8)"));
  assert.ok(rewind.includes("return {enabled:true,canRewind:!!canRewind,stage,targetStage:canRewind?7:null}"));
- assert.ok(rewind.includes("(bellrunner?'bellrunner':'millhand')+'/clinic'"));
+ assert.ok(rewind.includes("clinicHref(req.params.id,isFinaleOrigin(c.rows[0].origin)"));
  assert.ok(shell.includes("rewindTargetStage===6"));
 });
