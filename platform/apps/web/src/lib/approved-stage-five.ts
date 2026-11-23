@@ -137,23 +137,5 @@ const STAGES:WageClaimPhase[]=[
   'APPROACHING','OPENING','CHOOSE_APPROACH','APPROACH_EXCHANGE','COMMON_EXCHANGE',
   'CHOOSE_EVIDENCE','EVIDENCE_EXCHANGE','LEAVING','CORNERED_EXCHANGE','CHOOSE_STANCE','DONE'
 ];
-export function wageClaimJournal(s:WageClaimState):string[]{
-  const entries:string[]=[];
-  const reached=(phase:WageClaimPhase)=>STAGES.indexOf(s.phase)>=STAGES.indexOf(phase);
-  if(reached('CHOOSE_APPROACH'))
-    entries.push("I was heading home when Flint stopped me in the passage. The contractor wants money because the council held up Anvil's plates. What a fine business. They haven't paid us, and now they want me to pay them.");
-  if(s.approach && reached('COMMON_EXCHANGE'))
-    entries.push("I checked the contractor's paper. They've put the charge against me, and there's that same dead worker's number again. Flint wasn't sent by the council. The contractor sent him. He came for money, nothing else.");
-  if(reached('LEAVING')){
-    entries.push(s.branch==='restamp'
-      ?"I told Flint I delivered metal plates. The depot clerk recorded them properly, and I have the receipt. The contractor's paper had workers written on it. Still no answer for that."
-      :s.branch==='contracts'
-      ?"I told him about the two council records and the complaint I made. Nobody had told him. Seems he was only given enough information to collect the money."
-      :"I told him about the wages entered after the man's death. Flint didn't know who made those entries. I don't think he much cared, either.");
-  }
-  if(reached('CHOOSE_STANCE'))
-    entries.push("I told him I was going home. He wouldn't move. Took hold of his club instead. I had to decide how to get past him.");
-  if(s.stance)entries.push(s.stance==='brace'?'I braced myself.'
-    :s.stance==='moving'?'I tried to move around him.':'I used the nearby work cart as cover.');
-  return entries;
-}
+
+export {wageClaimJournal} from '@the-pall/game-core';
