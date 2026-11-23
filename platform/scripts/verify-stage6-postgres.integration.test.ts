@@ -3063,6 +3063,32 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
  assert.equal(Number(person.coins),20,'Exactly one paid examination was refunded');
  assert.equal(person.current_health,1,'Rewind restores saved pre-fight Health, not full Health');
  assert.equal(person.tutorial_stage,6);
+ // Stage VII → VI deliberately deletes the old Owler encounter. The saved
+ // witnessed hold still authorizes a fresh Stage VI combat start without
+ // replaying Stage V or recharging the clinic examination.
+ const replayCombat=base+selected.id+'/stitcher/combat';
+ assert.deepEqual((await request('GET',replayCombat)).body,{needsStart:true,stage:6},
+  'A legitimate rewind must show an unstarted fight, not reject the witnessed hold');
+ assert.equal((await request('GET',replayCombat,stranger)).status,404);
+ const startKey=randomUUID();
+ const startCommand={kind:'start',requestId:startKey};
+ const restarted=await request('POST',replayCombat,owner,startCommand);
+ assert.equal(restarted.status,200,JSON.stringify(restarted.body));
+ assert.equal(restarted.body!.status,'active');
+ assert.equal(restarted.body!.revision,0);
+ assert.equal(restarted.body!.preparation,'reason');
+ assert.equal(restarted.body!.branch,selected.branch);
+ assert.equal(restarted.body!.player.hp,1,'Replay uses refunded pre-fight Health');
+ assert.deepEqual((await request('POST',replayCombat,owner,startCommand)).body,restarted.body,
+   'Repeating the same start request cannot create another encounter');
+ assert.equal((await request('GET',replayCombat)).body!.revision,0);
+ const replayOwner=(await db.query<{tutorial_stage:number;tutorial_status:string;coins:number;current_health:number}>(
+   'SELECT tutorial_stage,tutorial_status,coins,current_health FROM player_characters WHERE id=$1',
+   [selected.id])).rows[0];
+ assert.equal(replayOwner.tutorial_stage,6);
+ assert.equal(replayOwner.tutorial_status,'IN_PROGRESS');
+ assert.equal(Number(replayOwner.coins),20,'Replaying the fight must not debit coins');
+ assert.equal(replayOwner.current_health,1);
  assert.equal((await request('POST',rewind,owner,{expectedStage:7})).status,409);
  assert.equal(JSON.stringify((await request('GET',base+sibling.id+'/journal')).body!.completed),siblingSnapshot,
   'Rewinding Stitcher must not touch another character on the same account');
