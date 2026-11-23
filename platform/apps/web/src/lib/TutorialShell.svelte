@@ -521,7 +521,8 @@
     {/if}
     {#if journalExpanded&&!journalController}
       {#key character.id}
-        <PersonalJournalHistory characterId={character.id} open={journalExpanded}/>
+        <PersonalJournalHistory characterId={character.id} open={journalExpanded}
+          currentJournalId={activeSceneJournal?.id??'scene-empty-journal'}/>
       {/key}
     {/if}
 
