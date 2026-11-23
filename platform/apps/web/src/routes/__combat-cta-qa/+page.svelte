@@ -10,7 +10,7 @@
   // No fake login, API call, progression write or in-game test character.
   const characterId='11111111-1111-4111-8111-111111111111';
   const character={
-    id:characterId,name:'QA fighter',origin:'Millhand',sex:'Male',coins:20,
+    id:characterId,name:'QA fighter',origin:'Millhand' as const,sex:'Male',coins:20,
     health:{current:0,maximum:50},startingLocation:'Smithing Workshop',
     tutorial:{stage:6,status:'COMPLETED'}
   };
@@ -43,5 +43,5 @@
 
 <TutorialShell {character} sceneLocation="Industrial service passage" alleyBackdrop={true}>
   <MillhandCombatScene {snapshot} {characterId} feedback={[]}
-    pending={false} errorMessage="" {perform}/>
+    pending={false} errorMessage="" {perform} origin={character.origin}/>
 </TutorialShell>
