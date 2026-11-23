@@ -1,3 +1,4 @@
+import {archiveMillhandSecondJob} from './personal-journal-completions.js';
 /**
  * Authenticated, server-authoritative Millhand Stage 4 second jobs.
  * The selected branch must come from persisted Stage 3; clients cannot choose
@@ -169,6 +170,7 @@ export function registerMillhandSecondJobRoutes(app:FastifyInstance){
         'INSERT INTO player_character_second_job_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
         [req.params.id,cmd.requestId,hash,JSON.stringify(result)]
       );
+      await archiveMillhandSecondJob(client,req.params.id,next);
       await client.query('COMMIT');transaction=false;
       return reply.code(200).send(result);
     }catch(e){
