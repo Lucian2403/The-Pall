@@ -48,7 +48,9 @@
     ++requestSerial;
     tasks=[];selected=null;cursor=null;error='';loading=false;
     loadedCharacter=character;
-    if(visible)void load(character,null,controller.signal);
+    if(visible)void Promise.resolve().then(()=>{
+      if(!controller.signal.aborted)void load(character,null,controller.signal);
+    });
     return ()=>{controller.abort();++requestSerial;};
   });
   const chosen=$derived(tasks.find(task=>task.taskInstanceId===selected)??null);
