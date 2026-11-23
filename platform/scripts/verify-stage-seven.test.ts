@@ -285,7 +285,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     shell.includes('rewindTargetStage') &&
     rewind.includes('if(expectedStage===7)') &&
     rewind.includes('if(expectedStage===8)') &&
-    web.includes("character={...character,tutorial:clinic.phase==='LEFT'"),
+    web.includes("tutorial:savedClinic.phase==='LEFT'"),
     'Stage 7 must safely rewind to a replayable Stage 6, reversing only committed clinic payment');
   assert.equal(CLINIC_FEE,10);
 });
