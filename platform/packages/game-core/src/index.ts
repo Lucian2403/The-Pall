@@ -28,3 +28,6 @@ export {stageTwoJournal,missingStampJournal,secondJobJournal,stage5JournalEntrie
 export type {Stage5JournalInput,BellrunnerJournalState,StitcherJournalState,ReadableMissingStampEvidence} from './journal-copy.js';
 
 export {STITCHER_STAGE_FINDINGS} from './journal-copy.js';
+
+export {wageClaimJournal,dogmanJournal} from './journal-copy.js';
+export type {DogmanViewState} from './journal-copy.js';
