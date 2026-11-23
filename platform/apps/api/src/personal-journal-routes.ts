@@ -13,7 +13,7 @@ type Account={user:{id:string;emailVerified:boolean}}|null;
 type Resolver=(headers:IncomingHttpHeaders)=>Promise<Account>;
 type Row={task_instance_id:string;task_id:string;stage:number;title:string;
   paragraphs:string[];choices:Record<string,string>;outcome:string|null;
-  content_version:number;completed_at:Date};
+  content_version:number;completed_at:string};
 
 export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
   pool?:pg.Pool;resolveSession?:Resolver
@@ -30,7 +30,7 @@ export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
     const rawLimit=req.query.limit??'20';
     if(!/^\d{1,2}$/.test(rawLimit)||Number(rawLimit)<1||Number(rawLimit)>50)
       return reply.code(400).send({error:'invalid_limit'});
-    let afterDate:Date|null=null,afterId:string|null=null;
+    let afterDate:string|null=null,afterId:string|null=null;
     if(req.query.cursor){
       if(req.query.cursor.length>512)return reply.code(400).send({error:'invalid_cursor'});
       try{
@@ -40,7 +40,7 @@ export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
           typeof decoded[1]!=='string'||typeof decoded[2]!=='string'||
           decoded[2].length>160||!Number.isFinite(Date.parse(decoded[1])))
           throw Error('invalid_cursor');
-        afterDate=new Date(decoded[1]);afterId=decoded[2];
+        afterDate=decoded[1];afterId=decoded[2];
       }catch{return reply.code(400).send({error:'invalid_cursor'});}
     }
     // Ownership is checked before ANY journal query. Two owned characters
@@ -52,7 +52,9 @@ export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
     const limit=Number(rawLimit);
     const history=await pool.query<Row>(
       `SELECT j.task_instance_id,j.task_id,j.stage,j.title,j.paragraphs,
-         j.choices,j.outcome,j.content_version,j.completed_at
+         j.choices,j.outcome,j.content_version,
+         to_char(j.completed_at AT TIME ZONE 'UTC',
+           'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS completed_at
        FROM player_character_journal_tasks AS j
        JOIN player_characters AS c ON c.id=j.character_id
        WHERE j.character_id=$1 AND c.account_id=$2
@@ -69,7 +71,7 @@ export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
       choices:row.choices,outcome:row.outcome,contentVersion:row.content_version,
       completedAt:row.completed_at
     })),nextCursor:history.rows.length>limit&&last
-      ?Buffer.from(JSON.stringify([req.params.id,last.completed_at.toISOString(),last.task_instance_id])).toString('base64url')
+      ?Buffer.from(JSON.stringify([req.params.id,last.completed_at,last.task_instance_id])).toString('base64url')
       :null};
   });
 }
