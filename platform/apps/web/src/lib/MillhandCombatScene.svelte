@@ -2,6 +2,7 @@
   import {getContext,tick} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
+  import {flintOwlerCombatJournal} from '@the-pall/game-core';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
   import {COMBAT_RESOURCE_SCALE} from '$lib/millhand-combat-model';
   import CombatRoundChronicle from '$lib/CombatRoundChronicle.svelte';
@@ -88,17 +89,7 @@
     : snapshot.enemy.hp <= 0
       ? 'Flint is on the ground and cannot stop you. You move past him and leave the passage.You\'re battered and aching all over. Better get yourself to the clinic'
       : 'Flint finally gets out of your way. You keep an eye on him as you walk past, then head down the passage. You\'re battered and aching all over. Better get yourself to the clinic.');
-  const toughVictory = $derived(snapshot.player.hp <= snapshot.player.hpMax / 2 ||
-    snapshot.player.wounds.some(wound => wound.severity === 'serious'));
-  const journal = $derived(isOwler
-    ?snapshot.outcome==='player_defeat'
-      ?"Owler was stronger than I expected. I went down at the night door. The attendant pulled the trolley back, and the ward staff would not let Owler take the man. Claudia told him to leave. I lost the fight, but the man's transfer was cancelled."
-      :"Owler tried to force his way past me. I held him off until he backed away. He said he would tell the school I stopped the transfer. I told him to tell them the patient refused. Claudia cancelled this one transfer, and the man stayed in the ward."
-    :snapshot.outcome === 'player_defeat'
-    ? "Flint beat me. Damn it. I thought I could get past him, but I couldn't. Other workers came when they heard the fight, and he left without taking my money. One of them helped me get to medical care. Still not a coin from the council for those plates. A fine day I've had."
-    : toughVictory
-      ? "I beat Flint and got past him. That was tough. For a moment I didn't think I'd manage it, not with that club of his. Everybody knows how hard he is to beat. Well, he didn't get a coin out of me. And after all that, the council still hasn't paid us for those plates."
-      : "I beat Flint and got past him. That club could've done some damage, but I managed to keep him off me. He didn't get a coin out of me. The council still owes us for the plates, of course.");
+  const journal=$derived(flintOwlerCombatJournal(snapshot,isOwler));
 
   const iconBase = '/ui-kit/combat-actions/';
   const displayedResources=[
