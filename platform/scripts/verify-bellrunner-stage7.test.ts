@@ -58,7 +58,8 @@ test('Bellrunner approved speech, real findings, and differing Dogman arrivals',
   assert.match(shared,/You arrive at the city clinic on your own/);
   assert.doesNotMatch(shared,/Dogman lowers his club and clears the passage/);
   assert.doesNotMatch(shared,/helps you through the streets to the city clinic/);
-  assert.match(shared,/origin==='Bellrunner'\?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS/);
+  assert.match(shared,/BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS/);
+  assert.match(shared,/STITCHER_PRICED_BEATS/);
   assert.match(shared,/arrivalIndex<0/);
   assert.match(shared,/onclick=\{advanceArrival\}/);
   assert.match(shared,/origin==='Millhand'/);
@@ -76,12 +77,12 @@ test('Both origins reuse one clinic API, state table, paid transaction and UI',(
   const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
   assert.ok(api.includes("registerSharedClinicRoutes(app,'Bellrunner'"));
   assert.ok(api.includes("registerSharedClinicRoutes(app,'Millhand'"));
-  assert.ok(api.includes("'player_character_dogman_combat':'player_character_flint_combat'"));
+  assert.ok(read('apps/web/src/lib/shared-finale-origins.ts').includes('player_character_dogman_combat'));
   assert.ok(api.includes('UPDATE player_characters SET coins=coins-$2,current_health=max_health'));
   assert.ok(api.includes('player_character_clinic_receipts'));
   assert.ok(api.includes('initialClinic(combat.rows[0].state)'));
   assert.ok(index.includes('registerBellrunnerClinicRoutes(api)'));
-  assert.ok(web.includes("origin.toLowerCase()+'/clinic'"));
+  assert.ok(web.includes('FINALE_ORIGINS[origin].clinicPath'));
   assert.ok(web.includes("playCoinTransactionSfx()"));
   assert.ok(web.includes("origin==='Millhand'"));
   assert.ok(combat.includes("'/bellrunner/clinic'"));
@@ -98,7 +99,7 @@ test('Both origins reuse one clinic API, state table, paid transaction and UI',(
   assert.ok(shell.includes("'← Back to Stage '+rewindTargetStage"));
   assert.ok(shell.includes('completed Dogman fight'));
   assert.ok(rewind.includes('if(stage===7||stage===8)'));
-  assert.ok(home.includes("href:base+'/bellrunner/clinic'"));
+  assert.ok(home.includes('clinicHref(character.id,character.origin)'));
   assert.ok(rewind.includes('if(bellrunner&&(expectedStage===7||expectedStage===8))'));
   assert.ok(rewind.includes('if(stage===7||stage===8)'));
   assert.ok(rewind.includes("const left=expectedStage===8"));

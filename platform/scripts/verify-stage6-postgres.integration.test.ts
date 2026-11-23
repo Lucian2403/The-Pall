@@ -30,7 +30,7 @@ import {
 } from '../apps/api/src/bellrunner-dogman-work.ts';
 import {INITIAL_WRONG_BELL} from '../apps/api/src/bellrunner-wrong-bell-work.ts';
 import {STAGE_FOUR_FACT,STAGE_FOUR_OPENING_LENGTH,STAGE_FOUR_REVELATION_LENGTH} from '../apps/api/src/bellrunner-second-job-work.ts';
-import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
+import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes,registerStitcherClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
@@ -83,6 +83,7 @@ registerBellrunnerDogmanCombatRoutes(app,{pool:db,resolveSession,seed:()=>7});
 registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5});
 registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerBellrunnerClinicRoutes(app,{pool:db,resolveSession});
+registerStitcherClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
@@ -2933,4 +2934,104 @@ test('Personal Journal strictly isolates one account\'s Stitcher and Millhand jo
   // Reaching Stage VIII does not erase B's earlier Stage II diary.
   await db.query("UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",[b]);
   assert.deepEqual((await fetchJournal(b)).body!.completed,be);
+});
+
+
+test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archive isolation',async()=>{
+ const characters=[] as {id:string;branch:string;clinicPath:string;homePath:string}[];
+ for(const branch of ['notes','consent','trolley'] as const){
+  const c=await stitcherAtNightDoor('reason',branch,true,1);
+  const clinicPath=base+c.id+'/stitcher/clinic';
+  const homePath=base+c.id+'/tutorial/home';
+  assert.equal((await request('GET',clinicPath)).status,409,'Cannot skip combat');
+  let fight=(await request('POST',c.path,owner,{kind:'start',requestId:randomUUID()})).body!;
+  for(let turn=0;turn<85&&fight.status==='active';turn++){
+   const step=await request('POST',c.path,owner,{kind:'turn',expectedRevision:fight.revision,
+    requestId:randomUUID(),action:{type:'guard'}});
+   assert.equal(step.status,200,JSON.stringify(step.body));
+   fight=step.body!;
+  }
+  assert.equal(fight.status,'finished');assert.equal(fight.outcome,'player_defeat');
+  assert.equal(fight.patientSafe,true);assert.equal(fight.transferCancelled,true);
+  assert.equal((await request('GET',clinicPath,null)).status,401);
+  assert.equal((await request('GET',clinicPath,stranger)).status,404);
+  assert.equal((await request('POST',clinicPath,stranger,{kind:'start',requestId:randomUUID()})).status,404);
+  assert.deepEqual((await request('GET',clinicPath)).body,{needsStart:true,stage:7});
+  let visit=(await request('POST',clinicPath,owner,{kind:'start',requestId:randomUUID()})).body!;
+  assert.equal(visit.phase,'ARRIVAL');
+  const go=async(action:string)=>{
+   const result=await request('POST',clinicPath,owner,{
+    kind:'action',action,expectedRevision:visit.revision,requestId:randomUUID()
+   });
+   assert.equal(result.status,200,action+': '+JSON.stringify(result.body));
+   visit=result.body!;return visit;
+  };
+  for(const action of ['examine','speak','review_price'])await go(action);
+  const feeKey=randomUUID();
+  const feeCommand={kind:'action',action:'pay',expectedRevision:visit.revision,requestId:feeKey};
+  const paid=await request('POST',clinicPath,owner,feeCommand);
+  assert.equal(paid.status,200,JSON.stringify(paid.body));
+  assert.equal(paid.body!.coins,10);
+  assert.equal(paid.body!.paid,true);
+  assert.deepEqual((await request('POST',clinicPath,owner,feeCommand)).body,paid.body,
+   'An idempotent request cannot charge the same person twice');
+  visit=paid.body!;
+  assert.equal((await request('POST',clinicPath,owner,{
+    ...feeCommand,requestId:randomUUID()
+  })).status,409,'A second payment at the next revision is forbidden');
+  await go('leave');
+  assert.equal(visit.phase,'LEFT');
+  const journal=base+c.id+'/journal';
+  const completed=(await request('GET',journal)).body!.completed;
+  const clinic=completed.find((entry:any)=>entry.stage===7);
+  assert.equal(clinic.taskId,'shared.clinic');
+  assert.ok(clinic.paragraphs.join(' ').includes('Owler'));
+  assert.equal((await request('GET',journal,stranger)).status,404);
+  assert.equal((await request('GET',homePath)).body!.needsStart,true);
+  let home=(await request('POST',homePath,owner,{kind:'start',requestId:randomUUID()})).body!;
+  assert.equal(home.homeId,'starter-rented-room');
+  assert.equal(home.branch,branch,'Only the actual saved Stitcher work branch is used');
+  assert.equal(home.coins,10);
+  assert.equal(home.noticeText.includes('150 coins'),true);
+  for(const action of ['read_notice','put_down','finish']){
+   const result=await request('POST',homePath,owner,{
+    kind:'action',action,expectedRevision:home.revision,requestId:randomUUID()
+   });
+   assert.equal(result.status,200,action+': '+JSON.stringify(result.body));
+   home=result.body!;
+  }
+  assert.equal(home.phase,'COMPLETE');
+  const tasks=(await request('GET',journal)).body!.completed;
+  const savedHome=tasks.find((entry:any)=>entry.stage===8);
+  assert.equal(savedHome.taskId,'shared.rented-home');
+  assert.equal(savedHome.taskInstanceId,'tutorial:stage:8');
+  assert.ok(savedHome.paragraphs.some((p:string)=>p.includes('150 coins')));
+  assert.equal((await request('GET',homePath,stranger)).status,404);
+  assert.equal((await request('POST',homePath,stranger,{
+   kind:'start',requestId:randomUUID()
+  })).status,404);
+  characters.push({id:c.id,branch,clinicPath,homePath});
+ }
+ // Distinct characters owned by the SAME account have identical stage task IDs,
+ // but their final Journal descriptions retain only their own branch/outcome.
+ const snapshots=await Promise.all(characters.map(async c=>
+  (await request('GET',base+c.id+'/journal')).body!.completed));
+ for(const [i,entries] of snapshots.entries()){
+  assert.equal(entries.filter((e:any)=>e.stage===7).length,1);
+  assert.equal(entries.filter((e:any)=>e.stage===8).length,1);
+  assert.deepEqual(entries.filter((e:any)=>e.stage>=7).map((e:any)=>e.taskInstanceId).sort(),
+   ['tutorial:stage:7','tutorial:stage:8']);
+  assert.equal(entries.find((e:any)=>e.stage===8).choices.route,characters[i].branch);
+ }
+ const before=JSON.stringify(snapshots[1]);
+ const dbClient=await db.connect();
+ try{
+  await dbClient.query('BEGIN');
+  await backfillCharacterJournal(dbClient,{
+   id:characters[0].id,origin:'Stitcher',tutorial_stage:8
+  });
+  await dbClient.query('COMMIT');
+ }catch(error){await dbClient.query('ROLLBACK');throw error;}finally{dbClient.release();}
+ assert.equal(JSON.stringify((await request('GET',base+characters[1].id+'/journal')).body!.completed),before,
+  'Backfilling one character cannot mutate a sibling character Journal');
 });

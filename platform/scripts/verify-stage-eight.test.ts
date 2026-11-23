@@ -4,6 +4,8 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import {initial,advance,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
+import {homeJournalEntries} from '../apps/web/src/lib/home-journal-copy.ts';
+import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
 const root=resolve(import.meta.dirname,'..');
 const source=(p:string)=>readFileSync(resolve(root,p),'utf8');
 
@@ -89,7 +91,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   shell.includes("'/home'"));
  assert.ok(clinic.includes('Travel Home</a>')&&
   clinic.includes("'/home'")&&
-  clinic.includes("next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home')")&&
+  clinic.includes("origin==='Stitcher'?'Leave the infirmary'")&&
   clinic.includes("if(action==='leave'&&result.phase==='LEFT')")&&
   clinic.includes("await goto('/characters/'+encodeURIComponent(id)+'/home')")&&
   clinic.includes("origin==='Millhand'"),
@@ -247,7 +249,7 @@ test('Saved Home journal is the selected character\'s shared reader',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
  const reader=source('apps/web/src/lib/PersonalJournal.svelte');
- assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]"));
+ assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:currentJournalEntries"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(reader.includes("encodeURIComponent(id)+'/journal"));
  assert.ok(!web.includes('id="home-journal"'));
@@ -267,4 +269,26 @@ test('Rented-room chest keeps its modal; Journal uses the shared reader',()=>{
  assert.ok(web.includes("journalController={{open:journalOpen"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(!web.includes('class="journal" aria-label="Personal Journal"'));
+});
+
+test('Every implemented origin archives the same Stage VIII diary shown while playing',()=>{
+ for(const [origin,branch] of [
+   ['Millhand','restamp'],['Bellrunner','trauma'],['Stitcher','notes']
+ ] as const){
+   let state=initial(origin,branch,'player_victory');
+   const live=()=>homeJournalEntries(origin,state.phase,RENT);
+   assert.equal(live().length,1,'No rent detail leaks before reading the notice');
+   assert.ok(!live().join(' ').includes('150'));
+   state=advance(state,'read_notice');
+   assert.ok(live().join(' ').includes('150'));
+   state=advance(state,'put_down');
+   assert.ok(live().join(' ').includes('Home at last'));
+   state=advance(state,'finish');
+   const saved=homeTask('character-'+origin,state);
+   assert.equal(saved.taskId,'shared.rented-home');
+   assert.equal(saved.taskInstanceId,'tutorial:stage:8');
+   assert.deepEqual(saved.paragraphs,live());
+   assert.ok(origin!=='Stitcher'||saved.paragraphs.join(' ').includes('Owler'));
+   assert.equal(view(state,'Ada',10).closingSpeech,CLOSING_SPEECH);
+ }
 });

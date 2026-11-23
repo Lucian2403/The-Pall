@@ -8,6 +8,8 @@ import {
   clinicView,initialClinic,defaultTutorialDischarge
 } from '../apps/api/src/millhand-clinic-state.ts';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
+import {clinicJournalEntries} from '../apps/web/src/lib/clinic-journal-copy.ts';
+import {clinicTask} from '../apps/api/src/personal-journal-tasks.ts';
 import {
   clinicianAssessment,clinicianDischarge,clinicianFatigue
 } from '../apps/web/src/lib/millhand-clinic-dialogue.ts';
@@ -225,7 +227,7 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(!api.includes('UPDATE player_character_flint_combat'));
   assert.ok(!api.includes('ordinary_xp'));
   const journalCopy=source('apps/web/src/lib/clinic-journal-copy.ts');
-  assert.ok(web.includes('clinicJournal(origin,{'));
+  assert.ok(web.includes('clinicJournalEntries(origin,{'));
   assert.ok(journalCopy.includes("clinic.conditionType==='cut'"));
   assert.ok(web.includes('Examine condition'));
   assert.ok(web.includes('Review the price'));
@@ -286,4 +288,29 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     web.includes("character={...character,tutorial:clinic.phase==='LEFT'"),
     'Stage 7 must safely rewind to a replayable Stage 6, reversing only committed clinic payment');
   assert.equal(CLINIC_FEE,10);
+});
+
+test('Shared Stage VII Journal is phase-aware and archives the exact character record',()=>{
+  for(const origin of ['Millhand','Bellrunner','Stitcher'] as const){
+    let visit=initialClinic(finished(50));
+    const read=()=>clinicJournalEntries(origin,{phase:visit.phase,paid:visit.paid,
+      outcome:visit.outcome,conditionType:classifyCondition(visit.before)});
+    assert.equal(read().length,1,'Arrival is recorded without invented examination/payment');
+    assert.ok(!read().join(' ').includes('costs ten coins'));
+    visit=advanceClinic(visit,'examine');
+    assert.ok(read().join(' ').includes('no injuries'),'Unhurt patients need no treatment');
+    visit=advanceClinic(visit,'speak');
+    assert.ok(!read().join(' ').includes('I paid ten coins'),'Never pre-record payment');
+    visit=advanceClinic(visit,'review_price');
+    assert.ok(read().join(' ').includes('costs ten coins'));
+    visit=advanceClinic(visit,'pay');
+    const paid=read();
+    assert.ok(paid.length>2 && paid.some(entry=>entry.includes('ten coins')));
+    visit=advanceClinic(visit,'leave');
+    const archive=clinicTask('character-'+origin,origin,visit);
+    assert.equal(archive.stage,7);
+    assert.equal(archive.taskInstanceId,'tutorial:stage:7');
+    assert.deepEqual(archive.paragraphs,read(),'Live and completed are one copy function');
+    assert.ok(origin!=='Stitcher'||archive.paragraphs.join(' ').includes('Owler'));
+  }
 });
