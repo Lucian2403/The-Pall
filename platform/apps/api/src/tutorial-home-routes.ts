@@ -1,3 +1,4 @@
+import {archiveCompletedHome} from './personal-journal-completions.js';
 /** Authenticated, idempotent Stage 8 home shared by Millhand and Bellrunner.
  * The rented room, rent, closing speech, storage and Home state are identical. */
 import type {FastifyInstance} from 'fastify';
@@ -159,6 +160,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     await db.query('UPDATE player_character_tutorial_home SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
      [c.id,state.revision,JSON.stringify(state)]);
    }
+   if(state.phase==='COMPLETE')await archiveCompletedHome(db,c.id,state);
    const result=view(state,c.name,Number(c.coins));
    await db.query('INSERT INTO player_character_tutorial_home_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [c.id,cmd.requestId,hash,JSON.stringify(result)]);
