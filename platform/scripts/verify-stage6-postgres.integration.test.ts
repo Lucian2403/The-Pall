@@ -36,6 +36,8 @@ import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
 import {archiveJournalTask} from '../apps/api/src/personal-journal-store.ts';
+import {INITIAL_PLATEWORK,advancePlatework} from '@the-pall/game-core';
+import {archiveMillhandWork} from '../apps/api/src/personal-journal-completions.ts';
 import {registerMillhandWorkRoutes} from '../apps/api/src/millhand-work-routes.ts';
 import {registerMissingStampRoutes} from '../apps/api/src/millhand-missing-stamp-routes.ts';
 import {registerMillhandSecondJobRoutes} from '../apps/api/src/millhand-second-job-routes.ts';
@@ -2931,4 +2933,34 @@ test('two characters on one account never share their Personal Journals',async()
   'A Private Millhand Event');
  assert.ok(!finalA.tasks.some((x:any)=>x.title==='A Private Millhand Event'));
  assert.ok(!finalB.tasks.some((x:any)=>x.title==='A Private Stitcher Event'));
+});
+
+test('Stage VIII character can read their original immutable Stage II diary after reload',async()=>{
+ const id=randomUUID();
+ await db.query(
+  "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) VALUES($1,$2,'Completed Millhand',$3,'Male','Millhand',$4::jsonb,'[]'::jsonb,'Smithing workshop',8,'COMPLETED')",
+  [id,owner,'completed-millhand-'+id,JSON.stringify({Craftsmanship:3})]);
+ // The history is saved at actual Stage II completion, not reconstructed
+ // from Stage VIII or from a client-provided diary paragraph.
+ let state=INITIAL_PLATEWORK;
+ for(const action of ['read_paper','set_stamps','look_at_bent_plate',
+  'straighten','stamp_number','check_number','finish_checking','return_paper'] as const)
+  state=advancePlatework(state,action);
+ assert.equal(state.phase,'COMPLETE');
+ const client=await db.connect();
+ try{
+  await client.query('BEGIN');
+  await archiveMillhandWork(client,id,state);
+  await client.query('COMMIT');
+ }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
+ const path=base+id+'/journal';
+ const first=await request('GET',path);
+ assert.equal(first.status,200,JSON.stringify(first.body));
+ assert.deepEqual(first.body?.tasks.map((entry:any)=>[entry.stage,entry.title]),
+  [[2,'Marking the Plates']]);
+ assert.ok(first.body!.tasks[0].paragraphs.some((line:string)=>line.startsWith('I ')));
+ const reloaded=await request('GET',path);
+ assert.deepEqual(reloaded.body,first.body,
+  'The Stage II snapshot remains available after a fresh Stage VIII read');
+ assert.equal((await request('GET',path,stranger)).status,404);
 });
