@@ -2,6 +2,7 @@
   import type {Snippet} from 'svelte';
   import {onMount,setContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRecord,type SceneJournalRegistrar} from '$lib/scene-journal';
+  import {isFinaleOrigin,clinicHref} from '$lib/shared-finale-origins';
   import {goto} from '$app/navigation';
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
@@ -93,8 +94,10 @@
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/wrong-bell'
     : character.origin === 'Bellrunner' && character.tutorial.stage === 2
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/dispatch'
-    : character.origin === 'Millhand' && character.tutorial.stage >= 7
-    ? '/characters/' + encodeURIComponent(character.id) + '/millhand/clinic'
+    : isFinaleOrigin(character.origin) && character.tutorial.stage === 7
+    ? clinicHref(character.id,character.origin)
+    : character.origin === 'Stitcher' && character.tutorial.stage === 6
+    ? '/characters/' + encodeURIComponent(character.id) + '/stitcher/combat'
     : character.origin === 'Millhand' && character.tutorial.stage === 6
     ? '/characters/' + encodeURIComponent(character.id) + '/millhand/combat'
     : character.origin === 'Millhand' && character.tutorial.stage === 5

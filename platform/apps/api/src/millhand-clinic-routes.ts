@@ -5,6 +5,7 @@
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
 import {clinicTask} from './personal-journal-tasks.js';
+import {FINALE_ORIGINS,type FinaleOrigin} from '../../web/src/lib/shared-finale-origins.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -49,16 +50,21 @@ function parseCommand(input:unknown):Command{
   };
 }
 function schemaMissing(e:unknown){return (e as {code?:string})?.code==='42P01';}
-type ClinicOrigin='Millhand'|'Bellrunner';
+type ClinicOrigin=FinaleOrigin;
+type FightRecord={state:CombatState;patient_safe?:boolean;transfer_cancelled?:boolean};
+function finishedEncounter(origin:ClinicOrigin,record:FightRecord|undefined):boolean{
+  return !!record&&record.state.status==='finished'&&
+    (origin!=='Stitcher'||record.patient_safe===true&&record.transfer_cancelled===true);
+}
 type ClinicDependencies={pool?:pg.Pool;resolveSession?:SessionResolver};
 /** Shared authenticated clinic: identical examination, ten-coin payment,
  * Health discharge and replay-safe receipts for both origins. */
 function registerSharedClinicRoutes(
   app:FastifyInstance,origin:ClinicOrigin,options:ClinicDependencies={}
 ){
-  const combatTable=origin==='Bellrunner'
-    ?'player_character_dogman_combat':'player_character_flint_combat';
-  const route='/api/characters/:id/'+origin.toLowerCase()+'/clinic';
+  const combatTable=FINALE_ORIGINS[origin].combatTable;
+  const combatFields=origin==='Stitcher'?'state,patient_safe,transfer_cancelled':'state';
+  const route='/api/characters/:id/'+FINALE_ORIGINS[origin].clinicPath;
   const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
   const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
@@ -85,11 +91,11 @@ function registerSharedClinicRoutes(
         if(saved.rowCount)return clinicView(saved.rows[0].state,Number(c.coins));
         if(c.tutorial_stage!==6||c.tutorial_status!=='COMPLETED')
           return reply.code(409).send({error:'clinic_not_ready'});
-        const fight=await pool.query<{state:CombatState}>(
-          `SELECT state FROM ${combatTable} WHERE character_id=$1`,
+        const fight=await pool.query<FightRecord>(
+          `SELECT ${combatFields} FROM ${combatTable} WHERE character_id=$1`,
           [req.params.id]
         );
-        if(!fight.rowCount||fight.rows[0].state.status!=='finished')
+        if(!finishedEncounter(origin,fight.rows[0]))
           return reply.code(409).send({error:'combat_not_finished'});
         return {needsStart:true,stage:7};
       }catch(error){
@@ -140,11 +146,11 @@ function registerSharedClinicRoutes(
           await db.query('ROLLBACK');open=false;
           return reply.code(409).send({error:'clinic_not_ready'});
         }
-        const combat=await db.query<{state:CombatState}>(
-          `SELECT state FROM ${combatTable} WHERE character_id=$1`,
+        const combat=await db.query<FightRecord>(
+          `SELECT ${combatFields} FROM ${combatTable} WHERE character_id=$1`,
           [req.params.id]
         );
-        if(!combat.rowCount||combat.rows[0].state.status!=='finished'){
+        if(!finishedEncounter(origin,combat.rows[0])){
           await db.query('ROLLBACK');open=false;
           return reply.code(409).send({error:'combat_not_finished'});
         }
@@ -230,10 +236,14 @@ function registerSharedClinicRoutes(
     });
 }
 
-/** Preserve the Millhand route and add the Bellrunner façade. */
+/** All implemented origins use this single authenticated Stage VII adapter. */
 export function registerMillhandClinicRoutes(app:FastifyInstance,options:ClinicDependencies={}){
   registerSharedClinicRoutes(app,'Millhand',options);
 }
 export function registerBellrunnerClinicRoutes(app:FastifyInstance,options:ClinicDependencies={}){
   registerSharedClinicRoutes(app,'Bellrunner',options);
+}
+
+export function registerStitcherClinicRoutes(app:FastifyInstance,options:ClinicDependencies={}){
+  registerSharedClinicRoutes(app,'Stitcher',options);
 }

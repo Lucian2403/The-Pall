@@ -1,7 +1,8 @@
 <script lang="ts">
   import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
-  import {clinicJournal} from '$lib/clinic-journal-copy';
-  // Both origins share this exact clinic stage, layout and medical state.
+  import {clinicJournalEntries} from '$lib/clinic-journal-copy';
+  import {FINALE_ORIGINS,type FinaleOrigin} from '$lib/shared-finale-origins';
+  // One treatment workflow; only approved arrival and dialogue lines vary by origin.
   import {onMount} from 'svelte';
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
@@ -13,7 +14,7 @@
   } from '$lib/millhand-clinic-dialogue';
   import {playCoinTransactionSfx} from '$lib/pall-audio';
 
-  let {origin}:{origin:'Millhand'|'Bellrunner'}=$props();
+  let {origin}:{origin:FinaleOrigin}=$props();
   type Wound={type:string;zone?:string;severity:string};
   type Condition={
     hp:number;hpMax:number;stamina:number;composure:number;
@@ -40,6 +41,12 @@
     {kind:'speech',speaker:'CLINICIAN',
       text:'Ten coins. That covers the examination and any basic treatment you need.'},
     {kind:'speech',speaker:'YOU',text:'All right. Go ahead.'}
+  ];
+  const STITCHER_PRICED_BEATS:readonly PricedBeat[]=[
+    {kind:'speech',speaker:'YOU',text:"You're charging me?"},
+    {kind:'speech',speaker:'CLINICIAN',text:'Ten coins.'},
+    {kind:'speech',speaker:'YOU',text:'I work here.'},
+    {kind:'speech',speaker:'CLINICIAN',text:"I know. It's still ten."}
   ];
   // One local narration or speech beat per Continue; saved examination state
   // remains authoritative and independent of this presentation cursor.
@@ -75,7 +82,7 @@
   let retryId:string|null=null;
   let retrySignature:string|null=null;
   const id=$derived(page.params.id);
-  const route=$derived('/api/characters/'+encodeURIComponent(id)+'/'+origin.toLowerCase()+'/clinic');
+  const route=$derived('/api/characters/'+encodeURIComponent(id)+'/'+FINALE_ORIGINS[origin].clinicPath);
   const next=$derived(clinic?.phase==='ARRIVAL'?'examine'
     :clinic?.phase==='EXAMINED'?'speak'
     :clinic?.phase==='SPOKEN'?'review_price'
@@ -85,9 +92,10 @@
     :next==='speak'?(origin==='Bellrunner'?'Let the clinician examine you':'Speak to clinician')
     :next==='review_price'?'Review the price'
     :next==='pay'?'Pay 10 coins'
-    :next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home'):'');
+    :next==='leave'?(origin==='Stitcher'?'Leave the infirmary':origin==='Bellrunner'?'Leave the clinic':'Travel Home'):'');
   let pricedDialogueIndex=$state(0);
-  const pricedBeats=$derived(origin==='Bellrunner'?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS);
+  const pricedBeats=$derived(origin==='Stitcher'?STITCHER_PRICED_BEATS:
+    origin==='Bellrunner'?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS);
   const pricedBeat=$derived(pricedBeats[pricedDialogueIndex]!);
   const pricedAtEnd=$derived(pricedDialogueIndex===pricedBeats.length-1);
   $effect(()=>{
@@ -99,16 +107,16 @@
     if(pending||clinic?.phase!=='PRICED'||pricedAtEnd)return;
     pricedDialogueIndex+=1;
   }
-  // The only visible journal toggle lives in TutorialShell; the journal's
-  // actual entries stay below the illustrated clinic.
+  // The single shared Journal reads this exact progress, also used by the archive.
 
   const assessment=$derived(clinic
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
   const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
   const departure=$derived(clinic?clinicianDischarge(clinic.conditionType):'');
-  const journal=$derived(clinic?clinicJournal(origin,{
-    paid:clinic.paid,outcome:clinic.outcome,conditionType:clinic.conditionType
-  }):'');
+  const journalEntries=$derived(clinic?clinicJournalEntries(origin,{
+    phase:clinic.phase,paid:clinic.paid,outcome:clinic.outcome,
+    conditionType:clinic.conditionType
+  }):[]);
 
 
   async function start(){
@@ -200,9 +208,9 @@
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
 {#if status==='ready' && character && clinic}
-  <TutorialShell {character} sceneLocation="City clinic" sceneStage={7} clinicBackdrop={true}
+  <TutorialShell {character} sceneLocation={FINALE_ORIGINS[origin].location} sceneStage={7} clinicBackdrop={true}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}
-    journalContent={{title:'The Clinic',entries:[journal,...(clinic?.phase==='LEFT'?["I've got ten coins left. Time to head home."]:[])]}}>
+    journalContent={{title:'The Clinic',entries:journalEntries}}>
     <section class="clinic" aria-label="Stage 7 clinic">
       <!-- Shared scene layout: the clinic painting is the stage (native
            1672x941); the clinician conversation is the reading column and
@@ -236,6 +244,17 @@
                   <p class="speech">“{arrivalBeat.text}”</p>
                 {/if}
               {/if}
+            {:else if origin==='Stitcher'}
+              <p class="narration">{clinic.outcome==='player_defeat'
+                ?'An unnamed ward worker helps you into the ordinary treatment area after Owler knocks you down. The patient remains in normal care.'
+                :'You return from the night door to the infirmary treatment area. The patient remains in ordinary care.'}</p>
+              <p class="narration">An ordinary clinician points toward an examination seat.</p>
+              <p class="speaker">CLINICIAN</p>
+              <p class="speech">“Sit down. What happened?”</p>
+              <p class="speaker">YOU</p>
+              <p class="speech">“Owler tried to take a patient. I got in his way.”</p>
+              <p class="speaker">CLINICIAN</p>
+              <p class="speech">“All right. Let me have a look.”</p>
             {:else}
               <p class="narration">{clinic.outcome==='player_defeat'
                 ?'Another worker helps you reach the clinic after Flint defeats you.'
@@ -246,7 +265,9 @@
           {:else if clinic.phase==='EXAMINED'}
             <p class="narration">{origin==='Bellrunner'
               ?'You check the Health and injuries recorded after Dogman’s attack. The clinician is ready to examine you.'
-              :'You sit on the edge of a bed and check yourself after the fight.'}</p>
+              :origin==='Stitcher'
+                ?'You check your actual Health and any recorded injuries from the Owler fight. The clinician is ready to examine you.'
+                :'You sit on the edge of a bed and check yourself after the fight.'}</p>
             {#if origin==='Millhand'}<p class="narration">The clinician waits for you to speak.</p>{/if}
           {:else if clinic.phase==='SPOKEN'}
             {#if origin==='Millhand'}
@@ -347,7 +368,7 @@
     {:else if status==='missing'}<h1>Character not found</h1>
     {:else if status==='prerequisite'}
       <h1>Clinic not yet available</h1>
-      <p>The fight with {origin==='Bellrunner'?'Dogman':'Flint'} must finish before the clinic examination.</p>
+      <p>The fight with {origin==='Stitcher'?'Owler':origin==='Bellrunner'?'Dogman':'Flint'} must finish before the clinic examination.</p>
       <a href={'/characters/'+encodeURIComponent(id)+'/'+origin.toLowerCase()+'/combat'}>Return to the encounter</a>
     {:else if status==='schema'}
       <h1>Clinic persistence is not installed</h1>

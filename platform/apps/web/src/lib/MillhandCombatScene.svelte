@@ -2,6 +2,7 @@
   import {getContext} from 'svelte';
 
   import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
+  import {clinicHref} from '$lib/shared-finale-origins';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
@@ -234,7 +235,7 @@
             <p class="after">The patient stays in ordinary care. This one transfer is cancelled. Your actual Health and wounds are saved. Medical care follows in Stage VII.</p>
           {:else}
             <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
-            <a class="pall-framed-button clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
+            <a class="pall-framed-button clinic-link" href={clinicHref(characterId,isOwler?'Stitcher':'Millhand')}>Continue to medical care</a>
           {/if}
         {:else}
           <p class="telegraph-title">{isOwler?"OWLER'S OBSERVABLE INTENTION":"FLINT'S OBSERVABLE INTENTION"}</p>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
-  import {homeJournalIntro as homeJournalIntroText} from '$lib/home-journal-copy';
+  import {homeJournalEntries} from '$lib/home-journal-copy';
+  import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {onMount,tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -10,8 +11,8 @@
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
   type Action='read_notice'|'put_down'|'finish'|'rest';
-  type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:string;
-    branch:'restamp'|'contracts'|'records'|'trauma'|'machinery';
+  type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:FinaleOrigin;
+    branch:string;
     outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
@@ -46,7 +47,7 @@
     overlayKind=null;
   }
   let retryKey:string|null=null,retryId:string|null=null;
-  const homeJournalIntro=$derived(home?homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner'):'');
+  const currentJournalEntries=$derived(home?homeJournalEntries(home.origin,home.phase,home.rent):[]);
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
   async function openRoomOverlay(kind:'storage'){
@@ -135,7 +136,7 @@
 {#if status==='ready'&&character&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
     journalController={{open:journalOpen,toggle:toggleJournal,
-      title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]}}>
+      title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
@@ -212,7 +213,7 @@
         {:else if home.phase==='COMPLETE'}
           <aside class="home-dialogue completion" aria-label="Stage eight completion">
             <p class="eyebrow">STAGE VIII · COMPLETE</p>
-            <h1>{home.origin==='Bellrunner'?'Bellrunner opening complete.':'Millhand opening complete.'}</h1>
+            <h1>{home.origin+' opening complete.'}</h1>
             <p>{home.origin==='Bellrunner'
               ?'The condemned worksite remains closed, and your local findings have not been resolved.'
               :'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.'}</p>
