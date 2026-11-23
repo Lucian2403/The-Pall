@@ -279,3 +279,10 @@ export function stitcherWardJournal(s:StitcherJournalState,branchFinding?:string
     return entries;
 }
 
+
+/** Shared canonical Stitcher findings used in UI and frozen journal snapshots. */
+export const STITCHER_STAGE_FINDINGS={
+  trolley:'At the receiving door, the clerk wanted the man\'s contract number. Didn\'t even ask his name. I refused to sign him over. He\'s still in the infirmary\'s care, but I doubt that\'s the end of it.',
+  consent:'The records show that the man was asleep when they took his thumbprint. Someone also heard him say he never agreed to the operation. For now, they can\'t move him.',
+  notes:'I\'ve checked the man\'s treatment notes against the teaching schedule. He doesn\'t need another operation. The doctors want to use him to teach their students. They\'re planning to cut him open for a lesson. And Claudia knows about it. I haven\'t signed him over, but they could still come for him.'
+} as const;
