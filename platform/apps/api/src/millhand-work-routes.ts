@@ -1,3 +1,4 @@
+import {archiveMillhandWork} from './personal-journal-completions.js';
 import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
 import pg from 'pg';
@@ -150,6 +151,7 @@ export function registerMillhandWorkRoutes(app: FastifyInstance) {
         'INSERT INTO player_character_work_receipts(character_id,request_id,request_hash,result) VALUES ($1,$2,$3,$4::jsonb)',
         [req.params.id,command.requestId,hash,JSON.stringify(result)]
       );
+      await archiveMillhandWork(client,req.params.id,next);
       await client.query('COMMIT'); inTransaction = false;
       return reply.code(200).send(result);
     } catch(e) {
