@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
+import {readdirSync,readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
 import Fastify from 'fastify';
 import pg from 'pg';
 import {getGameplayPool,databasePoolMax} from '../apps/api/src/database-pool.ts';
@@ -73,4 +75,25 @@ test('Identity budget can be capped independently of gameplay',()=>{
     if(old===undefined)delete process.env[key];
     else process.env[key]=old;
   }
+});
+
+test('No registered gameplay route constructs a private PostgreSQL pool',()=>{
+  const directory=resolve(import.meta.dirname,'../apps/api/src');
+  const routes=readdirSync(directory).filter(name=>name.endsWith('-routes.ts'));
+  const databaseRoutes=routes.filter(name=>{
+    const source=readFileSync(resolve(directory,name),'utf8');
+    return source.includes("import pg from 'pg';");
+  });
+  assert.ok(databaseRoutes.length>=18,'All three gameplay backgrounds remain covered');
+  for(const name of databaseRoutes){
+    const source=readFileSync(resolve(directory,name),'utf8');
+    assert.equal(source.includes('new pg.Pool('),false,
+      name+' created an isolated database connection pool');
+    assert.ok(source.includes('getGameplayPool(app,'),
+      name+' did not resolve its pool from the Fastify application');
+  }
+  const entry=readFileSync(resolve(directory,'index.ts'),'utf8');
+  assert.ok(entry.includes('getGameplayPool(api)'));
+  assert.ok(entry.includes('const pool=gameplayDb;'),
+    'The loopback fixture must not allocate another pool');
 });

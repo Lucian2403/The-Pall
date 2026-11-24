@@ -14,3 +14,19 @@ The local Mailpit/fixture configuration is **not** a production deployment.
 - Review logs, access controls, dependency advisories, and data retention before enabling public accounts.
 
 No deployed host, reverse proxy, email provider, or credential is configured by this repository. Passing CI does not attest external infrastructure.
+
+## PostgreSQL connection budgets (per API process)
+
+All gameplay routes (including Millhand, Bellrunner, Stitcher, Clinic, Home,
+inventory, Journal, and the local test fixture) use **one Fastify-owned pool**.
+Its default maximum is 10 connections (`GAMEPLAY_DB_POOL_MAX`). Better Auth
+has a **separate pool** capped at 4 (`AUTH_DB_POOL_MAX`). Both caps accept
+integer values from 1 to 50. The default aggregate connection budget is
+therefore **14 connections per running API process**, not including migrations,
+maintenance sessions, or separate workers.
+
+Set connection caps against PostgreSQL's actual capacity multiplied by the
+number of API processes. Do not set both caps to 50 without explicit database
+sizing and load tests. Fastify shutdown drains the gameplay and authentication
+pools on SIGINT/SIGTERM; scripted Better Auth migrations release their own
+pool when finished. External pools injected by tests remain caller-owned.
