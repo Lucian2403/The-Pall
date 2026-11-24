@@ -64,12 +64,12 @@ jobs:
         run: node --import tsx --test scripts/verify-stage6-postgres.integration.test.ts
       - name: Chromium desktop and mobile window interactions
         timeout-minutes: 4
-        run: timeout --signal=TERM --kill-after=5s 200s npm run verify:inventory-windows-browser
+        run: timeout --signal=TERM --kill-after=5s 240s npm run verify:inventory-windows-browser
       - name: Upload inventory layout screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: inventory-windows-desktop-mobile
-          path: platform/test-artifacts/inventory-windows/*.png
+          path: platform/test-artifacts/millhand-scenes/*inventory*.png
           if-no-files-found: ignore
           retention-days: 7

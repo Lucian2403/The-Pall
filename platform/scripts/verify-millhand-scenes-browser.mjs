@@ -174,7 +174,8 @@ const stub=String.raw`(()=>{
         ?{enabled:true,canRewind:true,stage:key?.startsWith('bellHome')?8:key==='bellClinicLeft'?8:7,
            targetStage:key?.startsWith('bellHome')?7:6}
         :{enabled:false,canRewind:false,stage,targetStage:null}));
-    if(method==='POST'){
+    if(method==='POST'&&!route.endsWith('/inventory')&&
+      !route.endsWith('/inventory/storage-context')){
       window.__pallPosts=(window.__pallPosts||[]).concat([JSON.parse(options.body||'{}')]);
       return Promise.resolve(json({error:'qa_stub_no_write'},503));
     }
@@ -186,11 +187,71 @@ const stub=String.raw`(()=>{
        coins:10,rent:150,shortfall:140,noticeTitle:'Notice',noticeText:'Rent is due.',closingSpeech:'Right.',
        completed:false,condition:{stamina:100,composure:100,fatigue:0,stress:0}}));
     }
+    if(route.endsWith('/inventory/storage-context')){
+      const data=JSON.parse(options?.body||'{}');
+      if(data.action==='close'){
+        if(data.token===window.__qaRoomToken)window.__qaRoomToken=null;
+        return Promise.resolve(json({closed:true}));
+      }
+      if(!path.endsWith('/home'))return Promise.resolve(json({error:'storage_not_unlocked'},409));
+      window.__qaRoomToken='b'.repeat(64);
+      window.__qaContextOpens=(window.__qaContextOpens||0)+1;
+      return Promise.resolve(json({token:window.__qaRoomToken,expiresInSeconds:600}));
+    }
     if(route.endsWith('/inventory')){
-      const empty={slotsUsed:0,maxSlots:12,weightKg:0,volumeL:0,maxWeightKg:20,maxVolumeL:30,overCapacity:false,items:[]};
-      return Promise.resolve(json({revision:0,storageEnabled:true,pack:empty,chest:{...empty,maxSlots:24},
-        equipment:{items:[]},bonuses:{armour:0,weaponDamage:null,pallProtection:0,ashProtection:0,
-          maxWeightKg:20,inventorySlots:12,maxVolumeL:30}}));
+      const item=(id,code,name,quantity,slot=null)=>({
+        id,code,name,description:'An ordinary possession from Grand Cylinder City.',
+        category:slot==='back'?'bag':slot==='torso'?'clothing':'component',
+        rarity:'Common',armour:0,carrySlotsBonus:slot==='back'?6:0,
+        equipSlot:slot,equipmentSlot:slot,quantity,
+        stackable:quantity>1,maxStack:10,qualityTier:1,weightKg:.1,volumeL:.1,
+        carryVolumeBonusL:slot==='back'?12:0,currentDurability:100,maxDurability:100,
+        designStatus:'PROVISIONAL'
+      });
+      window.__qaInventory??={
+        revision:0,storageEnabled:false,
+        pack:{slotsUsed:1,maxSlots:10,weightKg:.5,volumeL:.5,maxWeightKg:20,
+          maxVolumeL:17,overCapacity:false,
+          items:[item('qa-rivets','test_rivet','Steel Rivets',5)]},
+        chest:{slotsUsed:1,maxSlots:24,weightKg:.2,volumeL:.2,maxWeightKg:120,
+          maxVolumeL:200,overCapacity:false,
+          items:[item('qa-needles','test_needle','Spare Needles',2)]},
+        equipment:{items:[
+          item('qa-clothes','basic_clothes','Daily Worker Clothes',1,'torso'),
+          item('qa-bag','crude_small_bag','Simple Bag',1,'back')]},
+        bonuses:{armour:0,weaponDamage:null,pallProtection:0,ashProtection:0,
+          maxWeightKg:20,inventorySlots:10,maxVolumeL:17}
+      };
+      const state=window.__qaInventory;
+      const token=options?.headers?.['x-pall-storage-context'];
+      const available=!!token&&token===window.__qaRoomToken;
+      const view=()=>({...state,storageEnabled:available,
+        chest:available?state.chest:{...state.chest,items:[]}});
+      if(method==='GET')return Promise.resolve(json(view()));
+      const command=JSON.parse(options.body||'{}');
+      window.__qaInventoryPosts=(window.__qaInventoryPosts||[]).concat([command]);
+      if(command.expectedRevision!==state.revision)
+        return Promise.resolve(json({error:'stale_revision'},409));
+      const places=['equipment','pack','chest'];
+      const source=places.find(place=>state[place].items.some(x=>x.id===command.itemInstanceId));
+      const item=source?state[source].items.find(x=>x.id===command.itemInstanceId):null;
+      if(!item)return Promise.resolve(json({error:'item_not_owned'},409));
+      if((source==='chest'||command.to==='home_chest')&&!available)
+        return Promise.resolve(json({error:'storage_context_required'},409));
+      if(command.kind==='equip'){
+        state[source].items=state[source].items.filter(x=>x.id!==item.id);
+        state.equipment.items.push({...item,equipmentSlot:command.slot});
+      }else{
+        const dest=command.to==='home_chest'?'chest':'pack';
+        const count=command.quantity;
+        if(count===item.quantity)state[source].items=state[source].items.filter(x=>x.id!==item.id);
+        else item.quantity-=count;
+        state[dest].items.push({...item,quantity:count,equipmentSlot:null});
+      }
+      state.pack.slotsUsed=state.pack.items.length;
+      state.chest.slotsUsed=state.chest.items.length;
+      state.revision++;
+      return Promise.resolve(json(view()));
     }
     if(key&&fx[key]&&(/\/millhand\/(work|missing-stamp|second-job|wage-claim|clinic)$/.test(route)
       ||/\/bellrunner\/clinic$/.test(route)||/\/stitcher\/clinic$/.test(route)))
@@ -534,6 +595,85 @@ try{
   assert.match(millhandDiary,/Marking the Plates|council plates/);
   assert.ok(!millhandDiary.includes('Dogman')&&!millhandDiary.includes('bell linkage'));
   console.log('PASS: Stage VIII — one Journal interface reads only the selected character');
+
+
+  // New independent windows use the same real Svelte TutorialShell and Home page.
+  // Snapshot fixtures do not replace the PostgreSQL ownership/transaction tests.
+  await open('/characters/qa-scenes-millhand/home',1280,720,'.home-artwork');
+  await evalJS("document.querySelector('[data-open-inventory]').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .inventory-window')"),
+    7000,'independent Inventory window');
+  assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),false);
+  assert.equal(await evalJS("window.__qaContextOpens||0"),0);
+  assert.equal(await evalJS("window.__qaInventoryPosts?.length||0"),0);
+  await shot('independent-inventory-desktop');
+  await evalJS("document.querySelector('[data-open-home-chest]').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"] .storage-window')"),
+    9000,'simultaneous Home Chest');
+  assert.equal(await evalJS("window.__qaContextOpens"),1);
+  await shot('inventory-home-chest-desktop');
+  assert.equal(await evalJS("window.__qaInventoryPosts?.length||0"),0,
+    'Window movements and opening do not submit inventory commands');
+  const fronts=await evalJS("(()=>{const a=document.querySelector('[data-game-window=\"inventory\"]');"+
+    "const b=document.querySelector('[data-game-window=\"storage:home_chest\"]');"+
+    "return {a:Number(a.style.zIndex),b:Number(b.style.zIndex)};})()");
+  assert.ok(fronts.b>fronts.a,'Last-opened storage window is in front');
+  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .game-window-title').focus()");
+  await until(()=>evalJS(
+    "Number(document.querySelector('[data-game-window=\"inventory\"]').style.zIndex)>"+
+    "Number(document.querySelector('[data-game-window=\"storage:home_chest\"]').style.zIndex)"),
+    4000,'Inventory brought forward on focus');
+  // A real desktop pointer gesture moves the window instead of changing items.
+  const before=await evalJS("(()=>{const a=document.querySelector('[data-game-window=\"inventory\"]').getBoundingClientRect();"+
+    "const h=document.querySelector('[data-game-window=\"inventory\"] .game-window-title').getBoundingClientRect();"+
+    "return {x:a.x,y:a.y,hx:Math.round(h.x+90),hy:Math.round(h.y+20)};})()");
+  await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.hx,y:before.hy});
+  await cmd('Input.dispatchMouseEvent',{type:'mousePressed',x:before.hx,y:before.hy,button:'left',clickCount:1});
+  await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.hx+45,y:before.hy+32,buttons:1});
+  await cmd('Input.dispatchMouseEvent',{type:'mouseReleased',x:before.hx+45,y:before.hy+32,button:'left',clickCount:1});
+  const after=await evalJS("document.querySelector('[data-game-window=\"inventory\"]').getBoundingClientRect().x");
+  assert.ok(after>=before.x+10,'Desktop drag changes Inventory position');
+  // Cross-window drag: the destination drop triggers exactly one authoritative command.
+  await evalJS("(()=>{const item=document.querySelector('[data-game-window=\"inventory\"] .pack-card .item-slot.occupied');"+
+    "const target=document.querySelector('[data-game-window=\"storage:home_chest\"] .slot-target');"+
+    "const data=new DataTransfer();"+
+    "item.dispatchEvent(new DragEvent('dragstart',{bubbles:true,dataTransfer:data}));"+
+    "target.dispatchEvent(new DragEvent('dragover',{bubbles:true,cancelable:true,dataTransfer:data}));"+
+    "target.dispatchEvent(new DragEvent('drop',{bubbles:true,cancelable:true,dataTransfer:data}));})()");
+  await until(()=>evalJS("window.__qaInventoryPosts?.length===1"),5500,'drag transfer command');
+  assert.equal(await evalJS("window.__qaInventoryPosts[0].to"),'home_chest');
+  await until(()=>evalJS("document.querySelectorAll('[data-game-window=\"storage:home_chest\"] .item-slot.occupied').length===2"),
+    5000,'shared inventory refresh');
+  await evalJS("(()=>{const buttons=[...document.querySelectorAll('[data-game-window=\"storage:home_chest\"] .item-slot.occupied')];"+
+    "const item=buttons.find(b=>b.textContent.includes('Steel Rivets'));"+
+    "item.dispatchEvent(new MouseEvent('click',{shiftKey:true,bubbles:true}));})()");
+  await until(()=>evalJS("window.__qaInventoryPosts?.length===2"),5000,'Shift-click transfer');
+  assert.equal(await evalJS("window.__qaInventoryPosts[1].to"),'pack');
+  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .close-window').click()");
+  assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"inventory\"]')"),false);
+  assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),true);
+  await evalJS("document.querySelector('[data-game-window=\"storage:home_chest\"] .close-window').click()");
+  await until(()=>evalJS("!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),
+    4500,'independent storage close');
+  assert.equal(await evalJS("window.__qaRoomToken"),null);
+  console.log('PASS: Independent desktop windows, drag positioning, focus, transfers, Shift-click and revocation.');
+
+  await open('/characters/qa-scenes-millhand/home',390,844,'.home-artwork');
+  await evalJS("document.querySelector('[data-open-home-chest]').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"] .storage-window')"),
+    9000,'mobile Home Chest');
+  await evalJS("document.querySelector('.mobile-nav [data-open-inventory]').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .inventory-window')"),
+    9000,'mobile Inventory');
+  assert.equal(await evalJS("getComputedStyle(document.querySelector('[data-game-window=\"storage:home_chest\"]')).display"),
+    'none','Mobile has one visible panel while both remain open');
+  await shot('inventory-mobile-switcher');
+  await evalJS("document.querySelector('.game-window-tabs button:last-child').click()");
+  assert.notEqual(await evalJS("getComputedStyle(document.querySelector('[data-game-window=\"storage:home_chest\"]')).display"),
+    'none');
+  await shot('home-chest-mobile');
+  assert.equal(await evalJS("window.__qaInventoryPosts?.length||0"),0);
+  console.log('PASS: Mobile Inventory and Home Chest switch without overlapping miniature windows.');
 
   assert.deepEqual(exceptions,[],'No uncaught page exceptions');
   console.log('PASS: Millhand scenes — '+checks+' scene/size layouts and in-scene interactions verified in real pages');
