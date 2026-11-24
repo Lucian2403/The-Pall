@@ -603,8 +603,17 @@ try{
   // Snapshot fixtures do not replace the PostgreSQL ownership/transaction tests.
   await open('/characters/qa-scenes-millhand/home',1280,720,'.home-artwork');
   await evalJS("document.querySelector('[data-open-inventory]').click()");
-  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .inventory-window')"),
-    7000,'independent Inventory window');
+  try{
+    await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .inventory-window')"),
+      7000,'independent Inventory window');
+  }catch(error){
+    const info=await evalJS("(()=>({nav:document.querySelector('[data-open-inventory]')?.getAttribute('aria-expanded'),"+
+      "windows:[...document.querySelectorAll('[data-game-window]')].map(e=>({name:e.getAttribute('data-game-window'),text:e.innerText.slice(0,250)})),"+
+      "hasFixture:!!window.__qaInventory,pathname:location.pathname,alerts:[...document.querySelectorAll('[role=alert]')].map(e=>e.textContent),"+
+      "bodyEnd:document.body.innerText.slice(-500)}))()");
+    console.error('Inventory browser diagnostics:',JSON.stringify(info),JSON.stringify(exceptions.slice(-5)));
+    throw error;
+  }
   assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),false);
   assert.equal(await evalJS("window.__qaContextOpens||0"),0);
   assert.equal(await evalJS("window.__qaInventoryPosts?.length||0"),0);
