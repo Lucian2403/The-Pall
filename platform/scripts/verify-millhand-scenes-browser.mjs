@@ -217,8 +217,8 @@ const stub=String.raw`(()=>{
           maxVolumeL:200,overCapacity:false,
           items:[makeItem('qa-needles','test_needle','Spare Needles',2)]},
         equipment:{items:[
-          item('qa-clothes','basic_clothes','Daily Worker Clothes',1,'torso'),
-          item('qa-bag','crude_small_bag','Simple Bag',1,'back')]},
+          makeItem('qa-clothes','basic_clothes','Daily Worker Clothes',1,'torso'),
+          makeItem('qa-bag','crude_small_bag','Simple Bag',1,'back')]},
         bonuses:{armour:0,weaponDamage:null,pallProtection:0,ashProtection:0,
           maxWeightKg:20,inventorySlots:10,maxVolumeL:17}
       };
