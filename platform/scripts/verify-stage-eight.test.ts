@@ -297,7 +297,7 @@ test('Each supported finale uses its own Stage VIII completion prose',()=>{
  const expected={
   Millhand:'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.',
   Bellrunner:'The condemned worksite remains closed, and your local findings have not been resolved.',
-  Stitcher:'The patient remains in the ward under the staff’s care. Owler’s attempted transfer was stopped, but the school may still demand an explanation.'
+  Stitcher:'The patient remains in the ward under the staff’s care. You stopped Owler from taking him, but the school may still demand an explanation.'
  } as const;
  const endings=Object.entries(expected);
  for(const [origin,prose] of endings){
