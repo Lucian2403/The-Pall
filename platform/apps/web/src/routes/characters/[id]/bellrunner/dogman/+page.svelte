@@ -17,7 +17,7 @@
     stage:number;tutorialStatus:string;state:State;availableActions:DogmanAction[];
     tutorialPayout:{coins:number;ordinaryXp:number;items:number}
   };
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   let character=$state<Character|null>(null);
   let snapshot=$state<Snapshot|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'prerequisite'|'migration'|'unavailable'>('loading');

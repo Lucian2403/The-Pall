@@ -26,7 +26,7 @@
   let errorMessage=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   const api=$derived('/api/characters/'+encodeURIComponent(id)+'/millhand/combat');
 
   async function initialize(){

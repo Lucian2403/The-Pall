@@ -20,7 +20,7 @@
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
     coins:number;health:{current:number;maximum:number};startingLocation:string;
     tutorial:{stage:number;status:string}};
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   const api=$derived('/api/characters/'+encodeURIComponent(id)+'/tutorial/home');
   let character=$state<Character|null>(null);
   let home=$state<Home|null>(null);

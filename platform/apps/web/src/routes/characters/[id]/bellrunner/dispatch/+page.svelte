@@ -46,7 +46,7 @@
       description:'A sheet for the marked stops and their receiving marks. A blurred mark must be accounted for truthfully.'
     }
   };
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   let character=$state<Character|null>(null);
   let round=$state<Round|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'schema'|'unavailable'>('loading');
