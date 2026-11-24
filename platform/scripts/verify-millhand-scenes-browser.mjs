@@ -640,10 +640,20 @@ try{
     "return {x:a.x,y:a.y,hx:Math.round(h.x+90),hy:Math.round(h.y+20)};})()");
   await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.hx,y:before.hy});
   await cmd('Input.dispatchMouseEvent',{type:'mousePressed',x:before.hx,y:before.hy,button:'left',clickCount:1});
-  await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.hx+45,y:before.hy+32,buttons:1});
-  await cmd('Input.dispatchMouseEvent',{type:'mouseReleased',x:before.hx+45,y:before.hy+32,button:'left',clickCount:1});
-  const after=await evalJS("document.querySelector('[data-game-window=\"inventory\"]').getBoundingClientRect().x");
-  assert.ok(after>=before.x+10,'Desktop drag changes Inventory position');
+  await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.hx+20,y:before.hy+15,buttons:1});
+  await delay(60);
+  await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.hx+55,y:before.hy+36,buttons:1});
+  await delay(60);
+  await cmd('Input.dispatchMouseEvent',{type:'mouseReleased',x:before.hx+55,y:before.hy+36,button:'left',clickCount:1});
+  try{
+    await until(()=>evalJS("document.querySelector('[data-game-window=\"inventory\"]').getBoundingClientRect().x>"+(before.x+10)),
+      4000,'desktop header drag reposition');
+  }catch(error){
+    const details=await evalJS("(()=>{const e=document.querySelector('[data-game-window=\"inventory\"]');"+
+      "return {left:e.style.left,rect:e.getBoundingClientRect().x,active:document.activeElement?.className};})()");
+    console.error('Drag diagnostics:',JSON.stringify({before,details,exceptions:exceptions.slice(-4)}));
+    throw error;
+  }
   // Cross-window drag: the destination drop triggers exactly one authoritative command.
   await evalJS("(()=>{const item=document.querySelector('[data-game-window=\"inventory\"] .pack-card .item-slot.occupied');"+
     "const target=document.querySelector('[data-game-window=\"storage:home_chest\"] .slot-target');"+
