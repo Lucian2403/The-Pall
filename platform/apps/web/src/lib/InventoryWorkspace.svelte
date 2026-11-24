@@ -159,7 +159,7 @@
   if(event.dataTransfer)event.dataTransfer.effectAllowed='move';
  }
  async function submit(item:Item,intent:{kind:'transfer';to:'pack'|'home_chest'}|
-  {kind:'equip';slot:EquipSlot}){
+  {kind:'equip';slot:EquipSlot},quantityOverride?:number){
   if(!snapshot||pending)return;
   const id=characterId;
   const from= snapshot.pack.items.some(x=>x.id===item.id)?'pack':
@@ -169,7 +169,7 @@
    error='Open the Home Chest in your rented room to transfer these items.';
    return;
   }
-  const count=item.stackable?(amounts[item.id]??item.quantity):1;
+  const count=item.stackable?(quantityOverride??amounts[item.id]??item.quantity):1;
   if(intent.kind==='transfer'&&(!Number.isSafeInteger(count)||count<1||count>item.quantity)){
    error='Choose a valid quantity.';return;
   }
@@ -208,7 +208,12 @@
    if(!response.ok)throw Error('Move failed. Inventory was not changed.');
    const next=await response.json() as InventorySnapshot;
    if(id!==characterId)return;
-   snapshot=next;amounts={...amounts,[item.id]:next.pack.items.find(x=>x.id===item.id)?.quantity??1};
+   snapshot=next;
+   // Do not carry the previous move amount across containers. Shift-click
+   // always moves the complete remaining stack; manual quantities are fresh.
+   const updatedAmounts={...amounts};
+   delete updatedAmounts[item.id];
+   amounts=updatedAmounts;
    syncSelection(next);
   }catch(cause){
    if(id===characterId)error=cause instanceof Error?cause.message:
@@ -219,7 +224,7 @@
   const place:Place=snapshot?.equipment.items.some(x=>x.id===item.id)?'equipped':
    snapshot?.pack.items.some(x=>x.id===item.id)?'pack':'home_chest';
   if(shift&&(place==='equipped'||snapshot?.storageEnabled)){
-   void submit(item,{kind:'transfer',to:place==='pack'?'home_chest':'pack'});
+   void submit(item,{kind:'transfer',to:place==='pack'?'home_chest':'pack'},item.quantity);
   }else selectedId=item.id;
  }
  function drop(event:DragEvent,place:Place,slot?:EquipSlot){
