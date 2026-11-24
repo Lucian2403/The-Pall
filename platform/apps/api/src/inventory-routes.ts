@@ -4,7 +4,7 @@
 import type {FastifyInstance} from 'fastify';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
-import {createHash,randomUUID} from 'node:crypto';
+import {createHash,randomUUID,randomBytes} from 'node:crypto';
 import pg from 'pg';
 import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
@@ -22,6 +22,24 @@ type Command=
    itemInstanceId:string;slot:EquipmentSlot};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const base='/api/characters/:id/inventory';
+const TOKEN=/^[a-f0-9]{64}$/;
+const tokenHash=(value:string)=>createHash('sha256').update(value).digest('hex');
+const chestContextSQL=`SELECT 1 FROM player_character_storage_context
+ WHERE character_id=$1 AND token_hash=$2 AND expires_at>NOW() LIMIT 1`;
+const keepPrivate=(rows:InventoryRow[],allowed:boolean)=>allowed
+ ?rows:rows.filter(item=>item.location!=='home_chest');
+const validHome=(character:Character)=>character.tutorial_stage===8&&
+ ['IN_PROGRESS','COMPLETED'].includes(character.tutorial_status);
+async function homeAvailable(db:pg.PoolClient,character:Character):Promise<boolean>{
+ return validHome(character)&&
+   (await db.query(verifiedHome,[character.id])).rowCount===1;
+}
+async function chestAccess(db:pg.PoolClient,character:Character,
+ token:unknown):Promise<boolean>{
+ if(typeof token!=='string'||!TOKEN.test(token))return false;
+ if(!await homeAvailable(db,character))return false;
+ return (await db.query(chestContextSQL,[character.id,tokenHash(token)])).rowCount===1;
+}
 const selectRows=String.raw`SELECT i.id,i.item_code,i.location,i.equipment_slot,i.quantity,
  i.quality_tier,i.current_durability,i.max_durability,i.grant_key,
  d.name,d.category,d.description,d.stackable,d.max_stack,d.weight_kg,
@@ -69,6 +87,51 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
   auth.api.getSession({headers:fromNodeHeaders(headers)}));
 
+ // The home page opens this short-lived room context through an authenticated
+ // request. Navigation/closing explicitly revokes it; TTL covers lost tabs.
+ // No remote chest command is authorized by a client window flag alone.
+ app.post<{Params:{id:string}}>(base+'/storage-context',async(req,reply)=>{
+  reply.header('Cache-Control','no-store');
+  const session=await resolveSession(req.headers);
+  if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
+  if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+  if(!allowedOrigin(req.headers))return reply.code(403).send({error:'invalid_origin'});
+  if(!req.headers['content-type']?.toLowerCase().startsWith('application/json'))
+   return reply.code(415).send({error:'json_required'});
+  const body=req.body;
+  if(!body||typeof body!=='object'||Array.isArray(body))
+   return reply.code(400).send({error:'invalid_body'});
+  const data=body as Record<string,unknown>;
+  if(data.action!=='open'&&data.action!=='close')
+   return reply.code(400).send({error:'invalid_action'});
+  if(data.action==='open'&&Object.keys(data).join(',')!=='action'||
+     data.action==='close'&&(Object.keys(data).sort().join(',')!=='action,token'||
+       typeof data.token!=='string'||!TOKEN.test(data.token)))
+   return reply.code(400).send({error:'invalid_fields'});
+  const db=await pool.connect();
+  try{
+   const ch=await db.query<Character>(
+    'SELECT id,origin,tutorial_stage,tutorial_status FROM player_characters WHERE id=$1 AND account_id=$2',
+    [req.params.id,session.user.id]);
+   if(!ch.rowCount)return reply.code(404).send({error:'not_found'});
+   if(data.action==='close'){
+    await db.query('DELETE FROM player_character_storage_context WHERE character_id=$1 AND token_hash=$2',
+      [req.params.id,tokenHash(data.token as string)]);
+    return {closed:true};
+   }
+   if(!await homeAvailable(db,ch.rows[0]))
+    return reply.code(409).send({error:'storage_not_unlocked'});
+   const token=randomBytes(32).toString('hex');
+   await db.query('DELETE FROM player_character_storage_context WHERE character_id=$1 AND expires_at<=NOW()',
+     [req.params.id]);
+   await db.query(`INSERT INTO player_character_storage_context(character_id,token_hash,expires_at)
+     VALUES($1,$2,NOW()+interval '10 minutes')`,[req.params.id,tokenHash(token)]);
+   return {token,expiresInSeconds:600};
+  }catch(error){
+   if(schemaMissing(error))return reply.code(503).send({error:'inventory_schema_missing',setup:'npm run inventory:migrate'});
+   throw error;
+  }finally{db.release();}
+ });
  app.get<{Params:{id:string}}>(base,async(req,reply)=>{
   reply.header('Cache-Control','no-store');
   const session=await resolveSession(req.headers);
@@ -89,11 +152,10 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
    if(!state.rowCount){await db.query('ROLLBACK');open=false;
     return reply.code(503).send({error:'inventory_not_initialized',setup:'npm run inventory:migrate'});}
    const rows=await db.query<InventoryRow>(selectRows,[req.params.id]);
-   const homeReady=char.rows[0].tutorial_stage===8 &&
-    ['IN_PROGRESS','COMPLETED'].includes(char.rows[0].tutorial_status) &&
-    (await db.query(verifiedHome,[req.params.id])).rowCount===1;
+   const storageEnabled=await chestAccess(db,char.rows[0],req.headers['x-pall-storage-context']);
    await db.query('COMMIT');open=false;
-   return inventoryView(rows.rows,Number(state.rows[0].revision),homeReady);
+   return inventoryView(keepPrivate(rows.rows,storageEnabled),
+     Number(state.rows[0].revision),storageEnabled);
   }catch(error){
    if(open){try{await db.query('ROLLBACK');}catch{/* preserve original */}}
    if(schemaMissing(error))return reply.code(503).send({
@@ -123,14 +185,17 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
     'SELECT id,origin,tutorial_stage,tutorial_status FROM player_characters WHERE id=$1 AND account_id=$2 FOR UPDATE',
     [req.params.id,session.user.id]);
    if(!chars.rowCount){await db.query('ROLLBACK');open=false;return reply.code(404).send({error:'not_found'});}
+   const storageEnabled=await chestAccess(db,chars.rows[0],req.headers['x-pall-storage-context']);
    const oldReceipt=await db.query<{request_hash:string;response:unknown}>(
     'SELECT request_hash,response FROM player_character_inventory_receipts WHERE character_id=$1 AND request_id=$2',
     [req.params.id,cmd.requestId]);
    if(oldReceipt.rowCount){
     await db.query('COMMIT');open=false;
-    return oldReceipt.rows[0].request_hash===hash
-      ?oldReceipt.rows[0].response
-      :reply.code(409).send({error:'idempotency_key_reuse'});
+    if(oldReceipt.rows[0].request_hash!==hash)
+     return reply.code(409).send({error:'idempotency_key_reuse'});
+    const saved=oldReceipt.rows[0].response as ReturnType<typeof inventoryView>;
+    return {...saved,storageEnabled,
+      chest:storageEnabled?saved.chest:{...saved.chest,items:[]}};
    }
    const state=await db.query<InventoryState>(
     'SELECT revision FROM player_character_inventory_state WHERE character_id=$1 FOR UPDATE',
@@ -142,15 +207,16 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
     await db.query('ROLLBACK');open=false;
     return reply.code(409).send({error:'stale_revision',currentRevision:revision});
    }
-   // Chest transfers are allowed only after the authenticated Stage 8 home
-   // exists. Other backgrounds cannot teleport items into a fictional home.
-   const c=chars.rows[0];
-   const homeReady=c.tutorial_stage===8&&
-     ['IN_PROGRESS','COMPLETED'].includes(c.tutorial_status)&&
-     (await db.query(verifiedHome,[req.params.id])).rowCount===1;
-   if(!homeReady){await db.query('ROLLBACK');open=false;
-    return reply.code(409).send({error:'storage_not_unlocked'});}
+   // Personal gear is independent of Stage VIII. Chest access alone requires
+   // a verified, unexpired server-side room context.
    const before=await db.query<InventoryRow>(selectRows+' FOR UPDATE OF i',[req.params.id]);
+   const source=before.rows.find(item=>item.id===cmd.itemInstanceId);
+   const usesChest=(cmd.kind==='transfer'&&cmd.to==='home_chest')||
+     source?.location==='home_chest';
+   if(usesChest&&!storageEnabled){
+    await db.query('ROLLBACK');open=false;
+    return reply.code(409).send({error:'storage_context_required'});
+   }
    let planned:ReturnType<typeof planTransfer>;
    try{planned=cmd.kind==='equip'
      ?planEquip(before.rows,cmd.itemInstanceId,cmd.slot)
@@ -182,7 +248,8 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
    await db.query(
     'UPDATE player_character_inventory_state SET revision=revision+1,updated_at=NOW() WHERE character_id=$1',
     [req.params.id]);
-   const result=inventoryView(planned.after,revision+1,true);
+   const result=inventoryView(keepPrivate(planned.after,storageEnabled),
+     revision+1,storageEnabled);
    await db.query(
     'INSERT INTO player_character_inventory_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [req.params.id,cmd.requestId,hash,JSON.stringify(result)]);
