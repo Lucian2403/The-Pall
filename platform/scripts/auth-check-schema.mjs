@@ -7,7 +7,8 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-const required = ['account', 'session', 'user', 'verification'];
+const required = ['account', 'session', 'user', 'verification',
+  ...(process.env.NODE_ENV==='production'?['rateLimit']:[])];
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 5000 });
 try {
   await client.connect();
@@ -22,7 +23,7 @@ try {
     console.error('FAILED: Missing tables: ' + missing.join(', '));
     process.exitCode = 1;
   } else {
-    console.log('PASS: All 4 Better Auth tables exist in the application database.');
+    console.log('PASS: Required Better Auth tables exist in the application database.');
   }
 } catch (error) {
   // Avoid printing connection strings or other local configuration.
