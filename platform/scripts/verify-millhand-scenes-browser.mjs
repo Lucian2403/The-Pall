@@ -199,7 +199,7 @@ const stub=String.raw`(()=>{
       return Promise.resolve(json({token:window.__qaRoomToken,expiresInSeconds:600}));
     }
     if(route.endsWith('/inventory')){
-      const item=(id,code,name,quantity,slot=null)=>({
+      const makeItem=(id,code,name,quantity,slot=null)=>({
         id,code,name,description:'An ordinary possession from Grand Cylinder City.',
         category:slot==='back'?'bag':slot==='torso'?'clothing':'component',
         rarity:'Common',armour:0,carrySlotsBonus:slot==='back'?6:0,
@@ -212,10 +212,10 @@ const stub=String.raw`(()=>{
         revision:0,storageEnabled:false,
         pack:{slotsUsed:1,maxSlots:10,weightKg:.5,volumeL:.5,maxWeightKg:20,
           maxVolumeL:17,overCapacity:false,
-          items:[item('qa-rivets','test_rivet','Steel Rivets',5)]},
+          items:[makeItem('qa-rivets','test_rivet','Steel Rivets',5)]},
         chest:{slotsUsed:1,maxSlots:24,weightKg:.2,volumeL:.2,maxWeightKg:120,
           maxVolumeL:200,overCapacity:false,
-          items:[item('qa-needles','test_needle','Spare Needles',2)]},
+          items:[makeItem('qa-needles','test_needle','Spare Needles',2)]},
         equipment:{items:[
           item('qa-clothes','basic_clothes','Daily Worker Clothes',1,'torso'),
           item('qa-bag','crude_small_bag','Simple Bag',1,'back')]},
