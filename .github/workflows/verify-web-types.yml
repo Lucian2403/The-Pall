@@ -1,0 +1,29 @@
+name: Verify frontend types
+on:
+  pull_request:
+    paths:
+      - 'platform/apps/web/**'
+      - 'platform/packages/**'
+      - 'platform/package.json'
+      - 'platform/package-lock.json'
+      - '.github/workflows/verify-web-types.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  web-typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - run: npm run build:packages
+      - name: Blocking Svelte and TypeScript diagnostics
+        run: npm run check -w @the-pall/web

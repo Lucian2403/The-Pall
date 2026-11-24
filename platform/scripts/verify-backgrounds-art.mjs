@@ -138,3 +138,9 @@ assert.ok(!markup.includes('<AvatarPicker') &&
   !portraits.includes('<span>Portrait '),
   'Carousel must show one enlarged unlabelled portrait and allow explicit arrow selection');
 console.log('PASS: Six approved origins, live creation flow, owner frames, named origin art, carousel, city masthead, Grey Marches background and responsive layout.');
+
+// Release-availability contract: six illustrated origins, three enabled.
+assert.match(page,/disabled=\{!isPlayableCharacterOrigin\(origin\.origin\)\}/);
+assert.match(page,/class="coming-soon-frame"/);
+assert.ok(page.includes("/ui-kit/frames/dialogue-frame-trim.png"));
+console.log('PASS: Unreleased backgrounds remain illustrated, disabled and framed.');
