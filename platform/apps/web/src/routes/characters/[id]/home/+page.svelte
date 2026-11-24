@@ -2,10 +2,9 @@
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
   import {homeJournalEntries,homeCompletionSummary} from '$lib/home-journal-copy';
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
-  import {tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
-  import InventoryPanel from '$lib/InventoryPanel.svelte';
+  import {openGameWindow,closeContextWindows} from '$lib/game-window-state';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/pall-story-landscape.css';
 
@@ -28,9 +27,7 @@
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
   let noticeExpanded=$state(false);
-  let overlayKind=$state<'storage'|null>(null);
   let journalOpen=$state(false);
-  let overlayDialog:HTMLDialogElement|undefined;
   let nextOpenSound=0;
   const chestOpenSounds=['/audio/chest/PersonalChest_Open1.wav',
     '/audio/chest/PersonalChest_Open2.wav'];
@@ -42,24 +39,11 @@
     effect.volume=.65;
     void effect.play().catch(()=>{/* Browser may block audio */});
   }
-  function handleRoomOverlayClose(){
-    if(overlayKind==='storage')playChestSound('close');
-    overlayKind=null;
-  }
   let retryKey:string|null=null,retryId:string|null=null;
   const currentJournalEntries=$derived(home?homeJournalEntries(home.origin,home.phase,home.rent):[]);
-  // A native modal remains above the rented-room artwork, never below it.
-  // showModal handles focus, keyboard trapping and Escape without moving the scene.
-  async function openRoomOverlay(kind:'storage'){
-    overlayKind=kind;
-    await tick();
-    if(!overlayDialog?.open){
-      overlayDialog?.showModal();
-      playChestSound('open');
-    }
-  }
-  function closeRoomOverlay(){
-    overlayDialog?.close();
+  function openRoomStorage(){
+    openGameWindow(id,'storage');
+    playChestSound('open');
   }
   function toggleJournal(){journalOpen=!journalOpen;}
   $effect(()=>{const currentId=id;journalOpen=false;void currentId;});
@@ -71,8 +55,8 @@
     const current=()=>generation===requestGeneration&&requestedId===id;
     character=null;home=null;status='loading';pending=false;
     errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
-    noticeExpanded=false;overlayKind=null;
-    if(overlayDialog?.open)overlayDialog.close();
+    noticeExpanded=false;
+    closeContextWindows();
     try{
       const [person,r]=await Promise.all([
         fetch('/api/characters/'+encodeURIComponent(requestedId),{cache:'no-store'}),
@@ -169,7 +153,8 @@
 {#if status==='ready'&&character?.id===id&&home}
   <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home"
     journalController={{open:journalOpen,toggle:toggleJournal,
-      title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}>
+      title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
+    onStorageClosed={()=>playChestSound('close')}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
@@ -180,7 +165,7 @@
       <div class="home-scene pall-story-landscape" aria-label="A modest rented room in Grand Cylinder City">
         <div class="home-artwork" aria-label="The complete rented room illustration">
         <button type="button" class="hotspot chest" aria-label="Storage"
-          title="Storage" onclick={()=>{void openRoomOverlay('storage');}}>
+          data-open-home-chest title="Storage" onclick={openRoomStorage}>
           <span class="object-caption">Storage</span>
         </button>
         <button type="button" class="hotspot book" aria-label="Read journal"
@@ -256,12 +241,6 @@
       {/if}
       {/snippet}
       </ActivityLayout>
-        <dialog bind:this={overlayDialog} class="room-overlay"
-          aria-label="Inventory and Home Chest" onclose={handleRoomOverlayClose}>
-          {#if overlayKind==='storage'}
-            <InventoryPanel characterId={id} onClose={closeRoomOverlay}/>
-          {/if}
-        </dialog>
       {#if errorMessage}<p role="alert" class="error">{errorMessage}</p>{/if}
     </section>
   </TutorialShell>
@@ -395,11 +374,5 @@
   @container activity-panel (max-width:420px){
     .home-dialogue{border-width:17px 18px 17px;
       border-image-width:17px 18px 17px;padding:8px 11px}
-  }
-  /* The storage/journal modal sits in the top layer, sized to the window. */
-  @media(max-width:650px){
-    .room-overlay{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
-
-
   }
 </style>
