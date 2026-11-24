@@ -618,7 +618,7 @@ try{
   assert.equal(await evalJS("window.__qaContextOpens||0"),0);
   assert.equal(await evalJS("window.__qaInventoryPosts?.length||0"),0);
   await shot('independent-inventory-desktop');
-  await evalJS("document.querySelector('[data-open-home-chest]').click()");
+  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .inventory-companion-button').click()");
   await until(()=>evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"] .storage-window')"),
     9000,'simultaneous Home Chest');
   assert.equal(await evalJS("window.__qaContextOpens"),1);
@@ -629,7 +629,7 @@ try{
     "const b=document.querySelector('[data-game-window=\"storage:home_chest\"]');"+
     "return {a:Number(a.style.zIndex),b:Number(b.style.zIndex)};})()");
   assert.ok(fronts.b>fronts.a,'Last-opened storage window is in front');
-  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .game-window-title').focus()");
+  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .window-grip').focus()");
   await until(()=>evalJS(
     "Number(document.querySelector('[data-game-window=\"inventory\"]').style.zIndex)>"+
     "Number(document.querySelector('[data-game-window=\"storage:home_chest\"]').style.zIndex)"),
