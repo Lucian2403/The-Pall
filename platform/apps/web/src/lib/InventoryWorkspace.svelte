@@ -14,13 +14,13 @@
  const windows=$derived($gameWindows.characterId===characterId?$gameWindows.windows:[]);
  const inventoryOpen=$derived(windows.some(w=>w.id==='inventory'));
  const storageOpen=$derived(windows.some(w=>w.id==='storage:home_chest'));
+ let snapshot=$state<InventorySnapshot|null>(null);
+ let selectedId=$state<string|null>(null);
+ let amounts=$state<Record<string,number>>({});
  const selected=$derived(snapshot&&[
   ...snapshot.equipment.items,...snapshot.pack.items,...snapshot.chest.items
  ].find(item=>item.id===selectedId)||null);
  const quantity=$derived(selected?(amounts[selected.id]??selected.quantity):1);
- let snapshot=$state<InventorySnapshot|null>(null);
- let selectedId=$state<string|null>(null);
- let amounts=$state<Record<string,number>>({});
  let loading=$state(false),pending=$state(false),error=$state('');
  let contextToken=$state<string|null>(null);
  let acquiring=$state(false);
