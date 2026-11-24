@@ -140,59 +140,77 @@ test('Equipment bonuses follow worn items; carried and chest gear contribute not
  assert.equal(inventoryView([clothes()],0,true).bonuses.weaponDamage,null,
   'Unarmed damage must never be fabricated from the equipment panel');
 });
-test('UI provides equipped silhouette, clickable inspection, Shift-click and drag targets',()=>{
- const ui=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/InventoryPanel.svelte'),'utf8');
- assert.ok(ui.includes('class="equipment-silhouette"'));
- assert.ok(ui.includes('equipmentSlots'));
- assert.ok(ui.includes("label:'Body'"));
- assert.ok(!ui.includes("label:'Pants'"));
- assert.ok(ui.includes("class:outfit={slot.id==='torso'}"));
- assert.ok(ui.includes('class="equipment-bonuses"'));
+test('Inventory and Home Chest use separate typed windows with one authoritative controller',()=>{
+ const read=(name:string)=>readFileSync(resolve(import.meta.dirname,
+  '../apps/web/src/lib',name),'utf8');
+ const shell=read('TutorialShell.svelte');
+ const home=readFileSync(resolve(import.meta.dirname,
+  '../apps/web/src/routes/characters/[id]/home/+page.svelte'),'utf8');
+ const registry=read('game-window-state.ts');
+ const window=read('GameWindow.svelte');
+ const workspace=read('InventoryWorkspace.svelte');
+ const inventory=read('InventoryWindow.svelte');
+ const storage=read('StorageWindow.svelte');
+ const slots=read('EquipmentSlots.svelte');
+ const grid=read('ItemGrid.svelte');
+ const inspect=read('ItemInspection.svelte');
+ const stats=read('EquipmentStats.svelte');
+ const palette=read('inventory-windows.css');
+ for(const file of [registry,window,workspace,inventory,storage,slots,grid,inspect,stats])
+   assert.ok(file.length>250,'No empty placeholder windows');
+ assert.ok(shell.includes("openGameWindow(character.id,'inventory')"));
+ assert.ok(shell.includes('data-open-inventory'));
+ assert.ok(shell.includes('<InventoryWorkspace characterId={character.id}'));
+ assert.ok(home.includes("openGameWindow(id,'storage')"));
+ assert.ok(home.includes('data-open-home-chest'));
+ assert.ok(!home.includes('<InventoryPanel'));
+ assert.ok(!home.includes('<dialog bind:this={overlayDialog}'));
+ assert.ok(registry.includes('gameWindows=writable'));
+ assert.ok(registry.includes('selectWindowCharacter'));
+ assert.ok(registry.includes('closeContextWindows'));
+ assert.ok(registry.includes('frontGameWindow'));
+ assert.ok(window.includes('setPointerCapture'));
+ assert.ok(window.includes('onkeydown={keyboard}'));
+ assert.ok(workspace.includes('onkeydown={keys}'));
+ assert.ok(workspace.includes('storage-context'));
+ assert.ok(workspace.includes('x-pall-storage-context'));
+ assert.ok(workspace.includes('onDestroy('));
+ assert.ok(workspace.includes('contextToken'));
+ assert.ok(workspace.includes('<InventoryWindow'));
+ assert.ok(workspace.includes('<StorageWindow'));
+ assert.ok(workspace.includes('onTransfer'));
+ assert.ok(workspace.includes('onDrop'));
+ assert.ok(workspace.includes('requestId:crypto.randomUUID()'));
+ assert.ok(workspace.includes('expectedRevision:snapshot.revision'));
+ assert.ok(inventory.includes('<EquipmentSlots'));
+ assert.ok(inventory.includes('<EquipmentStats'));
+ assert.ok(inventory.includes('<ItemGrid'));
+ assert.ok(inventory.includes('<ItemInspection'));
+ assert.ok(storage.includes('Home Chest'));
+ assert.ok(storage.includes('<ItemGrid'));
+ assert.ok(storage.includes('<ItemInspection'));
+ assert.ok(slots.includes('class="equipment-silhouette"'));
+ assert.ok(slots.includes("label:'Body'")===false,'Equipment labels live in one typed model');
+ assert.ok(slots.includes('class:outfit={slot.id===\'torso\'}'));
+ assert.ok(grid.includes('class="item-slot occupied"'));
+ assert.ok(grid.includes('class="item-slot vacant"'));
+ assert.ok(grid.includes('event.shiftKey'));
+ assert.ok(grid.includes('ondragstart={event=>onDragStart(event,item)}'));
+ assert.ok(inspect.includes('aria-label="Selected item description"'));
+ assert.ok(inspect.includes('{selected.description}'));
+ assert.ok(inspect.includes('Store in chest'));
+ assert.ok(inspect.includes('Take into inventory'));
+ assert.ok(inspect.includes('Unequip to inventory'));
  for(const label of ['Armor','Damage','Pall Protection','Ash Protection','Max Weight',
-   'Inventory Slots','Bag Volume'])assert.ok(ui.includes(label));
- assert.ok(ui.includes('snapshot.bonuses.weaponDamage'));
- assert.ok(ui.includes('snapshot.bonuses.maxWeightKg'));
- assert.ok(ui.includes('class="stat-tile"'));
- assert.ok(ui.includes('border:2px ridge #926c40'));
- assert.ok(!ui.includes('equipment-footnote'));
- assert.ok(!ui.includes('bonus-note'));
- assert.ok(!ui.includes('class="provisional"'));
- assert.ok(!ui.includes('interaction-hint'));
- assert.ok(!ui.includes('Worn gear counts toward carrying weight.'));
- assert.ok(!ui.includes('Live equipment totals; damage and environmental mitigation'));
- assert.ok(!ui.includes('Carrying weight and chest balance remain provisional.'));
- 
- assert.ok(ui.includes('class="equip-socket filled"'));
- assert.ok(ui.includes('class="equip-socket empty"'));
- assert.ok(ui.includes('class="item-slot occupied"'));
- assert.ok(ui.includes('class="item-slot vacant"'));
- assert.ok(ui.includes('grid-template-columns:repeat(6,minmax(0,1fr))'));
- assert.ok(ui.includes('repeat(4,minmax(0,1fr))'));
- assert.ok(ui.includes('Array.from({length:snapshot.pack.maxSlots}'));
- assert.ok(ui.includes('Array.from({length:snapshot.chest.maxSlots}'));
- assert.ok(ui.includes('class:selected={selectedId===item.id}'));
- assert.ok(ui.includes('aria-pressed={selectedId===item.id}'));
- assert.ok(ui.includes('event.shiftKey'));
- assert.ok(ui.includes('ondragstart={event=>startDrag(event,item)}'));
- assert.ok(ui.includes("ondrop={event=>onDrop(event,'pack')}"));
- assert.ok(ui.includes("ondrop={event=>onDrop(event,'home_chest')}"));
- assert.ok(ui.includes("onDrop(event,'equipped',slot.id)"));
- assert.ok(ui.includes('aria-label="Selected item description"'));
- assert.ok(ui.includes('{selected.description}'));
- assert.ok(ui.includes('{itemType(selected)}'));
- assert.ok(ui.includes('{itemBenefit(selected)}'));
- assert.ok(ui.includes('Store in chest'));
- assert.ok(ui.includes('Take into inventory'));
- assert.ok(ui.includes('Unequip to inventory'));
- assert.ok(ui.includes('Items carried: {snapshot.pack.slotsUsed} / {snapshot.pack.maxSlots}'));
- assert.ok(ui.includes('Stored: {snapshot.chest.slotsUsed} / {snapshot.chest.maxSlots}'));
- assert.ok(ui.includes('Inventory endpoint missing (HTTP 404)'));
- assert.ok(ui.includes('Inventory server error (HTTP 500)'));
- assert.ok(ui.includes('inventory_schema_missing'));
- assert.ok(ui.includes('inventory_not_initialized'));
- assert.ok(ui.includes('Inventory API is unreachable (HTTP '));
- assert.ok(ui.includes('Inventory returned an invalid response'));
- assert.ok(!ui.includes("'Inventory is unavailable.'"));
+    'Inventory Slots','Bag Volume'])assert.ok(stats.includes(label));
+ assert.ok(palette.includes('.bonus-grid')&&!palette.includes('border:2px ridge'),
+   'Equipment stats should be compact rather than individually framed tiles');
+ const backend=readFileSync(resolve(import.meta.dirname,
+   '../apps/api/src/inventory-routes.ts'),'utf8');
+ assert.ok(backend.includes("source?.location==='home_chest'"));
+ assert.ok(backend.includes("storage_context_required"));
+ assert.ok(backend.includes('keepPrivate(rows.rows,storageEnabled)'));
+ assert.ok(!backend.includes('if(!homeReady)'));
 });
 test('Catalogue uses exact approved copy; new migration respects owner 4+6 rule',()=>{
  const base=readFileSync(resolve(import.meta.dirname,'../db/migrations/0011_inventory_foundation.sql'),'utf8');
@@ -209,6 +227,7 @@ test('Catalogue uses exact approved copy; new migration respects owner 4+6 rule'
  const migrate=readFileSync(resolve(import.meta.dirname,'inventory-migrate.mjs'),'utf8');
  assert.ok(migrate.includes('0012_equipment_slots.sql'));
  assert.ok(migrate.includes('0013_equipment_stats_and_clothing.sql'));
+ assert.ok(migrate.includes('0023_inventory_storage_context.sql'));
  const derived=readFileSync(resolve(import.meta.dirname,'../db/migrations/0013_equipment_stats_and_clothing.sql'),'utf8');
  assert.ok(derived.includes('ADD COLUMN IF NOT EXISTS pall_protection'));
  assert.ok(derived.includes('ADD COLUMN IF NOT EXISTS ash_protection'));
@@ -218,11 +237,13 @@ test('Catalogue uses exact approved copy; new migration respects owner 4+6 rule'
  assert.ok(!derived.includes("'torso','hands','pants','feet'"));
 });
 test('Owner starter illustrations remain genuine optimized WebP assets',()=>{
- const ui=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/InventoryPanel.svelte'),'utf8');
- assert.ok(ui.includes("'/items/daily-worker-clothes.webp'"));
- assert.ok(ui.includes("'/items/simple-bag.webp'"));
- assert.ok(ui.includes('class="item-art"'));
- assert.ok(ui.includes('class="inspection-art"'));
+ const types=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/inventory-types.ts'),'utf8');
+ const grid=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/ItemGrid.svelte'),'utf8');
+ const inspection=readFileSync(resolve(import.meta.dirname,'../apps/web/src/lib/ItemInspection.svelte'),'utf8');
+ assert.ok(types.includes("'/items/daily-worker-clothes.webp'"));
+ assert.ok(types.includes("'/items/simple-bag.webp'"));
+ assert.ok(grid.includes('class="item-art"'));
+ assert.ok(inspection.includes('class="inspection-art"'));
  for(const [name,expected] of [
   ['simple-bag.webp','fcfff89beb0ae01b16945bb87df1c8ddc92f4c8608769ac121566515e9ff999b'],
   ['daily-worker-clothes.webp','f3fe0210b9d6317d15752c5785c0fb6f6eac2e863eac54a8dfe3f2c9c25c0bc5']

@@ -52,6 +52,7 @@
 </script>
 <svelte:window onresize={fit}/>
 <section class="game-window" class:mobile-hidden={mobileHidden}
+  id={'game-window-'+(record.kind==='inventory'?'inventory':'storage-home-chest')}
   data-game-window={record.id} role="region" aria-label={title}
   style={'left:'+record.x+'px;top:'+record.y+'px;width:'+record.width+'px;z-index:'+(620+record.z)}
   onpointerdown={()=>frontGameWindow(record.id)}

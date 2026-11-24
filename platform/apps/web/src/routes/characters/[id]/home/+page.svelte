@@ -345,23 +345,6 @@
   }
   .status-message,.error{margin:0;padding:10px 15px;background:#362b1d;color:#e7d3b3}
   .error{color:#efaaa2;background:#472222}
-  .room-overlay{position:fixed;inset:0;margin:auto;
-    box-sizing:border-box;width:min(98vw,1580px);max-width:1580px;
-    max-height:calc(100dvh - 16px);min-width:0;padding:0;border:1px solid #aa8355;
-    border-radius:7px;background:#241e1a;color:#edd9b7;
-    box-shadow:0 18px 70px #000d;
-    /* Desktop fits without internal scrolling; on small viewports retain
-       wheel/touch access to all actions, but do not draw a scrollbar. */
-    overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-    scrollbar-width:none;-ms-overflow-style:none}
-  .room-overlay::-webkit-scrollbar{display:none}
-  .room-overlay::backdrop{background:rgba(11,8,6,.58);backdrop-filter:blur(1.5px)}
-
-
-
-
-
-
   .fallback{max-width:700px;margin:8vh auto;padding:30px;color:#ecd9b7;background:#28231e}
   /* Narrow stage (by its own width): the whole room is always visible, so
      only the small journal and notice targets grow to a tappable size. */
