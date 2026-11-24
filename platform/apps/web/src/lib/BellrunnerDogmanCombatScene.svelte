@@ -209,7 +209,7 @@
             <p class="defeat-narration">Your papers are still in your bag.</p>
           {:else}
             <p class="outcome">You defeated Dogman.</p>
-            <p>{resultText}</p>
+            <p><strong>{resultText}</strong></p>
           {/if}
           <CombatClinicContinuation {characterId} {origin}/>
         {:else}

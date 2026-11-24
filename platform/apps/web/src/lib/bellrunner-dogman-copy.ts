@@ -56,12 +56,12 @@ export const DOGMAN_DEMAND:readonly DogmanLine[]=[
   {speaker:'Player',text:"I'm leaving. I'm not giving you my papers."}
 ];
 export const DOGMAN_GATE:readonly DogmanLine[]=[
-  {speaker:'Narration',text:'Dogman steps into the way. The courier turns toward the open street, but Dogman moves to block it. A work cart stands nearby.'},
+  {speaker:'Narration',text:'Dogman steps into the way. You turn toward the open street, but Dogman moves to block it. A work cart stands nearby.'},
   {speaker:'Player',text:"I'm done talking. Let me go home."},
   {speaker:'Dogman',text:'Put the papers down.'},
   {speaker:'Player',text:"No. They're not yours."},
   {speaker:'Dogman',text:"Then I'll take them off you."},
-  {speaker:'Narration',text:"Dogman reaches toward the courier's bag. The courier pulls back. He draws a short club."},
+  {speaker:'Narration',text:"Dogman reaches toward the bag. You pull back. He draws a short club."},
   {speaker:'Player',text:"Don't touch my bag."},
   {speaker:'Dogman',text:'Then stop pulling away.'}
 ];
