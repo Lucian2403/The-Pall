@@ -8,7 +8,7 @@
     health:{current:number;maximum:number};startingLocation:string;
     tutorial:{stage:number;status:string}};
   import type {StitcherWardSnapshot} from '$lib/stitcher-ward-snapshot';
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   const api=$derived('/api/characters/'+encodeURIComponent(id)+'/stitcher/ward');
   let character=$state<Character|null>(null);
   let snapshot=$state<StitcherWardSnapshot|null>(null);

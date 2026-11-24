@@ -86,7 +86,7 @@
   let errorMessage=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   const route=$derived('/api/characters/'+encodeURIComponent(id)+'/'+FINALE_ORIGINS[origin].clinicPath);
   const next=$derived(clinic?.phase==='ARRIVAL'?'examine'
     :clinic?.phase==='EXAMINED'?'speak'
