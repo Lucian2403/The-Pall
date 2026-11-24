@@ -710,16 +710,21 @@ try{
     ".find(b=>b.textContent.includes('Store in chest'));return !!b&&!b.disabled;})()"),
     4500,'re-enabled item controls after stale revision');
   // Keyboard activation of the ordinary button is also a valid transfer path.
-  await evalJS("([...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
-    ".find(b=>b.textContent.includes('Store in chest'))).focus()");
-  await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
-  await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await evalJS("(()=>{window.__qaKeyEvents=[];"+
+    "document.addEventListener('keydown',event=>window.__qaKeyEvents.push(event.key),{capture:true});"+
+    "([...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
+    ".find(b=>b.textContent.includes('Store in chest'))).focus();})()");
+  // Space activates the focused native button on release (no synthetic click).
+  await cmd('Input.dispatchKeyEvent',{type:'rawKeyDown',key:' ',code:'Space',
+    text:' ',unmodifiedText:' ',windowsVirtualKeyCode:32,nativeVirtualKeyCode:32});
+  await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',
+    windowsVirtualKeyCode:32,nativeVirtualKeyCode:32});
   try{
     await until(()=>evalJS("window.__qaInventoryPosts?.length===5"),4500,'keyboard-driven transfer');
   }catch(error){
     const info=await evalJS("(()=>({active:document.activeElement?.outerHTML.slice(0,300),"+
       "errors:[...document.querySelectorAll('[role=alert]')].map(x=>x.textContent),"+
-      "calls:window.__qaInventoryPosts?.length}))()");
+      "calls:window.__qaInventoryPosts?.length,keys:window.__qaKeyEvents}))()");
     console.error('Keyboard transfer diagnostics:',JSON.stringify(info));
     throw error;
   }
