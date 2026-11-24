@@ -10,6 +10,7 @@ import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import {
@@ -65,10 +66,9 @@ function registerSharedClinicRoutes(
   const combatTable=FINALE_ORIGINS[origin].combatTable;
   const combatFields=origin==='Stitcher'?'state,patient_safe,transfer_cancelled':'state';
   const route='/api/characters/:id/'+FINALE_ORIGINS[origin].clinicPath;
-  const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const pool=getGameplayPool(app,options.pool);
   const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
-  app.addHook('onClose',async()=>{if(!options.pool)await pool.end();});
 
   app.get<{Params:{id:string}}>(route,
     async(req,reply)=>{

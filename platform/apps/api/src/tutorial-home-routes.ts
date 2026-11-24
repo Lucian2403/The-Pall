@@ -9,6 +9,7 @@ import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {advance,HomeInvalidAction,initial,view} from './shared-home-state.js';
 import type {Action,State,Branch,Outcome} from './shared-home-state.js';
@@ -36,10 +37,9 @@ const ready=(s:ClinicState|undefined)=>!!s&&s.phase==='LEFT'&&s.paid&&
 const base='/api/characters/:id/tutorial/home';
 const characterSQL='SELECT id,name,origin,tutorial_stage,tutorial_status,coins FROM player_characters WHERE id=$1 AND account_id=$2';
 export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg.Pool;resolveSession?:Resolver}={}){
- const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+ const pool=getGameplayPool(app,options.pool);
  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
   auth.api.getSession({headers:fromNodeHeaders(headers)}));
- app.addHook('onClose',async()=>{if(!options.pool)await pool.end();});
  app.get<{Params:{id:string}}>(base,async(req,reply)=>{
   reply.header('Cache-Control','no-store');
   const session=await resolveSession(req.headers);
