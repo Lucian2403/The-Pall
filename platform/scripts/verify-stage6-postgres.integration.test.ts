@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import {before,after,test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
 import Fastify from 'fastify';
 import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
