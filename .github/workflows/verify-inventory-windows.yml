@@ -52,6 +52,8 @@ jobs:
       - run: npm run build:packages
       - name: Inventory calculations, windows and source contracts
         run: npm run verify:inventory
+      - name: Stage VIII Home/Clinic and personal Journal invariants
+        run: npm run verify:stage-eight
       - name: API types
         run: npm run check:api
       - name: Svelte types
