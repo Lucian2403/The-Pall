@@ -85,3 +85,9 @@
  .item-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
  .game-window-tabs{max-width:100%}
 }
+
+.inventory-companion-button{margin:0 0 10px;padding:9px 14px;min-height:42px;
+ background:#423023;border:1px solid #94734d;color:#eed3a5;
+ font:600 14px var(--pall-font-reading,Georgia,serif);cursor:pointer}
+.inventory-companion-button:focus-visible,.inventory-companion-button:hover{
+ outline:2px solid #d5ab75;outline-offset:1px}

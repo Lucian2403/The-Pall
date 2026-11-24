@@ -37,7 +37,8 @@
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
     industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
-    cityMap,travelLocked = false,services = {},dock,journalController,journalContent,onStorageClosed
+    cityMap,travelLocked = false,services = {},dock,journalController,journalContent,
+    onStorageClosed,onStorageOpened
   }:{
     character:SavedCharacter;
     children:Snippet;
@@ -77,6 +78,7 @@
     journalContent?:SceneJournalRecord;
     /** The home page owns the existing chest-close sound. */
     onStorageClosed?:()=>void;
+    onStorageOpened?:()=>void;
   }=$props();
   const inventoryExpanded=$derived($gameWindows.characterId===character.id&&
     $gameWindows.windows.some(record=>record.id==='inventory'));
@@ -553,7 +555,8 @@
     <aside class="shell-dock" aria-label="Messages dock">{@render dock()}</aside>
   {/if}
 </div>
-<InventoryWorkspace characterId={character.id} {onStorageClosed}/>
+<InventoryWorkspace characterId={character.id} {onStorageClosed} {onStorageOpened}
+  inHome={sceneStage===8}/>
 
 {#snippet mapIcon()}
   <svg class="gateway-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"

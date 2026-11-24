@@ -1,6 +1,6 @@
 <script lang="ts">
  import {onDestroy} from 'svelte';
- import {gameWindows,selectWindowCharacter,closeGameWindow,frontGameWindow} from './game-window-state';
+ import {gameWindows,selectWindowCharacter,closeGameWindow,frontGameWindow,openGameWindow,resetGameWindows} from './game-window-state';
  import type {GameWindowRecord} from './game-window-state';
  import type {InventorySnapshot,Item,Place,EquipSlot} from './inventory-types';
  import GameWindow from './GameWindow.svelte';
@@ -8,8 +8,9 @@
  import StorageWindow from './StorageWindow.svelte';
  import './inventory-windows.css';
 
- let {characterId,onStorageClosed}:{
-  characterId:string;onStorageClosed?:()=>void
+ let {characterId,onStorageClosed,onStorageOpened,inHome=false}:{
+  characterId:string;onStorageClosed?:()=>void;onStorageOpened?:()=>void;
+  inHome?:boolean
  }=$props();
  const windows=$derived($gameWindows.characterId===characterId?$gameWindows.windows:[]);
  const inventoryOpen=$derived(windows.some(w=>w.id==='inventory'));
@@ -68,7 +69,7 @@
     if(response.status===503&&(code==='inventory_schema_missing'||code==='inventory_not_initialized'))
       throw Error('Inventory database needs setup (HTTP 503). Run npm run inventory:migrate.');
     if(response.status===404)throw Error('Inventory endpoint missing (HTTP 404). Restart the API.');
-    if(response.status===401)throw Error('Inventory sign-in required (HTTP 401).');
+    if(response.status===401){resetGameWindows();throw Error('Inventory sign-in required (HTTP 401).');}
     if(response.status===500)throw Error('Inventory server error (HTTP 500). Check the API terminal.');
     throw Error('Inventory API is unreachable (HTTP '+response.status+(code?'; '+code:'')+').');
    }
@@ -264,6 +265,15 @@
  <GameWindow {record} title={record.kind==='inventory'?'Inventory':'Home Chest'}
    mobileHidden={$gameWindows.mobileActive!==record.id} onClose={()=>close(record)}>
   {#snippet children()}
+   {#if record.kind==='storage'&&!inventoryOpen}
+    <button type="button" class="inventory-companion-button"
+      onclick={()=>openGameWindow(characterId,'inventory')}>Open Inventory</button>
+   {:else if record.kind==='inventory'&&!storageOpen&&inHome}
+    <button type="button" class="inventory-companion-button"
+      onclick={()=>{openGameWindow(characterId,'storage');onStorageOpened?.();}}>
+      Open Home Chest
+    </button>
+   {/if}
    {#if loading||acquiring}
     <p class="inventory-loading" role="status">Reading your possessions…</p>
    {:else if snapshot}
