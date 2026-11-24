@@ -50,7 +50,11 @@ registerTutorialHomeRoutes(api);
 registerInventoryRoutes(api);
 registerMillhandStageRewindRoutes(api);
 registerPersonalJournalRoutes(api);
-api.get('/health', async () => ({status: 'ok', module: 'technical-fixture'}));
+api.get('/health', async () => ({status: 'ok'}));
+// M0 technical fixture is never part of a publicly bound API.
+const fixtureAllowed=process.env.NODE_ENV!=='production' &&
+  ['127.0.0.1','localhost','::1'].includes(process.env.API_HOST??'127.0.0.1');
+if(fixtureAllowed){
 api.get('/api/fixture', async () => {
   const {rows} = await pool.query('SELECT revision, value FROM dev_action_state WHERE actor_id = $1', [ACTOR]);
   if (rows.length !== 1) throw new Error('Fixture schema has not been initialized');
@@ -87,7 +91,7 @@ api.post('/api/fixture', async (request, reply) => {
     throw err;
   } finally {db.release();}
 });
-
+}
 const port = Number(process.env.API_PORT || '8788');
 const host = process.env.API_HOST || '127.0.0.1';
 api.addHook('onClose', async () => {await pool.end();});

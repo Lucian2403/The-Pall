@@ -7,6 +7,13 @@ const CHARACTER_NAME=/^\p{L}\p{M}*(?:\p{L}\p{M}*|[ '\u2019-]\p{L}\p{M}*)*$/u;
 export const INITIAL_CHARACTER_SLOT_LIMIT=6;
 export const CHARACTER_ORIGINS=['Millhand','Bellrunner','Squatter','Stitcher','Scrapper','Inkbound'] as const;
 export type CharacterOrigin=(typeof CHARACTER_ORIGINS)[number];
+// All six remain in the approved lore catalogue; only these three have
+// complete server-owned tutorials. Never rely on a disabled browser button.
+export const PLAYABLE_CHARACTER_ORIGINS=['Millhand','Bellrunner','Stitcher'] as const;
+export type PlayableCharacterOrigin=(typeof PLAYABLE_CHARACTER_ORIGINS)[number];
+export function isPlayableCharacterOrigin(value:unknown):value is PlayableCharacterOrigin{
+  return typeof value==='string'&&PLAYABLE_CHARACTER_ORIGINS.some(o=>o===value);
+}
 export type CharacterSex='Male'|'Female';
 export type CreateCharacterCommand=Readonly<{
   requestId:string;
@@ -34,6 +41,7 @@ export function parseCreateCharacterCommand(value:unknown):CreateCharacterComman
   if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)throw Error('invalid_revision');
   if(v.sex!=='Male'&&v.sex!=='Female')throw Error('invalid_sex');
   if(typeof v.origin!=='string'||!CHARACTER_ORIGINS.some(o=>o===v.origin))throw Error('invalid_origin');
+  if(!isPlayableCharacterOrigin(v.origin))throw Error('origin_coming_soon');
   const avatarId=v.avatarId??null;
   if(avatarId!==null &&
      (typeof avatarId!=='string' ||
