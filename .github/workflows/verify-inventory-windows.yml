@@ -70,6 +70,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: inventory-windows-desktop-mobile
-          path: platform/test-artifacts/millhand-scenes/*inventory*.png
+          path: |
+            platform/test-artifacts/millhand-scenes/*inventory*.png
+            platform/test-artifacts/millhand-scenes/*home-chest*.png
           if-no-files-found: ignore
           retention-days: 7

@@ -694,7 +694,7 @@ try{
   assert.equal(await evalJS("getComputedStyle(document.querySelector('[data-game-window=\"storage:home_chest\"]')).display"),
     'none','Mobile has one visible panel while both remain open');
   await shot('inventory-mobile-switcher');
-  await evalJS("document.querySelector('.game-window-tabs button:last-child').click()");
+  await evalJS("([...document.querySelectorAll('.game-window-tabs button')].find(b=>b.textContent.includes('Home Chest'))).click()");
   assert.notEqual(await evalJS("getComputedStyle(document.querySelector('[data-game-window=\"storage:home_chest\"]')).display"),
     'none');
   await shot('home-chest-mobile');
