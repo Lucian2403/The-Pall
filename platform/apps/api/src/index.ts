@@ -2,6 +2,7 @@ import Fastify, {LogController} from 'fastify';
 import {getGameplayPool} from './database-pool.js';
 import {createHash} from 'node:crypto';
 import {registerAuthRoutes} from './auth-routes.js';
+import {authPool} from './auth.js';
 import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js';
 import {registerCharacterRoutes} from './character-routes.js';
 import {registerMillhandWorkRoutes} from './millhand-work-routes.js';
@@ -29,6 +30,7 @@ const ACTOR = '00000000-0000-4000-8000-000000000001';
 const api = Fastify({logger: true, logController: new LogController({disableRequestLogging: true}), bodyLimit: 16 * 1024});
 // The gameplay pool is created once and closed once with the Fastify process.
 const gameplayDb=getGameplayPool(api);
+api.addHook('onClose',async()=>{await authPool.end();});
 registerAuthRoutes(api);
 registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);

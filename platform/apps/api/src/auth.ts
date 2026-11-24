@@ -49,6 +49,9 @@ function dispatchAccountMail(to:string,subject:string,link:string):Promise<void>
   return Promise.resolve();
 }
 
+// Better Auth owns this pool; the API entrypoint closes it during shutdown.
+export const authPool=new pg.Pool({connectionString:databaseURL,max:databasePoolMax('AUTH_DB_POOL_MAX',4)});
+
 export const auth = betterAuth({
   appName: 'The Pall',
   secret,
@@ -58,7 +61,7 @@ export const auth = betterAuth({
   // Run auth:migrate with the production environment before deploying.
   rateLimit:{enabled:production,storage:'database',window:60,max:100},
   // Identity sessions get a separate, deliberately smaller connection budget.
-  database: new pg.Pool({connectionString:databaseURL,max:databasePoolMax('AUTH_DB_POOL_MAX',4)}),
+  database:authPool,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,

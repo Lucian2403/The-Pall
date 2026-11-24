@@ -58,3 +58,19 @@ test('Connection caps are bounded and fail closed for malformed settings',()=>{
     else process.env[key]=old;
   }
 });
+
+test('Identity budget can be capped independently of gameplay',()=>{
+  const key='AUTH_DB_POOL_MAX';
+  const old=process.env[key];
+  try{
+    delete process.env[key];
+    assert.equal(databasePoolMax(key,4),4);
+    process.env[key]='2';
+    assert.equal(databasePoolMax(key,4),2);
+    process.env[key]='0';
+    assert.throws(()=>databasePoolMax(key,4),/invalid_auth_db_pool_max/);
+  }finally{
+    if(old===undefined)delete process.env[key];
+    else process.env[key]=old;
+  }
+});
