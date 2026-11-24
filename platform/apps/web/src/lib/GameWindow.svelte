@@ -61,7 +61,8 @@
    <button type="button" class="window-grip" bind:this={header}
      aria-label={'Move '+title+'; hold Alt and arrow keys to move'}
      onpointerdown={start} onpointermove={move} onpointerup={stop}
-     onpointercancel={stop} onkeydown={keyboard}>
+     onpointercancel={stop} onkeydown={keyboard}
+     onclick={()=>frontGameWindow(record.id)}>
      <strong>{title}</strong>
      <span class="drag-note">Move</span>
    </button>

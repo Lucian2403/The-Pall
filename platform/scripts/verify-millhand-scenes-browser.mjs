@@ -629,7 +629,7 @@ try{
     "const b=document.querySelector('[data-game-window=\"storage:home_chest\"]');"+
     "return {a:Number(a.style.zIndex),b:Number(b.style.zIndex)};})()");
   assert.ok(fronts.b>fronts.a,'Last-opened storage window is in front');
-  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .window-grip').focus()");
+  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .window-grip').click()");
   await until(()=>evalJS(
     "Number(document.querySelector('[data-game-window=\"inventory\"]').style.zIndex)>"+
     "Number(document.querySelector('[data-game-window=\"storage:home_chest\"]').style.zIndex)"),
