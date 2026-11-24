@@ -27,3 +27,5 @@ jobs:
       - run: npm run build:packages
       - name: Blocking Svelte and TypeScript diagnostics
         run: npm run check -w @the-pall/web
+      - name: Six canonical origin portraits with coming-soon frames
+        run: npm run verify:backgrounds-art
