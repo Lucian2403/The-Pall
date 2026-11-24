@@ -1,0 +1,75 @@
+name: Verify independent inventory windows
+on:
+  pull_request:
+    paths:
+      - 'platform/apps/api/src/inventory-*.ts'
+      - 'platform/apps/web/src/lib/*Inventory*.svelte'
+      - 'platform/apps/web/src/lib/*Window*.svelte'
+      - 'platform/apps/web/src/lib/Item*.svelte'
+      - 'platform/apps/web/src/lib/Equipment*.svelte'
+      - 'platform/apps/web/src/lib/game-window-state.ts'
+      - 'platform/apps/web/src/lib/inventory-*.ts'
+      - 'platform/apps/web/src/lib/inventory-*.css'
+      - 'platform/apps/web/src/lib/TutorialShell.svelte'
+      - 'platform/apps/web/src/routes/characters/**'
+      - 'platform/scripts/verify-inventory.test.ts'
+      - 'platform/scripts/verify-stage6-postgres.integration.test.ts'
+      - 'platform/scripts/verify-inventory-windows-browser.mjs'
+      - 'platform/db/migrations/0023_inventory_storage_context.sql'
+      - 'platform/scripts/inventory-migrate.mjs'
+      - '.github/workflows/verify-inventory-windows.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory-windows:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pall_stage6_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pall_stage6_test"
+          --health-interval 3s
+          --health-timeout 5s
+          --health-retries 20
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - run: npm run build:packages
+      - name: Inventory calculations, windows and source contracts
+        run: npm run verify:inventory
+      - name: API types
+        run: npm run check:api
+      - name: Svelte types
+        run: npm run check -w @the-pall/web
+      - name: PostgreSQL gameplay and inventory access regression
+        env:
+          STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
+          BETTER_AUTH_SECRET: inventory-ci-not-for-production-96a3a108271e8534ae0a
+        run: node --import tsx --test scripts/verify-stage6-postgres.integration.test.ts
+      - name: Chromium desktop and mobile window interactions
+        timeout-minutes: 4
+        run: timeout --signal=TERM --kill-after=5s 200s npm run verify:inventory-windows-browser
+      - name: Upload inventory layout screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-windows-desktop-mobile
+          path: platform/test-artifacts/inventory-windows/*.png
+          if-no-files-found: ignore
+          retention-days: 7

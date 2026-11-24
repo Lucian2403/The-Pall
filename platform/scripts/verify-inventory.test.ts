@@ -3,6 +3,11 @@ import {test} from 'node:test';
 import {randomUUID,createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
+import {get} from 'svelte/store';
+import {
+ gameWindows,selectWindowCharacter,openGameWindow,closeGameWindow,
+ frontGameWindow,positionGameWindow,closeContextWindows,resetGameWindows
+} from '../apps/web/src/lib/game-window-state.ts';
 import {
  InventoryInvalidAction,inventoryView,locationSummary,planTransfer,planEquip,
  PLAYTEST_CAPACITY,EQUIPMENT_SLOTS
@@ -253,4 +258,31 @@ test('Owner starter illustrations remain genuine optimized WebP assets',()=>{
   assert.equal(img.subarray(8,12).toString(),'WEBP');
   assert.equal(createHash('sha256').update(img).digest('hex'),expected);
  }
+});
+
+test('Window registry permits two unique windows but does not share state across characters',()=>{
+ resetGameWindows();
+ const first=randomUUID(),second=randomUUID();
+ selectWindowCharacter(first);
+ openGameWindow(first,'inventory');
+ openGameWindow(first,'inventory');
+ assert.deepEqual(get(gameWindows).windows.map(x=>x.id),['inventory']);
+ openGameWindow(first,'storage');
+ assert.deepEqual(get(gameWindows).windows.map(x=>x.id),['inventory','storage:home_chest']);
+ const a=get(gameWindows).windows[0];
+ const b=get(gameWindows).windows[1];
+ assert.ok(a.z<b.z);
+ frontGameWindow('inventory');
+ assert.ok(get(gameWindows).windows[0].z>get(gameWindows).windows[1].z);
+ positionGameWindow('inventory',97,121);
+ assert.equal(get(gameWindows).windows[0].x,97);
+ assert.equal(get(gameWindows).windows[0].y,121);
+ closeContextWindows();
+ assert.deepEqual(get(gameWindows).windows.map(x=>x.id),['inventory']);
+ openGameWindow(first,'storage');
+ closeGameWindow('inventory');
+ assert.deepEqual(get(gameWindows).windows.map(x=>x.id),['storage:home_chest']);
+ selectWindowCharacter(second);
+ assert.deepEqual(get(gameWindows),{characterId:second,windows:[],mobileActive:null});
+ resetGameWindows();
 });
