@@ -21,7 +21,7 @@
   onMount(() => {
     void (async () => {
       try {
-        const response = await fetch('/api/characters/' + encodeURIComponent(page.params.id), {cache: 'no-store'});
+        const response = await fetch('/api/characters/' + encodeURIComponent(page.params.id!), {cache: 'no-store'});
         if (response.status === 401) {status = 'unauthorized'; return;}
         if (response.status === 404) {status = 'missing'; return;}
         if (!response.ok) {status = 'error'; return;}

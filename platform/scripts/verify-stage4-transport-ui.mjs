@@ -18,10 +18,10 @@ for(const term of ['STAGE_FOUR_TRANSPORT_HINTS','STAGE_FOUR_TRANSPORT_VERIFICATI
  assert.ok(copy.includes(term),'Missing '+term);
 }
 assert.match(scene,/STAGE_FOUR_TRANSPORT_HINTS\[action\]/);
-assert.match(scene,/STAGE_FOUR_TRANSPORT_VERIFICATION\[state\.transport\]/);
+assert.match(scene,/STAGE_FOUR_TRANSPORT_VERIFICATION\[sceneState\.transport\]/);
 assert.match(scene,/Continue to the depot/);
 assert.match(scene,/travelConfirmed/);
-assert.match(scene,/secondJobJournal\(state\)/);
+assert.match(scene,/secondJobJournal\(sceneState\)/);
 assert.match(core,/case 'secure_plates':transport='secured';phase='COMPARE_DELIVERY'/);
 assert.match(core,/case 'carry_smaller_loads':transport='smaller_loads';phase='COMPARE_DELIVERY'/);
 assert.doesNotMatch(scene,/Math\.random|damageChance|fatigueCost/);

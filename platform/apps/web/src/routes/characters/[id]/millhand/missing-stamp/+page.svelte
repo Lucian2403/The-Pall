@@ -28,7 +28,7 @@
   let errorMessage=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
-  const characterId=$derived(page.params.id);
+  const characterId=$derived(page.params.id!);
 
   async function refresh() {
     try {

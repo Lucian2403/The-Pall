@@ -86,7 +86,9 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !api.includes('UPDATE player_character_flint_combat'));
  assert.ok(migration.includes('REFERENCES player_characters(id) ON DELETE RESTRICT')&&
   migration.includes('PRIMARY KEY(character_id,request_id)'));
- assert.ok(character.includes("'player_character_tutorial_home_receipts','player_character_tutorial_home'"));
+ assert.ok(character.includes("fk.confrelid='player_characters'::regclass") &&
+    character.includes("'DELETE FROM '+row.table_name+' WHERE character_id=$1'"),
+    'The account-owned deletion path discovers completed home states and receipts via foreign keys');
  assert.ok(shell.includes("character.tutorial.stage === 8")&&
   shell.includes("'/home'"));
  assert.ok(clinic.includes('Travel Home</a>')&&

@@ -2,10 +2,11 @@
   import {onMount} from 'svelte';
   import '$lib/pall-owner-ui.css';
   import '$lib/pall-entry-pages.css';
-  import {APPROVED_WORLD_INTRO} from '$lib/approved-introductions';
+  import {APPROVED_WORLD_INTRO,type CopySegment} from '$lib/approved-introductions';
 
   // The canonical world introduction is publicly readable. Only choosing
   // characters requires authentication; replaying lore never mutates progress.
+  const worldParagraphs:readonly (readonly CopySegment[])[]=APPROVED_WORLD_INTRO.paragraphs;
   let signedIn=$state(false);
   onMount(()=>{void (async()=>{
     try{
@@ -43,7 +44,7 @@
       <article class="intro-manuscript" aria-label="World introduction">
         <span class="entry-eyebrow">The world beyond the walls</span>
         <div class="lore">
-        {#each APPROVED_WORLD_INTRO.paragraphs as paragraph,i}
+        {#each worldParagraphs as paragraph,i}
           <p class:ending={i>=APPROVED_WORLD_INTRO.paragraphs.length-2}>
             {#each paragraph as segment}
               {#if segment.style==='strong'}<strong>{segment.text}</strong>

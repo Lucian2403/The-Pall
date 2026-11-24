@@ -15,5 +15,5 @@ export function parseFixtureAction(value: unknown): FixtureAction {
   return {action: 'advance_fixture', requestId: v.requestId, expectedRevision: v.expectedRevision as number};
 }
 
-export {INITIAL_CHARACTER_SLOT_LIMIT, CHARACTER_ORIGINS, normalizeCharacterName, parseCreateCharacterCommand} from './character-creation.js';
-export type {CharacterOrigin, CharacterSex, CreateCharacterCommand} from './character-creation.js';
+export {INITIAL_CHARACTER_SLOT_LIMIT, CHARACTER_ORIGINS, PLAYABLE_CHARACTER_ORIGINS, isPlayableCharacterOrigin, normalizeCharacterName, parseCreateCharacterCommand} from './character-creation.js';
+export type {CharacterOrigin, PlayableCharacterOrigin, CharacterSex, CreateCharacterCommand} from './character-creation.js';

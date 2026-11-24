@@ -20,8 +20,8 @@ assert.match(s,/cancellation-slip\.webp/);
 assert.equal((s.match(/data-workshop-object/g)||[]).length,2);
 assert.match(s,/aria-pressed=\{inspectedView === "plate"\}/);
 assert.match(s,/aria-pressed=\{inspectedView === "slip"\}/);
-assert.match(s,/class:seen=\{state\.plateRead\}/);
-assert.match(s,/class:seen=\{state\.slipRead\}/);
+assert.match(s,/class:seen=\{sceneState\.plateRead\}/);
+assert.match(s,/class:seen=\{sceneState\.slipRead\}/);
 // Evidence props scale with the scene stage (container units), not the window.
 assert.match(s,/clamp\(64px, 13cqi, 180px\)/);
 assert.doesNotMatch(s,/scene-footer|Council-owned evidence\. No wages/);

@@ -32,10 +32,24 @@
     legalActions:[],events:[],turnEvents:[],
     rules:{
       strikeCost:11,guardCost:5,moveCost:6,recoverStamina:16,
-      recoverComposure:12,techniqueMomentum:20,
-      repeatedStrikeSurcharge:3,
+      recoverStaminaBelow50:16,recoverStaminaFrom50:12,
+      recoverComposure:12,techniqueMomentum:20,repeatedStrikeSurcharge:3,
+      fatigue:{cap:100,lowStaminaThreshold:30,lowStaminaGain:4,
+        exhaustedAttackGain:6,exhaustedDefenseGain:3,
+        recovery:8,recoveryBelow50:8,recoveryFrom50:6,
+        recoveryThreshold:50,limitedAt:70,recoverOnlyAt:100,
+        accuracyLossPerTen:2,currentAccuracyLoss:0},
       accuracy:{head:40,torso:70,limbs:58},
-      guardMitigationPercent:50,prototype:true
+      guardMitigationPercent:'50%',guardReductionMinPercent:25,
+      guardReductionMaxPercent:50,prototype:true,
+      unarmed:true,weaponLabel:'Fists',
+      strikeDamage:{min:4,max:7},techniqueDamage:{min:5,max:9},
+      strikeByZone:{head:{min:4,max:7},torso:{min:4,max:7},limbs:{min:4,max:7}},
+      techniqueByZone:{head:{min:5,max:9},torso:{min:5,max:9},limbs:{min:5,max:9}},
+      dodgeChance:{side:10,cover:20,back:15,close:15},
+      openingDamageBonus:0,openingReason:null,
+      enemyStrikeDamage:{min:4,max:8},guardedEnemyStrikeDamage:{min:2,max:5},
+      repositionUsesDistance:true
     }
   });
   async function perform(_action:CombatAction):Promise<void>{}

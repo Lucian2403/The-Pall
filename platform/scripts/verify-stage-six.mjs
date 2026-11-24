@@ -52,10 +52,11 @@ assert.ok(opening.includes("state.intent={") &&
   opening.includes("state.distance='far'") &&
   opening.includes('state.player.readiness+=2'),
   'The three opening stances must produce real existing-engine tactical differences');
-assert.ok(characterRoutes.includes("'player_character_flint_combat_receipts','player_character_flint_combat'") &&
-  characterRoutes.includes("'player_character_wage_claim_receipts','player_character_wage_claim'") &&
-  characterRoutes.includes("'DELETE FROM '+table+' WHERE character_id=$1'"),
-  'Account-owned deletion must remove Stage 5 and 6 child rows and receipts');
+assert.ok(characterRoutes.includes("fk.confrelid='player_characters'::regclass") &&
+  characterRoutes.includes("format('%I.%I',ns.nspname,cls.relname)") &&
+  characterRoutes.includes("'DELETE FROM '+row.table_name+' WHERE character_id=$1'") &&
+  characterRoutes.includes('unsupported_character_dependent_table'),
+  'Account-owned deletion must discover every foreign-key-dependent chapter and receipt');
 assert.ok(pgTest.includes("registerMillhandCombatRoutes(app,{pool:db,resolveSession,seed:()=>5})") &&
   pgTest.includes('Two concurrent browser tabs') &&
   pgTest.includes('A victory saves its actual Health') &&

@@ -30,19 +30,19 @@
     travelConfirmed:boolean;confirmTravel:()=>void;
   }=$props();
 
-  const state=$derived(snapshot.state);
+  const sceneState=$derived(snapshot.state);
   // The location-specific exit belongs only to StageFourNextStep.
   const workActions=$derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
   // Purely local presentation beat: a saved transport choice is shown at the
   // workshop before the player proceeds to the depot. This grants no work
   // action and cannot change server progress or cause a missing receipt.
-  const atWorkshop=$derived(state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'||
-    (state.phase==='COMPARE_DELIVERY'&&!travelConfirmed));
-  const speaking=$derived(state.phase==='DEPOT_DIALOGUE');
-  const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[state.dialogueIndex]:null);
-  const result=$derived(state.lastAction?STAGE_FOUR_OUTCOMES[state.lastAction]:null);
-  const instruction=$derived(STAGE_FOUR_INSTRUCTIONS[state.phase]);
-  const journal=$derived(secondJobJournal(state));
+  const atWorkshop=$derived(sceneState.phase==='CHECK_LOAD'||sceneState.phase==='CHOOSE_TRANSPORT'||
+    (sceneState.phase==='COMPARE_DELIVERY'&&!travelConfirmed));
+  const speaking=$derived(sceneState.phase==='DEPOT_DIALOGUE');
+  const beat=$derived(speaking?STAGE_FOUR_DIALOGUE.restamp[sceneState.dialogueIndex]:null);
+  const result=$derived(sceneState.lastAction?STAGE_FOUR_OUTCOMES[sceneState.lastAction]:null);
+  const instruction=$derived(STAGE_FOUR_INSTRUCTIONS[sceneState.phase]);
+  const journal=$derived(secondJobJournal(sceneState));
   let selected=$state<'plates'|'paper'|null>(null);
   // The persistent corner control is owned by TutorialShell, not this dialogue.
   const registerSceneJournal=getContext<SceneJournalRegistrar|undefined>(SCENE_JOURNAL_CONTEXT);
@@ -91,26 +91,26 @@
   <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label="Depot delivery interaction">
       <p class="eyebrow">{atWorkshop?'PREPARING THE DELIVERY':'MUNICIPAL DEPOT'} · STAGE 4</p>
-      {#if state.revision===0}
+      {#if sceneState.revision===0}
         <p class="context">{STAGE_FOUR_ROUTES.restamp.entry}</p>
       {/if}
-      {#if (state.phase==='DONE'||state.phase==='EXITED')}
+      {#if (sceneState.phase==='DONE'||sceneState.phase==='EXITED')}
         <p class="outcome">{STAGE_FOUR_FINAL.restamp}</p>
         <StageFourNextStep {snapshot} {pending} {perform}/>
       {:else if speaking && beat}
         <p class="speaker">{dialogueSpeakerLabel(beat.speaker)}</p>
         <p class="speech">“{beat.text}”</p>
       {:else}
-        {#if result && !(state.phase==='COMPARE_DELIVERY' && travelConfirmed)}
+        {#if result && !(sceneState.phase==='COMPARE_DELIVERY' && travelConfirmed)}
           <p class="result">{result}</p>
         {/if}
-        {#if state.phase==='COMPARE_DELIVERY' && state.transport && travelConfirmed}
-          <p class="context transport-verification">{STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]}</p>
+        {#if sceneState.phase==='COMPARE_DELIVERY' && sceneState.transport && travelConfirmed}
+          <p class="context transport-verification">{STAGE_FOUR_TRANSPORT_VERIFICATION[sceneState.transport]}</p>
         {/if}
-        {#if !(state.phase==='COMPARE_DELIVERY' && !travelConfirmed) && result!==instruction}
+        {#if !(sceneState.phase==='COMPARE_DELIVERY' && !travelConfirmed) && result!==instruction}
           <p class="instruction">{instruction}</p>
         {/if}
-        {#if state.phase==='SPEAK_DEPOT'||state.phase==='CHOOSE_RECEIPT'}
+        {#if sceneState.phase==='SPEAK_DEPOT'||sceneState.phase==='CHOOSE_RECEIPT'}
           <p class="context">The goods column on the delivery list has “workers” written in it. You brought numbered metal plates.</p>
         {/if}
       {/if}
@@ -120,7 +120,7 @@
           <strong>{selected==='plates'?'Numbered metal plates':'Council work paper'}</strong>
           <p>{selected==='plates'
             ? atWorkshop
-              ? state.phase==='COMPARE_DELIVERY'
+              ? sceneState.phase==='COMPARE_DELIVERY'
                 ? 'You have chosen how to move the load. The plates are ready to go to the depot.'
                 : 'The finished plates are together on the bench. Check the load against the paper before moving them.'
               : 'You have brought numbered metal plates to the municipal depot.'
@@ -130,7 +130,7 @@
         </div>
       {/if}
 
-      {#if state.phase==='COMPARE_DELIVERY' && !travelConfirmed}
+      {#if sceneState.phase==='COMPARE_DELIVERY' && !travelConfirmed}
         <div class="actions"><button type="button" class="primary-choice" disabled={pending}
           onclick={() => {selected=null;confirmTravel();}}>Continue to the depot</button></div>
       {:else if workActions.length>0}

@@ -1,12 +1,14 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
-  import {APPROVED_BACKGROUND_SELECTION} from '$lib/approved-introductions';
+  import {APPROVED_BACKGROUND_SELECTION,type CopySegment} from '$lib/approved-introductions';
   import '$lib/pall-owner-ui.css';
   import '$lib/pall-entry-pages.css';
   import PortraitCarousel from '$lib/PortraitCarousel.svelte';
   import {originVisual} from '$lib/origin-visuals';
+  import {isPlayableCharacterOrigin} from '@the-pall/contracts';
 
+  const closingCopy:readonly (readonly CopySegment[])[]=APPROVED_BACKGROUND_SELECTION.closing;
   type OriginFact = {origin: string; socialRole: string; majorSkill: string};
   type Catalogue = {
     status: 'read_only_preview';
@@ -41,7 +43,8 @@
   }
 
   async function createCharacter() {
-    if (!selected || !selectedAvatarId || !roster || busy || roster.slots.used >= roster.slots.limit) return;
+    if (!selected || !isPlayableCharacterOrigin(selected.origin) ||
+        !selectedAvatarId || !roster || busy || roster.slots.used >= roster.slots.limit) return;
     busy = true;
     creationMessage = '';
     const signature = JSON.stringify([name, selected.origin, selectedSex, selectedAvatarId, roster.revision]);
@@ -73,6 +76,7 @@
         slots_full: 'All six character slots are occupied.',
         stale_revision: 'Your character list changed. Review it and try again.',
         invalid_origin: 'Select an approved origin.',
+        origin_coming_soon: 'This background is not playable yet.',
         invalid_sex: 'Select a portrait variant.',
         invalid_avatar: 'Choose one of the available portraits.',
         idempotency_key_reuse: 'This request was already used for another character. Review the form.'
@@ -153,20 +157,27 @@
           <section class="origin-section" aria-label="Choose one of six backgrounds">
             <div class="origin-grid">
               {#each APPROVED_BACKGROUND_SELECTION.origins as origin (origin.origin)}
-                <button type="button" class="origin-card" class:active={selectedOrigin===origin.origin}
+                <button type="button" class="origin-card"
+                  class:active={selectedOrigin===origin.origin}
+                  class:coming-soon={!isPlayableCharacterOrigin(origin.origin)}
+                  disabled={!isPlayableCharacterOrigin(origin.origin)}
                   aria-pressed={selectedOrigin===origin.origin}
+                  aria-label={origin.heading+(isPlayableCharacterOrigin(origin.origin)?'':' — coming soon')}
                   onclick={()=>{selectedOrigin=origin.origin;creationMessage='';}}>
                   <span class="origin-art" style={'background-image:linear-gradient(0deg,#17140fef,#17140f3e),url("'+originVisual(origin.origin).src+'")'}></span>
                   <span class="origin-text">
                     <strong>{origin.heading}</strong>
                     <span>{origin.description}</span>
                     <small><em>Advantage:</em> {origin.advantage}</small>
+                    {#if !isPlayableCharacterOrigin(origin.origin)}
+                      <span class="coming-soon-frame">Coming soon · This background is not yet playable</span>
+                    {/if}
                   </span>
                 </button>
               {/each}
             </div>
             <div class="approved-ending">
-              {#each APPROVED_BACKGROUND_SELECTION.closing as paragraph}
+              {#each closingCopy as paragraph}
                 <p>{#each paragraph as segment}
                   {#if segment.style==='strong'}<strong>{segment.text}</strong>
                   {:else if segment.style==='em'}<em>{segment.text}</em>
@@ -442,6 +453,20 @@
   .backgrounds-page .origin-card:focus-visible{
     outline:3px solid #f0bc76;
     outline-offset:3px;
+  }
+  .backgrounds-page .origin-card:disabled{
+    cursor:not-allowed;border-color:#6e5c48;box-shadow:0 4px 12px #0008;
+  }
+  .backgrounds-page .origin-card:disabled:hover{
+    border-color:#6e5c48;box-shadow:0 4px 12px #0008;
+  }
+  .backgrounds-page .coming-soon-frame{
+    display:block;flex:none;margin-top:6px;padding:9px 11px;
+    border:solid transparent;border-width:13px 18px 12px;
+    border-image-source:url('/ui-kit/frames/dialogue-frame-trim.png');
+    border-image-slice:145 190 125 190 fill;border-image-repeat:stretch;
+    color:#482719;font:700 14px/1.4 var(--pall-font-reading,Georgia,serif);
+    text-align:center;letter-spacing:.01em;
   }
   .backgrounds-page .origin-card.active{
     border:2px solid #f0c084;

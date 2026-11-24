@@ -80,7 +80,7 @@ assert.ok(ui.includes("import MillhandDepotScene from '$lib/MillhandDepotScene.s
 assert.ok(depotUi.includes("/locations/depot/depot-background-cold.webp") &&
   depotUi.includes("background-image:url('/workshop/environment.webp')"),
   'Route A must prepare the plates at the workshop before switching to the owner supplied depot backdrop');
-assert.ok(depotUi.includes("state.phase==='CHECK_LOAD'||state.phase==='CHOOSE_TRANSPORT'"),
+assert.ok(depotUi.includes("sceneState.phase==='CHECK_LOAD'||sceneState.phase==='CHOOSE_TRANSPORT'"),
   'Travel to the depot must follow the saved transport choice, not precede it');
 assert.ok(depotUi.includes('/workshop/metal-plates.webp') &&
   depotUi.includes('/workshop/council-work.webp') &&
@@ -118,7 +118,7 @@ assert.ok(contractsUi.includes("which==='death' && snapshot.availableActions.inc
   contractsUi.includes("which==='wage' && snapshot.availableActions.includes('compare_official_records')") &&
   contractsUi.includes("void perform('compare_official_records')"),
   'Commerce must require separate owner book selections for the two existing saved evidence steps');
-assert.ok(contractsUi.includes("state.phase==='EXAMINE_PAPER'||state.phase==='COMPARE_RECORDS'") &&
+assert.ok(contractsUi.includes("sceneState.phase==='EXAMINE_PAPER'||sceneState.phase==='COMPARE_RECORDS'") &&
   contractsUi.includes("{:else if workActions.length>0}"),
   'Remove evidence action buttons from dialogue while retaining later Clerk and dispute actions');
 assert.ok(!contractsUi.includes("perform('read_death_register')") &&
@@ -150,7 +150,7 @@ for(const [phase,which,action] of [
   ['READ_WAGE_RECORD','wage','check_wage_record'],
   ['EXAMINE_SCRAPED_ENTRY','wage','examine_scraped_entry']
 ]){
-  assert.ok(recordsUi.includes("state.phase==='"+phase+"'") &&
+  assert.ok(recordsUi.includes("sceneState.phase==='"+phase+"'") &&
     recordsUi.includes("which==='"+which+"' && snapshot.availableActions.includes('"+action+"')") &&
     recordsUi.includes("void perform('"+action+"')"),
     'Scholarship must require the correct physical book for '+phase);
@@ -198,11 +198,11 @@ assert.ok(copy.includes('STAGE_FOUR_TRANSPORT_HINTS') &&
   copy.includes('I secured the plates together and carried them to the depot as one load.') &&
   copy.includes('I carried the plates in smaller groups. It took more trips'),
   'Both transport choices must change the immediate/depot/journal copy');
-assert.ok(depotUi.includes("state.phase==='COMPARE_DELIVERY' && state.transport && travelConfirmed") &&
-  depotUi.includes('STAGE_FOUR_TRANSPORT_VERIFICATION[state.transport]') &&
+assert.ok(depotUi.includes("sceneState.phase==='COMPARE_DELIVERY' && sceneState.transport && travelConfirmed") &&
+  depotUi.includes('STAGE_FOUR_TRANSPORT_VERIFICATION[sceneState.transport]') &&
   depotUi.includes('STAGE_FOUR_TRANSPORT_HINTS[action]') &&
   depotUi.includes('Continue to the depot') &&
-  depotUi.includes("state.phase==='COMPARE_DELIVERY'&&!travelConfirmed"),
+  depotUi.includes("sceneState.phase==='COMPARE_DELIVERY'&&!travelConfirmed"),
   'Saved transport must drive depot verification and pre-choice trade-off text');
 assert.ok(core.includes("case 'secure_plates':transport='secured';phase='COMPARE_DELIVERY';") &&
   core.includes("case 'carry_smaller_loads':transport='smaller_loads';phase='COMPARE_DELIVERY';"),

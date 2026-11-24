@@ -101,7 +101,7 @@ test('arrival introduces the passage before Dogman appears; one Continue reveals
   assert.equal(dogmanLine(after)?.text,DOGMAN_PAPERS[0]?.text);
   const scene=readFileSync(new URL('../apps/web/src/lib/BellrunnerDogmanScene.svelte',
     import.meta.url),'utf8');
-  assert.match(scene,/state.phase!=='arrival'/);
+  assert.match(scene,/sceneState.phase!=='arrival'/);
   assert.match(scene,/\{#if dogmanVisible\}/);
   assert.match(scene,/The Service Passage/);
 });
