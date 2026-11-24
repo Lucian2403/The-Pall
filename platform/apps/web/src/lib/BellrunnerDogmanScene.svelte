@@ -21,12 +21,12 @@
     snapshot:Snapshot;pending:boolean;errorMessage:string;
     perform:(action:DogmanAction)=>Promise<void>;
   }=$props();
-  const state=$derived(snapshot.state);
-  const line=$derived(dogmanLine(state));
-  const journal=$derived(dogmanJournal(state));
-  const atGate=$derived(state.phase==='gate'||state.phase==='done');
+  const sceneState=$derived(snapshot.state);
+  const line=$derived(dogmanLine(sceneState));
+  const journal=$derived(dogmanJournal(sceneState));
+  const atGate=$derived(sceneState.phase==='gate'||sceneState.phase==='done');
   // The alley comes first. Dogman's artwork enters only after Continue.
-  const dogmanVisible=$derived(state.phase!=='arrival');
+  const dogmanVisible=$derived(sceneState.phase!=='arrival');
   const actions=$derived(snapshot.availableActions);
   let alleyImageMissing=$state(false);
   let dogmanImageMissing=$state(false);
@@ -72,8 +72,8 @@
     {#snippet panel()}
       <section class="pall-story-dialogue-section" aria-label="Dogman confrontation dialogue">
         <div class="work-card">
-          <p class="eyebrow">BELLRUNNER · STAGE V · {state.phase==='arrival'?'SERVICE PASSAGE':atGate?'GATE BARRED':'SHOW YOUR PAPERS'}</p>
-          <h1>{state.phase==='arrival'?'The Service Passage':atGate?'Gate Barred':'Show Your Papers'}</h1>
+          <p class="eyebrow">BELLRUNNER · STAGE V · {sceneState.phase==='arrival'?'SERVICE PASSAGE':atGate?'GATE BARRED':'SHOW YOUR PAPERS'}</p>
+          <h1>{sceneState.phase==='arrival'?'The Service Passage':atGate?'Gate Barred':'Show Your Papers'}</h1>
           {#if line}
             {#if line.speaker==='Narration'}
               <p class="narration">{line.text}</p>
@@ -81,8 +81,8 @@
               <p class="speaker">{dialogueSpeakerLabel(line.speaker).toUpperCase()}</p>
               <p class="spoken">“{line.text}”</p>
             {/if}
-          {:else if state.phase==='done'&&state.stance}
-            <p class="narration">{DOGMAN_STANCE_NOTES[state.stance]}</p>
+          {:else if sceneState.phase==='done'&&sceneState.stance}
+            <p class="narration">{DOGMAN_STANCE_NOTES[sceneState.stance]}</p>
             <p class="narration">Dogman comes forward with the club held low. The service lane is narrow, with the public street beyond.</p>
             <a class="pall-framed-button primary-choice combat-link"
               href={'/characters/'+encodeURIComponent(page.params.id)+'/bellrunner/combat'}>

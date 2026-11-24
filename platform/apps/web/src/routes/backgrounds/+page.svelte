@@ -1,13 +1,14 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {goto} from '$app/navigation';
-  import {APPROVED_BACKGROUND_SELECTION} from '$lib/approved-introductions';
+  import {APPROVED_BACKGROUND_SELECTION,type CopySegment} from '$lib/approved-introductions';
   import '$lib/pall-owner-ui.css';
   import '$lib/pall-entry-pages.css';
   import PortraitCarousel from '$lib/PortraitCarousel.svelte';
   import {originVisual} from '$lib/origin-visuals';
   import {isPlayableCharacterOrigin} from '@the-pall/contracts';
 
+  const closingCopy:readonly (readonly CopySegment[])[]=APPROVED_BACKGROUND_SELECTION.closing;
   type OriginFact = {origin: string; socialRole: string; majorSkill: string};
   type Catalogue = {
     status: 'read_only_preview';
@@ -176,7 +177,7 @@
               {/each}
             </div>
             <div class="approved-ending">
-              {#each APPROVED_BACKGROUND_SELECTION.closing as paragraph}
+              {#each closingCopy as paragraph}
                 <p>{#each paragraph as segment}
                   {#if segment.style==='strong'}<strong>{segment.text}</strong>
                   {:else if segment.style==='em'}<em>{segment.text}</em>

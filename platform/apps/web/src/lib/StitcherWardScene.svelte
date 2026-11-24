@@ -15,29 +15,10 @@
   import {STITCHER_SCENE_ART,stitcherSceneEnvironment} from '$lib/stitcher-scene-environment';
   import '$lib/pall-story-landscape.css';
   import '$lib/workshop-object-labels.css';
-  type Branch='trolley'|'consent'|'notes';
-  type Phase='intro'|'briefing'|'inspect'|'order'|'prepare'|'care'|'linen_check'|
-    'linen_fix'|'verify'|'record'|'report'|'close'|'discovery'|'claudia'|'choose'|
-    'opening'|'work'|'dialogue'|'finish'|'exited'|'attendant'|'investigate'|
-    'witness'|'hold'|'door'|'prepare_door'|'door_reply'|'fight_ready';
-  type State={
-    revision:number;stage:1|2|3|4|5;phase:Phase;introLine:number;
-    inspectedA:boolean;inspectedB:boolean;first:'a'|'b'|null;
-    prepared:'cut'|'ready'|null;treatedA:boolean;treatedB:boolean;
-    correction:'discard'|'trim'|null;reportLine:number;
-    bedObserved:boolean;chartRead:boolean;patientHeard:boolean;
-    patientLine:number;focus:'bed'|'chart'|'patient'|null;
-    claudiaLine:number;branch:Branch|null;taskStep:number;
-    routeMethod:string|null;openingLine:number;dialogueLine:number;
-    stage5Line?:number;stage5Choice?:'papers'|'claudia'|'evidence'|null;
-    stage5Witnessed?:boolean;stage5Hold?:boolean;
-    stage5Preparation?:'reason'|'cart'|'brace'|null
-  };
-  type Snapshot={stage:number;tutorialStatus:string;state:State;
-    started:boolean;availableActions:string[]};
+  import type {StitcherWardSnapshot} from '$lib/stitcher-ward-snapshot';
   let {snapshot,pending,errorMessage,perform,characterId}:{
     characterId:string;
-    snapshot:Snapshot;pending:boolean;errorMessage:string;
+    snapshot:StitcherWardSnapshot;pending:boolean;errorMessage:string;
     perform:(action:string)=>Promise<void>;
   }=$props();
   const s=$derived(snapshot.state);

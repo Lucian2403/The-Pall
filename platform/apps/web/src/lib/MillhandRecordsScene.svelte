@@ -37,17 +37,17 @@
     perform: (action: SecondJobAction) => Promise<void>;
   } = $props();
 
-  const state = $derived(snapshot.state);
+  const sceneState = $derived(snapshot.state);
   // Leave is rendered by the shared location exit, not in the work-action list.
   const workActions = $derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
   const beat = $derived(
-    state.phase === "ARCHIVE_DIALOGUE"
-      ? STAGE_FOUR_DIALOGUE.records[state.dialogueIndex]
+    sceneState.phase === "ARCHIVE_DIALOGUE"
+      ? STAGE_FOUR_DIALOGUE.records[sceneState.dialogueIndex]
       : null,
   );
-  const journal = $derived(secondJobJournal(state));
+  const journal = $derived(secondJobJournal(sceneState));
   const result = $derived(
-    state.lastAction ? STAGE_FOUR_OUTCOMES[state.lastAction] : null,
+    sceneState.lastAction ? STAGE_FOUR_OUTCOMES[sceneState.lastAction] : null,
   );
 
   // The two existing owner books also suit the Scholarship records task.
@@ -62,18 +62,18 @@
   });
 
   const readingPhase = $derived(
-    state.phase === "READ_DEATH_REGISTER" ||
-      state.phase === "READ_WAGE_RECORD" ||
-      state.phase === "EXAMINE_SCRAPED_ENTRY",
+    sceneState.phase === "READ_DEATH_REGISTER" ||
+      sceneState.phase === "READ_WAGE_RECORD" ||
+      sceneState.phase === "EXAMINE_SCRAPED_ENTRY",
   );
   const instruction = $derived(
-    state.phase === "READ_DEATH_REGISTER"
+    sceneState.phase === "READ_DEATH_REGISTER"
       ? "Find the worker number in the Death Register on the counter."
-      : state.phase === "READ_WAGE_RECORD"
+      : sceneState.phase === "READ_WAGE_RECORD"
         ? "Check the later Wage Record against the recorded death."
-        : state.phase === "EXAMINE_SCRAPED_ENTRY"
+        : sceneState.phase === "EXAMINE_SCRAPED_ENTRY"
           ? "Examine the damaged line in the Wage Record."
-          : STAGE_FOUR_INSTRUCTIONS[state.phase],
+          : STAGE_FOUR_INSTRUCTIONS[sceneState.phase],
   );
 
   // All three examination steps use the server's already-approved actions.
@@ -81,7 +81,7 @@
   function inspect(which: "death" | "wage") {
     if (pending) return;
     inspected = which;
-    if (state.phase === "READ_DEATH_REGISTER") {
+    if (sceneState.phase === "READ_DEATH_REGISTER") {
       if (
         which === "death" &&
         snapshot.availableActions.includes("read_death_register")
@@ -94,7 +94,7 @@
       }
       return;
     }
-    if (state.phase === "READ_WAGE_RECORD") {
+    if (sceneState.phase === "READ_WAGE_RECORD") {
       if (
         which === "wage" &&
         snapshot.availableActions.includes("check_wage_record")
@@ -107,7 +107,7 @@
       }
       return;
     }
-    if (state.phase === "EXAMINE_SCRAPED_ENTRY") {
+    if (sceneState.phase === "EXAMINE_SCRAPED_ENTRY") {
       if (
         which === "wage" &&
         snapshot.availableActions.includes("examine_scraped_entry")
@@ -191,14 +191,14 @@
   <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label="Ledger Reconciliation interaction">
       <p class="eyebrow">LEDGER RECONCILIATION · STAGE 4</p>
-      {#if state.revision === 0}
+      {#if sceneState.revision === 0}
         <p class="context">{STAGE_FOUR_ROUTES.records.entry}</p>
       {/if}
 
-      {#if (state.phase === "DONE" || state.phase === "EXITED")}
+      {#if (sceneState.phase === "DONE" || sceneState.phase === "EXITED")}
         <p class="outcome">{STAGE_FOUR_FINAL.records}</p>
         <StageFourNextStep {snapshot} {pending} {perform} />
-      {:else if state.phase === "ARCHIVE_DIALOGUE" && beat}
+      {:else if sceneState.phase === "ARCHIVE_DIALOGUE" && beat}
         <p class="speaker">
           {dialogueSpeakerLabel(beat.speaker)}
         </p>
@@ -210,7 +210,7 @@
         {#if result !== instruction}
           <p class="instruction">{instruction}</p>
         {/if}
-        {#if state.phase === "SPEAK_ARCHIVE" || state.phase === "CHOOSE_SOURCE"}
+        {#if sceneState.phase === "SPEAK_ARCHIVE" || sceneState.phase === "CHOOSE_SOURCE"}
           <p class="context">
             You check the newer wage record. Same worker number again. But
             someone's scratched out part of what's written there. Can't make out

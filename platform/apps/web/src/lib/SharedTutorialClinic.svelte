@@ -238,7 +238,7 @@
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
 {#if status==='ready' && character?.id===id && clinic}
-  <TutorialShell {character} sceneLocation={FINALE_ORIGINS[origin].location} sceneStage={7} clinicBackdrop={true}
+  <TutorialShell character={character!} sceneLocation={FINALE_ORIGINS[origin].location} sceneStage={7} clinicBackdrop={true}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}
     journalContent={{title:'The Clinic',entries:journalEntries}}>
     <section class="clinic" aria-label="Stage 7 clinic">
@@ -408,7 +408,7 @@
       <p>Run <code>npm run clinic:migrate</code> from the platform folder.</p>
     {:else}
       <h1>Clinic service unavailable</h1><p role="alert">{errorMessage}</p>
-      <button class="pall-framed-button" type="button" onclick={refresh}>Retry</button>
+      <button class="pall-framed-button" type="button" onclick={()=>{void refresh(id);}}>Retry</button>
     {/if}
   </main>
 {/if}

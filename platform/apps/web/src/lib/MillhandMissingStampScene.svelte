@@ -78,18 +78,18 @@
   // The journal lives outside the workshop scene. Expanding it must never
   // enlarge the NPC's small dialogue popup or push objects beneath it.
 
-  const state = $derived(snapshot.state);
+  const sceneState = $derived(snapshot.state);
   $effect(() => {
-    if (state.phase !== "DECISION") decisionStep = 0;
+    if (sceneState.phase !== "DECISION") decisionStep = 0;
   });
   const beat = $derived(
-    MISSING_STAMP_CONFRONTATION[state.dialogueIndex] ?? null,
+    MISSING_STAMP_CONFRONTATION[sceneState.dialogueIndex] ?? null,
   );
   const journal = $derived(
-    missingStampJournal(state, snapshot.finding, snapshot.slip, snapshot.plate),
+    missingStampJournal(sceneState, snapshot.finding, snapshot.slip, snapshot.plate),
   );
   const branchCopy = $derived(
-    state.branch ? MISSING_STAMP_ROUTES[state.branch] : null,
+    sceneState.branch ? MISSING_STAMP_ROUTES[sceneState.branch] : null,
   );
   const canAct = (a: MissingStampAction) =>
     snapshot.availableActions.includes(a) && !pending;
@@ -108,9 +108,9 @@
   );
   async function inspect(which: "slip" | "plate") {
     if (
-      state.phase === "CONFRONT" ||
-      state.phase === "DECISION" ||
-      state.phase === "RESTAMP"
+      sceneState.phase === "CONFRONT" ||
+      sceneState.phase === "DECISION" ||
+      sceneState.phase === "RESTAMP"
     )
       return;
     talkingOptional = false;
@@ -150,7 +150,7 @@
       <button
         type="button"
         class="npc-hotspot"
-        disabled={state.phase === "CONFRONT" || state.phase === "DECISION"}
+        disabled={sceneState.phase === "CONFRONT" || sceneState.phase === "DECISION"}
         onclick={() => {
           talkingOptional = true;
           inspectedView = null;
@@ -162,12 +162,12 @@
         <div class="evidence" aria-label="Council evidence on the bench">
           <button
             type="button"
-            class:seen={state.plateRead}
+            class:seen={sceneState.plateRead}
             data-workshop-object data-pall-sfx="click"
             aria-pressed={inspectedView === "plate"}
-            disabled={state.phase === "CONFRONT" ||
-              state.phase === "DECISION" ||
-              state.phase === "RESTAMP"}
+            disabled={sceneState.phase === "CONFRONT" ||
+              sceneState.phase === "DECISION" ||
+              sceneState.phase === "RESTAMP"}
             onclick={() => {
               void inspect("plate");
             }}
@@ -183,12 +183,12 @@
           </button>
           <button
             type="button"
-            class:seen={state.slipRead}
+            class:seen={sceneState.slipRead}
             data-workshop-object data-pall-sfx="paper"
             aria-pressed={inspectedView === "slip"}
-            disabled={state.phase === "CONFRONT" ||
-              state.phase === "DECISION" ||
-              state.phase === "RESTAMP"}
+            disabled={sceneState.phase === "CONFRONT" ||
+              sceneState.phase === "DECISION" ||
+              sceneState.phase === "RESTAMP"}
             onclick={() => {
               void inspect("slip");
             }}
@@ -210,12 +210,12 @@
   <div class="reading-column pall-story-dialogue-section">
     <aside
       class="dialogue"
-      class:record-view={(state.phase === "INSPECT" ||
-        state.phase === "READY_TO_SPEAK") &&
+      class:record-view={(sceneState.phase === "INSPECT" ||
+        sceneState.phase === "READY_TO_SPEAK") &&
         inspectedView !== null &&
         evidencePage === 1 &&
         !talkingOptional}
-      class:route-choice={state.phase === "DECISION" &&
+      class:route-choice={sceneState.phase === "DECISION" &&
         decisionStep === 1 &&
         !talkingOptional}
       aria-label="The Missing Stamp dialogue"
@@ -229,8 +229,8 @@
         />
       {:else}
         <p class="eyebrow">THE MISSING STAMP · STAGE 3</p>
-        {#if state.phase === "INSPECT" || state.phase === "READY_TO_SPEAK"}
-          {#if !state.slipRead && !state.plateRead && !inspectedView}
+        {#if sceneState.phase === "INSPECT" || sceneState.phase === "READY_TO_SPEAK"}
+          {#if !sceneState.slipRead && !sceneState.plateRead && !inspectedView}
             <p class="speaker">Guther</p>
             <p class="speech">“{MISSING_STAMP_HANDOFF}”</p>
             <p class="story">{MISSING_STAMP_OPENING}</p>
@@ -244,7 +244,7 @@
                 ? CANCELLATION_NARRATION
                 : PLATE_NARRATION}
             </p>
-            {#if (inspectedView === "slip" && state.slipRead) || (inspectedView === "plate" && state.plateRead)}
+            {#if (inspectedView === "slip" && sceneState.slipRead) || (inspectedView === "plate" && sceneState.plateRead)}
               <div class="choices">
                 <button
                   type="button"
@@ -352,7 +352,7 @@
               Inspect the other evidence object on the workbench.
             </p>
           {/if}
-        {:else if state.phase === "CONFRONT" && beat}
+        {:else if sceneState.phase === "CONFRONT" && beat}
           <p class="speaker">
             {dialogueSpeakerLabel(beat.speaker)}
           </p>
@@ -382,7 +382,7 @@
               }}>{GUTHER_WORK_SKIP_LINE}</button
             >
           </div>
-        {:else if state.phase === "DECISION"}
+        {:else if sceneState.phase === "DECISION"}
           {#if decisionStep === 0}
             <p class="story">
               You put the returned plate and the cancellation slip before
@@ -406,7 +406,7 @@
           <p class="speaker">Guther</p>
           <p class="speech">“{branchCopy.response}”</p>
           <p class="story">{branchCopy.consequence}</p>
-          {#if state.phase === "RESTAMP"}
+          {#if sceneState.phase === "RESTAMP"}
             <p class="instruction">
               Make one more worker-number mark. Do not touch the council
               inspector's mark.
@@ -421,13 +421,13 @@
                 }}>Stamp the worker number again</button
               >
             </div>
-          {:else if state.phase === "SELECTED"}
+          {:else if sceneState.phase === "SELECTED"}
             <div class="choices">
               <button type="button"
                 class="primary-choice" onclick={continueToJob}>
-                {state.branch === "restamp"
+                {sceneState.branch === "restamp"
                   ? "Take the plates to the depot"
-                  : state.branch === "contracts"
+                  : sceneState.branch === "contracts"
                     ? "Go to the Contracts office"
                     : "Go to the records room"}
               </button>

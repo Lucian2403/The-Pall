@@ -167,7 +167,7 @@
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character?.id===id&&home}
-  <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
+  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home"
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
@@ -273,7 +273,7 @@
     {:else if status==='schema'}<h1>Stage 8 database missing</h1><p>Run npm run home:migrate.</p>
     {:else if status==='prerequisite'}<h1>Finish the clinic first</h1>
     {:else}<h1>Home unavailable</h1><p>{errorMessage}</p>
-      <button type="button" onclick={()=>{void refresh();}}>Retry</button>{/if}
+      <button type="button" onclick={()=>{void refresh(id);}}>Retry</button>{/if}
     <a href={'/characters/'+encodeURIComponent(id)}>Character</a>
   </main>
 {/if}
