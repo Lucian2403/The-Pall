@@ -85,7 +85,7 @@
             <p class="narration">{DOGMAN_STANCE_NOTES[sceneState.stance]}</p>
             <p class="narration">Dogman comes forward with the club held low. The service lane is narrow, with the public street beyond.</p>
             <a class="pall-framed-button primary-choice combat-link"
-              href={'/characters/'+encodeURIComponent(page.params.id)+'/bellrunner/combat'}>
+              href={'/characters/'+encodeURIComponent(page.params.id!)+'/bellrunner/combat'}>
               Enter the fight
             </a>
           {/if}
