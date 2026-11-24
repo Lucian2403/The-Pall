@@ -244,9 +244,12 @@ const stub=String.raw`(()=>{
       }else{
         const dest=command.to==='home_chest'?'chest':'pack';
         const count=command.quantity;
-        if(count===item.quantity)state[source].items=state[source].items.filter(x=>x.id!==item.id);
+        const entire=count===item.quantity;
+        if(entire)state[source].items=state[source].items.filter(x=>x.id!==item.id);
         else item.quantity-=count;
-        state[dest].items.push({...item,quantity:count,equipmentSlot:null});
+        state[dest].items.push({...item,
+          id:entire?item.id:item.id+'-split-'+state.revision,
+          quantity:count,equipmentSlot:null});
       }
       state.pack.slotsUsed=state.pack.items.length;
       state.chest.slotsUsed=state.chest.items.length;
@@ -601,6 +604,13 @@ try{
 
   // New independent windows use the same real Svelte TutorialShell and Home page.
   // Snapshot fixtures do not replace the PostgreSQL ownership/transaction tests.
+  // A personal pack and worn equipment are available before Stage VIII.
+  await open('/characters/qa-scenes-millhand/opening',1280,720,'.workshop .illustration');
+  await evalJS("document.querySelector('[data-open-inventory]').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .inventory-window')"),
+    7000,'Inventory before Stage VIII');
+  assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),false);
+  await shot('inventory-before-stage-eight-desktop');
   await open('/characters/qa-scenes-millhand/home',1280,720,'.home-artwork');
   await evalJS("document.querySelector('[data-open-inventory]').click()");
   try{
@@ -670,6 +680,38 @@ try{
     "item.dispatchEvent(new MouseEvent('click',{shiftKey:true,bubbles:true}));})()");
   await until(()=>evalJS("window.__qaInventoryPosts?.length===2"),5000,'Shift-click transfer');
   assert.equal(await evalJS("window.__qaInventoryPosts[1].to"),'pack');
+  // Partial-stack transfers retain remaining quantities and create a new
+  // item-instance ID; using the transfer button is the keyboard fallback.
+  await evalJS("document.querySelector('[data-game-window=\"inventory\"] .item-slot.occupied[title*=\"Steel Rivets\"]').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .quantity-label input')"),
+    4000,'stack quantity input');
+  await evalJS("(()=>{const input=document.querySelector('[data-game-window=\"inventory\"] .quantity-label input');"+
+    "input.value='2';input.dispatchEvent(new Event('input',{bubbles:true}));})()");
+  await evalJS("([...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
+    ".find(b=>b.textContent.includes('Store in chest'))).click()");
+  await until(()=>evalJS("window.__qaInventoryPosts?.length===3"),4500,'partial stack transfer');
+  assert.equal(await evalJS("window.__qaInventoryPosts[2].quantity"),2);
+  await until(()=>evalJS("window.__qaInventory.pack.items.find(i=>i.code==='test_rivet')?.quantity===3"),
+    4500,'remaining stack quantity');
+  const rivetIds=await evalJS("([...window.__qaInventory.pack.items,...window.__qaInventory.chest.items]"+
+    ".filter(i=>i.code==='test_rivet').map(i=>i.id))");
+  assert.equal(new Set(rivetIds).size,rivetIds.length,'Partial stacks have unique IDs');
+  // A stale revision must refresh both windows without repeating the item move.
+  await evalJS("window.__qaInventory.revision+=1");
+  await evalJS("([...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
+    ".find(b=>b.textContent.includes('Store in chest'))).click()");
+  await until(()=>evalJS("window.__qaInventoryPosts?.length===4"),4500,'stale revision attempt');
+  await until(()=>evalJS("document.querySelector('[data-game-window=\"inventory\"] [role=alert]')?.textContent.includes('Inventory changed')"),
+    4500,'stale revision recovery');
+  assert.equal(await evalJS("window.__qaInventory.pack.items.find(i=>i.code==='test_rivet')?.quantity"),3);
+  // Keyboard activation of the ordinary button is also a valid transfer path.
+  await evalJS("([...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
+    ".find(b=>b.textContent.includes('Store in chest'))).focus()");
+  await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  await until(()=>evalJS("window.__qaInventoryPosts?.length===5"),4500,'keyboard-driven transfer');
+  assert.equal(await evalJS("window.__qaInventoryPosts[4].to"),'home_chest');
+  console.log('PASS: Partial-stack identity, stale revision recovery and keyboard transfer.');
   await evalJS("document.querySelector('[data-game-window=\"inventory\"] .close-window').click()");
   assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"inventory\"]')"),false);
   assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),true);
