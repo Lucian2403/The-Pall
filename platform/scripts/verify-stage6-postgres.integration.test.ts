@@ -3094,3 +3094,91 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
   'Rewinding Stitcher must not touch another character on the same account');
  assert.equal((await request('GET',sibling.homePath)).body!.phase,'COMPLETE');
 });
+
+
+test('Creation rejects unfinished backgrounds without changing the roster',async()=>{
+ const roster=await request('GET','/api/characters',owner);
+ assert.equal(roster.status,200);
+ const revision=roster.body!.revision;
+ const before=roster.body!.slots.used;
+ for(const origin of ['Squatter','Scrapper','Inkbound']){
+  const result=await request('POST','/api/characters',owner,{
+   name:'Unavailable '+origin,origin,sex:'Female',avatarId:'female-01',
+   expectedRevision:revision,requestId:randomUUID()
+  });
+  assert.equal(result.status,400,origin+': '+JSON.stringify(result.body));
+  assert.equal(result.body?.error,'origin_coming_soon');
+ }
+ const after=await request('GET','/api/characters',owner);
+ assert.equal(after.body!.revision,revision);
+ assert.equal(after.body!.slots.used,before);
+});
+
+test('Deletion clears completed character records across Millhand, Bellrunner and Stitcher',async()=>{
+ const cases=[
+  {origin:'Millhand',combat:'player_character_flint_combat',
+   receipts:'player_character_flint_combat_receipts',columns:',stance',values:",'brace'"},
+  {origin:'Bellrunner',combat:'player_character_dogman_combat',
+   receipts:'player_character_dogman_combat_receipts',
+   columns:',stance',values:",'defend'"},
+  {origin:'Stitcher',combat:'player_character_owler_combat',
+   receipts:'player_character_owler_combat_receipts',
+   columns:',preparation,branch',values:",'reason','notes'"}
+ ] as const;
+ for(const entry of cases){
+  const id=randomUUID(),name='Removal '+entry.origin+' '+id.slice(0,8);
+  await db.query(
+   "INSERT INTO player_characters(id,account_id,name,name_key,sex,origin,major_skill_bonuses,starter_item_requirements,starting_location,tutorial_stage,tutorial_status) "+
+   "VALUES($1,$2,$3,$4,'Female',$5,'{}'::jsonb,'[]'::jsonb,'Clinic',8,'COMPLETED')",
+   [id,owner,name,'removal-'+id,entry.origin]);
+  await db.query(
+   'INSERT INTO '+entry.combat+'(character_id,state'+entry.columns+
+   ") VALUES($1,$2::jsonb"+entry.values+')',[id,'{}']);
+  const field='response';
+  await db.query(
+   'INSERT INTO '+entry.receipts+'(character_id,request_id,request_hash,'+field+
+   ') VALUES($1,$2,$3,$4::jsonb)',[id,randomUUID(),'receipt','{}']);
+  if(entry.origin==='Bellrunner'){
+   await db.query(
+    'INSERT INTO player_character_bellrunner_dogman(character_id,state) VALUES($1,$2::jsonb)',
+    [id,'{}']);
+   await db.query(
+    'INSERT INTO player_character_bellrunner_dogman_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
+    [id,randomUUID(),'receipt','{}']);
+  }
+  if(entry.origin==='Stitcher'){
+   await db.query(
+    'INSERT INTO player_character_stitcher_ward(character_id,revision,state) VALUES($1,0,$2::jsonb)',
+    [id,'{}']);
+   await db.query(
+    'INSERT INTO player_character_stitcher_ward_receipts(character_id,request_id,request_hash,result) VALUES($1,$2,$3,$4::jsonb)',
+    [id,randomUUID(),'receipt','{}']);
+  }
+  await db.query(
+   'INSERT INTO player_character_clinic(character_id,revision,state) VALUES($1,0,$2::jsonb)',[id,'{}']);
+  await db.query(
+   'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',[id,'{}']);
+  await db.query(
+   'INSERT INTO player_character_journal(character_id,task_instance_id,task_id,stage,title,paragraphs,content_version) VALUES($1,$2,$3,8,$4,$5::jsonb,1)',
+   [id,'tutorial:stage:8','shared.rented-home','Rented Home',JSON.stringify(['Done'])]);
+  const before=await request('GET','/api/characters',owner);
+  const body={confirmedName:name,expectedRevision:before.body!.revision};
+  assert.equal((await request('DELETE',base+id,stranger,body)).status,404);
+  const removed=await request('DELETE',base+id,owner,body);
+  assert.equal(removed.status,200,entry.origin+': '+JSON.stringify(removed.body));
+  assert.equal(removed.body?.deleted,true);
+  assert.equal((await request('GET',base+id,owner)).status,404);
+  const dependentTables=[entry.combat,entry.receipts,
+   'player_character_clinic','player_character_tutorial_home','player_character_journal',
+   ...(entry.origin==='Stitcher'?[
+    'player_character_stitcher_ward','player_character_stitcher_ward_receipts'
+   ]:entry.origin==='Bellrunner'?[
+    'player_character_bellrunner_dogman','player_character_bellrunner_dogman_receipts'
+   ]:[])];
+  for(const table of dependentTables){
+   const found=await db.query<{remaining:string}>(
+    'SELECT COUNT(*)::text AS remaining FROM '+table+' WHERE character_id=$1',[id]);
+   assert.equal(Number(found.rows[0].remaining),0,entry.origin+' orphan in '+table);
+  }
+ }
+});

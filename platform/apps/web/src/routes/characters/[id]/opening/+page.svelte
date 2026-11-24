@@ -110,7 +110,7 @@
   onMount(() => {
     void (async () => {
       try {
-        const response = await fetch('/api/characters/' + encodeURIComponent(page.params.id), {cache: 'no-store'});
+        const response = await fetch('/api/characters/' + encodeURIComponent(page.params.id!), {cache: 'no-store'});
         if (response.status === 401) {status = 'login'; return;}
         if (response.status === 404) {status = 'missing'; return;}
         if (!response.ok) {status = 'unavailable'; return;}
@@ -252,7 +252,7 @@
       <p>Check that the local API and PostgreSQL are running.</p>
     {/if}
     <nav class="fallback-nav">
-      <a href={'/characters/' + page.params.id}>Character details</a>
+      <a href={'/characters/' + page.params.id!}>Character details</a>
       <a href="/characters">All characters</a>
     </nav>
   </main>

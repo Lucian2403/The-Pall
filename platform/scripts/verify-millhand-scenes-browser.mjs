@@ -384,7 +384,7 @@ try{
     {key:'bellHomeDone',id:'qa-scenes-bellrunner',origin:'Bellrunner',
       expected:'The condemned worksite remains closed'},
     {key:'stitcherHomeDone',id:'qa-scenes-stitcher',origin:'Stitcher',
-      expected:'Owler’s attempted transfer was stopped'}
+      expected:'You stopped Owler from taking him'}
   ];
   for(const chosen of completeCases){
     await open('/characters/'+chosen.id+'/home?qa='+chosen.key,

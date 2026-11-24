@@ -10,7 +10,7 @@
 
   // The exact same exit surface is used by Industry, Commerce, and Scholarship.
   // No future character, confrontation, or combat title appears before exiting.
-  const href=$derived('/characters/'+encodeURIComponent(page.params.id)+'/millhand/wage-claim');
+  const href=$derived('/characters/'+encodeURIComponent(page.params.id!)+'/millhand/wage-claim');
   const label=$derived(snapshot.state.branch==='restamp'?'Leave the depot'
     :snapshot.state.branch==='contracts'?'Leave the Contracts office':'Leave the records room');
   const exitAvailable=$derived(snapshot.stage===4&&

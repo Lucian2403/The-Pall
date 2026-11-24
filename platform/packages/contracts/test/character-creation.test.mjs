@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseCreateCharacterCommand, normalizeCharacterName, CHARACTER_ORIGINS, INITIAL_CHARACTER_SLOT_LIMIT} from '../dist/index.js';
+import {parseCreateCharacterCommand, normalizeCharacterName, CHARACTER_ORIGINS, PLAYABLE_CHARACTER_ORIGINS, isPlayableCharacterOrigin, INITIAL_CHARACTER_SLOT_LIMIT} from '../dist/index.js';
 
 const requestId = 'b3bc8b6f-b9c3-4f37-94eb-47b455c9a394';
 const input = (extra = {}) => ({requestId, expectedRevision: 0, name: 'Evelyn Soot', sex: 'Female', origin: 'Millhand', ...extra});
@@ -10,7 +10,7 @@ test('M1.2 policy exposes exactly six starting origins and six slots', () => {
   assert.equal(INITIAL_CHARACTER_SLOT_LIMIT, 6);
 });
 test('accepts valid origin/sex combinations and strips surrounding spaces', () => {
-  for (const origin of CHARACTER_ORIGINS) for (const sex of ['Male', 'Female']) {
+  for (const origin of PLAYABLE_CHARACTER_ORIGINS) for (const sex of ['Male', 'Female']) {
     const cmd = parseCreateCharacterCommand(input({origin, sex, name: '  Éloïse-Mary  '}));
     assert.equal(cmd.name, 'Éloïse-Mary');
     assert.equal(cmd.nameKey, 'éloïse-mary');
@@ -39,7 +39,7 @@ test('rejects missing, malformed, negative and fractional revisions', () => {
 });
 
 test('all six origins can select any one of eight shared portraits per sex',()=>{
-  for(const origin of CHARACTER_ORIGINS)for(const sex of ['Male','Female'])
+  for(const origin of PLAYABLE_CHARACTER_ORIGINS)for(const sex of ['Male','Female'])
     for(let i=1;i<=8;i++){
       const avatarId=sex.toLowerCase()+'-'+String(i).padStart(2,'0');
       assert.equal(parseCreateCharacterCommand(input({origin,sex,avatarId})).avatarId,avatarId);
@@ -50,4 +50,12 @@ test('rejects cross-sex, out-of-library and injected avatar IDs',()=>{
     assert.throws(()=>parseCreateCharacterCommand(input({avatarId})),/invalid_avatar/);
   assert.throws(()=>parseCreateCharacterCommand(input({sex:'Male',avatarId:'female-01'})),/invalid_avatar/);
   assert.equal(parseCreateCharacterCommand(input()).avatarId,null);
+});
+
+test('all six lore backgrounds remain visible; only three accept character creation',()=>{
+ assert.deepEqual(PLAYABLE_CHARACTER_ORIGINS,['Millhand','Bellrunner','Stitcher']);
+ for(const origin of CHARACTER_ORIGINS){
+  if(isPlayableCharacterOrigin(origin))assert.equal(parseCreateCharacterCommand(input({origin})).origin,origin);
+  else assert.throws(()=>parseCreateCharacterCommand(input({origin})),/origin_coming_soon/,origin);
+ }
 });

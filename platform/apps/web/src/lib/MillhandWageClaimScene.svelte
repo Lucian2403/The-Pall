@@ -24,20 +24,20 @@
     snapshot:Snapshot;pending:boolean;errorMessage:string;
     perform:(action:WageClaimAction)=>Promise<void>;
   }=$props();
-  const state=$derived(snapshot.state);
-  const approaching=$derived(state.phase==='APPROACHING');
-  const beat=$derived(wageClaimBeat(state));
-  const journal=$derived(wageClaimJournal(state));
-  const offered=$derived(!approaching&&state.phase!=='OPENING');
+  const sceneState=$derived(snapshot.state);
+  const approaching=$derived(sceneState.phase==='APPROACHING');
+  const beat=$derived(wageClaimBeat(sceneState));
+  const journal=$derived(wageClaimJournal(sceneState));
+  const offered=$derived(!approaching&&sceneState.phase!=='OPENING');
   // Compute Back availability from saved position. This stays visible even
   // during a stale local API build that omits the previous_dialogue action,
   // so the user receives a clear server error instead of a dead button.
-  const canGoBack=$derived(state.phase!=='APPROACHING');
-  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','CHOOSE_STANCE'].includes(state.phase));
+  const canGoBack=$derived(sceneState.phase!=='APPROACHING');
+  const atChoice=$derived(['CHOOSE_APPROACH','CHOOSE_EVIDENCE','CHOOSE_STANCE'].includes(sceneState.phase));
   const forwardActions=$derived(snapshot.availableActions.filter(a=>a!=='previous_dialogue'));
   let flintImageMissing=$state(false);
   const cornered=$derived(
-    state.phase==='CORNERED_EXCHANGE'||state.phase==='CHOOSE_STANCE'||state.phase==='DONE');
+    sceneState.phase==='CORNERED_EXCHANGE'||sceneState.phase==='CHOOSE_STANCE'||sceneState.phase==='DONE');
   let inspected=$state<'bill'|'club'|'cart'|null>(null);
   let inspectionNote=$state('');
   // The persistent corner control is owned by TutorialShell, not this dialogue.
@@ -51,7 +51,7 @@
     if(pending)return;
     inspected=which;
     if(which==='bill'){
-      if(state.phase==='CHOOSE_APPROACH'&&snapshot.availableActions.includes('read_demand')){
+      if(sceneState.phase==='CHOOSE_APPROACH'&&snapshot.availableActions.includes('read_demand')){
         inspectionNote='';
         void perform('read_demand');
         return;
@@ -111,7 +111,7 @@
   <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label={approaching?'Journey home narration':'Flint dialogue and confrontation'}>
       <p class="eyebrow">{approaching?'ON THE WAY HOME':cornered?'CORNERED':'THE WAGE CLAIM'} · STAGE 5</p>
-      {#if state.phase==='OPENING'}
+      {#if sceneState.phase==='OPENING'}
         <p class="context">{WAGE_CLAIM_OPENING}</p>
       {/if}
       {#if beat}
@@ -122,21 +122,21 @@
           <p class="speech">“{beat.text}”</p>
         {/if}
       {:else if approaching}
-        <p class="context current-beat">{WAGE_CLAIM_WALK_HOME[state.branch]}</p>
-      {:else if state.phase==='LEAVING'}
+        <p class="context current-beat">{WAGE_CLAIM_WALK_HOME[sceneState.branch]}</p>
+      {:else if sceneState.phase==='LEAVING'}
         <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
         <p class="speech">“I'm going home.”</p>
-      {:else if state.phase==='CHOOSE_STANCE'}
+      {:else if sceneState.phase==='CHOOSE_STANCE'}
         <p class="context">You have to choose how to meet him. Flint is close enough to strike if you try to push past.</p>
-        <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
-      {:else if state.phase==='DONE' && state.stance}
-        <p class="context">{WAGE_CLAIM_STANCE_OUTCOMES[state.stance]}</p>
+        <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[sceneState.phase]}</p>
+      {:else if sceneState.phase==='DONE' && sceneState.stance}
+        <p class="context">{WAGE_CLAIM_STANCE_OUTCOMES[sceneState.stance]}</p>
         <p class="instruction">Your position is saved. The encounter begins in Stage 6.</p>
         {#if snapshot.stage===6}
-          <a class="pall-framed-button combat-link primary-choice" href={'/characters/'+encodeURIComponent(page.params.id)+'/millhand/combat'}>Enter the fight</a>
+          <a class="pall-framed-button combat-link primary-choice" href={'/characters/'+encodeURIComponent(page.params.id!)+'/millhand/combat'}>Enter the fight</a>
         {/if}
       {:else}
-        <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[state.phase]}</p>
+        <p class="instruction">{WAGE_CLAIM_INSTRUCTIONS[sceneState.phase]}</p>
       {/if}
 
       {#if inspectionNote}

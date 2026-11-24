@@ -14,7 +14,7 @@
   };
   type Roster={revision:number;slots:{used:number;limit:number};characters:Character[]};
   let roster=$state<Roster|null>(null);
-  let state=$state<'checking'|'ready'|'login'|'unavailable'>('checking');
+  let rosterStatus=$state<'checking'|'ready'|'login'|'unavailable'>('checking');
   let editingId=$state<string|null>(null);
   let draftAvatarId=$state<string|null>(null);
   let deletingId=$state<string|null>(null);
@@ -24,11 +24,11 @@
   async function refresh(){
     try{
       const res=await fetch('/api/characters',{cache:'no-store'});
-      if(res.status===401){state='login';return;}
-      if(!res.ok){state='unavailable';return;}
+      if(res.status===401){rosterStatus='login';return;}
+      if(!res.ok){rosterStatus='unavailable';return;}
       roster=await res.json() as Roster;
-      state='ready';
-    }catch{state='unavailable';}
+      rosterStatus='ready';
+    }catch{rosterStatus='unavailable';}
   }
   onMount(()=>{void refresh();});
   async function changePortrait(character:Character,id:string){
@@ -86,11 +86,11 @@
       </header>
     </div>
     <main class="entry-content characters-content">
-      {#if state==='checking'}
+      {#if rosterStatus==='checking'}
         <div class="roster-notice"><p role="status">Loading your characters…</p></div>
-      {:else if state==='login'}
+      {:else if rosterStatus==='login'}
         <div class="roster-notice"><p>Sign in to view your characters.</p><a class="entry-button" href="/account">Account access</a></div>
-      {:else if state==='unavailable'||!roster}
+      {:else if rosterStatus==='unavailable'||!roster}
         <div class="roster-notice"><p role="alert">The character service is unavailable. Check the API and database.</p></div>
       {:else}
         <div class="roster-head">

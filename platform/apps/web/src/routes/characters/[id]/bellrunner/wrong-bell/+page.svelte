@@ -23,7 +23,7 @@
   type Character={id:string;name:string;origin:string;sex:string;coins:number;
     health:{current:number;maximum:number};startingLocation:string;
     tutorial:{stage:number;status:string}};
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
   let character=$state<Character|null>(null);
   let snapshot=$state<Snapshot|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'schema'|'not-ready'|'error'>('loading');

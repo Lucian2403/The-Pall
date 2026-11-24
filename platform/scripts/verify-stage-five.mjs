@@ -73,9 +73,9 @@ assert.ok(copy.includes('WAGE_CLAIM_WALK_HOME') &&
   canon.includes('Owner-approved presentation refinement — Walking home before Flint appears'),
   'All three introduction routes must respect the approved neutral arrival');
 assert.ok(scene.includes("{#if !approaching}") &&
-  scene.includes("WAGE_CLAIM_WALK_HOME[state.branch]") &&
+  scene.includes("WAGE_CLAIM_WALK_HOME[sceneState.branch]") &&
   scene.includes("{approaching?'ON THE WAY HOME'") &&
-  scene.includes('const canGoBack=$derived(state.phase!==\'APPROACHING\')') &&
+  scene.includes('const canGoBack=$derived(sceneState.phase!==\'APPROACHING\')') &&
   scene.includes("aria-label={approaching?'Journey home narration'"),
   'The intro must suppress Flint and his inspection label until Continue');
 assert.match(core,/initialWageClaim/);
@@ -111,7 +111,7 @@ assert.match(shell,/Review journal/);
 assert.ok(!scene.includes('Choose your response</p>\n        {/if}\n        <div') ||
   !scene.includes("'CHOOSE_EVIDENCE','LEAVING','CHOOSE_STANCE'"),
   'LEAVING must not be rendered as a one-option response choice');
-assert.ok(scene.includes("state.phase==='LEAVING'") &&
+assert.ok(scene.includes("sceneState.phase==='LEAVING'") &&
   scene.includes("“I'm going home.”") &&
   copy.includes("say_going_home:'Continue'") &&
   core.includes("dialogueIndex=action==='say_going_home'?1:0"),
@@ -123,7 +123,7 @@ assert.match(scene,/previous_dialogue/);
 assert.match(shell,/Back to Stage 5/);
 assert.match(scene,/atChoice/);
 assert.match(scene,/Choose your response/);
-assert.match(scene,/canGoBack=\$derived\(state\.phase!==/);
+assert.match(scene,/canGoBack=\$derived\(sceneState\.phase!==/);
 assert.match(route,/previousAllowed/);
 assert.match(route,/Previous Dialogue requires the updated Stage 5 API/);
 assert.match(scene,/Previous dialogue/);

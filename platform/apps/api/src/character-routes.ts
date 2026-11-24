@@ -255,23 +255,26 @@ export function registerCharacterRoutes(app:FastifyInstance,options:{
       if(character.rows[0].name!==confirmedName){
         await client.query('ROLLBACK');open=false;return reply.code(400).send({error:'confirmation_mismatch'});
       }
-      // Child rows have ON DELETE RESTRICT. Explicitly clear only this owned
-      // character's receipts and chapter states, then its creation receipts.
-      for(const table of [
-        'player_character_tutorial_home_receipts','player_character_tutorial_home',
-        'player_character_clinic_receipts','player_character_clinic',
-        'player_character_flint_combat_receipts','player_character_flint_combat',
-        'player_character_wage_claim_receipts','player_character_wage_claim',
-        'player_character_second_job_receipts','player_character_second_job',
-        'player_character_missing_stamp_receipts','player_character_missing_stamp',
-        'player_character_work_receipts','player_character_platework',
-        'player_character_bellrunner_second_job_receipts','player_character_bellrunner_second_job',
-        'player_character_bellrunner_wrong_bell_receipts','player_character_bellrunner_wrong_bell',
-        'player_character_bellrunner_dispatch_work_receipts','player_character_bellrunner_dispatch_receipts',
-        'player_character_bellrunner_dispatch',
-        'player_character_create_receipts'
-      ]){
-        await client.query('DELETE FROM '+table+' WHERE character_id=$1',[request.params.id]);
+      // Discover all character-owned records through their actual foreign keys,
+      // not a stale hand-maintained list of origin-specific tables. PostgreSQL
+      // quotes the identifiers; the user-supplied ID stays a bound parameter.
+      // Reject unknown FK layouts instead of leaving orphan records behind.
+      const dependents=await client.query<{table_name:string;column_name:string;relation:string}>(
+        `SELECT format('%I.%I',ns.nspname,cls.relname) AS table_name,
+                att.attname AS column_name,cls.relname AS relation
+         FROM pg_constraint fk
+         JOIN pg_class cls ON cls.oid=fk.conrelid
+         JOIN pg_namespace ns ON ns.oid=cls.relnamespace
+         LEFT JOIN pg_attribute att ON att.attrelid=cls.oid AND
+               array_length(fk.conkey,1)=1 AND att.attnum=fk.conkey[1]
+         WHERE fk.contype='f' AND fk.confrelid='player_characters'::regclass
+           AND ns.nspname=current_schema()
+         ORDER BY cls.relname`
+      );
+      for(const row of dependents.rows){
+        if(row.column_name!=='character_id'||!row.relation.startsWith('player_character_'))
+          throw Error('unsupported_character_dependent_table');
+        await client.query('DELETE FROM '+row.table_name+' WHERE character_id=$1',[request.params.id]);
       }
       const removed=await client.query('DELETE FROM player_characters WHERE id=$1 AND account_id=$2',[request.params.id,session.user.id]);
       if(removed.rowCount!==1)throw Error('character_delete_race');

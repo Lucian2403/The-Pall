@@ -37,24 +37,24 @@
     perform: (action: SecondJobAction) => Promise<void>;
   } = $props();
 
-  const state = $derived(snapshot.state);
+  const sceneState = $derived(snapshot.state);
   // Leave is rendered by the shared location exit, not in the work-action list.
   const workActions = $derived(snapshot.availableActions.filter(action=>action!=='leave_location'));
-  const speaking = $derived(state.phase === "CONTRACTS_DIALOGUE");
+  const speaking = $derived(sceneState.phase === "CONTRACTS_DIALOGUE");
   const beat = $derived(
-    speaking ? STAGE_FOUR_DIALOGUE.contracts[state.dialogueIndex] : null,
+    speaking ? STAGE_FOUR_DIALOGUE.contracts[sceneState.dialogueIndex] : null,
   );
   const result = $derived(
-    state.lastAction ? STAGE_FOUR_OUTCOMES[state.lastAction] : null,
+    sceneState.lastAction ? STAGE_FOUR_OUTCOMES[sceneState.lastAction] : null,
   );
   const instruction = $derived(
-    state.phase === "EXAMINE_PAPER"
+    sceneState.phase === "EXAMINE_PAPER"
       ? "You have the disputed work paper. Check the register on the counter."
-      : state.phase === "COMPARE_RECORDS"
+      : sceneState.phase === "COMPARE_RECORDS"
         ? "Compare the second book with what you have just examined."
-        : STAGE_FOUR_INSTRUCTIONS[state.phase],
+        : STAGE_FOUR_INSTRUCTIONS[sceneState.phase],
   );
-  const journal = $derived(secondJobJournal(state));
+  const journal = $derived(secondJobJournal(sceneState));
 
   // Only two owner-supplied physical props. The approved compensation/charge
   // comparison remains in the dialogue, not painted onto these book images.
@@ -72,7 +72,7 @@
   function inspect(which: "death" | "wage") {
     if (pending) return;
     inspected = which;
-    if (state.phase === "EXAMINE_PAPER") {
+    if (sceneState.phase === "EXAMINE_PAPER") {
       if (
         which === "death" &&
         snapshot.availableActions.includes("examine_work_paper")
@@ -85,7 +85,7 @@
       }
       return;
     }
-    if (state.phase === "COMPARE_RECORDS") {
+    if (sceneState.phase === "COMPARE_RECORDS") {
       if (
         which === "wage" &&
         snapshot.availableActions.includes("compare_official_records")
@@ -166,10 +166,10 @@
   <div class="reading-column pall-story-dialogue-section">
     <aside class="work-dialogue" aria-label="Contracts office interaction">
       <p class="eyebrow">DISPUTED DOCKET · STAGE 4</p>
-      {#if state.revision === 0}
+      {#if sceneState.revision === 0}
         <p class="context">{STAGE_FOUR_ROUTES.contracts.entry}</p>
       {/if}
-      {#if (state.phase === "DONE" || state.phase === "EXITED")}
+      {#if (sceneState.phase === "DONE" || sceneState.phase === "EXITED")}
         <p class="outcome">{STAGE_FOUR_FINAL.contracts}</p>
         <StageFourNextStep {snapshot} {pending} {perform} />
       {:else if speaking && beat}
@@ -184,7 +184,7 @@
         {#if result !== instruction}
           <p class="instruction">{instruction}</p>
         {/if}
-        {#if state.phase === "SPEAK_CONTRACTS" || state.phase === "CHOOSE_CHALLENGE"}
+        {#if sceneState.phase === "SPEAK_CONTRACTS" || sceneState.phase === "CHOOSE_CHALLENGE"}
           <p class="context">Dead in one record, working in the other.</p>
         {/if}
       {/if}
@@ -198,7 +198,7 @@
         </div>
       {/if}
 
-      {#if state.phase === "EXAMINE_PAPER" || state.phase === "COMPARE_RECORDS"}
+      {#if sceneState.phase === "EXAMINE_PAPER" || sceneState.phase === "COMPARE_RECORDS"}
         <p class="prop-hint">Select a book on the counter to examine it.</p>
       {:else if workActions.length > 0}
         <div class="actions" aria-label="Available Contracts actions">

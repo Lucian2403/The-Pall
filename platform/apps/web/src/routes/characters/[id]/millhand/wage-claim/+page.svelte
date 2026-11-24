@@ -25,7 +25,7 @@
   let backStageError=$state('');
   let retryId:string|null=null;
   let retrySignature:string|null=null;
-  const id=$derived(page.params.id);
+  const id=$derived(page.params.id!);
 
   async function refresh(){
     try{
