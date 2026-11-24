@@ -3117,7 +3117,7 @@ test('Creation rejects unfinished backgrounds without changing the roster',async
 test('Deletion clears completed character records across Millhand, Bellrunner and Stitcher',async()=>{
  const cases=[
   {origin:'Millhand',combat:'player_character_flint_combat',
-   receipts:'player_character_flint_combat_receipts',columns:'',values:''},
+   receipts:'player_character_flint_combat_receipts',columns:',stance',values:",'brace'"},
   {origin:'Bellrunner',combat:'player_character_dogman_combat',
    receipts:'player_character_dogman_combat_receipts',
    columns:',stance',values:",'defend'"},
@@ -3134,7 +3134,7 @@ test('Deletion clears completed character records across Millhand, Bellrunner an
   await db.query(
    'INSERT INTO '+entry.combat+'(character_id,state'+entry.columns+
    ") VALUES($1,$2::jsonb"+entry.values+')',[id,'{}']);
-  const field=entry.origin==='Millhand'?'result':'response';
+  const field='response';
   await db.query(
    'INSERT INTO '+entry.receipts+'(character_id,request_id,request_hash,'+field+
    ') VALUES($1,$2,$3,$4::jsonb)',[id,randomUUID(),'receipt','{}']);
