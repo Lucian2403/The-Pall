@@ -7,7 +7,7 @@ import type {FinaleOrigin} from './shared-finale-origins.js';
 const COMPLETION_SUMMARIES:Record<FinaleOrigin,string>={
  Millhand:'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.',
  Bellrunner:'The condemned worksite remains closed, and your local findings have not been resolved.',
- Stitcher:'The patient remains in the ward under the staff’s care. Owler’s attempted transfer was stopped, but the school may still demand an explanation.'
+ Stitcher:'The patient remains in the ward under the staff’s care. You stopped Owler from taking him, but the school may still demand an explanation.'
 };
 export function homeCompletionSummary(origin:FinaleOrigin):string{
  return COMPLETION_SUMMARIES[origin];
