@@ -61,7 +61,7 @@ export async function backfillCharacterJournal(
   const dogman=await savedState<CombatState>(client,'player_character_dogman_combat',id);
   if(dogman?.status==='finished')await archiveJournalTask(client,combatTask(id,'dogman',dogman));
  }
- if(character.origin==='Millhand'||character.origin==='Bellrunner'){
+ if(character.origin==='Millhand'||character.origin==='Bellrunner'||character.origin==='Stitcher'){
   const clinic=await savedState<ClinicState>(client,'player_character_clinic',id);
   if(clinic?.phase==='LEFT'&&clinic.paid)
    await archiveJournalTask(client,clinicTask(id,character.origin,clinic));

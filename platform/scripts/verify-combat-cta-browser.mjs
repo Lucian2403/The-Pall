@@ -120,7 +120,7 @@ try{
   }
   async function position(){
     return evaluate(`(()=>{
-      const link=document.querySelector('a.clinic-link');
+      const link=document.querySelector('a.clinic-transition');
       if(!link)return null;
       link.scrollIntoView({block:'center',inline:'center',behavior:'instant'});
       const r=link.getBoundingClientRect();
@@ -169,7 +169,7 @@ try{
     });
     await until(async()=>{
       const hover=await evaluate(
-        "getComputedStyle(document.querySelector('a.clinic-link')).borderImageSource"
+        "getComputedStyle(document.querySelector('a.clinic-transition')).borderImageSource"
       );
       return hover?.includes('button-hover-trim.png');
     },3000,outcome+' hover frame');
@@ -183,7 +183,7 @@ try{
       });
     }else{
       // The same native link must remain keyboard navigable.
-      await evaluate("document.querySelector('a.clinic-link').focus()");
+      await evaluate("document.querySelector('a.clinic-transition').focus()");
       await command('Input.dispatchKeyEvent',{
         type:'keyDown',key:'Enter',code:'Enter',
         windowsVirtualKeyCode:13,nativeVirtualKeyCode:13

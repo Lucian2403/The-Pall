@@ -2,6 +2,8 @@
   import {getContext} from 'svelte';
 
   import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
+  import CombatClinicContinuation from '$lib/CombatClinicContinuation.svelte';
+  import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
@@ -11,9 +13,10 @@
   import ActivityLayout from '$lib/ActivityLayout.svelte';
   import '$lib/pall-story-landscape.css';
 
-  let {snapshot, feedback, pending, errorMessage, perform, characterId}: {
+  let {snapshot, feedback, pending, errorMessage, perform, characterId, origin}: {
     snapshot: CombatSnapshot;
     characterId: string;
+    origin: FinaleOrigin;
     feedback: CombatFloatingFeedback[];
     pending: boolean;
     errorMessage: string;
@@ -208,16 +211,7 @@
             <p class="outcome">You defeated Dogman.</p>
             <p>{resultText}</p>
           {/if}
-          <!-- Share the EXACT nine-slice primary-choice art used by Millhand
-               and Bellrunner narrative actions; no bespoke dark rectangle. -->
-          <div class="pall-story-dialogue-section combat-outcome-actions">
-            <div class="actions">
-              <a class="pall-framed-button primary-choice clinic-transition"
-                href={'/characters/'+encodeURIComponent(characterId)+'/bellrunner/clinic'}>
-                Continue to the city clinic
-              </a>
-            </div>
-          </div>
+          <CombatClinicContinuation {characterId} {origin}/>
         {:else}
           <p class="telegraph-title">DOGMAN'S OBSERVABLE INTENTION</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -528,8 +522,6 @@
   .parchment .stance{font-style:italic;font-size:14px}
   .parchment .position{font-size:12px;color:#604531}
   .parchment .outcome{font-weight:700}
-  .parchment .combat-outcome-actions{margin-top:16px}
-  .parchment .combat-outcome-actions .actions{width:100%}
   /* Defeat is a full narrated scene. Give it the width, ink contrast and
      readable type that the shorter victory outcome does not need. */
   .alley.defeat{min-height:clamp(665px,55vw,790px)}
@@ -728,7 +720,6 @@
     .player-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .player-status .resource+.resource{border-left:0;padding-left:0}
   }
-  .clinic-link{position:relative;z-index:1;max-width:100%;margin:12px 0 1px;pointer-events:auto}
   /* Transient hit/miss overlays are anchored to the target, never to a guessed
      attack roll. Actual damage comes from the committed combat Chronicle. */
   .combat-float{position:absolute;z-index:6;top:29%;left:52%;

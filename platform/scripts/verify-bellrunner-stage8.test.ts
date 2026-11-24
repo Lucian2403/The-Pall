@@ -65,7 +65,7 @@ test('Bellrunner Stage VIII retains home artwork and uses the shared character-s
  const home=read('apps/web/src/lib/CharacterHome.svelte');
  const rewind=read('apps/api/src/millhand-stage-rewind-routes.ts');
  const shell=read('apps/web/src/lib/TutorialShell.svelte');
- assert.ok(api.includes("!['Millhand','Bellrunner'].includes(c.origin)"));
+ assert.ok(api.includes('!isFinaleOrigin(c.origin)'));
  assert.ok(api.includes('player_character_bellrunner_wrong_bell'));
  assert.ok(api.includes('player_character_bellrunner_second_job'));
  assert.ok(api.includes("chosen?.phase!=='committed'||second?.phase!=='exited'"));
@@ -73,13 +73,13 @@ test('Bellrunner Stage VIII retains home artwork and uses the shared character-s
  assert.ok(api.includes('player_character_tutorial_home_receipts'));
  assert.ok(clinic.includes("if(action==='leave'&&result.phase==='LEFT')"));
  assert.ok(clinic.includes("await goto('/characters/'+encodeURIComponent(id)+'/home')"));
- assert.ok(home.includes("character.origin==='Bellrunner'&&character.tutorial.stage===8"));
+ assert.ok(home.includes('isFinaleOrigin(character.origin)&&character.tutorial.stage===8'));
  assert.ok(web.includes("url('/locations/home/rented-room.webp')"));
  assert.ok(web.includes('src="/locations/home/notice.webp"'));
- assert.ok(web.includes("home.origin==='Bellrunner'?'Bellrunner opening complete.'"));
- assert.ok(web.includes("homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner')"));
+ assert.ok(web.includes("home.origin+' opening complete.'"));
+ assert.ok(web.includes('homeJournalEntries(home.origin,home.phase,home.rent)'));
  assert.ok(read('apps/web/src/lib/home-journal-copy.ts').includes("origin==='Bellrunner'"));
- assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]"));
+ assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:currentJournalEntries"));
  assert.ok(web.includes("journalController={{open:journalOpen"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(shell.includes('character.id'));
@@ -92,6 +92,6 @@ test('Bellrunner Stage VIII retains home artwork and uses the shared character-s
  assert.ok(rewind.includes("const homeExists=await client.query("));
  assert.ok(rewind.includes("if(stage===8)"));
  assert.ok(rewind.includes("return {enabled:true,canRewind:!!canRewind,stage,targetStage:canRewind?7:null}"));
- assert.ok(rewind.includes("(bellrunner?'bellrunner':'millhand')+'/clinic'"));
+ assert.ok(rewind.includes("clinicHref(req.params.id,isFinaleOrigin(c.rows[0].origin)"));
  assert.ok(shell.includes("rewindTargetStage===6"));
 });

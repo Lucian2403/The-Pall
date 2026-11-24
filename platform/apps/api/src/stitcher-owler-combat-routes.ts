@@ -79,6 +79,13 @@ function readyPreparation(claim:Claim|undefined):OwlerPreparation|null{
   const chosen=st.stage5Preparation;
   return chosen==='reason'||chosen==='cart'||chosen==='brace'?chosen:null;
 }
+/** Stage VII → VI rewind intentionally leaves the witnessed preparation intact
+ * while removing the Owler record. Only that unstarted Stage VI state may
+ * initialize the same encounter again; an active/completed missing record fails closed. */
+function canInitializeCombat(character:Character):boolean{
+  return character.tutorial_stage===5||
+    (character.tutorial_stage===6&&character.tutorial_status==='NOT_STARTED');
+}
 function snapshot(record:CombatRecord){
   const viewStance=record.preparation==='reason'?'moving'
     :record.preparation==='brace'?'brace':'cart';
@@ -124,7 +131,7 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
       const saved=await db.query<CombatRecord>(
         'SELECT state,history,preparation,branch,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1',[req.params.id]);
       if(!saved.rowCount){
-        if(c.rows[0].tutorial_stage!==5)return reply.code(409).send({error:'combat_not_found'});
+        if(!canInitializeCombat(c.rows[0]))return reply.code(409).send({error:'combat_not_found'});
         return {needsStart:true,stage:6};
       }
       if(saved.rows[0].preparation!==preparation||saved.rows[0].branch!==claim.rows[0].state.branch)
@@ -187,7 +194,7 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
       if(command.kind==='start'){
         if(saved.rowCount)record=saved.rows[0];
         else{
-          if(ch.tutorial_stage!==5){
+          if(!canInitializeCombat(ch)){
             await client.query('ROLLBACK');inTransaction=false;
             return reply.code(409).send({error:'combat_not_initialized'});
           }

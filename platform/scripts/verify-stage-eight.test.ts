@@ -4,6 +4,8 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import {initial,advance,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
+import {homeJournalEntries,homeCompletionSummary} from '../apps/web/src/lib/home-journal-copy.ts';
+import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
 const root=resolve(import.meta.dirname,'..');
 const source=(p:string)=>readFileSync(resolve(root,p),'utf8');
 
@@ -89,7 +91,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   shell.includes("'/home'"));
  assert.ok(clinic.includes('Travel Home</a>')&&
   clinic.includes("'/home'")&&
-  clinic.includes("next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home')")&&
+  clinic.includes("origin==='Stitcher'?'Leave the infirmary'")&&
   clinic.includes("if(action==='leave'&&result.phase==='LEFT')")&&
   clinic.includes("await goto('/characters/'+encodeURIComponent(id)+'/home')")&&
   clinic.includes("origin==='Millhand'"),
@@ -236,7 +238,7 @@ test('Back to Stage 7 reopens the paid clinic without touching combat, coins or 
    api.includes('DELETE FROM player_character_tutorial_home_receipts') &&
    api.includes('DELETE FROM player_character_tutorial_home WHERE character_id') &&
    api.includes("tutorial_stage=7,tutorial_status='IN_PROGRESS'") &&
-   api.includes("(bellrunner?'bellrunner':'millhand')+'/clinic'") &&
+   api.includes("clinicHref(req.params.id,isFinaleOrigin(c.rows[0].origin)") &&
    api.includes('coinDelta:0'),
    'Stage 8 back button should return to the paid clinic, not replay Flint');
  assert.ok(shell.includes("'← Back to Stage '+rewindTargetStage") &&
@@ -247,7 +249,7 @@ test('Saved Home journal is the selected character\'s shared reader',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
  const reader=source('apps/web/src/lib/PersonalJournal.svelte');
- assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]"));
+ assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:currentJournalEntries"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(reader.includes("encodeURIComponent(id)+'/journal"));
  assert.ok(!web.includes('id="home-journal"'));
@@ -267,4 +269,49 @@ test('Rented-room chest keeps its modal; Journal uses the shared reader',()=>{
  assert.ok(web.includes("journalController={{open:journalOpen"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
  assert.ok(!web.includes('class="journal" aria-label="Personal Journal"'));
+});
+
+test('Every implemented origin archives the same Stage VIII diary shown while playing',()=>{
+ for(const [origin,branch] of [
+   ['Millhand','restamp'],['Bellrunner','trauma'],['Stitcher','notes']
+ ] as const){
+   let state=initial(origin,branch,'player_victory');
+   const live=()=>homeJournalEntries(origin,state.phase,RENT);
+   assert.equal(live().length,1,'No rent detail leaks before reading the notice');
+   assert.ok(!live().join(' ').includes('150'));
+   state=advance(state,'read_notice');
+   assert.ok(live().join(' ').includes('150'));
+   state=advance(state,'put_down');
+   assert.ok(live().join(' ').includes('Home at last'));
+   state=advance(state,'finish');
+   const saved=homeTask('character-'+origin,state);
+   assert.equal(saved.taskId,'shared.rented-home');
+   assert.equal(saved.taskInstanceId,'tutorial:stage:8');
+   assert.deepEqual(saved.paragraphs,live());
+   assert.ok(origin!=='Stitcher'||saved.paragraphs.join(' ').includes('Owler'));
+   assert.equal(view(state,'Ada',10).closingSpeech,CLOSING_SPEECH);
+ }
+});
+
+test('Each supported finale uses its own Stage VIII completion prose',()=>{
+ const expected={
+  Millhand:'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.',
+  Bellrunner:'The condemned worksite remains closed, and your local findings have not been resolved.',
+  Stitcher:'The patient remains in the ward under the staff’s care. Owler’s attempted transfer was stopped, but the school may still demand an explanation.'
+ } as const;
+ const endings=Object.entries(expected);
+ for(const [origin,prose] of endings){
+  assert.equal(homeCompletionSummary(origin as keyof typeof expected),prose);
+  for(const [other,otherText] of endings){
+   if(other!==origin)assert.notEqual(prose,otherText,origin+' must not reuse '+other+' history');
+  }
+ }
+ const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ const copy=source('apps/web/src/lib/home-journal-copy.ts');
+ assert.ok(home.includes('homeCompletionSummary(home.origin)'),
+  'The shared completion screen reads its own persisted origin');
+ assert.ok(!home.includes('plate lot')&&!home.includes('condemned worksite')&&
+   !home.includes('Owler'), 'Story-dependent ending text belongs in a shared copy module');
+ assert.match(copy,/COMPLETION_SUMMARIES:Record<FinaleOrigin,string>/,
+  'Require an exhaustive map for every finale origin');
 });

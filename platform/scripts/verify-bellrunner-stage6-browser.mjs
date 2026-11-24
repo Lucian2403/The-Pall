@@ -209,7 +209,8 @@ try{
         assert.ok(data.parchmentBox.bottom<=data.arenaBox.bottom+3,
           'Defeat narrative parchment must remain in the illustrated stage: '+JSON.stringify(data));
       }
-      if(outcome==='victory'||outcome==='defeat')assert.ok(!data.body.includes('Continue to medical care'));
+      assert.equal(data.body.includes('Continue to medical care'),outcome!=='active',
+        'The common Clinic continuation appears only after the saved fight finishes');
       if(width===1280||width===1920)await screenshot('dogman-'+outcome+'-'+width);
     }
   }

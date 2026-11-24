@@ -8,6 +8,9 @@ import {
   clinicView,initialClinic,defaultTutorialDischarge
 } from '../apps/api/src/millhand-clinic-state.ts';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
+import {clinicJournalEntries} from '../apps/web/src/lib/clinic-journal-copy.ts';
+import {clinicTask} from '../apps/api/src/personal-journal-tasks.ts';
+import {clinicHref,FINALE_ORIGINS} from '../apps/web/src/lib/shared-finale-origins.ts';
 import {
   clinicianAssessment,clinicianDischarge,clinicianFatigue
 } from '../apps/web/src/lib/millhand-clinic-dialogue.ts';
@@ -225,13 +228,14 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
   assert.ok(!api.includes('UPDATE player_character_flint_combat'));
   assert.ok(!api.includes('ordinary_xp'));
   const journalCopy=source('apps/web/src/lib/clinic-journal-copy.ts');
-  assert.ok(web.includes('clinicJournal(origin,{'));
+  assert.ok(web.includes('clinicJournalEntries(origin,{'));
   assert.ok(journalCopy.includes("clinic.conditionType==='cut'"));
   assert.ok(web.includes('Examine condition'));
   assert.ok(web.includes('Review the price'));
   assert.ok(web.includes('Pay 10 coins'));
   assert.ok(clinician.includes('No injuries found. No treatment needed.'));
-  assert.ok(battle.includes('Continue to medical care'));
+  assert.ok(battle.includes('<CombatClinicContinuation {characterId} {origin}/>'));
+  assert.ok(source('apps/web/src/lib/CombatClinicContinuation.svelte').includes('Continue to medical care'));
   const shared=source('apps/web/src/lib/pall-owner-ui.css');
   const wage=source('apps/web/src/lib/MillhandWageClaimScene.svelte');
   assert.ok(web.includes('class="pall-framed-button advance primary-choice"'));
@@ -283,7 +287,74 @@ test('Web and API wire the clinic without altering original combat rules',()=>{
     shell.includes('rewindTargetStage') &&
     rewind.includes('if(expectedStage===7)') &&
     rewind.includes('if(expectedStage===8)') &&
-    web.includes("character={...character,tutorial:clinic.phase==='LEFT'"),
+    web.includes("tutorial:savedClinic.phase==='LEFT'"),
     'Stage 7 must safely rewind to a replayable Stage 6, reversing only committed clinic payment');
   assert.equal(CLINIC_FEE,10);
+});
+
+test('Shared Stage VII Journal is phase-aware and archives the exact character record',()=>{
+  for(const origin of ['Millhand','Bellrunner','Stitcher'] as const){
+    let visit=initialClinic(finished(50));
+    const read=()=>clinicJournalEntries(origin,{phase:visit.phase,paid:visit.paid,
+      outcome:visit.outcome,conditionType:classifyCondition(visit.before)});
+    assert.equal(read().length,1,'Arrival is recorded without invented examination/payment');
+    assert.ok(!read().join(' ').includes('costs ten coins'));
+    visit=advanceClinic(visit,'examine');
+    assert.ok(read().join(' ').includes('no injuries'),'Unhurt patients need no treatment');
+    visit=advanceClinic(visit,'speak');
+    assert.ok(!read().join(' ').includes('I paid ten coins'),'Never pre-record payment');
+    visit=advanceClinic(visit,'review_price');
+    assert.ok(read().join(' ').includes('costs ten coins'));
+    visit=advanceClinic(visit,'pay');
+    const paid=read();
+    assert.ok(paid.length>2 && paid.some(entry=>entry.includes('ten coins')));
+    visit=advanceClinic(visit,'leave');
+    const archive=clinicTask('character-'+origin,origin,visit);
+    assert.equal(archive.stage,7);
+    assert.equal(archive.taskInstanceId,'tutorial:stage:7');
+    assert.deepEqual(archive.paragraphs,read(),'Live and completed are one copy function');
+    assert.ok(origin!=='Stitcher'||archive.paragraphs.join(' ').includes('Owler'));
+  }
+});
+
+test('One background-independent Stage VI continuation serves every saved finale origin',()=>{
+  const control=source('apps/web/src/lib/CombatClinicContinuation.svelte');
+  const millhand=source('apps/web/src/lib/MillhandCombatScene.svelte');
+  const dogman=source('apps/web/src/lib/BellrunnerDogmanCombatScene.svelte');
+  const sharedTag='<CombatClinicContinuation {characterId} {origin}/>';
+  assert.ok(control.includes('href={clinicHref(characterId,origin)}'));
+  assert.ok(control.includes('Continue to medical care'));
+  assert.ok(control.includes('pointer-events:auto'));
+  for(const scene of [millhand,dogman]){
+    assert.equal(scene.split(sharedTag).length-1,1,'One continuation per finished scene');
+    assert.ok(scene.includes(sharedTag+'\n        {:else}'),
+      'The CTA must be outside outcome-specific conditions and inside finished combat');
+    assert.ok(!scene.includes('/millhand/clinic')&&!scene.includes('/bellrunner/clinic')&&
+      !scene.includes('/stitcher/clinic'),'Scene markup cannot hardcode origin routes');
+  }
+  for(const origin of Object.keys(FINALE_ORIGINS) as (keyof typeof FINALE_ORIGINS)[]){
+    const path=origin.toLowerCase();
+    const page=source('apps/web/src/routes/characters/[id]/'+path+'/combat/+page.svelte');
+    assert.ok(page.includes('origin={character.origin}'),
+      'The persisted character chooses the clinic for '+origin);
+    assert.equal(clinicHref('player id',origin),
+      '/characters/player%20id/'+FINALE_ORIGINS[origin].clinicPath);
+  }
+});
+
+test('Stitcher Stage VII presents arrival and clinician speech in two local steps',()=>{
+  const web=source('apps/web/src/lib/SharedTutorialClinic.svelte');
+  assert.ok(web.includes("origin==='Stitcher'?0:-1"),
+    'Stitcher arrival must have one local Continue before the examination');
+  assert.match(web, /\{:else if origin==='Stitcher'\}\s*\{#if arrivalIndex<0\}/);
+  assert.ok(web.includes('A clinician sees you come in and points to an examination chair.'));
+  assert.ok(web.includes('Owler tried to take one of the patients away. I stood in his way.'));
+  assert.ok(web.includes("{#if clinic.phase==='ARRIVAL'&&!arrivalAtEnd}"));
+  assert.ok(web.includes("action==='examine'&&!arrivalAtEnd"),
+    'Examination cannot begin before the presentation reaches its second step');
+  assert.ok(web.includes('onclick={advanceArrival}>Continue</button>'));
+  assert.ok(web.includes("if(clinic?.phase!=='ARRIVAL')arrivalIndex=-1;"),
+    'Leaving the arrival phase resets its local cursor');
+  assert.ok(web.includes('pricedDialogueIndex=0;arrivalIndex=-1;'),
+    'Switching character must not carry over the previous arrival step');
 });

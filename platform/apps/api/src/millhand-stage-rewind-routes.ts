@@ -10,6 +10,7 @@ import pg from 'pg';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import type {ClinicState} from './millhand-clinic-state.js';
 import {INITIAL_STITCHER,STITCHER_MAJOR,type StitcherState} from './stitcher-work.js';
+import {clinicHref,isFinaleOrigin} from '../../web/src/lib/shared-finale-origins.js';
 import {auth} from './auth.js';
 import {INITIAL_PLATEWORK,planMillhandRewind,MillhandRewindInvalid,previousWageClaim,WageClaimInvalidAction} from '@the-pall/game-core';
 import type {MissingStampBranch,WageClaimState} from '@the-pall/game-core';
@@ -44,6 +45,39 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
     if(!result.rowCount)return reply.code(404).send({error:'not_found'});
     const stage=result.rows[0].tutorial_stage;
     if(result.rows[0].origin==='Stitcher'){
+      if(stage===7||stage===8){
+        const visitRows=await db.query<{state:ClinicState}>(
+          'SELECT state FROM player_character_clinic WHERE character_id=$1',[req.params.id]);
+        const visit=visitRows.rows[0]?.state;
+        const homeRows=stage===8?await db.query<{state:{phase:string;origin:string;outcome:string}}>(
+          'SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[req.params.id]):null;
+        const savedHome=homeRows?.rows[0]?.state;
+        if(stage===8){
+          const canRewind=!!visit&&visit.phase==='LEFT'&&visit.paid===true&&
+            !!visit.after&&visit.after.hp===result.rows[0].current_health&&
+            (savedHome
+              ?savedHome.origin==='Stitcher'&&savedHome.outcome===visit.outcome&&
+                ((savedHome.phase==='COMPLETE'&&result.rows[0].tutorial_status==='COMPLETED')||
+                 (savedHome.phase!=='COMPLETE'&&result.rows[0].tutorial_status==='IN_PROGRESS'))
+              :result.rows[0].tutorial_status==='NOT_STARTED');
+          return {enabled:true,canRewind,stage,targetStage:canRewind?7:null};
+        }
+        const fightRows=await db.query<{state:CombatState;patient_safe:boolean;transfer_cancelled:boolean}>(
+          'SELECT state,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1',
+          [req.params.id]);
+        const fight=fightRows.rows[0];
+        const paid=visit?.paid===true;
+        const valid=!!visit&&!!fight&&fight.state.status==='finished'&&
+          fight.patient_safe&&fight.transfer_cancelled&&
+          visit.outcome===fight.state.outcome&&
+          visit.before.hp===fight.state.player.hp&&
+          visit.before.hpMax===fight.state.player.hpMax&&
+          visit.phase!=='LEFT'&&result.rows[0].tutorial_status==='IN_PROGRESS'&&
+          (paid
+            ?visit.phase==='PAID'&&visit.after?.hp===result.rows[0].current_health
+            :visit.after===null&&visit.before.hp===result.rows[0].current_health);
+        return {enabled:true,canRewind:!!valid,stage,targetStage:valid?6:null};
+      }
       if(stage===6){
         // Back to Stage 5 is the same local-only replay capability as the
         // other origin battles, not a link to an immutable old ward screen.
@@ -300,7 +334,80 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         return reply.code(409).send({error:'stale_stage',stage:c.rows[0].tutorial_stage});
       }
 
-      if(c.rows[0].origin==='Stitcher'){
+      if(c.rows[0].origin==='Stitcher'&&expectedStage!==8){
+        if(expectedStage===7){
+          // Local QA replay of Owler and the one paid/unpaid examination.
+          // Keep the patient's earlier witnessed refusal and stage 4 choice.
+          const ward=await client.query<{state:StitcherState}>(
+            'SELECT state FROM player_character_stitcher_ward WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          const before=ward.rows[0]?.state;
+          const visitRows=await client.query<{state:ClinicState}>(
+            'SELECT state FROM player_character_clinic WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          const combatRows=await client.query<{state:CombatState;preparation:string;branch:string;
+            patient_safe:boolean;transfer_cancelled:boolean}>(
+            'SELECT state,preparation,branch,patient_safe,transfer_cancelled FROM player_character_owler_combat WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          const visit=visitRows.rows[0]?.state;
+          const fight=combatRows.rows[0];
+          if(!before||before.stage!==5||before.phase!=='fight_ready'||
+            before.stage5Witnessed!==true||before.stage5Hold!==true||
+            !before.branch||!(before.branch in STITCHER_MAJOR)||
+            !['reason','cart','brace'].includes(before.stage5Preparation??'')||
+            !fight||fight.branch!==before.branch||fight.preparation!==before.stage5Preparation||
+            fight.state.status!=='finished'||!fight.patient_safe||!fight.transfer_cancelled||
+            !visit||visit.outcome!==fight.state.outcome||visit.phase==='LEFT'||
+            visit.before.hp!==fight.state.player.hp||
+            visit.before.hpMax!==fight.state.player.hpMax||
+            c.rows[0].tutorial_status!=='IN_PROGRESS'){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_clinic_state'});
+          }
+          const wasPaid=visit.paid===true;
+          if(wasPaid
+            ?visit.phase!=='PAID'||!visit.after||
+               visit.after.hp!==c.rows[0].current_health||
+               visit.after.hp!==c.rows[0].max_health
+            :visit.after!==null||c.rows[0].current_health!==fight.state.player.hp){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_clinic_health_state'});
+          }
+          const home=await client.query(
+            'SELECT 1 FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',
+            [req.params.id]);
+          if(home.rowCount){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_home_state'});
+          }
+          const started=await client.query<{response:{
+            revision:number;preparation:string;branch:string;player:{hp:number}
+          }}>(
+            "SELECT response FROM player_character_owler_combat_receipts WHERE character_id=$1 AND response->>'revision'='0' ORDER BY created_at ASC,request_id ASC LIMIT 1",
+            [req.params.id]);
+          const first=started.rows[0]?.response;
+          if(first?.revision!==0||first.preparation!==fight.preparation||
+            first.branch!==fight.branch||!Number.isSafeInteger(first.player?.hp)||
+            first.player.hp<=0||first.player.hp>c.rows[0].max_health){
+            await client.query('ROLLBACK');transaction=false;
+            return reply.code(409).send({error:'unsafe_combat_initial_health'});
+          }
+          await client.query('DELETE FROM player_character_clinic_receipts WHERE character_id=$1',
+            [req.params.id]);
+          await client.query('DELETE FROM player_character_clinic WHERE character_id=$1',
+            [req.params.id]);
+          await client.query('DELETE FROM player_character_owler_combat_receipts WHERE character_id=$1',
+            [req.params.id]);
+          await client.query('DELETE FROM player_character_owler_combat WHERE character_id=$1',
+            [req.params.id]);
+          await client.query(
+            "UPDATE player_characters SET tutorial_stage=6,tutorial_status='NOT_STARTED',current_health=$2,coins=coins+$3 WHERE id=$1",
+            [req.params.id,first.player.hp,wasPaid?10:0]);
+          await client.query('COMMIT');transaction=false;
+          return {stage:6,tutorialStatus:'NOT_STARTED',
+            route:'/characters/'+req.params.id+'/stitcher/combat',
+            coinDelta:wasPaid?10:0};
+        }
         if(expectedStage===6){
           // Atomically restore the pre-fight Health and the Stage V doorway
           // choice, removing the Owler fight and every replayable request ID.
@@ -576,9 +683,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           route:'/characters/'+req.params.id+'/bellrunner/second-job',coinDelta:0};
       }
       if(expectedStage===8){
-        // For Bellrunner, the final clinic screen can still show saved Stage
-        // VIII before home starts. Only a *saved home row* takes the shared
-        // Stage VIII -> VII path; otherwise the previous clinic rewind applies.
+        // Bellrunner retains its old final-clinic fallback until Home starts.
+        // All three playable origins share the safe Stage VIII -> VII rewind.
         const homeExists=await client.query(
           'SELECT 1 FROM player_character_tutorial_home WHERE character_id=$1',[req.params.id]);
         if(!bellrunner||homeExists.rowCount){
@@ -640,7 +746,8 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         await client.query('COMMIT');transaction=false;
         return {
           stage:7,tutorialStatus:'IN_PROGRESS',
-          route:'/characters/'+req.params.id+'/'+(bellrunner?'bellrunner':'millhand')+'/clinic',
+          route:clinicHref(req.params.id,isFinaleOrigin(c.rows[0].origin)
+             ?c.rows[0].origin:'Millhand'),
           coinDelta:0
         };
         }

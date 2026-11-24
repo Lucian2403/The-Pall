@@ -68,9 +68,16 @@ const bellHomeStart=homeState.initial('Bellrunner','machinery','player_victory')
 let bellHomeDone=bellHomeStart;
 for(const action of ['read_notice','put_down','finish'])
   bellHomeDone=homeState.advance(bellHomeDone,action);
+const completedHome=(origin,branch)=>{
+  let state=homeState.initial(origin,branch,'player_victory');
+  for(const action of ['read_notice','put_down','finish'])state=homeState.advance(state,action);
+  return homeState.view(state,'QA '+origin,10);
+};
 const fixtures={
   bellHome:homeState.view(bellHomeStart,'QA Bellrunner',10),
   bellHomeDone:homeState.view(bellHomeDone,'QA Bellrunner',10),
+  millHomeDone:completedHome('Millhand','restamp'),
+  stitcherHomeDone:completedHome('Stitcher','notes'),
   work:{stage:2,tutorialStatus:'IN_PROGRESS',work,availableActions:[...core.availableActions(work)],tutorialPayout:payout},
   stamp:{stage:3,tutorialStatus:'IN_PROGRESS',majorSkillBonuses:{},state:stamp,
     availableActions:[...core.availableMissingStampActions(stamp,evidence)],contentReady:true,
@@ -84,7 +91,9 @@ const fixtures={
   clinic:clinicState.clinicView(clinic,20),
   bellClinicDefeat:clinicState.clinicView(clinicState.initialClinic(dogmanDefeat),20),
   bellClinicVictory:clinicState.clinicView(clinicState.initialClinic(dogmanVictory),20),
-  bellClinicLeft:clinicState.clinicView(bellClinicLeft,10)
+  bellClinicLeft:clinicState.clinicView(bellClinicLeft,10),
+  stitcherClinicVictory:clinicState.clinicView(clinicState.initialClinic(dogmanVictory),20),
+  stitcherClinicDefeat:clinicState.clinicView(clinicState.initialClinic(dogmanDefeat),20)
 };
 assert.equal(depot.phase,'DEPOT_DIALOGUE','Depot fixture reaches the receiving counter');
 assert.equal(wage.phase,'CHOOSE_STANCE','Wage-claim fixture reaches the stance choice');
@@ -103,9 +112,13 @@ const scenes=[
   ['Bellrunner Stage 7 defeat','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicDefeat',7,'.clinic-dialogue','.clinic-scene',A],
   ['Bellrunner Stage 7 victory','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicVictory',7,'.clinic-dialogue','.clinic-scene',A],
   ['Bellrunner Stage 7 completed','/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicLeft',7,'.clinic-dialogue','.clinic-scene',A],
+  ['Stitcher Stage 7 victory','/characters/qa-scenes-stitcher/stitcher/clinic?qa=stitcherClinicVictory',7,'.clinic-dialogue','.clinic-scene',A],
+  ['Stitcher Stage 7 defeat','/characters/qa-scenes-stitcher/stitcher/clinic?qa=stitcherClinicDefeat',7,'.clinic-dialogue','.clinic-scene',A],
   ['Stage 8 home','/characters/qa-scenes-millhand/home',8,'.home-artwork','.home-scene',A],
   ['Bellrunner Stage 8 shared home','/characters/qa-scenes-bellrunner/home?qa=bellHome',8,'.home-artwork','.home-scene',A],
-  ['Bellrunner Stage 8 complete','/characters/qa-scenes-bellrunner/home?qa=bellHomeDone',8,'.home-artwork','.home-scene',A]
+  ['Bellrunner Stage 8 complete','/characters/qa-scenes-bellrunner/home?qa=bellHomeDone',8,'.home-artwork','.home-scene',A],
+  ['Millhand Stage 8 complete','/characters/qa-scenes-millhand/home?qa=millHomeDone',8,'.home-artwork','.home-scene',A],
+  ['Stitcher Stage 8 complete','/characters/qa-scenes-stitcher/home?qa=stitcherHomeDone',8,'.home-artwork','.home-scene',A]
 ];
 const sizes=[[1920,1080],[1280,720],[1024,768],[390,844]];
 
@@ -116,12 +129,13 @@ const stub=String.raw`(()=>{
   const path=location.pathname;
   const stage=path.endsWith('/opening')?1:path.endsWith('/millhand/work')?2:path.endsWith('/millhand/missing-stamp')?3
     :path.endsWith('/millhand/second-job')?4:path.endsWith('/millhand/wage-claim')?5
-    :path.endsWith('/millhand/clinic')||path.endsWith('/bellrunner/clinic')?7:path.endsWith('/home')?8:6;
+    :path.endsWith('/millhand/clinic')||path.endsWith('/bellrunner/clinic')||path.endsWith('/stitcher/clinic')?7:path.endsWith('/home')?8:6;
   const key=new URLSearchParams(location.search).get('qa');
   window.fetch=(input,options)=>{
     const route=new URL(typeof input==='string'?input:input.url,location.href).pathname;
     if(!route.startsWith('/api/characters/qa-scenes-millhand')&&
-       !route.startsWith('/api/characters/qa-scenes-bellrunner'))return original(input,options);
+       !route.startsWith('/api/characters/qa-scenes-bellrunner')&&
+       !route.startsWith('/api/characters/qa-scenes-stitcher'))return original(input,options);
     const method=options?.method||'GET';
     if(route==='/api/characters/qa-scenes-millhand')return Promise.resolve(json({character:{
       id:'qa-scenes-millhand',name:'QA Millhand',origin:'Millhand',sex:'Female',coins:20,avatarId:null,
@@ -133,6 +147,10 @@ const stub=String.raw`(()=>{
       id:'qa-scenes-bellrunner',name:'QA Bellrunner',origin:'Bellrunner',sex:'Female',coins:20,
       welcomeSeen:true,startingLocation:'Dispatch House',health:{current:0,maximum:50},
       tutorial:{stage:stage===8?8:7,status:key==='bellHomeDone'?'COMPLETED':'IN_PROGRESS'}}}));
+    if(route==='/api/characters/qa-scenes-stitcher')return Promise.resolve(json({character:{
+      id:'qa-scenes-stitcher',name:'QA Stitcher',origin:'Stitcher',sex:'Female',coins:20,
+      welcomeSeen:true,startingLocation:'Cinder Row Infirmary',health:{current:0,maximum:50},
+      tutorial:{stage,status:stage===8?'COMPLETED':'IN_PROGRESS'}}}));
     if(route.endsWith('/journal')){
       const bellrunner=route.includes('qa-scenes-bellrunner');
       return Promise.resolve(json({
@@ -161,7 +179,8 @@ const stub=String.raw`(()=>{
       return Promise.resolve(json({error:'qa_stub_no_write'},503));
     }
     if(route.endsWith('/tutorial/home')){
-      if(key?.startsWith('bellHome'))return Promise.resolve(json(fx[key]));
+      if(key?.startsWith('bellHome')||key==='millHomeDone'||key==='stitcherHomeDone')
+        return Promise.resolve(json(fx[key]));
       return Promise.resolve(json({stage:8,revision:0,phase:'HOME',
        homeId:'qa-home',origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Millhand',
        coins:10,rent:150,shortfall:140,noticeTitle:'Notice',noticeText:'Rent is due.',closingSpeech:'Right.',
@@ -174,7 +193,7 @@ const stub=String.raw`(()=>{
           maxWeightKg:20,inventorySlots:12,maxVolumeL:30}}));
     }
     if(key&&fx[key]&&(/\/millhand\/(work|missing-stamp|second-job|wage-claim|clinic)$/.test(route)
-      ||/\/bellrunner\/clinic$/.test(route)))
+      ||/\/bellrunner\/clinic$/.test(route)||/\/stitcher\/clinic$/.test(route)))
       return Promise.resolve(json(fx[key]));
     return Promise.resolve(json({error:'unavailable'},404));
   };
@@ -358,6 +377,61 @@ try{
   }
   console.log('PASS: Bellrunner Stage VIII uses same rented room with Back to Stage VII and one chosen journal finding.');
   
+  // The final frame is one common component, with origin-specific endings.
+  const completeCases=[
+    {key:'millHomeDone',id:'qa-scenes-millhand',origin:'Millhand',
+      expected:'The council has not paid for the plate lot.'},
+    {key:'bellHomeDone',id:'qa-scenes-bellrunner',origin:'Bellrunner',
+      expected:'The condemned worksite remains closed'},
+    {key:'stitcherHomeDone',id:'qa-scenes-stitcher',origin:'Stitcher',
+      expected:'Owler’s attempted transfer was stopped'}
+  ];
+  for(const chosen of completeCases){
+    await open('/characters/'+chosen.id+'/home?qa='+chosen.key,
+      1280,720,'.home-dialogue.completion');
+    const copy=await evalJS("document.querySelector('.home-dialogue.completion')?.innerText");
+    assert.ok(copy.includes(chosen.origin+' opening complete.'),copy);
+    assert.ok(copy.includes(chosen.expected),copy);
+    for(const other of completeCases){
+      if(other.origin!==chosen.origin)assert.ok(!copy.includes(other.expected),
+        chosen.origin+' displayed '+other.origin+' ending: '+copy);
+    }
+    assert.match(copy,/10 coins remaining. Rent notice: 150 coins./);
+  }
+  console.log('PASS: Stage VIII shows the correct ending for Millhand, Bellrunner and Stitcher.');
+
+  // Stitcher's arrival is two panels. Continue is local; only Examine posts.
+  for(const outcome of ['Victory','Defeat']){
+    await open('/characters/qa-scenes-stitcher/stitcher/clinic?qa=stitcherClinic'+outcome,
+      1280,720,'.clinic-dialogue');
+    const first=await evalJS("document.querySelector('.clinic-dialogue')?.innerText");
+    assert.match(first,outcome==='Victory'
+      ?/You return to the infirmary after the fight with Owler/
+      :/An unnamed ward worker helps you into the ordinary treatment area/);
+    assert.match(first,/A clinician sees you come in and points to an examination chair/);
+    assert.doesNotMatch(first,/Come on, sit down|Owler tried to take one of the patients away/);
+    assert.match(await evalJS("document.querySelector('.clinic-dialogue .actions button')?.textContent"),/Continue/);
+    assert.equal(await evalJS("window.__pallPosts?.length??0"),0);
+    await evalJS("document.querySelector('.clinic-dialogue .actions button').click()");
+    await until(()=>evalJS(
+      "document.querySelector('.clinic-dialogue')?.innerText.includes('Owler tried to take one of the patients away')"),
+      4500,'Stitcher clinician conversation after Continue');
+    const second=await evalJS("document.querySelector('.clinic-dialogue')?.innerText");
+    assert.match(second,/Come on, sit down. What happened out there/);
+    assert.match(second,/Owler tried to take one of the patients away. I stood in his way/);
+    assert.match(second,/I see. Well, let's have a look at you/);
+    assert.doesNotMatch(second,/A clinician sees you come in and points to an examination chair/);
+    assert.match(await evalJS("document.querySelector('.clinic-dialogue .actions button')?.textContent"),/Examine condition/);
+    assert.equal(await evalJS("window.__pallPosts?.length??0"),0,
+      'Continue must not mutate persisted clinic state');
+    await evalJS("document.querySelector('.clinic-dialogue .actions button').click()");
+    const posts=await until(()=>evalJS("window.__pallPosts"),4000,'Stitcher examination command');
+    assert.equal(posts.length,1);
+    assert.equal(posts[0].action,'examine');
+    await shot('stitcher-clinic-dialogue-step-2-'+outcome.toLowerCase());
+  }
+  console.log('PASS: Stitcher Stage VII separates arrival and clinician dialogue, preserving one saved examination.');
+
   // The Bellrunner arrival is real Svelte dialogue, not a static screenshot.
   // Both outcomes must begin AT the clinic, not repeat Dogman's escape.
   await open('/characters/qa-scenes-bellrunner/bellrunner/clinic?qa=bellClinicDefeat',

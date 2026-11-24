@@ -2,6 +2,7 @@
   import {onMount} from 'svelte';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import {originVisual} from '$lib/origin-visuals';
+  import {isFinaleOrigin,clinicHref} from '$lib/shared-finale-origins';
   import CharacterSkills from '$lib/CharacterSkills.svelte';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
 
@@ -64,17 +65,25 @@
       label:'Continue the Dogman encounter',
       href:base+'/bellrunner/combat'
     };
-    if(character.origin==='Bellrunner'&&character.tutorial.stage===7) return {
-      title:'The Clinic',
-      description:'The fight with Dogman is recorded. Continue your examination and any basic care; the service costs ten coins.',
-      label:'Continue clinic visit',
-      href:base+'/bellrunner/clinic'
+    if(character.origin==='Stitcher'&&character.tutorial.stage===6) return {
+      title:'The Fight with Owler',
+      description:'The witnessed hold and saved Owler fight are retained. Resume the encounter or review its outcome.',
+      label:'Continue the Owler encounter',
+      href:base+'/stitcher/combat'
     };
-    if(character.origin==='Bellrunner'&&character.tutorial.stage===8) return {
+    if(isFinaleOrigin(character.origin)&&character.tutorial.stage===7) return {
+      title:'The Clinic',
+      description:character.origin==='Stitcher'
+        ?'Return to Cinder Row for the saved examination and the ten-coin care service.'
+        :'The fight is recorded. Continue the saved examination and any basic care.',
+      label:'Continue clinic visit',
+      href:clinicHref(character.id,character.origin)
+    };
+    if(isFinaleOrigin(character.origin)&&character.tutorial.stage===8) return {
       title:character.tutorial.status==='COMPLETED'?'Your rented home':'Return Home',
       description:character.tutorial.status==='COMPLETED'
         ?'Your introduction is complete. Your shared rent notice and Journal remain available.'
-        :'Your examination is complete. Return to the rented room and read the notice.',
+        :'Your examination is complete. Return to the shared rented room to read the rent notice.',
       label:character.tutorial.status==='COMPLETED'?'Return to rented home':'Travel home',
       href:base+'/home'
     };
@@ -107,20 +116,6 @@
       description:'Your stance and the fight with Flint are saved. Resume the encounter or review its result.',
       label:'Continue the fight with Flint',
       href:base+'/millhand/combat'
-    };
-    if(character.origin==='Millhand'&&character.tutorial.stage===7) return {
-      title:'The Clinic',
-      description:'The fight has ended. Your examination, condition and payment progress are saved.',
-      label:'Continue the clinic visit',
-      href:base+'/millhand/clinic'
-    };
-    if(character.origin==='Millhand'&&character.tutorial.stage===8) return {
-      title:character.tutorial.status==='COMPLETED'?'Your rented home':'Return Home',
-      description:character.tutorial.status==='COMPLETED'
-        ?'Your introduction is complete. Your rent notice and Journal remain available.'
-        :'The clinic is complete. Return to the shared rented room to finish your introduction.',
-      label:character.tutorial.status==='COMPLETED'?'Return to rented home':'Travel home',
-      href:base+'/home'
     };
     return null;
   });

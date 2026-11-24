@@ -26,7 +26,8 @@ export function homeCondition(from?:Partial<HomeCondition>|null):HomeCondition{
 }
 export type MillhandBranch='restamp'|'contracts'|'records';
 export type BellrunnerBranch='contracts'|'trauma'|'machinery';
-export type Branch=MillhandBranch|BellrunnerBranch;
+import type {StitcherBranch} from './stitcher-work.js';
+export type Branch=MillhandBranch|BellrunnerBranch|StitcherBranch;
 export type Outcome='player_victory'|'player_defeat';
 export type State={revision:number;phase:Phase;homeId:string;origin:string;
   branch:Branch;outcome:Outcome;condition?:HomeCondition};

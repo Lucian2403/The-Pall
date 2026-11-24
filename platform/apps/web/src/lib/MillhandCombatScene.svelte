@@ -2,6 +2,8 @@
   import {getContext} from 'svelte';
 
   import {combatJournal,combatOpening} from '$lib/combat-journal-copy';
+  import CombatClinicContinuation from '$lib/CombatClinicContinuation.svelte';
+  import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalRegistrar} from '$lib/scene-journal';
   import type {CombatAction} from '@the-pall/game-core/combat-v0.5.1';
   import type {CombatActorView,CombatSnapshot} from '$lib/millhand-combat-model';
@@ -10,9 +12,10 @@
   import type {CombatFloatingFeedback} from '$lib/millhand-combat-feedback';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
 
-  let {snapshot, feedback, pending, errorMessage, perform, characterId, encounter='flint'}: {
+  let {snapshot, feedback, pending, errorMessage, perform, characterId, origin, encounter='flint'}: {
     snapshot: CombatSnapshot;
     characterId: string;
+    origin: FinaleOrigin;
     encounter?:'flint'|'owler';
     feedback: CombatFloatingFeedback[];
     pending: boolean;
@@ -231,11 +234,10 @@
               <p><strong>CLAUDIA: “I'll speak to them myself. Now get out of my infirmary.”</strong></p>
             {/if}
             <p><strong>CLAUDIA: “Enough. The man stays here. I'm cancelling the transfer, and if the school has a problem with that, they can speak to me.”</strong></p>
-            <p class="after">The patient stays in ordinary care. This one transfer is cancelled. Your actual Health and wounds are saved. Medical care follows in Stage VII.</p>
           {:else}
             <p class="after">Your actual fight condition is saved. Both outcomes lead to a clinic examination.</p>
-            <a class="pall-framed-button clinic-link" href={'/characters/'+encodeURIComponent(characterId)+'/millhand/clinic'}>Continue to medical care</a>
           {/if}
+          <CombatClinicContinuation {characterId} {origin}/>
         {:else}
           <p class="telegraph-title">{isOwler?"OWLER'S OBSERVABLE INTENTION":"FLINT'S OBSERVABLE INTENTION"}</p>
           <p class:heavy={snapshot.intentType === 'heavy threat'} class="intent">{snapshot.enemyIntent}</p>
@@ -733,7 +735,6 @@
     .player-status .resources{grid-template-columns:repeat(2,minmax(0,1fr))}
     .player-status .resource+.resource{border-left:0;padding-left:0}
   }
-  .clinic-link{position:relative;z-index:1;max-width:100%;margin:12px 0 1px;pointer-events:auto}
   /* Transient hit/miss overlays are anchored to the target, never to a guessed
      attack roll. Actual damage comes from the committed combat Chronicle. */
   .combat-float{position:absolute;z-index:6;top:29%;left:52%;

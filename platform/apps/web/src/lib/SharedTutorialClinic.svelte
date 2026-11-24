@@ -1,8 +1,9 @@
 <script lang="ts">
-  import {dialogueSpeakerLabel} from '$lib/dialogue-speaker';
-  import {clinicJournal} from '$lib/clinic-journal-copy';
-  // Both origins share this exact clinic stage, layout and medical state.
-  import {onMount} from 'svelte';
+  import {dialogueSpeakerLabel,PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
+  import {clinicJournalEntries} from '$lib/clinic-journal-copy';
+  import {FINALE_ORIGINS,type FinaleOrigin} from '$lib/shared-finale-origins';
+  // One treatment workflow; only approved arrival and dialogue lines vary by origin.
+
   import {page} from '$app/state';
   import {goto} from '$app/navigation';
   import TutorialShell from '$lib/TutorialShell.svelte';
@@ -13,7 +14,7 @@
   } from '$lib/millhand-clinic-dialogue';
   import {playCoinTransactionSfx} from '$lib/pall-audio';
 
-  let {origin}:{origin:'Millhand'|'Bellrunner'}=$props();
+  let {origin}:{origin:FinaleOrigin}=$props();
   type Wound={type:string;zone?:string;severity:string};
   type Condition={
     hp:number;hpMax:number;stamina:number;composure:number;
@@ -41,6 +42,12 @@
       text:'Ten coins. That covers the examination and any basic treatment you need.'},
     {kind:'speech',speaker:'YOU',text:'All right. Go ahead.'}
   ];
+  const STITCHER_PRICED_BEATS:readonly PricedBeat[]=[
+    {kind:'speech',speaker:'YOU',text:"You're charging me?"},
+    {kind:'speech',speaker:'CLINICIAN',text:'Ten coins.'},
+    {kind:'speech',speaker:'YOU',text:'I work here.'},
+    {kind:'speech',speaker:'CLINICIAN',text:"I know. It's still ten."}
+  ];
   // One local narration or speech beat per Continue; saved examination state
   // remains authoritative and independent of this presentation cursor.
   const BELLRUNNER_ARRIVAL_BEATS:readonly PricedBeat[]=[
@@ -61,11 +68,16 @@
     tutorial:{stage:number;status:string};
   };
   let character=$state<Character|null>(null);
+  // One shared, presentation-only arrival cursor. Stitcher has two panels
+  // (arrival, then dialogue); Bellrunner keeps its existing sequential beats.
+  // Millhand goes directly to the examination action.
   let arrivalIndex=$state(-1);
-  const arrivalAtEnd=$derived(arrivalIndex>=BELLRUNNER_ARRIVAL_BEATS.length-1);
+  const arrivalLastIndex=$derived(origin==='Bellrunner'
+    ?BELLRUNNER_ARRIVAL_BEATS.length-1:origin==='Stitcher'?0:-1);
+  const arrivalAtEnd=$derived(arrivalIndex>=arrivalLastIndex);
   const arrivalBeat=$derived(BELLRUNNER_ARRIVAL_BEATS[arrivalIndex]??null);
   function advanceArrival(){
-    if(pending||clinic?.phase!=='ARRIVAL'||origin!=='Bellrunner'||arrivalAtEnd)return;
+    if(pending||clinic?.phase!=='ARRIVAL'||arrivalAtEnd)return;
     arrivalIndex+=1;
   }
   let clinic=$state<Clinic|null>(null);
@@ -75,7 +87,7 @@
   let retryId:string|null=null;
   let retrySignature:string|null=null;
   const id=$derived(page.params.id);
-  const route=$derived('/api/characters/'+encodeURIComponent(id)+'/'+origin.toLowerCase()+'/clinic');
+  const route=$derived('/api/characters/'+encodeURIComponent(id)+'/'+FINALE_ORIGINS[origin].clinicPath);
   const next=$derived(clinic?.phase==='ARRIVAL'?'examine'
     :clinic?.phase==='EXAMINED'?'speak'
     :clinic?.phase==='SPOKEN'?'review_price'
@@ -85,9 +97,10 @@
     :next==='speak'?(origin==='Bellrunner'?'Let the clinician examine you':'Speak to clinician')
     :next==='review_price'?'Review the price'
     :next==='pay'?'Pay 10 coins'
-    :next==='leave'?(origin==='Bellrunner'?'Leave the clinic':'Travel Home'):'');
+    :next==='leave'?(origin==='Stitcher'?'Leave the infirmary':origin==='Bellrunner'?'Leave the clinic':'Travel Home'):'');
   let pricedDialogueIndex=$state(0);
-  const pricedBeats=$derived(origin==='Bellrunner'?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS);
+  const pricedBeats=$derived(origin==='Stitcher'?STITCHER_PRICED_BEATS:
+    origin==='Bellrunner'?BELLRUNNER_PRICED_BEATS:PRICED_DIALOGUE_BEATS);
   const pricedBeat=$derived(pricedBeats[pricedDialogueIndex]!);
   const pricedAtEnd=$derived(pricedDialogueIndex===pricedBeats.length-1);
   $effect(()=>{
@@ -99,68 +112,88 @@
     if(pending||clinic?.phase!=='PRICED'||pricedAtEnd)return;
     pricedDialogueIndex+=1;
   }
-  // The only visible journal toggle lives in TutorialShell; the journal's
-  // actual entries stay below the illustrated clinic.
+  // The single shared Journal reads this exact progress, also used by the archive.
 
   const assessment=$derived(clinic
     ?clinicianAssessment(clinic.before,clinic.conditionType):'');
   const fatigueNote=$derived(clinic?clinicianFatigue(clinic.before):null);
   const departure=$derived(clinic?clinicianDischarge(clinic.conditionType):'');
-  const journal=$derived(clinic?clinicJournal(origin,{
-    paid:clinic.paid,outcome:clinic.outcome,conditionType:clinic.conditionType
-  }):'');
+  const journalEntries=$derived(clinic?clinicJournalEntries(origin,{
+    phase:clinic.phase,paid:clinic.paid,outcome:clinic.outcome,
+    conditionType:clinic.conditionType
+  }):[]);
 
 
-  async function start(){
-    const response=await fetch(route,{method:'POST',headers:{'content-type':'application/json'},
-      body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
-    if(!response.ok)throw Error('clinic_start_failed_'+response.status);
-    clinic=await response.json() as Clinic;
-  }
-  async function refresh(){
-    status='loading';errorMessage='';
+  // A reused character route must never show or apply another character's
+  // previous Clinic snapshot. The shared Journal reader is keyed separately.
+  let requestGeneration=0;
+  async function refresh(requestedId:string){
+    const generation=++requestGeneration;
+    const requestedRoute='/api/characters/'+encodeURIComponent(requestedId)+
+      '/'+FINALE_ORIGINS[origin].clinicPath;
+    const current=()=>generation===requestGeneration&&requestedId===id;
+    character=null;clinic=null;status='loading';pending=false;
+    errorMessage='';retryId=null;retrySignature=null;
+    pricedDialogueIndex=0;arrivalIndex=-1;
     try{
       const [person,visit]=await Promise.all([
-        fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
-        fetch(route,{cache:'no-store'})
+        fetch('/api/characters/'+encodeURIComponent(requestedId),{cache:'no-store'}),
+        fetch(requestedRoute,{cache:'no-store'})
       ]);
+      if(!current())return;
       if(person.status===401||visit.status===401){status='login';return;}
       if(person.status===404||visit.status===404){status='missing';return;}
       if(visit.status===503){status='schema';return;}
       if(visit.status===409){status='prerequisite';return;}
       if(!person.ok||!visit.ok)throw Error('clinic_fetch_failed');
-      character=(await person.json() as {character:Character}).character;
+      const savedCharacter=(await person.json() as {character:Character}).character;
       const result=await visit.json() as Clinic|{needsStart:true};
-      if('needsStart' in result)await start();
-      else clinic=result;
-      // Starting the clinic already advances the saved character to Stage 7.
-      // Keep the mounted shell in sync so its dev-only Back to Stage 6
-      // control appears immediately, not only after a full page reload.
-      if(clinic&&character)
-        character={...character,tutorial:clinic.phase==='LEFT'
-          ?{stage:8,status:'NOT_STARTED'}
-          :{stage:7,status:'IN_PROGRESS'}};
+      if(!current())return;
+      let savedClinic:Clinic;
+      if('needsStart' in result){
+        const started=await fetch(requestedRoute,{method:'POST',
+          headers:{'content-type':'application/json'},
+          body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
+        if(!started.ok)throw Error('clinic_start_failed_'+started.status);
+        savedClinic=await started.json() as Clinic;
+      }else savedClinic=result;
+      if(!current())return;
+      clinic=savedClinic;
+      character={...savedCharacter,tutorial:savedClinic.phase==='LEFT'
+        ?{stage:8,status:'NOT_STARTED'}
+        :{stage:7,status:'IN_PROGRESS'}};
       status='ready';
     }catch(error){
+      if(!current())return;
       status='error';
       errorMessage=error instanceof Error?error.message:'Clinic record unavailable';
     }
   }
-  onMount(()=>{void refresh();});
+  $effect(()=>{
+    const requestedId=id;
+    void refresh(requestedId);
+    return ()=>{requestGeneration++;};
+  });
   async function perform(action:Action){
-    if(pending||!clinic||next!==action||(action==='pay'&&!pricedAtEnd))return;
+    if(pending||!clinic||next!==action||
+      (action==='examine'&&!arrivalAtEnd)||(action==='pay'&&!pricedAtEnd))return;
+    const actingId=id,actingGeneration=requestGeneration;
+    const current=()=>actingId===id&&actingGeneration===requestGeneration;
     pending=true;errorMessage='';
     const signature=clinic.revision+':'+action;
     if(signature!==retrySignature||!retryId){
       retrySignature=signature;retryId=crypto.randomUUID();
     }
     try{
-      const response=await fetch(route,{method:'POST',headers:{'content-type':'application/json'},
+      const response=await fetch('/api/characters/'+encodeURIComponent(actingId)+
+        '/'+FINALE_ORIGINS[origin].clinicPath,{method:'POST',
+        headers:{'content-type':'application/json'},
         body:JSON.stringify({
           kind:'action',requestId:retryId,expectedRevision:clinic.revision,action
         })
       });
       const result=await response.json() as Clinic&{error?:string};
+      if(!current())return;
       if(response.ok){
         // Only a newly confirmed, balance-changing payment receives the coin cue.
         const paidNow=action==='pay'&&result.paid===true&&result.coins<clinic.coins;
@@ -183,8 +216,13 @@
       }else{
         if(response.status===409){
           retryId=null;retrySignature=null;
-          const current=await fetch(route,{cache:'no-store'});
-          if(current.ok)clinic=await current.json() as Clinic;
+          const reloaded=await fetch('/api/characters/'+encodeURIComponent(actingId)+
+            '/'+FINALE_ORIGINS[origin].clinicPath,{cache:'no-store'});
+          if(reloaded.ok){
+            const latest=await reloaded.json() as Clinic;
+            if(!current())return;
+            clinic=latest;
+          }
         }
         errorMessage=result.error==='stale_revision'
           ?'The clinic was updated in another tab. The saved examination has been reloaded.'
@@ -193,16 +231,16 @@
           :'The clinic action was not saved: '+(result.error??response.status);
       }
     }catch{
-      errorMessage='Connection interrupted. Retry the same action; the fee cannot be charged twice.';
-    }finally{pending=false;}
+      if(current())errorMessage='Connection interrupted. Retry the same action; the fee cannot be charged twice.';
+    }finally{if(current())pending=false;}
   }
 </script>
 
 <svelte:head><title>The Pall — The Clinic</title></svelte:head>
-{#if status==='ready' && character && clinic}
-  <TutorialShell {character} sceneLocation="City clinic" sceneStage={7} clinicBackdrop={true}
+{#if status==='ready' && character?.id===id && clinic}
+  <TutorialShell {character} sceneLocation={FINALE_ORIGINS[origin].location} sceneStage={7} clinicBackdrop={true}
     combatStamina={{current:clinic.after?.stamina??clinic.before.stamina,maximum:100}}
-    journalContent={{title:'The Clinic',entries:[journal,...(clinic?.phase==='LEFT'?["I've got ten coins left. Time to head home."]:[])]}}>
+    journalContent={{title:'The Clinic',entries:journalEntries}}>
     <section class="clinic" aria-label="Stage 7 clinic">
       <!-- Shared scene layout: the clinic painting is the stage (native
            1672x941); the clinician conversation is the reading column and
@@ -236,6 +274,20 @@
                   <p class="speech">“{arrivalBeat.text}”</p>
                 {/if}
               {/if}
+            {:else if origin==='Stitcher'}
+              {#if arrivalIndex<0}
+                <p class="narration">{clinic.outcome==='player_defeat'
+                  ?'An unnamed ward worker helps you into the ordinary treatment area after Owler knocks you down. The patient is still in the ward, where the staff can look after him.'
+                  :'You return to the infirmary after the fight with Owler. The patient is still in the ward, where the staff can look after him.'}</p>
+                <p class="narration">A clinician sees you come in and points to an examination chair.</p>
+              {:else}
+                <p class="speaker">CLINICIAN</p>
+                <p class="speech">“Come on, sit down. What happened out there?”</p>
+                <p class="speaker">{PLAYER_SPEAKER_LABEL}</p>
+                <p class="speech">“Owler tried to take one of the patients away. I stood in his way.”</p>
+                <p class="speaker">CLINICIAN</p>
+                <p class="speech">“I see. Well, let's have a look at you.”</p>
+              {/if}
             {:else}
               <p class="narration">{clinic.outcome==='player_defeat'
                 ?'Another worker helps you reach the clinic after Flint defeats you.'
@@ -246,7 +298,9 @@
           {:else if clinic.phase==='EXAMINED'}
             <p class="narration">{origin==='Bellrunner'
               ?'You check the Health and injuries recorded after Dogman’s attack. The clinician is ready to examine you.'
-              :'You sit on the edge of a bed and check yourself after the fight.'}</p>
+              :origin==='Stitcher'
+                ?'You check your actual Health and any recorded injuries from the Owler fight. The clinician is ready to examine you.'
+                :'You sit on the edge of a bed and check yourself after the fight.'}</p>
             {#if origin==='Millhand'}<p class="narration">The clinician waits for you to speak.</p>{/if}
           {:else if clinic.phase==='SPOKEN'}
             {#if origin==='Millhand'}
@@ -290,7 +344,7 @@
 
           {#if next}
             <div class="actions">
-              {#if clinic.phase==='ARRIVAL'&&origin==='Bellrunner'&&!arrivalAtEnd}
+              {#if clinic.phase==='ARRIVAL'&&!arrivalAtEnd}
                 <button class="pall-framed-button advance primary-choice" type="button"
                   disabled={pending} onclick={advanceArrival}>Continue</button>
               {:else if clinic.phase==='PRICED' && !pricedAtEnd}
@@ -347,7 +401,7 @@
     {:else if status==='missing'}<h1>Character not found</h1>
     {:else if status==='prerequisite'}
       <h1>Clinic not yet available</h1>
-      <p>The fight with {origin==='Bellrunner'?'Dogman':'Flint'} must finish before the clinic examination.</p>
+      <p>The fight with {origin==='Stitcher'?'Owler':origin==='Bellrunner'?'Dogman':'Flint'} must finish before the clinic examination.</p>
       <a href={'/characters/'+encodeURIComponent(id)+'/'+origin.toLowerCase()+'/combat'}>Return to the encounter</a>
     {:else if status==='schema'}
       <h1>Clinic persistence is not installed</h1>

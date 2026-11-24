@@ -1,7 +1,8 @@
 <script lang="ts">
   import {PLAYER_SPEAKER_LABEL} from '$lib/dialogue-speaker';
-  import {homeJournalIntro as homeJournalIntroText} from '$lib/home-journal-copy';
-  import {onMount,tick} from 'svelte';
+  import {homeJournalEntries,homeCompletionSummary} from '$lib/home-journal-copy';
+  import type {FinaleOrigin} from '$lib/shared-finale-origins';
+  import {tick} from 'svelte';
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import InventoryPanel from '$lib/InventoryPanel.svelte';
@@ -10,8 +11,8 @@
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
   type Action='read_notice'|'put_down'|'finish'|'rest';
-  type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:string;
-    branch:'restamp'|'contracts'|'records'|'trauma'|'machinery';
+  type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:FinaleOrigin;
+    branch:string;
     outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
@@ -46,7 +47,7 @@
     overlayKind=null;
   }
   let retryKey:string|null=null,retryId:string|null=null;
-  const homeJournalIntro=$derived(home?homeJournalIntroText(home.origin as 'Millhand'|'Bellrunner'):'');
+  const currentJournalEntries=$derived(home?homeJournalEntries(home.origin,home.phase,home.rent):[]);
   // A native modal remains above the rented-room artwork, never below it.
   // showModal handles focus, keyboard trapping and Escape without moving the scene.
   async function openRoomOverlay(kind:'storage'){
@@ -62,66 +63,99 @@
   }
   function toggleJournal(){journalOpen=!journalOpen;}
   $effect(()=>{const currentId=id;journalOpen=false;void currentId;});
-  async function refresh(){
-    status='loading';errorMessage='';restMessage='';
+  // A reused route cannot carry another character's Home or Journal state.
+  let requestGeneration=0;
+  async function refresh(requestedId:string){
+    const generation=++requestGeneration;
+    const requestedApi='/api/characters/'+encodeURIComponent(requestedId)+'/tutorial/home';
+    const current=()=>generation===requestGeneration&&requestedId===id;
+    character=null;home=null;status='loading';pending=false;
+    errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
+    noticeExpanded=false;overlayKind=null;
+    if(overlayDialog?.open)overlayDialog.close();
     try{
-      const [c,r]=await Promise.all([
-        fetch('/api/characters/'+encodeURIComponent(id),{cache:'no-store'}),
-        fetch(api,{cache:'no-store'})]);
-      if(c.status===401||r.status===401){status='unauthorized';return;}
-      if(c.status===404||r.status===404){status='missing';return;}
+      const [person,r]=await Promise.all([
+        fetch('/api/characters/'+encodeURIComponent(requestedId),{cache:'no-store'}),
+        fetch(requestedApi,{cache:'no-store'})
+      ]);
+      if(!current())return;
+      if(person.status===401||r.status===401){status='unauthorized';return;}
+      if(person.status===404||r.status===404){status='missing';return;}
       if(r.status===503){status='schema';return;}
       if(r.status===409){status='prerequisite';return;}
-      if(!c.ok||!r.ok)throw Error('home_unavailable');
-      character=(await c.json() as {character:Character}).character;
+      if(!person.ok||!r.ok)throw Error('home_unavailable');
+      const savedCharacter=(await person.json() as {character:Character}).character;
       const result=await r.json() as Home|{needsStart:true};
+      if(!current())return;
+      let savedHome:Home;
       if('needsStart' in result){
-        const started=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},
+        const started=await fetch(requestedApi,{method:'POST',
+          headers:{'content-type':'application/json'},
           body:JSON.stringify({kind:'start',requestId:crypto.randomUUID()})});
         if(!started.ok)throw Error('home_start_failed');
-        home=await started.json() as Home;
-      }else home=result;
-      noticeExpanded=home.phase==='NOTICE';
-      if(character&&home)character={...character,tutorial:{stage:8,
-        status:home.completed?'COMPLETED':'IN_PROGRESS'}};
+        savedHome=await started.json() as Home;
+      }else savedHome=result;
+      if(!current())return;
+      home=savedHome;noticeExpanded=savedHome.phase==='NOTICE';
+      character={...savedCharacter,tutorial:{stage:8,
+        status:savedHome.completed?'COMPLETED':'IN_PROGRESS'}};
       status='ready';
-    }catch(e){errorMessage=e instanceof Error?e.message:'Home unavailable';status='error';}
+    }catch(error){
+      if(!current())return;
+      errorMessage=error instanceof Error?error.message:'Home unavailable';
+      status='error';
+    }
   }
-  onMount(()=>{void refresh();});
+  $effect(()=>{
+    const requestedId=id;
+    void refresh(requestedId);
+    return ()=>{requestGeneration++;};
+  });
   async function perform(action:Action):Promise<boolean>{
     if(pending||!home||(home.completed&&action!=='rest'))return false;
+    const actingId=id,actingGeneration=requestGeneration;
+    const current=()=>actingId===id&&actingGeneration===requestGeneration;
+    const actingApi='/api/characters/'+encodeURIComponent(actingId)+'/tutorial/home';
     const key=home.revision+':'+action;
     if(key!==retryKey||!retryId){retryKey=key;retryId=crypto.randomUUID();}
     pending=true;errorMessage='';
     try{
-      const response=await fetch(api,{method:'POST',headers:{'content-type':'application/json'},
+      const response=await fetch(actingApi,{method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({kind:'action',action,requestId:retryId,expectedRevision:home.revision})});
+      if(!current())return false;
       if(response.status===409){
         retryId=null;retryKey=null;
-        const latest=await fetch(api,{cache:'no-store'});
-        if(latest.ok){home=await latest.json() as Home;noticeExpanded=home.phase==='NOTICE';}
+        const latest=await fetch(actingApi,{cache:'no-store'});
+        if(latest.ok){
+          const updated=await latest.json() as Home;
+          if(!current())return false;
+          home=updated;noticeExpanded=updated.phase==='NOTICE';
+        }
         errorMessage='The saved scene changed. Current progress has been reloaded.';
         return false;
       }
       if(!response.ok)throw Error('home_action_failed');
-      home=await response.json() as Home;
-      noticeExpanded=home.phase==='NOTICE';
+      const result=await response.json() as Home;
+      if(!current())return false;
+      home=result;noticeExpanded=result.phase==='NOTICE';
       retryId=null;retryKey=null;
       if(character)character={...character,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
       return true;
     }catch{
-      errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';
+      if(current())errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';
       return false;
     }
-    finally{pending=false;}
+    finally{if(current())pending=false;}
   }
   async function restInBed(){
     if(restAnimating||pending||!home)return;
+    const actingId=id,actingGeneration=requestGeneration;
     restAnimating=true;restMessage='';
-    // This is only a one-second visual transition; the server still owns Rest.
+    // Only the confirmed server Rest changes character condition.
     const fade=new Promise<void>(resolve=>setTimeout(resolve,1000));
     const saved=await perform('rest');
     await fade;
+    if(actingId!==id||actingGeneration!==requestGeneration)return;
     restAnimating=false;
     if(saved)restMessage='Rested. Stamina and Composure are full; Fatigue and Stress cleared.';
   }
@@ -132,10 +166,10 @@
   }
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
-{#if status==='ready'&&character&&home}
+{#if status==='ready'&&character?.id===id&&home}
   <TutorialShell {character} sceneStage={8} sceneLocation="Shared rented home"
     journalController={{open:journalOpen,toggle:toggleJournal,
-      title:'Rented Home',entries:home.completed?[]:[homeJournalIntro]}}>
+      title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}>
     <section class="stage8" aria-label="Stage 8 shared rented home">
       <!-- Shared scene layout: the rented room (native 1672x941) with its
            chest, journal, notice and bed is the stage; the room dialogue is
@@ -212,10 +246,8 @@
         {:else if home.phase==='COMPLETE'}
           <aside class="home-dialogue completion" aria-label="Stage eight completion">
             <p class="eyebrow">STAGE VIII · COMPLETE</p>
-            <h1>{home.origin==='Bellrunner'?'Bellrunner opening complete.':'Millhand opening complete.'}</h1>
-            <p>{home.origin==='Bellrunner'
-              ?'The condemned worksite remains closed, and your local findings have not been resolved.'
-              :'The council has not paid for the plate lot. The dispute over the worker number remains unresolved.'}</p>
+            <h1>{home.origin+' opening complete.'}</h1>
+            <p class="completion-copy">{homeCompletionSummary(home.origin)}</p>
             <p><strong>{home.coins} coins remaining. Rent notice: {home.rent} coins.</strong></p>
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
           </aside>

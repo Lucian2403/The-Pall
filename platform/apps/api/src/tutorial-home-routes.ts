@@ -1,8 +1,10 @@
-/** Authenticated, idempotent Stage 8 home shared by Millhand and Bellrunner.
+/** Authenticated, idempotent Stage 8 home shared by every playable origin.
  * The rented room, rent, closing speech, storage and Home state are identical. */
 import type {FastifyInstance} from 'fastify';
 import {archiveJournalTask} from './personal-journal-store.js';
 import {homeTask} from './personal-journal-tasks.js';
+import {isFinaleOrigin} from '../../web/src/lib/shared-finale-origins.js';
+import {STITCHER_MAJOR} from './stitcher-work.js';
 import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
@@ -46,7 +48,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
   try{
    const rows=await pool.query<Character>(characterSQL,[req.params.id,session.user.id]);
    const c=rows.rows[0];
-   if(!c||!['Millhand','Bellrunner'].includes(c.origin))return reply.code(404).send({error:'not_found'});
+   if(!c||!isFinaleOrigin(c.origin))return reply.code(404).send({error:'not_found'});
    if(c.tutorial_stage!==8)return reply.code(409).send({error:'home_not_ready'});
    const saved=await pool.query<{state:State}>('SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[c.id]);
    if(saved.rowCount){
@@ -81,7 +83,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    await db.query('BEGIN');open=true;
    const characters=await db.query<Character>(characterSQL+' FOR UPDATE',[req.params.id,session.user.id]);
    const c=characters.rows[0];
-   if(!c||!['Millhand','Bellrunner'].includes(c.origin)){
+   if(!c||!isFinaleOrigin(c.origin)){
     await db.query('ROLLBACK');open=false;return reply.code(404).send({error:'not_found'});
    }
    const receipt=await db.query<{request_hash:string;response:unknown}>(
@@ -125,6 +127,26 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
        return reply.code(409).send({error:'route_not_saved'});
       }
       branch=chosen.branch as Branch;
+     }else if(c.origin==='Stitcher'){
+      // Reuse the committed Stage IV branch and the protected Owler outcome;
+      // neither the patient's safety nor a branch choice is rewritten at home.
+      const ward=await db.query<{state:{stage:number;phase:string;branch:string|null;
+        stage5Witnessed?:boolean;stage5Hold?:boolean;stage5Preparation?:string|null}}>(
+       'SELECT state FROM player_character_stitcher_ward WHERE character_id=$1',[c.id]);
+      const combat=await db.query<{branch:string;patient_safe:boolean;transfer_cancelled:boolean;
+        state:{status:string}}>(
+       'SELECT branch,patient_safe,transfer_cancelled,state FROM player_character_owler_combat WHERE character_id=$1',[c.id]);
+      const saved=ward.rows[0]?.state;
+      const fight=combat.rows[0];
+      if(saved?.stage!==5||saved.phase!=='fight_ready'||!saved.branch||
+         !Object.prototype.hasOwnProperty.call(STITCHER_MAJOR,saved.branch)||
+         saved.stage5Witnessed!==true||saved.stage5Hold!==true||
+         !saved.stage5Preparation||fight?.branch!==saved.branch||
+         fight.state.status!=='finished'||!fight.patient_safe||!fight.transfer_cancelled){
+       await db.query('ROLLBACK');open=false;
+       return reply.code(409).send({error:'route_not_saved'});
+      }
+      branch=saved.branch as Branch;
      }else{
       const finding=await db.query<{state:{branch:string;phase:string}}>(
        'SELECT state FROM player_character_missing_stamp WHERE character_id=$1',[c.id]);

@@ -211,7 +211,7 @@ test('UI uses the exact existing frames, accessible background-bed hotspots and 
    'Only legacy paused Stage V saves may resume from NOT_STARTED');
  assert.ok(routes.includes('FOR UPDATE'));
  assert.ok(rewind.includes("if(result.rows[0].origin==='Stitcher')"));
- assert.ok(rewind.includes("if(c.rows[0].origin==='Stitcher')"));
+ assert.ok(rewind.includes("if(c.rows[0].origin==='Stitcher'&&expectedStage!==8)"));
  assert.ok(rewind.includes('DELETE FROM player_character_stitcher_ward_receipts'));
  assert.ok(shell.includes("character.origin!=='Stitcher'"));
  assert.ok(home.includes("character.origin==='Stitcher'"));

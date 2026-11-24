@@ -129,7 +129,8 @@ test('Stitcher Stage VI reuses Flint combat HUD and has correct outcome artwork'
  assert.match(shared,/locations\/stitcher\/owler-defeated.webp/);
  assert.match(shared,/locations\/stitcher\/owler.webp/);
  assert.match(shared,/<CombatRoundChronicle/);
- assert.match(shared,/The patient stays in ordinary care/);
+ assert.doesNotMatch(shared,/The patient stays in ordinary care/);
+ assert.match(shared,/The man stays here/);
  assert.match(shared,/I'm cancelling the transfer/);
  assert.doesNotMatch(shared,/<details class="round-expanded">/);
  assert.match(engine,/scene==='owler'&&state.round>1/);
