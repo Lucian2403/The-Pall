@@ -704,12 +704,25 @@ try{
   await until(()=>evalJS("document.querySelector('[data-game-window=\"inventory\"] [role=alert]')?.textContent.includes('Inventory changed')"),
     4500,'stale revision recovery');
   assert.equal(await evalJS("window.__qaInventory.pack.items.find(i=>i.code==='test_rivet')?.quantity"),3);
+  // Wait for the failed action's finally block to restore the controls.
+  // The stale-revision alert appears before pending becomes false.
+  await until(()=>evalJS("(()=>{const b=[...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
+    ".find(b=>b.textContent.includes('Store in chest'));return !!b&&!b.disabled;})()"),
+    4500,'re-enabled item controls after stale revision');
   // Keyboard activation of the ordinary button is also a valid transfer path.
   await evalJS("([...document.querySelectorAll('[data-game-window=\"inventory\"] .inspection-actions button')]"+
     ".find(b=>b.textContent.includes('Store in chest'))).focus()");
   await cmd('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
   await cmd('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
-  await until(()=>evalJS("window.__qaInventoryPosts?.length===5"),4500,'keyboard-driven transfer');
+  try{
+    await until(()=>evalJS("window.__qaInventoryPosts?.length===5"),4500,'keyboard-driven transfer');
+  }catch(error){
+    const info=await evalJS("(()=>({active:document.activeElement?.outerHTML.slice(0,300),"+
+      "errors:[...document.querySelectorAll('[role=alert]')].map(x=>x.textContent),"+
+      "calls:window.__qaInventoryPosts?.length}))()");
+    console.error('Keyboard transfer diagnostics:',JSON.stringify(info));
+    throw error;
+  }
   assert.equal(await evalJS("window.__qaInventoryPosts[4].to"),'home_chest');
   console.log('PASS: Partial-stack identity, stale revision recovery and keyboard transfer.');
   await evalJS("document.querySelector('[data-game-window=\"inventory\"] .close-window').click()");
