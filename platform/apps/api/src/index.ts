@@ -98,4 +98,16 @@ api.post('/api/fixture', async (request, reply) => {
 }
 const port = Number(process.env.API_PORT || '8788');
 const host = process.env.API_HOST || '127.0.0.1';
+// Drain in-flight requests and both managed pools on a normal process stop.
+let shuttingDown=false;
+for(const signal of ['SIGINT','SIGTERM'] as const){
+  process.once(signal,()=>{
+    if(shuttingDown)return;
+    shuttingDown=true;
+    void api.close().catch(error=>{
+      api.log.error({err:error,signal},'API shutdown failed');
+      process.exitCode=1;
+    });
+  });
+}
 await api.listen({host, port});
