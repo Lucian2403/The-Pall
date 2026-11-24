@@ -8,6 +8,7 @@ import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {
   WAGE_CLAIM_ACTIONS,initialWageClaim,availableWageClaimActions,
@@ -15,7 +16,6 @@ import {
 } from '@the-pall/game-core';
 import type {WageClaimAction,WageClaimState,MissingStampBranch} from '@the-pall/game-core';
 
-const db=new pg.Pool({connectionString:process.env.DATABASE_URL});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params={id:string};
 type CharacterRow={origin:string;tutorial_stage:number;tutorial_status:string};
@@ -44,8 +44,8 @@ function finishedBranch(job:PriorJob|undefined,stage:number):MissingStampBranch|
   const b=job.state.branch;
   return b==='restamp'||b==='contracts'||b==='records'?b:null;
 }
-export function registerMillhandWageClaimRoutes(app:FastifyInstance){
-  app.addHook('onClose',async()=>{await db.end();});
+export function registerMillhandWageClaimRoutes(app:FastifyInstance, options:{pool?:pg.Pool}={}){
+  const db=getGameplayPool(app,options.pool);
 
   app.get<{Params:Params}>('/api/characters/:id/millhand/wage-claim',async(req,reply)=>{
     const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});

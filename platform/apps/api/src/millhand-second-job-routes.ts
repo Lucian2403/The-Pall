@@ -9,6 +9,7 @@ import {millhandSecondJobTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {
   SECOND_JOB_ACTIONS,initialSecondJob,availableSecondJobActions,
@@ -16,7 +17,6 @@ import {
 } from '@the-pall/game-core';
 import type {SecondJobAction,SecondJobState,MissingStampBranch} from '@the-pall/game-core';
 
-const db=new pg.Pool({connectionString:process.env.DATABASE_URL});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params={id:string};
 type CharacterRow={origin:string;tutorial_stage:number;tutorial_status:string;major_skill_bonuses:Record<string,number>};
@@ -43,8 +43,8 @@ function branchFromSavedStage3(value:{branch:MissingStampBranch|null;phase:strin
   return value.branch;
 }
 
-export function registerMillhandSecondJobRoutes(app:FastifyInstance){
-  app.addHook('onClose',async()=>{await db.end();});
+export function registerMillhandSecondJobRoutes(app:FastifyInstance, options:{pool?:pg.Pool}={}){
+  const db=getGameplayPool(app,options.pool);
 
   app.get<{Params:Params}>('/api/characters/:id/millhand/second-job',async(req,reply)=>{
     const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});

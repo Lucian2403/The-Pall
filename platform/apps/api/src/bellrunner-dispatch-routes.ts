@@ -9,6 +9,7 @@ import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {INITIAL_DISPATCH_STATE,DISPATCH_ACTIONS,applyDispatchAction,InvalidDispatchAction,
   type DispatchState,type DispatchWorkAction} from './bellrunner-dispatch-work.js';
@@ -57,8 +58,7 @@ const schemaMissing=(e:unknown)=>['42P01','42703'].includes((e as {code?:string}
 
 export function registerBellrunnerDispatchRoutes(app:FastifyInstance,
   options?:{pool?:pg.Pool;resolveSession?:Resolver}){
-  const db=options?.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
-  if(!options?.pool)app.addHook('onClose',async()=>{await db.end();});
+  const db=getGameplayPool(app,options?.pool);
   const resolve=options?.resolveSession??(async(headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
 

@@ -3,12 +3,12 @@ import {archiveJournalTask} from './personal-journal-store.js';
 import {plateworkTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {createHash} from 'node:crypto';
 import {auth} from './auth.js';
 import {INITIAL_PLATEWORK, WORK_ACTIONS, availableActions, advancePlatework, PlateworkInvalidAction} from '@the-pall/game-core';
 import type {PlateworkAction, PlateworkState} from '@the-pall/game-core';
 
-const db = new pg.Pool({connectionString: process.env.DATABASE_URL});
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params = {id: string};
 type CharacterState = {origin: string; tutorial_stage: number; tutorial_status: string};
@@ -40,8 +40,8 @@ function snapshot(char: CharacterState, work: PlateworkState | null) {
   };
 }
 
-export function registerMillhandWorkRoutes(app: FastifyInstance) {
-  app.addHook('onClose', async () => {await db.end();});
+export function registerMillhandWorkRoutes(app:FastifyInstance, options:{pool?:pg.Pool}={}) {
+  const db=getGameplayPool(app,options.pool);
 
   app.get<{Params: Params}>('/api/characters/:id/millhand/work', async (req, reply) => {
     const session = await auth.api.getSession({headers: fromNodeHeaders(req.headers)});
