@@ -3159,7 +3159,7 @@ test('Deletion clears completed character records across Millhand, Bellrunner an
   await db.query(
    'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',[id,'{}']);
   await db.query(
-   'INSERT INTO player_character_journal(character_id,task_instance_id,task_id,stage,title,paragraphs) VALUES($1,$2,$3,8,$4,$5::jsonb)',
+   'INSERT INTO player_character_journal(character_id,task_instance_id,task_id,stage,title,paragraphs,content_version) VALUES($1,$2,$3,8,$4,$5::jsonb,1)',
    [id,'tutorial:stage:8','shared.rented-home','Rented Home',JSON.stringify(['Done'])]);
   const before=await request('GET','/api/characters',owner);
   const body={confirmedName:name,expectedRevision:before.body!.revision};
