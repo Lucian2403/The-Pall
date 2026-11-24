@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import pg from 'pg';
 import nodemailer from 'nodemailer';
+import {databasePoolMax} from './database-pool.js';
 
 // Mailpit remains the local default. Production requires an explicit HTTPS
 // origin and authenticated encrypted SMTP; no silent verification failures.
@@ -56,7 +57,8 @@ export const auth = betterAuth({
   // Persistent counters are required when the public API scales beyond one worker.
   // Run auth:migrate with the production environment before deploying.
   rateLimit:{enabled:production,storage:'database',window:60,max:100},
-  database: new pg.Pool({ connectionString: databaseURL }),
+  // Identity sessions get a separate, deliberately smaller connection budget.
+  database: new pg.Pool({connectionString:databaseURL,max:databasePoolMax('AUTH_DB_POOL_MAX',4)}),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,

@@ -1,5 +1,5 @@
 import Fastify, {LogController} from 'fastify';
-import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {createHash} from 'node:crypto';
 import {registerAuthRoutes} from './auth-routes.js';
 import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js';
@@ -27,6 +27,8 @@ import {advanceFixture} from '@the-pall/game-core';
 // M0 ONLY: fixed server-owned test identity, loopback host, no production users.
 const ACTOR = '00000000-0000-4000-8000-000000000001';
 const api = Fastify({logger: true, logController: new LogController({disableRequestLogging: true}), bodyLimit: 16 * 1024});
+// The gameplay pool is created once and closed once with the Fastify process.
+const gameplayDb=getGameplayPool(api);
 registerAuthRoutes(api);
 registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);
@@ -54,8 +56,7 @@ api.get('/health', async () => ({status: 'ok'}));
 const fixtureAllowed=process.env.NODE_ENV!=='production' &&
   ['127.0.0.1','localhost','::1'].includes(process.env.API_HOST??'127.0.0.1');
 if(fixtureAllowed){
-const pool = new pg.Pool({connectionString:process.env.DATABASE_URL});
-api.addHook('onClose',async()=>{await pool.end();});
+const pool=gameplayDb;
 api.get('/api/fixture', async () => {
   const {rows} = await pool.query('SELECT revision, value FROM dev_action_state WHERE actor_id = $1', [ACTOR]);
   if (rows.length !== 1) throw new Error('Fixture schema has not been initialized');
