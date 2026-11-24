@@ -385,6 +385,8 @@ try{
   })()`);
 
   let checks=0;
+  const inventoryOnly=process.argv.includes('--inventory-only');
+  if(!inventoryOnly){
   for(const [name,path,,ready,art,ratio] of scenes){
     for(const [width,height] of sizes){
       await open(path,width,height,ready);
@@ -595,7 +597,7 @@ try{
   assert.match(millhandDiary,/Marking the Plates|council plates/);
   assert.ok(!millhandDiary.includes('Dogman')&&!millhandDiary.includes('bell linkage'));
   console.log('PASS: Stage VIII — one Journal interface reads only the selected character');
-
+  }
 
   // New independent windows use the same real Svelte TutorialShell and Home page.
   // Snapshot fixtures do not replace the PostgreSQL ownership/transaction tests.
@@ -652,17 +654,22 @@ try{
   await evalJS("document.querySelector('[data-game-window=\"inventory\"] .close-window').click()");
   assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"inventory\"]')"),false);
   assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),true);
+  await evalJS("document.querySelector('[data-game-window=\"storage:home_chest\"] .inventory-companion-button').click()");
+  await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"]')"),
+    4000,'restore Inventory while storage remains open');
   await evalJS("document.querySelector('[data-game-window=\"storage:home_chest\"] .close-window').click()");
   await until(()=>evalJS("!document.querySelector('[data-game-window=\"storage:home_chest\"]')"),
     4500,'independent storage close');
-  assert.equal(await evalJS("window.__qaRoomToken"),null);
+  assert.equal(await evalJS("!!document.querySelector('[data-game-window=\"inventory\"]')"),true,
+    'Closing Home Chest leaves Inventory available');
+  await until(()=>evalJS("window.__qaRoomToken===null"),4000,'storage context revocation');
   console.log('PASS: Independent desktop windows, drag positioning, focus, transfers, Shift-click and revocation.');
 
   await open('/characters/qa-scenes-millhand/home',390,844,'.home-artwork');
   await evalJS("document.querySelector('[data-open-home-chest]').click()");
   await until(()=>evalJS("!!document.querySelector('[data-game-window=\"storage:home_chest\"] .storage-window')"),
     9000,'mobile Home Chest');
-  await evalJS("document.querySelector('.mobile-nav [data-open-inventory]').click()");
+  await evalJS("document.querySelector('[data-game-window=\"storage:home_chest\"] .inventory-companion-button').click()");
   await until(()=>evalJS("!!document.querySelector('[data-game-window=\"inventory\"] .inventory-window')"),
     9000,'mobile Inventory');
   assert.equal(await evalJS("getComputedStyle(document.querySelector('[data-game-window=\"storage:home_chest\"]')).display"),
@@ -676,7 +683,7 @@ try{
   console.log('PASS: Mobile Inventory and Home Chest switch without overlapping miniature windows.');
 
   assert.deepEqual(exceptions,[],'No uncaught page exceptions');
-  console.log('PASS: Millhand scenes — '+checks+' scene/size layouts and in-scene interactions verified in real pages');
+  if(!inventoryOnly)console.log('PASS: Millhand scenes — '+checks+' scene/size layouts and in-scene interactions verified in real pages');
 }finally{
   clearTimeout(timeout);
   close();
