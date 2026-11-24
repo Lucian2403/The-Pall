@@ -6,6 +6,7 @@ import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash,randomUUID} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {inventoryView,planTransfer,planEquip,InventoryInvalidAction,EQUIPMENT_SLOTS} from './inventory-model.js';
 import type {InventoryRow,StorageLocation,EquipmentSlot} from './inventory-model.js';
@@ -64,10 +65,9 @@ const allowedOrigin=(h:IncomingHttpHeaders)=>!h.origin||
 export function registerInventoryRoutes(app:FastifyInstance,options:{
  pool?:pg.Pool;resolveSession?:ResolveSession
 }={}){
- const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+ const pool=getGameplayPool(app,options.pool);
  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
   auth.api.getSession({headers:fromNodeHeaders(headers)}));
- app.addHook('onClose',async()=>{if(!options.pool)await pool.end();});
 
  app.get<{Params:{id:string}}>(base,async(req,reply)=>{
   reply.header('Cache-Control','no-store');

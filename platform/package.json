@@ -24,6 +24,7 @@
     "db:stop": "docker compose stop postgres",
     "db:migrate": "node scripts/db-migrate.mjs",
     "verify:api": "node scripts/verify-api.mjs",
+    "verify:shared-db-pool": "node --import tsx --test scripts/verify-shared-db-pool.test.ts",
     "mail:up": "docker compose up -d mailpit",
     "auth:migrate": "node --env-file=.env --import tsx scripts/auth-migrate.ts",
     "auth:status": "node --env-file=.env scripts/auth-check-schema.mjs",

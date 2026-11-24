@@ -4,6 +4,7 @@ import {missingStampTask} from './personal-journal-tasks.js';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {
   AUTHORED_MISSING_STAMP_EVIDENCE, INITIAL_MISSING_STAMP,
@@ -13,7 +14,6 @@ import {
 } from '@the-pall/game-core';
 import type {MissingStampAction,MissingStampState,MissingStampEvidence} from '@the-pall/game-core';
 
-const db=new pg.Pool({connectionString:process.env.DATABASE_URL});
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 type Params={id:string};
 type CharacterRow={origin:string;tutorial_stage:number;tutorial_status:string;major_skill_bonuses:Record<string,number>};
@@ -63,8 +63,8 @@ function snapshot(ch:CharacterRow,state:MissingStampState) {
   };
 }
 
-export function registerMissingStampRoutes(app:FastifyInstance) {
-  app.addHook('onClose',async()=>{await db.end();});
+export function registerMissingStampRoutes(app:FastifyInstance, options:{pool?:pg.Pool}={}) {
+  const db=getGameplayPool(app,options.pool);
 
   app.get<{Params:Params}>('/api/characters/:id/millhand/missing-stamp',async(req,reply)=>{
     const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});

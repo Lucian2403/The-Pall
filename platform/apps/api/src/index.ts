@@ -1,7 +1,8 @@
 import Fastify, {LogController} from 'fastify';
-import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {createHash} from 'node:crypto';
 import {registerAuthRoutes} from './auth-routes.js';
+import {authPool} from './auth.js';
 import {registerCharacterCatalogueRoutes} from './character-catalogue-routes.js';
 import {registerCharacterRoutes} from './character-routes.js';
 import {registerMillhandWorkRoutes} from './millhand-work-routes.js';
@@ -27,6 +28,9 @@ import {advanceFixture} from '@the-pall/game-core';
 // M0 ONLY: fixed server-owned test identity, loopback host, no production users.
 const ACTOR = '00000000-0000-4000-8000-000000000001';
 const api = Fastify({logger: true, logController: new LogController({disableRequestLogging: true}), bodyLimit: 16 * 1024});
+// The gameplay pool is created once and closed once with the Fastify process.
+const gameplayDb=getGameplayPool(api);
+api.addHook('onClose',async()=>{await authPool.end();});
 registerAuthRoutes(api);
 registerCharacterCatalogueRoutes(api);
 registerCharacterRoutes(api);
@@ -54,8 +58,7 @@ api.get('/health', async () => ({status: 'ok'}));
 const fixtureAllowed=process.env.NODE_ENV!=='production' &&
   ['127.0.0.1','localhost','::1'].includes(process.env.API_HOST??'127.0.0.1');
 if(fixtureAllowed){
-const pool = new pg.Pool({connectionString:process.env.DATABASE_URL});
-api.addHook('onClose',async()=>{await pool.end();});
+const pool=gameplayDb;
 api.get('/api/fixture', async () => {
   const {rows} = await pool.query('SELECT revision, value FROM dev_action_state WHERE actor_id = $1', [ACTOR]);
   if (rows.length !== 1) throw new Error('Fixture schema has not been initialized');
@@ -95,4 +98,16 @@ api.post('/api/fixture', async (request, reply) => {
 }
 const port = Number(process.env.API_PORT || '8788');
 const host = process.env.API_HOST || '127.0.0.1';
+// Drain in-flight requests and both managed pools on a normal process stop.
+let shuttingDown=false;
+for(const signal of ['SIGINT','SIGTERM'] as const){
+  process.once(signal,()=>{
+    if(shuttingDown)return;
+    shuttingDown=true;
+    void api.close().catch(error=>{
+      api.log.error({err:error,signal},'API shutdown failed');
+      process.exitCode=1;
+    });
+  });
+}
 await api.listen({host, port});

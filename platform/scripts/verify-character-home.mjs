@@ -18,7 +18,7 @@ const panelCss=skillPanel.slice(skillPanel.indexOf('<style>'));
 
 // Keep account ownership boundaries, owner HUD and all real chapter routes.
 for(const fragment of [
-  "fetch('/api/characters/' + encodeURIComponent(page.params.id), {cache: 'no-store'})",
+  "fetch('/api/characters/' + encodeURIComponent(page.params.id!), {cache: 'no-store'})",
   'response.status === 401','response.status === 404',
   '<TutorialShell {character} activePage="character" smithingBackdrop={character.origin===\'Millhand\'}>',
   '<CharacterHome {character}/>',

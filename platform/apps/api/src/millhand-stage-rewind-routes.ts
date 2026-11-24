@@ -7,6 +7,7 @@ import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import type {CombatState} from '@the-pall/game-core/combat-v0.5.1';
 import type {ClinicState} from './millhand-clinic-state.js';
 import {INITIAL_STITCHER,STITCHER_MAJOR,type StitcherState} from './stitcher-work.js';
@@ -26,10 +27,9 @@ type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
 export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
   pool?:pg.Pool;resolveSession?:SessionResolver;
 }={}){
-  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const db=getGameplayPool(app,options.pool);
   const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
-  app.addHook('onClose',async()=>{if(!options.pool)await db.end();});
   const host=process.env.API_HOST??'127.0.0.1';
   const loopback=host==='127.0.0.1'||host==='::1'||host==='localhost';
   if(process.env.NODE_ENV==='production'||!loopback)return;

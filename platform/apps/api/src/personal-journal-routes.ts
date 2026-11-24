@@ -3,6 +3,7 @@ import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -18,8 +19,7 @@ type Archived={
 export function registerPersonalJournalRoutes(app:FastifyInstance,options:{
  pool?:pg.Pool;resolveSession?:Resolver
 }={}){
- const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
- if(!options.pool)app.addHook('onClose',async()=>{await db.end();});
+ const db=getGameplayPool(app,options.pool);
  const resolve=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
    auth.api.getSession({headers:fromNodeHeaders(headers)}));
  app.get<{Params:Params;Querystring:Query}>('/api/characters/:id/journal',async(req,reply)=>{

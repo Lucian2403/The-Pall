@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify';
 import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {createHash, randomUUID} from 'node:crypto';
 import {APPROVED_STARTING_FACTS, ORIGIN_CATALOGUE} from '@the-pall/game-core';
 import {INITIAL_CHARACTER_SLOT_LIMIT, parseCreateCharacterCommand} from '@the-pall/contracts';
@@ -51,10 +52,9 @@ type SessionResolver=(headers:IncomingHttpHeaders)=>Promise<SessionAccount>;
 export function registerCharacterRoutes(app:FastifyInstance,options:{
   pool?:pg.Pool;resolveSession?:SessionResolver;
 }={}) {
-  const pool=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const pool=getGameplayPool(app,options.pool);
   const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
-  app.addHook('onClose',async()=>{if(!options.pool)await pool.end();});
 
   app.get('/api/characters', async (request, reply) => {
     const session = await resolveSession(request.headers);

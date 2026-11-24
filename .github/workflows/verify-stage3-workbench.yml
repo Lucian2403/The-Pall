@@ -55,6 +55,7 @@ on:
       - 'platform/scripts/characters-migrate.mjs'
       - 'platform/db/migrations/0008_millhand_clinic.sql'
       - 'platform/scripts/verify-stage6-postgres.integration.test.ts'
+      - 'platform/scripts/verify-shared-db-pool.test.ts'
       - 'platform/db/migrations/**'
       - 'platform/apps/api/src/millhand-combat-opening.ts'
       - 'platform/db/migrations/0007_millhand_flint_combat.sql'
@@ -97,6 +98,8 @@ jobs:
           cache-dependency-path: platform/package-lock.json
       - run: npm ci
       - run: npm run build:packages
+      - name: Shared Fastify PostgreSQL pool lifecycle
+        run: npm run verify:shared-db-pool
       - run: npm run verify:stage3-workbench-ui
       - name: Bellrunner Stage 1 art, dialogue and handoff contract
         run: npm run verify:bellrunner-stage1

@@ -13,6 +13,7 @@ import {fromNodeHeaders} from 'better-auth/node';
 import type {IncomingHttpHeaders} from 'node:http';
 import {createHash,randomBytes} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {step,CombatError} from '@the-pall/game-core/combat-v0.5.1';
 import {initializeOwlerCombat,type OwlerPreparation} from './stitcher-owler-combat-opening.js';
@@ -108,11 +109,10 @@ export function registerStitcherOwlerCombatRoutes(app:FastifyInstance,options:{
   resolveSession?:SessionResolver;
   seed?:()=>number;
 }={}){
-  const db=options.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
+  const db=getGameplayPool(app,options.pool);
   const resolveSession=options.resolveSession??(async (headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
   const seed=options.seed??(()=>randomBytes(4).readUInt32BE(0));
-  app.addHook('onClose',async()=>{if(!options.pool)await db.end();});
 
   app.get<{Params:Params}>('/api/characters/:id/stitcher/combat',async(req,reply)=>{
     reply.header('Cache-Control','no-store');

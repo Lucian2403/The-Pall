@@ -8,6 +8,7 @@ import type {IncomingHttpHeaders} from 'node:http';
 import {fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
+import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
 import {
   INITIAL_WRONG_BELL,BELL_ACTIONS,BELL_BRANCH_SKILL,advanceWrongBell,
@@ -51,8 +52,7 @@ function view(character:Character,state:BellState){
 export function registerBellrunnerWrongBellRoutes(app:FastifyInstance,options?:{
   pool?:pg.Pool;resolveSession?:Resolver
 }){
-  const db=options?.pool??new pg.Pool({connectionString:process.env.DATABASE_URL});
-  if(!options?.pool)app.addHook('onClose',async()=>{await db.end();});
+  const db=getGameplayPool(app,options?.pool);
   const resolve=options?.resolveSession??(async(headers:IncomingHttpHeaders)=>
     auth.api.getSession({headers:fromNodeHeaders(headers)}));
   const URL='/api/characters/:id/bellrunner/wrong-bell';
