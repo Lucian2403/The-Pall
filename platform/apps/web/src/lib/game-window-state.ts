@@ -20,9 +20,12 @@ export function selectWindowCharacter(characterId:string){
 }
 export function resetGameWindows(){gameWindows.set(empty());}
 function position(kind:ActiveWindowType,viewportWidth:number){
- const x=Math.max(12,Math.round((viewportWidth-1100)/2));
- return kind==='inventory'?{x,y:76,width:625}:
-  {x:x+640,y:98,width:435};
+ const width=600,storageWidth=420,gap=14;
+ const group=width+gap+storageWidth;
+ const centered=Math.round((viewportWidth-group)/2);
+ const x=Math.max(12,viewportWidth>=1200?Math.max(215,centered):centered);
+ return kind==='inventory'?{x,y:76,width}:
+  {x:x+width+gap,y:98,width:storageWidth};
 }
 export function openGameWindow(characterId:string,kind:ActiveWindowType){
  selectWindowCharacter(characterId);

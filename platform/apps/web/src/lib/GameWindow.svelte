@@ -11,7 +11,7 @@
  let drag:{pointer:number;x:number;y:number;left:number;top:number}|null=null;
  const bounds=()=>{
   const width=window.innerWidth,height=window.innerHeight;
-  return {x:Math.max(8,width-record.width-8),y:Math.max(8,height-60)};
+  return {x:Math.max(8,width-record.width-8),y:Math.max(8,height-180)};
  };
  const clamp=(x:number,y:number)=>{
   const limit=bounds();
@@ -54,7 +54,8 @@
 <section class="game-window" class:mobile-hidden={mobileHidden}
   id={'game-window-'+(record.kind==='inventory'?'inventory':'storage-home-chest')}
   data-game-window={record.id} aria-label={title}
-  style={'left:'+record.x+'px;top:'+record.y+'px;width:'+record.width+'px;z-index:'+(620+record.z)}
+  style={'left:'+record.x+'px;top:'+record.y+'px;width:'+record.width+'px;'+
+    'max-height:calc(100dvh - '+(record.y+8)+'px);z-index:'+(620+record.z)}
   onpointerdown={()=>frontGameWindow(record.id)}
   onfocusin={()=>frontGameWindow(record.id)}>
  <header class="game-window-title">
@@ -95,7 +96,7 @@
  .game-window-content{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px}
  @media(max-width:700px){
   .game-window{inset:52px 6px 6px!important;width:auto!important;max-width:none;
-   max-height:none;border-radius:0}
+   max-height:none!important;border-radius:0}
   .game-window.mobile-hidden{display:none}
   .drag-note{display:none}
   .game-window-content{padding:10px}
