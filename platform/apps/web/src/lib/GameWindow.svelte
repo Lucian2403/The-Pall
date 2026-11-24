@@ -7,7 +7,7 @@
   record:GameWindowRecord;title:string;children:Snippet;onClose:()=>void;
   mobileHidden?:boolean;
  }=$props();
- let header:HTMLElement;
+ let header:HTMLButtonElement;
  let drag:{pointer:number;x:number;y:number;left:number;top:number}|null=null;
  const bounds=()=>{
   const width=window.innerWidth,height=window.innerHeight;
@@ -20,7 +20,7 @@
    Math.min(Math.max(8,Math.round(y)),limit.y));
  };
  function start(event:PointerEvent){
-  if(event.button!==0||(event.target as HTMLElement).closest('button'))return;
+  if(event.button!==0)return;
   frontGameWindow(record.id);
   if(window.matchMedia('(max-width:700px)').matches)return;
   drag={pointer:event.pointerId,x:event.clientX,y:event.clientY,left:record.x,top:record.y};
@@ -53,16 +53,18 @@
 <svelte:window onresize={fit}/>
 <section class="game-window" class:mobile-hidden={mobileHidden}
   id={'game-window-'+(record.kind==='inventory'?'inventory':'storage-home-chest')}
-  data-game-window={record.id} role="region" aria-label={title}
+  data-game-window={record.id} aria-label={title}
   style={'left:'+record.x+'px;top:'+record.y+'px;width:'+record.width+'px;z-index:'+(620+record.z)}
   onpointerdown={()=>frontGameWindow(record.id)}
   onfocusin={()=>frontGameWindow(record.id)}>
- <header class="game-window-title" bind:this={header} tabindex="0"
-   aria-label={title+'; hold Alt and arrow keys to move'}
-   onpointerdown={start} onpointermove={move} onpointerup={stop}
-   onpointercancel={stop} onkeydown={keyboard}>
-   <strong>{title}</strong>
-   <span class="drag-note">Move</span>
+ <header class="game-window-title">
+   <button type="button" class="window-grip" bind:this={header}
+     aria-label={'Move '+title+'; hold Alt and arrow keys to move'}
+     onpointerdown={start} onpointermove={move} onpointerup={stop}
+     onpointercancel={stop} onkeydown={keyboard}>
+     <strong>{title}</strong>
+     <span class="drag-note">Move</span>
+   </button>
    <button type="button" class="close-window" aria-label={'Close '+title}
      onclick={onClose}>×</button>
  </header>
@@ -79,8 +81,11 @@
  .game-window-title{display:flex;align-items:center;gap:10px;flex:none;min-height:44px;
   padding:4px 6px 4px 13px;border-bottom:1px solid #826440;background:#30251c;
   color:#eed2a5;user-select:none;touch-action:none;cursor:grab}
- .game-window-title:active{cursor:grabbing}
- .game-window-title:focus-visible{outline:2px solid #efd092;outline-offset:-3px}
+ .window-grip{appearance:none;border:0;background:transparent;color:inherit;
+  display:flex;align-items:center;gap:10px;flex:1;min-width:0;
+  min-height:38px;text-align:left;cursor:grab;touch-action:none}
+ .window-grip:active{cursor:grabbing}
+ .window-grip:focus-visible{outline:2px solid #efd092;outline-offset:-3px}
  .game-window-title strong{font:600 17px var(--pall-font-reading,Georgia,serif)}
  .drag-note{font:11px var(--pall-font-label,Arial,sans-serif);color:#ae987b;margin-left:auto}
  .close-window{width:36px;height:34px;border:1px solid #816448;background:#473325;
