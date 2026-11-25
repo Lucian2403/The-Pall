@@ -9,14 +9,14 @@ is enabled.
 
 - `/characters/:id/home`: physical rented room; its bed, chest and Journal
   still work after Stage VIII.
-- `/characters/:id/overview`: separate normal Home **entry**, using the existing
-  HUD and Inventory/Journal; ordinary activities are explicitly unavailable.
+- `/characters/:id/overview`: the city overview, using the existing HUD and Inventory/Journal.
+  The temporary Home entry panel is removed; the approved announcement is the only first-entry modal.
 - `/characters/:id`: independent Character record and skills.
 - Character selection defaults to `/overview` only for saved `Stage VIII +
   COMPLETED` characters; all others still use the Character sheet.
 
 The overview page loads `GET /api/characters/:id/free-play` and may render
-normal Home only after a successful owner-scoped 200. The API requires a playable
+the city entry only after a successful owner-scoped 200. The API requires a playable
 origin, Stage VIII COMPLETE status, and an exact saved home phase/identifier/
 origin match. It returns `409 free_play_not_unlocked` for unfinished or
 rewound characters. A missing or non-owned ID returns 404 without exposing an
@@ -29,7 +29,16 @@ No browser-supplied "tutorial completed" bit can open Free Play.
 The optional `free_play_intro_seen_at` is on `player_characters`. GET
 reports `announcementSeen`, initially false for all existing completed saves.
 The server exposes an idempotent `POST /api/characters/:id/free-play/announcement`
-accepting JSON `{}`. The overview displays the owner-approved “You're on your own now.” modal when GET reports `announcementSeen: false`. **Enter the City** posts the acknowledgement; the modal remains open until the server confirms success. Refreshes or later visits after acknowledgement skip the modal. The overview's availability notice remains accurate; the announcement does not enable ordinary gameplay.
+accepting JSON `{}`. The overview displays the owner-approved “You're on your own now.” modal when GET reports `announcementSeen: false`. **Enter the City** posts the acknowledgement; the modal remains open until the server confirms success. Refreshes or later visits after acknowledgement skip the modal. After acknowledgement the city overview mounts directly, without a second welcome panel. The announcement does not enable ordinary gameplay.
+
+## City overview foundation
+
+- `GET /api/characters/:id/free-play/city` uses the same owner, origin and saved Stage VIII gate as Free Play GET, plus a persisted announcement acknowledgement. An unseen announcement returns 409 `free_play_announcement_required`.
+- The shared `CityOverviewSnapshot` / `CityPointOfInterest` types separate stable POI IDs, display names, availability, and supported page destinations.
+- The server-owned `city-poi-catalogue.ts` currently exposes only the existing rented room (`starter-rented-room`). Adding a POI requires an approved location, availability and working route; unknown destinations are not navigable.
+- `CityOverview.svelte` is a replaceable, design-neutral list. It fetches only after acknowledgement, handles loading/errors/retry, and aborts stale requests on character changes.
+- Opening the rented-room route preserves its existing behaviour. It is page navigation, **not** a new travel action, timer, relocation or economy mutation.
+- Map coordinates, districts, art, travel graph, additional POIs and future rules are deliberately unspecified until owner design approval. No additional migration is required.
 
 ### Migration
 
@@ -59,6 +68,5 @@ The dedicated GitHub Actions job also runs all Stage VI–VIII real-PostgreSQL
 integration tests against a disposable `pall_stage6_test` database. Do **not**
 point this test harness at a personal or production character database.
 
-Later PRs: Help access to the announcement, normal Home dashboard, normalized
-city map/locations, then travel clocks. Those future features must not invent
+Later work: owner-approved city overview design and additional POIs, Help access to the announcement, then travel clocks. Those future features must not invent
 saved location, wages, XP or rent deadlines at this step.

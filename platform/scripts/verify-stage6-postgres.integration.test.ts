@@ -3280,8 +3280,13 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
  const c=await character();
  const url=base+c.id+'/free-play';
  const ack=url+'/announcement';
+ const city=url+'/city';
  assert.equal((await request('GET',url,null)).status,401);
  assert.equal((await request('GET',url,stranger)).status,404);
+ assert.equal((await request('GET',city,null)).status,401);
+ assert.equal((await request('GET',city,stranger)).status,404);
+ assert.equal((await request('GET',city)).status,409);
+ assert.equal((await request('GET',base+'not-a-uuid/free-play/city')).status,404);
  assert.equal((await request('POST',ack,stranger,{})).status,404);
  assert.equal((await request('GET',base+'not-a-uuid/free-play')).status,404);
  assert.equal((await request('POST',ack,owner,{} ,{'origin':'https://untrusted.example'})).status,403);
@@ -3307,6 +3312,7 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
     [c.id,save(phase,homeId,origin)]);
   assert.equal((await request('GET',url)).status,409,
     'Mismatched home identity or origin must remain locked');
+  assert.equal((await request('GET',city)).status,409);
  }
  await db.query('UPDATE player_character_tutorial_home SET state=$2::jsonb WHERE character_id=$1',
   [c.id,save('COMPLETE')]);
@@ -3317,6 +3323,7 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
   [c.id])).rows[0];
  assert.equal(before.free_play_intro_seen_at,null);
  assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:false});
+ assert.deepEqual(await request('GET',city),{status:409,body:{error:'free_play_announcement_required'}});
  const replies=await Promise.all([
   request('POST',ack,owner,{}),request('POST',ack,owner,{})
  ]);
@@ -3325,6 +3332,11 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
  assert.deepEqual(replies[0].body,{unlocked:true,announcementSeen:true});
  assert.deepEqual(replies[1].body,replies[0].body);
  assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:true});
+ assert.deepEqual(await request('GET',city),{status:200,body:{
+   cityId:'grand-cylinder-city',name:'Grand Cylinder City',
+   pointsOfInterest:[{id:'starter-rented-room',name:'Rented room',availability:'available',destination:'rented-room'}]
+ }});
+ assert.equal((await request('GET',city,stranger)).status,404);
  const seen=(await db.query<{
   coins:string|number;major_skill_bonuses:Record<string,number>;
   current_health:number;free_play_intro_seen_at:Date|null
@@ -3346,6 +3358,7 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
   [c.id]);
  assert.equal((await request('GET',url)).status,409,
   'Development rewind must immediately revoke Free Play entry');
+ assert.equal((await request('GET',city)).status,409);
  assert.equal((await request('POST',ack,owner,{})).status,409);
  assert.equal((await request('GET',base+c.id+'/tutorial/home')).status,409);
 });

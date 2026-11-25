@@ -377,8 +377,8 @@
       </a>
       {#if tutorialComplete}
         <a class:active={freePlayView} class="nav-entry" href={detail+'/overview'}
-          title="Free Play Home" aria-current={freePlayView?'page':undefined}>
-          <span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Home overview</span>
+          title="City overview" aria-current={freePlayView?'page':undefined}>
+          <span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">City overview</span>
         </a>
       {/if}
       <a class:active={activePage === 'character'} class="nav-entry" href={detail} title="Character" aria-current={activePage === 'character' ? 'page' : undefined}>
@@ -577,7 +577,7 @@
 {/if}
 
 <nav class="mobile-nav" aria-label="Character navigation">
-  {#if tutorialComplete}<a href={detail+'/overview'} aria-current={freePlayView?'page':undefined}><span aria-hidden="true">⌂</span>Home</a>{/if}
+  {#if tutorialComplete}<a href={detail+'/overview'} aria-current={freePlayView?'page':undefined}><span aria-hidden="true">⌂</span>City</a>{/if}
   <a href={chapter} aria-current={activePage === 'scene' ? 'page' : undefined}><span aria-hidden="true">⌂</span>Scene</a>
   <a href={detail} aria-current={activePage === 'character' ? 'page' : undefined}><span aria-hidden="true">◈</span>Character</a>
   <button type="button" data-open-inventory

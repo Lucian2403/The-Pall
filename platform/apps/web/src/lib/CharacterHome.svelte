@@ -81,8 +81,8 @@
     };
     if(isFinaleOrigin(character.origin)&&character.tutorial.stage===8&&
        character.tutorial.status==='COMPLETED')return {
-      title:'Free Play Home',
-      description:'Your introduction is complete. The city overview is ready; ordinary jobs and travel are still in development.',
+      title:'City overview',
+      description:'Open the city overview to find available destinations.',
       label:'Enter Free Play',
       href:base+'/overview'
     };

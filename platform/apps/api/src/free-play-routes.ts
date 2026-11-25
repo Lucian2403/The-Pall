@@ -8,6 +8,7 @@ import pg from 'pg';
 import {auth} from './auth.js';
 import {getGameplayPool} from './database-pool.js';
 import {HOME_ID} from './shared-home-state.js';
+import {CITY_OVERVIEW} from './city-poi-catalogue.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const base='/api/characters/:id/free-play';
@@ -41,7 +42,9 @@ export function registerFreePlayRoutes(app:FastifyInstance,options:{
   const session=await resolveSession(headers);
   return session?.user.emailVerified?session.user.id:null;
  }
- app.get<{Params:{id:string}}>(base,async(req,reply)=>{
+ // Both read routes use the same ownership and saved-completion boundary.
+ for(const read of ['entry','city'] as const){
+ app.get<{Params:{id:string}}>(read==='city'?base+'/city':base,async(req,reply)=>{
   reply.header('Cache-Control','no-store');
   const owner=await identity(req.headers);
   if(!owner)return reply.code(401).send({error:'unauthorized'});
@@ -52,13 +55,19 @@ export function registerFreePlayRoutes(app:FastifyInstance,options:{
     return reply.code(404).send({error:'not_found'});
    if(!unlocked(found.rows[0]))
     return reply.code(409).send({error:'free_play_not_unlocked'});
-   return {unlocked:true,announcementSeen:found.rows[0].free_play_intro_seen_at!==null};
+   const announcementSeen=found.rows[0].free_play_intro_seen_at!==null;
+   if(read==='city'){
+    if(!announcementSeen)return reply.code(409).send({error:'free_play_announcement_required'});
+    return CITY_OVERVIEW;
+   }
+   return {unlocked:true,announcementSeen};
   }catch(error){
    if(schemaMissing(error))return reply.code(503).send({
     error:'free_play_schema_missing',setup:'npm run free-play:migrate'});
    throw error;
   }
  });
+ }
  // The overview calls this endpoint when the one-time announcement is acknowledged.
  // Safe to retry across multiple tabs, refreshes and reconnects.
  app.post<{Params:{id:string}}>(base+'/announcement',async(req,reply)=>{

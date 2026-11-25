@@ -81,8 +81,10 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(overview.includes("fetch(base+'/free-play',{cache:'no-store'})"));
  assert.ok(overview.includes('status=\'locked\''));
  assert.ok(overview.includes('activePage="overview"'));
- assert.ok(overview.includes("href={href+'/home'}"));
- assert.ok(overview.includes('paid jobs and timed activities are not yet available'));
+ assert.ok(!overview.includes('Your life within the walls'));
+ assert.ok(!overview.includes('free-play-entry'));
+ assert.ok(overview.includes('access.announcementSeen===true'));
+ assert.ok(overview.includes('<CityOverview characterId={character.id}/>'));
  assert.ok(!overview.includes('requestId:'));
  assert.ok(!overview.includes("coins=coins+"));
  assert.ok(stage8.includes("home.phase==='COMPLETE'"));
@@ -99,4 +101,22 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(profile.includes("href:base+'/overview'"));
  assert.ok(profile.includes("href:base+'/home'"));
  assert.ok(sheet.includes('<CharacterHome {character}/>'));
+});
+
+test('City overview is a read-only, acknowledged, data-driven POI surface',()=>{
+ const api=source('apps/api/src/free-play-routes.ts');
+ const catalog=source('apps/api/src/city-poi-catalogue.ts');
+ const city=source('apps/web/src/lib/CityOverview.svelte');
+ const types=source('packages/game-core/src/city-overview.ts');
+ assert.ok(api.includes("read==='city'?base+'/city':base"));
+ assert.ok(api.includes("if(!announcementSeen)return reply.code(409).send({error:'free_play_announcement_required'})"));
+ assert.ok(api.includes('return CITY_OVERVIEW'));
+ assert.ok(catalog.includes("id:HOME_ID,name:'Rented room',availability:'available',destination:'rented-room'"));
+ assert.ok(types.includes('pointsOfInterest:readonly CityPointOfInterest[]'));
+ assert.ok(city.includes("+'/free-play/city'"));
+ assert.ok(city.includes('city.pointsOfInterest as point (point.id)'));
+ assert.ok(city.includes("point.availability==='available'&&point.destination==='rented-room'"));
+ assert.ok(city.includes("encodeURIComponent(characterId)+'/home'"));
+ assert.ok(city.includes('controller?.abort()'));
+ assert.ok(!city.includes("method:'POST'"),'Viewing or opening a POI must not start travel');
 });

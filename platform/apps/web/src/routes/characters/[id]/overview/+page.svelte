@@ -2,6 +2,7 @@
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import FreePlayAnnouncement from '$lib/FreePlayAnnouncement.svelte';
+  import CityOverview from '$lib/CityOverview.svelte';
   import '$lib/pall-owner-ui.css';
 
   type SavedCharacter={
@@ -36,7 +37,7 @@
       const saved=(await person.json() as {character:SavedCharacter}).character;
       const boundary=await gate.json() as Access;
       if(!current())return;
-      if(boundary.unlocked!==true||saved.id!==requestedId||
+      if(boundary.unlocked!==true||typeof boundary.announcementSeen!=='boolean'||saved.id!==requestedId||
         saved.tutorial.stage!==8||saved.tutorial.status!=='COMPLETED')
         throw Error('free_play_state_mismatch');
       character=saved;access=boundary;status='ready';
@@ -53,22 +54,10 @@
     return ()=>{requestGeneration++;};
   });
 </script>
-<svelte:head><title>The Pall — Free Play Home</title></svelte:head>
+<svelte:head><title>The Pall — Grand Cylinder City</title></svelte:head>
 
 {#if status==='ready'&&character?.id===id&&access?.unlocked}
   <TutorialShell {character} activePage="overview" sceneLocation="Grand Cylinder City · Overview">
-    <main class="free-play-entry" aria-labelledby="free-play-home-title">
-      <span class="eyebrow">GRAND CYLINDER CITY · FREE PLAY</span>
-      <h1 id="free-play-home-title">Your life within the walls</h1>
-      <p>The eight-stage introduction is complete. Your saved character, Inventory
-        and Journal remain available. You can return to your rented room.</p>
-      <p>City navigation, ordinary paid jobs and timed activities are not yet available.
-        They will open as their gameplay systems are implemented.</p>
-      <nav class="entry-actions" aria-label="Available Free Play entry actions">
-        <a class="pall-framed-button" href={href+'/home'}>Visit rented room</a>
-        <a class="pall-framed-button" href={href}>Character record</a>
-      </nav>
-    </main>
     {#if access.announcementSeen===false}
       {#key character.id}
         {@const announcementId=character.id}
@@ -77,6 +66,10 @@
             access={...access,announcementSeen:true};
           }
         }}/>
+      {/key}
+    {:else if access.announcementSeen===true}
+      {#key character.id}
+        <CityOverview characterId={character.id}/>
       {/key}
     {/if}
   </TutorialShell>
@@ -104,18 +97,8 @@
 {/if}
 <style>
   :global(body){background:#171513;color:#ead6b7}
-  .free-play-entry{margin:clamp(18px,4vw,45px) auto;max-width:850px;
-    padding:clamp(24px,3.5vw,45px);background:#27211b;
-    border:1px solid #856545;box-shadow:0 8px 27px #0008}
-  .eyebrow{display:block;font:600 12px var(--pall-font-label,'Arial Narrow',sans-serif);
-    letter-spacing:.13em;color:#cdaa78}
   h1{margin:12px 0 20px;font:600 clamp(30px,3.4vw,44px)/1.2 Georgia,serif;
     color:#f0dbc0}
-  .free-play-entry p{max-width:69ch;line-height:1.65;color:#dcc5a6}
-  .entry-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
-  .entry-actions a{min-height:44px;display:inline-flex;align-items:center;
-    text-decoration:none;padding:8px 15px;color:#2c2117}
-  .entry-actions a:focus-visible{outline:2px solid #e3bb7f;outline-offset:3px}
   .free-play-fallback{max-width:720px;margin:7vh auto;padding:28px;
     background:#26211d;border:1px solid #785d41}
   .free-play-fallback a{display:inline-block;margin:12px 15px 0 0;color:#e7bd81}
