@@ -29,7 +29,7 @@ No browser-supplied "tutorial completed" bit can open Free Play.
 The optional `free_play_intro_seen_at` is on `player_characters`. GET
 reports `announcementSeen`, initially false for all existing completed saves.
 The server exposes an idempotent `POST /api/characters/:id/free-play/announcement`
-accepting JSON `{}`. The overview displays the owner-approved “You're on your own now.” modal when GET reports `announcementSeen: false`. **Enter the City** posts the acknowledgement; the modal remains open until the server confirms success. Refreshes or later visits after acknowledgement skip the modal. After acknowledgement the city overview mounts directly, without a second welcome panel. The announcement does not enable ordinary gameplay.
+accepting JSON `{}`. The overview displays the owner-approved “You're on your own now.” modal when GET reports `announcementSeen: false`. **Enter the City** posts the acknowledgement; the modal remains open until the server confirms success. Refreshes or later visits after acknowledgement skip the modal. After acknowledgement the city overview mounts directly, without a second welcome panel. A `Review Free Play announcement` button reopens the same copy in read-only mode without changing its saved acknowledgement. A developer-only Stage VIII → VII rewind clears the selected character's acknowledgement in the existing rewind transaction, so replaying the finale prompts for acknowledgement again. Rewind still works before migration 0024. The announcement does not enable ordinary gameplay.
 
 ## City overview foundation
 

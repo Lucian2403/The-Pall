@@ -18,11 +18,12 @@
   let access=$state<Access|null>(null);
   let status=$state<'loading'|'ready'|'login'|'missing'|'locked'|'schema'|'error'>('loading');
   let message=$state('');
+  let reviewOpen=$state(false);
   let requestGeneration=0;
   async function refresh(requestedId:string){
     const generation=++requestGeneration;
     const current=()=>generation===requestGeneration&&requestedId===id;
-    character=null;access=null;status='loading';message='';
+    character=null;access=null;status='loading';message='';reviewOpen=false;
     try{
       const base='/api/characters/'+encodeURIComponent(requestedId);
       const [person,gate]=await Promise.all([
@@ -69,7 +70,10 @@
       {/key}
     {:else if access.announcementSeen===true}
       {#key character.id}
-        <CityOverview characterId={character.id}/>
+        <CityOverview characterId={character.id} onReviewAnnouncement={()=>{reviewOpen=true;}}/>
+        {#if reviewOpen}
+          <FreePlayAnnouncement characterId={character.id} reviewOnly onAcknowledged={()=>{reviewOpen=false;}}/>
+        {/if}
       {/key}
     {/if}
   </TutorialShell>

@@ -2257,6 +2257,9 @@ test('Bellrunner Back to Stage 7 from completed home restores PAID clinic, prese
     home=result.body!;
   }
   assert.equal(home.phase,'COMPLETE');
+  const freePlay=base+f.id+'/free-play';
+  assert.equal((await request('POST',freePlay+'/announcement',owner,{})).status,200);
+  assert.deepEqual((await request('GET',freePlay)).body,{unlocked:true,announcementSeen:true});
   const endpoint=base+f.id+'/dev/rewind-stage';
   assert.deepEqual((await request('GET',endpoint)).body,{
     enabled:true,canRewind:true,stage:8,targetStage:7
@@ -2291,6 +2294,14 @@ test('Bellrunner Back to Stage 7 from completed home restores PAID clinic, prese
   assert.equal(newHome.body?.phase,'HOME');
   assert.equal(newHome.body?.branch,'machinery');
   assert.equal(newHome.body?.outcome,outcome);
+  let replay=newHome.body!;
+  for(const action of ['read_notice','put_down','finish']){
+    const result=await request('POST',path,owner,{kind:'action',action,expectedRevision:replay.revision,requestId:randomUUID()});
+    assert.equal(result.status,200,JSON.stringify(result.body));
+    replay=result.body!;
+  }
+  assert.deepEqual((await request('GET',freePlay)).body,{unlocked:true,announcementSeen:false});
+  assert.equal((await request('GET',freePlay+'/city')).status,409);
  }
 });
 
@@ -3137,10 +3148,18 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
  const siblingSnapshot=JSON.stringify((await request('GET',base+sibling.id+'/journal')).body!.completed);
  assert.equal((await request('GET',rewind)).body!.targetStage,7);
  assert.equal((await request('POST',rewind,stranger,{expectedStage:8})).status,404);
+ const selectedEntry=base+selected.id+'/free-play';
+ const siblingEntry=base+sibling.id+'/free-play';
+ assert.equal((await request('POST',selectedEntry+'/announcement',owner,{})).status,200);
+ assert.equal((await request('POST',siblingEntry+'/announcement',owner,{})).status,200);
  const backHome=await request('POST',rewind,owner,{expectedStage:8});
  assert.equal(backHome.status,200,JSON.stringify(backHome.body));
  assert.equal(backHome.body!.route,'/characters/'+selected.id+'/stitcher/clinic');
  assert.equal(backHome.body!.coinDelta,0);
+ const resetAnnouncement=(await db.query<{free_play_intro_seen_at:Date|null}>(
+   'SELECT free_play_intro_seen_at FROM player_characters WHERE id=$1',[selected.id])).rows[0];
+ assert.equal(resetAnnouncement.free_play_intro_seen_at,null);
+ assert.deepEqual((await request('GET',siblingEntry)).body,{unlocked:true,announcementSeen:true});
  assert.equal((await request('GET',rewind)).body!.targetStage,6);
  assert.equal((await request('GET',selected.clinicPath)).body!.phase,'PAID');
  assert.equal((await request('GET',selected.homePath)).status,409);

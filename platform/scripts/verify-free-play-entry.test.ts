@@ -53,7 +53,7 @@ test('Acknowledgement is additive, idempotent and connected to the one-time UI',
  assert.ok(modal.includes("+'/free-play/announcement'"));
  assert.ok(modal.includes("method:'POST',headers:{'content-type':'application/json'},body:'{}'"));
  assert.ok(modal.includes('!response.ok||result.unlocked!==true||result.announcementSeen!==true'));
- assert.ok(modal.indexOf('result.announcementSeen!==true')<modal.indexOf('await onAcknowledged()'));
+ assert.ok(modal.indexOf('result.announcementSeen!==true')<modal.lastIndexOf('await onAcknowledged()'));
  assert.ok(modal.includes('dialog.showModal()'));
  assert.ok(modal.includes('oncancel={(event)=>event.preventDefault()}'));
  assert.ok(modal.includes('disabled={pending}'));
@@ -84,7 +84,7 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(!overview.includes('Your life within the walls'));
  assert.ok(!overview.includes('free-play-entry'));
  assert.ok(overview.includes('access.announcementSeen===true'));
- assert.ok(overview.includes('<CityOverview characterId={character.id}/>'));
+ assert.ok(overview.includes('<CityOverview characterId={character.id} onReviewAnnouncement='));
  assert.ok(!overview.includes('requestId:'));
  assert.ok(!overview.includes("coins=coins+"));
  assert.ok(stage8.includes("home.phase==='COMPLETE'"));
@@ -119,4 +119,18 @@ test('City overview is a read-only, acknowledged, data-driven POI surface',()=>{
  assert.ok(city.includes("encodeURIComponent(characterId)+'/home'"));
  assert.ok(city.includes('controller?.abort()'));
  assert.ok(!city.includes("method:'POST'"),'Viewing or opening a POI must not start travel');
+});
+
+test('Previously acknowledged announcements can be reviewed without mutation and replayed after a dev rewind',()=>{
+ const view=source('apps/web/src/routes/characters/[id]/overview/+page.svelte');
+ const modal=source('apps/web/src/lib/FreePlayAnnouncement.svelte');
+ const city=source('apps/web/src/lib/CityOverview.svelte');
+ const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
+ assert.ok(view.includes('reviewOpen=false'));
+ assert.ok(view.includes('reviewOnly onAcknowledged='));
+ assert.ok(city.includes('Review Free Play announcement'));
+ assert.ok(modal.includes('if(reviewOnly){await onAcknowledged();return;}'));
+ assert.ok(modal.indexOf('if(reviewOnly)')<modal.indexOf('await fetch('));
+ assert.ok(rewind.includes("attname='free_play_intro_seen_at'"));
+ assert.ok(rewind.includes('UPDATE player_characters SET free_play_intro_seen_at=NULL WHERE id=$1'));
 });

@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import type {CityOverviewSnapshot,CityPointOfInterest} from '@the-pall/game-core';
 
-  let {characterId}:{characterId:string}=$props();
+  let {characterId,onReviewAnnouncement}:{characterId:string;onReviewAnnouncement:()=>void}=$props();
   let city=$state<CityOverviewSnapshot|null>(null);
   let status=$state<'loading'|'ready'|'error'>('loading');
   let errorMessage=$state('');
@@ -47,6 +47,7 @@
      will replace this semantic list without changing the data/entry boundary. -->
 <main class="city-overview" aria-labelledby="city-overview-title">
   <h1 id="city-overview-title">{city?.name??'Grand Cylinder City'}</h1>
+  <button type="button" class="review-announcement" onclick={onReviewAnnouncement}>Review Free Play announcement</button>
   {#if status==='loading'}
     <p role="status">Loading city destinations…</p>
   {:else if status==='error'}
@@ -72,6 +73,7 @@
 <style>
   .city-overview{min-width:0;padding:clamp(16px,3vw,32px)}
   h1{margin:0 0 20px;font:600 clamp(26px,3vw,38px)/1.2 Georgia,serif;color:#f0dbc0}
+  .review-announcement{display:block;min-height:44px;margin:0 0 20px;padding:6px 12px;background:transparent;border:1px solid #856545;color:#e7bd81;cursor:pointer}
   ul{margin:0;padding-inline-start:24px}
   li{margin:8px 0}
   a{display:inline-flex;align-items:center;min-height:44px;color:#e7bd81}

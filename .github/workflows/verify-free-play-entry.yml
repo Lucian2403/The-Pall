@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'platform/apps/api/src/free-play-routes.ts'
+      - 'platform/apps/api/src/millhand-stage-rewind-routes.ts'
       - 'platform/apps/api/src/city-poi-catalogue.ts'
       - 'platform/apps/web/src/lib/CityOverview.svelte'
       - 'platform/apps/web/src/lib/FreePlayAnnouncement.svelte'

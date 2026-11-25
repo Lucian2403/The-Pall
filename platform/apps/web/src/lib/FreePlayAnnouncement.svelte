@@ -1,8 +1,9 @@
 <script lang="ts">
   import {onMount} from 'svelte';
 
-  let {characterId,onAcknowledged}:{
+  let {characterId,onAcknowledged,reviewOnly=false}:{
     characterId:string;
+    reviewOnly?:boolean;
     onAcknowledged:()=>void|Promise<void>;
   }=$props();
   let dialog:HTMLDialogElement;
@@ -18,6 +19,7 @@
 
   async function enterCity(){
     if(pending)return;
+    if(reviewOnly){await onAcknowledged();return;}
     pending=true;errorMessage='';
     try{
       const response=await fetch('/api/characters/'+encodeURIComponent(characterId)+'/free-play/announcement',{
