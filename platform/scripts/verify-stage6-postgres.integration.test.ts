@@ -1456,6 +1456,9 @@ test('Stage 8 shared home: six Millhand route/outcome combinations complete once
    }
    assert.equal(state.completed,true);
    assert.equal(state.revision,3);
+   const entry=await request('GET',base+c.id+'/free-play');
+   assert.deepEqual(entry,{status:200,body:{unlocked:true,announcementSeen:false}},
+     'Every Millhand branch/outcome unlocks exactly the same Free Play boundary');
    assert.equal((await request('POST',route,owner,{
      kind:'action',requestId:randomUUID(),expectedRevision:state.revision,action:'finish'
    })).status,409,'Cannot complete again');
@@ -2217,6 +2220,9 @@ test('Bellrunner final Stage VIII shares rented-room notice, exact speech and br
      assert.equal(s.phase,phase);
    }
    assert.equal(s.completed,true);
+   assert.deepEqual((await request('GET',base+f.id+'/free-play')).body,
+     {unlocked:true,announcementSeen:false},
+     'Every Bellrunner branch/outcome unlocks Free Play without new rewards');
    assert.equal((await request('POST',path,owner,{
      kind:'action',action:'finish',expectedRevision:s.revision,requestId:randomUUID()
    })).status,409,'Completion cannot be granted twice');
@@ -3085,6 +3091,9 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
    home=result.body!;
   }
   assert.equal(home.phase,'COMPLETE');
+  assert.deepEqual((await request('GET',base+c.id+'/free-play')).body,
+    {unlocked:true,announcementSeen:false},
+    'Completed Stitcher ward/clinic/home history unlocks Free Play');
   const tasks=(await request('GET',journal)).body!.completed;
   const savedHome=tasks.find((entry:any)=>entry.stage===8);
   assert.equal(savedHome.taskId,'shared.rented-home');
@@ -3265,4 +3274,78 @@ test('Deletion clears completed character records across Millhand, Bellrunner an
    assert.equal(Number(found.rows[0].remaining),0,entry.origin+' orphan in '+table);
   }
  }
+});
+
+test('Free Play is owner-scoped, phase-checked, idempotent and has no economic effects',async()=>{
+ const c=await character();
+ const url=base+c.id+'/free-play';
+ const ack=url+'/announcement';
+ assert.equal((await request('GET',url,null)).status,401);
+ assert.equal((await request('GET',url,stranger)).status,404);
+ assert.equal((await request('POST',ack,stranger,{})).status,404);
+ assert.equal((await request('GET',base+'not-a-uuid/free-play')).status,404);
+ assert.equal((await request('POST',ack,owner,{} ,{'origin':'https://untrusted.example'})).status,403);
+ assert.equal((await request('POST',ack,owner,{extra:true})).status,400);
+ assert.equal((await request('GET',url)).body?.error,'free_play_not_unlocked');
+ assert.equal((await request('POST',ack,owner,{})).body?.error,'free_play_not_unlocked');
+
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",
+  [c.id]);
+ assert.equal((await request('GET',url)).status,409,'Status alone cannot unlock Free Play');
+ const save=(phase:string,homeId='starter-rented-room',origin='Millhand')=>
+   JSON.stringify({phase,homeId,origin,revision:3});
+ await db.query(
+  'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',
+  [c.id,save('NOTICE')]);
+ assert.equal((await request('GET',url)).status,409,'An unread notice is not completion');
+ for(const [phase,homeId,origin] of [
+  ['COMPLETE','another-room','Millhand'],
+  ['COMPLETE','starter-rented-room','Bellrunner']
+ ]){
+  await db.query('UPDATE player_character_tutorial_home SET state=$2::jsonb WHERE character_id=$1',
+    [c.id,save(phase,homeId,origin)]);
+  assert.equal((await request('GET',url)).status,409,
+    'Mismatched home identity or origin must remain locked');
+ }
+ await db.query('UPDATE player_character_tutorial_home SET state=$2::jsonb WHERE character_id=$1',
+  [c.id,save('COMPLETE')]);
+ const before=(await db.query<{
+  coins:string|number;major_skill_bonuses:Record<string,number>;
+  current_health:number;free_play_intro_seen_at:Date|null
+ }>('SELECT coins,major_skill_bonuses,current_health,free_play_intro_seen_at FROM player_characters WHERE id=$1',
+  [c.id])).rows[0];
+ assert.equal(before.free_play_intro_seen_at,null);
+ assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:false});
+ const replies=await Promise.all([
+  request('POST',ack,owner,{}),request('POST',ack,owner,{})
+ ]);
+ assert.deepEqual(replies.map(x=>x.status),[200,200],
+  'Two-tab acknowledgements must be safe and idempotent');
+ assert.deepEqual(replies[0].body,{unlocked:true,announcementSeen:true});
+ assert.deepEqual(replies[1].body,replies[0].body);
+ assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:true});
+ const seen=(await db.query<{
+  coins:string|number;major_skill_bonuses:Record<string,number>;
+  current_health:number;free_play_intro_seen_at:Date|null
+ }>('SELECT coins,major_skill_bonuses,current_health,free_play_intro_seen_at FROM player_characters WHERE id=$1',
+  [c.id])).rows[0];
+ assert.ok(seen.free_play_intro_seen_at,'Acknowledgement is persisted server-side');
+ assert.equal(Number(seen.coins),Number(before.coins));
+ assert.deepEqual(seen.major_skill_bonuses,before.major_skill_bonuses);
+ assert.equal(seen.current_health,before.current_health);
+ await request('POST',ack,owner,{});
+ const repeated=(await db.query<{free_play_intro_seen_at:Date}>(
+  'SELECT free_play_intro_seen_at FROM player_characters WHERE id=$1',[c.id])).rows[0];
+ assert.equal(repeated.free_play_intro_seen_at.getTime(),
+  seen.free_play_intro_seen_at.getTime(),'Repeat calls never reset the acknowledgement timestamp');
+ const sibling=await character();
+ assert.equal((await request('GET',base+sibling.id+'/free-play')).status,409);
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
+  [c.id]);
+ assert.equal((await request('GET',url)).status,409,
+  'Development rewind must immediately revoke Free Play entry');
+ assert.equal((await request('POST',ack,owner,{})).status,409);
+ assert.equal((await request('GET',base+c.id+'/tutorial/home')).status,409);
 });
