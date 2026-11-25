@@ -1,0 +1,63 @@
+name: Verify Free Play entry
+on:
+  pull_request:
+    paths:
+      - 'platform/apps/api/src/free-play-routes.ts'
+      - 'platform/apps/api/src/index.ts'
+      - 'platform/apps/web/src/routes/characters/**'
+      - 'platform/apps/web/src/lib/CharacterHome.svelte'
+      - 'platform/apps/web/src/lib/TutorialShell.svelte'
+      - 'platform/scripts/verify-free-play-entry.test.ts'
+      - 'platform/scripts/verify-stage6-postgres.integration.test.ts'
+      - 'platform/scripts/free-play-migrate.mjs'
+      - 'platform/db/migrations/0024_free_play_entry.sql'
+      - 'platform/package.json'
+      - '.github/workflows/verify-free-play-entry.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  free-play-entry:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pall_stage6_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pall_stage6_test"
+          --health-interval 3s
+          --health-timeout 5s
+          --health-retries 20
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+      - run: npm ci
+      - run: npm run build:packages
+      - name: Free Play entry contracts
+        run: npm run verify:free-play-entry
+      - name: Stage VIII canonical ending and saved states
+        run: npm run verify:stage-eight
+      - name: Existing character sheet contracts
+        run: npm run verify:character-home
+      - name: API typecheck
+        run: npm run check:api
+      - name: Svelte typecheck
+        run: npm run check -w @the-pall/web
+      - name: Real PostgreSQL owner, stage, rewind and character lifecycle
+        env:
+          STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
+          BETTER_AUTH_SECRET: free-play-entry-ci-not-for-production-96a3a108271e8534ae0a
+        run: node --import tsx --test scripts/verify-stage6-postgres.integration.test.ts
