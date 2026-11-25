@@ -3,6 +3,11 @@ on:
   pull_request:
     paths:
       - 'platform/apps/api/src/free-play-routes.ts'
+      - 'platform/apps/api/src/city-travel.ts'
+      - 'platform/db/migrations/0025_city_travel.sql'
+      - 'platform/scripts/city-travel-migrate.mjs'
+      - 'platform/apps/web/src/lib/CityMapViewport.svelte'
+      - 'platform/apps/web/src/lib/city-map-assets.ts'
       - 'platform/apps/api/src/millhand-stage-rewind-routes.ts'
       - 'platform/apps/api/src/city-poi-catalogue.ts'
       - 'platform/apps/web/src/lib/CityOverview.svelte'

@@ -748,6 +748,10 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
         const announcementColumn=await client.query(
           "SELECT 1 FROM pg_attribute WHERE attrelid='player_characters'::regclass AND attname='free_play_intro_seen_at' AND NOT attisdropped"
         );
+        const travelTable=await client.query("SELECT to_regclass('player_character_city_travel') AS name");
+        if(travelTable.rows[0]?.name){
+          await client.query('DELETE FROM player_character_city_travel WHERE character_id=$1',[req.params.id]);
+        }
         if(announcementColumn.rowCount){
           await client.query(
             'UPDATE player_characters SET free_play_intro_seen_at=NULL WHERE id=$1',

@@ -63,7 +63,7 @@ const schema=[
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
   '0022_personal_journal.sql','0023_inventory_storage_context.sql',
-  '0024_free_play_entry.sql'
+  '0024_free_play_entry.sql','0025_city_travel.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -3351,10 +3351,19 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
  assert.deepEqual(replies[0].body,{unlocked:true,announcementSeen:true});
  assert.deepEqual(replies[1].body,replies[0].body);
  assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:true});
- assert.deepEqual(await request('GET',city),{status:200,body:{
-   cityId:'grand-cylinder-city',name:'Grand Cylinder City',
-   pointsOfInterest:[{id:'starter-rented-room',name:'Rented room',availability:'available',destination:'rented-room'}]
- }});
+ const snapshot=await request('GET',city);
+ assert.equal(snapshot.status,200);
+ assert.equal(snapshot.body?.cityId,'grand-cylinder-city');
+ assert.equal(snapshot.body?.currentLocationId,'starter-rented-room');
+ assert.equal(snapshot.body?.journey,null);
+ assert.equal(snapshot.body?.pointsOfInterest.length,9);
+ assert.equal(snapshot.body?.pointsOfInterest.filter((p:any)=>p.availability==='available').length,1);
+ const travel=city+'/travel';
+ const command={destinationId:'job-board',expectedRevision:0,requestId:randomUUID()};
+ assert.equal((await request('POST',travel,stranger,command)).status,404);
+ assert.equal((await request('POST',travel,owner,command)).body?.error,'destination_unavailable');
+ assert.equal((await request('POST',travel,owner,{...command,destinationId:'starter-rented-room'})).body?.error,'already_at_destination');
+ assert.equal((await request('GET',city)).body?.revision,0);
  assert.equal((await request('GET',city,stranger)).status,404);
  const seen=(await db.query<{
   coins:string|number;major_skill_bonuses:Record<string,number>;

@@ -100,11 +100,14 @@
   // current activity, AND a real map route has been supplied.
   const tutorialComplete=$derived(character.tutorial.stage>=8&&character.tutorial.status==='COMPLETED');
   const freePlayView=$derived(activePage==='overview');
-  const mapState=$derived(!tutorialComplete?'introduction':travelLocked?'activity':!cityMap?'unavailable':'open');
+  const mapHref=$derived(cityMap?.href??(tutorialComplete?'/characters/'+encodeURIComponent(character.id)+'/overview':undefined));
+  const mapState=$derived(!tutorialComplete?'introduction':travelLocked?'activity':!mapHref?'unavailable':'open');
   const mapStatus=$derived(mapState==='introduction'?'Opens after the introduction'
     :mapState==='activity'?'Travel is locked during this activity'
     :mapState==='unavailable'?'Not available yet':'Open the city map');
-  const chapter = $derived(character.tutorial.stage === 8
+  const chapter = $derived(tutorialComplete
+    ? '/characters/' + encodeURIComponent(character.id) + '/scene'
+    : character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
     : character.origin === 'Bellrunner' && character.tutorial.stage === 6
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/combat'
@@ -482,8 +485,8 @@
         <strong id="city-banner-title">Grand Cylinder City</strong>
         <small>{tutorialComplete?character.origin:'Guided introduction · '+character.origin}</small>
       </div>
-      {#if mapState==='open'&&cityMap}
-        <a class="city-map-gateway" href={cityMap.href} aria-describedby="city-map-status">
+      {#if mapState==='open'&&mapHref}
+        <a class="city-map-gateway" href={mapHref} aria-describedby="city-map-status">
           {@render mapIcon()}
           <span class="gateway-text"><span class="gateway-title">City map</span>
             <span class="gateway-status" id="city-map-status">{mapStatus}</span></span>
