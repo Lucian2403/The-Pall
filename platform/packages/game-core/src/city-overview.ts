@@ -14,7 +14,7 @@ export type CityCatalogue=Readonly<{
 }>;
 export type CityJourney=Readonly<{originId:string;destinationId:string;startedAt:string;arrivesAt:string}>;
 export type CityTravelState=Readonly<{currentLocationId:string;revision:number;journey:CityJourney|null}>;
-export type CityOverviewSnapshot=CityCatalogue&CityTravelState&Readonly<{serverNow:string}>;
+export type CityOverviewSnapshot=CityCatalogue&CityTravelState&Readonly<{serverNow:string;arrived:boolean}>;
 /** Distance scale is distance units per original image pixel; speed is units/sec. */
 export function cityWalkingSeconds(from:CityCoordinates,to:CityCoordinates,config:CityTravelConfig):number{
   if([from.x,from.y,to.x,to.y].some(v=>!Number.isFinite(v)||v<0||v>1)||

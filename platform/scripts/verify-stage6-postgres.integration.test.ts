@@ -33,6 +33,7 @@ import {STAGE_FOUR_FACT,STAGE_FOUR_OPENING_LENGTH,STAGE_FOUR_REVELATION_LENGTH} 
 import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes,registerStitcherClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
 import {registerFreePlayRoutes} from '../apps/api/src/free-play-routes.ts';
+import {CITY_OVERVIEW} from '../apps/api/src/city-poi-catalogue.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
@@ -3389,4 +3390,41 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
  assert.equal((await request('GET',city)).status,409);
  assert.equal((await request('POST',ack,owner,{})).status,409);
  assert.equal((await request('GET',base+c.id+'/tutorial/home')).status,409);
+});
+
+test('City travel starts and arrives once across duplicate requests and owner-scoped reloads (test-only destination)',async()=>{
+ const c=await character();
+ await db.query("UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",[c.id]);
+ await db.query('INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',
+  [c.id,JSON.stringify({phase:'COMPLETE',homeId:'starter-rented-room',origin:'Millhand',revision:3})]);
+ const city=base+c.id+'/free-play/city';
+ assert.equal((await request('POST',base+c.id+'/free-play/announcement',owner,{})).status,200);
+ const fixture=Fastify({logger:false});
+ const points=CITY_OVERVIEW.pointsOfInterest.map(p=>p.id==='job-board'?{...p,availability:'available' as const,destination:'qa-only'}:p);
+ registerFreePlayRoutes(fixture,{pool:db,resolveSession,cityCatalogue:{...CITY_OVERVIEW,pointsOfInterest:points,config:{...CITY_OVERVIEW.config,minimumSeconds:60}}});
+ await fixture.ready();
+ const call=async(method:'GET'|'POST',url:string,body?:unknown,principal=owner)=>{
+  const response=await fixture.inject({method,url,headers:{'x-test-principal':principal,...(body?{'content-type':'application/json',origin:'http://127.0.0.1:5173'}:{})},...(body?{payload:JSON.stringify(body)}:{})});
+  return {status:response.statusCode,body:JSON.parse(response.body)};
+ };
+ try{
+  const start={destinationId:'job-board',expectedRevision:0,requestId:randomUUID()};
+  const first=await Promise.all([call('POST',city+'/travel',start),call('POST',city+'/travel',start)]);
+  assert.deepEqual(first.map(x=>x.status),[200,200]);
+  assert.equal(first[0].body.journey.arrivesAt,first[1].body.journey.arrivesAt);
+  assert.equal(first[0].body.currentLocationId,'starter-rented-room');
+  assert.equal(first[0].body.revision,1);
+  assert.equal((await call('POST',city+'/travel',{...start,requestId:randomUUID(),expectedRevision:1})).body.error,'travel_in_progress');
+  assert.equal((await call('GET',city,undefined,stranger)).status,404);
+  assert.equal((await call('GET',city)).body.journey.destinationId,'job-board');
+  assert.equal((await request('GET',base+c.id+'/tutorial/home')).body?.error,'not_at_home');
+  // Move only the disposable fixture's clock into the past; no sleep or browser timer authority.
+  await db.query("UPDATE player_character_city_travel SET started_at=NOW()-INTERVAL '120 seconds',arrives_at=NOW()-INTERVAL '60 seconds' WHERE character_id=$1",[c.id]);
+  const arrival=await Promise.all([call('GET',city),call('GET',city)]);
+  assert.deepEqual(arrival.map(x=>x.body.currentLocationId),['job-board','job-board']);
+  assert.deepEqual(arrival.map(x=>x.body.revision),[2,2]);
+  assert.equal(arrival.filter(x=>x.body.arrived).length,1);
+  assert.equal((await call('POST',city+'/travel',start)).body.revision,2);
+  assert.equal((await call('POST',city+'/travel',{...start,requestId:randomUUID()})).body.error,'stale_city_revision');
+ }finally{await fixture.close();}
 });

@@ -9,7 +9,8 @@
  let {characterId,onReviewAnnouncement}:{characterId:string;onReviewAnnouncement:()=>void}=$props();
  let city=$state<CityOverviewSnapshot|null>(null),selectedId=$state(''),search=$state(''),directoryOpen=$state(false);
  let status=$state<'loading'|'ready'|'error'>('loading'),errorMessage=$state(''),pending=$state(false);
- let time=$state(0),clockBase=0,clockAt=0,disposed=false,requestInFlight=false;
+ let time=$state(0),requestInFlight=$state(false);
+ let clockBase=0,clockAt=0,disposed=false;
  let controller:AbortController|undefined;
  let audio:ReturnType<typeof createCityMapAudio>|undefined;
  let failedIcons=$state<Record<string,boolean>>({});
@@ -34,7 +35,7 @@
   if(!selectedId||!snapshot.pointsOfInterest.some(p=>p.id===selectedId))
    selectedId=snapshot.journey?.destinationId??snapshot.currentLocationId;
   audio?.set(snapshot.journey?'walking':'city');
-  if(previous?.journey&&!snapshot.journey&&snapshot.currentLocationId===previous.journey.destinationId){
+  if(!snapshot.journey&&(snapshot.arrived||(previous?.journey&&snapshot.currentLocationId===previous.journey.destinationId))){
    const destination=href(snapshot.pointsOfInterest.find(p=>p.id===snapshot.currentLocationId));
    if(destination&&!disposed){audio?.set(null);await goto(destination);}
   }
@@ -45,6 +46,7 @@
   controller=new AbortController();
   try{
    const response=await fetch(base,{cache:'no-store',signal:controller.signal});
+   if(!response.ok&&[401,403,404,409].includes(response.status)){city=null;audio?.set(null);}
    if(!response.ok)throw Error(response.status===503?'City database update required: npm run city-travel:migrate':response.status===409?'City access has changed. Reopen the city overview.':'City destinations could not be loaded.');
    const snapshot=await response.json() as CityOverviewSnapshot;
    if(disposed)return;
@@ -118,7 +120,7 @@
      <h2>{@render poiIcon(selected)}{selected.name}</h2><p>{selected.description}</p>
      <p class="walking-time">{selected.id===city.currentLocationId?'Current location':seconds+' sec walk'}</p>
      {#if selected.availability==='unavailable'}<p class="availability">Unavailable — scene not implemented.</p>{/if}
-     <button type="button" class="walk pall-framed-button" disabled={pending||!!city.journey||selected.availability!=='available'} onclick={()=>{void walk();}}>
+     <button type="button" class="walk pall-framed-button" disabled={pending||requestInFlight||!!city.journey||selected.availability!=='available'} onclick={()=>{void walk();}}>
       {pending?'Starting…':selected.id===city.currentLocationId?'Enter location':'Walk there'}
      </button>
      <p class="hint">Selecting a location does not start travel. Use “Walk there” to move to it.</p>

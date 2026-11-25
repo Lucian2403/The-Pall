@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
+import {cityWalkingSeconds,startCityJourney,settleCityJourney,type CityCatalogue} from '@the-pall/game-core';
+import {CITY_OVERVIEW} from '../apps/api/src/city-poi-catalogue.ts';
 
 const root=resolve(import.meta.dirname,'..');
 const source=(path:string)=>readFileSync(resolve(root,path),'utf8');
@@ -103,22 +105,56 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(sheet.includes('<CharacterHome {character}/>'));
 });
 
-test('City overview is a read-only, acknowledged, data-driven POI surface',()=>{
+test('City map has a shared acknowledged catalogue, explicit travel action and dev-only calibration',()=>{
  const api=source('apps/api/src/free-play-routes.ts');
- const catalog=source('apps/api/src/city-poi-catalogue.ts');
+ const catalogue=source('apps/api/src/city-poi-catalogue.ts');
  const city=source('apps/web/src/lib/CityOverview.svelte');
+ const map=source('apps/web/src/lib/CityMapViewport.svelte');
  const types=source('packages/game-core/src/city-overview.ts');
- assert.ok(api.includes("read==='city'?base+'/city':base"));
- assert.ok(api.includes("if(!announcementSeen)return reply.code(409).send({error:'free_play_announcement_required'})"));
- assert.ok(api.includes('return CITY_OVERVIEW'));
- assert.ok(catalog.includes("id:HOME_ID,name:'Rented room',availability:'available',destination:'rented-room'"));
+ assert.ok(api.includes("method==='GET'?base+'/city':base+'/city/travel'"));
+ assert.ok(api.includes("free_play_announcement_required"));
+ assert.ok(catalogue.includes("poi(HOME_ID,'Home'"));
+ assert.equal(CITY_OVERVIEW.pointsOfInterest.length,9);
+ assert.equal(new Set(CITY_OVERVIEW.pointsOfInterest.map(p=>p.id)).size,9);
+ assert.equal(CITY_OVERVIEW.pointsOfInterest.filter(p=>p.availability==='available').length,1);
  assert.ok(types.includes('pointsOfInterest:readonly CityPointOfInterest[]'));
  assert.ok(city.includes("+'/free-play/city'"));
- assert.ok(city.includes('city.pointsOfInterest as point (point.id)'));
- assert.ok(city.includes("point.availability==='available'&&point.destination==='rented-room'"));
- assert.ok(city.includes("encodeURIComponent(characterId)+'/home'"));
+ assert.ok(city.includes('filtered as point (point.id)'));
+ assert.ok(city.includes("fetch(base+'/travel',{method:'POST'"));
+ assert.ok(city.includes('function select(id:string){selectedId=id;}'));
  assert.ok(city.includes('controller?.abort()'));
- assert.ok(!city.includes("method:'POST'"),'Viewing or opening a POI must not start travel');
+ assert.ok(map.includes('{#if dev}'));
+ assert.ok(map.includes('width*scale'));
+});
+
+test('Distance uses original image aspect ratio, global speed and rounding only',()=>{
+ const c={width:1400,height:1000,distanceScale:.02,walkingSpeed:1.4,minimumSeconds:2,roundingSeconds:1};
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:.5,y:0},c),10);
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:0,y:.5},c),8);
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:0,y:0},c),0);
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:.001,y:0},c),2);
+ assert.ok(cityWalkingSeconds({x:0,y:0},{x:.8,y:.8},c)>cityWalkingSeconds({x:0,y:0},{x:.2,y:.2},c));
+});
+
+test('Journey requires a distinct available destination and settles once at its timestamp',()=>{
+ const home=CITY_OVERVIEW.pointsOfInterest[0];
+ const fixture={...CITY_OVERVIEW.pointsOfInterest[1],availability:'available' as const,destination:'qa-only'};
+ const catalogue:CityCatalogue={...CITY_OVERVIEW,pointsOfInterest:[home,fixture]};
+ const state={currentLocationId:home.id,revision:0,journey:null};
+ const now=new Date('2026-11-25T12:00:00Z');
+ assert.throws(()=>startCityJourney(state,CITY_OVERVIEW,fixture.id,now),/destination_unavailable/);
+ assert.throws(()=>startCityJourney(state,catalogue,home.id,now),/already_at_destination/);
+ const started=startCityJourney(state,catalogue,fixture.id,now);
+ assert.equal(started.currentLocationId,home.id);
+ assert.equal(started.revision,1);
+ assert.throws(()=>startCityJourney(started,catalogue,fixture.id,now),/travel_in_progress/);
+ const arrival=new Date(started.journey!.arrivesAt);
+ assert.equal(settleCityJourney(started,new Date(arrival.getTime()-1)),started);
+ const landed=settleCityJourney(started,arrival);
+ assert.equal(landed.currentLocationId,fixture.id);
+ assert.equal(landed.revision,2);
+ assert.equal(landed.journey,null);
+ assert.equal(settleCityJourney(landed,arrival),landed);
 });
 
 test('Previously acknowledged announcements can be reviewed without mutation and replayed after a dev rewind',()=>{
@@ -128,7 +164,7 @@ test('Previously acknowledged announcements can be reviewed without mutation and
  const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
  assert.ok(view.includes('reviewOpen=false'));
  assert.ok(view.includes('reviewOnly onAcknowledged='));
- assert.ok(city.includes('Review Free Play announcement'));
+ assert.ok(city.includes('Review announcement'));
  assert.ok(modal.includes('if(reviewOnly){await onAcknowledged();return;}'));
  assert.ok(modal.indexOf('if(reviewOnly)')<modal.indexOf('await fetch('));
  assert.ok(rewind.includes("attname='free_play_intro_seen_at'"));

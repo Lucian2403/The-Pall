@@ -11,7 +11,7 @@ import {createHash} from 'node:crypto';
 import pg from 'pg';
 import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
-import {advance,HomeInvalidAction,initial,view} from './shared-home-state.js';
+import {HOME_ID,advance,HomeInvalidAction,initial,view} from './shared-home-state.js';
 import type {Action,State,Branch,Outcome} from './shared-home-state.js';
 import type {ClinicState} from './millhand-clinic-state.js';
 
@@ -36,6 +36,16 @@ const ready=(s:ClinicState|undefined)=>!!s&&s.phase==='LEFT'&&s.paid&&
  (s.outcome==='player_victory'||s.outcome==='player_defeat');
 const base='/api/characters/:id/tutorial/home';
 const characterSQL='SELECT id,name,origin,tutorial_stage,tutorial_status,coins FROM player_characters WHERE id=$1 AND account_id=$2';
+/** The old tutorial room still works before the city migration. Once travel
+ * exists, completed characters must actually be at Home to use the room. */
+async function physicallyAtHome(db:pg.Pool|pg.PoolClient,id:string){
+ const exists=await db.query("SELECT to_regclass('player_character_city_travel') AS name");
+ if(!exists.rows[0]?.name)return true;
+ const result=await db.query<{current_location_id:string;destination_id:string|null}>(
+  'SELECT current_location_id,destination_id FROM player_character_city_travel WHERE character_id=$1',[id]);
+ const row=result.rows[0];
+ return !row||(row.current_location_id===HOME_ID&&row.destination_id===null);
+}
 export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg.Pool;resolveSession?:Resolver}={}){
  const pool=getGameplayPool(app,options.pool);
  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
@@ -50,6 +60,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    const c=rows.rows[0];
    if(!c||!isFinaleOrigin(c.origin))return reply.code(404).send({error:'not_found'});
    if(c.tutorial_stage!==8)return reply.code(409).send({error:'home_not_ready'});
+   if(c.tutorial_status==='COMPLETED'&&!await physicallyAtHome(pool,c.id))return reply.code(409).send({error:'not_at_home'});
    const saved=await pool.query<{state:State}>('SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[c.id]);
    if(saved.rowCount){
     const state=saved.rows[0].state;
@@ -85,6 +96,9 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    const c=characters.rows[0];
    if(!c||!isFinaleOrigin(c.origin)){
     await db.query('ROLLBACK');open=false;return reply.code(404).send({error:'not_found'});
+   }
+   if(c.tutorial_status==='COMPLETED'&&!await physicallyAtHome(db,c.id)){
+    await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'not_at_home'});
    }
    const receipt=await db.query<{request_hash:string;response:unknown}>(
     'SELECT request_hash,response FROM player_character_tutorial_home_receipts WHERE character_id=$1 AND request_id=$2',

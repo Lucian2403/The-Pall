@@ -1,5 +1,5 @@
 <script lang="ts">
- import {onMount} from 'svelte';
+ import {onMount,untrack} from 'svelte';
  import {dev} from '$app/environment';
  import type {CityPointOfInterest} from '@the-pall/game-core';
  import {cityMapAssets as assets} from './city-map-assets';
@@ -10,7 +10,7 @@
  let viewport:HTMLDivElement;
  let w=$state(1),h=$state(1),zoom=$state(1),x=$state(0),y=$state(0);
  let fit=$derived(Math.min(w/width,h/height)),scale=$derived(fit*zoom);
- let mapSource=$state(assets.useFinalMap?assets.map:assets.fallbackMap);
+ let mapSource=$state<string>(assets.useFinalMap?assets.map:assets.fallbackMap);
  let failedIcons=$state<Record<string,boolean>>({});
  let artFailed=$state(false),calibrating=$state(false),coordinate=$state('');
  const pointers=new Map<number,{x:number;y:number}>();
@@ -31,7 +31,7 @@
   const p=points.find(p=>p.id===id);
   if(p){x=w/2-p.position.x*width*scale;y=h/2-p.position.y*height*scale;constrain();}
  }
- $effect(()=>{const id=selectedId;if(id)centre(id);});
+ $effect(()=>{const id=selectedId;if(id)untrack(()=>centre(id));});
  onMount(()=>{
   const observer=new ResizeObserver(([entry])=>{
    const cx=(w/2-x)/(width*scale),cy=(h/2-y)/(height*scale);
@@ -119,7 +119,7 @@
  .map-frame{min-width:0;min-height:0;border:3px double #765538;background:#b59a6d;padding:3px}
  .viewport{position:relative;width:100%;height:100%;min-height:320px;overflow:hidden;touch-action:none;user-select:none;isolation:isolate;background:#c9b287;cursor:grab}
  .viewport:active{cursor:grabbing}.map-art{position:absolute;max-width:none;pointer-events:none;user-select:none}
- .marker{position:absolute;transform:translate(-50%,-100%);z-index:2;width:44px;height:48px;padding:0;display:grid;place-items:center;color:#f3d9a5;background:#312417;border:2px solid #e6c88e;border-radius:50% 50% 45% 45%;box-shadow:0 2px 5px #412c17aa;cursor:pointer;line-height:1;font:700 25px Georgia,serif}
+ .marker{position:absolute;transform:translate(-50%,calc(-100% - 7px));z-index:2;width:44px;height:48px;padding:0;display:grid;place-items:center;color:#f3d9a5;background:#312417;border:2px solid #e6c88e;border-radius:50% 50% 45% 45%;box-shadow:0 2px 5px #412c17aa;cursor:pointer;line-height:1;font:700 25px Georgia,serif}
  .marker::after{content:'';position:absolute;bottom:-7px;left:calc(50% - 5px);width:10px;height:10px;background:inherit;border-right:2px solid #e6c88e;border-bottom:2px solid #e6c88e;transform:rotate(45deg);z-index:-1}
  .marker img{width:32px;height:32px;object-fit:contain;pointer-events:none}
  .marker.unavailable{color:#b9a98d;background:#514535}
