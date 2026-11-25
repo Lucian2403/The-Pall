@@ -59,7 +59,7 @@ export function registerFreePlayRoutes(app:FastifyInstance,options:{
    throw error;
   }
  });
- // Step 2 will call this endpoint when the one-time announcement is dismissed.
+ // The overview calls this endpoint when the one-time announcement is acknowledged.
  // Safe to retry across multiple tabs, refreshes and reconnects.
  app.post<{Params:{id:string}}>(base+'/announcement',async(req,reply)=>{
   reply.header('Cache-Control','no-store');

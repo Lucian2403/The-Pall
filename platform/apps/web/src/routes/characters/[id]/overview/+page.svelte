@@ -1,6 +1,7 @@
 <script lang="ts">
   import {page} from '$app/state';
   import TutorialShell from '$lib/TutorialShell.svelte';
+  import FreePlayAnnouncement from '$lib/FreePlayAnnouncement.svelte';
   import '$lib/pall-owner-ui.css';
 
   type SavedCharacter={
@@ -68,6 +69,16 @@
         <a class="pall-framed-button" href={href}>Character record</a>
       </nav>
     </main>
+    {#if access.announcementSeen===false}
+      {#key character.id}
+        {@const announcementId=character.id}
+        <FreePlayAnnouncement characterId={announcementId} onAcknowledged={()=>{
+          if(id===announcementId&&character?.id===announcementId&&access?.unlocked){
+            access={...access,announcementSeen:true};
+          }
+        }}/>
+      {/key}
+    {/if}
   </TutorialShell>
 {:else}
   <main class="free-play-fallback">

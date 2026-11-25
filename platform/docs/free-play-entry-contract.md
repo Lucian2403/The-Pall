@@ -24,13 +24,12 @@ existing character. Authentication failures return 401.
 
 No browser-supplied "tutorial completed" bit can open Free Play.
 
-## Announcement prepared for Step 2
+## One-time Free Play announcement
 
 The optional `free_play_intro_seen_at` is on `player_characters`. GET
 reports `announcementSeen`, initially false for all existing completed saves.
 The server exposes an idempotent `POST /api/characters/:id/free-play/announcement`
-accepting JSON `{}`. The next PR will add owner-approved copy and call this
-when the announcement is explicitly acknowledged. There is **no pop-up yet**.
+accepting JSON `{}`. The overview displays the owner-approved “You're on your own now.” modal when GET reports `announcementSeen: false`. **Enter the City** posts the acknowledgement; the modal remains open until the server confirms success. Refreshes or later visits after acknowledgement skip the modal. The overview's availability notice remains accurate; the announcement does not enable ordinary gameplay.
 
 ### Migration
 
@@ -60,6 +59,6 @@ The dedicated GitHub Actions job also runs all Stage VI–VIII real-PostgreSQL
 integration tests against a disposable `pall_stage6_test` database. Do **not**
 point this test harness at a personal or production character database.
 
-Later PRs: approved freedom announcement, normal Home dashboard, normalized
+Later PRs: Help access to the announcement, normal Home dashboard, normalized
 city map/locations, then travel clocks. Those future features must not invent
 saved location, wages, XP or rent deadlines at this step.

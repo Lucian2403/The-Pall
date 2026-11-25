@@ -1,5 +1,5 @@
 /** Structural contracts complement the real PostgreSQL end-to-end gate test.
- * This PR deliberately adds no ordinary gameplay or announcement modal. */
+ * Free Play entry and announcement must not enable ordinary gameplay. */
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
@@ -31,7 +31,7 @@ test('One Free Play gate checks the actual Stage VIII saved ending',()=>{
  assert.ok(home.includes("UPDATE player_characters SET tutorial_status='COMPLETED'"));
 });
 
-test('Acknowledgement is additive, idempotent and intentionally unconnected to UI for now',()=>{
+test('Acknowledgement is additive, idempotent and connected to the one-time UI',()=>{
  const api=source('apps/api/src/free-play-routes.ts');
  const schema=source('db/migrations/0024_free_play_entry.sql');
  const migrate=source('scripts/free-play-migrate.mjs');
@@ -46,8 +46,29 @@ test('Acknowledgement is additive, idempotent and intentionally unconnected to U
  assert.ok(api.includes("req.headers.origin"));
  assert.ok(migrate.includes('BEGIN')&&migrate.includes('COMMIT')&&migrate.includes('ROLLBACK'));
  assert.ok(packageJson.includes('"free-play:migrate"'));
- assert.ok(!view.includes("'/announcement'"),
-  'The approved one-time announcement itself belongs in Step 2');
+ const modal=source('apps/web/src/lib/FreePlayAnnouncement.svelte');
+ assert.ok(view.includes('access.announcementSeen===false'));
+ assert.ok(view.includes('{#key character.id}'));
+ assert.ok(view.includes('access={...access,announcementSeen:true}'));
+ assert.ok(modal.includes("+'/free-play/announcement'"));
+ assert.ok(modal.includes("method:'POST',headers:{'content-type':'application/json'},body:'{}'"));
+ assert.ok(modal.includes('!response.ok||result.unlocked!==true||result.announcementSeen!==true'));
+ assert.ok(modal.indexOf('result.announcementSeen!==true')<modal.indexOf('await onAcknowledged()'));
+ assert.ok(modal.includes('dialog.showModal()'));
+ assert.ok(modal.includes('oncancel={(event)=>event.preventDefault()}'));
+ assert.ok(modal.includes('disabled={pending}'));
+ for(const line of [
+   "You're on your own now.",
+   "Your introduction to Grand Cylinder City is over. You've finished your first jobs, dealt with your share of trouble, and finally have some control over what happens next.",
+   "You have a place to sleep, but the rent is due. You'll need money, and nobody is going to hand it to you.",
+   "There's paid work to find. You can develop your skills, learn trades, craft equipment, repair what you own, and take on more dangerous jobs when you're ready.",
+   "Almost every action takes real time. Your equipment has limits. Poor preparation and bad decisions can cost you money, supplies, or your life.",
+   "You decide what work to accept, where to go, and how much risk you're willing to take.",
+   "Grand Cylinder City is open to you.",
+   "Enter the City"
+ ]){
+  assert.ok(modal.includes(line),'Missing approved announcement copy: '+line);
+ }
 });
 
 test('Completed characters enter a new overview without changing the physical rented room',()=>{
