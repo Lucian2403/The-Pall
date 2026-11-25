@@ -7,6 +7,7 @@ import {isPlayableCharacterOrigin} from '@the-pall/contracts';
 import pg from 'pg';
 import {auth} from './auth.js';
 import {getGameplayPool} from './database-pool.js';
+import {HOME_ID} from './shared-home-state.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const base='/api/characters/:id/free-play';
@@ -14,16 +15,19 @@ type Session={user:{id:string;emailVerified:boolean}}|null;
 type Resolver=(headers:IncomingHttpHeaders)=>Promise<Session>;
 type GateRow={
  origin:string;tutorial_stage:number;tutorial_status:string;
- home_phase:string|null;free_play_intro_seen_at:Date|null;
+ home_phase:string|null;home_id:string|null;home_origin:string|null;
+ free_play_intro_seen_at:Date|null;
 };
 const characterState=`SELECT c.origin,c.tutorial_stage,c.tutorial_status,
-  h.state->>'phase' AS home_phase,c.free_play_intro_seen_at
+  h.state->>'phase' AS home_phase,h.state->>'homeId' AS home_id,
+  h.state->>'origin' AS home_origin,c.free_play_intro_seen_at
   FROM player_characters c
   LEFT JOIN player_character_tutorial_home h ON h.character_id=c.id
   WHERE c.id=$1 AND c.account_id=$2`;
 const unlocked=(row:GateRow)=>
  isPlayableCharacterOrigin(row.origin)&&row.tutorial_stage===8&&
- row.tutorial_status==='COMPLETED'&&row.home_phase==='COMPLETE';
+ row.tutorial_status==='COMPLETED'&&row.home_phase==='COMPLETE'&&
+ row.home_id===HOME_ID&&row.home_origin===row.origin;
 const schemaMissing=(error:unknown)=>['42P01','42703'].includes(
  (error as {code?:string})?.code??'');
 
