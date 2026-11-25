@@ -55,6 +55,8 @@ jobs:
         run: npm run check:api
       - name: Svelte typecheck
         run: npm run check -w @the-pall/web
+      - name: Production web build
+        run: npm run build -w @the-pall/web
       - name: Real PostgreSQL owner, stage, rewind and character lifecycle
         env:
           STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test
