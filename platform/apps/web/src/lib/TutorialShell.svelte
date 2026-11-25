@@ -42,7 +42,7 @@
   }:{
     character:SavedCharacter;
     children:Snippet;
-    activePage?:'scene'|'character';
+    activePage?:'scene'|'character'|'overview';
     sceneLocation?:string;
     /** Deprecated option used by earlier screens to fully hide the panorama. */
     compactBanner?:boolean;
@@ -99,6 +99,7 @@
   // server-confirmed introduction is complete, travel is not locked by the
   // current activity, AND a real map route has been supplied.
   const tutorialComplete=$derived(character.tutorial.stage>=8&&character.tutorial.status==='COMPLETED');
+  const freePlayView=$derived(activePage==='overview');
   const mapState=$derived(!tutorialComplete?'introduction':travelLocked?'activity':!cityMap?'unavailable':'open');
   const mapStatus=$derived(mapState==='introduction'?'Opens after the introduction'
     :mapState==='activity'?'Travel is locked during this activity'
@@ -364,7 +365,7 @@
   ] as const;
 </script>
 
-<div class="frame" class:has-dock={!!dock} data-mode="onboarding">
+<div class="frame" class:has-dock={!!dock} data-mode={freePlayView?'free-play':'onboarding'}>
   <aside class="rail" aria-label="Game navigation">
     <a class="identity" href="/characters" title="Characters">
       <img class="brand-logo" src="/ui-kit/branding/logo-compact.png" alt="The Pall" width="166" height="107" />
@@ -374,6 +375,12 @@
       <a class:active={activePage === 'scene'} class="nav-entry" href={chapter} title="Current scene" aria-current={activePage === 'scene' ? 'page' : undefined}>
         <span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Current scene</span>
       </a>
+      {#if tutorialComplete}
+        <a class:active={freePlayView} class="nav-entry" href={detail+'/overview'}
+          title="Free Play Home" aria-current={freePlayView?'page':undefined}>
+          <span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-text">Home overview</span>
+        </a>
+      {/if}
       <a class:active={activePage === 'character'} class="nav-entry" href={detail} title="Character" aria-current={activePage === 'character' ? 'page' : undefined}>
         <span class="nav-icon" aria-hidden="true">◈</span><span class="nav-text">Character</span>
       </a>
@@ -393,10 +400,10 @@
       </a>
     </nav>
     <div class="nav-rule"></div>
-    <p class="locked-heading">AFTER YOUR INTRODUCTION</p>
+    <p class="locked-heading">{tutorialComplete?'COMING LATER':'AFTER YOUR INTRODUCTION'}</p>
     <div class="nav-list">
       {#each lockedSections as item}
-        <span class="nav-entry locked" aria-disabled="true" title={item.name+' — unavailable during the eight-stage introduction'}>
+        <span class="nav-entry locked" aria-disabled="true" title={item.name+(tutorialComplete?' — not implemented yet':' — unavailable during the eight-stage introduction')}>
           <span class="nav-icon" aria-hidden="true">{item.icon}</span><span class="nav-text">{item.name}</span><span class="lock" aria-label="locked">—</span>
         </span>
       {/each}
@@ -455,7 +462,7 @@
             <span><small>Coins</small><strong>{character.coins}</strong></span>
           </div>
           <div class="stat stage">
-            <span><small>Introduction</small><strong>{introStage} / VIII</strong></span>
+            <span><small>Introduction</small><strong>{freePlayView?'Completed':introStage+' / VIII'}</strong></span>
           </div>
         </div>
         <div class="top-tools" role="group" aria-label="Notifications, chat, sound and account">
@@ -503,7 +510,7 @@
         <span class="location-icon" aria-hidden="true">⚒</span>
         <span class="chapter-location">{sceneLocation ?? character.startingLocation}</span>
       </div>
-      <div class="chapter-meta">Stage {sceneStage??character.tutorial.stage} · {character.origin}</div>
+      <div class="chapter-meta">{freePlayView?'Free Play':'Stage '+(sceneStage??character.tutorial.stage)} · {character.origin}</div>
       {#if (character.origin==='Millhand'||character.origin==='Bellrunner') && character.tutorial.stage===6 && backToStageFive && !canRewind}
         <button type="button" class="rewind-button" disabled={backStageBusy}
           title={character.origin==='Bellrunner'
@@ -548,7 +555,7 @@
       {/key}
     {/if}
 
-    <footer class="onboarding-footer">GUIDED CHAPTER · Other game systems are still in development.</footer>
+    <footer class="onboarding-footer">{freePlayView?'FREE PLAY ENTRY · City travel and paid work are still in development.':'GUIDED CHAPTER · Other game systems are still in development.'}</footer>
   </div>
 
   {#if dock}
@@ -569,7 +576,8 @@
   <WelcomeToThePall characterId={character.id} onStarted={beginWelcomeStory}/>
 {/if}
 
-<nav class="mobile-nav" aria-label="Tutorial navigation">
+<nav class="mobile-nav" aria-label="Character navigation">
+  {#if tutorialComplete}<a href={detail+'/overview'} aria-current={freePlayView?'page':undefined}><span aria-hidden="true">⌂</span>Home</a>{/if}
   <a href={chapter} aria-current={activePage === 'scene' ? 'page' : undefined}><span aria-hidden="true">⌂</span>Scene</a>
   <a href={detail} aria-current={activePage === 'character' ? 'page' : undefined}><span aria-hidden="true">◈</span>Character</a>
   <button type="button" data-open-inventory

@@ -13,6 +13,10 @@
     majorSkillBonuses:Record<string,number>;
   };
   type Roster={revision:number;slots:{used:number;limit:number};characters:Character[]};
+  const finished=(character:Character)=>character.tutorial.stage===8&&
+    character.tutorial.status==='COMPLETED';
+  const entryHref=(character:Character)=>'/characters/'+encodeURIComponent(character.id)+
+    (finished(character)?'/overview':'');
   let roster=$state<Roster|null>(null);
   let rosterStatus=$state<'checking'|'ready'|'login'|'unavailable'>('checking');
   let editingId=$state<string|null>(null);
@@ -113,9 +117,11 @@
                 </div>
                 <div class="card-details">
                   <p>{character.startingLocation}</p>
-                  <p class="entry-muted">Introduction · Stage {character.tutorial.stage} of 8</p>
+                  <p class="entry-muted">{finished(character)
+                    ?'Introduction complete · Free Play entry'
+                    :'Introduction · Stage '+character.tutorial.stage+' of 8'}</p>
                   <div class="card-actions">
-                    <a class="entry-button" href={'/characters/'+encodeURIComponent(character.id)}>Select character</a>
+                    <a class="entry-button" href={entryHref(character)}>{finished(character)?'Enter Free Play':'Select character'}</a>
                     <button class="small-action" type="button" onclick={()=>{
                       const opening=editingId!==character.id;
                       editingId=opening?character.id:null;
