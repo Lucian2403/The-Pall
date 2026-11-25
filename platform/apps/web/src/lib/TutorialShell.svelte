@@ -135,7 +135,7 @@
   // The server owns first-entry acknowledgement. QA fixture characters that
   // predate the field remain unaffected; newly created ones explicitly say false.
   let welcomedThisMount=$state(false);
-  const welcomeRequired=$derived(character.welcomeSeen===false&&!welcomedThisMount);
+  const welcomeRequired=$derived(character.tutorial.stage===1&&character.welcomeSeen===false&&!welcomedThisMount);
   async function beginWelcomeStory(){
     welcomedThisMount=true;
     if(character.tutorial.stage===1){

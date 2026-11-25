@@ -69,6 +69,8 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(stage8.includes("perform('finish')"));
  assert.ok(stage8.includes("home.noticeText")&&stage8.includes("home.closingSpeech"));
  assert.ok(shell.includes("href={detail+'/overview'}"));
+ assert.ok(shell.includes("character.tutorial.stage===1&&character.welcomeSeen===false"),
+  'Stage I welcome cannot reappear over Free Play for older migrated saves');
  assert.ok(shell.includes("character.tutorial.stage === 8"));
  assert.ok(shell.includes("'/home'"));
  assert.ok(roster.includes("finished(character)?'/overview':''"));
