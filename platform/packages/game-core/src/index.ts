@@ -23,3 +23,5 @@ export type {SecondJobState,SecondJobPhase,SecondJobAction,SecondJobChoice} from
 
 export {WAGE_CLAIM_ACTIONS,WAGE_CLAIM_DIALOGUE_COUNTS,initialWageClaim,availableWageClaimActions,previousWageClaim,advanceWageClaim,WageClaimInvalidAction} from './millhand-wage-claim.js';
 export type {WageClaimState,WageClaimPhase,WageClaimAction,WageClaimApproach,WageClaimStance} from './millhand-wage-claim.js';
+
+export type {CityPointOfInterest, CityOverviewSnapshot} from './city-overview.js';

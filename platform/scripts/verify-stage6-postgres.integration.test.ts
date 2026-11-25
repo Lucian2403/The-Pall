@@ -32,6 +32,7 @@ import {INITIAL_WRONG_BELL} from '../apps/api/src/bellrunner-wrong-bell-work.ts'
 import {STAGE_FOUR_FACT,STAGE_FOUR_OPENING_LENGTH,STAGE_FOUR_REVELATION_LENGTH} from '../apps/api/src/bellrunner-second-job-work.ts';
 import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes,registerStitcherClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
+import {registerFreePlayRoutes} from '../apps/api/src/free-play-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
@@ -61,7 +62,8 @@ const schema=[
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
-  '0022_personal_journal.sql','0023_inventory_storage_context.sql'
+  '0022_personal_journal.sql','0023_inventory_storage_context.sql',
+  '0024_free_play_entry.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -85,6 +87,7 @@ registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerBellrunnerClinicRoutes(app,{pool:db,resolveSession});
 registerStitcherClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
+registerFreePlayRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 registerPersonalJournalRoutes(app,{pool:db,resolveSession});
@@ -1453,6 +1456,9 @@ test('Stage 8 shared home: six Millhand route/outcome combinations complete once
    }
    assert.equal(state.completed,true);
    assert.equal(state.revision,3);
+   const entry=await request('GET',base+c.id+'/free-play');
+   assert.deepEqual(entry,{status:200,body:{unlocked:true,announcementSeen:false}},
+     'Every Millhand branch/outcome unlocks exactly the same Free Play boundary');
    assert.equal((await request('POST',route,owner,{
      kind:'action',requestId:randomUUID(),expectedRevision:state.revision,action:'finish'
    })).status,409,'Cannot complete again');
@@ -2214,6 +2220,9 @@ test('Bellrunner final Stage VIII shares rented-room notice, exact speech and br
      assert.equal(s.phase,phase);
    }
    assert.equal(s.completed,true);
+   assert.deepEqual((await request('GET',base+f.id+'/free-play')).body,
+     {unlocked:true,announcementSeen:false},
+     'Every Bellrunner branch/outcome unlocks Free Play without new rewards');
    assert.equal((await request('POST',path,owner,{
      kind:'action',action:'finish',expectedRevision:s.revision,requestId:randomUUID()
    })).status,409,'Completion cannot be granted twice');
@@ -2248,6 +2257,9 @@ test('Bellrunner Back to Stage 7 from completed home restores PAID clinic, prese
     home=result.body!;
   }
   assert.equal(home.phase,'COMPLETE');
+  const freePlay=base+f.id+'/free-play';
+  assert.equal((await request('POST',freePlay+'/announcement',owner,{})).status,200);
+  assert.deepEqual((await request('GET',freePlay)).body,{unlocked:true,announcementSeen:true});
   const endpoint=base+f.id+'/dev/rewind-stage';
   assert.deepEqual((await request('GET',endpoint)).body,{
     enabled:true,canRewind:true,stage:8,targetStage:7
@@ -2282,6 +2294,14 @@ test('Bellrunner Back to Stage 7 from completed home restores PAID clinic, prese
   assert.equal(newHome.body?.phase,'HOME');
   assert.equal(newHome.body?.branch,'machinery');
   assert.equal(newHome.body?.outcome,outcome);
+  let replay=newHome.body!;
+  for(const action of ['read_notice','put_down','finish']){
+    const result=await request('POST',path,owner,{kind:'action',action,expectedRevision:replay.revision,requestId:randomUUID()});
+    assert.equal(result.status,200,JSON.stringify(result.body));
+    replay=result.body!;
+  }
+  assert.deepEqual((await request('GET',freePlay)).body,{unlocked:true,announcementSeen:false});
+  assert.equal((await request('GET',freePlay+'/city')).status,409);
  }
 });
 
@@ -3082,6 +3102,9 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
    home=result.body!;
   }
   assert.equal(home.phase,'COMPLETE');
+  assert.deepEqual((await request('GET',base+c.id+'/free-play')).body,
+    {unlocked:true,announcementSeen:false},
+    'Completed Stitcher ward/clinic/home history unlocks Free Play');
   const tasks=(await request('GET',journal)).body!.completed;
   const savedHome=tasks.find((entry:any)=>entry.stage===8);
   assert.equal(savedHome.taskId,'shared.rented-home');
@@ -3125,10 +3148,18 @@ test('Shared Stitcher Clinic/Home: paid once, saved branch, two-character archiv
  const siblingSnapshot=JSON.stringify((await request('GET',base+sibling.id+'/journal')).body!.completed);
  assert.equal((await request('GET',rewind)).body!.targetStage,7);
  assert.equal((await request('POST',rewind,stranger,{expectedStage:8})).status,404);
+ const selectedEntry=base+selected.id+'/free-play';
+ const siblingEntry=base+sibling.id+'/free-play';
+ assert.equal((await request('POST',selectedEntry+'/announcement',owner,{})).status,200);
+ assert.equal((await request('POST',siblingEntry+'/announcement',owner,{})).status,200);
  const backHome=await request('POST',rewind,owner,{expectedStage:8});
  assert.equal(backHome.status,200,JSON.stringify(backHome.body));
  assert.equal(backHome.body!.route,'/characters/'+selected.id+'/stitcher/clinic');
  assert.equal(backHome.body!.coinDelta,0);
+ const resetAnnouncement=(await db.query<{free_play_intro_seen_at:Date|null}>(
+   'SELECT free_play_intro_seen_at FROM player_characters WHERE id=$1',[selected.id])).rows[0];
+ assert.equal(resetAnnouncement.free_play_intro_seen_at,null);
+ assert.deepEqual((await request('GET',siblingEntry)).body,{unlocked:true,announcementSeen:true});
  assert.equal((await request('GET',rewind)).body!.targetStage,6);
  assert.equal((await request('GET',selected.clinicPath)).body!.phase,'PAID');
  assert.equal((await request('GET',selected.homePath)).status,409);
@@ -3262,4 +3293,91 @@ test('Deletion clears completed character records across Millhand, Bellrunner an
    assert.equal(Number(found.rows[0].remaining),0,entry.origin+' orphan in '+table);
   }
  }
+});
+
+test('Free Play is owner-scoped, phase-checked, idempotent and has no economic effects',async()=>{
+ const c=await character();
+ const url=base+c.id+'/free-play';
+ const ack=url+'/announcement';
+ const city=url+'/city';
+ assert.equal((await request('GET',url,null)).status,401);
+ assert.equal((await request('GET',url,stranger)).status,404);
+ assert.equal((await request('GET',city,null)).status,401);
+ assert.equal((await request('GET',city,stranger)).status,404);
+ assert.equal((await request('GET',city)).status,409);
+ assert.equal((await request('GET',base+'not-a-uuid/free-play/city')).status,404);
+ assert.equal((await request('POST',ack,stranger,{})).status,404);
+ assert.equal((await request('GET',base+'not-a-uuid/free-play')).status,404);
+ assert.equal((await request('POST',ack,owner,{} ,{'origin':'https://untrusted.example'})).status,403);
+ assert.equal((await request('POST',ack,owner,{extra:true})).status,400);
+ assert.equal((await request('GET',url)).body?.error,'free_play_not_unlocked');
+ assert.equal((await request('POST',ack,owner,{})).body?.error,'free_play_not_unlocked');
+
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",
+  [c.id]);
+ assert.equal((await request('GET',url)).status,409,'Status alone cannot unlock Free Play');
+ const save=(phase:string,homeId='starter-rented-room',origin='Millhand')=>
+   JSON.stringify({phase,homeId,origin,revision:3});
+ await db.query(
+  'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',
+  [c.id,save('NOTICE')]);
+ assert.equal((await request('GET',url)).status,409,'An unread notice is not completion');
+ for(const [phase,homeId,origin] of [
+  ['COMPLETE','another-room','Millhand'],
+  ['COMPLETE','starter-rented-room','Bellrunner']
+ ]){
+  await db.query('UPDATE player_character_tutorial_home SET state=$2::jsonb WHERE character_id=$1',
+    [c.id,save(phase,homeId,origin)]);
+  assert.equal((await request('GET',url)).status,409,
+    'Mismatched home identity or origin must remain locked');
+  assert.equal((await request('GET',city)).status,409);
+ }
+ await db.query('UPDATE player_character_tutorial_home SET state=$2::jsonb WHERE character_id=$1',
+  [c.id,save('COMPLETE')]);
+ const before=(await db.query<{
+  coins:string|number;major_skill_bonuses:Record<string,number>;
+  current_health:number;free_play_intro_seen_at:Date|null
+ }>('SELECT coins,major_skill_bonuses,current_health,free_play_intro_seen_at FROM player_characters WHERE id=$1',
+  [c.id])).rows[0];
+ assert.equal(before.free_play_intro_seen_at,null);
+ assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:false});
+ assert.deepEqual(await request('GET',city),{status:409,body:{error:'free_play_announcement_required'}});
+ const replies=await Promise.all([
+  request('POST',ack,owner,{}),request('POST',ack,owner,{})
+ ]);
+ assert.deepEqual(replies.map(x=>x.status),[200,200],
+  'Two-tab acknowledgements must be safe and idempotent');
+ assert.deepEqual(replies[0].body,{unlocked:true,announcementSeen:true});
+ assert.deepEqual(replies[1].body,replies[0].body);
+ assert.deepEqual((await request('GET',url)).body,{unlocked:true,announcementSeen:true});
+ assert.deepEqual(await request('GET',city),{status:200,body:{
+   cityId:'grand-cylinder-city',name:'Grand Cylinder City',
+   pointsOfInterest:[{id:'starter-rented-room',name:'Rented room',availability:'available',destination:'rented-room'}]
+ }});
+ assert.equal((await request('GET',city,stranger)).status,404);
+ const seen=(await db.query<{
+  coins:string|number;major_skill_bonuses:Record<string,number>;
+  current_health:number;free_play_intro_seen_at:Date|null
+ }>('SELECT coins,major_skill_bonuses,current_health,free_play_intro_seen_at FROM player_characters WHERE id=$1',
+  [c.id])).rows[0];
+ assert.ok(seen.free_play_intro_seen_at,'Acknowledgement is persisted server-side');
+ assert.equal(Number(seen.coins),Number(before.coins));
+ assert.deepEqual(seen.major_skill_bonuses,before.major_skill_bonuses);
+ assert.equal(seen.current_health,before.current_health);
+ await request('POST',ack,owner,{});
+ const repeated=(await db.query<{free_play_intro_seen_at:Date}>(
+  'SELECT free_play_intro_seen_at FROM player_characters WHERE id=$1',[c.id])).rows[0];
+ assert.equal(repeated.free_play_intro_seen_at.getTime(),
+  seen.free_play_intro_seen_at.getTime(),'Repeat calls never reset the acknowledgement timestamp');
+ const sibling=await character();
+ assert.equal((await request('GET',base+sibling.id+'/free-play')).status,409);
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
+  [c.id]);
+ assert.equal((await request('GET',url)).status,409,
+  'Development rewind must immediately revoke Free Play entry');
+ assert.equal((await request('GET',city)).status,409);
+ assert.equal((await request('POST',ack,owner,{})).status,409);
+ assert.equal((await request('GET',base+c.id+'/tutorial/home')).status,409);
 });

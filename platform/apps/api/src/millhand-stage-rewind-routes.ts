@@ -743,6 +743,17 @@ export function registerMillhandStageRewindRoutes(app:FastifyInstance,options:{
           "UPDATE player_characters SET tutorial_stage=7,tutorial_status='IN_PROGRESS' WHERE id=$1",
           [req.params.id]
         );
+        // Replay of the finale must also replay its once-per-character
+        // announcement. Stage VIII remains usable before migration 0024.
+        const announcementColumn=await client.query(
+          "SELECT 1 FROM pg_attribute WHERE attrelid='player_characters'::regclass AND attname='free_play_intro_seen_at' AND NOT attisdropped"
+        );
+        if(announcementColumn.rowCount){
+          await client.query(
+            'UPDATE player_characters SET free_play_intro_seen_at=NULL WHERE id=$1',
+            [req.params.id]
+          );
+        }
         await client.query('COMMIT');transaction=false;
         return {
           stage:7,tutorialStatus:'IN_PROGRESS',

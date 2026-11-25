@@ -79,12 +79,17 @@
       label:'Continue clinic visit',
       href:clinicHref(character.id,character.origin)
     };
+    if(isFinaleOrigin(character.origin)&&character.tutorial.stage===8&&
+       character.tutorial.status==='COMPLETED')return {
+      title:'City overview',
+      description:'Open the city overview to find available destinations.',
+      label:'Enter Free Play',
+      href:base+'/overview'
+    };
     if(isFinaleOrigin(character.origin)&&character.tutorial.stage===8) return {
-      title:character.tutorial.status==='COMPLETED'?'Your rented home':'Return Home',
-      description:character.tutorial.status==='COMPLETED'
-        ?'Your introduction is complete. Your shared rent notice and Journal remain available.'
-        :'Your examination is complete. Return to the shared rented room to read the rent notice.',
-      label:character.tutorial.status==='COMPLETED'?'Return to rented home':'Travel home',
+      title:'Return Home',
+      description:'Your examination is complete. Return to the shared rented room to read the rent notice.',
+      label:'Travel home',
       href:base+'/home'
     };
     if(character.origin==='Millhand'&&character.tutorial.stage===2) return {

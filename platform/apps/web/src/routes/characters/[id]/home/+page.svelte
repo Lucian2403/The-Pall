@@ -236,6 +236,10 @@
             <p class="completion-copy">{homeCompletionSummary(home.origin)}</p>
             <p><strong>{home.coins} coins remaining. Rent notice: {home.rent} coins.</strong></p>
             <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
+            <a class="pall-framed-button primary-choice"
+              href={'/characters/'+encodeURIComponent(id)+'/overview'}>
+              Continue to Free Play
+            </a>
           </aside>
         {/if}
       </div>
