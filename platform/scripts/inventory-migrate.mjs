@@ -6,7 +6,7 @@ import {resolve} from 'node:path';
 if(!process.env.DATABASE_URL)
   throw Error('DATABASE_URL required; run from platform with --env-file=.env');
 const migrations=['0011_inventory_foundation.sql','0012_equipment_slots.sql',
-  '0013_equipment_stats_and_clothing.sql'];
+  '0013_equipment_stats_and_clothing.sql','0023_inventory_storage_context.sql'];
 const db=new pg.Client({connectionString:process.env.DATABASE_URL});
 await db.connect();
 try{

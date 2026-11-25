@@ -257,16 +257,22 @@ test('Saved Home journal is the selected character\'s shared reader',()=>{
  assert.ok(!web.includes('id="home-journal"'));
 });
 
-test('Rented-room chest keeps its modal; Journal uses the shared reader',()=>{
+test('Rented-room chest is contextual while Inventory and Journal remain independent',()=>{
  const web=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
- assert.ok(web.includes("let overlayKind=$state<'storage'|null>(null);"));
- assert.ok(web.includes('overlayDialog?.showModal()'));
- assert.ok(web.includes('overlayDialog?.close()'));
- assert.ok(web.includes('onclose={handleRoomOverlayClose}'));
- assert.ok(web.includes("onclick={()=>{void openRoomOverlay('storage');}}"));
- assert.ok(web.includes('class="room-overlay"'));
- assert.ok(web.includes('<InventoryPanel characterId={id} onClose={closeRoomOverlay}/>'));
+ const workspace=source('apps/web/src/lib/InventoryWorkspace.svelte');
+ const windows=source('apps/web/src/lib/game-window-state.ts');
+ assert.ok(web.includes("openGameWindow(id,'storage')"));
+ assert.ok(web.includes('data-open-home-chest'));
+ assert.ok(web.includes("onStorageClosed={()=>playChestSound('close')}"));
+ assert.ok(web.includes("onStorageOpened={()=>playChestSound('open')}"));
+ assert.ok(shell.includes('<InventoryWorkspace characterId={character.id}'));
+ assert.ok(shell.includes("openGameWindow(character.id,'inventory')"));
+ assert.ok(workspace.includes("storage-context"));
+ assert.ok(workspace.includes("x-pall-storage-context"));
+ assert.ok(windows.includes("closeContextWindows"));
+ assert.ok(!web.includes('overlayDialog?.showModal()'));
+ assert.ok(!web.includes('<InventoryPanel'));
  assert.ok(web.includes("onclick={()=>{void toggleJournal();}}"));
  assert.ok(web.includes("journalController={{open:journalOpen"));
  assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));

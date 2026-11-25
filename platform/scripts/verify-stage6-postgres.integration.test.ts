@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import {before,after,test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
 import Fastify from 'fastify';
 import pg from 'pg';
 import {registerMillhandCombatRoutes} from '../apps/api/src/millhand-combat-routes.ts';
@@ -61,7 +61,7 @@ const schema=[
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
-  '0022_personal_journal.sql'
+  '0022_personal_journal.sql','0023_inventory_storage_context.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -91,19 +91,27 @@ registerPersonalJournalRoutes(app,{pool:db,resolveSession});
 
 async function request(
   method:'GET'|'POST'|'DELETE',path:string,
-  account:string|null=owner,body?:unknown
+  account:string|null=owner,body?:unknown,extraHeaders:Record<string,string>={}
 ){
   const response=await app.inject({
     method,url:path,
     headers:{
       ...(account?{'x-test-principal':account}:{}),
-      ...(body?{'content-type':'application/json',origin:'http://127.0.0.1:5173'}:{})
+      ...(body?{'content-type':'application/json',origin:'http://127.0.0.1:5173'}:{}),
+      ...extraHeaders
     },
     ...(body?{payload:JSON.stringify(body)}:{})
   });
   let value:Record<string,any>|null=null;
   try{value=JSON.parse(response.body);}catch{/* HTTP errors should be JSON */}
   return {status:response.statusCode,body:value};
+}
+async function openStorageContext(id:string,account=owner){
+ const result=await request('POST',base+id+'/inventory/storage-context',account,
+  {action:'open'});
+ assert.equal(result.status,200,JSON.stringify(result.body));
+ assert.match(result.body?.token,/^[a-f0-9]{64}$/);
+ return {'x-pall-storage-context':result.body!.token as string};
 }
 async function character(
   account=owner,stance:'brace'|'moving'|'cart'='brace',health=50
@@ -946,12 +954,73 @@ test('Inventory API shows separate equipment, 4+6 pack and authenticated locked 
  assert.equal((await request('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:0,
   itemInstanceId:bag.id,quantity:1,to:'home_chest'
- })).body!.error,'storage_not_unlocked');
- assert.equal((await request('POST',path,owner,{
-  kind:'equip',requestId:randomUUID(),expectedRevision:0,
+ })).body!.error,'storage_context_required');
+ // Outside the rented room the player can still remove and equip personal gear.
+ const unequip=await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:bag.id,quantity:1,to:'pack'
+ });
+ assert.equal(unequip.status,200,JSON.stringify(unequip.body));
+ assert.equal(unequip.body!.revision,1);
+ assert.equal(unequip.body!.pack.items.length,1);
+ assert.equal(unequip.body!.pack.maxSlots,4);
+ const equip=await request('POST',path,owner,{
+  kind:'equip',requestId:randomUUID(),expectedRevision:1,
   itemInstanceId:bag.id,slot:'back'
- })).body!.error,'storage_not_unlocked');
- assert.equal((await request('GET',path)).body!.revision,0);
+ });
+ assert.equal(equip.status,200,JSON.stringify(equip.body));
+ assert.equal(equip.body!.revision,2);
+ assert.equal(equip.body!.pack.maxSlots,10);
+ assert.equal((await request('GET',path)).body!.revision,2);
+ assert.equal((await request('POST',path+'/storage-context',owner,{action:'open'})).body!.error,
+  'storage_not_unlocked');
+});
+
+test('Home Chest context is character-scoped, revocable, expires, and never reveals remote contents',async()=>{
+ const c=await character();
+ const path=base+c.id+'/inventory';
+ const context=path+'/storage-context';
+ await db.query(
+  "UPDATE player_characters SET tutorial_stage=8,tutorial_status='COMPLETED' WHERE id=$1",[c.id]);
+ await db.query(
+  'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',
+  [c.id,JSON.stringify({phase:'COMPLETE',revision:3})]);
+ await db.query(
+  "INSERT INTO pall_item_definitions(code,name,category,stackable,max_stack,weight_kg,volume_l,quality_min,quality_max) VALUES('test_chest_lock','Locked Needle','component',FALSE,1,.001,.001,1,1) ON CONFLICT DO NOTHING");
+ const itemId=randomUUID();
+ await db.query(
+  "INSERT INTO player_character_item_instances(id,character_id,item_code,location) VALUES($1,$2,'test_chest_lock','home_chest')",[itemId,c.id]);
+ const outside=(await request('GET',path)).body!;
+ assert.equal(outside.storageEnabled,false);
+ assert.deepEqual(outside.chest.items,[]);
+ assert.equal((await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:itemId,quantity:1,to:'pack'
+ })).body!.error,'storage_context_required');
+ assert.equal((await request('POST',context,stranger,{action:'open'})).status,404);
+ const headers=await openStorageContext(c.id);
+ const token=headers['x-pall-storage-context'];
+ const inside=(await request('GET',path,owner,undefined,headers)).body!;
+ assert.equal(inside.storageEnabled,true);
+ assert.equal(inside.chest.items.length,1);
+ assert.equal(inside.chest.items[0].id,itemId);
+ assert.equal((await request('GET',path,stranger,undefined,headers)).status,404);
+ const other=await character();
+ assert.equal((await request('GET',base+other.id+'/inventory',owner,undefined,headers)).body!.storageEnabled,false);
+ const closing=await request('POST',context,owner,{action:'close',token});
+ assert.equal(closing.body!.closed,true);
+ assert.equal((await request('GET',path,owner,undefined,headers)).body!.storageEnabled,false);
+ assert.deepEqual((await request('GET',path)).body!.chest.items,[]);
+ const second=await openStorageContext(c.id);
+ await db.query(
+  "UPDATE player_character_storage_context SET expires_at=NOW()-interval '1 minute' WHERE character_id=$1 AND token_hash=$2",
+  [c.id,createHash('sha256').update(second['x-pall-storage-context']).digest('hex')]);
+ assert.equal((await request('GET',path,owner,undefined,second)).body!.storageEnabled,false);
+ assert.equal((await request('POST',path,owner,{
+  kind:'transfer',requestId:randomUUID(),expectedRevision:0,
+  itemInstanceId:itemId,quantity:1,to:'pack'
+ },second)).body!.error,'storage_context_required');
+ assert.equal((await db.query('SELECT count(*)::int AS count FROM player_character_item_instances WHERE character_id=$1 AND id=$2',[c.id,itemId])).rows[0].count,1);
 });
 test('Chest/equipment transfers preserve identity, receipts, revisions and capacity',async()=>{
  const c=await character();
@@ -961,34 +1030,37 @@ test('Chest/equipment transfers preserve identity, receipts, revisions and capac
  await db.query(
   'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',
   [c.id,JSON.stringify({phase:'HOME',revision:0})]);
- const original=(await request('GET',path)).body!;
+ const headers=await openStorageContext(c.id);
+ const chestRequest=(method:'GET'|'POST'|'DELETE',url:string,account:string|null=owner,
+  body?:unknown)=>request(method,url,account,body,headers);
+ const original=(await chestRequest('GET',path)).body!;
  const bag=original.equipment.items.find((x:any)=>x.code==='crude_small_bag');
  const key=randomUUID();
  const cmd={kind:'transfer',requestId:key,expectedRevision:0,
   itemInstanceId:bag.id,quantity:1,to:'home_chest'};
- const moved=await request('POST',path,owner,cmd);
+ const moved=await chestRequest('POST',path,owner,cmd);
  assert.equal(moved.status,200,JSON.stringify(moved.body));
  assert.equal(moved.body!.revision,1);
  assert.equal(moved.body!.pack.maxSlots,4);
  assert.equal(moved.body!.pack.maxVolumeL,5);
  assert.equal(moved.body!.chest.items[0].id,bag.id);
  assert.equal(moved.body!.equipment.items.length,1);
- assert.deepEqual((await request('POST',path,owner,cmd)).body,moved.body);
- assert.equal((await request('GET',path)).body!.chest.items.length,1);
- assert.equal((await request('POST',path,owner,{
+ assert.deepEqual((await chestRequest('POST',path,owner,cmd)).body,moved.body);
+ assert.equal((await chestRequest('GET',path)).body!.chest.items.length,1);
+ assert.equal((await chestRequest('POST',path,owner,{
   ...cmd,to:'pack'
  })).body!.error,'idempotency_key_reuse');
- assert.equal((await request('POST',path,owner,{
+ assert.equal((await chestRequest('POST',path,owner,{
   ...cmd,requestId:randomUUID()
  })).body!.error,'stale_revision');
- assert.equal((await request('POST',path,owner,{
+ assert.equal((await chestRequest('POST',path,owner,{
   ...cmd,requestId:randomUUID(),expectedRevision:1,qualityTier:5
  })).status,400);
- assert.equal((await request('POST',path,owner,{
+ assert.equal((await chestRequest('POST',path,owner,{
   kind:'equip',requestId:randomUUID(),expectedRevision:1,
   itemInstanceId:bag.id,slot:'torso'
  })).body!.error,'slot_incompatible');
- const reequipped=await request('POST',path,owner,{
+ const reequipped=await chestRequest('POST',path,owner,{
   kind:'equip',requestId:randomUUID(),expectedRevision:1,
   itemInstanceId:bag.id,slot:'back'
  });
@@ -997,16 +1069,16 @@ test('Chest/equipment transfers preserve identity, receipts, revisions and capac
  assert.equal(reequipped.body!.pack.maxSlots,10);
  assert.equal(reequipped.body!.equipment.items.find((x:any)=>x.code==='crude_small_bag').id,bag.id);
  assert.equal(reequipped.body!.chest.items.length,0);
- const same=await request('POST',path,owner,{
+ const same=await chestRequest('POST',path,owner,{
   kind:'equip',requestId:randomUUID(),expectedRevision:2,
   itemInstanceId:bag.id,slot:'back'
  });
  assert.equal(same.body!.error,'already_equipped');
  const concurrent=(await Promise.all([randomUUID(),randomUUID()].map(requestId=>
-  request('POST',path,owner,{...cmd,requestId,expectedRevision:2})
+  chestRequest('POST',path,owner,{...cmd,requestId,expectedRevision:2})
  ))).sort((a,b)=>a.status-b.status);
  assert.deepEqual(concurrent.map(x=>x.status),[200,409]);
- const after=(await request('GET',path)).body!;
+ const after=(await chestRequest('GET',path)).body!;
  assert.equal(after.revision,3);
  assert.equal(after.pack.maxSlots,4);
  assert.equal(after.chest.items.length,1);
@@ -1175,16 +1247,19 @@ test('PostgreSQL enforces 10 equipped-bag slots, 4 bare slots and full chest',as
  await db.query(
   "INSERT INTO player_character_item_instances(id,character_id,item_code,location) VALUES($1,$2,'test_needle','home_chest')",
   [waiting,c.id]);
- const state=(await request('GET',path)).body!;
+ const headers=await openStorageContext(c.id);
+ const chestRequest=(method:'GET'|'POST'|'DELETE',url:string,account:string|null=owner,
+  body?:unknown)=>request(method,url,account,body,headers);
+ const state=(await chestRequest('GET',path)).body!;
  assert.equal(state.pack.slotsUsed,10);
  assert.equal(state.pack.maxSlots,10);
- const denied=await request('POST',path,owner,{
+ const denied=await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:0,
   itemInstanceId:waiting,quantity:1,to:'pack'
  });
  assert.equal(denied.body!.error,'pack_slots_exceeded');
  const bag=state.equipment.items.find((x:any)=>x.code==='crude_small_bag');
- assert.equal((await request('POST',path,owner,{
+ assert.equal((await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:0,
   itemInstanceId:bag.id,quantity:1,to:'home_chest'
  })).body!.error,'pack_slots_exceeded');
@@ -1193,12 +1268,12 @@ test('PostgreSQL enforces 10 equipped-bag slots, 4 bare slots and full chest',as
   [c.id]);
  assert.equal(chestFull.rowCount,23);
  const outfit=state.equipment.items.find((x:any)=>x.code==='basic_clothes');
- const blocked=await request('POST',path,owner,{
+ const blocked=await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:0,
   itemInstanceId:outfit.id,quantity:1,to:'home_chest'
  });
  assert.equal(blocked.body!.error,'chest_slots_exceeded');
- assert.equal((await request('GET',path)).body!.revision,0);
+ assert.equal((await chestRequest('GET',path)).body!.revision,0);
 });
 test('Stacking still splits and merges without duplication under equipment scheme',async()=>{
  const c=await character();
@@ -1214,14 +1289,17 @@ test('Stacking still splits and merges without duplication under equipment schem
  await db.query(
   "INSERT INTO player_character_item_instances(id,character_id,item_code,location,quantity) VALUES($1,$2,'test_rivet','home_chest',8)",
   [itemId,c.id]);
- const part=await request('POST',path,owner,{
+ const headers=await openStorageContext(c.id);
+ const chestRequest=(method:'GET'|'POST'|'DELETE',url:string,account:string|null=owner,
+  body?:unknown)=>request(method,url,account,body,headers);
+ const part=await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:0,
   itemInstanceId:itemId,quantity:3,to:'pack'
  });
  assert.equal(part.status,200,JSON.stringify(part.body));
  assert.equal(part.body!.chest.items.find((x:any)=>x.id===itemId).quantity,5);
  assert.equal(part.body!.pack.items.find((x:any)=>x.code==='test_rivet').quantity,3);
- const second=await request('POST',path,owner,{
+ const second=await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:1,
   itemInstanceId:itemId,quantity:5,to:'pack'
  });
@@ -1236,12 +1314,12 @@ test('Stacking still splits and merges without duplication under equipment schem
  await db.query(
   "INSERT INTO player_character_item_instances(id,character_id,item_code,location) VALUES($1,$2,'test_anvil','home_chest')",
   [heavyId,c.id]);
- const heavy=await request('POST',path,owner,{
+ const heavy=await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:2,
   itemInstanceId:heavyId,quantity:1,to:'pack'
  });
  assert.equal(heavy.body!.error,'pack_capacity_exceeded');
- assert.equal((await request('GET',path)).body!.revision,2);
+ assert.equal((await chestRequest('GET',path)).body!.revision,2);
 });
 
 test('Equipment protection, weapon damage and maximum weight derive from equipped records',async()=>{
@@ -1252,7 +1330,10 @@ test('Equipment protection, weapon damage and maximum weight derive from equippe
  await db.query(
   'INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,0,$2::jsonb)',
   [c.id,JSON.stringify({phase:'HOME',revision:0})]);
- const first=(await request('GET',path)).body!;
+ const headers=await openStorageContext(c.id);
+ const chestRequest=(method:'GET'|'POST'|'DELETE',url:string,account:string|null=owner,
+  body?:unknown)=>request(method,url,account,body,headers);
+ const first=(await chestRequest('GET',path)).body!;
  assert.deepEqual(first.bonuses,{
   armour:0,weaponDamage:null,pallProtection:0,ashProtection:0,
   maxWeightKg:20,inventorySlots:10,maxVolumeL:17
@@ -1272,7 +1353,7 @@ test('Equipment protection, weapon damage and maximum weight derive from equippe
  await db.query(
   "INSERT INTO player_character_item_instances(id,character_id,item_code,location) VALUES($1,$3,'test_protective_mask','home_chest'),($2,$3,'test_short_blade','home_chest')",
   [mask,weapon,c.id]);
- const worn=await request('POST',path,owner,{
+ const worn=await chestRequest('POST',path,owner,{
   kind:'equip',requestId:randomUUID(),expectedRevision:0,
   itemInstanceId:mask,slot:'face'
  });
@@ -1281,14 +1362,14 @@ test('Equipment protection, weapon damage and maximum weight derive from equippe
   armour:2,weaponDamage:null,pallProtection:4,ashProtection:3,
   maxWeightKg:22,inventorySlots:10,maxVolumeL:17
  });
- const armed=await request('POST',path,owner,{
+ const armed=await chestRequest('POST',path,owner,{
   kind:'equip',requestId:randomUUID(),expectedRevision:1,
   itemInstanceId:weapon,slot:'primary_weapon'
  });
  assert.equal(armed.status,200,JSON.stringify(armed.body));
  assert.equal(armed.body!.bonuses.weaponDamage,9);
- assert.equal((await request('GET',path)).body!.bonuses.weaponDamage,9);
- const removed=await request('POST',path,owner,{
+ assert.equal((await chestRequest('GET',path)).body!.bonuses.weaponDamage,9);
+ const removed=await chestRequest('POST',path,owner,{
   kind:'transfer',requestId:randomUUID(),expectedRevision:2,
   itemInstanceId:mask,quantity:1,to:'home_chest'
  });
@@ -1297,7 +1378,7 @@ test('Equipment protection, weapon damage and maximum weight derive from equippe
   armour:0,weaponDamage:9,pallProtection:0,ashProtection:0,
   maxWeightKg:20,inventorySlots:10,maxVolumeL:17
  });
- const refused=await request('POST',path,owner,{
+ const refused=await chestRequest('POST',path,owner,{
   kind:'equip',requestId:randomUUID(),expectedRevision:3,
   itemInstanceId:mask,slot:'pants'
  });

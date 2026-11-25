@@ -3,7 +3,9 @@
   import {onMount,setContext} from 'svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRecord,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {isFinaleOrigin,clinicHref} from '$lib/shared-finale-origins';
-  import {goto} from '$app/navigation';
+  import {goto,beforeNavigate} from '$app/navigation';
+  import InventoryWorkspace from '$lib/InventoryWorkspace.svelte';
+  import {gameWindows,selectWindowCharacter,openGameWindow,resetGameWindows,closeContextWindows} from '$lib/game-window-state';
   import './pall-owner-ui.css';
   import CharacterAvatar from '$lib/CharacterAvatar.svelte';
   import PallAudioControls from '$lib/PallAudioControls.svelte';
@@ -35,7 +37,8 @@
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
     industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
-    cityMap,travelLocked = false,services = {},dock,journalController,journalContent
+    cityMap,travelLocked = false,services = {},dock,journalController,journalContent,
+    onStorageClosed,onStorageOpened
   }:{
     character:SavedCharacter;
     children:Snippet;
@@ -73,7 +76,25 @@
     journalController?:SceneJournalController;
     /** Pages which render TutorialShell directly register current prose here. */
     journalContent?:SceneJournalRecord;
+    /** The home page owns the existing chest-close sound. */
+    onStorageClosed?:()=>void;
+    onStorageOpened?:()=>void;
   }=$props();
+  const inventoryExpanded=$derived($gameWindows.characterId===character.id&&
+    $gameWindows.windows.some(record=>record.id==='inventory'));
+  // Keep personal inventory open across routes for the same character.
+  // Close contextual windows when leaving their scene; clear the registry when
+  // leaving the character entirely (selection, account, logout or switch).
+  beforeNavigate(({to})=>{
+    const path=to?.url.pathname;
+    const root='/characters/'+encodeURIComponent(character.id);
+    if(!path||(path!==root&&!path.startsWith(root+'/')))resetGameWindows();
+    else if(path!==root+'/home')closeContextWindows();
+  });
+  $effect(()=>{
+    const id=character.id;
+    selectWindowCharacter(id);
+  });
   // The City header is the future map gateway. It only becomes a link when the
   // server-confirmed introduction is complete, travel is not locked by the
   // current activity, AND a real map route has been supplied.
@@ -335,7 +356,6 @@
   // completion transaction. No post-tutorial capabilities are exposed here.
   const lockedSections = [
     {name: 'City', icon: '▥'},
-    {name: 'Inventory', icon: '▣'},
     {name: 'Jobs', icon: '⚒'},
     {name: 'Market', icon: '⚖'},
     {name: 'Contracts', icon: '≡'},
@@ -361,6 +381,12 @@
         aria-controls="personal-journal" aria-expanded={journalExpanded}
         onclick={togglePersonalJournal}>
         <span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">Journal</span>
+      </button>
+      <button type="button" class="nav-entry inventory-nav"
+        data-open-inventory aria-expanded={inventoryExpanded}
+        aria-controls="game-window-inventory"
+        onclick={()=>openGameWindow(character.id,'inventory')}>
+        <span class="nav-icon" aria-hidden="true">▣</span><span class="nav-text">Inventory</span>
       </button>
       <a class="nav-entry" href="/characters" title="Characters">
         <span class="nav-icon" aria-hidden="true">☰</span><span class="nav-text">Characters</span>
@@ -529,6 +555,8 @@
     <aside class="shell-dock" aria-label="Messages dock">{@render dock()}</aside>
   {/if}
 </div>
+<InventoryWorkspace characterId={character.id} {onStorageClosed} {onStorageOpened}
+  inHome={sceneStage===8}/>
 
 {#snippet mapIcon()}
   <svg class="gateway-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"
@@ -544,6 +572,11 @@
 <nav class="mobile-nav" aria-label="Tutorial navigation">
   <a href={chapter} aria-current={activePage === 'scene' ? 'page' : undefined}><span aria-hidden="true">⌂</span>Scene</a>
   <a href={detail} aria-current={activePage === 'character' ? 'page' : undefined}><span aria-hidden="true">◈</span>Character</a>
+  <button type="button" data-open-inventory
+    aria-expanded={inventoryExpanded} aria-controls="game-window-inventory"
+    onclick={()=>openGameWindow(character.id,'inventory')}>
+    <span aria-hidden="true">▣</span>Inventory
+  </button>
   <a href="/characters"><span aria-hidden="true">☰</span>Characters</a>
   <span aria-disabled="true"><span aria-hidden="true">▣</span>More later</span>
 </nav>
@@ -737,7 +770,9 @@
   .scene-journal-button:focus-visible{outline:2px solid #efd092;outline-offset:2px}
   .chapter-content{display:flex;flex-direction:column;flex:1;min-width:0;padding:0}
   /* The sole Journal anchor is #personal-journal, outside activity. */
-  .journal-nav{appearance:none;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left;width:100%}
+  .journal-nav,.inventory-nav{appearance:none;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left;width:100%}
+  .inventory-nav[aria-expanded="true"]{background:#473426;border-color:#9a6b3d}
+  .inventory-nav:hover,.inventory-nav:focus-visible{outline:1px solid #cba16e}
   .onboarding-footer{border-top:1px solid #4d3928;padding:10px 17px;font:11px/1.5 sans-serif;color:#a99783;letter-spacing:.06em}
   .shell-dock{position:sticky;top:0;align-self:start;height:100vh;height:100dvh;min-width:0;overflow:auto;
     border-left:1px solid #56412d;background:#171715}
