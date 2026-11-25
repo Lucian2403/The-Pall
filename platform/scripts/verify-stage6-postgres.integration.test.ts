@@ -32,6 +32,7 @@ import {INITIAL_WRONG_BELL} from '../apps/api/src/bellrunner-wrong-bell-work.ts'
 import {STAGE_FOUR_FACT,STAGE_FOUR_OPENING_LENGTH,STAGE_FOUR_REVELATION_LENGTH} from '../apps/api/src/bellrunner-second-job-work.ts';
 import {registerMillhandClinicRoutes,registerBellrunnerClinicRoutes,registerStitcherClinicRoutes} from '../apps/api/src/millhand-clinic-routes.ts';
 import {registerTutorialHomeRoutes} from '../apps/api/src/tutorial-home-routes.ts';
+import {registerFreePlayRoutes} from '../apps/api/src/free-play-routes.ts';
 import {registerInventoryRoutes} from '../apps/api/src/inventory-routes.ts';
 import {registerMillhandStageRewindRoutes} from '../apps/api/src/millhand-stage-rewind-routes.ts';
 import {registerPersonalJournalRoutes} from '../apps/api/src/personal-journal-routes.ts';
@@ -61,7 +62,8 @@ const schema=[
   '0016_bellrunner_wrong_bell.sql','0017_bellrunner_second_job.sql',
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
-  '0022_personal_journal.sql','0023_inventory_storage_context.sql'
+  '0022_personal_journal.sql','0023_inventory_storage_context.sql',
+  '0024_free_play_entry.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -85,6 +87,7 @@ registerMillhandClinicRoutes(app,{pool:db,resolveSession});
 registerBellrunnerClinicRoutes(app,{pool:db,resolveSession});
 registerStitcherClinicRoutes(app,{pool:db,resolveSession});
 registerTutorialHomeRoutes(app,{pool:db,resolveSession});
+registerFreePlayRoutes(app,{pool:db,resolveSession});
 registerInventoryRoutes(app,{pool:db,resolveSession});
 registerMillhandStageRewindRoutes(app,{pool:db,resolveSession});
 registerPersonalJournalRoutes(app,{pool:db,resolveSession});

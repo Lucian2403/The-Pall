@@ -80,6 +80,8 @@
     "combat:migrate": "node --env-file=.env scripts/combat-migrate.mjs",
     "clinic:migrate": "node --env-file=.env scripts/clinic-migrate.mjs",
     "home:migrate": "node --env-file=.env scripts/tutorial-home-migrate.mjs",
+    "free-play:migrate": "node --env-file=.env scripts/free-play-migrate.mjs",
+    "verify:free-play-entry": "node --import tsx --test scripts/verify-free-play-entry.test.ts",
     "inventory:migrate": "node --env-file=.env scripts/inventory-migrate.mjs",
     "verify:inventory": "node --import tsx --test scripts/verify-inventory.test.ts",
     "verify:inventory-windows-browser": "node --import tsx scripts/verify-millhand-scenes-browser.mjs --inventory-only",
