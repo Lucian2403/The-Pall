@@ -114,8 +114,8 @@ test('City map has a shared acknowledged catalogue, explicit travel action and d
  assert.ok(api.includes("method==='GET'?base+'/city':base+'/city/travel'"));
  assert.ok(api.includes("free_play_announcement_required"));
  assert.ok(catalogue.includes("poi(HOME_ID,'Home'"));
- assert.equal(CITY_OVERVIEW.pointsOfInterest.length,9);
- assert.equal(new Set(CITY_OVERVIEW.pointsOfInterest.map(p=>p.id)).size,9);
+ assert.equal(CITY_OVERVIEW.pointsOfInterest.length,16);
+ assert.equal(new Set(CITY_OVERVIEW.pointsOfInterest.map(p=>p.id)).size,16);
  assert.equal(CITY_OVERVIEW.pointsOfInterest.filter(p=>p.availability==='available').length,1);
  assert.ok(types.includes('pointsOfInterest:readonly CityPointOfInterest[]'));
  assert.ok(city.includes("+'/free-play/city'"));
@@ -138,7 +138,7 @@ test('Distance uses original image aspect ratio, global speed and rounding only'
 
 test('Journey requires a distinct available destination and settles once at its timestamp',()=>{
  const home=CITY_OVERVIEW.pointsOfInterest[0];
- const fixture={...CITY_OVERVIEW.pointsOfInterest[1],availability:'available' as const,destination:'qa-only'};
+ const fixture={...CITY_OVERVIEW.pointsOfInterest.find(p=>p.id==='job-board')!,availability:'available' as const,destination:'qa-only'};
  const catalogue:CityCatalogue={...CITY_OVERVIEW,pointsOfInterest:[home,fixture]};
  const state={currentLocationId:home.id,revision:0,journey:null};
  const now=new Date('2026-11-25T12:00:00Z');
@@ -169,4 +169,21 @@ test('Previously acknowledged announcements can be reviewed without mutation and
  assert.ok(modal.indexOf('if(reviewOnly)')<modal.indexOf('await fetch('));
  assert.ok(rewind.includes("attname='free_play_intro_seen_at'"));
  assert.ok(rewind.includes('UPDATE player_characters SET free_play_intro_seen_at=NULL WHERE id=$1'));
+});
+
+test('Owner map uses the complete numbered roster and shared video/image geometry',()=>{
+ const map=source('apps/web/src/lib/CityMapViewport.svelte');
+ const assets=source('apps/web/src/lib/city-map-assets.ts');
+ assert.deepEqual(CITY_OVERVIEW.pointsOfInterest.map(p=>p.name),['Home','Inn','Job Board','City Board','Marketplace','Clothing Trader','Weapon Trader','Materials Merchant','Herbalist','Clinic','Blacksmith','Depot','Mechanical Yard','Workshop & Repairs','City Gates','Forest']);
+ assert.deepEqual(CITY_OVERVIEW.pointsOfInterest.map(p=>p.displayOrder),Array.from({length:16},(_,i)=>i+1));
+ assert.equal(CITY_OVERVIEW.config.width/CITY_OVERVIEW.config.height,16/9);
+ for(const p of CITY_OVERVIEW.pointsOfInterest){
+  assert.ok(p.position.x>0&&p.position.x<1&&p.position.y>0&&p.position.y<1);
+  assert.equal(p.icon,'/locations/city/poi/'+p.id+'.webp');
+ }
+ assert.ok(assets.includes("video:'/locations/city/map.webm'")&&assets.includes('useAnimatedMap:true'));
+ assert.ok(map.includes('autoplay loop muted playsinline')&&map.includes('prefers-reduced-motion'));
+ assert.ok(map.includes('videoFailed=true;videoReady=false;'));
+ assert.ok(map.includes("style:left={x+'px'} style:top={y+'px'} style:width={width*scale+'px'} style:height={height*scale+'px'}"));
+ assert.ok(map.includes("style:left={x+p.position.x*width*scale+'px'}"));
 });

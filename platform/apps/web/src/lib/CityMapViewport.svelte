@@ -11,7 +11,24 @@
  let w=$state(1),h=$state(1),zoom=$state(1),x=$state(0),y=$state(0);
  let fit=$derived(Math.min(w/width,h/height)),scale=$derived(fit*zoom);
  let mapSource=$state<string>(assets.useFinalMap?assets.map:assets.fallbackMap);
+ let videoElement:HTMLVideoElement|undefined=$state();
+ let videoFailed=$state(false),videoReady=$state(false),motionEnabled=$state(false);
+ let pageVisible=$state(true);
  let failedIcons=$state<Record<string,boolean>>({});
+ // The video and static artwork always share the exact same camera geometry.
+ const showVideo=$derived(assets.useAnimatedMap&&motionEnabled&&pageVisible&&!videoFailed);
+ $effect(()=>{
+  if(!showVideo||!videoElement){videoReady=false;return;}
+  const video=videoElement;
+  video.muted=true;
+  let active=true;
+  void video.play().catch(()=>{if(active){videoFailed=true;videoReady=false;}});
+  return ()=>{active=false;video.pause();};
+ });
+ function toggleAnimation(){
+  const retry=videoFailed;videoFailed=false;videoReady=false;motionEnabled=retry||!motionEnabled;
+ }
+
  let artFailed=$state(false),calibrating=$state(false),coordinate=$state('');
  const pointers=new Map<number,{x:number;y:number}>();
  let moved=false, suppressUntil=0;
@@ -33,6 +50,12 @@
  }
  $effect(()=>{const id=selectedId;if(id)untrack(()=>centre(id));});
  onMount(()=>{
+  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const syncMotion=()=>{motionEnabled=!motion.matches;};
+  const syncVisibility=()=>{pageVisible=!document.hidden;};
+  syncMotion();syncVisibility();
+  motion.addEventListener('change',syncMotion);
+  document.addEventListener('visibilitychange',syncVisibility);
   const observer=new ResizeObserver(([entry])=>{
    const cx=(w/2-x)/(width*scale),cy=(h/2-y)/(height*scale);
    w=Math.max(1,entry.contentRect.width);h=Math.max(1,entry.contentRect.height);
@@ -44,7 +67,7 @@
    zoomAt(zoom*Math.exp(-event.deltaY*.0015),event.clientX-r.left,event.clientY-r.top);
   };
   viewport.addEventListener('wheel',wheel,{passive:false});
-  return ()=>{observer.disconnect();viewport.removeEventListener('wheel',wheel);};
+  return ()=>{observer.disconnect();viewport.removeEventListener('wheel',wheel);motion.removeEventListener('change',syncMotion);document.removeEventListener('visibilitychange',syncVisibility);};
  });
  function point(event:PointerEvent){const r=viewport.getBoundingClientRect();return {x:event.clientX-r.left,y:event.clientY-r.top};}
  function down(event:PointerEvent){
@@ -93,6 +116,12 @@
   onpointerdown={down} onpointermove={move} onpointerup={up} onpointercancel={up} onlostpointercapture={up}>
   {#if !artFailed}<img class="map-art" src={mapSource} alt="" draggable="false" onerror={imageError}
    style:left={x+'px'} style:top={y+'px'} style:width={width*scale+'px'} style:height={height*scale+'px'}/>{/if}
+  {#if showVideo}
+   <video bind:this={videoElement} class="map-art animated-art" class:ready={videoReady}
+    src={assets.video} autoplay loop muted playsinline preload="metadata" aria-hidden="true" tabindex="-1"
+    onplaying={()=>{videoReady=true;}} onerror={()=>{videoFailed=true;videoReady=false;}}
+    style:left={x+'px'} style:top={y+'px'} style:width={width*scale+'px'} style:height={height*scale+'px'}></video>
+  {/if}
   {#each points as p (p.id)}
    <button type="button" class="marker" class:selected={selectedId===p.id} class:current={currentId===p.id}
     class:unavailable={p.availability==='unavailable'} class:travelling={travelId===p.id}
@@ -110,6 +139,7 @@
    <button type="button" aria-label="Zoom out" onclick={()=>zoomAt(zoom/assets.zoomStep)}>−</button>
    <button type="button" onclick={reset}>Reset</button>
    <button type="button" onclick={()=>centre(currentId)}>Player</button>
+   {#if assets.useAnimatedMap}<button type="button" aria-pressed={motionEnabled&&!videoFailed} onclick={toggleAnimation}>{videoFailed?'Retry animation':motionEnabled?'Pause animation':'Animate'}</button>{/if}
    {#if dev}<button type="button" aria-pressed={calibrating} onclick={()=>{calibrating=!calibrating;}}>Calibrate</button>{/if}
   </div>
   {#if dev&&calibrating}<output class="coordinates">{coordinate||'Click map for normalized coordinates'}</output>{/if}
@@ -119,6 +149,7 @@
  .map-frame{min-width:0;min-height:0;border:3px double #765538;background:#b59a6d;padding:3px}
  .viewport{position:relative;width:100%;height:100%;min-height:320px;overflow:hidden;touch-action:none;user-select:none;isolation:isolate;background:#c9b287;cursor:grab}
  .viewport:active{cursor:grabbing}.map-art{position:absolute;max-width:none;pointer-events:none;user-select:none}
+ .animated-art{opacity:0;object-fit:fill}.animated-art.ready{opacity:1}
  .marker{position:absolute;transform:translate(-50%,calc(-100% - 7px));z-index:2;width:44px;height:48px;padding:0;display:grid;place-items:center;color:#f3d9a5;background:#312417;border:2px solid #e6c88e;border-radius:50% 50% 45% 45%;box-shadow:0 2px 5px #412c17aa;cursor:pointer;line-height:1;font:700 25px Georgia,serif}
  .marker::after{content:'';position:absolute;bottom:-7px;left:calc(50% - 5px);width:10px;height:10px;background:inherit;border-right:2px solid #e6c88e;border-bottom:2px solid #e6c88e;transform:rotate(45deg);z-index:-1}
  .marker img{width:32px;height:32px;object-fit:contain;pointer-events:none}

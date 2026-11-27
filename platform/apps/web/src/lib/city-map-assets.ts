@@ -1,9 +1,11 @@
 /** Swap these paths/flags after the final asset pack is supplied. */
 export const cityMapAssets={
  map:'/locations/city/map.webp',
+ video:'/locations/city/map.webm',
+ useAnimatedMap:true,
  fallbackMap:'/locations/city/map-placeholder.svg',
- useFinalMap:false,
- useFinalIcons:false,
+ useFinalMap:true,
+ useFinalIcons:true,
  cityAmbience:'/audio/city/city-ambience.mp3',
  walkingAmbience:'/audio/city/walking-ambience.mp3',
  enableAmbience:false,

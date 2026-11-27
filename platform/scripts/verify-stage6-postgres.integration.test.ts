@@ -3357,7 +3357,7 @@ test('Free Play is owner-scoped, phase-checked, idempotent and has no economic e
  assert.equal(snapshot.body?.cityId,'grand-cylinder-city');
  assert.equal(snapshot.body?.currentLocationId,'starter-rented-room');
  assert.equal(snapshot.body?.journey,null);
- assert.equal(snapshot.body?.pointsOfInterest.length,9);
+ assert.equal(snapshot.body?.pointsOfInterest.length,16);
  assert.equal(snapshot.body?.pointsOfInterest.filter((p:any)=>p.availability==='available').length,1);
  const travel=city+'/travel';
  const command={destinationId:'job-board',expectedRevision:0,requestId:randomUUID()};

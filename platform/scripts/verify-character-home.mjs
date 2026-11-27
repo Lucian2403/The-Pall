@@ -20,7 +20,9 @@ const panelCss=skillPanel.slice(skillPanel.indexOf('<style>'));
 for(const fragment of [
   "fetch('/api/characters/' + encodeURIComponent(page.params.id!), {cache: 'no-store'})",
   'response.status === 401','response.status === 404',
-  '<TutorialShell {character} activePage="character" smithingBackdrop={character.origin===\'Millhand\'}>',
+  '<TutorialShell {character} activePage="character"',
+  "smithingBackdrop={character.origin==='Millhand'}",
+  "cityMap={character.tutorial.stage===8&&character.tutorial.status==='COMPLETED'",
   '<CharacterHome {character}/>',
   'avatarId?: string | null;',
   'href="/characters"','href="/account"'

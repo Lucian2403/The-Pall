@@ -1,24 +1,24 @@
 # Grand Cylinder City map and local travel
 
 ## Installation
-From `platform` run `npm run city-travel:migrate` against the same local database as the API. Restart the API and web development server. Migration 0025 is additive and idempotent; it also applies 0024 if needed. No coin, XP, combat or onboarding data is modified.
+From `platform` run `npm run city-travel:migrate` against the same local database as the API, then restart API and web. Migration 0025 is additive and idempotent. It also applies 0024 if needed.
 
-## Catalogue and artwork
-`apps/api/src/city-poi-catalogue.ts` is the source of truth: ID, name, description, icon, normalized position, display order, availability and relative character scene destination. Nine names are confirmed by the owner's screenshot; the three remaining names are not present in the existing registry or supplied location workbook. Only Home has a usable post-introduction scene. Clinic and other tutorial-only scenes are not normal Free Play destinations. Do not map unavailable POIs to those tutorial routes.
+The separately supplied runtime asset pack must be extracted at the repository root. It contains `platform/apps/web/static/locations/city/map.webm` (original VP9, 1920 × 1080, 29.97 sec), `map.webp` (optimized 4096 × 2304 still from the 9600 × 5400 clean master), and 16 transparent WebP icons in `poi/`. Do not put the annotated map or the CoK project file in the runtime directory. The asset pack is not committed by the code-only connector. Without the pack, the existing schematic and glyph fallbacks remain functional.
 
-`apps/web/src/lib/city-map-assets.ts` centralizes the asset switches and paths:
-- `apps/web/static/locations/city/map.webp` — final artwork; enable `useFinalMap`. The separate `map-placeholder.svg` is the fallback.
-- `apps/web/static/locations/city/poi/<poi-id>.webp` — individual transparent icons; enable `useFinalIcons`. Unicode symbols remain the fallback.
-- `apps/web/static/audio/city/city-ambience.mp3` and `walking-ambience.mp3` — enable `enableAmbience` only after the assets arrive. The map uses global sound/volume settings and a single scene-owned loop with sequential fade-out and fade-in (450 ms each). Missing files are non-blocking.
+## Map and catalogue
+`apps/api/src/city-poi-catalogue.ts` is the authoritative 16-entry registry, in the supplied numbered order. The normalized anchor for each POI was measured from the midpoint of its red handwritten number on the annotated map; final gate and forest positions are provisional. Only Home has an implemented post-tutorial scene. Other locations are selectable but cannot initiate travel. Do not map them to tutorial scenes.
 
-For final positioning set config width/height to the artwork's actual pixel dimensions. Open the map in the dev server, enable Calibrate, click the marker's building anchor, copy its normalized x/y and edit the POI entry. The calibration control is excluded from production. Markers stay screen-size and coordinates never use browser viewport dimensions.
+`apps/web/src/lib/city-map-assets.ts` centralizes map/image/video/icon references. Animated playback is muted, inline, looping and stationary. It shares the image and marker camera transform, is disabled for reduced-motion users by default, stops when the page is hidden or unmounted, and can be paused manually. A video failure falls back to the clean static map; an absent static image falls back to the schematic. No gameplay depends on decoding video. Zoom is 1–4× fitted view; panning clamps to artwork edges. Letterbox space at fitted zoom is intentional where aspect ratios differ.
+
+For replacement artwork keep the same aspect ratio and camera framing; if geometry changes, recalibrate with the development-only Calibrate tool. Set source width/height to the reference master dimensions and adapt the distance scale to keep game travel independent of export resolution.
 
 ## Travel
-The provisional configuration uses 1400 × 1000 source pixels, 0.02 distance units/pixel, 1.4 units/sec, 2 sec minimum, and round up to 1 sec. Distance uses Euclidean original-image geometry; no street path is drawn. Update the global scale/speed rather than per-pair times.
+The source geometry is 9600 × 5400. Scale is provisionally 28/9600 distance units per source pixel, maintaining the former 28-unit map width; walking speed 1.4 units/sec, minimum 2 sec, rounding up to 1 sec. No road pathfinding or wall collision. Geometry and distances are independent of camera zoom/pan and artwork file resolution.
 
-`GET /api/characters/:id/free-play/city` returns the catalogue, server time, current location, revision and active journey. It reconciles due arrivals under the existing character row lock. `POST .../city/travel` requires an explicit destination, expected revision and request UUID. No client clock authorizes arrival; the timer is presentation only. A duplicate request cannot start a second journey. Arrival persists exactly once on the next authorized read/command, even after closing the browser. The current scene resolver uses the saved physical location; direct Home access and Home actions are blocked while away or walking. Developer Stage VIII rewind clears only the selected character's travel state.
+GET /api/characters/:id/free-play/city returns the catalogue, server time, current location, revision and active journey; it reconciles due arrivals under the character row lock. POST .../city/travel requires explicit destination, expected revision and request UUID. Home access checks physical presence. Developer Stage VIII rewind resets the selected character's travel state. No travel fee, stamina loss, rewards or new encounters.
 
-No travel fee, stamina use, random encounters or rewards. Future destination scene APIs must enforce physical presence before performing gameplay actions; no non-Home scene is enabled in this increment. A journey can be exercised with test-only POIs in the PostgreSQL and browser harnesses.
+## Audio
+City and walking ambience are disabled until supplied. Expected files are `static/audio/city/city-ambience.mp3` and `walking-ambience.mp3`.
 
 ## Validation
-`npm run verify:free-play-entry` includes pure geometry, timing and entry contracts. The Free Play GitHub workflow runs API and Svelte typechecks, build, real PostgreSQL lifecycle and city travel concurrency tests and a Chromium smoke test at 1440, 390 and 320 px with a test-only route. Actual owner asset audio and artwork calibration are pending.
+The Free Play workflow runs entry and geometry tests, API and Svelte checks, Chromium smoke tests at desktop, 390 and 320 px, and real PostgreSQL travel lifecycle tests using a test-only destination. The actual supplied video and icons require local browser testing after extracting the asset pack.
