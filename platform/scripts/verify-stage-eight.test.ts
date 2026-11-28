@@ -3,7 +3,7 @@ import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
-import {initial,advance,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
+import {initial,advance,payStarterRent,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
 import {homeJournalEntries,homeCompletionSummary} from '../apps/web/src/lib/home-journal-copy.ts';
 import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
 const root=resolve(import.meta.dirname,'..');
@@ -82,7 +82,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   api.includes('player_character_tutorial_home_receipts')&&
   api.includes('hash=createHash')&&api.includes('stale_revision')&&
   api.includes('clinic_not_left')&&api.includes("phase!=='SELECTED'")&&
-  !api.includes('coins=coins+')&&!api.includes('coins=coins-')&&
+  !api.includes('coins=coins+')&&api.includes('coins=coins-$2,starter_rent_paid_at=NOW()')&&
   !api.includes('UPDATE player_character_flint_combat'));
  assert.ok(migration.includes('REFERENCES player_characters(id) ON DELETE RESTRICT')&&
   migration.includes('PRIMARY KEY(character_id,request_id)'));
@@ -200,7 +200,7 @@ test('Stage 8 hotspots never paint a rectangular debug hover and bed is clickabl
   !web.includes('outline:2px solid #eccc85'));
  const api=source('apps/api/src/tutorial-home-routes.ts');
  assert.ok(api.includes("'read_notice','put_down','finish','rest'")&&
-  api.includes("cmd.action==='rest'&&c.tutorial_status==='COMPLETED'")&&
+  api.includes("(cmd.action==='rest'||cmd.action==='pay_rent')&&c.tutorial_status==='COMPLETED'")&&
   api.includes('clinic.rows[0].state.after')&&
   !api.includes('UPDATE player_character_flint_combat'));
 });
@@ -322,4 +322,28 @@ test('Each supported finale uses its own Stage VIII completion prose',()=>{
    !home.includes('Owler'), 'Story-dependent ending text belongs in a shared copy module');
  assert.match(copy,/COMPLETION_SUMMARIES:Record<FinaleOrigin,string>/,
   'Require an exhaustive map for every finale origin');
+});
+
+test('Initial rent payment is a single full debit after the shared closing sequence',()=>{
+ const before=initial('Millhand','restamp','player_victory');
+ assert.throws(()=>payStarterRent(before,150,null),/rent_not_ready/);
+ const complete=advance(advance(advance(before,'read_notice'),'put_down'),'finish');
+ assert.throws(()=>payStarterRent(complete,149,null),/insufficient_coins/);
+ const paid=payStarterRent(complete,200,null);
+ assert.equal(paid.coins,50);
+ assert.equal(paid.state.phase,'COMPLETE');
+ assert.equal(paid.state.revision,complete.revision+1);
+ const stamp='2026-11-28T12:00:00Z';
+ assert.throws(()=>payStarterRent(paid.state,500,stamp),/rent_already_paid/);
+ const snapshot=view(paid.state,'Ada',paid.coins,stamp);
+ assert.equal(snapshot.rentPaid,true);assert.equal(snapshot.rentDue,0);assert.equal(snapshot.shortfall,0);
+ assert.equal(snapshot.noticeTitle,'RENT PAID');
+ assert.equal(view(complete,'Ada',10).rentDue,150);
+ assert.equal(view(before,'Ada',10,stamp).noticeTitle,'FINAL NOTICE','Developer replay retains original copy');
+ const ui=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ assert.ok(ui.includes("perform('pay_rent')")&&ui.includes('disabled={pending||home.shortfall>0}'));
+ assert.ok(ui.includes('class="hotspot kitchen"')&&ui.includes('Cooking is not yet available.'));
+ assert.ok(ui.includes('coins:result.coins'));
+ const schema=source('db/migrations/0026_starter_rent.sql');
+ assert.ok(schema.includes('ADD COLUMN IF NOT EXISTS starter_rent_paid_at'));
 });

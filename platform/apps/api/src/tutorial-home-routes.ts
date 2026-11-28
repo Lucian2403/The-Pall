@@ -11,14 +11,14 @@ import {createHash} from 'node:crypto';
 import pg from 'pg';
 import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
-import {HOME_ID,advance,HomeInvalidAction,initial,view} from './shared-home-state.js';
+import {HOME_ID,RENT,advance,payStarterRent,HomeInvalidAction,initial,view} from './shared-home-state.js';
 import type {Action,State,Branch,Outcome} from './shared-home-state.js';
 import type {ClinicState} from './millhand-clinic-state.js';
 
 type Session={user:{id:string;emailVerified:boolean}}|null;
 type Resolver=(headers:IncomingHttpHeaders)=>Promise<Session>;
-type Character={id:string;name:string;origin:string;tutorial_stage:number;tutorial_status:string;coins:string|number};
-type Command={kind:'start';requestId:string}|{kind:'action';requestId:string;expectedRevision:number;action:Action};
+type Character={id:string;name:string;origin:string;tutorial_stage:number;tutorial_status:string;coins:string|number;rent_paid_at:string|null};
+type Command={kind:'start';requestId:string}|{kind:'action';requestId:string;expectedRevision:number;action:Action|'pay_rent'};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function parse(input:unknown):Command{
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('invalid_body');
@@ -28,14 +28,15 @@ function parse(input:unknown):Command{
  if(v.kind==='start'&&keys==='kind,requestId')return {kind:'start',requestId:v.requestId};
  if(v.kind!=='action'||keys!=='action,expectedRevision,kind,requestId')throw Error('invalid_fields');
  if(!Number.isSafeInteger(v.expectedRevision)||(v.expectedRevision as number)<0)throw Error('invalid_revision');
- if(!['read_notice','put_down','finish','rest'].includes(String(v.action)))throw Error('invalid_action');
- return {kind:'action',requestId:v.requestId,expectedRevision:v.expectedRevision as number,action:v.action as Action};
+ if(!['read_notice','put_down','finish','rest','pay_rent'].includes(String(v.action)))throw Error('invalid_action');
+ return {kind:'action',requestId:v.requestId,expectedRevision:v.expectedRevision as number,action:v.action as Action|'pay_rent'};
 }
 const missing=(e:unknown)=>(e as {code?:string})?.code==='42P01';
 const ready=(s:ClinicState|undefined)=>!!s&&s.phase==='LEFT'&&s.paid&&
  (s.outcome==='player_victory'||s.outcome==='player_defeat');
 const base='/api/characters/:id/tutorial/home';
-const characterSQL='SELECT id,name,origin,tutorial_stage,tutorial_status,coins FROM player_characters WHERE id=$1 AND account_id=$2';
+// Read old schemas without breaking the tutorial; actual payment requires 0026.
+const characterSQL="SELECT id,name,origin,tutorial_stage,tutorial_status,coins,to_jsonb(player_characters)->>'starter_rent_paid_at' AS rent_paid_at FROM player_characters WHERE id=$1 AND account_id=$2";
 /** The old tutorial room still works before the city migration. Once travel
  * exists, completed characters must actually be at Home to use the room. */
 async function physicallyAtHome(db:pg.Pool|pg.PoolClient,id:string){
@@ -66,7 +67,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     const state=saved.rows[0].state;
     if((state.phase==='COMPLETE')!==(c.tutorial_status==='COMPLETED'))
      return reply.code(409).send({error:'home_completion_mismatch'});
-    return view(state,c.name,Number(c.coins));
+    return view(state,c.name,Number(c.coins),c.rent_paid_at);
    }
    if(c.tutorial_status!=='NOT_STARTED')return reply.code(409).send({error:'home_not_started'});
    const clinic=await pool.query<{state:ClinicState}>('SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
@@ -114,6 +115,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    const saved=await db.query<{state:State}>(
     'SELECT state FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',[c.id]);
    let state:State;
+   let coins=Number(c.coins),paidAt=c.rent_paid_at;
    if(cmd.kind==='start'){
     if(saved.rowCount)state=saved.rows[0].state;
     else{
@@ -180,7 +182,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    }else{
     if(!saved.rowCount||
        !(c.tutorial_status==='IN_PROGRESS'||
-         (cmd.action==='rest'&&c.tutorial_status==='COMPLETED'&&
+         ((cmd.action==='rest'||cmd.action==='pay_rent')&&c.tutorial_status==='COMPLETED'&&
           saved.rows[0].state.phase==='COMPLETE'))){
      await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'home_not_started'});
     }
@@ -188,7 +190,18 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     if(old.revision!==cmd.expectedRevision){
      await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'stale_revision',currentRevision:old.revision});
     }
-    try{state=advance(old,cmd.action);}catch(error){
+    try{
+     if(cmd.action==='pay_rent'){
+      if(c.tutorial_status!=='COMPLETED')throw new HomeInvalidAction('rent_not_ready');
+      const payment=payStarterRent(old,coins,paidAt);
+      // The owner row is already locked. Debit and durable receipt are one transaction.
+      const paid=await db.query<{paid_at:string}>(
+       'UPDATE player_characters SET coins=coins-$2,starter_rent_paid_at=NOW() WHERE id=$1 AND starter_rent_paid_at IS NULL AND coins>=$2 RETURNING starter_rent_paid_at::text AS paid_at',
+       [c.id,RENT]);
+      if(!paid.rowCount)throw new HomeInvalidAction('rent_payment_conflict');
+      state=payment.state;coins=payment.coins;paidAt=paid.rows[0].paid_at;
+     }else state=advance(old,cmd.action);
+    }catch(error){
      if(!(error instanceof HomeInvalidAction))throw error;
      await db.query('ROLLBACK');open=false;return reply.code(409).send({error:error.message});
     }
@@ -199,14 +212,14 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     await db.query('UPDATE player_character_tutorial_home SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
      [c.id,state.revision,JSON.stringify(state)]);
    }
-   const result=view(state,c.name,Number(c.coins));
+   const result=view(state,c.name,coins,paidAt);
    await db.query('INSERT INTO player_character_tutorial_home_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [c.id,cmd.requestId,hash,JSON.stringify(result)]);
    await db.query('COMMIT');open=false;
    return result;
   }catch(error){
    if(open){try{await db.query('ROLLBACK');}catch{/* preserve original */}}
-   if(missing(error))return reply.code(503).send({error:'home_schema_missing',setup:'npm run home:migrate'});
+   if(missing(error)||(error as {code?:string})?.code==='42703')return reply.code(503).send({error:'home_schema_missing',setup:'npm run home:migrate'});
    throw error;
   }finally{db.release();}
  });

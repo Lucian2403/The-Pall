@@ -1,4 +1,4 @@
-/** Shared rented-home onboarding finale. No payment, eviction or gameplay release. */
+/** Shared rented-home finale and the initial Free Play rent payment. No recurring rent or eviction. */
 export const HOME_ID='starter-rented-room';
 export const RENT=150;
 export const CLOSING_SPEECH="Ah, hell. Need a place of my own. First I've got this rent to pay. More jobs... or I could make something to sell.";
@@ -56,15 +56,23 @@ export function advance(s:State,action:Action):State{
   if(actions[s.phase]!==action)throw new HomeInvalidAction('wrong_home_phase');
   return {...s,revision:s.revision+1,phase:next[action]};
 }
-export function view(s:State,name:string,coins:number){
+/** Payment is only available after the first notice and closing speech are complete. */
+export function payStarterRent(s:State,coins:number,paidAt:string|null){
+  if(s.phase!=='COMPLETE')throw new HomeInvalidAction('rent_not_ready');
+  if(paidAt!==null)throw new HomeInvalidAction('rent_already_paid');
+  if(!Number.isFinite(coins)||coins<RENT)throw new HomeInvalidAction('insufficient_coins');
+  return {state:{...s,revision:s.revision+1},coins:coins-RENT};
+}
+export function view(s:State,name:string,coins:number,paidAt:string|null=null){
   // Older Stage 8 snapshots may still be on the removed city/door steps.
   // Show them directly inside the room, without rewriting a GET request.
   const phase=s.phase==='JOURNEY'||s.phase==='DOOR'?'HOME':s.phase;
   return {stage:8,revision:s.revision,phase,
     homeId:s.homeId,origin:s.origin,branch:s.branch,outcome:s.outcome,
-    characterName:name,coins,rent:RENT,shortfall:Math.max(0,RENT-coins),
+    characterName:name,coins,rent:RENT,rentPaid:paidAt!==null,rentPaidAt:paidAt,
+    rentDue:paidAt!==null?0:RENT,shortfall:paidAt!==null?0:Math.max(0,RENT-coins),
     condition:homeCondition(s.condition),
-    noticeTitle:'FINAL NOTICE',
-    noticeText:name+', you have to pay '+RENT+' coins in rent, or you are out. No discussion.',
+    noticeTitle:paidAt!==null&&s.phase==='COMPLETE'?'RENT PAID':'FINAL NOTICE',
+    noticeText:paidAt!==null&&s.phase==='COMPLETE'?'The rent has been paid in full.':name+', you have to pay '+RENT+' coins in rent, or you are out. No discussion.',
     closingSpeech:CLOSING_SPEECH,completed:s.phase==='COMPLETE'};
 }

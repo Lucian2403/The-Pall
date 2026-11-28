@@ -9,11 +9,12 @@
   import '$lib/pall-story-landscape.css';
 
   type Phase='HOME'|'NOTICE'|'SPEECH'|'COMPLETE';
-  type Action='read_notice'|'put_down'|'finish'|'rest';
+  type Action='read_notice'|'put_down'|'finish'|'rest'|'pay_rent';
   type Home={stage:8;revision:number;phase:Phase;homeId:string;origin:FinaleOrigin;
     branch:string;
     outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
+    rentPaid:boolean;rentPaidAt:string|null;rentDue:number;
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
     condition:{stamina:number;composure:number;fatigue:number;stress:number}};
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
@@ -27,6 +28,7 @@
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
   let noticeExpanded=$state(false);
+  let kitchenOpen=$state(false);
   let journalOpen=$state(false);
   let nextOpenSound=0;
   const chestOpenSounds=['/audio/chest/PersonalChest_Open1.wav',
@@ -55,7 +57,7 @@
     const current=()=>generation===requestGeneration&&requestedId===id;
     character=null;home=null;status='loading';pending=false;
     errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
-    noticeExpanded=false;
+    noticeExpanded=false;kitchenOpen=false;
     closeContextWindows();
     try{
       const [person,r]=await Promise.all([
@@ -88,7 +90,7 @@
       }else savedHome=result;
       if(!current())return;
       home=savedHome;noticeExpanded=savedHome.phase==='NOTICE';
-      character={...savedCharacter,tutorial:{stage:8,
+      character={...savedCharacter,coins:savedHome.coins,tutorial:{stage:8,
         status:savedHome.completed?'COMPLETED':'IN_PROGRESS'}};
       status='ready';
     }catch(error){
@@ -103,7 +105,7 @@
     return ()=>{requestGeneration++;};
   });
   async function perform(action:Action):Promise<boolean>{
-    if(pending||!home||(home.completed&&action!=='rest'))return false;
+    if(pending||!home||(home.completed&&action!=='rest'&&action!=='pay_rent'))return false;
     const actingId=id,actingGeneration=requestGeneration;
     const current=()=>actingId===id&&actingGeneration===requestGeneration;
     const actingApi='/api/characters/'+encodeURIComponent(actingId)+'/tutorial/home';
@@ -115,22 +117,26 @@
         body:JSON.stringify({kind:'action',action,requestId:retryId,expectedRevision:home.revision})});
       if(!current())return false;
       if(response.status===409){
+        const problem=await response.json().catch(()=>({}));
+        if(!current())return false;
         retryId=null;retryKey=null;
         const latest=await fetch(actingApi,{cache:'no-store'});
         if(latest.ok){
           const updated=await latest.json() as Home;
           if(!current())return false;
-          home=updated;noticeExpanded=updated.phase==='NOTICE';
+          home=updated;noticeExpanded=updated.phase==='NOTICE'||(action==='pay_rent'&&updated.completed);
+          if(character)character={...character,coins:updated.coins,tutorial:{stage:8,status:updated.completed?'COMPLETED':'IN_PROGRESS'}};
         }
-        errorMessage='The saved scene changed. Current progress has been reloaded.';
+        errorMessage=problem.error==='insufficient_coins'?'You do not have enough coins to pay the rent.':problem.error==='rent_already_paid'?'The rent has already been paid.':'The saved scene changed. Current progress has been reloaded.';
         return false;
       }
+      if(response.status===503){errorMessage='Home database update required. Run npm run home:migrate.';return false;}
       if(!response.ok)throw Error('home_action_failed');
       const result=await response.json() as Home;
       if(!current())return false;
-      home=result;noticeExpanded=result.phase==='NOTICE';
+      home=result;noticeExpanded=result.phase==='NOTICE'||(action==='pay_rent'&&result.completed);
       retryId=null;retryKey=null;
-      if(character)character={...character,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
+      if(character)character={...character,coins:result.coins,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
       return true;
     }catch{
       if(current())errorMessage='Connection interrupted. Retry the same action; it cannot complete twice.';
@@ -141,7 +147,7 @@
   async function restInBed(){
     if(restAnimating||pending||!home)return;
     const actingId=id,actingGeneration=requestGeneration;
-    restAnimating=true;restMessage='';
+    restAnimating=true;restMessage='';kitchenOpen=false;
     // Only the confirmed server Rest changes character condition.
     const fade=new Promise<void>(resolve=>setTimeout(resolve,1000));
     const saved=await perform('rest');
@@ -152,8 +158,13 @@
   }
   function interactNotice(){
     if(pending||!home)return;
+    restMessage='';kitchenOpen=false;
     if(home.phase==='HOME')void perform('read_notice');
     else if(['NOTICE','SPEECH','COMPLETE'].includes(home.phase))noticeExpanded=true;
+  }
+  function interactKitchen(){
+    if(pending||restAnimating||!home?.completed)return;
+    restMessage='';noticeExpanded=false;kitchenOpen=true;
   }
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
@@ -192,6 +203,12 @@
           disabled={pending||restAnimating} onclick={()=>{void restInBed();}}>
           <span class="object-caption">Rest</span>
         </button>
+        {#if home.completed}
+          <button type="button" class="hotspot kitchen" aria-label="Kitchen — Tier I"
+            title="Kitchen — Tier I" disabled={pending||restAnimating} onclick={interactKitchen}>
+            <span class="object-caption">Kitchen · T1</span>
+          </button>
+        {/if}
         {#if restAnimating}<div class="rest-fade" aria-hidden="true"></div>{/if}
         </div>
       </div>
@@ -216,16 +233,36 @@
             <p class="narration">You return to your rented home. A notice lies on the table.</p>
             <p class="instruction">Read the notice on the table.</p>
           </aside>
+        {:else if kitchenOpen&&home.completed}
+          <aside class="home-dialogue" aria-label="Kitchen">
+            <p class="eyebrow">HOME · TIER I</p>
+            <h1>Kitchen</h1>
+            <p class="narration">A small iron stove, a battered pot and a little space to work. Not much, but enough to put a meal on the table.</p>
+            <p class="instruction">Cooking is not yet available.</p>
+            <button type="button" class="pall-framed-button primary-choice" onclick={()=>kitchenOpen=false}>Continue</button>
+          </aside>
         {:else if noticeExpanded}
           <aside class="home-dialogue notice" aria-label="Notice">
-            <p class="eyebrow">NOTICE · STAGE VIII</p>
+            <p class="eyebrow">{home.completed?'HOME · RENT':'NOTICE · STAGE VIII'}</p>
             <h1>{home.noticeTitle}</h1><p class="notice-text">{home.noticeText}</p>
             {#if home.phase==='NOTICE'}
               <button type="button" class="pall-framed-button primary-choice" disabled={pending}
                 onclick={()=>{void perform('put_down');}}>Put the notice down</button>
             {:else}
+              {#if home.completed}
+                {#if home.rentPaid}
+                  <p class="narration">For now, the roof over your head is paid for. One less thing to worry about.</p>
+                  <p class="instruction" role="status">Rent paid in full.</p>
+                {:else}
+                  <p class="narration">The notice still lies on the table. The roof over your head won't pay for itself.</p>
+                  <p class="instruction">Rent due: {home.rent} coins. You have {home.coins} coins.</p>
+                  {#if home.shortfall>0}<p class="instruction">You need {home.shortfall} more coins.</p>{/if}
+                  <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0}
+                    onclick={()=>{void perform('pay_rent');}}>{pending?'Paying…':'Pay Rent'}</button>
+                {/if}
+              {/if}
               <button type="button" class="pall-framed-button secondary-choice"
-                onclick={()=>noticeExpanded=false}>Close notice</button>
+                disabled={pending} onclick={()=>noticeExpanded=false}>Close notice</button>
             {/if}
           </aside>
         {:else if home.phase==='SPEECH'}
@@ -241,8 +278,8 @@
             <p class="eyebrow">STAGE VIII · COMPLETE</p>
             <h1>{home.origin+' opening complete.'}</h1>
             <p class="completion-copy">{homeCompletionSummary(home.origin)}</p>
-            <p><strong>{home.coins} coins remaining. Rent notice: {home.rent} coins.</strong></p>
-            <p class="prototype-note">The opening is complete. Further game systems are not available in this prototype.</p>
+            <p><strong>{home.coins} coins remaining. {home.rentPaid?'Rent paid in full.':'Rent notice: '+home.rent+' coins.'}</strong></p>
+            <p class="prototype-note">The room is yours to use. Rest, inspect the kitchen or review the rent notice.</p>
             <a class="pall-framed-button primary-choice"
               href={'/characters/'+encodeURIComponent(id)+'/overview'}>
               Continue to Free Play
@@ -339,6 +376,7 @@
   .chest{left:1%;top:64%;width:19%;height:25%}
   .book{left:63%;top:68%;width:11%;height:11%}
   .bed{left:14%;top:39%;width:31%;height:25%}
+  .kitchen{left:76%;top:37%;width:20%;height:28%}
   .notice-object{left:50%;top:65%;width:12%;height:15%;
     display:grid;place-items:center}
   .notice-object img{width:100%;height:100%;object-fit:contain;
@@ -364,7 +402,7 @@
     .book{min-height:36px}
     .notice-object{min-height:36px}
     .hotspot .object-caption{font-size:11px;padding:2px 5px}
-    .chest .object-caption{bottom:auto;top:-22px}
+    .chest .object-caption,.kitchen .object-caption{bottom:auto;top:-22px}
   }
   @container activity-panel (max-width:420px){
     .home-dialogue{border-width:17px 18px 17px;

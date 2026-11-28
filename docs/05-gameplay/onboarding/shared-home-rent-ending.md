@@ -68,3 +68,9 @@ Use this shared scene rather than producing six copied home/rent scripts.
 All six should reference the **same home identifier, room/storage implementation, rent amount source, notice content, generic player prompts, absence of deadline/payment and completion logic**. Only the background's earlier quest-journal findings may differ; **the closing speech does not**. Neither the notice nor its narration changes by origin.
 
 Related: [shared onboarding rules](shared-structure.md), [Squatter approved clinic](squatter/clinic-treatment.md), [Millhand Stage 8](millhand/home-rent-ending.md), [Bellrunner Stage 8](bellrunner/home-rent-ending.md), [onboarding index](README.md).
+
+## Free Play Home extension — 2026-11-28
+
+The first notice, put-down and closing speech remain unchanged. After completing that sequence, reopening the notice exposes **Pay Rent**. The initial 150-coin demand is payable in full once; an insufficient balance shows the shortfall and prevents payment. A successful transaction deducts the server-defined amount and records `starter_rent_paid_at` on the character, independently of tutorial state, so developer rewinds cannot charge the same obligation twice. Reopening the notice shows paid status. No recurring rent, partial payments, deadlines, penalties, eviction or housing ownership are defined. This supersedes the earlier payment-mechanics TBD for the initial obligation only.
+
+The existing stove in the rented room is an interactive Tier I Kitchen after completion. Clicking it opens the shared parchment dialogue; cooking, recipes, ingredients, costs and timing remain TBD. Bed, chest and journal keep their existing behaviour. Install migration 0026 with `npm run home:migrate` from platform.
