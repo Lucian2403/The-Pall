@@ -135,8 +135,8 @@
    </button>
   {/each}
   <div class="map-controls" aria-label="Map controls">
-   <button type="button" aria-label="Zoom in" onclick={()=>zoomAt(zoom*assets.zoomStep)}>+</button>
-   <button type="button" aria-label="Zoom out" onclick={()=>zoomAt(zoom/assets.zoomStep)}>−</button>
+   <button type="button" aria-label="Zoom in" disabled={zoom>=assets.zoomMax} onclick={()=>zoomAt(zoom*assets.zoomStep)}>+</button>
+   <button type="button" aria-label="Zoom out" disabled={zoom<=assets.zoomMin} onclick={()=>zoomAt(zoom/assets.zoomStep)}>−</button>
    <button type="button" onclick={reset}>Reset</button>
    <button type="button" onclick={()=>centre(currentId)}>Player</button>
    {#if assets.useAnimatedMap}<button type="button" aria-pressed={motionEnabled&&!videoFailed} onclick={toggleAnimation}>{videoFailed?'Retry animation':motionEnabled?'Pause animation':'Animate'}</button>{/if}
@@ -146,22 +146,36 @@
  </div>
 </div>
 <style>
- .map-frame{min-width:0;min-height:0;border:3px double #765538;background:#b59a6d;padding:3px}
- .viewport{position:relative;width:100%;height:100%;min-height:320px;overflow:hidden;touch-action:none;user-select:none;isolation:isolate;background:#c9b287;cursor:grab}
+ .map-frame{box-sizing:border-box;min-width:0;min-height:0;border:9px solid transparent;
+  border-image:var(--city-frame,url('/ui-kit/city/engraved-frame.svg')) 24 stretch;
+  background:var(--city-paper,url('/ui-kit/city/parchment-grain.svg')) repeat,radial-gradient(ellipse,#ebcfa0,#bc9663);
+  background-clip:padding-box}
+ .viewport{position:relative;width:100%;height:100%;min-height:320px;overflow:hidden;touch-action:none;user-select:none;isolation:isolate;
+  background:var(--city-paper,url('/ui-kit/city/parchment-grain.svg')) repeat,radial-gradient(ellipse at 50% 48%,#ecd0a0,#d7b580);
+  box-shadow:inset 0 0 22px #6f49282e;cursor:grab}
  .viewport:active{cursor:grabbing}.map-art{position:absolute;max-width:none;pointer-events:none;user-select:none}
  .animated-art{opacity:0;object-fit:fill}.animated-art.ready{opacity:1}
  .marker{position:absolute;transform:translate(-50%,calc(-100% - 7px));z-index:2;width:44px;height:48px;padding:0;display:grid;place-items:center;color:#f3d9a5;background:#312417;border:2px solid #e6c88e;border-radius:50% 50% 45% 45%;box-shadow:0 2px 5px #412c17aa;cursor:pointer;line-height:1;font:700 25px Georgia,serif}
  .marker::after{content:'';position:absolute;bottom:-7px;left:calc(50% - 5px);width:10px;height:10px;background:inherit;border-right:2px solid #e6c88e;border-bottom:2px solid #e6c88e;transform:rotate(45deg);z-index:-1}
  .marker img{width:32px;height:32px;object-fit:contain;pointer-events:none}
- .marker.unavailable{color:#b9a98d;background:#514535}
+ .marker.unavailable{color:#e0c594;background:#352b20}
  .marker:hover,.marker.selected,.marker:focus-visible{z-index:4;outline:2px solid #e9ac37;outline-offset:3px;color:#ffedb9}
- .marker.selected{background:#543510;box-shadow:0 0 15px #e3a72d}
+ .marker.selected{background:#65401b;border-color:#ffdb80;box-shadow:0 0 0 3px #eab74b66,0 0 18px 5px #e3a72d99}
+ .marker.selected::after{border-color:#ffdb80}
  .marker.travelling{border-color:#f5a82b}
  .current-dot{position:absolute;right:-4px;top:-3px;border-radius:50%;width:12px;height:12px;background:#53835b;border:2px solid #f4e7bb}
- .map-controls{position:absolute;top:8px;right:8px;z-index:6;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 16px)}
- .map-controls button{min-height:40px;min-width:40px;padding:4px 8px;background:#f0d8ac;color:#37271a;border:1px solid #74573a;border-radius:2px;cursor:pointer;font:600 14px Georgia,serif}
+ .map-controls{position:absolute;top:7px;right:7px;z-index:6;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 14px)}
+ .map-controls button{box-sizing:border-box;min-height:39px;min-width:38px;padding:5px 8px;
+  background:var(--city-paper,url('/ui-kit/city/parchment-grain.svg')) repeat,linear-gradient(#f7e1b9,#dcb985);
+  color:#302015;border:1px solid #6c4828;border-radius:4px;
+  box-shadow:inset 0 0 0 2px #e2bd85,inset 0 0 0 3px #9d754c,0 2px 4px #39271899;
+  cursor:pointer;font:700 14px/1.2 var(--pall-font-reading,Georgia,serif)}
+ .map-controls button:hover:not(:disabled){background-color:#f5dbab;box-shadow:inset 0 0 0 2px #f3cf8d,inset 0 0 0 3px #b17b35,0 2px 5px #39271899}
+ .map-controls button:active:not(:disabled),.map-controls button[aria-pressed="true"]{box-shadow:inset 0 2px 5px #53391d70,inset 0 0 0 2px #c79b61}
+ .map-controls button:disabled{opacity:.6;cursor:default}
  button:focus-visible{outline:2px solid #a26112;outline-offset:2px}
  .coordinates{position:absolute;z-index:7;bottom:8px;left:8px;background:#f5dfb6;color:#362719;padding:8px;font:12px monospace}
- @media(max-width:600px){.viewport{min-height:300px}.marker{width:40px;height:43px;font-size:22px}}
+ @container (max-width:1000px){.map-frame{height:clamp(420px,60dvh,680px)}}
+ @container (max-width:620px){.map-frame{height:clamp(320px,54dvh,460px)}.viewport{min-height:0}.marker{width:40px;height:43px;font-size:22px}.map-controls button{min-height:36px;min-width:33px;padding:4px 6px;font-size:12px}}
  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>

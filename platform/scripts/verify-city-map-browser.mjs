@@ -113,7 +113,7 @@ try{
       return Promise.resolve(json({error:'unavailable'},404));
     };
   })();`});
-  for(const width of [1440,390,320]){
+  for(const width of [1600,1440,1024,390,320]){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
     await evalJS('window.__pallLeaving=true').catch(()=>{});
     await cmd('Page.navigate',{url:origin+'/characters/qa-city/overview'});
@@ -121,7 +121,17 @@ try{
     await evalJS('document.fonts.ready.then(()=>true)');
     assert.equal(await evalJS("!!document.querySelector('vite-error-overlay')"),false);
     assert.equal(await evalJS("document.documentElement.scrollWidth<=document.documentElement.clientWidth"),true,'No page overflow at '+width);
-    if(width<650)await evalJS("document.querySelector('.directory-toggle').click()");
+    const geometry=await evalJS("(()=>{const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}};return {directory:box('.directory'),map:box('.map-frame'),details:box('.details'),workspace:box('.workspace'),toggle:getComputedStyle(document.querySelector('.directory-toggle')).display,frame:getComputedStyle(document.querySelector('.map-frame')).borderImageSource,background:getComputedStyle(document.querySelector('.city-workspace')).backgroundImage}})()");
+    assert.ok(geometry.frame.includes('engraved-frame.svg')&&geometry.background.includes('parchment-grain.svg'),'Local city ornament and texture applied');
+    if(width>=1440){
+      assert.ok(Math.abs(geometry.directory.y-geometry.map.y)<2&&Math.abs(geometry.details.y-geometry.map.y)<2,'Three aligned desktop columns');
+      assert.ok(Math.abs(geometry.directory.h-geometry.map.h)<2&&Math.abs(geometry.details.h-geometry.map.h)<2,'Equal-height desktop panels');
+      assert.ok(geometry.map.w>geometry.directory.w*1.8&&geometry.map.w>geometry.details.w*1.8,'Map remains dominant');
+    }else if(width===1024){
+      assert.ok(geometry.details.y>=geometry.map.y+geometry.map.h-1,'Tablet details below map');
+    }
+    if(geometry.toggle!=='none')await evalJS("document.querySelector('.directory-toggle').click()");
+    assert.equal(await evalJS("document.querySelector('.directory-item').getAttribute('aria-pressed')"),'true');
     await evalJS("document.querySelectorAll('.directory-item')[1].click()");
     assert.equal(await evalJS("document.querySelector('.details h2').textContent.includes('Job Board')"),true);
     assert.equal(await evalJS("window.cityStarts"),0);
@@ -136,7 +146,10 @@ try{
     await evalJS("document.querySelector('.walk').click()");
     await until(()=>evalJS("!!document.querySelector('.journey progress')"),5000,'Travel progress');
     assert.equal(await evalJS("window.cityStarts"),1);
-    console.log('PASS: city map, synchronized selection, zoom-independent time, disabled POI, explicit travel at '+width+'px');
+    const shot=await cmd('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:false});
+    const folder=resolve(root,'test-artifacts','city-map');
+    mkdirSync(folder,{recursive:true});writeFileSync(join(folder,'city-map-'+width+'.png'),Buffer.from(shot.data,'base64'));
+    console.log('PASS: city map, parchment layout, synchronized selection, zoom-independent time, disabled POI, explicit travel at '+width+'px');
   }
 }catch(error){
   console.error(error);

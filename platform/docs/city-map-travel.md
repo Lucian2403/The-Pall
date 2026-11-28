@@ -22,3 +22,6 @@ City and walking ambience are disabled until supplied. Expected files are `stati
 
 ## Validation
 The Free Play workflow runs entry and geometry tests, API and Svelte checks, Chromium smoke tests at desktop, 390 and 320 px, and real PostgreSQL travel lifecycle tests using a test-only destination. The actual supplied video and icons require local browser testing after extracting the asset pack.
+
+## City workspace visual pass
+The city workspace uses its own scalable engraved nine-slice frame and procedural parchment grain in `static/ui-kit/city/`. No shared HUD or map/travel geometry is changed. Desktop panels use a 20:55:23 proportion with aligned heights; the directory scrolls internally, tablet details move below the map, and phone panels stack. The announcement review action remains accessible beneath the workspace. Map controls have compact beveled parchment styling and visibly disabled zoom-limit buttons. The browser fixture now checks layout at 1600, 1440, 1024, 390 and 320 pixels, and saves diagnostic screenshots. Actual owner map/video/icon assets remain local until committed separately.
