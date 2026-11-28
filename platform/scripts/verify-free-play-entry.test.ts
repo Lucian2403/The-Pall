@@ -86,7 +86,7 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(!overview.includes('Your life within the walls'));
  assert.ok(!overview.includes('free-play-entry'));
  assert.ok(overview.includes('access.announcementSeen===true'));
- assert.ok(overview.includes('<CityOverview characterId={character.id} onReviewAnnouncement='));
+ assert.ok(overview.includes('<CityOverview characterId={character.id}')&&overview.includes('onReviewAnnouncement='));
  assert.ok(!overview.includes('requestId:'));
  assert.ok(!overview.includes("coins=coins+"));
  assert.ok(stage8.includes("home.phase==='COMPLETE'"));

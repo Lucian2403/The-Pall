@@ -472,7 +472,7 @@
               <span class="resource-track" role="progressbar" aria-label={resource.label}
                 aria-valuemin="0" aria-valuemax={resource.data.maximum}
                 aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}
-                title={resource.id==='stamina'&&!isMeasured(combatStamina)&&!isMeasured(character.stamina)
+                title={resource.id==='stamina'&&!isMeasured(combatStamina)&&!isMeasured(character.stamina)&&typeof currentStatus?.stamina!=='number'
                   ?'Provisional full stamina; future combat data will replace this value'
                   :undefined}>
                 <span class="resource-interior">

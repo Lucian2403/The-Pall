@@ -1567,6 +1567,8 @@ test('Stage 8 bed Rest is persistent, replay-safe, and available after tutorial 
  const storage=await request('POST',base+c.id+'/inventory/storage-context',owner,{action:'open'});
  assert.equal(storage.status,200);
  const inventory=base+c.id+'/inventory';
+ const inspection=await request('GET',inventory,owner,undefined,{'x-pall-storage-context':storage.body!.token});
+ assert.equal(inspection.status,200);assert.equal(inspection.body?.storageEnabled,true);
  assert.equal((await request('POST',inventory,owner,{kind:'transfer',requestId:randomUUID(),expectedRevision:0,itemInstanceId:randomUUID(),quantity:1,to:'home_chest'})).body?.error,'activity_in_progress');
  assert.equal((await request('POST',inventory,owner,{kind:'equip',requestId:randomUUID(),expectedRevision:0,itemInstanceId:randomUUID(),slot:'torso'})).body?.error,'activity_in_progress');
  assert.equal((await request('POST',freePlay+'/city/travel',owner,{destinationId:'job-board',expectedRevision:0,requestId:randomUUID()})).body?.error,'activity_in_progress');

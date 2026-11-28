@@ -65,7 +65,7 @@
   $effect(()=>{if(section)void tick().then(()=>section?.focus());});
   const selected=$derived(completed.find(item=>item.taskInstanceId===selectedId)??null);
   function handleKey(event:KeyboardEvent){
-    if(event.key==='Escape'){event.preventDefault();onClose();}
+    if(event.key==='Escape'&&!event.defaultPrevented&&!(event.target instanceof Element&&event.target.closest('dialog[open]'))){event.preventDefault();onClose();}
   }
 </script>
 

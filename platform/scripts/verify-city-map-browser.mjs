@@ -95,13 +95,13 @@ try{
     const json=(v,s=200)=>new Response(JSON.stringify(v),{status:s,headers:{'content-type':'application/json'}});
     const homeRoot='/api/characters/qa-home';
     window.homeCounts={get:0,start:0,journal:0,rewind:0};
-    let homeRevision=3,rest=null;
+    let homeRevision=3,rest=null,noticeReadAt=null;
     const homeCondition=()=>rest?.completedAt?{stamina:100,composure:100,fatigue:0,stress:0}:{stamina:40,composure:50,fatigue:20,stress:10};
     const homeSnapshot=()=>({stage:8,revision:homeRevision,phase:'COMPLETE',homeId:'starter-rented-room',
       origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Home',coins:10,rent:150,
       shortfall:140,rentPaid:false,rentPaidAt:null,rentDue:150,noticeTitle:'FINAL NOTICE',noticeText:'Rent due.',
       closingSpeech:'',completed:true,condition:homeCondition(),activity:rest,serverNow:new Date().toISOString(),
-      restOffer:{key:'home.rest',label:'Resting',durationSeconds:15},notifications:{items:rest?.completedAt?[{id:'activity.completed:'+rest.id,kind:'activity.completed',title:'Rest complete',message:'You have finished resting.',createdAt:rest.completedAt,readAt:null}]:[],unread:rest?.completedAt?1:0}});
+      restOffer:{key:'home.rest',label:'Resting',durationSeconds:15},notifications:{items:rest?.completedAt?[{id:'activity.completed:'+rest.id,kind:'activity.completed',title:'Rest complete',message:'You have finished resting.',createdAt:rest.completedAt,readAt:noticeReadAt}]:[],unread:rest?.completedAt&&!noticeReadAt?1:0}});
     const root='/api/characters/qa-city';
     const points=[{id:'starter-rented-room',name:'Home',description:'Room',symbol:'⌂',icon:'',position:{x:.2,y:.6},displayOrder:1,availability:'available',destination:'home'},
      {id:'job-board',name:'Job Board',description:'Find paid work',symbol:'▤',icon:'',position:{x:.7,y:.3},displayOrder:2,availability:'available',destination:'qa-only'},
@@ -127,6 +127,7 @@ try{
           }
           return Promise.resolve(json(homeSnapshot()));
         }
+        if(route===homeRoot+'/free-play/notifications/read'){noticeReadAt=new Date().toISOString();return Promise.resolve(json(homeSnapshot()));}
         if(route===homeRoot+'/journal'){window.homeCounts.journal++;return Promise.resolve(json({characterId:'qa-home',completed:[],nextCursor:null}));}
         if(route===homeRoot+'/dev/rewind-stage'){window.homeCounts.rewind++;return Promise.resolve(json({enabled:true,canRewind:true,stage:8,targetStage:7}));}
         return Promise.resolve(json({error:'unavailable'},404));
@@ -176,6 +177,11 @@ try{
   assert.equal(await evalJS("window.homeCounts.get"),runningCounts.get+1,'One server reconciliation at completion');
   await until(()=>evalJS("document.querySelector('.notification-toast')?.textContent.includes('Rest complete')"),5000,'Completion notification');
   assert.ok(await evalJS("!!document.querySelector('[data-shell-service=notifications] .badge')"));
+  await evalJS("document.querySelector('[data-shell-service=notifications] button').click()");
+  await until(()=>evalJS("!!document.querySelector('.notification-panel .read-all')"),5000,'Notification inbox');
+  await evalJS("document.querySelector('.notification-panel .read-all').click()");
+  await until(()=>evalJS("!document.querySelector('[data-shell-service=notifications] .badge')"),5000,'Unread count cleared');
+  assert.ok(await evalJS("document.querySelector('.notification-panel').textContent.includes('Rest complete')"),'Read notification remains in inbox');
   assert.equal(await evalJS("window.homeCounts.journal"),initialCounts.journal);
   assert.equal(await evalJS("window.homeCounts.rewind"),initialCounts.rewind);
   await delay(2000);
