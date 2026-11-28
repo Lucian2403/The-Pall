@@ -64,7 +64,7 @@ const schema=[
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
   '0022_personal_journal.sql','0023_inventory_storage_context.sql',
-  '0024_free_play_entry.sql','0025_city_travel.sql'
+  '0024_free_play_entry.sql','0025_city_travel.sql','0026_starter_rent.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -3427,4 +3427,37 @@ test('City travel starts and arrives once across duplicate requests and owner-sc
   assert.equal((await call('POST',city+'/travel',start)).body.revision,2);
   assert.equal((await call('POST',city+'/travel',{...start,requestId:randomUUID()})).body.error,'stale_city_revision');
  }finally{await fixture.close();}
+});
+
+test('Initial rent is owner-only, affordable, atomic and persists independently of tutorial replay',async()=>{
+ const c=await character();
+ const route=base+c.id+'/tutorial/home';
+ await db.query("UPDATE player_characters SET tutorial_stage=8,tutorial_status='IN_PROGRESS',coins=149 WHERE id=$1",[c.id]);
+ const state={revision:2,phase:'SPEECH',homeId:'starter-rented-room',origin:'Millhand',branch:'restamp',outcome:'player_victory'};
+ await db.query('INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,2,$2::jsonb)',[c.id,JSON.stringify(state)]);
+ const command=(revision:number,requestId=randomUUID())=>({kind:'action',action:'pay_rent',expectedRevision:revision,requestId});
+ assert.equal((await request('POST',route,owner,command(2))).body?.error,'rent_not_ready');
+ await db.query("UPDATE player_characters SET tutorial_status='COMPLETED' WHERE id=$1",[c.id]);
+ await db.query("UPDATE player_character_tutorial_home SET revision=3,state=$2::jsonb WHERE character_id=$1",[c.id,JSON.stringify({...state,phase:'COMPLETE',revision:3})]);
+ assert.equal((await request('GET',route)).body?.rentDue,150);
+ assert.equal((await request('POST',route,stranger,command(3))).status,404);
+ assert.equal((await request('POST',route,null,command(3))).status,401);
+ assert.equal((await request('POST',route,owner,command(3))).body?.error,'insufficient_coins');
+ assert.equal(Number((await db.query('SELECT coins FROM player_characters WHERE id=$1',[c.id])).rows[0].coins),149);
+ await db.query('UPDATE player_characters SET coins=200 WHERE id=$1',[c.id]);
+ const pay=command(3);
+ assert.equal((await request('POST',route,owner,{...pay,amount:1})).status,400);
+ const responses=await Promise.all([request('POST',route,owner,pay),request('POST',route,owner,pay)]);
+ for(const r of responses){assert.equal(r.status,200,JSON.stringify(r.body));assert.equal(r.body?.coins,50);assert.equal(r.body?.rentPaid,true);assert.equal(r.body?.revision,4);}
+ assert.deepEqual(responses[0].body,responses[1].body);
+ assert.equal((await request('POST',route,owner,command(4))).body?.error,'rent_already_paid');
+ const saved=await request('GET',route);
+ assert.equal(saved.body?.rentDue,0);assert.equal(saved.body?.shortfall,0);assert.equal(saved.body?.coins,50);
+ // Developer rewind discards the tutorial state, not the character-owned rent receipt.
+ await db.query('DELETE FROM player_character_tutorial_home_receipts WHERE character_id=$1',[c.id]);
+ await db.query('DELETE FROM player_character_tutorial_home WHERE character_id=$1',[c.id]);
+ await db.query('INSERT INTO player_character_tutorial_home(character_id,revision,state) VALUES($1,3,$2::jsonb)',[c.id,JSON.stringify({...state,phase:'COMPLETE',revision:3})]);
+ assert.equal((await request('GET',route)).body?.rentPaid,true);
+ assert.equal((await request('POST',route,owner,command(3))).body?.error,'rent_already_paid');
+ assert.equal(Number((await db.query('SELECT coins FROM player_characters WHERE id=$1',[c.id])).rows[0].coins),50);
 });

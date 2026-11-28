@@ -3,6 +3,11 @@ on:
   pull_request:
     paths:
       - 'platform/apps/api/src/free-play-routes.ts'
+      - 'platform/apps/api/src/tutorial-home-routes.ts'
+      - 'platform/apps/api/src/shared-home-state.ts'
+      - 'platform/db/migrations/0026_starter_rent.sql'
+      - 'platform/scripts/tutorial-home-migrate.mjs'
+      - 'platform/scripts/verify-stage-eight.test.ts'
       - 'platform/apps/api/src/city-travel.ts'
       - 'platform/db/migrations/0025_city_travel.sql'
       - 'platform/scripts/city-travel-migrate.mjs'
