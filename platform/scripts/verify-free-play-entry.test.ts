@@ -187,3 +187,75 @@ test('Owner map uses the complete numbered roster and shared video/image geometr
  assert.ok(map.includes("style:left={x+'px'} style:top={y+'px'} style:width={width*scale+'px'} style:height={height*scale+'px'}"));
  assert.ok(map.includes("style:left={x+p.position.x*width*scale+'px'}"));
 });
+
+
+test('Owner-approved POI descriptions remain verbatim and render in the destination panel',()=>{
+ const expected=[
+  [
+    "Home",
+    "A shelter from the city's hardships. Rest, recover your strength and prepare for another day."
+  ],
+  [
+    "Inn",
+    "A warm meal and a moment's respite. Purchase food and replenish your strength before returning to work."
+  ],
+  [
+    "Job Board",
+    "Employers seek willing hands. Find paid work suited to your skills and earn, not always, an honest coin."
+  ],
+  [
+    "City Board",
+    "Read municipal announcements, public notices and recent developments affecting the city and its inhabitants."
+  ],
+  [
+    "Marketplace",
+    "Among crowded stalls and bargaining voices, buy and sell everyday goods at prevailing market prices."
+  ],
+  [
+    "Clothing Trader",
+    "Purchase garments and protective attire suited to the city's labour and the hardships beyond its walls."
+  ],
+  [
+    "Weapon Trader",
+    "Acquire firearms, ammunition and other weapons necessary for survival beyond the safety of the city."
+  ],
+  [
+    "Materials Merchant",
+    "Purchase raw materials and manufactured components required for crafting, construction and repairs."
+  ],
+  [
+    "Herbalist",
+    "Among dried roots and bitter remedies, acquire medicinal herbs and ingredients for restorative preparations."
+  ],
+  [
+    "Clinic",
+    "Seek medical attention, have your wounds treated and recover from injuries sustained through labour or misfortune."
+  ],
+  [
+    "Blacksmith",
+    "Amid ringing anvils and burning coal, work metal into tools, equipment and useful components."
+  ],
+  [
+    "Depot",
+    "Store belongings, materials and equipment safely until they are needed again."
+  ],
+  [
+    "Mechanical Yard",
+    "Work among steam engines and worn machinery, salvaging useful mechanical parts and components."
+  ],
+  [
+    "Workshop & Repairs",
+    "Put your craftsmanship to use, assemble equipment and restore worn belongings to working condition."
+  ],
+  [
+    "City Gates",
+    "Beyond these guarded gates lies uncertain territory. Depart the city to undertake expeditions into the wider world."
+  ],
+  [
+    "Forest",
+    "Gather timber, forage for useful plants and collect natural resources beneath the shelter of the trees."
+  ]
+];
+ assert.deepEqual(CITY_OVERVIEW.pointsOfInterest.map(p=>[p.name,p.description]),expected);
+ assert.ok(source('apps/web/src/lib/CityOverview.svelte').includes('{selected.description}'));
+});
