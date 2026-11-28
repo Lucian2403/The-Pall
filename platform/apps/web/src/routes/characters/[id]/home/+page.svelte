@@ -3,6 +3,9 @@
   import {homeJournalEntries,homeCompletionSummary} from '$lib/home-journal-copy';
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {page} from '$app/state';
+  import {onMount} from 'svelte';
+  import {activityRunning,type ActivityRun} from '@the-pall/game-core';
+  import ActivityProgress from '$lib/ActivityProgress.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {openGameWindow,closeContextWindows} from '$lib/game-window-state';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
@@ -15,6 +18,7 @@
     outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
     rentPaid:boolean;rentPaidAt:string|null;rentDue:number;
+    activity?:ActivityRun|null;serverNow?:string;
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
     condition:{stamina:number;composure:number;fatigue:number;stress:number}};
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
@@ -27,6 +31,14 @@
   let status=$state<'loading'|'ready'|'unauthorized'|'missing'|'prerequisite'|'schema'|'error'>('loading');
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
+  const activityBusy=$derived(activityRunning(home?.activity));
+  let activityTime=$state(0);
+  let clockBase=0,clockAt=0,polling=false,lastPoll=0;
+  const REST_RESULT='Stamina and Composure restored. Fatigue and Stress cleared.';
+  function syncClock(saved:Home){
+    clockBase=saved.serverNow?Date.parse(saved.serverNow):Date.now();
+    clockAt=performance.now();activityTime=clockBase;
+  }
   let noticeExpanded=$state(false);
   let kitchenOpen=$state(false);
   let journalOpen=$state(false);
@@ -57,7 +69,7 @@
     const current=()=>generation===requestGeneration&&requestedId===id;
     character=null;home=null;status='loading';pending=false;
     errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
-    noticeExpanded=false;kitchenOpen=false;
+    noticeExpanded=false;kitchenOpen=false;lastPoll=0;
     closeContextWindows();
     try{
       const [person,r]=await Promise.all([
@@ -89,7 +101,8 @@
         savedHome=await started.json() as Home;
       }else savedHome=result;
       if(!current())return;
-      home=savedHome;noticeExpanded=savedHome.phase==='NOTICE';
+      home=savedHome;syncClock(savedHome);noticeExpanded=savedHome.phase==='NOTICE';
+      if(savedHome.activity?.key==='home.rest'&&savedHome.activity.completedAt)restMessage=REST_RESULT;
       character={...savedCharacter,coins:savedHome.coins,tutorial:{stage:8,
         status:savedHome.completed?'COMPLETED':'IN_PROGRESS'}};
       status='ready';
@@ -104,8 +117,44 @@
     void refresh(requestedId);
     return ()=>{requestGeneration++;};
   });
+  // Poll while in Free Play, including when another tab starts an activity.
+  // The server settles due work. The local clock only animates its progress.
+  async function pollHome(){
+    if(polling||pending||restAnimating||status!=='ready'||!home?.completed)return;
+    const requestedId=id,generation=requestGeneration;
+    polling=true;
+    try{
+      const response=await fetch('/api/characters/'+encodeURIComponent(requestedId)+'/tutorial/home',{cache:'no-store'});
+      if(requestedId!==id||generation!==requestGeneration||pending)return;
+      if(!response.ok)return;
+      const result=await response.json() as Home;
+      if(requestedId!==id||generation!==requestGeneration||pending||!home||result.revision<home.revision)return;
+      const previous=home.activity;
+      home=result;syncClock(result);
+      if(character)character={...character,coins:result.coins};
+      if(activityRunning(result.activity)){
+        noticeExpanded=false;kitchenOpen=false;restMessage='';
+      }else if(result.activity?.key==='home.rest'&&result.activity.completedAt&&
+        (activityRunning(previous)||previous?.id!==result.activity.id)){
+        restMessage=REST_RESULT;
+      }
+    }catch{/* Keep the last confirmed state. Retry on the next poll. */}
+    finally{polling=false;}
+  }
+  onMount(()=>{
+    const tick=()=>{
+      activityTime=clockBase+performance.now()-clockAt;
+      if(document.hidden)return;
+      const interval=activityBusy?1000:5000;
+      if(performance.now()-lastPoll>=interval){lastPoll=performance.now();void pollHome();}
+    };
+    const timer=window.setInterval(tick,250);
+    const resume=()=>{if(!document.hidden)void pollHome();};
+    window.addEventListener('focus',resume);document.addEventListener('visibilitychange',resume);
+    return ()=>{clearInterval(timer);window.removeEventListener('focus',resume);document.removeEventListener('visibilitychange',resume);};
+  });
   async function perform(action:Action):Promise<boolean>{
-    if(pending||!home||(home.completed&&action!=='rest'&&action!=='pay_rent'))return false;
+    if(pending||activityBusy||!home||(home.completed&&action!=='rest'&&action!=='pay_rent'))return false;
     const actingId=id,actingGeneration=requestGeneration;
     const current=()=>actingId===id&&actingGeneration===requestGeneration;
     const actingApi='/api/characters/'+encodeURIComponent(actingId)+'/tutorial/home';
@@ -124,17 +173,17 @@
         if(latest.ok){
           const updated=await latest.json() as Home;
           if(!current())return false;
-          home=updated;noticeExpanded=updated.phase==='NOTICE'||(action==='pay_rent'&&updated.completed);
+          home=updated;syncClock(updated);noticeExpanded=updated.phase==='NOTICE'||(action==='pay_rent'&&updated.completed);
           if(character)character={...character,coins:updated.coins,tutorial:{stage:8,status:updated.completed?'COMPLETED':'IN_PROGRESS'}};
         }
-        errorMessage=problem.error==='insufficient_coins'?'You do not have enough coins to pay the rent.':problem.error==='rent_already_paid'?'The rent has already been paid.':'The saved scene changed. Current progress has been reloaded.';
+        errorMessage=problem.error==='activity_in_progress'?'An activity is already in progress.':problem.error==='insufficient_coins'?'You do not have enough coins to pay the rent.':problem.error==='rent_already_paid'?'The rent has already been paid.':'The saved scene changed. Current progress has been reloaded.';
         return false;
       }
       if(response.status===503){errorMessage='Home database update required. Run npm run home:migrate.';return false;}
       if(!response.ok)throw Error('home_action_failed');
       const result=await response.json() as Home;
       if(!current())return false;
-      home=result;noticeExpanded=result.phase==='NOTICE'||(action==='pay_rent'&&result.completed);
+      home=result;syncClock(result);noticeExpanded=result.phase==='NOTICE'||(action==='pay_rent'&&result.completed);
       retryId=null;retryKey=null;
       if(character)character={...character,coins:result.coins,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
       return true;
@@ -145,7 +194,11 @@
     finally{if(current())pending=false;}
   }
   async function restInBed(){
-    if(restAnimating||pending||!home)return;
+    if(restAnimating||pending||activityBusy||!home)return;
+    if(home.completed){
+      restMessage='';kitchenOpen=false;noticeExpanded=false;
+      await perform('rest');return;
+    }
     const actingId=id,actingGeneration=requestGeneration;
     restAnimating=true;restMessage='';kitchenOpen=false;
     // Only the confirmed server Rest changes character condition.
@@ -154,22 +207,22 @@
     await fade;
     if(actingId!==id||actingGeneration!==requestGeneration)return;
     restAnimating=false;
-    if(saved)restMessage='Rested. Stamina and Composure are full; Fatigue and Stress cleared.';
+    if(saved)restMessage=REST_RESULT;
   }
   function interactNotice(){
-    if(pending||!home)return;
+    if(pending||activityBusy||!home)return;
     restMessage='';kitchenOpen=false;
     if(home.phase==='HOME')void perform('read_notice');
     else if(['NOTICE','SPEECH','COMPLETE'].includes(home.phase))noticeExpanded=true;
   }
   function interactKitchen(){
-    if(pending||restAnimating||!home?.completed)return;
+    if(pending||restAnimating||activityBusy||!home?.completed)return;
     restMessage='';noticeExpanded=false;kitchenOpen=true;
   }
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character?.id===id&&home}
-  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home" cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
+  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home" travelLocked={activityBusy} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
     onStorageClosed={()=>playChestSound('close')}
@@ -184,7 +237,7 @@
       <div class="home-scene pall-story-landscape" aria-label="A modest rented room in Grand Cylinder City">
         <div class="home-artwork" aria-label="The complete rented room illustration">
         <button type="button" class="hotspot chest" aria-label="Storage"
-          data-open-home-chest title="Storage" onclick={openRoomStorage}>
+          data-open-home-chest title="Storage" disabled={activityBusy} onclick={openRoomStorage}>
           <span class="object-caption">Storage</span>
         </button>
         <button type="button" class="hotspot book" aria-label="Read journal"
@@ -193,19 +246,19 @@
           <span class="object-caption">Journal</span>
         </button>
         <button type="button" class="hotspot notice-object" aria-label="Read notice"
-          title="Notice" data-pall-sfx="paper" onclick={interactNotice}>
+          title="Notice" data-pall-sfx="paper" disabled={activityBusy} onclick={interactNotice}>
           <img src="/locations/home/notice.webp" alt="" width="150" height="100"
             draggable="false" />
           <span class="object-caption">Notice</span>
         </button>
         <button type="button" class="hotspot bed" aria-label="Rest in bed"
           title="Rest — restore Stamina and Composure, clear Fatigue and Stress"
-          disabled={pending||restAnimating} onclick={()=>{void restInBed();}}>
+          disabled={pending||restAnimating||activityBusy} onclick={()=>{void restInBed();}}>
           <span class="object-caption">Rest</span>
         </button>
         {#if home.completed}
           <button type="button" class="hotspot kitchen" aria-label="Kitchen — Tier I"
-            title="Kitchen — Tier I" disabled={pending||restAnimating} onclick={interactKitchen}>
+            title="Kitchen — Tier I" disabled={pending||restAnimating||activityBusy} onclick={interactKitchen}>
             <span class="object-caption">Kitchen · T1</span>
           </button>
         {/if}
@@ -217,11 +270,19 @@
       {#snippet panel()}
       {#if home}
       <div class="reading-column pall-story-dialogue-section">
-        {#if restMessage}
+        {#if home.activity&&activityBusy}
+          <aside class="home-dialogue rest-dialogue" aria-label="Current activity">
+            <p class="eyebrow">BED · REST</p>
+            <h1>Resting</h1>
+            <p class="narration">You are resting in bed.</p>
+            <ActivityProgress activity={home.activity} now={activityTime}/>
+            <p class="instruction">You can leave this page. Rest continues until the allotted time has elapsed.</p>
+          </aside>
+        {:else if restMessage}
           <aside class="home-dialogue rest-dialogue" aria-label="Rest result" role="status">
             <p class="eyebrow">BED · REST</p>
-            <h1>A moment of quiet</h1>
-            <p class="narration">You lie down. For a little while, the racket of the city falls away.</p>
+            <h1>Rest complete</h1>
+            <p class="narration">You have finished resting.</p>
             <p class="instruction">{restMessage}</p>
             <button type="button" class="pall-framed-button primary-choice"
               onclick={()=>restMessage=''}>Continue</button>
@@ -251,10 +312,10 @@
             {:else}
               {#if home.completed}
                 {#if home.rentPaid}
-                  <p class="narration">For now, the roof over your head is paid for. One less thing to worry about.</p>
+                  <p class="narration">You have paid the 150 coins demanded in the notice. No rent remains outstanding.</p>
                   <p class="instruction" role="status">Rent paid in full.</p>
                 {:else}
-                  <p class="narration">The notice still lies on the table. The roof over your head won't pay for itself.</p>
+                  <p class="narration">You read the notice again. You still owe 150 coins in rent.</p>
                   <p class="instruction">Rent due: {home.rent} coins. You have {home.coins} coins.</p>
                   {#if home.shortfall>0}<p class="instruction">You need {home.shortfall} more coins.</p>{/if}
                   <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0}

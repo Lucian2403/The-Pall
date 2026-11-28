@@ -3,10 +3,12 @@
     import { goto } from "$app/navigation";
     import {
         cityWalkingSeconds,
+        activityRunning,
         type CityOverviewSnapshot,
         type CityPointOfInterest,
     } from "@the-pall/game-core";
     import CityMapViewport from "./CityMapViewport.svelte";
+    import ActivityProgress from "./ActivityProgress.svelte";
     import { cityMapAssets as assets } from "./city-map-assets";
     import { createCityMapAudio } from "./city-map-audio";
 
@@ -46,6 +48,7 @@
         ),
     );
     const selected = $derived(points.find((p) => p.id === selectedId));
+    const activityBusy = $derived(activityRunning(city?.activity));
     const current = $derived(
         points.find((p) => p.id === city?.currentLocationId),
     );
@@ -186,6 +189,7 @@
             if (destination) await goto(destination);
             return;
         }
+        if (activityBusy) return;
         pending = true;
         errorMessage = "";
         controller = new AbortController();
@@ -205,7 +209,9 @@
                 throw Error(
                     result.error === "travel_in_progress"
                         ? "Travel is already in progress."
-                        : result.error === "destination_unavailable"
+                        : result.error === "activity_in_progress"
+                          ? "An activity is already in progress."
+                          : result.error === "destination_unavailable"
                           ? "Destination unavailable."
                           : "Travel request could not be confirmed.",
                 );
@@ -229,7 +235,7 @@
         const timer = window.setInterval(() => {
             if (city) {
                 time = clockBase + performance.now() - clockAt;
-                const interval = city.journey ? 1000 : 5000;
+                const interval = city.journey || activityBusy ? 1000 : 5000;
                 if (performance.now() - lastPoll >= interval) {
                     lastPoll = performance.now();
                     void load();
@@ -353,6 +359,9 @@
                 onSelect={select}
             />
             <aside class="details panel" aria-label="Selected location">
+                {#if city.activity&&activityBusy}
+                    <div class="journey"><ActivityProgress activity={city.activity} now={time}/><p>Travel is unavailable during this activity.</p></div>
+                {/if}
                 {#if city.journey}
                     <div class="journey" role="status">
                         <strong
@@ -386,6 +395,7 @@
                         disabled={pending ||
                             requestInFlight ||
                             !!city.journey ||
+                            (activityBusy && selected.id !== city.currentLocationId) ||
                             selected.availability !== "available"}
                         onclick={() => {
                             void walk();

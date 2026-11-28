@@ -10,7 +10,8 @@ import {getGameplayPool} from './database-pool.js';
 import {HOME_ID} from './shared-home-state.js';
 import {CITY_OVERVIEW} from './city-poi-catalogue.js';
 import {citySnapshot,CityTravelConflict,type TravelCommand} from './city-travel.js';
-import type {CityCatalogue} from '@the-pall/game-core';
+import {activityRunning,type CityCatalogue} from '@the-pall/game-core';
+import {settleActivity} from './activity-engine.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const base='/api/characters/:id/free-play';
@@ -94,9 +95,13 @@ export function registerFreePlayRoutes(app:FastifyInstance,options:{
    if(found.rows[0].free_play_intro_seen_at===null){
     await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'free_play_announcement_required'});
    }
+   const activity=await settleActivity(db,req.params.id);
+   if(command&&activityRunning(activity.activity)){
+    await db.query('COMMIT');open=false;return reply.code(409).send({error:'activity_in_progress'});
+   }
    const snapshot=await citySnapshot(db,req.params.id,options.cityCatalogue??CITY_OVERVIEW,command);
    await db.query('COMMIT');open=false;
-   return snapshot;
+   return {...snapshot,activity:activity.activity};
   }catch(error){
    if(open){try{await db.query('ROLLBACK');}catch{/* Preserve original */}}
    if(error instanceof CityTravelConflict)return reply.code(409).send({error:error.message});

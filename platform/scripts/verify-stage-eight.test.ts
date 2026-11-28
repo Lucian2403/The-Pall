@@ -6,6 +6,7 @@ import {resolve} from 'node:path';
 import {initial,advance,payStarterRent,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
 import {homeJournalEntries,homeCompletionSummary} from '../apps/web/src/lib/home-journal-copy.ts';
 import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
+import {activityCanFinish,activityRunning,activityRemainingSeconds,activityProgress,type ActivityRun} from '@the-pall/game-core';
 const root=resolve(import.meta.dirname,'..');
 const source=(p:string)=>readFileSync(resolve(root,p),'utf8');
 
@@ -346,4 +347,24 @@ test('Initial rent payment is a single full debit after the shared closing seque
  assert.ok(ui.includes('coins:result.coins'));
  const schema=source('db/migrations/0026_starter_rent.sql');
  assert.ok(schema.includes('ADD COLUMN IF NOT EXISTS starter_rent_paid_at'));
+});
+
+test('Universal activity timing uses elapsed time and waits for unresolved required interactions',()=>{
+ const run:ActivityRun={id:'fixture',key:'fixture',label:'Fixture',startedAt:'2026-11-28T12:00:00.000Z',endsAt:'2026-11-28T12:00:30.000Z',completedAt:null};
+ const half=new Date('2026-11-28T12:00:15.000Z'),end=new Date(run.endsAt);
+ assert.equal(activityRunning(run),true);
+ assert.equal(activityRemainingSeconds(run,half.getTime()),15);
+ assert.equal(activityProgress(run,half.getTime()),50);
+ assert.equal(activityCanFinish(run,new Date(end.getTime()-1)),false);
+ assert.equal(activityCanFinish(run,end,true),false);
+ assert.equal(activityCanFinish(run,end),true);
+ assert.equal(activityRemainingSeconds(run,end.getTime()+10000),0);
+ assert.equal(activityCanFinish({...run,completedAt:run.endsAt},end),false);
+ const engine=source('apps/api/src/activity-engine.ts');
+ const definition=source('apps/api/src/activity-definitions.ts');
+ const api=source('apps/api/src/tutorial-home-routes.ts');
+ assert.ok(engine.includes('activityDefinition(activity.key).complete'));
+ assert.ok(definition.includes("advance(await savedHome(db, id), 'rest')"));
+ assert.ok(api.includes("startActivity(db,c.id,'home.rest',cmd.requestId,activity)"));
+ assert.ok(source('apps/api/src/free-play-routes.ts').includes("error:'activity_in_progress'"));
 });

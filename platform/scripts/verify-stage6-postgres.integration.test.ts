@@ -64,7 +64,7 @@ const schema=[
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
   '0022_personal_journal.sql','0023_inventory_storage_context.sql',
-  '0024_free_play_entry.sql','0025_city_travel.sql','0026_starter_rent.sql'
+  '0024_free_play_entry.sql','0025_city_travel.sql','0026_starter_rent.sql','0027_activity_engine.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -1537,17 +1537,40 @@ test('Stage 8 bed Rest is persistent, replay-safe, and available after tutorial 
  }
  assert.equal(rev,4);
  assert.equal((await request('GET',route)).body!.completed,true);
- const afterComplete=await request('POST',route,owner,{
-   kind:'action',requestId:randomUUID(),expectedRevision:rev,action:'rest'
- });
+ // Lower condition in a test fixture so premature recovery is observable.
+ const tired={stamina:21,composure:18,fatigue:55,stress:48};
+ await db.query("UPDATE player_character_tutorial_home SET state=jsonb_set(state,'{condition}',$2::jsonb) WHERE character_id=$1",[c.id,JSON.stringify(tired)]);
+ const restCommand={kind:'action',requestId:randomUUID(),expectedRevision:rev,action:'rest'};
+ const afterComplete=await request('POST',route,owner,restCommand);
  assert.equal(afterComplete.status,200,JSON.stringify(afterComplete.body));
  assert.equal(afterComplete.body!.phase,'COMPLETE');
  assert.equal(afterComplete.body!.completed,true);
  assert.equal(afterComplete.body!.revision,5);
- assert.deepEqual(afterComplete.body!.condition,
-   {stamina:100,composure:100,fatigue:0,stress:0});
+ assert.deepEqual(afterComplete.body!.condition,tired,'Start must not restore condition');
+ assert.equal(afterComplete.body!.activity.key,'home.rest');
+ assert.equal(afterComplete.body!.activity.completedAt,null);
+ assert.equal(Date.parse(afterComplete.body!.activity.endsAt)-Date.parse(afterComplete.body!.activity.startedAt),30000);
+ assert.deepEqual((await request('POST',route,owner,restCommand)).body,afterComplete.body,'Duplicate start returns the original receipt');
+ assert.equal((await request('POST',route,owner,{...restCommand,requestId:randomUUID(),expectedRevision:5})).body?.error,'activity_in_progress');
+ assert.equal((await request('POST',route,owner,{...restCommand,requestId:randomUUID(),expectedRevision:5,action:'pay_rent'})).body?.error,'activity_in_progress');
+ assert.deepEqual((await request('GET',route)).body!.condition,tired);
+ assert.equal((await request('GET',route,stranger)).status,404);
+ const freePlay=base+c.id+'/free-play';
+ assert.equal((await request('POST',freePlay+'/announcement',owner,{})).status,200);
+ const map=await request('GET',freePlay+'/city');
+ assert.equal(map.body?.activity.id,restCommand.requestId);
+ assert.equal((await request('POST',freePlay+'/city/travel',owner,{destinationId:'job-board',expectedRevision:0,requestId:randomUUID()})).body?.error,'activity_in_progress');
+ // Only the isolated QA database clock fixture is changed; no production shortcut.
+ await db.query("UPDATE player_character_activity SET started_at=NOW()-INTERVAL '40 seconds',ends_at=NOW()-INTERVAL '10 seconds' WHERE character_id=$1",[c.id]);
+ const arrivals=await Promise.all([request('GET',route),request('GET',route),request('GET',freePlay+'/city')]);
+ assert.deepEqual(arrivals.slice(0,2).map(r=>r.body?.revision),[6,6]);
+ for(const result of arrivals.slice(0,2)){
+   assert.deepEqual(result.body?.condition,{stamina:100,composure:100,fatigue:0,stress:0});
+   assert.ok(result.body?.activity.completedAt);
+ }
+ assert.equal((await request('GET',route)).body?.revision,6,'Completion is applied once');
  assert.equal((await request('POST',route,owner,{
-   kind:'action',requestId:randomUUID(),expectedRevision:5,action:'finish'
+   kind:'action',requestId:randomUUID(),expectedRevision:6,action:'finish'
  })).status,409,'Bed rest never reopens an already completed tutorial');
  const char=await db.query<{current_health:number;coins:string|number;
    tutorial_status:string;tutorial_stage:number}>(
