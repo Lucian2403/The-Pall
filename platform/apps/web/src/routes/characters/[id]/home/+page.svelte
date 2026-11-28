@@ -237,7 +237,7 @@
           <aside class="home-dialogue" aria-label="Kitchen">
             <p class="eyebrow">HOME · TIER I</p>
             <h1>Kitchen</h1>
-            <p class="narration">A small iron stove, a battered pot and a little space to work. Not much, but enough to put a meal on the table.</p>
+            <p class="narration">A modest kitchen with the bare essentials. Turn gathered ingredients into simple meals to restore your strength.</p>
             <p class="instruction">Cooking is not yet available.</p>
             <button type="button" class="pall-framed-button primary-choice" onclick={()=>kitchenOpen=false}>Continue</button>
           </aside>
@@ -254,7 +254,7 @@
                   <p class="narration">For now, the roof over your head is paid for. One less thing to worry about.</p>
                   <p class="instruction" role="status">Rent paid in full.</p>
                 {:else}
-                  <p class="narration">The notice still lies on the table. The roof over your head won't pay for itself.</p>
+                  <p class="narration">The rent notice is still on the table. You'll need to find some work if you mean to keep this room.</p>
                   <p class="instruction">Rent due: {home.rent} coins. You have {home.coins} coins.</p>
                   {#if home.shortfall>0}<p class="instruction">You need {home.shortfall} more coins.</p>{/if}
                   <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0}
