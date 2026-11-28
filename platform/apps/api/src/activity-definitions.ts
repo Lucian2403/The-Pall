@@ -1,4 +1,5 @@
 import type pg from 'pg';
+import {PHYSICAL_ACTIONS,type ActivityAction} from '@the-pall/game-core';
 import {advance, HOME_ID, type State} from './shared-home-state.js';
 import {physicallyAtHome} from './character-location.js';
 
@@ -6,6 +7,9 @@ import {physicallyAtHome} from './character-location.js';
  * All hooks execute inside the caller's character-locked transaction. */
 export type ActivityDefinition = Readonly<{
   label: string;
+  location: string;
+  blockedActions: readonly ActivityAction[];
+  completionNotice: {title:string;message:string};
   durationSeconds: number;
   prepare(db: pg.PoolClient, characterId: string): Promise<void>;
   complete(db: pg.PoolClient, characterId: string): Promise<void>;
@@ -23,6 +27,9 @@ async function savedHome(db: pg.PoolClient, id: string): Promise<State> {
 export const ACTIVITIES: Readonly<Record<string, ActivityDefinition>> = {
   'home.rest': {
     label: 'Resting',
+    location: 'Home',
+    blockedActions: PHYSICAL_ACTIONS,
+    completionNotice: {title:'Rest complete',message:'You have finished resting. Stamina and Composure have been restored.'},
     durationSeconds: 30, // Provisional first Free Play activity duration.
     async prepare(db, id) {
       await savedHome(db, id);

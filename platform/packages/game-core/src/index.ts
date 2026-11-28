@@ -32,3 +32,6 @@ export type {ActivityRun,ActivitySnapshot} from './activity.js';
 
 export {ACTIVITY_CONFIRMATION_SECONDS,requiresActivityConfirmation} from './activity.js';
 export type {ActivityOffer} from './activity.js';
+
+export {PHYSICAL_ACTIONS,activityBlocks,ACTIVITY_NOTIFICATION_SECONDS,requiresActivityNotification} from './activity.js';
+export type {ActivityAction,GameNotification,NotificationInbox,ActivityStatusSnapshot} from './activity.js';

@@ -8,9 +8,9 @@
  import StorageWindow from './StorageWindow.svelte';
  import './inventory-windows.css';
 
- let {characterId,onStorageClosed,onStorageOpened,inHome=false}:{
+ let {characterId,onStorageClosed,onStorageOpened,inHome=false,blockTransfer=false,blockEquip=false}:{
   characterId:string;onStorageClosed?:()=>void;onStorageOpened?:()=>void;
-  inHome?:boolean
+  inHome?:boolean;blockTransfer?:boolean;blockEquip?:boolean
  }=$props();
  const windows=$derived($gameWindows.characterId===characterId?$gameWindows.windows:[]);
  const inventoryOpen=$derived(windows.some(w=>w.id==='inventory'));
@@ -154,13 +154,14 @@
   });
  }
  function drag(event:DragEvent,item:Item){
-  if(pending){event.preventDefault();return;}
+  if(pending||blockTransfer||blockEquip){event.preventDefault();return;}
   event.dataTransfer?.setData('application/x-pall-item',item.id);
   if(event.dataTransfer)event.dataTransfer.effectAllowed='move';
  }
  async function submit(item:Item,intent:{kind:'transfer';to:'pack'|'home_chest'}|
   {kind:'equip';slot:EquipSlot},quantityOverride?:number){
   if(!snapshot||pending)return;
+  if(intent.kind==='equip'?blockEquip:blockTransfer){error='Item changes are unavailable during the current activity.';return;}
   const id=characterId;
   const from= snapshot.pack.items.some(x=>x.id===item.id)?'pack':
    snapshot.equipment.items.some(x=>x.id===item.id)?'equipped':'home_chest';
@@ -188,7 +189,8 @@
    });
    if(response.status===409){
     const body=await response.json() as {error?:string};
-    const message=body.error==='pack_slots_exceeded'?'All inventory slots are occupied.'
+    const message=body.error==='activity_in_progress'?'Item changes are unavailable during the current activity.'
+     :body.error==='pack_slots_exceeded'?'All inventory slots are occupied.'
      :body.error==='chest_slots_exceeded'?'All chest slots are occupied.'
      :body.error==='pack_capacity_exceeded'?'Too much weight or volume to carry.'
      :body.error==='chest_capacity_exceeded'?'The chest cannot hold that much weight or volume.'
@@ -223,13 +225,13 @@
  function select(item:Item,shift:boolean){
   const place:Place=snapshot?.equipment.items.some(x=>x.id===item.id)?'equipped':
    snapshot?.pack.items.some(x=>x.id===item.id)?'pack':'home_chest';
-  if(shift&&(place==='equipped'||snapshot?.storageEnabled)){
+  if(shift&&!blockTransfer&&(place==='equipped'||snapshot?.storageEnabled)){
    void submit(item,{kind:'transfer',to:place==='pack'?'home_chest':'pack'},item.quantity);
   }else selectedId=item.id;
  }
  function drop(event:DragEvent,place:Place,slot?:EquipSlot){
   event.preventDefault();
-  if(!snapshot||pending)return;
+  if(!snapshot||pending||blockTransfer||blockEquip)return;
   const id=event.dataTransfer?.getData('application/x-pall-item');
   const item=[...snapshot.equipment.items,...snapshot.pack.items,...snapshot.chest.items]
    .find(x=>x.id===id);
@@ -282,14 +284,15 @@
    {#if loading||acquiring}
     <p class="inventory-loading" role="status">Reading your possessions…</p>
    {:else if snapshot}
+    {#if blockTransfer||blockEquip}<p class="inventory-loading" role="status">Inspection only. Item changes are unavailable during the current activity.</p>{/if}
     {#if record.kind==='inventory'}
-     <InventoryWindow {snapshot} {selected} {selectedId} {pending} {quantity}
+     <InventoryWindow {snapshot} {selected} {selectedId} pending={pending||blockTransfer||blockEquip} {quantity}
        onQuantity={(id,n)=>amounts={...amounts,[id]:n}} onSelect={select}
        onEquip={(item,slot)=>{void submit(item,{kind:'equip',slot});}}
        onTransfer={(item,to)=>{void submit(item,{kind:'transfer',to});}}
        onDragStart={drag} onDrop={drop}/>
     {:else if snapshot.storageEnabled}
-     <StorageWindow {snapshot} {selected} {selectedId} {pending} {quantity}
+     <StorageWindow {snapshot} {selected} {selectedId} pending={pending||blockTransfer||blockEquip} {quantity}
        onQuantity={(id,n)=>amounts={...amounts,[id]:n}} onSelect={select}
        onEquip={(item,slot)=>{void submit(item,{kind:'equip',slot});}}
        onTransfer={(item,to)=>{void submit(item,{kind:'transfer',to});}}

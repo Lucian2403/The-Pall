@@ -64,7 +64,7 @@ const schema=[
   '0018_bellrunner_dogman.sql','0019_bellrunner_dogman_combat.sql',
   '0020_stitcher_ward.sql','0021_stitcher_owler_combat.sql',
   '0022_personal_journal.sql','0023_inventory_storage_context.sql',
-  '0024_free_play_entry.sql','0025_city_travel.sql','0026_starter_rent.sql','0027_activity_engine.sql'
+  '0024_free_play_entry.sql','0025_city_travel.sql','0026_starter_rent.sql','0027_activity_engine.sql','0028_character_notifications.sql'
 ];
 let legacyInventoryId='';
 const resolveSession=async(headers:import('node:http').IncomingHttpHeaders)=>{
@@ -1559,6 +1559,16 @@ test('Stage 8 bed Rest is persistent, replay-safe, and available after tutorial 
  assert.equal((await request('POST',freePlay+'/announcement',owner,{})).status,200);
  const map=await request('GET',freePlay+'/city');
  assert.equal(map.body?.activity.id,restCommand.requestId);
+ assert.equal(map.body?.activity.location,'Home');
+ assert.equal(map.body?.notifications.unread,0);
+ assert.equal((await request('GET',freePlay+'/activity',stranger)).status,404);
+ assert.equal((await request('GET',freePlay+'/activity')).body?.activity.id,restCommand.requestId);
+ assert.equal((await request('GET',base+c.id+'/inventory')).status,200);
+ const storage=await request('POST',base+c.id+'/inventory/storage-context',owner,{action:'open'});
+ assert.equal(storage.status,200);
+ const inventory=base+c.id+'/inventory';
+ assert.equal((await request('POST',inventory,owner,{kind:'transfer',requestId:randomUUID(),expectedRevision:0,itemInstanceId:randomUUID(),quantity:1,to:'home_chest'})).body?.error,'activity_in_progress');
+ assert.equal((await request('POST',inventory,owner,{kind:'equip',requestId:randomUUID(),expectedRevision:0,itemInstanceId:randomUUID(),slot:'torso'})).body?.error,'activity_in_progress');
  assert.equal((await request('POST',freePlay+'/city/travel',owner,{destinationId:'job-board',expectedRevision:0,requestId:randomUUID()})).body?.error,'activity_in_progress');
  // Only the isolated QA database clock fixture is changed; no production shortcut.
  await db.query("UPDATE player_character_activity SET started_at=NOW()-INTERVAL '40 seconds',ends_at=NOW()-INTERVAL '10 seconds' WHERE character_id=$1",[c.id]);
@@ -1569,6 +1579,15 @@ test('Stage 8 bed Rest is persistent, replay-safe, and available after tutorial 
    assert.ok(result.body?.activity.completedAt);
  }
  assert.equal((await request('GET',route)).body?.revision,6,'Completion is applied once');
+ const status=await request('GET',freePlay+'/activity');
+ assert.equal(status.body?.notifications.unread,1);
+ assert.equal(status.body?.notifications.items[0].id,'activity.completed:'+restCommand.requestId);
+ assert.equal(status.body?.stamina,100);
+ assert.equal((await request('POST',freePlay+'/notifications/read',stranger,{})).status,404);
+ const read=await request('POST',freePlay+'/notifications/read',owner,{});
+ assert.equal(read.body?.notifications.unread,0);
+ assert.ok(read.body?.notifications.items[0].readAt);
+ assert.equal((await request('GET',freePlay+'/activity')).body?.notifications.items.length,1);
  assert.equal((await request('POST',route,owner,{
    kind:'action',requestId:randomUUID(),expectedRevision:6,action:'finish'
  })).status,409,'Bed rest never reopens an already completed tutorial');

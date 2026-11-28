@@ -1,5 +1,6 @@
 <script lang="ts">
   import {page} from '$app/state';
+  import type {ActivityStatusSnapshot} from '@the-pall/game-core';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import FreePlayAnnouncement from '$lib/FreePlayAnnouncement.svelte';
   import CityOverview from '$lib/CityOverview.svelte';
@@ -19,11 +20,12 @@
   let status=$state<'loading'|'ready'|'login'|'missing'|'locked'|'schema'|'error'>('loading');
   let message=$state('');
   let reviewOpen=$state(false);
+  let activityStatus=$state<ActivityStatusSnapshot|null>(null);
   let requestGeneration=0;
   async function refresh(requestedId:string){
     const generation=++requestGeneration;
     const current=()=>generation===requestGeneration&&requestedId===id;
-    character=null;access=null;status='loading';message='';reviewOpen=false;
+    character=null;access=null;status='loading';message='';reviewOpen=false;activityStatus=null;
     try{
       const base='/api/characters/'+encodeURIComponent(requestedId);
       const [person,gate]=await Promise.all([
@@ -58,7 +60,7 @@
 <svelte:head><title>The Pall — Grand Cylinder City</title></svelte:head>
 
 {#if status==='ready'&&character?.id===id&&access?.unlocked}
-  <TutorialShell {character} activePage="overview" sceneLocation="Grand Cylinder City · City Map" cityMap={{href:href+'/overview'}}>
+  <TutorialShell {character} {activityStatus} activePage="overview" sceneLocation="Grand Cylinder City · City Map" cityMap={{href:href+'/overview'}}>
     {#if access.announcementSeen===false}
       {#key character.id}
         {@const announcementId=character.id}
@@ -70,7 +72,7 @@
       {/key}
     {:else if access.announcementSeen===true}
       {#key character.id}
-        <CityOverview characterId={character.id} onReviewAnnouncement={()=>{reviewOpen=true;}}/>
+        <CityOverview characterId={character.id} onActivityStatus={(snapshot)=>{activityStatus=snapshot;}} onReviewAnnouncement={()=>{reviewOpen=true;}}/>
         {#if reviewOpen}
           <FreePlayAnnouncement characterId={character.id} reviewOnly onAcknowledged={()=>{reviewOpen=false;}}/>
         {/if}

@@ -1,6 +1,7 @@
 import type pg from 'pg';
-import {activityCanFinish, activityRunning, type ActivityRun, type ActivitySnapshot} from '@the-pall/game-core';
+import {activityCanFinish, activityRunning, requiresActivityNotification, type ActivityRun, type ActivitySnapshot} from '@the-pall/game-core';
 import {activityDefinition} from './activity-definitions.js';
+import {addNotification} from './notification-store.js';
 
 type Row = {
   run_id: string;
@@ -11,8 +12,9 @@ type Row = {
 };
 
 function toRun(row: Row): ActivityRun {
+  const definition=activityDefinition(row.activity_key);
   return {
-    id: row.run_id, key: row.activity_key, label: activityDefinition(row.activity_key).label,
+    id: row.run_id, key: row.activity_key, label: definition.label,location:definition.location,blockedActions:definition.blockedActions,
     startedAt: row.started_at.toISOString(), endsAt: row.ends_at.toISOString(),
     completedAt: row.completed_at?.toISOString() ?? null
   };
@@ -36,6 +38,10 @@ export async function settleActivity(db: pg.PoolClient, id: string): Promise<Act
   if (activity && activityCanFinish(activity, now)) {
     await activityDefinition(activity.key).complete(db, id);
     await db.query('UPDATE player_character_activity SET completed_at=$2 WHERE character_id=$1', [id, now]);
+    const duration=(Date.parse(activity.endsAt)-Date.parse(activity.startedAt))/1000;
+    if(requiresActivityNotification(duration)){
+      await addNotification(db,id,{id:'activity.completed:'+activity.id,kind:'activity.completed',...activityDefinition(activity.key).completionNotice},now);
+    }
     activity = {...activity, completedAt: now.toISOString()};
   }
   return {activity, serverNow: now.toISOString()};
@@ -48,6 +54,8 @@ export async function startActivity(
 ): Promise<ActivitySnapshot> {
   if (activityRunning(current.activity)) throw Error('activity_in_progress');
   const definition = activityDefinition(key);
+  // Fail before starting a run if its durable completion inbox has not been migrated.
+  if(requiresActivityNotification(definition.durationSeconds))await db.query('SELECT 1 FROM player_character_notifications LIMIT 0');
   if (!Number.isSafeInteger(definition.durationSeconds) || definition.durationSeconds <= 0)
     throw Error('invalid_activity_duration');
   await definition.prepare(db, id);

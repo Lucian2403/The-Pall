@@ -14,7 +14,8 @@ import {auth} from './auth.js';
 import {RENT,advance,payStarterRent,HomeInvalidAction,initial,view} from './shared-home-state.js';
 import type {Action,State,Branch,Outcome} from './shared-home-state.js';
 import type {ClinicState} from './millhand-clinic-state.js';
-import {activityRunning} from '@the-pall/game-core';
+import {activityRunning,activityBlocks} from '@the-pall/game-core';
+import {notificationInbox} from './notification-store.js';
 import {settleActivity,startActivity} from './activity-engine.js';
 import {activityDefinition} from './activity-definitions.js';
 import {physicallyAtHome} from './character-location.js';
@@ -68,8 +69,9 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     const state=saved.rows[0].state;
     if((state.phase==='COMPLETE')!==(c.tutorial_status==='COMPLETED'))
      return reply.code(409).send({error:'home_completion_mismatch'});
+    const notifications=state.phase==='COMPLETE'?await notificationInbox(db,c.id):null;
     await db.query('COMMIT');open=false;
-    return {...view(state,c.name,Number(c.coins),c.rent_paid_at),...activity,restOffer:restOffer(state)};
+    return {...view(state,c.name,Number(c.coins),c.rent_paid_at),...activity,notifications,restOffer:restOffer(state)};
    }
    if(c.tutorial_status!=='NOT_STARTED')return reply.code(409).send({error:'home_not_started'});
    const clinic=await db.query<{state:ClinicState}>('SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
@@ -118,7 +120,8 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'home_not_ready'});
    }
    let activity=await settleActivity(db,c.id);
-   if(cmd.kind==='action'&&activityRunning(activity.activity)){
+   if(cmd.kind==='action'&&(cmd.action==='pay_rent'?activityBlocks(activity.activity,'rent.pay'):
+     cmd.action==='rest'?activityBlocks(activity.activity,'activity.start'):activityRunning(activity.activity))){
     await db.query('COMMIT');open=false;return reply.code(409).send({error:'activity_in_progress'});
    }
    const saved=await db.query<{state:State}>(
@@ -226,7 +229,8 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     await db.query('UPDATE player_character_tutorial_home SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
      [c.id,state.revision,JSON.stringify(state)]);
    }
-   const result={...view(state,c.name,coins,paidAt),...activity,restOffer:restOffer(state)};
+   const notifications=state.phase==='COMPLETE'?await notificationInbox(db,c.id):null;
+   const result={...view(state,c.name,coins,paidAt),...activity,notifications,restOffer:restOffer(state)};
    await db.query('INSERT INTO player_character_tutorial_home_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [c.id,cmd.requestId,hash,JSON.stringify(result)]);
    await db.query('COMMIT');open=false;

@@ -4,7 +4,7 @@
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {page} from '$app/state';
   import {onMount} from 'svelte';
-  import {activityRunning,requiresActivityConfirmation,type ActivityRun,type ActivityOffer} from '@the-pall/game-core';
+  import {activityRunning,activityBlocks,requiresActivityConfirmation,type ActivityRun,type ActivityOffer,type ActivityStatusSnapshot} from '@the-pall/game-core';
   import ActivityConfirmation from '$lib/ActivityConfirmation.svelte';
   import {createActivitySync} from '$lib/activity-sync';
   import ActivityProgress from '$lib/ActivityProgress.svelte';
@@ -21,6 +21,7 @@
     characterName:string;coins:number;rent:number;shortfall:number;
     rentPaid:boolean;rentPaidAt:string|null;rentDue:number;
     activity?:ActivityRun|null;serverNow?:string;restOffer?:ActivityOffer|null;
+    notifications?:ActivityStatusSnapshot['notifications'];
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
     condition:{stamina:number;composure:number;fatigue:number;stress:number}};
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
@@ -34,6 +35,7 @@
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
   const activityBusy=$derived(activityRunning(home?.activity));
+  const statusSnapshot=$derived(home?.completed&&home.serverNow?{activity:home.activity??null,serverNow:home.serverNow,notifications:home.notifications,stamina:home.condition.stamina}:null);
   let restConfirmation=$state<ActivityOffer|null>(null);
   let activitySync:ReturnType<typeof createActivitySync>|undefined;
   const REST_RESULT='Stamina and Composure restored. Fatigue and Stress cleared.';
@@ -134,7 +136,8 @@
       syncClock(result);
       // Do not replace reactive character/scene objects with identical snapshots.
       if(result.revision===home.revision&&result.coins===home.coins&&
-         result.activity?.id===previous?.id&&result.activity?.completedAt===previous?.completedAt)return true;
+         result.activity?.id===previous?.id&&result.activity?.completedAt===previous?.completedAt&&
+         JSON.stringify(result.notifications)===JSON.stringify(home.notifications))return true;
       home=result;
       if(character&&character.coins!==result.coins)character={...character,coins:result.coins};
       if(activityRunning(result.activity)){
@@ -216,13 +219,13 @@
     await perform('rest');
   }
   function interactNotice(){
-    if(pending||activityBusy||!home)return;
+    if(pending||!home)return;
     restMessage='';kitchenOpen=false;
     if(home.phase==='HOME')void perform('read_notice');
     else if(['NOTICE','SPEECH','COMPLETE'].includes(home.phase))noticeExpanded=true;
   }
   function interactKitchen(){
-    if(pending||restAnimating||activityBusy||!home?.completed)return;
+    if(pending||restAnimating||!home?.completed)return;
     restMessage='';noticeExpanded=false;kitchenOpen=true;
   }
 </script>
@@ -233,7 +236,7 @@
     onCancel={()=>restConfirmation=null} onConfirm={()=>{void startRest();}}/>
 {/if}
 {#if status==='ready'&&character?.id===id&&home&&shellCharacter}
-  <TutorialShell character={shellCharacter} sceneStage={8} sceneLocation="Shared rented home" travelLocked={activityBusy} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
+  <TutorialShell character={shellCharacter} sceneStage={8} sceneLocation="Shared rented home" activityStatus={statusSnapshot} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
     onStorageClosed={()=>playChestSound('close')}
@@ -248,7 +251,7 @@
       <div class="home-scene pall-story-landscape" aria-label="A modest rented room in Grand Cylinder City">
         <div class="home-artwork" aria-label="The complete rented room illustration">
         <button type="button" class="hotspot chest" aria-label="Storage"
-          data-open-home-chest title="Storage" disabled={activityBusy} onclick={openRoomStorage}>
+          data-open-home-chest title="Storage" onclick={openRoomStorage}>
           <span class="object-caption">Storage</span>
         </button>
         <button type="button" class="hotspot book" aria-label="Read journal"
@@ -257,7 +260,7 @@
           <span class="object-caption">Journal</span>
         </button>
         <button type="button" class="hotspot notice-object" aria-label="Read notice"
-          title="Notice" data-pall-sfx="paper" disabled={activityBusy} onclick={interactNotice}>
+          title="Notice" data-pall-sfx="paper" onclick={interactNotice}>
           <img src="/locations/home/notice.webp" alt="" width="150" height="100"
             draggable="false" />
           <span class="object-caption">Notice</span>
@@ -269,7 +272,7 @@
         </button>
         {#if home?.completed}
           <button type="button" class="hotspot kitchen" aria-label="Kitchen — Tier I"
-            title="Kitchen — Tier I" disabled={pending||restAnimating||activityBusy} onclick={interactKitchen}>
+            title="Kitchen — Tier I" disabled={pending||restAnimating} onclick={interactKitchen}>
             <span class="object-caption">Kitchen · T1</span>
           </button>
         {/if}
@@ -281,7 +284,7 @@
       {#snippet panel()}
       {#if home}
       <div class="reading-column pall-story-dialogue-section">
-        {#if home.activity&&activityBusy}
+        {#if home.activity&&activityBusy&&!noticeExpanded&&!kitchenOpen}
           <aside class="home-dialogue rest-dialogue" aria-label="Current activity">
             <p class="eyebrow">BED · REST</p>
             <h1>Resting</h1>
@@ -289,7 +292,7 @@
             <ActivityProgress activity={home.activity} serverNow={home.serverNow??home.activity.startedAt}/>
             <p class="instruction">You can leave this page. Rest continues until the allotted time has elapsed.</p>
           </aside>
-        {:else if restMessage}
+        {:else if restMessage&&!noticeExpanded&&!kitchenOpen}
           <aside class="home-dialogue rest-dialogue" aria-label="Rest result" role="status">
             <p class="eyebrow">BED · REST</p>
             <h1>Rest complete</h1>
@@ -329,7 +332,8 @@
                   <p class="narration">You read the notice again. You still owe 150 coins in rent.</p>
                   <p class="instruction">Rent due: {home.rent} coins. You have {home.coins} coins.</p>
                   {#if home.shortfall>0}<p class="instruction">You need {home.shortfall} more coins.</p>{/if}
-                  <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0}
+                  {#if activityBlocks(home.activity,'rent.pay')}<p class="instruction">Rent cannot be paid during the current activity.</p>{/if}
+                  <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0||activityBlocks(home.activity,'rent.pay')}
                     onclick={()=>{void perform('pay_rent');}}>{pending?'Paying…':'Pay Rent'}</button>
                 {/if}
               {/if}

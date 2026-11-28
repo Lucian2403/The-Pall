@@ -797,6 +797,24 @@ function playFile(filename:string,gain=1,delaySeconds=0){
     // Browsers without a functional audio output remain fully usable.
   }
 }
+/** A short, original completion chime through the existing SFX volume and mute path. */
+export function playActivityCompletionSfx(){
+  if(!sceneActive||!settings.enabled||!unlocked||settings.sfxVolume<=0||!sfxContext)return;
+  const key='activity-completion-tone';
+  if(!sfxBuffers.has(key)){
+    const rate=sfxContext.sampleRate;
+    const buffer=sfxContext.createBuffer(1,Math.ceil(rate*.36),rate);
+    const data=buffer.getChannelData(0);
+    for(let i=0;i<data.length;i++){
+      const t=i/rate;
+      const local=t<.18?t:t-.18;
+      const envelope=Math.min(1,local/.018)*Math.max(0,1-local/.18)**2;
+      data[i]=Math.sin(2*Math.PI*(t<.18?440:660)*local)*envelope*.24;
+    }
+    sfxBuffers.set(key,buffer);
+  }
+  playFile(key,.65);
+}
 export function playUiClick(){
   if(typeof performance==='undefined')return;
   const now=performance.now();

@@ -101,7 +101,7 @@ try{
       origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Home',coins:10,rent:150,
       shortfall:140,rentPaid:false,rentPaidAt:null,rentDue:150,noticeTitle:'FINAL NOTICE',noticeText:'Rent due.',
       closingSpeech:'',completed:true,condition:homeCondition(),activity:rest,serverNow:new Date().toISOString(),
-      restOffer:{key:'home.rest',label:'Resting',durationSeconds:15}});
+      restOffer:{key:'home.rest',label:'Resting',durationSeconds:15},notifications:{items:rest?.completedAt?[{id:'activity.completed:'+rest.id,kind:'activity.completed',title:'Rest complete',message:'You have finished resting.',createdAt:rest.completedAt,readAt:null}]:[],unread:rest?.completedAt?1:0}});
     const root='/api/characters/qa-city';
     const points=[{id:'starter-rented-room',name:'Home',description:'Room',symbol:'⌂',icon:'',position:{x:.2,y:.6},displayOrder:1,availability:'available',destination:'home'},
      {id:'job-board',name:'Job Board',description:'Find paid work',symbol:'▤',icon:'',position:{x:.7,y:.3},displayOrder:2,availability:'available',destination:'qa-only'},
@@ -118,7 +118,7 @@ try{
             if(request.action!=='rest')return Promise.resolve(json({error:'invalid_action'},400));
             window.homeCounts.start++;homeRevision++;
             const now=Date.now();
-            rest={id:request.requestId,key:'home.rest',label:'Resting',startedAt:new Date(now).toISOString(),endsAt:new Date(now+15000).toISOString(),completedAt:null};
+            rest={id:request.requestId,key:'home.rest',label:'Resting',location:'Home',startedAt:new Date(now).toISOString(),endsAt:new Date(now+15000).toISOString(),completedAt:null};
           }else{
             window.homeCounts.get++;
             if(rest&&!rest.completedAt&&Date.now()>=Date.parse(rest.endsAt)){
@@ -161,16 +161,21 @@ try{
   await evalJS("document.querySelector('.hotspot.bed').click()");
   await until(()=>evalJS("!!document.querySelector('dialog[open]')"),5000,'Second confirmation');
   await evalJS("[...document.querySelectorAll('dialog button')].find(b=>b.textContent.trim()==='Confirm').click()");
-  await until(()=>evalJS("!!document.querySelector('.activity-progress progress')"),5000,'Activity started');
+  await until(()=>evalJS("!!document.querySelector('.rest-dialogue .activity-progress progress')"),5000,'Activity started');
   assert.equal(await evalJS("window.homeCounts.start"),1);
-  const before=await evalJS("document.querySelector('.activity-progress progress').value");
+  assert.ok(await evalJS("document.querySelector('.hud-activity').textContent.includes('Resting · Home')"));
+  assert.equal(await evalJS("document.querySelector('.hotspot.chest').disabled"),false);
+  assert.ok(await evalJS("!!document.querySelector('a[title=\"City overview\"]')"));
+  const before=await evalJS("document.querySelector('.rest-dialogue .activity-progress progress').value");
   const runningCounts=await evalJS("({...window.homeCounts})");
   await delay(3200);
-  assert.ok(await evalJS("document.querySelector('.activity-progress progress').value")>before,'Countdown advances locally');
+  assert.ok(await evalJS("document.querySelector('.rest-dialogue .activity-progress progress').value")>before,'Countdown advances locally');
   assert.deepEqual(await evalJS("({...window.homeCounts})"),runningCounts,'No polling, journal reload or rewind request during countdown');
   assert.equal(await evalJS("window.savedJournal===document.querySelector('#personal-journal')&&window.savedRoom===document.querySelector('.home-artwork')"),true,'Room and journal stay mounted');
   await until(()=>evalJS("document.querySelector('.rest-dialogue h1')?.textContent==='Rest complete'"),22000,'Deadline completion');
   assert.equal(await evalJS("window.homeCounts.get"),runningCounts.get+1,'One server reconciliation at completion');
+  await until(()=>evalJS("document.querySelector('.notification-toast')?.textContent.includes('Rest complete')"),5000,'Completion notification');
+  assert.ok(await evalJS("!!document.querySelector('[data-shell-service=notifications] .badge')"));
   assert.equal(await evalJS("window.homeCounts.journal"),initialCounts.journal);
   assert.equal(await evalJS("window.homeCounts.rewind"),initialCounts.rewind);
   await delay(2000);

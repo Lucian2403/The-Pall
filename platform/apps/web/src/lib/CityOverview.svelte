@@ -3,7 +3,7 @@
     import { goto } from "$app/navigation";
     import {
         cityWalkingSeconds,
-        activityRunning,
+        activityRunning,activityBlocks,type ActivityStatusSnapshot,
         type CityOverviewSnapshot,
         type CityPointOfInterest,
     } from "@the-pall/game-core";
@@ -15,8 +15,8 @@
 
     let {
         characterId,
-        onReviewAnnouncement,
-    }: { characterId: string; onReviewAnnouncement: () => void } = $props();
+        onReviewAnnouncement,onActivityStatus,
+    }: { characterId: string; onReviewAnnouncement: () => void;onActivityStatus?:(snapshot:ActivityStatusSnapshot|null)=>void } = $props();
     let city = $state<CityOverviewSnapshot | null>(null),
         selectedId = $state(""),
         search = $state(""),
@@ -105,6 +105,7 @@
         const deadline=snapshot.journey?.arrivesAt??(activityRunning(snapshot.activity)?snapshot.activity?.endsAt:null);
         activitySync?.update(snapshot.serverNow,deadline);
         city = snapshot;
+        onActivityStatus?.({activity:snapshot.activity??null,serverNow:snapshot.serverNow,notifications:snapshot.notifications,stamina:snapshot.stamina});
         status = "ready";
         errorMessage = "";
         if (
@@ -146,6 +147,7 @@
                 [401, 403, 404, 409].includes(response.status)
             ) {
                 city = null;
+                onActivityStatus?.(null);
                 activitySync?.update(undefined,null);
                 audio?.set(null);
             }
@@ -196,7 +198,7 @@
             if (destination) await goto(destination);
             return;
         }
-        if (activityBusy) return;
+        if (activityBlocks(city.activity,'travel')) return;
         pending = true;
         errorMessage = "";
         controller = new AbortController();
@@ -354,7 +356,12 @@
             />
             <aside class="details panel" aria-label="Selected location">
                 {#if city.activity&&activityBusy}
-                    <div class="journey"><ActivityProgress activity={city.activity} serverNow={city.serverNow}/><p>Travel is unavailable during this activity.</p></div>
+                    <div class="journey" aria-label="Current activity">
+                        <small>CURRENT ACTIVITY</small>
+                        <h3>{city.activity.label}{city.activity.location?' · '+city.activity.location:''}</h3>
+                        <ActivityProgress activity={city.activity} serverNow={city.serverNow}/>
+                        {#if activityBlocks(city.activity,'travel')}<p>Travel is unavailable during this activity.</p>{/if}
+                    </div>
                 {/if}
                 {#if city.journey}
                     <div class="journey" role="status">
@@ -389,7 +396,7 @@
                         disabled={pending ||
                             requestInFlight ||
                             !!city.journey ||
-                            (activityBusy && selected.id !== city.currentLocationId) ||
+                            (activityBlocks(city.activity,'travel') && selected.id !== city.currentLocationId) ||
                             selected.availability !== "available"}
                         onclick={() => {
                             void walk();
@@ -807,4 +814,6 @@
             padding: 7px;
         }
     }
+    .journey h3{font-size:20px;margin:5px 0 10px;line-height:1.2}
+    .journey small{font-size:11px;letter-spacing:.08em;color:#ead1a7}
 </style>

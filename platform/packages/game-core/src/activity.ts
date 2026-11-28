@@ -3,6 +3,8 @@ export type ActivityRun = Readonly<{
   id: string;
   key: string;
   label: string;
+  location?: string;
+  blockedActions?: readonly ActivityAction[];
   startedAt: string;
   endsAt: string;
   completedAt: string | null;
@@ -40,3 +42,22 @@ export const ACTIVITY_CONFIRMATION_SECONDS = 15;
 export function requiresActivityConfirmation(seconds:number):boolean {
   return seconds >= ACTIVITY_CONFIRMATION_SECONDS;
 }
+
+/** Browsing is not an action. Only mutations pass through this policy. */
+export type ActivityAction = 'travel' | 'inventory.transfer' | 'inventory.equip' | 'rent.pay' | 'activity.start';
+export const PHYSICAL_ACTIONS: readonly ActivityAction[] = ['travel','inventory.transfer','inventory.equip','rent.pay','activity.start'];
+export function activityBlocks(run:ActivityRun|null|undefined, action:ActivityAction):boolean {
+  return activityRunning(run) && (run!.blockedActions ?? PHYSICAL_ACTIONS).includes(action);
+}
+export const ACTIVITY_NOTIFICATION_SECONDS = 10;
+export function requiresActivityNotification(seconds:number):boolean {
+  return seconds > ACTIVITY_NOTIFICATION_SECONDS;
+}
+export type GameNotification = Readonly<{
+  id:string; kind:string; title:string; message:string; createdAt:string; readAt:string|null;
+}>;
+export type NotificationInbox = Readonly<{items:readonly GameNotification[]; unread:number}>;
+export type ActivityStatusSnapshot = ActivitySnapshot & Readonly<{
+  notifications?:NotificationInbox|null;
+  stamina?:number;
+}>;
