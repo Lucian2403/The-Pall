@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
+import {cityWalkingSeconds,startCityJourney,settleCityJourney,type CityCatalogue} from '@the-pall/game-core';
+import {CITY_OVERVIEW} from '../apps/api/src/city-poi-catalogue.ts';
 
 const root=resolve(import.meta.dirname,'..');
 const source=(path:string)=>readFileSync(resolve(root,path),'utf8');
@@ -103,22 +105,56 @@ test('Completed characters enter a new overview without changing the physical re
  assert.ok(sheet.includes('<CharacterHome {character}/>'));
 });
 
-test('City overview is a read-only, acknowledged, data-driven POI surface',()=>{
+test('City map has a shared acknowledged catalogue, explicit travel action and dev-only calibration',()=>{
  const api=source('apps/api/src/free-play-routes.ts');
- const catalog=source('apps/api/src/city-poi-catalogue.ts');
+ const catalogue=source('apps/api/src/city-poi-catalogue.ts');
  const city=source('apps/web/src/lib/CityOverview.svelte');
+ const map=source('apps/web/src/lib/CityMapViewport.svelte');
  const types=source('packages/game-core/src/city-overview.ts');
- assert.ok(api.includes("read==='city'?base+'/city':base"));
- assert.ok(api.includes("if(!announcementSeen)return reply.code(409).send({error:'free_play_announcement_required'})"));
- assert.ok(api.includes('return CITY_OVERVIEW'));
- assert.ok(catalog.includes("id:HOME_ID,name:'Rented room',availability:'available',destination:'rented-room'"));
+ assert.ok(api.includes("method==='GET'?base+'/city':base+'/city/travel'"));
+ assert.ok(api.includes("free_play_announcement_required"));
+ assert.ok(catalogue.includes("poi(HOME_ID,'Home'"));
+ assert.equal(CITY_OVERVIEW.pointsOfInterest.length,16);
+ assert.equal(new Set(CITY_OVERVIEW.pointsOfInterest.map(p=>p.id)).size,16);
+ assert.equal(CITY_OVERVIEW.pointsOfInterest.filter(p=>p.availability==='available').length,1);
  assert.ok(types.includes('pointsOfInterest:readonly CityPointOfInterest[]'));
  assert.ok(city.includes("+'/free-play/city'"));
- assert.ok(city.includes('city.pointsOfInterest as point (point.id)'));
- assert.ok(city.includes("point.availability==='available'&&point.destination==='rented-room'"));
- assert.ok(city.includes("encodeURIComponent(characterId)+'/home'"));
+ assert.ok(city.includes('filtered as point (point.id)'));
+ assert.ok(city.includes("fetch(base+'/travel',{method:'POST'"));
+ assert.ok(city.includes('function select(id:string){selectedId=id;}'));
  assert.ok(city.includes('controller?.abort()'));
- assert.ok(!city.includes("method:'POST'"),'Viewing or opening a POI must not start travel');
+ assert.ok(map.includes('{#if dev}'));
+ assert.ok(map.includes('width*scale'));
+});
+
+test('Distance uses original image aspect ratio, global speed and rounding only',()=>{
+ const c={width:1400,height:1000,distanceScale:.02,walkingSpeed:1.4,minimumSeconds:2,roundingSeconds:1};
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:.5,y:0},c),10);
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:0,y:.5},c),8);
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:0,y:0},c),0);
+ assert.equal(cityWalkingSeconds({x:0,y:0},{x:.001,y:0},c),2);
+ assert.ok(cityWalkingSeconds({x:0,y:0},{x:.8,y:.8},c)>cityWalkingSeconds({x:0,y:0},{x:.2,y:.2},c));
+});
+
+test('Journey requires a distinct available destination and settles once at its timestamp',()=>{
+ const home=CITY_OVERVIEW.pointsOfInterest[0];
+ const fixture={...CITY_OVERVIEW.pointsOfInterest.find(p=>p.id==='job-board')!,availability:'available' as const,destination:'qa-only'};
+ const catalogue:CityCatalogue={...CITY_OVERVIEW,pointsOfInterest:[home,fixture]};
+ const state={currentLocationId:home.id,revision:0,journey:null};
+ const now=new Date('2026-11-25T12:00:00Z');
+ assert.throws(()=>startCityJourney(state,CITY_OVERVIEW,fixture.id,now),/destination_unavailable/);
+ assert.throws(()=>startCityJourney(state,catalogue,home.id,now),/already_at_destination/);
+ const started=startCityJourney(state,catalogue,fixture.id,now);
+ assert.equal(started.currentLocationId,home.id);
+ assert.equal(started.revision,1);
+ assert.throws(()=>startCityJourney(started,catalogue,fixture.id,now),/travel_in_progress/);
+ const arrival=new Date(started.journey!.arrivesAt);
+ assert.equal(settleCityJourney(started,new Date(arrival.getTime()-1)),started);
+ const landed=settleCityJourney(started,arrival);
+ assert.equal(landed.currentLocationId,fixture.id);
+ assert.equal(landed.revision,2);
+ assert.equal(landed.journey,null);
+ assert.equal(settleCityJourney(landed,arrival),landed);
 });
 
 test('Previously acknowledged announcements can be reviewed without mutation and replayed after a dev rewind',()=>{
@@ -128,9 +164,98 @@ test('Previously acknowledged announcements can be reviewed without mutation and
  const rewind=source('apps/api/src/millhand-stage-rewind-routes.ts');
  assert.ok(view.includes('reviewOpen=false'));
  assert.ok(view.includes('reviewOnly onAcknowledged='));
- assert.ok(city.includes('Review Free Play announcement'));
+ assert.ok(city.includes('Review announcement'));
  assert.ok(modal.includes('if(reviewOnly){await onAcknowledged();return;}'));
  assert.ok(modal.indexOf('if(reviewOnly)')<modal.indexOf('await fetch('));
  assert.ok(rewind.includes("attname='free_play_intro_seen_at'"));
  assert.ok(rewind.includes('UPDATE player_characters SET free_play_intro_seen_at=NULL WHERE id=$1'));
+});
+
+test('Owner map uses the complete numbered roster and shared video/image geometry',()=>{
+ const map=source('apps/web/src/lib/CityMapViewport.svelte');
+ const assets=source('apps/web/src/lib/city-map-assets.ts');
+ assert.deepEqual(CITY_OVERVIEW.pointsOfInterest.map(p=>p.name),['Home','Inn','Job Board','City Board','Marketplace','Clothing Trader','Weapon Trader','Materials Merchant','Herbalist','Clinic','Blacksmith','Depot','Mechanical Yard','Workshop & Repairs','City Gates','Forest']);
+ assert.deepEqual(CITY_OVERVIEW.pointsOfInterest.map(p=>p.displayOrder),Array.from({length:16},(_,i)=>i+1));
+ assert.equal(CITY_OVERVIEW.config.width/CITY_OVERVIEW.config.height,16/9);
+ for(const p of CITY_OVERVIEW.pointsOfInterest){
+  assert.ok(p.position.x>0&&p.position.x<1&&p.position.y>0&&p.position.y<1);
+  assert.equal(p.icon,'/locations/city/poi/'+p.id+'.webp');
+ }
+ assert.ok(assets.includes("video:'/locations/city/map.webm'")&&assets.includes('useAnimatedMap:true'));
+ assert.ok(map.includes('autoplay loop muted playsinline')&&map.includes('prefers-reduced-motion'));
+ assert.ok(map.includes('videoFailed=true;videoReady=false;'));
+ assert.ok(map.includes("style:left={x+'px'} style:top={y+'px'} style:width={width*scale+'px'} style:height={height*scale+'px'}"));
+ assert.ok(map.includes("style:left={x+p.position.x*width*scale+'px'}"));
+});
+
+
+test('Owner-approved POI descriptions remain verbatim and render in the destination panel',()=>{
+ const expected=[
+  [
+    "Home",
+    "A shelter from the city's hardships. Rest, recover your strength and prepare for another day."
+  ],
+  [
+    "Inn",
+    "A warm meal and a moment's respite. Purchase food and replenish your strength before returning to work."
+  ],
+  [
+    "Job Board",
+    "Employers seek willing hands. Find paid work suited to your skills and earn, not always, an honest coin."
+  ],
+  [
+    "City Board",
+    "Read municipal announcements, public notices and recent developments affecting the city and its inhabitants."
+  ],
+  [
+    "Marketplace",
+    "Among crowded stalls and bargaining voices, buy and sell everyday goods at prevailing market prices."
+  ],
+  [
+    "Clothing Trader",
+    "Purchase garments and protective attire suited to the city's labour and the hardships beyond its walls."
+  ],
+  [
+    "Weapon Trader",
+    "Acquire firearms, ammunition and other weapons necessary for survival beyond the safety of the city."
+  ],
+  [
+    "Materials Merchant",
+    "Purchase raw materials and manufactured components required for crafting, construction and repairs."
+  ],
+  [
+    "Herbalist",
+    "Among dried roots and bitter remedies, acquire medicinal herbs and ingredients for restorative preparations."
+  ],
+  [
+    "Clinic",
+    "Seek medical attention, have your wounds treated and recover from injuries sustained through labour or misfortune."
+  ],
+  [
+    "Blacksmith",
+    "Amid ringing anvils and burning coal, work metal into tools, equipment and useful components."
+  ],
+  [
+    "Depot",
+    "Store belongings, materials and equipment safely until they are needed again."
+  ],
+  [
+    "Mechanical Yard",
+    "Work among steam engines and worn machinery, salvaging useful mechanical parts and components."
+  ],
+  [
+    "Workshop & Repairs",
+    "Put your craftsmanship to use, assemble equipment and restore worn belongings to working condition."
+  ],
+  [
+    "City Gates",
+    "Beyond these guarded gates lies uncertain territory. Depart the city to undertake expeditions into the wider world."
+  ],
+  [
+    "Forest",
+    "Gather timber, forage for useful plants and collect natural resources beneath the shelter of the trees."
+  ]
+];
+ assert.deepEqual(CITY_OVERVIEW.pointsOfInterest.map(p=>[p.name,p.description]),expected);
+ assert.ok(source('apps/web/src/lib/CityOverview.svelte').includes('{selected.description}'));
 });

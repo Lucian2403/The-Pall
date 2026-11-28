@@ -3,6 +3,14 @@ on:
   pull_request:
     paths:
       - 'platform/apps/api/src/free-play-routes.ts'
+      - 'platform/apps/api/src/city-travel.ts'
+      - 'platform/db/migrations/0025_city_travel.sql'
+      - 'platform/scripts/city-travel-migrate.mjs'
+      - 'platform/apps/web/src/lib/CityMapViewport.svelte'
+      - 'platform/apps/web/src/lib/city-map-assets.ts'
+      - 'platform/apps/web/src/lib/city-map-audio.ts'
+      - 'platform/apps/web/static/locations/city/**'
+      - 'platform/scripts/verify-city-map-browser.mjs'
       - 'platform/apps/api/src/millhand-stage-rewind-routes.ts'
       - 'platform/apps/api/src/city-poi-catalogue.ts'
       - 'platform/apps/web/src/lib/CityOverview.svelte'
@@ -63,6 +71,8 @@ jobs:
         run: npm run check -w @the-pall/web
       - name: Production web build
         run: npm run build -w @the-pall/web
+      - name: City map browser at desktop and phone widths
+        run: node scripts/verify-city-map-browser.mjs
       - name: Real PostgreSQL owner, stage, rewind and character lifecycle
         env:
           STAGE6_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/pall_stage6_test

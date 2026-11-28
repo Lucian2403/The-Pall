@@ -58,7 +58,7 @@
 <svelte:head><title>The Pall — Grand Cylinder City</title></svelte:head>
 
 {#if status==='ready'&&character?.id===id&&access?.unlocked}
-  <TutorialShell {character} activePage="overview" sceneLocation="Grand Cylinder City · Overview">
+  <TutorialShell {character} activePage="overview" sceneLocation="Grand Cylinder City · City Map" cityMap={{href:href+'/overview'}}>
     {#if access.announcementSeen===false}
       {#key character.id}
         {@const announcementId=character.id}

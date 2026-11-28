@@ -104,7 +104,9 @@
   const mapStatus=$derived(mapState==='introduction'?'Opens after the introduction'
     :mapState==='activity'?'Travel is locked during this activity'
     :mapState==='unavailable'?'Not available yet':'Open the city map');
-  const chapter = $derived(character.tutorial.stage === 8
+  const chapter = $derived(tutorialComplete
+    ? '/characters/' + encodeURIComponent(character.id) + '/scene'
+    : character.tutorial.stage === 8
     ? '/characters/' + encodeURIComponent(character.id) + '/home'
     : character.origin === 'Bellrunner' && character.tutorial.stage === 6
     ? '/characters/' + encodeURIComponent(character.id) + '/bellrunner/combat'

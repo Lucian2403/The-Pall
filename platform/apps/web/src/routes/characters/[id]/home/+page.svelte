@@ -66,7 +66,14 @@
       if(person.status===401||r.status===401){status='unauthorized';return;}
       if(person.status===404||r.status===404){status='missing';return;}
       if(r.status===503){status='schema';return;}
-      if(r.status===409){status='prerequisite';return;}
+      if(r.status===409){
+        const detail=await r.json().catch(()=>({}));
+        if(!current())return;
+        if(detail.error==='not_at_home'){
+          window.location.replace('/characters/'+encodeURIComponent(requestedId)+'/overview');return;
+        }
+        status='prerequisite';return;
+      }
       if(!person.ok||!r.ok)throw Error('home_unavailable');
       const savedCharacter=(await person.json() as {character:Character}).character;
       const result=await r.json() as Home|{needsStart:true};
@@ -151,7 +158,7 @@
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character?.id===id&&home}
-  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home"
+  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home" cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
     onStorageClosed={()=>playChestSound('close')}
