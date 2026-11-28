@@ -29,3 +29,6 @@ export type {CityPointOfInterest,CityOverviewSnapshot,CityCoordinates,CityTravel
 
 export {activityRunning,activityCanFinish,activityRemainingSeconds,activityProgress} from './activity.js';
 export type {ActivityRun,ActivitySnapshot} from './activity.js';
+
+export {ACTIVITY_CONFIRMATION_SECONDS,requiresActivityConfirmation} from './activity.js';
+export type {ActivityOffer} from './activity.js';

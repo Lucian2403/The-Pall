@@ -9,6 +9,7 @@
     } from "@the-pall/game-core";
     import CityMapViewport from "./CityMapViewport.svelte";
     import ActivityProgress from "./ActivityProgress.svelte";
+    import {createActivitySync} from "./activity-sync";
     import { cityMapAssets as assets } from "./city-map-assets";
     import { createCityMapAudio } from "./city-map-audio";
 
@@ -29,6 +30,7 @@
         clockAt = 0,
         disposed = false;
     let controller: AbortController | undefined;
+    let activitySync:ReturnType<typeof createActivitySync>|undefined;
     let audio: ReturnType<typeof createCityMapAudio> | undefined;
     let failedIcons = $state<Record<string, boolean>>({});
     const base = $derived(
@@ -100,6 +102,8 @@
         clockBase = Date.parse(snapshot.serverNow);
         clockAt = performance.now();
         time = clockBase;
+        const deadline=snapshot.journey?.arrivesAt??(activityRunning(snapshot.activity)?snapshot.activity?.endsAt:null);
+        activitySync?.update(snapshot.serverNow,deadline);
         city = snapshot;
         status = "ready";
         errorMessage = "";
@@ -128,8 +132,8 @@
             }
         }
     }
-    async function load() {
-        if (requestInFlight || pending || disposed) return;
+    async function load():Promise<boolean> {
+        if (requestInFlight || pending || disposed) return false;
         requestInFlight = true;
         controller = new AbortController();
         try {
@@ -153,7 +157,7 @@
                           : "City destinations could not be loaded.",
                 );
             const snapshot = (await response.json()) as CityOverviewSnapshot;
-            if (disposed) return;
+            if (disposed) return false;
             if (
                 snapshot.cityId !== "grand-cylinder-city" ||
                 !Array.isArray(snapshot.pointsOfInterest) ||
@@ -162,6 +166,7 @@
             )
                 throw Error("City data unavailable");
             await apply(snapshot);
+            return true;
         } catch (error) {
             if (!disposed) {
                 errorMessage =
@@ -170,6 +175,7 @@
                         : "City destinations could not be loaded.";
                 status = city ? "ready" : "error";
             }
+            return false;
         } finally {
             requestInFlight = false;
         }
@@ -231,28 +237,15 @@
     onMount(() => {
         audio = createCityMapAudio();
         void load();
-        let lastPoll = 0;
+        activitySync=createActivitySync(load);
         const timer = window.setInterval(() => {
-            if (city) {
-                time = clockBase + performance.now() - clockAt;
-                const interval = city.journey || activityBusy ? 1000 : 5000;
-                if (performance.now() - lastPoll >= interval) {
-                    lastPoll = performance.now();
-                    void load();
-                }
-            }
+            if (city?.journey) time = clockBase + performance.now() - clockAt;
         }, 250);
-        const resume = () => {
-            if (!document.hidden) void load();
-        };
-        document.addEventListener("visibilitychange", resume);
-        window.addEventListener("focus", resume);
         return () => {
             disposed = true;
             controller?.abort();
             clearInterval(timer);
-            document.removeEventListener("visibilitychange", resume);
-            window.removeEventListener("focus", resume);
+            activitySync?.dispose();
             audio?.dispose();
         };
     });
@@ -360,7 +353,7 @@
             />
             <aside class="details panel" aria-label="Selected location">
                 {#if city.activity&&activityBusy}
-                    <div class="journey"><ActivityProgress activity={city.activity} now={time}/><p>Travel is unavailable during this activity.</p></div>
+                    <div class="journey"><ActivityProgress activity={city.activity} serverNow={city.serverNow}/><p>Travel is unavailable during this activity.</p></div>
                 {/if}
                 {#if city.journey}
                     <div class="journey" role="status">

@@ -33,3 +33,10 @@ export function activityProgress(run: ActivityRun, now: number): number {
   const duration = Date.parse(run.endsAt) - start;
   return Math.max(0, Math.min(100, 100 * (now - start) / duration));
 }
+
+/** Server-owned preview of an available activity, not permission to start it. */
+export type ActivityOffer = Readonly<{key:string;label:string;durationSeconds:number}>;
+export const ACTIVITY_CONFIRMATION_SECONDS = 15;
+export function requiresActivityConfirmation(seconds:number):boolean {
+  return seconds >= ACTIVITY_CONFIRMATION_SECONDS;
+}

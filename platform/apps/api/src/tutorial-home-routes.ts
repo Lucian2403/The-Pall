@@ -16,6 +16,7 @@ import type {Action,State,Branch,Outcome} from './shared-home-state.js';
 import type {ClinicState} from './millhand-clinic-state.js';
 import {activityRunning} from '@the-pall/game-core';
 import {settleActivity,startActivity} from './activity-engine.js';
+import {activityDefinition} from './activity-definitions.js';
 import {physicallyAtHome} from './character-location.js';
 
 type Session={user:{id:string;emailVerified:boolean}}|null;
@@ -40,6 +41,10 @@ const ready=(s:ClinicState|undefined)=>!!s&&s.phase==='LEFT'&&s.paid&&
 const base='/api/characters/:id/tutorial/home';
 // Read old schemas without breaking the tutorial; actual payment requires 0026.
 const characterSQL="SELECT id,name,origin,tutorial_stage,tutorial_status,coins,to_jsonb(player_characters)->>'starter_rent_paid_at' AS rent_paid_at FROM player_characters WHERE id=$1 AND account_id=$2";
+function restOffer(state:State){
+ const definition=activityDefinition('home.rest');
+ return state.phase==='COMPLETE'?{key:'home.rest',label:definition.label,durationSeconds:definition.durationSeconds}:null;
+}
 export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg.Pool;resolveSession?:Resolver}={}){
  const pool=getGameplayPool(app,options.pool);
  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
@@ -64,7 +69,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     if((state.phase==='COMPLETE')!==(c.tutorial_status==='COMPLETED'))
      return reply.code(409).send({error:'home_completion_mismatch'});
     await db.query('COMMIT');open=false;
-    return {...view(state,c.name,Number(c.coins),c.rent_paid_at),...activity};
+    return {...view(state,c.name,Number(c.coins),c.rent_paid_at),...activity,restOffer:restOffer(state)};
    }
    if(c.tutorial_status!=='NOT_STARTED')return reply.code(409).send({error:'home_not_started'});
    const clinic=await db.query<{state:ClinicState}>('SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
@@ -221,7 +226,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     await db.query('UPDATE player_character_tutorial_home SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
      [c.id,state.revision,JSON.stringify(state)]);
    }
-   const result={...view(state,c.name,coins,paidAt),...activity};
+   const result={...view(state,c.name,coins,paidAt),...activity,restOffer:restOffer(state)};
    await db.query('INSERT INTO player_character_tutorial_home_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [c.id,cmd.requestId,hash,JSON.stringify(result)]);
    await db.query('COMMIT');open=false;

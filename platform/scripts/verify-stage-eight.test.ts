@@ -124,7 +124,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !web.includes('id="home-journal"')&&
   web.includes("if(home.phase==='HOME')void perform('read_notice')")&&
   web.includes("home.phase==='COMPLETE'")&&
-  web.includes('Further game systems are not available in this prototype.'));
+  web.includes('The room is yours to use. Rest, inspect the kitchen or review the rent notice.'));
  assert.ok(state.includes('FINAL NOTICE')&&
   state.includes('No discussion.')&&
   !state.includes('due_date')&&!state.includes('evictionDeadline'));
@@ -367,4 +367,19 @@ test('Universal activity timing uses elapsed time and waits for unresolved requi
  assert.ok(definition.includes("advance(await savedHome(db, id), 'rest')"));
  assert.ok(api.includes("startActivity(db,c.id,'home.rest',cmd.requestId,activity)"));
  assert.ok(source('apps/api/src/free-play-routes.ts').includes("error:'activity_in_progress'"));
+});
+
+test('Long activity confirmation is explicit and countdowns do not poll the Home every second',()=>{
+ const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ const modal=source('apps/web/src/lib/ActivityConfirmation.svelte');
+ const progress=source('apps/web/src/lib/ActivityProgress.svelte');
+ const sync=source('apps/web/src/lib/activity-sync.ts');
+ assert.ok(home.includes('requiresActivityConfirmation(home.restOffer.durationSeconds)'));
+ assert.ok(home.includes('onCancel={()=>restConfirmation=null}'));
+ assert.ok(home.includes("await perform('rest')"));
+ assert.ok(home.includes('result.revision===home.revision&&result.coins===home.coins'));
+ assert.ok(modal.includes('dialog.showModal()')&&modal.includes('cancelButton.focus()'));
+ assert.ok(progress.includes('setInterval')&&!progress.includes('fetch('));
+ assert.ok(sync.includes('deadline-performance.now()')&&!sync.includes('setInterval'));
+ assert.ok(!home.includes('lastPoll')&&!home.includes('pollHome'));
 });

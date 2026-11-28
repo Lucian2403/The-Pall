@@ -240,13 +240,18 @@
     stopMedicalClinicAmbience();
   });
 
+  const rewindCharacterId=$derived(character.id);
+  const rewindOrigin=$derived(character.origin);
+  const rewindStage=$derived(character.tutorial.stage);
+  const rewindStatus=$derived(character.tutorial.status);
   // Read the local-only replay contract for each implemented origin.
   // Production/non-loopback never exposes this route or its button.
   $effect(()=>{
-    if(character.origin!=='Millhand'&&character.origin!=='Bellrunner'&&
-       character.origin!=='Stitcher')return;
-    const characterId=character.id;
-    const currentStage=character.tutorial.stage;
+    const origin=rewindOrigin;
+    const characterId=rewindCharacterId;
+    const currentStage=rewindStage;
+    void rewindStatus;
+    if(origin!=='Millhand'&&origin!=='Bellrunner'&&origin!=='Stitcher')return;
     let stale=false;
     canRewind=false;
     rewindFromStage=null;

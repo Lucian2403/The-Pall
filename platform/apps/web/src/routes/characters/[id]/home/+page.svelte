@@ -4,7 +4,9 @@
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {page} from '$app/state';
   import {onMount} from 'svelte';
-  import {activityRunning,type ActivityRun} from '@the-pall/game-core';
+  import {activityRunning,requiresActivityConfirmation,type ActivityRun,type ActivityOffer} from '@the-pall/game-core';
+  import ActivityConfirmation from '$lib/ActivityConfirmation.svelte';
+  import {createActivitySync} from '$lib/activity-sync';
   import ActivityProgress from '$lib/ActivityProgress.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {openGameWindow,closeContextWindows} from '$lib/game-window-state';
@@ -18,7 +20,7 @@
     outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
     rentPaid:boolean;rentPaidAt:string|null;rentDue:number;
-    activity?:ActivityRun|null;serverNow?:string;
+    activity?:ActivityRun|null;serverNow?:string;restOffer?:ActivityOffer|null;
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
     condition:{stamina:number;composure:number;fatigue:number;stress:number}};
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
@@ -32,13 +34,13 @@
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
   const activityBusy=$derived(activityRunning(home?.activity));
-  let activityTime=$state(0);
-  let clockBase=0,clockAt=0,polling=false,lastPoll=0;
+  let restConfirmation=$state<ActivityOffer|null>(null);
+  let activitySync:ReturnType<typeof createActivitySync>|undefined;
   const REST_RESULT='Stamina and Composure restored. Fatigue and Stress cleared.';
   function syncClock(saved:Home){
-    clockBase=saved.serverNow?Date.parse(saved.serverNow):Date.now();
-    clockAt=performance.now();activityTime=clockBase;
+    activitySync?.update(saved.serverNow,activityRunning(saved.activity)?saved.activity?.endsAt:null);
   }
+  const shellCharacter=$derived(character&&home?{...character,stamina:{current:home.condition.stamina,maximum:100}}:null);
   let noticeExpanded=$state(false);
   let kitchenOpen=$state(false);
   let journalOpen=$state(false);
@@ -69,7 +71,7 @@
     const current=()=>generation===requestGeneration&&requestedId===id;
     character=null;home=null;status='loading';pending=false;
     errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
-    noticeExpanded=false;kitchenOpen=false;lastPoll=0;
+    noticeExpanded=false;kitchenOpen=false;restConfirmation=null;activitySync?.update(undefined,null);
     closeContextWindows();
     try{
       const [person,r]=await Promise.all([
@@ -117,41 +119,38 @@
     void refresh(requestedId);
     return ()=>{requestGeneration++;};
   });
-  // Poll while in Free Play, including when another tab starts an activity.
-  // The server settles due work. The local clock only animates its progress.
-  async function pollHome(){
-    if(polling||pending||restAnimating||status!=='ready'||!home?.completed)return;
+  // Reconcile at the deadline or on returning to the page, not every second.
+  async function reconcileHome():Promise<boolean>{
+    if(pending||restAnimating||status!=='ready'||!home?.completed)return false;
     const requestedId=id,generation=requestGeneration;
-    polling=true;
+    const revision=home.revision;
     try{
       const response=await fetch('/api/characters/'+encodeURIComponent(requestedId)+'/tutorial/home',{cache:'no-store'});
-      if(requestedId!==id||generation!==requestGeneration||pending)return;
-      if(!response.ok)return;
+      if(requestedId!==id||generation!==requestGeneration||pending)return false;
+      if(!response.ok)return false;
       const result=await response.json() as Home;
-      if(requestedId!==id||generation!==requestGeneration||pending||!home||result.revision<home.revision)return;
+      if(requestedId!==id||generation!==requestGeneration||pending||!home||home.revision!==revision||result.revision<revision)return false;
       const previous=home.activity;
-      home=result;syncClock(result);
-      if(character)character={...character,coins:result.coins};
+      syncClock(result);
+      // Do not replace reactive character/scene objects with identical snapshots.
+      if(result.revision===home.revision&&result.coins===home.coins&&
+         result.activity?.id===previous?.id&&result.activity?.completedAt===previous?.completedAt)return true;
+      home=result;
+      if(character&&character.coins!==result.coins)character={...character,coins:result.coins};
       if(activityRunning(result.activity)){
-        noticeExpanded=false;kitchenOpen=false;restMessage='';
+        restConfirmation=null;noticeExpanded=false;kitchenOpen=false;restMessage='';
       }else if(result.activity?.key==='home.rest'&&result.activity.completedAt&&
         (activityRunning(previous)||previous?.id!==result.activity.id)){
         restMessage=REST_RESULT;
       }
-    }catch{/* Keep the last confirmed state. Retry on the next poll. */}
-    finally{polling=false;}
+      return true;
+    }catch{return false;}
   }
   onMount(()=>{
-    const tick=()=>{
-      activityTime=clockBase+performance.now()-clockAt;
-      if(document.hidden)return;
-      const interval=activityBusy?1000:5000;
-      if(performance.now()-lastPoll>=interval){lastPoll=performance.now();void pollHome();}
-    };
-    const timer=window.setInterval(tick,250);
-    const resume=()=>{if(!document.hidden)void pollHome();};
-    window.addEventListener('focus',resume);document.addEventListener('visibilitychange',resume);
-    return ()=>{clearInterval(timer);window.removeEventListener('focus',resume);document.removeEventListener('visibilitychange',resume);};
+    const sync=createActivitySync(reconcileHome);
+    activitySync=sync;
+    if(home)syncClock(home);
+    return ()=>{sync.dispose();activitySync=undefined;};
   });
   async function perform(action:Action):Promise<boolean>{
     if(pending||activityBusy||!home||(home.completed&&action!=='rest'&&action!=='pay_rent'))return false;
@@ -196,8 +195,9 @@
   async function restInBed(){
     if(restAnimating||pending||activityBusy||!home)return;
     if(home.completed){
-      restMessage='';kitchenOpen=false;noticeExpanded=false;
-      await perform('rest');return;
+      if(!home.restOffer){errorMessage='Rest is unavailable. Reload the room.';return;}
+      if(requiresActivityConfirmation(home.restOffer.durationSeconds)){restConfirmation=home.restOffer;return;}
+      await startRest();return;
     }
     const actingId=id,actingGeneration=requestGeneration;
     restAnimating=true;restMessage='';kitchenOpen=false;
@@ -208,6 +208,12 @@
     if(actingId!==id||actingGeneration!==requestGeneration)return;
     restAnimating=false;
     if(saved)restMessage=REST_RESULT;
+  }
+  async function startRest(){
+    restConfirmation=null;
+    if(pending||activityBusy||!home?.completed)return;
+    restMessage='';kitchenOpen=false;noticeExpanded=false;
+    await perform('rest');
   }
   function interactNotice(){
     if(pending||activityBusy||!home)return;
@@ -221,8 +227,13 @@
   }
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
-{#if status==='ready'&&character?.id===id&&home}
-  <TutorialShell character={{...character,stamina:{current:home.condition.stamina,maximum:100}}} sceneStage={8} sceneLocation="Shared rented home" travelLocked={activityBusy} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
+{#if restConfirmation}
+  <ActivityConfirmation title="Rest in bed?" durationSeconds={restConfirmation.durationSeconds}
+    description="Rest restores Stamina and Composure and clears Fatigue and Stress. You cannot travel while resting."
+    onCancel={()=>restConfirmation=null} onConfirm={()=>{void startRest();}}/>
+{/if}
+{#if status==='ready'&&character?.id===id&&home&&shellCharacter}
+  <TutorialShell character={shellCharacter} sceneStage={8} sceneLocation="Shared rented home" travelLocked={activityBusy} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
     onStorageClosed={()=>playChestSound('close')}
@@ -275,7 +286,7 @@
             <p class="eyebrow">BED · REST</p>
             <h1>Resting</h1>
             <p class="narration">You are resting in bed.</p>
-            <ActivityProgress activity={home.activity} now={activityTime}/>
+            <ActivityProgress activity={home.activity} serverNow={home.serverNow??home.activity.startedAt}/>
             <p class="instruction">You can leave this page. Rest continues until the allotted time has elapsed.</p>
           </aside>
         {:else if restMessage}
