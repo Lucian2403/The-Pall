@@ -11,9 +11,14 @@ import {createHash} from 'node:crypto';
 import pg from 'pg';
 import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
-import {HOME_ID,RENT,advance,payStarterRent,HomeInvalidAction,initial,view} from './shared-home-state.js';
+import {RENT,advance,payStarterRent,HomeInvalidAction,initial,view} from './shared-home-state.js';
 import type {Action,State,Branch,Outcome} from './shared-home-state.js';
 import type {ClinicState} from './millhand-clinic-state.js';
+import {activityRunning,activityBlocks} from '@the-pall/game-core';
+import {notificationInbox} from './notification-store.js';
+import {settleActivity,startActivity} from './activity-engine.js';
+import {activityDefinition} from './activity-definitions.js';
+import {physicallyAtHome} from './character-location.js';
 
 type Session={user:{id:string;emailVerified:boolean}}|null;
 type Resolver=(headers:IncomingHttpHeaders)=>Promise<Session>;
@@ -37,15 +42,9 @@ const ready=(s:ClinicState|undefined)=>!!s&&s.phase==='LEFT'&&s.paid&&
 const base='/api/characters/:id/tutorial/home';
 // Read old schemas without breaking the tutorial; actual payment requires 0026.
 const characterSQL="SELECT id,name,origin,tutorial_stage,tutorial_status,coins,to_jsonb(player_characters)->>'starter_rent_paid_at' AS rent_paid_at FROM player_characters WHERE id=$1 AND account_id=$2";
-/** The old tutorial room still works before the city migration. Once travel
- * exists, completed characters must actually be at Home to use the room. */
-async function physicallyAtHome(db:pg.Pool|pg.PoolClient,id:string){
- const exists=await db.query("SELECT to_regclass('player_character_city_travel') AS name");
- if(!exists.rows[0]?.name)return true;
- const result=await db.query<{current_location_id:string;destination_id:string|null}>(
-  'SELECT current_location_id,destination_id FROM player_character_city_travel WHERE character_id=$1',[id]);
- const row=result.rows[0];
- return !row||(row.current_location_id===HOME_ID&&row.destination_id===null);
+function restOffer(state:State){
+ const definition=activityDefinition('home.rest');
+ return state.phase==='COMPLETE'?{key:'home.rest',label:definition.label,durationSeconds:definition.durationSeconds}:null;
 }
 export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg.Pool;resolveSession?:Resolver}={}){
  const pool=getGameplayPool(app,options.pool);
@@ -56,26 +55,34 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
   const session=await resolveSession(req.headers);
   if(!session?.user.emailVerified)return reply.code(401).send({error:'unauthorized'});
   if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+  const db=await pool.connect();let open=false;
   try{
-   const rows=await pool.query<Character>(characterSQL,[req.params.id,session.user.id]);
+   await db.query('BEGIN');open=true;
+   const rows=await db.query<Character>(characterSQL+' FOR UPDATE',[req.params.id,session.user.id]);
    const c=rows.rows[0];
    if(!c||!isFinaleOrigin(c.origin))return reply.code(404).send({error:'not_found'});
    if(c.tutorial_stage!==8)return reply.code(409).send({error:'home_not_ready'});
-   if(c.tutorial_status==='COMPLETED'&&!await physicallyAtHome(pool,c.id))return reply.code(409).send({error:'not_at_home'});
-   const saved=await pool.query<{state:State}>('SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[c.id]);
+   if(c.tutorial_status==='COMPLETED'&&!await physicallyAtHome(db,c.id))return reply.code(409).send({error:'not_at_home'});
+   const activity=await settleActivity(db,c.id);
+   const saved=await db.query<{state:State}>('SELECT state FROM player_character_tutorial_home WHERE character_id=$1',[c.id]);
    if(saved.rowCount){
     const state=saved.rows[0].state;
     if((state.phase==='COMPLETE')!==(c.tutorial_status==='COMPLETED'))
      return reply.code(409).send({error:'home_completion_mismatch'});
-    return view(state,c.name,Number(c.coins),c.rent_paid_at);
+    const notifications=state.phase==='COMPLETE'?await notificationInbox(db,c.id):null;
+    await db.query('COMMIT');open=false;
+    return {...view(state,c.name,Number(c.coins),c.rent_paid_at),...activity,notifications,restOffer:restOffer(state)};
    }
    if(c.tutorial_status!=='NOT_STARTED')return reply.code(409).send({error:'home_not_started'});
-   const clinic=await pool.query<{state:ClinicState}>('SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
+   const clinic=await db.query<{state:ClinicState}>('SELECT state FROM player_character_clinic WHERE character_id=$1',[c.id]);
    if(!ready(clinic.rows[0]?.state))return reply.code(409).send({error:'clinic_not_left'});
+   await db.query('COMMIT');open=false;
    return {needsStart:true,stage:8};
   }catch(error){
    if(missing(error))return reply.code(503).send({error:'home_schema_missing',setup:'npm run home:migrate'});
    throw error;
+  }finally{
+   try{if(open)await db.query('ROLLBACK');}finally{db.release();}
   }
  });
  app.post<{Params:{id:string}}>(base,async(req,reply)=>{
@@ -111,6 +118,11 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
    }
    if(c.tutorial_stage!==8){
     await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'home_not_ready'});
+   }
+   let activity=await settleActivity(db,c.id);
+   if(cmd.kind==='action'&&(cmd.action==='pay_rent'?activityBlocks(activity.activity,'rent.pay'):
+     cmd.action==='rest'?activityBlocks(activity.activity,'activity.start'):activityRunning(activity.activity))){
+    await db.query('COMMIT');open=false;return reply.code(409).send({error:'activity_in_progress'});
    }
    const saved=await db.query<{state:State}>(
     'SELECT state FROM player_character_tutorial_home WHERE character_id=$1 FOR UPDATE',[c.id]);
@@ -200,6 +212,11 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
        [c.id,RENT]);
       if(!paid.rowCount)throw new HomeInvalidAction('rent_payment_conflict');
       state=payment.state;coins=payment.coins;paidAt=paid.rows[0].paid_at;
+     }else if(cmd.action==='rest'&&old.phase==='COMPLETE'){
+      if(c.tutorial_status!=='COMPLETED')throw new HomeInvalidAction('home_completion_mismatch');
+      activity=await startActivity(db,c.id,'home.rest',cmd.requestId,activity);
+      // Starting reserves this revision but does not restore any resources.
+      state={...old,revision:old.revision+1};
      }else state=advance(old,cmd.action);
     }catch(error){
      if(!(error instanceof HomeInvalidAction))throw error;
@@ -212,7 +229,8 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
     await db.query('UPDATE player_character_tutorial_home SET revision=$2,state=$3::jsonb,updated_at=NOW() WHERE character_id=$1',
      [c.id,state.revision,JSON.stringify(state)]);
    }
-   const result=view(state,c.name,coins,paidAt);
+   const notifications=state.phase==='COMPLETE'?await notificationInbox(db,c.id):null;
+   const result={...view(state,c.name,coins,paidAt),...activity,notifications,restOffer:restOffer(state)};
    await db.query('INSERT INTO player_character_tutorial_home_receipts(character_id,request_id,request_hash,response) VALUES($1,$2,$3,$4::jsonb)',
     [c.id,cmd.requestId,hash,JSON.stringify(result)]);
    await db.query('COMMIT');open=false;

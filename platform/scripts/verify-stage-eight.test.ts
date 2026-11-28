@@ -6,6 +6,7 @@ import {resolve} from 'node:path';
 import {initial,advance,payStarterRent,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
 import {homeJournalEntries,homeCompletionSummary} from '../apps/web/src/lib/home-journal-copy.ts';
 import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
+import {activityCanFinish,activityRunning,activityRemainingSeconds,activityProgress,requiresActivityConfirmation,activityBlocks,requiresActivityNotification,type ActivityRun} from '@the-pall/game-core';
 const root=resolve(import.meta.dirname,'..');
 const source=(p:string)=>readFileSync(resolve(root,p),'utf8');
 
@@ -123,7 +124,7 @@ test('Stage 8 uses authenticated persisted API, owner-directed text and preserve
   !web.includes('id="home-journal"')&&
   web.includes("if(home.phase==='HOME')void perform('read_notice')")&&
   web.includes("home.phase==='COMPLETE'")&&
-  web.includes('Further game systems are not available in this prototype.'));
+  web.includes('The room is yours to use. Rest, inspect the kitchen or review the rent notice.'));
  assert.ok(state.includes('FINAL NOTICE')&&
   state.includes('No discussion.')&&
   !state.includes('due_date')&&!state.includes('evictionDeadline'));
@@ -252,7 +253,7 @@ test('Saved Home journal is the selected character\'s shared reader',()=>{
  const shell=source('apps/web/src/lib/TutorialShell.svelte');
  const reader=source('apps/web/src/lib/PersonalJournal.svelte');
  assert.ok(web.includes("title:'Rented Home',entries:home.completed?[]:currentJournalEntries"));
- assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
+ assert.ok(shell.includes('<PersonalJournal characterId={rewindCharacterId}'));
  assert.ok(reader.includes("encodeURIComponent(id)+'/journal"));
  assert.ok(!web.includes('id="home-journal"'));
 });
@@ -275,7 +276,7 @@ test('Rented-room chest is contextual while Inventory and Journal remain indepen
  assert.ok(!web.includes('<InventoryPanel'));
  assert.ok(web.includes("onclick={()=>{void toggleJournal();}}"));
  assert.ok(web.includes("journalController={{open:journalOpen"));
- assert.ok(shell.includes('<PersonalJournal characterId={character.id}'));
+ assert.ok(shell.includes('<PersonalJournal characterId={rewindCharacterId}'));
  assert.ok(!web.includes('class="journal" aria-label="Personal Journal"'));
 });
 
@@ -341,9 +342,64 @@ test('Initial rent payment is a single full debit after the shared closing seque
  assert.equal(view(complete,'Ada',10).rentDue,150);
  assert.equal(view(before,'Ada',10,stamp).noticeTitle,'FINAL NOTICE','Developer replay retains original copy');
  const ui=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
- assert.ok(ui.includes("perform('pay_rent')")&&ui.includes('disabled={pending||home.shortfall>0}'));
+ assert.ok(ui.includes("perform('pay_rent')")&&ui.includes("disabled={pending||home.shortfall>0||activityBlocks(home.activity,'rent.pay')}"));
  assert.ok(ui.includes('class="hotspot kitchen"')&&ui.includes('Cooking is not yet available.'));
  assert.ok(ui.includes('coins:result.coins'));
  const schema=source('db/migrations/0026_starter_rent.sql');
  assert.ok(schema.includes('ADD COLUMN IF NOT EXISTS starter_rent_paid_at'));
+});
+
+test('Universal activity timing uses elapsed time and waits for unresolved required interactions',()=>{
+ const run:ActivityRun={id:'fixture',key:'fixture',label:'Fixture',startedAt:'2026-11-28T12:00:00.000Z',endsAt:'2026-11-28T12:00:30.000Z',completedAt:null};
+ const half=new Date('2026-11-28T12:00:15.000Z'),end=new Date(run.endsAt);
+ assert.equal(activityRunning(run),true);
+ assert.equal(activityRemainingSeconds(run,half.getTime()),15);
+ assert.equal(activityProgress(run,half.getTime()),50);
+ assert.equal(activityCanFinish(run,new Date(end.getTime()-1)),false);
+ assert.equal(activityCanFinish(run,end,true),false);
+ assert.equal(activityCanFinish(run,end),true);
+ assert.equal(activityRemainingSeconds(run,end.getTime()+10000),0);
+ assert.equal(activityCanFinish({...run,completedAt:run.endsAt},end),false);
+ const engine=source('apps/api/src/activity-engine.ts');
+ const definition=source('apps/api/src/activity-definitions.ts');
+ const api=source('apps/api/src/tutorial-home-routes.ts');
+ assert.ok(engine.includes('activityDefinition(activity.key).complete'));
+ assert.ok(definition.includes("advance(await savedHome(db, id), 'rest')"));
+ assert.ok(api.includes("startActivity(db,c.id,'home.rest',cmd.requestId,activity)"));
+ assert.ok(source('apps/api/src/free-play-routes.ts').includes("error:'activity_in_progress'"));
+});
+
+test('Long activity confirmation is explicit and countdowns do not poll the Home every second',()=>{
+ assert.equal(requiresActivityConfirmation(14),false);
+ assert.equal(requiresActivityConfirmation(15),true);
+ assert.equal(requiresActivityConfirmation(30),true);
+ const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ const modal=source('apps/web/src/lib/ActivityConfirmation.svelte');
+ const progress=source('apps/web/src/lib/ActivityProgress.svelte');
+ const sync=source('apps/web/src/lib/activity-sync.ts');
+ assert.ok(home.includes('requiresActivityConfirmation(home.restOffer.durationSeconds)'));
+ assert.ok(home.includes('onCancel={()=>restConfirmation=null}'));
+ assert.ok(home.includes("await perform('rest')"));
+ assert.ok(home.includes('result.revision===home.revision&&result.coins===home.coins'));
+ assert.ok(modal.includes('dialog.showModal()')&&modal.includes('cancelButton.focus()'));
+ assert.ok(progress.includes('activityClock')&&!progress.includes('fetch('));
+ assert.ok(source('apps/web/src/lib/activity-clock.ts').includes('setInterval'));
+ assert.ok(sync.includes('deadline-performance.now()')&&!sync.includes('setInterval'));
+ assert.ok(!home.includes('lastPoll')&&!home.includes('pollHome'));
+});
+
+test('Activity restrictions apply only to physical mutations, with a strict over-ten-second notification rule',()=>{
+ const run:ActivityRun={id:'fixture',key:'home.rest',label:'Resting',startedAt:'2026-11-28T12:00:00.000Z',endsAt:'2026-11-28T12:00:30.000Z',completedAt:null,blockedActions:['travel','inventory.transfer','inventory.equip','rent.pay','activity.start']};
+ assert.equal(activityBlocks(run,'travel'),true);
+ assert.equal(activityBlocks(run,'inventory.transfer'),true);
+ assert.equal(activityBlocks({...run,blockedActions:['travel']},'inventory.equip'),false);
+ assert.equal(activityBlocks({...run,completedAt:run.endsAt},'rent.pay'),false);
+ assert.equal(requiresActivityNotification(10),false);
+ assert.equal(requiresActivityNotification(11),true);
+ const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
+ assert.ok(home.includes('title="Storage" onclick={openRoomStorage}'));
+ const engine=source('apps/api/src/activity-engine.ts');
+ assert.ok(engine.includes('requiresActivityNotification(duration)')&&engine.includes("id:'activity.completed:'+activity.id"));
+ const inventory=source('apps/api/src/inventory-routes.ts');
+ assert.ok(inventory.includes("activityBlocks(activity.activity,cmd.kind==='equip'?'inventory.equip':'inventory.transfer')"));
 });

@@ -3,6 +3,11 @@
   import {homeJournalEntries,homeCompletionSummary} from '$lib/home-journal-copy';
   import type {FinaleOrigin} from '$lib/shared-finale-origins';
   import {page} from '$app/state';
+  import {onMount} from 'svelte';
+  import {activityRunning,activityBlocks,requiresActivityConfirmation,type ActivityRun,type ActivityOffer,type ActivityStatusSnapshot} from '@the-pall/game-core';
+  import ActivityConfirmation from '$lib/ActivityConfirmation.svelte';
+  import {createActivitySync} from '$lib/activity-sync';
+  import ActivityProgress from '$lib/ActivityProgress.svelte';
   import TutorialShell from '$lib/TutorialShell.svelte';
   import {openGameWindow,closeContextWindows} from '$lib/game-window-state';
   import ActivityLayout from '$lib/ActivityLayout.svelte';
@@ -15,6 +20,8 @@
     outcome:'player_victory'|'player_defeat';
     characterName:string;coins:number;rent:number;shortfall:number;
     rentPaid:boolean;rentPaidAt:string|null;rentDue:number;
+    activity?:ActivityRun|null;serverNow?:string;restOffer?:ActivityOffer|null;
+    notifications?:ActivityStatusSnapshot['notifications'];
     noticeTitle:string;noticeText:string;closingSpeech:string;completed:boolean;
     condition:{stamina:number;composure:number;fatigue:number;stress:number}};
   type Character={id:string;name:string;origin:string;sex:string;avatarId?:string|null;
@@ -27,6 +34,15 @@
   let status=$state<'loading'|'ready'|'unauthorized'|'missing'|'prerequisite'|'schema'|'error'>('loading');
   let pending=$state(false),errorMessage=$state(''),restMessage=$state('');
   let restAnimating=$state(false);
+  const activityBusy=$derived(activityRunning(home?.activity));
+  const statusSnapshot=$derived(home?.completed&&home.serverNow?{activity:home.activity??null,serverNow:home.serverNow,notifications:home.notifications,stamina:home.condition.stamina}:null);
+  let restConfirmation=$state<ActivityOffer|null>(null);
+  let activitySync:ReturnType<typeof createActivitySync>|undefined;
+  const REST_RESULT='Stamina and Composure restored. Fatigue and Stress cleared.';
+  function syncClock(saved:Home){
+    activitySync?.update(saved.serverNow,activityRunning(saved.activity)?saved.activity?.endsAt:null);
+  }
+  const shellCharacter=$derived(character&&home?{...character,stamina:{current:home.condition.stamina,maximum:100}}:null);
   let noticeExpanded=$state(false);
   let kitchenOpen=$state(false);
   let journalOpen=$state(false);
@@ -57,7 +73,7 @@
     const current=()=>generation===requestGeneration&&requestedId===id;
     character=null;home=null;status='loading';pending=false;
     errorMessage='';restMessage='';restAnimating=false;retryKey=null;retryId=null;
-    noticeExpanded=false;kitchenOpen=false;
+    noticeExpanded=false;kitchenOpen=false;restConfirmation=null;activitySync?.update(undefined,null);
     closeContextWindows();
     try{
       const [person,r]=await Promise.all([
@@ -89,7 +105,8 @@
         savedHome=await started.json() as Home;
       }else savedHome=result;
       if(!current())return;
-      home=savedHome;noticeExpanded=savedHome.phase==='NOTICE';
+      home=savedHome;syncClock(savedHome);noticeExpanded=savedHome.phase==='NOTICE';
+      if(savedHome.activity?.key==='home.rest'&&savedHome.activity.completedAt)restMessage=REST_RESULT;
       character={...savedCharacter,coins:savedHome.coins,tutorial:{stage:8,
         status:savedHome.completed?'COMPLETED':'IN_PROGRESS'}};
       status='ready';
@@ -104,8 +121,42 @@
     void refresh(requestedId);
     return ()=>{requestGeneration++;};
   });
+  // Reconcile at the deadline or on returning to the page, not every second.
+  async function reconcileHome():Promise<boolean>{
+    if(pending||restAnimating||status!=='ready'||!home?.completed)return false;
+    const requestedId=id,generation=requestGeneration;
+    const revision=home.revision;
+    try{
+      const response=await fetch('/api/characters/'+encodeURIComponent(requestedId)+'/tutorial/home',{cache:'no-store'});
+      if(requestedId!==id||generation!==requestGeneration||pending)return false;
+      if(!response.ok)return false;
+      const result=await response.json() as Home;
+      if(requestedId!==id||generation!==requestGeneration||pending||!home||home.revision!==revision||result.revision<revision)return false;
+      const previous=home.activity;
+      syncClock(result);
+      // Do not replace reactive character/scene objects with identical snapshots.
+      if(result.revision===home.revision&&result.coins===home.coins&&
+         result.activity?.id===previous?.id&&result.activity?.completedAt===previous?.completedAt&&
+         JSON.stringify(result.notifications)===JSON.stringify(home.notifications))return true;
+      home=result;
+      if(character&&character.coins!==result.coins)character={...character,coins:result.coins};
+      if(activityRunning(result.activity)){
+        restConfirmation=null;noticeExpanded=false;kitchenOpen=false;restMessage='';
+      }else if(result.activity?.key==='home.rest'&&result.activity.completedAt&&
+        (activityRunning(previous)||previous?.id!==result.activity.id)){
+        restMessage=REST_RESULT;
+      }
+      return true;
+    }catch{return false;}
+  }
+  onMount(()=>{
+    const sync=createActivitySync(reconcileHome);
+    activitySync=sync;
+    if(home)syncClock(home);
+    return ()=>{sync.dispose();activitySync=undefined;};
+  });
   async function perform(action:Action):Promise<boolean>{
-    if(pending||!home||(home.completed&&action!=='rest'&&action!=='pay_rent'))return false;
+    if(pending||activityBusy||!home||(home.completed&&action!=='rest'&&action!=='pay_rent'))return false;
     const actingId=id,actingGeneration=requestGeneration;
     const current=()=>actingId===id&&actingGeneration===requestGeneration;
     const actingApi='/api/characters/'+encodeURIComponent(actingId)+'/tutorial/home';
@@ -124,17 +175,17 @@
         if(latest.ok){
           const updated=await latest.json() as Home;
           if(!current())return false;
-          home=updated;noticeExpanded=updated.phase==='NOTICE'||(action==='pay_rent'&&updated.completed);
+          home=updated;syncClock(updated);noticeExpanded=updated.phase==='NOTICE'||(action==='pay_rent'&&updated.completed);
           if(character)character={...character,coins:updated.coins,tutorial:{stage:8,status:updated.completed?'COMPLETED':'IN_PROGRESS'}};
         }
-        errorMessage=problem.error==='insufficient_coins'?'You do not have enough coins to pay the rent.':problem.error==='rent_already_paid'?'The rent has already been paid.':'The saved scene changed. Current progress has been reloaded.';
+        errorMessage=problem.error==='activity_in_progress'?'An activity is already in progress.':problem.error==='insufficient_coins'?'You do not have enough coins to pay the rent.':problem.error==='rent_already_paid'?'The rent has already been paid.':'The saved scene changed. Current progress has been reloaded.';
         return false;
       }
       if(response.status===503){errorMessage='Home database update required. Run npm run home:migrate.';return false;}
       if(!response.ok)throw Error('home_action_failed');
       const result=await response.json() as Home;
       if(!current())return false;
-      home=result;noticeExpanded=result.phase==='NOTICE'||(action==='pay_rent'&&result.completed);
+      home=result;syncClock(result);noticeExpanded=result.phase==='NOTICE'||(action==='pay_rent'&&result.completed);
       retryId=null;retryKey=null;
       if(character)character={...character,coins:result.coins,tutorial:{stage:8,status:home.completed?'COMPLETED':'IN_PROGRESS'}};
       return true;
@@ -145,7 +196,12 @@
     finally{if(current())pending=false;}
   }
   async function restInBed(){
-    if(restAnimating||pending||!home)return;
+    if(restAnimating||pending||activityBusy||!home)return;
+    if(home.completed){
+      if(!home.restOffer){errorMessage='Rest is unavailable. Reload the room.';return;}
+      if(requiresActivityConfirmation(home.restOffer.durationSeconds)){restConfirmation=home.restOffer;return;}
+      await startRest();return;
+    }
     const actingId=id,actingGeneration=requestGeneration;
     restAnimating=true;restMessage='';kitchenOpen=false;
     // Only the confirmed server Rest changes character condition.
@@ -154,7 +210,13 @@
     await fade;
     if(actingId!==id||actingGeneration!==requestGeneration)return;
     restAnimating=false;
-    if(saved)restMessage='Rested. Stamina and Composure are full; Fatigue and Stress cleared.';
+    if(saved)restMessage=REST_RESULT;
+  }
+  async function startRest(){
+    restConfirmation=null;
+    if(pending||activityBusy||!home?.completed)return;
+    restMessage='';kitchenOpen=false;noticeExpanded=false;
+    await perform('rest');
   }
   function interactNotice(){
     if(pending||!home)return;
@@ -168,8 +230,13 @@
   }
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
-{#if status==='ready'&&character?.id===id&&home}
-  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home" cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
+{#if restConfirmation}
+  <ActivityConfirmation title="Rest in bed?" durationSeconds={restConfirmation.durationSeconds}
+    description="Rest restores Stamina and Composure and clears Fatigue and Stress. You cannot travel while resting."
+    onCancel={()=>restConfirmation=null} onConfirm={()=>{void startRest();}}/>
+{/if}
+{#if status==='ready'&&character?.id===id&&home&&shellCharacter}
+  <TutorialShell character={shellCharacter} sceneStage={8} sceneLocation="Shared rented home" activityStatus={statusSnapshot} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
     onStorageClosed={()=>playChestSound('close')}
@@ -200,10 +267,10 @@
         </button>
         <button type="button" class="hotspot bed" aria-label="Rest in bed"
           title="Rest — restore Stamina and Composure, clear Fatigue and Stress"
-          disabled={pending||restAnimating} onclick={()=>{void restInBed();}}>
+          disabled={pending||restAnimating||activityBusy} onclick={()=>{void restInBed();}}>
           <span class="object-caption">Rest</span>
         </button>
-        {#if home.completed}
+        {#if home?.completed}
           <button type="button" class="hotspot kitchen" aria-label="Kitchen — Tier I"
             title="Kitchen — Tier I" disabled={pending||restAnimating} onclick={interactKitchen}>
             <span class="object-caption">Kitchen · T1</span>
@@ -217,11 +284,19 @@
       {#snippet panel()}
       {#if home}
       <div class="reading-column pall-story-dialogue-section">
-        {#if restMessage}
+        {#if home.activity&&activityBusy&&!noticeExpanded&&!kitchenOpen}
+          <aside class="home-dialogue rest-dialogue" aria-label="Current activity">
+            <p class="eyebrow">BED · REST</p>
+            <h1>Resting</h1>
+            <p class="narration">You are resting in bed.</p>
+            <ActivityProgress activity={home.activity} serverNow={home.serverNow??home.activity.startedAt}/>
+            <p class="instruction">You can leave this page. Rest continues until the allotted time has elapsed.</p>
+          </aside>
+        {:else if restMessage&&!noticeExpanded&&!kitchenOpen}
           <aside class="home-dialogue rest-dialogue" aria-label="Rest result" role="status">
             <p class="eyebrow">BED · REST</p>
-            <h1>A moment of quiet</h1>
-            <p class="narration">You lie down. For a little while, the racket of the city falls away.</p>
+            <h1>Rest complete</h1>
+            <p class="narration">You have finished resting.</p>
             <p class="instruction">{restMessage}</p>
             <button type="button" class="pall-framed-button primary-choice"
               onclick={()=>restMessage=''}>Continue</button>
@@ -251,13 +326,14 @@
             {:else}
               {#if home.completed}
                 {#if home.rentPaid}
-                  <p class="narration">For now, the roof over your head is paid for. One less thing to worry about.</p>
+                  <p class="narration">You have paid the 150 coins demanded in the notice. No rent remains outstanding.</p>
                   <p class="instruction" role="status">Rent paid in full.</p>
                 {:else}
-                  <p class="narration">The notice still lies on the table. The roof over your head won't pay for itself.</p>
+                  <p class="narration">You read the notice again. You still owe 150 coins in rent.</p>
                   <p class="instruction">Rent due: {home.rent} coins. You have {home.coins} coins.</p>
                   {#if home.shortfall>0}<p class="instruction">You need {home.shortfall} more coins.</p>{/if}
-                  <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0}
+                  {#if activityBlocks(home.activity,'rent.pay')}<p class="instruction">Rent cannot be paid during the current activity.</p>{/if}
+                  <button type="button" class="pall-framed-button primary-choice" disabled={pending||home.shortfall>0||activityBlocks(home.activity,'rent.pay')}
                     onclick={()=>{void perform('pay_rent');}}>{pending?'Paying…':'Pay Rent'}</button>
                 {/if}
               {/if}

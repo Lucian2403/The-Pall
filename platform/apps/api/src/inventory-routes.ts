@@ -8,6 +8,9 @@ import {createHash,randomUUID,randomBytes} from 'node:crypto';
 import pg from 'pg';
 import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
+import {activityBlocks} from '@the-pall/game-core';
+import {settleActivity} from './activity-engine.js';
+import {physicallyAtHome} from './character-location.js';
 import {inventoryView,planTransfer,planEquip,InventoryInvalidAction,EQUIPMENT_SLOTS} from './inventory-model.js';
 import type {InventoryRow,StorageLocation,EquipmentSlot} from './inventory-model.js';
 
@@ -32,7 +35,8 @@ const validHome=(character:Character)=>character.tutorial_stage===8&&
  ['IN_PROGRESS','COMPLETED'].includes(character.tutorial_status);
 async function homeAvailable(db:pg.PoolClient,character:Character):Promise<boolean>{
  return validHome(character)&&
-   (await db.query(verifiedHome,[character.id])).rowCount===1;
+   (await db.query(verifiedHome,[character.id])).rowCount===1&&
+   await physicallyAtHome(db,character.id);
 }
 async function chestAccess(db:pg.PoolClient,character:Character,
  token:unknown):Promise<boolean>{
@@ -196,6 +200,10 @@ export function registerInventoryRoutes(app:FastifyInstance,options:{
     const saved=oldReceipt.rows[0].response as ReturnType<typeof inventoryView>;
     return {...saved,storageEnabled,
       chest:storageEnabled?saved.chest:{...saved.chest,items:[]}};
+   }
+   const activity=await settleActivity(db,req.params.id);
+   if(activityBlocks(activity.activity,cmd.kind==='equip'?'inventory.equip':'inventory.transfer')){
+    await db.query('COMMIT');open=false;return reply.code(409).send({error:'activity_in_progress'});
    }
    const state=await db.query<InventoryState>(
     'SELECT revision FROM player_character_inventory_state WHERE character_id=$1 FOR UPDATE',

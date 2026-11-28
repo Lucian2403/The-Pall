@@ -1,3 +1,5 @@
+import type {ActivityRun,NotificationInbox} from './activity.js';
+
 /** All coordinates use the original map's normalized space, never the viewport. */
 export type CityCoordinates=Readonly<{x:number;y:number}>;
 export type CityPointOfInterest=Readonly<{
@@ -14,7 +16,7 @@ export type CityCatalogue=Readonly<{
 }>;
 export type CityJourney=Readonly<{originId:string;destinationId:string;startedAt:string;arrivesAt:string}>;
 export type CityTravelState=Readonly<{currentLocationId:string;revision:number;journey:CityJourney|null}>;
-export type CityOverviewSnapshot=CityCatalogue&CityTravelState&Readonly<{serverNow:string;arrived:boolean}>;
+export type CityOverviewSnapshot=CityCatalogue&CityTravelState&Readonly<{serverNow:string;arrived:boolean;activity?:ActivityRun|null;notifications?:NotificationInbox|null;stamina?:number}>;
 /** Distance scale is distance units per original image pixel; speed is units/sec. */
 export function cityWalkingSeconds(from:CityCoordinates,to:CityCoordinates,config:CityTravelConfig):number{
   if([from.x,from.y,to.x,to.y].some(v=>!Number.isFinite(v)||v<0||v>1)||

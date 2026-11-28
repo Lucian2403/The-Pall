@@ -26,3 +26,12 @@ export type {WageClaimState,WageClaimPhase,WageClaimAction,WageClaimApproach,Wag
 
 export {cityWalkingSeconds,settleCityJourney,startCityJourney} from './city-overview.js';
 export type {CityPointOfInterest,CityOverviewSnapshot,CityCoordinates,CityTravelConfig,CityCatalogue,CityJourney,CityTravelState} from './city-overview.js';
+
+export {activityRunning,activityCanFinish,activityRemainingSeconds,activityProgress} from './activity.js';
+export type {ActivityRun,ActivitySnapshot} from './activity.js';
+
+export {ACTIVITY_CONFIRMATION_SECONDS,requiresActivityConfirmation} from './activity.js';
+export type {ActivityOffer} from './activity.js';
+
+export {PHYSICAL_ACTIONS,activityBlocks,ACTIVITY_NOTIFICATION_SECONDS,requiresActivityNotification} from './activity.js';
+export type {ActivityAction,GameNotification,NotificationInbox,ActivityStatusSnapshot} from './activity.js';

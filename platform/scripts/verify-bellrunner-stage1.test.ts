@@ -371,7 +371,8 @@ test('Hector, document cards and original UI/audio remain consistent',()=>{
  assert.ok(opening.includes("depotBackdrop={character.origin==='Bellrunner'}"));
  assert.ok(stage2.includes('sceneLocation={HAULING_SCENES[sceneKey].label}'));
  assert.ok(stage2.includes("depotBackdrop={sceneKey==='depot'}"));
- assert.ok(shell.includes("character.origin!=='Millhand'&&character.origin!=='Bellrunner'"));
+ assert.ok(shell.includes('const rewindOrigin=$derived(character.origin)')&&
+  shell.includes("origin!=='Millhand'&&origin!=='Bellrunner'&&origin!=='Stitcher'"));
  assert.ok(shell.includes('Back to Stage '));
  for(const item of ['hector-d-smoke.webp','council-work.webp','sealed-order.webp','route-sheet.webp'])
   assert.ok(scene.includes(item));

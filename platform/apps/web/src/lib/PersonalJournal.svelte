@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {tick} from 'svelte';
+  import {tick,untrack} from 'svelte';
 
   export type CompletedTask={
     taskInstanceId:string;taskId:string;stage:number;title:string;
@@ -59,13 +59,13 @@
     // Each character gets a fresh reader and a new request. No shared cache,
     // account-scoped key, stale selection, or retained previous journal.
     completed=[];selectedId=null;nextCursor=null;tab='current';
-    void loadPage(id,null,true);
+    untrack(()=>{void loadPage(id,null,true);});
     return ()=>{requestSequence++;activeController?.abort();};
   });
   $effect(()=>{if(section)void tick().then(()=>section?.focus());});
   const selected=$derived(completed.find(item=>item.taskInstanceId===selectedId)??null);
   function handleKey(event:KeyboardEvent){
-    if(event.key==='Escape'){event.preventDefault();onClose();}
+    if(event.key==='Escape'&&!event.defaultPrevented&&!(event.target instanceof Element&&event.target.closest('dialog[open]'))){event.preventDefault();onClose();}
   }
 </script>
 

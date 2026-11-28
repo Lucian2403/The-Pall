@@ -10,7 +10,9 @@ import {getGameplayPool} from './database-pool.js';
 import {HOME_ID} from './shared-home-state.js';
 import {CITY_OVERVIEW} from './city-poi-catalogue.js';
 import {citySnapshot,CityTravelConflict,type TravelCommand} from './city-travel.js';
-import type {CityCatalogue} from '@the-pall/game-core';
+import {activityBlocks,type CityCatalogue} from '@the-pall/game-core';
+import {settleActivity} from './activity-engine.js';
+import {activityStatus,readNotifications} from './notification-store.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const base='/api/characters/:id/free-play';
@@ -94,15 +96,52 @@ export function registerFreePlayRoutes(app:FastifyInstance,options:{
    if(found.rows[0].free_play_intro_seen_at===null){
     await db.query('ROLLBACK');open=false;return reply.code(409).send({error:'free_play_announcement_required'});
    }
+   const activity=await settleActivity(db,req.params.id);
+   if(command&&activityBlocks(activity.activity,'travel')){
+    await db.query('COMMIT');open=false;return reply.code(409).send({error:'activity_in_progress'});
+   }
    const snapshot=await citySnapshot(db,req.params.id,options.cityCatalogue??CITY_OVERVIEW,command);
+   const status=await activityStatus(db,req.params.id,activity);
    await db.query('COMMIT');open=false;
-   return snapshot;
+   return {...snapshot,...status};
   }catch(error){
    if(open){try{await db.query('ROLLBACK');}catch{/* Preserve original */}}
    if(error instanceof CityTravelConflict)return reply.code(409).send({error:error.message});
    if(schemaMissing(error))return reply.code(503).send({error:'city_travel_schema_missing',setup:'npm run city-travel:migrate'});
    throw error;
   }finally{db.release();}
+ }});
+ }
+ // Read-only screens use this status endpoint when they do not already own a Home/city snapshot.
+ // Marking notifications read changes only inbox metadata, never gameplay.
+ for(const method of ['GET','POST'] as const){
+ app.route<{Params:{id:string}}>({method,url:method==='GET'?base+'/activity':base+'/notifications/read',handler:async(req,reply)=>{
+  reply.header('Cache-Control','no-store');
+  const owner=await identity(req.headers);
+  if(!owner)return reply.code(401).send({error:'unauthorized'});
+  if(!UUID.test(req.params.id))return reply.code(404).send({error:'not_found'});
+  if(method==='POST'){
+   if(req.headers.origin&&req.headers.origin!==(process.env.AUTH_BASE_URL??'http://127.0.0.1:5173'))return reply.code(403).send({error:'invalid_origin'});
+   if(!req.headers['content-type']?.toLowerCase().startsWith('application/json'))return reply.code(415).send({error:'json_required'});
+   if(!req.body||typeof req.body!=='object'||Array.isArray(req.body)||Object.keys(req.body).length!==0)return reply.code(400).send({error:'invalid_body'});
+  }
+  const db=await pool.connect();let open=false;
+  try{
+   await db.query('BEGIN');open=true;
+   const found=await db.query<GateRow>(characterState+' FOR UPDATE OF c',[req.params.id,owner]);
+   if(!found.rowCount||!isPlayableCharacterOrigin(found.rows[0].origin))return reply.code(404).send({error:'not_found'});
+   if(!unlocked(found.rows[0]))return reply.code(409).send({error:'free_play_not_unlocked'});
+   // Mark existing notifications first, so an activity finishing in this transaction remains unread.
+   if(method==='POST')await readNotifications(db,req.params.id);
+   const result=await activityStatus(db,req.params.id,await settleActivity(db,req.params.id));
+   await db.query('COMMIT');open=false;
+   return result;
+  }catch(error){
+   if(schemaMissing(error))return reply.code(503).send({error:'activity_schema_missing',setup:'npm run home:migrate'});
+   throw error;
+  }finally{
+   try{if(open)await db.query('ROLLBACK');}finally{db.release();}
+  }
  }});
  }
  // The overview calls this endpoint when the one-time announcement is acknowledged.

@@ -1,6 +1,10 @@
 <script lang="ts">
   import type {Snippet} from 'svelte';
-  import {onMount,setContext} from 'svelte';
+  import {onMount,setContext,untrack} from 'svelte';
+  import {activityRunning,activityBlocks,type ActivityStatusSnapshot} from '@the-pall/game-core';
+  import {createActivitySync} from '$lib/activity-sync';
+  import ActivityProgress from '$lib/ActivityProgress.svelte';
+  import NotificationCenter from '$lib/NotificationCenter.svelte';
   import {SCENE_JOURNAL_CONTEXT,type SceneJournalController,type SceneJournalRecord,type SceneJournalRegistrar} from '$lib/scene-journal';
   import {isFinaleOrigin,clinicHref} from '$lib/shared-finale-origins';
   import {goto,beforeNavigate} from '$app/navigation';
@@ -37,7 +41,7 @@
     councilBackdrop = false,alleyBackdrop = false,depotBackdrop = false,
     industrialCourtyardBackdrop = false,clinicBackdrop = false,
     combatStamina,sceneStage,backToStageFive,backStageBusy = false,backStageError = '',
-    cityMap,travelLocked = false,services = {},dock,journalController,journalContent,
+    cityMap,travelLocked = false,activityStatus,services = {},dock,journalController,journalContent,
     onStorageClosed,onStorageOpened
   }:{
     character:SavedCharacter;
@@ -66,6 +70,8 @@
     cityMap?:{href:string};
     /** The current activity forbids travel (e.g. an encounter in progress). */
     travelLocked?:boolean;
+    /** Home/map supply their existing snapshots; other Free Play pages use one deadline sync. */
+    activityStatus?:ActivityStatusSnapshot|null;
     /** Live Notifications / Chat services. Omitted ones show an honest unavailable state. */
     services?:{notifications?:ShellService;chat?:ShellService};
     /** Future chat/messages dock. It takes its own grid column and reflows the
@@ -100,7 +106,33 @@
   // current activity, AND a real map route has been supplied.
   const tutorialComplete=$derived(character.tutorial.stage>=8&&character.tutorial.status==='COMPLETED');
   const freePlayView=$derived(activePage==='overview');
-  const mapState=$derived(!tutorialComplete?'introduction':travelLocked?'activity':!cityMap?'unavailable':'open');
+  let fallbackStatus=$state<ActivityStatusSnapshot|null>(null);
+  const managedStatus=$derived(activityStatus!==undefined);
+  const currentStatus=$derived(managedStatus?activityStatus??null:fallbackStatus);
+  const currentActivity=$derived(currentStatus?.activity??null);
+  $effect(()=>{
+    const id=rewindCharacterId;
+    const completed=tutorialComplete;
+    const managed=managedStatus;
+    fallbackStatus=null;
+    if(!completed||managed)return;
+    let disposed=false;
+    const load=async()=>{
+      try{
+        const response=await fetch('/api/characters/'+encodeURIComponent(id)+'/free-play/activity',{cache:'no-store'});
+        if(!response.ok||disposed)return false;
+        const snapshot=await response.json() as ActivityStatusSnapshot;
+        if(disposed)return false;
+        fallbackStatus=snapshot;
+        sync.update(snapshot.serverNow,activityRunning(snapshot.activity)?snapshot.activity?.endsAt:null);
+        return true;
+      }catch{return false;}
+    };
+    const sync=createActivitySync(load);
+    untrack(()=>{void sync.refresh();});
+    return ()=>{disposed=true;sync.dispose();};
+  });
+  const mapState=$derived(!tutorialComplete?'introduction':travelLocked&&!activityRunning(currentActivity)?'activity':!cityMap?'unavailable':'open');
   const mapStatus=$derived(mapState==='introduction'?'Opens after the introduction'
     :mapState==='activity'?'Travel is locked during this activity'
     :mapState==='unavailable'?'Not available yet':'Open the city map');
@@ -149,8 +181,10 @@
   // Outside combat, retain the existing saved-resource/provisional HUD behavior.
   const staminaShown=$derived(isMeasured(combatStamina)
     ?combatStamina
-    :isMeasured(character.stamina)
-      ?character.stamina:{current:100,maximum:100});
+    :typeof currentStatus?.stamina==='number'
+      ?{current:currentStatus.stamina,maximum:100}
+      :isMeasured(character.stamina)
+        ?character.stamina:{current:100,maximum:100});
   const resources=$derived([
     {id:'health',label:'Health',data:character.health},
     {id:'stamina',label:'Stamina',data:staminaShown}
@@ -240,13 +274,18 @@
     stopMedicalClinicAmbience();
   });
 
+  const rewindCharacterId=$derived(character.id);
+  const rewindOrigin=$derived(character.origin);
+  const rewindStage=$derived(character.tutorial.stage);
+  const rewindStatus=$derived(character.tutorial.status);
   // Read the local-only replay contract for each implemented origin.
   // Production/non-loopback never exposes this route or its button.
   $effect(()=>{
-    if(character.origin!=='Millhand'&&character.origin!=='Bellrunner'&&
-       character.origin!=='Stitcher')return;
-    const characterId=character.id;
-    const currentStage=character.tutorial.stage;
+    const origin=rewindOrigin;
+    const characterId=rewindCharacterId;
+    const currentStage=rewindStage;
+    void rewindStatus;
+    if(origin!=='Millhand'&&origin!=='Bellrunner'&&origin!=='Stitcher')return;
     let stale=false;
     canRewind=false;
     rewindFromStage=null;
@@ -433,7 +472,7 @@
               <span class="resource-track" role="progressbar" aria-label={resource.label}
                 aria-valuemin="0" aria-valuemax={resource.data.maximum}
                 aria-valuenow={Math.min(resource.data.current,resource.data.maximum)}
-                title={resource.id==='stamina'&&!isMeasured(combatStamina)&&!isMeasured(character.stamina)
+                title={resource.id==='stamina'&&!isMeasured(combatStamina)&&!isMeasured(character.stamina)&&typeof currentStatus?.stamina!=='number'
                   ?'Provisional full stamina; future combat data will replace this value'
                   :undefined}>
                 <span class="resource-interior">
@@ -468,7 +507,11 @@
           </div>
         </div>
         <div class="top-tools" role="group" aria-label="Notifications, chat, sound and account">
-          <ShellServiceControl kind="notifications" service={services.notifications}/>
+          {#if tutorialComplete&&currentStatus?.notifications}
+            <NotificationCenter characterId={rewindCharacterId} inbox={currentStatus.notifications}/>
+          {:else}
+            <ShellServiceControl kind="notifications" service={services.notifications}/>
+          {/if}
           <ShellServiceControl kind="chat" service={services.chat}/>
           <PallAudioControls/>
           <div class="account-link"><a href="/account" aria-label="Account settings">Account</a></div>
@@ -532,6 +575,12 @@
           {rewinding?'Rewinding…':'← Back to Stage '+rewindTargetStage}
         </button>
       {/if}
+      {#if currentActivity&&activityRunning(currentActivity)&&currentStatus}
+        <div class="hud-activity" aria-label="Current activity">
+          <span><small>CURRENT ACTIVITY</small><strong>{currentActivity.label}{currentActivity.location?' · '+currentActivity.location:''}</strong></span>
+          <ActivityProgress activity={currentActivity} serverNow={currentStatus.serverNow} compact/>
+        </div>
+      {/if}
       <div class="scene-journal-bar" aria-label="Personal journal controls">
         <button type="button" class="scene-journal-button" data-pall-sfx="paper"
           aria-expanded={journalExpanded}
@@ -550,7 +599,7 @@
 
     {#if journalExpanded}
       {#key character.id}
-        <PersonalJournal characterId={character.id}
+        <PersonalJournal characterId={rewindCharacterId}
           currentTitle={activeSceneJournal?.title??'Current task'}
           currentEntries={activeSceneJournal?.entries??[]}
           onClose={togglePersonalJournal}/>
@@ -565,7 +614,7 @@
   {/if}
 </div>
 <InventoryWorkspace characterId={character.id} {onStorageClosed} {onStorageOpened}
-  inHome={sceneStage===8}/>
+  inHome={sceneStage===8} blockTransfer={activityBlocks(currentActivity,'inventory.transfer')} blockEquip={activityBlocks(currentActivity,'inventory.equip')}/>
 
 {#snippet mapIcon()}
   <svg class="gateway-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none"
@@ -871,4 +920,9 @@
   @media(prefers-reduced-motion:reduce){
     .meter-fill{transition:none}
   }
+  .hud-activity{display:flex;gap:10px;align-items:center;min-width:0;padding:4px 9px;border:1px solid #82613b;background:#38291c;color:#f1d8b3}
+  .hud-activity span{display:grid;gap:2px;min-width:0}
+  .hud-activity small{font-size:9px;letter-spacing:.08em;color:#c3a57e}
+  .hud-activity strong{font-size:13px;white-space:normal;overflow-wrap:anywhere}
+  @media(max-width:700px){.hud-activity{flex:1 1 100%;justify-content:space-between}}
 </style>
