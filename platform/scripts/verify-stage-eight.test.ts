@@ -6,7 +6,7 @@ import {resolve} from 'node:path';
 import {initial,advance,payStarterRent,HomeInvalidAction,view,HOME_ID,RENT,CLOSING_SPEECH} from '../apps/api/src/shared-home-state.ts';
 import {homeJournalEntries,homeCompletionSummary} from '../apps/web/src/lib/home-journal-copy.ts';
 import {homeTask} from '../apps/api/src/personal-journal-tasks.ts';
-import {activityCanFinish,activityRunning,activityRemainingSeconds,activityProgress,type ActivityRun} from '@the-pall/game-core';
+import {activityCanFinish,activityRunning,activityRemainingSeconds,activityProgress,requiresActivityConfirmation,type ActivityRun} from '@the-pall/game-core';
 const root=resolve(import.meta.dirname,'..');
 const source=(p:string)=>readFileSync(resolve(root,p),'utf8');
 
@@ -370,6 +370,9 @@ test('Universal activity timing uses elapsed time and waits for unresolved requi
 });
 
 test('Long activity confirmation is explicit and countdowns do not poll the Home every second',()=>{
+ assert.equal(requiresActivityConfirmation(14),false);
+ assert.equal(requiresActivityConfirmation(15),true);
+ assert.equal(requiresActivityConfirmation(30),true);
  const home=source('apps/web/src/routes/characters/[id]/home/+page.svelte');
  const modal=source('apps/web/src/lib/ActivityConfirmation.svelte');
  const progress=source('apps/web/src/lib/ActivityProgress.svelte');

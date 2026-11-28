@@ -555,7 +555,7 @@
 
     {#if journalExpanded}
       {#key character.id}
-        <PersonalJournal characterId={character.id}
+        <PersonalJournal characterId={rewindCharacterId}
           currentTitle={activeSceneJournal?.title??'Current task'}
           currentEntries={activeSceneJournal?.entries??[]}
           onClose={togglePersonalJournal}/>

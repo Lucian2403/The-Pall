@@ -146,6 +146,7 @@
                 [401, 403, 404, 409].includes(response.status)
             ) {
                 city = null;
+                activitySync?.update(undefined,null);
                 audio?.set(null);
             }
             if (!response.ok)

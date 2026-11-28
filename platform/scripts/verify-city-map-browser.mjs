@@ -93,6 +93,15 @@ try{
   await cmd('Page.addScriptToEvaluateOnNewDocument',{source:String.raw`(()=>{
     const original=window.fetch.bind(window);
     const json=(v,s=200)=>new Response(JSON.stringify(v),{status:s,headers:{'content-type':'application/json'}});
+    const homeRoot='/api/characters/qa-home';
+    window.homeCounts={get:0,start:0,journal:0,rewind:0};
+    let homeRevision=3,rest=null;
+    const homeCondition=()=>rest?.completedAt?{stamina:100,composure:100,fatigue:0,stress:0}:{stamina:40,composure:50,fatigue:20,stress:10};
+    const homeSnapshot=()=>({stage:8,revision:homeRevision,phase:'COMPLETE',homeId:'starter-rented-room',
+      origin:'Millhand',branch:'restamp',outcome:'player_victory',characterName:'QA Home',coins:10,rent:150,
+      shortfall:140,rentPaid:false,rentPaidAt:null,rentDue:150,noticeTitle:'FINAL NOTICE',noticeText:'Rent due.',
+      closingSpeech:'',completed:true,condition:homeCondition(),activity:rest,serverNow:new Date().toISOString(),
+      restOffer:{key:'home.rest',label:'Resting',durationSeconds:15}});
     const root='/api/characters/qa-city';
     const points=[{id:'starter-rented-room',name:'Home',description:'Room',symbol:'⌂',icon:'',position:{x:.2,y:.6},displayOrder:1,availability:'available',destination:'home'},
      {id:'job-board',name:'Job Board',description:'Find paid work',symbol:'▤',icon:'',position:{x:.7,y:.3},displayOrder:2,availability:'available',destination:'qa-only'},
@@ -101,6 +110,27 @@ try{
     const snapshot=()=>({cityId:'grand-cylinder-city',name:'Grand Cylinder City',config:{width:1400,height:1000,distanceScale:.02,walkingSpeed:1.4,minimumSeconds:2,roundingSeconds:1},pointsOfInterest:points,currentLocationId:'starter-rented-room',revision:journey?1:0,journey,serverNow:new Date().toISOString(),arrived:false});
     window.fetch=(input,options)=>{
       const route=new URL(typeof input==='string'?input:input.url,location.href).pathname;
+      if(route.startsWith(homeRoot)){
+        if(route===homeRoot)return Promise.resolve(json({character:{id:'qa-home',name:'QA Home',origin:'Millhand',sex:'Male',coins:10,avatarId:null,welcomeSeen:true,startingLocation:'Home',health:{current:43,maximum:50},tutorial:{stage:8,status:'COMPLETED'}}}));
+        if(route===homeRoot+'/tutorial/home'){
+          if(options?.method==='POST'){
+            const request=JSON.parse(options.body);
+            if(request.action!=='rest')return Promise.resolve(json({error:'invalid_action'},400));
+            window.homeCounts.start++;homeRevision++;
+            const now=Date.now();
+            rest={id:request.requestId,key:'home.rest',label:'Resting',startedAt:new Date(now).toISOString(),endsAt:new Date(now+15000).toISOString(),completedAt:null};
+          }else{
+            window.homeCounts.get++;
+            if(rest&&!rest.completedAt&&Date.now()>=Date.parse(rest.endsAt)){
+              rest={...rest,completedAt:new Date().toISOString()};homeRevision++;
+            }
+          }
+          return Promise.resolve(json(homeSnapshot()));
+        }
+        if(route===homeRoot+'/journal'){window.homeCounts.journal++;return Promise.resolve(json({characterId:'qa-home',completed:[],nextCursor:null}));}
+        if(route===homeRoot+'/dev/rewind-stage'){window.homeCounts.rewind++;return Promise.resolve(json({enabled:true,canRewind:true,stage:8,targetStage:7}));}
+        return Promise.resolve(json({error:'unavailable'},404));
+      }
       if(!route.startsWith(root))return original(input,options);
       if(route===root)return Promise.resolve(json({character:{id:'qa-city',name:'QA City',origin:'Millhand',sex:'Male',coins:10,avatarId:null,welcomeSeen:true,startingLocation:'Home',health:{current:50,maximum:50},tutorial:{stage:8,status:'COMPLETED'}}}));
       if(route===root+'/free-play')return Promise.resolve(json({unlocked:true,announcementSeen:true}));
@@ -113,6 +143,39 @@ try{
       return Promise.resolve(json({error:'unavailable'},404));
     };
   })();`});
+  // Real Home UI, isolated mock server: only the activity clock runs locally.
+  await cmd('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  await cmd('Page.navigate',{url:origin+'/characters/qa-home/home'});
+  await until(()=>evalJS("!!document.querySelector('.hotspot.bed')"),30000,'Home ready');
+  await evalJS("document.querySelector('.hotspot.book').click()");
+  await until(()=>evalJS("window.homeCounts.journal===1&&window.homeCounts.rewind===1&&!!document.querySelector('#personal-journal')"),5000,'Journal and rewind loaded');
+  await evalJS("window.savedJournal=document.querySelector('#personal-journal');window.savedRoom=document.querySelector('.home-artwork')");
+  const initialCounts=await evalJS("({...window.homeCounts})");
+  await evalJS("document.querySelector('.hotspot.bed').click()");
+  await until(()=>evalJS("!!document.querySelector('dialog[open]')"),5000,'Confirmation');
+  assert.equal(await evalJS("document.activeElement.textContent.trim()"),'Cancel');
+  assert.ok(await evalJS("document.querySelector('dialog[open]').textContent.includes('15 seconds')"));
+  await evalJS("[...document.querySelectorAll('dialog button')].find(b=>b.textContent.trim()==='Cancel').click()");
+  await until(()=>evalJS("!document.querySelector('dialog[open]')"),5000,'Cancel closes modal');
+  assert.equal(await evalJS("window.homeCounts.start"),0,'Cancel never starts an activity');
+  await evalJS("document.querySelector('.hotspot.bed').click()");
+  await until(()=>evalJS("!!document.querySelector('dialog[open]')"),5000,'Second confirmation');
+  await evalJS("[...document.querySelectorAll('dialog button')].find(b=>b.textContent.trim()==='Confirm').click()");
+  await until(()=>evalJS("!!document.querySelector('.activity-progress progress')"),5000,'Activity started');
+  assert.equal(await evalJS("window.homeCounts.start"),1);
+  const before=await evalJS("document.querySelector('.activity-progress progress').value");
+  const runningCounts=await evalJS("({...window.homeCounts})");
+  await delay(3200);
+  assert.ok(await evalJS("document.querySelector('.activity-progress progress').value")>before,'Countdown advances locally');
+  assert.deepEqual(await evalJS("({...window.homeCounts})"),runningCounts,'No polling, journal reload or rewind request during countdown');
+  assert.equal(await evalJS("window.savedJournal===document.querySelector('#personal-journal')&&window.savedRoom===document.querySelector('.home-artwork')"),true,'Room and journal stay mounted');
+  await until(()=>evalJS("document.querySelector('.rest-dialogue h1')?.textContent==='Rest complete'"),22000,'Deadline completion');
+  assert.equal(await evalJS("window.homeCounts.get"),runningCounts.get+1,'One server reconciliation at completion');
+  assert.equal(await evalJS("window.homeCounts.journal"),initialCounts.journal);
+  assert.equal(await evalJS("window.homeCounts.rewind"),initialCounts.rewind);
+  await delay(2000);
+  assert.equal(await evalJS("window.homeCounts.get"),runningCounts.get+1,'No idle polling after completion');
+  console.log('PASS: activity confirmation, cancel without request, local countdown, stable journal and room, one deadline GET');
   for(const width of [1600,1440,1024,390,320]){
     await cmd('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
     await evalJS('window.__pallLeaving=true').catch(()=>{});
