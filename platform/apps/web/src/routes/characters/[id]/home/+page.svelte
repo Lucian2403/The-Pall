@@ -222,7 +222,7 @@
 </script>
 <svelte:head><title>The Pall — Return Home</title></svelte:head>
 {#if status==='ready'&&character?.id===id&&home}
-  <TutorialShell character={character!} sceneStage={8} sceneLocation="Shared rented home" travelLocked={activityBusy} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
+  <TutorialShell character={{...character,stamina:{current:home.condition.stamina,maximum:100}}} sceneStage={8} sceneLocation="Shared rented home" travelLocked={activityBusy} cityMap={home?.completed?{href:'/characters/'+encodeURIComponent(id)+'/overview'}:undefined}
     journalController={{open:journalOpen,toggle:toggleJournal,
       title:'Rented Home',entries:home.completed?[]:currentJournalEntries}}
     onStorageClosed={()=>playChestSound('close')}
@@ -256,7 +256,7 @@
           disabled={pending||restAnimating||activityBusy} onclick={()=>{void restInBed();}}>
           <span class="object-caption">Rest</span>
         </button>
-        {#if home.completed}
+        {#if home?.completed}
           <button type="button" class="hotspot kitchen" aria-label="Kitchen — Tier I"
             title="Kitchen — Tier I" disabled={pending||restAnimating||activityBusy} onclick={interactKitchen}>
             <span class="object-caption">Kitchen · T1</span>

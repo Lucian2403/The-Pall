@@ -11,11 +11,12 @@ import {createHash} from 'node:crypto';
 import pg from 'pg';
 import {getGameplayPool} from './database-pool.js';
 import {auth} from './auth.js';
-import {HOME_ID,RENT,advance,payStarterRent,HomeInvalidAction,initial,view} from './shared-home-state.js';
+import {RENT,advance,payStarterRent,HomeInvalidAction,initial,view} from './shared-home-state.js';
 import type {Action,State,Branch,Outcome} from './shared-home-state.js';
 import type {ClinicState} from './millhand-clinic-state.js';
 import {activityRunning} from '@the-pall/game-core';
 import {settleActivity,startActivity} from './activity-engine.js';
+import {physicallyAtHome} from './character-location.js';
 
 type Session={user:{id:string;emailVerified:boolean}}|null;
 type Resolver=(headers:IncomingHttpHeaders)=>Promise<Session>;
@@ -39,16 +40,6 @@ const ready=(s:ClinicState|undefined)=>!!s&&s.phase==='LEFT'&&s.paid&&
 const base='/api/characters/:id/tutorial/home';
 // Read old schemas without breaking the tutorial; actual payment requires 0026.
 const characterSQL="SELECT id,name,origin,tutorial_stage,tutorial_status,coins,to_jsonb(player_characters)->>'starter_rent_paid_at' AS rent_paid_at FROM player_characters WHERE id=$1 AND account_id=$2";
-/** The old tutorial room still works before the city migration. Once travel
- * exists, completed characters must actually be at Home to use the room. */
-async function physicallyAtHome(db:pg.Pool|pg.PoolClient,id:string){
- const exists=await db.query("SELECT to_regclass('player_character_city_travel') AS name");
- if(!exists.rows[0]?.name)return true;
- const result=await db.query<{current_location_id:string;destination_id:string|null}>(
-  'SELECT current_location_id,destination_id FROM player_character_city_travel WHERE character_id=$1',[id]);
- const row=result.rows[0];
- return !row||(row.current_location_id===HOME_ID&&row.destination_id===null);
-}
 export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg.Pool;resolveSession?:Resolver}={}){
  const pool=getGameplayPool(app,options.pool);
  const resolveSession=options.resolveSession??(async(headers:IncomingHttpHeaders)=>
@@ -83,7 +74,9 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
   }catch(error){
    if(missing(error))return reply.code(503).send({error:'home_schema_missing',setup:'npm run home:migrate'});
    throw error;
-  }finally{if(open)await db.query('ROLLBACK');db.release();}
+  }finally{
+   try{if(open)await db.query('ROLLBACK');}finally{db.release();}
+  }
  });
  app.post<{Params:{id:string}}>(base,async(req,reply)=>{
   reply.header('Cache-Control','no-store');
@@ -212,6 +205,7 @@ export function registerTutorialHomeRoutes(app:FastifyInstance,options:{pool?:pg
       if(!paid.rowCount)throw new HomeInvalidAction('rent_payment_conflict');
       state=payment.state;coins=payment.coins;paidAt=paid.rows[0].paid_at;
      }else if(cmd.action==='rest'&&old.phase==='COMPLETE'){
+      if(c.tutorial_status!=='COMPLETED')throw new HomeInvalidAction('home_completion_mismatch');
       activity=await startActivity(db,c.id,'home.rest',cmd.requestId,activity);
       // Starting reserves this revision but does not restore any resources.
       state={...old,revision:old.revision+1};
